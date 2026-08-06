@@ -1,0 +1,71 @@
+# .gitignore — BY PATH, NOT BY EXTENSION
+#
+# Decided 2026-07-29, restated in the charter at §6.4. The reasoning matters more than the
+# list: a blanket `*.docx` rule would block the synthetic test fixtures this project needs
+# while doing nothing at all about a real client document that had been renamed. So this
+# file ignores PLACES, and the pre-commit scan in `tools/` is the actual control.
+#
+# THIS FILE PREVENTS ACCIDENTS. IT IS NOT A SECURITY CONTROL. It removes nothing already
+# committed and does not stop a deliberate `git add -f`. Making a repository public exposes
+# the whole history, and a leaked client name cannot be rotated. That is why the material
+# below lives OUTSIDE this tree rather than merely being named here.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# The three sibling folders that may never enter the repository (charter §6.5).
+# They are siblings, so Git cannot see them from here. These entries exist for the
+# one case that would defeat that: a copy landing INSIDE the tree, at any depth.
+# ─────────────────────────────────────────────────────────────────────────────
+legal-translation-private/
+legal-translation-logs/
+legal-translation-test-documents/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# THE FROZEN INTERMEDIATES — the most content-rich files this project has produced.
+# A frozen intermediate is a translated notes file from a real corpus run: it holds the
+# document's full source text and its full English text, side by side. The location rule
+# has always covered them in principle; naming them by path is the first time it is
+# applied to them in practice.
+#
+# They live in the logs folder, in a per-document working directory. These patterns catch
+# that shape wherever it lands, plus the frozen-set directory the harness builds.
+# ─────────────────────────────────────────────────────────────────────────────
+tests/frozen/
+**/wd/
+**/wd-*/
+**/lt-logs/
+**/orig_unpacked/
+**/trans_unpacked/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scratch, local overrides and build output
+# ─────────────────────────────────────────────────────────────────────────────
+temp/
+*.local
+
+# Packaged skills are BUILD OUTPUT — `tools/package.py` regenerates them at release time.
+# What you see in `uk/` and `us/` is what ships; the archive is derived from it.
+*.skill
+
+# Renders and conversions produced while checking a document. The rendered visual diff is
+# this project's highest-yield instrument and it runs against real client documents.
+*.pdf
+*.png
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Python
+# ─────────────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# OS and editor
+# ─────────────────────────────────────────────────────────────────────────────
+Thumbs.db
+desktop.ini
+.DS_Store
+.idea/
+.vscode/

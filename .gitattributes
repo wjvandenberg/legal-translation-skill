@@ -1,0 +1,39 @@
+# NEVER TRANSLATE LINE ENDINGS. NOT ON CHECKOUT, NOT ON COMMIT, NOT ON ANY PLATFORM.
+#
+# This is not a style preference. It is what makes the rest of the repository true.
+#
+# Git on Windows ships with `core.autocrlf=true` in its system config, and it was ON when
+# this repository was created -- the first `git add` of the two published trees printed a
+# CRLF warning for every text file in them. Left alone it would have done this:
+#
+#   * the blob stored in Git is LF, matching the published archive;
+#   * every CHECKOUT rewrites it to CRLF;
+#   * so a fresh clone -- CI, another machine, a reviewer's laptop -- gets a working tree
+#     that does NOT byte-match the archive the trees were unpacked from.
+#
+# Three things this project depends on would then be quietly wrong, and none of them would
+# announce it:
+#
+#   1. Branch 0's premise. It commits both published trees UNMODIFIED, and "unmodified" is
+#      verified by SHA-256 against the archive. A CRLF checkout fails that comparison on
+#      every text file while the diff shows nothing at all.
+#   2. The byte-comparison harness. The pipeline's mechanical half is a deterministic
+#      function and the test is to compare bytes. Line endings that vary by platform make
+#      every such comparison meaningless.
+#   3. The parity check. It compares the UK and US trees line by line. Two clones with
+#      different checkout settings would disagree about trees that are in fact identical.
+#
+# A local `core.autocrlf=false` does not travel with a clone. This file does.
+* -text
+
+# Belt and braces for the two variant trees and the fixtures, so the intent survives anyone
+# later relaxing the blanket rule above.
+uk/**   -text
+us/**   -text
+tests/fixtures/**  -text -diff
+
+# Word documents and packaged skills are ZIP containers: binary, never diffed, never merged.
+*.docx  binary
+*.doc   binary
+*.dotx  binary
+*.skill binary

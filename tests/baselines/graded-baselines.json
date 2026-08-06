@@ -1,0 +1,63 @@
+{
+  "_what_this_is": [
+    "The never-regress baseline. Twelve graded runs of the eleven-document test corpus,",
+    "measured in July 2026 under grader v3. Every later run is compared against these and",
+    "no criterion may regress. This file is the machine-readable form of the record; the",
+    "narrative version is in CLAUDE.md.",
+    "",
+    "A DOCUMENT IS NAMED BY ITS INSTRUMENT CLASS AND ITS LANGUAGE AND BY NOTHING ELSE.",
+    "The subject-matter qualifier -- what the agreement is over, what the guarantee is for --",
+    "plus a language plus a date range identifies a real instrument far more sharply than a",
+    "name does, to anyone who knows the market. The technical character of each file IS the",
+    "evidence and is not sensitive: it describes the FILE, not the deal.",
+    "",
+    "The documents themselves live outside this repository, permanently, and their filenames",
+    "alone carry counterparty names."
+  ],
+  "_instruments_held_constant": {
+    "grader": "v3, FROZEN until the verification run. A moving ruler destroys the comparison.",
+    "harness": "v2.2. D02 and D11 ran v1 -- their re-run, gate and iteration counts are NOT comparable.",
+    "thinking_level": "extra on all twelve. `max` has never been used, so every grade here is a LOWER BOUND.",
+    "batch_vs_single": "D01, D10 and D03B have batch-run baselines. Reproduce the configuration or the comparison is not like-for-like."
+  },
+  "_columns": {
+    "grade": "overall, grader v3, 17 criteria",
+    "active_minutes": "wall-clock excluding interruptions",
+    "script_pct": "share of ACTIVE time spent in Python rather than in the model",
+    "commands": "tool calls",
+    "gates": "quality gates fired",
+    "reruns": "iterations forced by a gate or a tool defect",
+    "batches": "paragraphs per translation batch, in order"
+  },
+  "runs": [
+    {"doc": "D03",  "instrument": "Agreement",         "language": "Norwegian", "variant": "UK", "paragraphs": 98,  "grade": 9.3, "active_minutes": 33.1, "script_pct": 1, "commands": 56, "gates": 1, "reruns": 40, "batches": [26, 18, 18], "tests": "the only language with NO sub-lexicon"},
+    {"doc": "D01",  "instrument": "Power of Attorney", "language": "Hungarian", "variant": "UK", "paragraphs": 24,  "grade": 9.2, "active_minutes": 20.6, "script_pct": 0, "commands": 29, "gates": 0, "reruns": 15, "batches": [17], "tests": "the shortest run; batch position 1", "caveat": "simplicity -- several structure criteria score 10 on ABSENCE, not capability"},
+    {"doc": "D09",  "instrument": "Document",          "language": "Hungarian", "variant": "UK", "paragraphs": 96,  "grade": 9.1, "active_minutes": 27.3, "script_pct": 0, "commands": 41, "gates": 1, "reruns": 27, "batches": [29, 33], "tests": "the most tables; four known-answer judgement calls -- the Step C arm document"},
+    {"doc": "D10",  "instrument": "Guarantee",         "language": "Polish",    "variant": "UK", "paragraphs": 45,  "grade": 9.1, "active_minutes": 17.8, "script_pct": 0, "commands": 37, "gates": 0, "reruns": 23, "batches": [20, 18], "tests": "both the positive and the negative highlight control in one file; batch position 2", "caveat": "simplicity -- several structure criteria score 10 on ABSENCE, not capability"},
+    {"doc": "D04",  "instrument": "Contract",          "language": "Spanish",   "variant": "US", "paragraphs": 137, "grade": 9.0, "active_minutes": 33.2, "script_pct": 1, "commands": 75, "gates": 1, "reruns": 60, "batches": [31, 34], "tests": "the heaviest tracked-change load"},
+    {"doc": "D11",  "instrument": "MOU",               "language": "Japanese",  "variant": "UK", "paragraphs": 43,  "grade": 8.8, "active_minutes": 25.6, "script_pct": 0, "commands": 41, "gates": 1, "reruns": 25, "batches": [14, 12], "tests": "the only non-Latin script, plus tracked changes", "harness": "v1 -- rerun/gate/iteration counts NOT comparable"},
+    {"doc": "D06",  "instrument": "Contract",          "language": "Italian",   "variant": "UK", "paragraphs": 613, "grade": 8.8, "active_minutes": 49.6, "script_pct": 1, "commands": 84, "gates": 4, "reruns": 69, "batches": null, "batch_note": "18 batches, each <= 35", "tests": "the only TRUE legacy binary .doc -- the sole exercise of the conversion path; the largest document"},
+    {"doc": "D07",  "instrument": "Novation",          "language": "English",   "variant": "US", "paragraphs": 97,  "grade": 8.6, "active_minutes": 35.0, "script_pct": 0, "commands": 28, "gates": 2, "reruns": 13, "batches": [35, 17], "tests": "source language == target language, which nothing in the pipeline notices"},
+    {"doc": "D03B", "instrument": "Agreement",         "language": "Norwegian", "variant": "UK", "paragraphs": 98,  "grade": 8.6, "active_minutes": 32.0, "script_pct": 0, "commands": 42, "gates": 1, "reruns": 27, "batches": [29, 19, 14], "tests": "THE CONTROLLED ARM -- same document as D03, batch position 3 is the only variable"},
+    {"doc": "D08",  "instrument": "Agreement",         "language": "Finnish",   "variant": "UK", "paragraphs": 57,  "grade": 8.5, "active_minutes": 27.6, "script_pct": 0, "commands": 43, "gates": 2, "reruns": 28, "batches": [21, 16], "tests": "comments plus highlights"},
+    {"doc": "D02",  "instrument": "Agreement",         "language": "Dutch",     "variant": "UK", "paragraphs": 316, "grade": 8.4, "active_minutes": 28.7, "script_pct": 1, "commands": 59, "gates": 5, "reruns": 43, "batches": null, "batch_note": "6 batches, each <= 26", "tests": "the richest: heavy tracked changes, 24 highlights, comments, full auxiliary parts", "harness": "v1 -- rerun/gate/iteration counts NOT comparable"},
+    {"doc": "D05",  "instrument": "Deed",              "language": "Italian",   "variant": "US", "paragraphs": 241, "grade": 8.4, "active_minutes": 38.8, "script_pct": 0, "commands": 41, "gates": 2, "reruns": 29, "batches": [35, 35, 35, 35, 35, 35, 21], "tests": "160 bold runs; the lost-footnote case"}
+  ],
+  "_variant_split": {
+    "US": ["D04", "D05", "D07"],
+    "UK": ["D01", "D02", "D03", "D03B", "D06", "D08", "D09", "D10", "D11"],
+    "principle": "The hard technical paths run on UK, the default, so a failure is unambiguously a pipeline defect rather than a variant defect. US goes to terminologically rich but technically straightforward documents, so variant divergence is what gets tested."
+  },
+  "_conclusions_replicated_across_documents": [
+    "Script time is 0-1%; model time 99-100%. Twelve runs from twelve. No efficiency work should touch the Python.",
+    "Runtime is 24.6 + 0.040 x paragraphs minutes -- about 25 minutes of fixed overhead and 2.4 seconds a paragraph. The skill has one gear, and that is the runtime problem.",
+    "The 35-paragraph batch cap is an ATTENTION cap, not a context cap. Context was never the binding constraint on any run.",
+    "Context is not a constraint: the skill-side peak is 6.4% of the 1M window. The live reasons to care about file size are findability and truncation, not tokens.",
+    "Quality and terminology scored 9 on all twelve; English-variant conformance scored 10 on all twelve. Translation quality is not the problem.",
+    "Batch position degrades the POLICING, not the translation. The controlled pair scored 9/9/9 on the translation criteria in both runs."
+  ],
+  "_two_gaps_the_corpus_cannot_reach": [
+    "No Symbol or Wingdings runs anywhere, so the Greek-glyph defect cannot be reproduced from a real document.",
+    "Content controls, smart tags, images with alt text and charts with titles appear in none of the eleven."
+  ]
+}
