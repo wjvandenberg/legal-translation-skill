@@ -1,0 +1,43 @@
+#!/bin/sh
+# RUN THE CONFIDENTIALITY GATE BEFORE EVERY COMMIT.
+#
+# The charter's §3.2 step 3 asks for "the pre-commit secret and client-name scan" -- this is
+# the wiring that makes it actually pre-commit rather than something to remember.
+#
+# It is deliberately not fast. A commit cannot be un-published, a private repository made
+# public later exposes its whole history, and a leaked client name cannot be rotated. Ten
+# seconds against that is not a trade worth optimising.
+#
+# The gate exits 2 -- CANNOT CERTIFY -- when a pattern list is unreadable, and that blocks
+# too. A control that could not run has not passed.
+#
+# Install:  uv run python tools/install_hooks.py
+# Override, deliberately and rarely:  LT_SKIP_GATE=1 git commit
+
+if [ "$LT_SKIP_GATE" = "1" ]; then
+    echo "pre-commit: LT_SKIP_GATE=1 — the confidentiality gate did NOT run." >&2
+    exit 0
+fi
+
+root=$(git rev-parse --show-toplevel)
+runner="uv run python"
+command -v uv >/dev/null 2>&1 || runner="python"
+
+# shellcheck disable=SC2086
+$runner "$root/tools/precommit_gate.py"
+rc=$?
+
+if [ $rc -ne 0 ]; then
+    echo "" >&2
+    if [ $rc -eq 2 ]; then
+        echo "  COMMIT BLOCKED — a control could not run, so nothing was certified." >&2
+    else
+        echo "  COMMIT BLOCKED — a confidentiality control is failing." >&2
+    fi
+    echo "  Read the output above and fix the input. Do not work around the gate." >&2
+    echo "  If you must:  LT_SKIP_GATE=1 git commit" >&2
+    echo "" >&2
+    exit $rc
+fi
+
+exit 0

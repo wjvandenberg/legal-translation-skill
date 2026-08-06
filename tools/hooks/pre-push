@@ -1,0 +1,49 @@
+#!/bin/sh
+# REFUSE A DIRECT PUSH TO main.
+#
+# Why this exists as a FILE rather than as a setting. Branch protection was decided for this
+# repository "from repository creation" (charter §5.2). GitHub declines it on a private
+# repository on the Free plan -- both classic protection and the ruleset fallback the charter
+# names return 403. So the decided control is unavailable at the server until the repository
+# is either paid for or made public, and the flip needs an explicit decision at the moment it
+# happens.
+#
+# This is the half that can be had now, and it is the half the charter says matters most:
+# "It also stops *Claude* committing to `main` by accident, which is the likelier failure."
+#
+# WHAT IT DOES NOT DO, stated plainly so nobody mistakes it for the real thing: it is local,
+# it does not travel with a clone, it does not apply to anything pushed from another machine
+# or from CI, and anyone can pass --no-verify. It is an accident guard, not a security
+# control. Merges are meant to happen through a reviewed pull request, which is a server-side
+# operation and is unaffected by this.
+#
+# Install:  uv run python tools/install_hooks.py
+# Override, deliberately and rarely:  LT_ALLOW_MAIN_PUSH=1 git push
+
+remote="$1"
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+    case "$remote_ref" in
+        refs/heads/main)
+            if [ "$LT_ALLOW_MAIN_PUSH" = "1" ]; then
+                echo "pre-push: LT_ALLOW_MAIN_PUSH=1 — allowing a direct push to main." >&2
+                continue
+            fi
+            echo "" >&2
+            echo "  BLOCKED: direct push to main on '$remote'." >&2
+            echo "" >&2
+            echo "  Every branch goes through a pull request, gets a presented review, and" >&2
+            echo "  Wouter approves the merge. Autonomy never means self-merging." >&2
+            echo "" >&2
+            echo "    git switch -c feature/<name>" >&2
+            echo "    git push -u origin feature/<name>" >&2
+            echo "    gh pr create" >&2
+            echo "" >&2
+            echo "  If you genuinely mean it:  LT_ALLOW_MAIN_PUSH=1 git push" >&2
+            echo "" >&2
+            exit 1
+            ;;
+    esac
+done
+
+exit 0
