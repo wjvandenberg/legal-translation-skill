@@ -1,0 +1,2966 @@
+{
+ "_what": "Divergences between the two trees that were already present when the parity check was built. The check fails only on divergences NOT in this list, which is what makes 'the drift cannot grow while the repair waits' true rather than aspirational.",
+ "_repair": "Deferred item D1 reconciles these. As it lands, entries come OUT of this file. When the file is empty the check has teeth with no baseline at all.",
+ "_not_an_excuse": "A divergence is baselined only because it EXISTS today, never because it is acceptable. Anything the check cannot positively classify is reported, never folded on a guess.",
+ "count": 493,
+ "divergences": [
+  {
+   "arm": "cross-tree",
+   "kind": "body-differs",
+   "key": "scripts/apply_translations_textmatch.py::textmatch_apply",
+   "detail": "2 differing string literal(s), none carrying a variant token"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "body-differs",
+   "key": "scripts/coalesce_fragmented_tcs.py::main",
+   "detail": "2 differing string literal(s), none carrying a variant token"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "body-differs",
+   "key": "scripts/post_process.py::fix_article_to_clause",
+   "detail": "2 differing string literal(s), none carrying a variant token"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "body-differs",
+   "key": "scripts/post_process.py::post_process",
+   "detail": "identical string literals \u2014 the bodies differ in STRUCTURE or in names, which is what comparing programs rather than text is for"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "body-differs",
+   "key": "scripts/quality_check.py::check",
+   "detail": "identical string literals \u2014 the bodies differ in STRUCTURE or in names, which is what comparing programs rather than text is for"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "body-differs",
+   "key": "scripts/strip_noop_tracked_changes.py::_is_bracket_only",
+   "detail": "identical string literals \u2014 the bodies differ in STRUCTURE or in names, which is what comparing programs rather than text is for"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "body-differs",
+   "key": "scripts/strip_noop_tracked_changes.py::_is_noise_only",
+   "detail": "identical string literals \u2014 the bodies differ in STRUCTURE or in names, which is what comparing programs rather than text is for"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "body-differs",
+   "key": "scripts/strip_noop_tracked_changes.py::_strip_matching_pairs",
+   "detail": "identical string literals \u2014 the bodies differ in STRUCTURE or in names, which is what comparing programs rather than text is for"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "body-differs",
+   "key": "scripts/strip_noop_tracked_changes.py::main",
+   "detail": "2 differing string literal(s), none carrying a variant token"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "body-differs",
+   "key": "scripts/validate_apply.py::main",
+   "detail": "2 differing string literal(s), none carrying a variant token"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-count",
+   "key": "references/ip-it-technology.md",
+   "detail": "uk 233 rows vs us 232"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/consumer-retail.md::catalog (US default) / catalogue (UK)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/consumer-retail.md::catalogue",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/consumer-retail.md::centralised procurement",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/consumer-retail.md::centralized procurement",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::authorisation to carry out transactions",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::authorization to carry out transactions",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::bonus issue / capitalisation issue",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::bonus issue / capitalization issue",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::closing (US default) / completion (UK)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::completion (UK) / closing (US)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::legal representative / authorised signatory",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::legal representative / authorized signatory",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::legalisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::legalization",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::licence-back",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::license-back",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::to authorise / to empower",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::to authorize / to empower",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::vote in favor",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/corporate-ma-jv.md::vote in favour",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/employment.md::COLLECTIVE LABOR MATTERS",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/employment.md::COLLECTIVE LABOUR MATTERS",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::PERMITS AND AUTHORISATIONS",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::PERMITS AND AUTHORIZATIONS",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::construction schedule / program",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::construction schedule / programme",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::indemnification / indemnity",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::indemnity / indemnification",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::integrated environmental authorisation (IEA)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::integrated environmental authorization (IEA)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::landscape authorisation / landscape approval",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::landscape authorization / landscape approval",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::single authorisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/energy-infrastructure.md::single authorization",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/finance-banking.md::UTILISATION / DRAWDOWN",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/finance-banking.md::UTILIZATION / DRAWDOWN",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/finance-banking.md::banking licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/finance-banking.md::banking license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/finance-banking.md::crystallisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/finance-banking.md::crystallization",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/finance-banking.md::drawdown / utilisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/finance-banking.md::drawdown / utilization",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/finance-banking.md::licence / authorisation (sanctions context)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/finance-banking.md::license / authorization (sanctions context)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::Authorised signatory: [name]",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::Authorized signatory: [name]",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::Clause",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::Exhibit / Schedule",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::Schedule",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::Section",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::UK English (default)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::US English (default)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::amendment",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::amendment (UK) / modification (US)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::amendment (also \"modification\")",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::amendment / modification",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::authorised representative",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::authorized representative",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::best efforts",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::best endeavours (traditional UK) / best efforts",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::closing",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::completion",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::defence, licence (noun), practice (noun)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::defense, license (noun), practice (noun)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::duly authorised",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::duly authorized",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::favor, honor, color",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::favour, honour, colour",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::indemnification",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::indemnification / indemnity",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::indemnity",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::indemnity (UK) / indemnification (US)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::organise, recognise",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::organize, recognize",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::program",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::programme (but: program for software)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::undertakings (UK finance) / covenants (M&A/US) /",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::undertakings (UK finance/LMA) / covenants (M&A/U",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::while",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/general-legal.md::whilst (traditional)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::LICENCE GRANT",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::LICENSE GRANT",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::SCOPE OF LICENCE",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::SCOPE OF LICENSE",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::anonymisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::anonymization (US default) / anonymisation (UK /",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::compulsory licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::compulsory license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::copyleft licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::copyleft license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::cross-licence / cross-licensing",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::cross-license / cross-licensing",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::data center (US default) / data centre (UK)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::data centre (UK) / data center (US)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::data localisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::data localization",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::end-user licence agreement (EULA)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::end-user license agreement (EULA)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::enterprise licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::enterprise license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::exclusive licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::exclusive license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::genericisation / loss of distinctiveness",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::genericization / loss of distinctiveness",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::licence agreement (UK) / license agreement (US)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::licence notice",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::licence to use",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::license agreement (US default) / licence agreeme",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::license notice",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::license to use",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::non-exclusive licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::non-exclusive license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::open source licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::open source license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::patent licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::patent license (US default) / patent licence (UK",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::per-user licence / per-seat licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::per-user license / per-seat license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::permissive licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::permissive license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::perpetual licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::perpetual license (US default) / perpetual licen",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::pseudonymisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::pseudonymization (US default) / pseudonymisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::software licence agreement (UK) / software licen",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::software license agreement (US default) / softwa",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::sub-licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::sub-licence (UK) / sublicense (US)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::sublicense (US default) / sub-licence (UK)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::term licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::term license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::trade mark (UK) / trademark (US)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::trade mark licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::trademark (US default) / trade mark (UK)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ip-it-technology.md::trademark license (US default) / trade mark lice",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::criminal offence / crime",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::criminal offense / crime",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::defence / objection",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::defence of settlement",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::defense / objection",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::defense of settlement",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::recognisance / undertaking",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::recognizance / undertaking",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::set-off (as defence)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::set-off (as defense)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::settlement installment",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::settlement instalment",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::summary offence (UK) / misdemeanor (US)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/litigation-settlement.md::summary offence (UK) / misdemeanour (US)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ndas-service-agreements.md::authorised recipients / permitted recipients",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ndas-service-agreements.md::authorized recipients / permitted recipients",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ndas-service-agreements.md::licence-back",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/ndas-service-agreements.md::license-back",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/permitting-environmental.md::authorisation (REACH)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/permitting-environmental.md::authorization (REACH)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/permitting-environmental.md::environmental offence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/permitting-environmental.md::environmental offense",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/permitting-environmental.md::waste permit / waste management licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/permitting-environmental.md::waste permit / waste management license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/permitting-environmental.md::water abstraction licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/permitting-environmental.md::water abstraction license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/public-procurement.md::competitive dialog",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/public-procurement.md::competitive dialogue",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/real-estate.md::building licence / building approval",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/real-estate.md::building license / building approval",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::Harmonised System (HS)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::Harmonized System (HS)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::advance payment / installment",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::advance payment / instalment",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::amortisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::amortization",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::authorised economic operator (AEO)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::authorized economic operator (AEO)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::center of vital interests",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::centre of vital interests",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::safe harbor",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::safe harbour",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::tax-neutral reorganisation / qualifying reorgani",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::tax-neutral reorganization / qualifying reorgani",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::thin capitalisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/taxes.md::thin capitalization",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/transport-and-insurance.md::containerisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/transport-and-insurance.md::containerization (US default) / containerisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/transport-and-insurance.md::laydays / canceling date (lay/can)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/transport-and-insurance.md::laydays / cancelling date (lay/can)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/transport-and-insurance.md::logistics hub / distribution center",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "references/transport-and-insurance.md::logistics hub / distribution centre",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/chinese-taxes.md::\u8d44\u672c\u5f31\u5316 (thin capitalisation)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/chinese-taxes.md::\u8d44\u672c\u5f31\u5316 (thin capitalization)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-consumer-retail.md::European Consumer Center / ECC-Net",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-consumer-retail.md::European Consumer Centre / ECC-Net",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-finance-banking.md::organised trading facility (OTF)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-finance-banking.md::organized trading facility (OTF)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-ip-it-technology.md::defence-and-indemnify",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-ip-it-technology.md::defense-and-indemnify",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-ip-it-technology.md::end user licence agreement (EULA)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-ip-it-technology.md::end user license agreement (EULA)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-ip-it-technology.md::gebruikersrechten / end user licence agreement (",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-ip-it-technology.md::gebruikersrechten / end user license agreement (",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-ip-it-technology.md::sole licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-ip-it-technology.md::sole license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-taxes.md::Functionele analyse",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/dutch-taxes.md::Functionele analyze",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/french-public-procurement.md::dialog comp\u00e9titif",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/french-public-procurement.md::dialogue comp\u00e9titif",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/french-taxes.md::center des int\u00e9r\u00eats \u00e9conomiques",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/french-taxes.md::centre des int\u00e9r\u00eats \u00e9conomiques",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/french-taxes.md::sous-capitalisation (historic)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/french-taxes.md::sous-capitalization (historic)",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/german-corporate-ma-jv.md::Konsularische Legalisation",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/german-corporate-ma-jv.md::Konsularische Legalization",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/italian-ip-it-technology.md::licenza incrociata / cross-licence",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/italian-ip-it-technology.md::licenza incrociata / cross-license",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/polish-taxes.md::safe harbor",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "dictionary-row-missing",
+   "key": "sub-lexicons/polish-taxes.md::safe harbour",
+   "detail": "row present in only one tree"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "rule-table-length",
+   "key": "scripts/post_process.py::UK_SPELLING",
+   "detail": "uk 37 entries vs us 60"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "rule-table-length",
+   "key": "scripts/post_process.py::US_SPELLING",
+   "detail": "uk 34 entries vs us 91"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "rule-table-length",
+   "key": "scripts/quality_check.py::UK_SPELLINGS_INV",
+   "detail": "uk 24 entries vs us 59"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "rule-table-length",
+   "key": "scripts/quality_check.py::US_SPELLINGS",
+   "detail": "uk 24 entries vs us 40"
+  },
+  {
+   "arm": "cross-tree",
+   "kind": "signature",
+   "key": "scripts/post_process.py::fix_article_to_clause",
+   "detail": "uk fix_article_to_clause(root)[defaults=0+0] vs us fix_article_to_clause(root, variant)[defaults=1+0]"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/references/ip-it-technology.md::IMPROVEMENTS",
+   "detail": "renders 'modification' as a whole alternative without 'amendment'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/references/ip-it-technology.md::THIRD-PARTY INFRINGEMENT",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/references/litigation-settlement.md::summary judgment",
+   "detail": "renders 'defence' as a whole alternative without 'defense'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-corporate-ma-jv.md::\u4ea4\u5272\u65e5",
+   "detail": "renders 'completion' as a whole alternative without 'closing'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-corporate-ma-jv.md::\u8d54\u507f",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-corporate-ma-jv.md::\u8d54\u507f / \u8865\u507f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-energy-infrastructure.md::\u65bd\u5de5\u8fdb\u5ea6\u8ba1\u5212",
+   "detail": "renders 'programme' as a whole alternative without 'program'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-general-legal.md::\u6761",
+   "detail": "renders 'section' as a whole alternative without 'clause'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-general-legal.md::\u6761\u6b3e / \u89c4\u5b9a",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-general-legal.md::\u8d54\u507f / \u8865\u507f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-ip-it-technology.md::\u4f7f\u7528\u6743 / \u8bb8\u53ef",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-litigation-settlement.md::\u514d\u8d23\u58f0\u660e",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-litigation-settlement.md::\u8d54\u507f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-litigation-settlement.md::\u8d54\u507f / \u8865\u507f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-ndas-service-agreements.md::\u8d54\u507f / \u8865\u507f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/chinese-transport-and-insurance.md::\u4fdd\u9669\u8d54\u507f / \u7406\u8d54",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-corporate-ma-jv.md::VRIJWARING",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-corporate-ma-jv.md::schadevergoeding op basis van vrijwaring",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-energy-infrastructure.md::planning / uitvoeringsplanning",
+   "detail": "renders 'programme' as a whole alternative without 'program'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-energy-infrastructure.md::vergunning (Energiewet)",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-finance-banking.md::regres",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-finance-banking.md::vergunning",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-general-legal.md::Artikel (intern in contract)",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-general-legal.md::Artikel (wetgeving)",
+   "detail": "renders 'section' as a whole alternative without 'clause'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-general-legal.md::Bijlage",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-general-legal.md::wijziging / aanvulling",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-ip-it-technology.md::gebruiksrecht / licentie",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-ip-it-technology.md::licentie",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-ip-it-technology.md::licentie / licentieovereenkomst",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-litigation-settlement.md::eiswijziging / vermeerdering van eis",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-ndas-service-agreements.md::licentie / gebruiksrecht",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-ndas-service-agreements.md::vrijwaring",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/dutch-transport-and-insurance.md::vergunning",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-corporate-ma-jv.md::completion-oikaisu / closing-oikaisu",
+   "detail": "renders 'completion' as a whole alternative without 'closing'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-corporate-ma-jv.md::t\u00e4yt\u00e4nt\u00f6\u00f6npanop\u00e4iv\u00e4",
+   "detail": "renders 'completion' as a whole alternative without 'closing'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-employment.md::optio-ohjelma",
+   "detail": "renders 'program' as a whole alternative without 'programme'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-energy-infrastructure.md::s\u00e4hk\u00f6n tuotantolupa",
+   "detail": "renders 'license' as a whole alternative without 'licence'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-finance-banking.md::toimilupa",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-general-legal.md::ehto / sopimusehto",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-general-legal.md::pyk\u00e4l\u00e4 / \u00a7",
+   "detail": "renders 'section' as a whole alternative without 'clause'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-general-legal.md::vahingonkorvaus",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-ip-it-technology.md::lisenssin my\u00f6nt\u00e4minen",
+   "detail": "renders 'license' as a whole alternative without 'licence'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-litigation-settlement.md::vastine",
+   "detail": "renders 'defence' as a whole alternative without 'defense'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-ndas-service-agreements.md::vahingonkorvausvelvollisuus / vapauttami",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/finnish-transport-and-insurance.md::vakuutuskorvaus",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-corporate-ma-jv.md::INDEMNISATION",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-corporate-ma-jv.md::R\u00c9ALISATION",
+   "detail": "renders 'completion' as a whole alternative without 'closing'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-finance-banking.md::annexe / suppl\u00e9ment",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-general-legal.md::Annexe",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-general-legal.md::Article (internal)",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-general-legal.md::Article (legislation)",
+   "detail": "renders 'section' as a whole alternative without 'clause'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-general-legal.md::modification / avenant",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-ip-it-technology.md::DROIT D'UTILISATION / LICENCE",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-litigation-settlement.md::moyen de d\u00e9fense",
+   "detail": "renders 'defence' as a whole alternative without 'defense'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-ndas-service-agreements.md::indemnit\u00e9 / clause d'indemnisation",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-public-procurement.md::avenant",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/french-transport-and-insurance.md::indemnit\u00e9 / indemnisation",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-corporate-ma-jv.md::FREISTELLUNG",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-corporate-ma-jv.md::VOLLZUG",
+   "detail": "renders 'completion' as a whole alternative without 'closing'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-general-legal.md::Anlage",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-general-legal.md::Artikel / \u00a7 / Paragraph (legislation)",
+   "detail": "renders 'section' as a whole alternative without 'clause'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-general-legal.md::Ziffer / Klausel (internal)",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-general-legal.md::\u00c4nderung / Nachtrag",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-ip-it-technology.md::NUTZUNGSRECHT / LIZENZ",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-litigation-settlement.md::FREISTELLUNG",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-litigation-settlement.md::Freistellung / Freihaltung",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-litigation-settlement.md::Freistellungserkl\u00e4rung",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-litigation-settlement.md::Klageerwiderung",
+   "detail": "renders 'defence' as a whole alternative without 'defense'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-litigation-settlement.md::Schadloshaltung",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-litigation-settlement.md::Schiedsvereinbarung / Schiedsklausel",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-ndas-service-agreements.md::Freistellung",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-permitting-environmental.md::wasserrechtliche Erlaubnis / Bewilligung",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-taxes.md::Berichtigung",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/german-transport-and-insurance.md::Versicherungsleistung / Entsch\u00e4digung",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-corporate-ma-jv.md::K\u00c1RTALAN\u00cdT\u00c1S",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-corporate-ma-jv.md::closing-kiigaz\u00edt\u00e1s",
+   "detail": "renders 'completion' as a whole alternative without 'closing'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-corporate-ma-jv.md::z\u00e1r\u00e1s napja",
+   "detail": "renders 'completion' as a whole alternative without 'closing'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-energy-infrastructure.md::eloszt\u00f3i enged\u00e9ly",
+   "detail": "renders 'license' as a whole alternative without 'licence'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-energy-infrastructure.md::villamosenergia-kereskedelmi enged\u00e9ly",
+   "detail": "renders 'license' as a whole alternative without 'licence'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-energy-infrastructure.md::villamosenergia-termel\u00e9si enged\u00e9ly",
+   "detail": "renders 'license' as a whole alternative without 'licence'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-energy-infrastructure.md::\u00e1tviteli enged\u00e9ly",
+   "detail": "renders 'license' as a whole alternative without 'licence'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-general-legal.md::k\u00e1rt\u00e9r\u00edt\u00e9s / k\u00e1rtalan\u00edt\u00e1s",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-general-legal.md::rendelkez\u00e9s / kik\u00f6t\u00e9s",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-general-legal.md::szakasz / \u00a7",
+   "detail": "renders 'section' as a whole alternative without 'clause'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-ip-it-technology.md::k\u00e1rtalan\u00edt\u00e1s",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-ip-it-technology.md::szerz\u0151i jogi licencia / felhaszn\u00e1l\u00e1si sz",
+   "detail": "renders 'license' as a whole alternative without 'licence'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-ip-it-technology.md::v\u00e9djegylicencia / v\u00e9djegyhaszn\u00e1lati szer",
+   "detail": "renders 'license' as a whole alternative without 'licence'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-litigation-settlement.md::m\u00f3dos\u00edt\u00e1s",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-ndas-service-agreements.md::mentes\u00edt\u00e9si k\u00f6telezetts\u00e9g",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/hungarian-transport-and-insurance.md::k\u00e1rt\u00e9r\u00edt\u00e9s",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-corporate-ma-jv.md::CLOSING",
+   "detail": "renders 'completion' as a whole alternative without 'closing'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-corporate-ma-jv.md::INDENNIZZO",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-finance-banking.md::allegato",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-finance-banking.md::amendment",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-finance-banking.md::autorizzazione",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-finance-banking.md::licenza",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-general-legal.md::Allegato",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-general-legal.md::Articolo (internal)",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-general-legal.md::apparenza",
+   "detail": "renders 'color' as a whole alternative without 'colour'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-general-legal.md::clausola",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-general-legal.md::modifica",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-general-legal.md::produzione documentale",
+   "detail": "renders 'exhibit' as a whole alternative without 'schedule'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-ip-it-technology.md::indennit\u00e0 per violazione IP",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-litigation-settlement.md::comparsa di risposta",
+   "detail": "renders 'defence' as a whole alternative without 'defense'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-litigation-settlement.md::eccezione",
+   "detail": "renders 'defence' as a whole alternative without 'defense'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-litigation-settlement.md::manleva",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/italian-ndas-service-agreements.md::manleva / indennizzo",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/japanese-corporate-ma-jv.md::\u30af\u30ed\u30fc\u30b8\u30f3\u30b0\u8abf\u6574",
+   "detail": "renders 'completion' as a whole alternative without 'closing'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/japanese-corporate-ma-jv.md::\u88dc\u511f",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/japanese-energy-infrastructure.md::\u96fb\u6c17\u4e8b\u696d\u8a31\u53ef",
+   "detail": "renders 'license' as a whole alternative without 'licence'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/japanese-finance-banking.md::\u4e2d\u671f\u793e\u50b5\u30d7\u30ed\u30b0\u30e9\u30e0 (MTN)",
+   "detail": "renders 'program' as a whole alternative without 'programme'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/japanese-general-legal.md::\u6761\u9805 / \u898f\u5b9a",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/japanese-general-legal.md::\u7bc0",
+   "detail": "renders 'section' as a whole alternative without 'clause'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/japanese-general-legal.md::\u88dc\u511f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/japanese-ip-it-technology.md::\u5b9f\u65bd\u8a31\u8afe",
+   "detail": "renders 'license' as a whole alternative without 'licence'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/japanese-ndas-service-agreements.md::\u88dc\u511f / \u514d\u8cac\u88dc\u511f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/polish-corporate-ma-jv.md::zwolnienie z odpowiedzialno\u015bci / zabezpi",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/polish-energy-infrastructure.md::koncesja",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/polish-general-legal.md::paragraf / \u00a7",
+   "detail": "renders 'section' as a whole alternative without 'clause'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/polish-general-legal.md::postanowienie / klauzula",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/polish-general-legal.md::zmiana / aneks",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/polish-ip-it-technology.md::utw\u00f3r zale\u017cny / modyfikacja",
+   "detail": "renders 'modification' as a whole alternative without 'amendment'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/polish-litigation-settlement.md::odpowied\u017a na pozew",
+   "detail": "renders 'defence' as a whole alternative without 'defense'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/polish-ndas-service-agreements.md::zwolnienie z odpowiedzialno\u015bci (indemnit",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/polish-transport-and-insurance.md::odszkodowanie",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/portuguese-corporate-ma-jv.md::INDEMNIZA\u00c7\u00c3O",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/portuguese-energy-infrastructure.md::cronograma",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/portuguese-energy-infrastructure.md::programa de trabalhos",
+   "detail": "renders 'programme' as a whole alternative without 'program'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/portuguese-general-legal.md::aditamento / adenda",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/portuguese-general-legal.md::artigo",
+   "detail": "renders 'section' as a whole alternative without 'clause'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/portuguese-general-legal.md::cl\u00e1usula / disposi\u00e7\u00e3o",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/portuguese-ip-it-technology.md::DIREITO DE UTILIZA\u00c7\u00c3O / LICEN\u00c7A",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/portuguese-litigation-settlement.md::contesta\u00e7\u00e3o",
+   "detail": "renders 'defence' as a whole alternative without 'defense'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/portuguese-litigation-settlement.md::indemniza\u00e7\u00e3o",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/portuguese-ndas-service-agreements.md::indemniza\u00e7\u00e3o / compensa\u00e7\u00e3o",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/portuguese-transport-and-insurance.md::indemniza\u00e7\u00e3o / presta\u00e7\u00e3o do seguro",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-corporate-ma-jv.md::CIERRE",
+   "detail": "renders 'completion' as a whole alternative without 'closing'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-corporate-ma-jv.md::INDEMNIZACI\u00d3N",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-finance-banking.md::suplemento / anexo",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-general-legal.md::Anexo",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-general-legal.md::Art\u00edculo (legislation)",
+   "detail": "renders 'section' as a whole alternative without 'clause'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-general-legal.md::Cl\u00e1usula / Art\u00edculo (internal)",
+   "detail": "renders 'clause' as a whole alternative without 'section'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-general-legal.md::modificaci\u00f3n / enmienda",
+   "detail": "renders 'amendment' as a whole alternative without 'modification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-ip-it-technology.md::DERECHO DE USO / LICENCIA",
+   "detail": "renders 'licence' as a whole alternative without 'license'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-litigation-settlement.md::contestaci\u00f3n a la demanda",
+   "detail": "renders 'defence' as a whole alternative without 'defense'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-litigation-settlement.md::indemnizaci\u00f3n",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-ndas-service-agreements.md::indemnizaci\u00f3n",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "uk/sub-lexicons/spanish-transport-and-insurance.md::indemnizaci\u00f3n",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/references/ip-it-technology.md::THIRD-PARTY INFRINGEMENT",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/references/litigation-settlement.md::summary judgment",
+   "detail": "renders 'defense' as a whole alternative without 'defence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-corporate-ma-jv.md::\u4ea4\u5272\u65e5",
+   "detail": "renders 'completion' as a whole alternative without 'closing'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-corporate-ma-jv.md::\u8d54\u507f",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-corporate-ma-jv.md::\u8d54\u507f / \u8865\u507f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-energy-infrastructure.md::\u65bd\u5de5\u8fdb\u5ea6\u8ba1\u5212",
+   "detail": "renders 'programme' as a whole alternative without 'program'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-general-legal.md::\u6761",
+   "detail": "renders 'section' as a whole alternative without 'clause'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-general-legal.md::\u8d54\u507f / \u8865\u507f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-ip-it-technology.md::\u4f7f\u7528\u6743 / \u8bb8\u53ef",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-litigation-settlement.md::\u514d\u8d23\u58f0\u660e",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-litigation-settlement.md::\u8d54\u507f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-litigation-settlement.md::\u8d54\u507f / \u8865\u507f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-ndas-service-agreements.md::\u8d54\u507f / \u8865\u507f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/chinese-transport-and-insurance.md::\u4fdd\u9669\u8d54\u507f / \u7406\u8d54",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-corporate-ma-jv.md::VRIJWARING",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-corporate-ma-jv.md::schadevergoeding op basis van vrijwaring",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-energy-infrastructure.md::planning / uitvoeringsplanning",
+   "detail": "renders 'program' as a whole alternative without 'programme'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-energy-infrastructure.md::vergunning (Energiewet)",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-finance-banking.md::regres",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-finance-banking.md::vergunning",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-general-legal.md::Artikel (wetgeving)",
+   "detail": "renders 'section' as a whole alternative without 'clause'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-ip-it-technology.md::gebruiksrecht / licentie",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-ip-it-technology.md::licentie",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-ip-it-technology.md::licentie / licentieovereenkomst",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-ndas-service-agreements.md::licentie / gebruiksrecht",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-ndas-service-agreements.md::vrijwaring",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/dutch-transport-and-insurance.md::vergunning",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-corporate-ma-jv.md::completion-oikaisu / closing-oikaisu",
+   "detail": "renders 'completion' as a whole alternative without 'closing'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-corporate-ma-jv.md::t\u00e4yt\u00e4nt\u00f6\u00f6npanop\u00e4iv\u00e4",
+   "detail": "renders 'completion' as a whole alternative without 'closing'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-employment.md::optio-ohjelma",
+   "detail": "renders 'program' as a whole alternative without 'programme'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-energy-infrastructure.md::s\u00e4hk\u00f6n tuotantolupa",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-finance-banking.md::toimilupa",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-general-legal.md::pyk\u00e4l\u00e4 / \u00a7",
+   "detail": "renders 'section' as a whole alternative without 'clause'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-general-legal.md::vahingonkorvaus",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-ip-it-technology.md::k\u00e4ytt\u00f6oikeus / lisenssi",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-ip-it-technology.md::lisenssin my\u00f6nt\u00e4minen",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-litigation-settlement.md::vastine",
+   "detail": "renders 'defense' as a whole alternative without 'defence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-ndas-service-agreements.md::vahingonkorvausvelvollisuus / vapauttami",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/finnish-transport-and-insurance.md::vakuutuskorvaus",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/french-corporate-ma-jv.md::INDEMNISATION",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/french-corporate-ma-jv.md::R\u00c9ALISATION",
+   "detail": "renders 'completion' as a whole alternative without 'closing'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/french-finance-banking.md::annexe / suppl\u00e9ment",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit / schedule'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/french-general-legal.md::Article (legislation)",
+   "detail": "renders 'section' as a whole alternative without 'clause'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/french-ip-it-technology.md::DROIT D'UTILISATION / LICENCE",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/french-litigation-settlement.md::moyen de d\u00e9fense",
+   "detail": "renders 'defense' as a whole alternative without 'defence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/french-ndas-service-agreements.md::indemnit\u00e9 / clause d'indemnisation",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/french-transport-and-insurance.md::indemnit\u00e9 / indemnisation",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-corporate-ma-jv.md::FREISTELLUNG",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-corporate-ma-jv.md::VOLLZUG",
+   "detail": "renders 'completion' as a whole alternative without 'closing'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-general-legal.md::Artikel / \u00a7 / Paragraph (legislation)",
+   "detail": "renders 'section' as a whole alternative without 'clause'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-ip-it-technology.md::NUTZUNGSRECHT / LIZENZ",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-litigation-settlement.md::FREISTELLUNG",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-litigation-settlement.md::Freistellung / Freihaltung",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-litigation-settlement.md::Freistellungserkl\u00e4rung",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-litigation-settlement.md::Klageerwiderung",
+   "detail": "renders 'defense' as a whole alternative without 'defence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-litigation-settlement.md::Schadloshaltung",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-litigation-settlement.md::Schiedsvereinbarung / Schiedsklausel",
+   "detail": "renders 'clause' as a whole alternative without 'section'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-ndas-service-agreements.md::Freistellung",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-permitting-environmental.md::wasserrechtliche Erlaubnis / Bewilligung",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/german-transport-and-insurance.md::Versicherungsleistung / Entsch\u00e4digung",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-corporate-ma-jv.md::K\u00c1RTALAN\u00cdT\u00c1S",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-corporate-ma-jv.md::closing-kiigaz\u00edt\u00e1s",
+   "detail": "renders 'completion' as a whole alternative without 'closing'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-corporate-ma-jv.md::z\u00e1r\u00e1s napja",
+   "detail": "renders 'completion' as a whole alternative without 'closing'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-energy-infrastructure.md::eloszt\u00f3i enged\u00e9ly",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-energy-infrastructure.md::villamosenergia-kereskedelmi enged\u00e9ly",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-energy-infrastructure.md::villamosenergia-termel\u00e9si enged\u00e9ly",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-energy-infrastructure.md::\u00e1tviteli enged\u00e9ly",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-general-legal.md::k\u00e1rt\u00e9r\u00edt\u00e9s / k\u00e1rtalan\u00edt\u00e1s",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-general-legal.md::szakasz / \u00a7",
+   "detail": "renders 'section' as a whole alternative without 'clause'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-ip-it-technology.md::k\u00e1rtalan\u00edt\u00e1s",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-ip-it-technology.md::szerz\u0151i jogi licencia / felhaszn\u00e1l\u00e1si sz",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-ip-it-technology.md::v\u00e9djegylicencia / v\u00e9djegyhaszn\u00e1lati szer",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-ndas-service-agreements.md::mentes\u00edt\u00e9si k\u00f6telezetts\u00e9g",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/hungarian-transport-and-insurance.md::k\u00e1rt\u00e9r\u00edt\u00e9s",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/italian-corporate-ma-jv.md::INDENNIZZO",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/italian-finance-banking.md::allegato",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit / schedule'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/italian-finance-banking.md::autorizzazione",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/italian-finance-banking.md::licenza",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/italian-general-legal.md::apparenza",
+   "detail": "renders 'color' as a whole alternative without 'colour'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/italian-ip-it-technology.md::indennit\u00e0 per violazione IP",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/italian-litigation-settlement.md::comparsa di risposta",
+   "detail": "renders 'defense' as a whole alternative without 'defence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/italian-litigation-settlement.md::eccezione",
+   "detail": "renders 'defense' as a whole alternative without 'defence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/italian-litigation-settlement.md::manleva",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/italian-ndas-service-agreements.md::manleva / indennizzo",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/japanese-corporate-ma-jv.md::\u30af\u30ed\u30fc\u30b8\u30f3\u30b0\u8abf\u6574",
+   "detail": "renders 'completion' as a whole alternative without 'closing'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/japanese-corporate-ma-jv.md::\u88dc\u511f",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/japanese-energy-infrastructure.md::\u96fb\u6c17\u4e8b\u696d\u8a31\u53ef",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/japanese-finance-banking.md::\u4e2d\u671f\u793e\u50b5\u30d7\u30ed\u30b0\u30e9\u30e0 (MTN)",
+   "detail": "renders 'program' as a whole alternative without 'programme'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/japanese-general-legal.md::\u7bc0",
+   "detail": "renders 'section' as a whole alternative without 'clause'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/japanese-general-legal.md::\u88dc\u511f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/japanese-ndas-service-agreements.md::\u88dc\u511f / \u514d\u8cac\u88dc\u511f",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/polish-corporate-ma-jv.md::zwolnienie z odpowiedzialno\u015bci / zabezpi",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/polish-energy-infrastructure.md::koncesja",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/polish-general-legal.md::paragraf / \u00a7",
+   "detail": "renders 'section' as a whole alternative without 'clause'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/polish-litigation-settlement.md::odpowied\u017a na pozew",
+   "detail": "renders 'defense' as a whole alternative without 'defence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/polish-ndas-service-agreements.md::zwolnienie z odpowiedzialno\u015bci (indemnit",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/polish-transport-and-insurance.md::odszkodowanie",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/portuguese-corporate-ma-jv.md::INDEMNIZA\u00c7\u00c3O",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/portuguese-energy-infrastructure.md::cronograma",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit / schedule'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/portuguese-energy-infrastructure.md::programa de trabalhos",
+   "detail": "renders 'programme' as a whole alternative without 'program'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/portuguese-general-legal.md::artigo",
+   "detail": "renders 'section' as a whole alternative without 'clause'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/portuguese-ip-it-technology.md::DIREITO DE UTILIZA\u00c7\u00c3O / LICEN\u00c7A",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/portuguese-litigation-settlement.md::contesta\u00e7\u00e3o",
+   "detail": "renders 'defense' as a whole alternative without 'defence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/portuguese-litigation-settlement.md::indemniza\u00e7\u00e3o",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/portuguese-ndas-service-agreements.md::indemniza\u00e7\u00e3o / compensa\u00e7\u00e3o",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/portuguese-transport-and-insurance.md::indemniza\u00e7\u00e3o / presta\u00e7\u00e3o do seguro",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/spanish-corporate-ma-jv.md::INDEMNIZACI\u00d3N",
+   "detail": "renders 'indemnification' as a whole alternative without 'indemnity'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/spanish-finance-banking.md::suplemento / anexo",
+   "detail": "renders 'schedule' as a whole alternative without 'exhibit / schedule'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/spanish-general-legal.md::Art\u00edculo (legislation)",
+   "detail": "renders 'section' as a whole alternative without 'clause'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/spanish-ip-it-technology.md::DERECHO DE USO / LICENCIA",
+   "detail": "renders 'license' as a whole alternative without 'licence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/spanish-litigation-settlement.md::contestaci\u00f3n a la demanda",
+   "detail": "renders 'defense' as a whole alternative without 'defence'"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/spanish-litigation-settlement.md::indemnizaci\u00f3n",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/spanish-ndas-service-agreements.md::indemnizaci\u00f3n",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  },
+  {
+   "arm": "within-tree",
+   "kind": "single-variant-row",
+   "key": "us/sub-lexicons/spanish-transport-and-insurance.md::indemnizaci\u00f3n",
+   "detail": "renders 'indemnity' as a whole alternative without 'indemnification'  \u2014 and it is the OTHER variant's form, in this tree"
+  }
+ ]
+}
