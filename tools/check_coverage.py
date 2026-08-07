@@ -94,17 +94,65 @@ def exits(src):
     return literal, computed
 
 
+def raises(src):
+    """Blocking by RAISING, which is the other half and the first version of this tool missed
+    it entirely -- it read `sys.exit` calls and nothing else, so it reported the apply step as
+    having no check when the apply step's gate mechanism IS an uncaught RuntimeError.
+
+    A raise inside a `try` whose `except` would swallow it is not a block, so those are
+    excluded. The approximation is lexical: a raise is counted when no enclosing `try` in the
+    same function has a bare `except`, `except Exception` or a matching named handler. It can
+    over-count a raise caught by a caller inside the same file; it does not under-count."""
+    out = []
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return out
+
+    def handled(stack, exc_name):
+        for node in stack:
+            if not isinstance(node, ast.Try):
+                continue
+            for h in node.handlers:
+                t = h.type
+                if t is None:
+                    return True
+                names = ([e.id for e in t.elts if isinstance(e, ast.Name)]
+                         if isinstance(t, ast.Tuple)
+                         else [t.id] if isinstance(t, ast.Name) else [])
+                if "Exception" in names or "BaseException" in names or exc_name in names:
+                    return True
+        return False
+
+    def walk(node, stack):
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, ast.Raise) and child.exc is not None:
+                f = child.exc.func if isinstance(child.exc, ast.Call) else child.exc
+                name = f.id if isinstance(f, ast.Name) else getattr(f, "attr", "?")
+                # Only the body of a Try is protected; a raise in its handler is not.
+                protecting = [n for n in stack if isinstance(n, ast.Try)]
+                if not handled(protecting, name):
+                    out.append(name)
+            walk(child, stack + [child])
+
+    walk(tree, [])
+    return sorted(set(out))
+
+
 scripts = {}
 for p in sorted((TREE / "scripts").glob("*.py")):
     src = p.read_text(encoding="utf-8", errors="replace")
     literal, computed = exits(src)
     own = sorted(c for c in literal if c not in (0, SENTINEL))
+    rs = raises(src)
     scripts[p.name] = {
         "own": own,
         "computed": sorted(computed),
+        "raises": rs,
         "sentinel": SENTINEL in literal,
-        # Its own verdict, not the shared integrity guard's.
-        "can_block": bool(own) or bool(computed),
+        # Its own verdict, not the shared integrity guard's -- by EITHER mechanism.
+        "can_block": bool(own) or bool(computed) or bool(rs),
+        "by_exit": bool(own) or bool(computed),
         "verdicts": sorted({m.group(0) for m in
                             re.finditer(r"\b(?:PASS|FAIL|WARN|BLOCK(?:ED)?|GATE)\b", src)}),
     }
@@ -175,11 +223,20 @@ for n, m in sorted(blockers.items()):
     for c in m["computed"]:
         print(f"      computed: sys.exit({c})")
 
+by_raise = {n: m for n, m in scripts.items() if m["raises"] and not m["by_exit"]}
+if by_raise:
+    print()
+    print("  AND THESE BLOCK BY RAISING, NOT BY EXITING — the mechanism the first version of")
+    print("  this tool missed completely, which made it report the apply step as unchecked")
+    print("  when apply's gate IS an uncaught RuntimeError:")
+    for n, m in sorted(by_raise.items()):
+        print(f"      {n:<38} raises {', '.join(m['raises'])}")
+
 print()
 print(f"  {len(blockers)} of {len(scripts)} scripts carry a verdict of their own.")
 mute = [n for n, m in scripts.items() if not m["can_block"]]
-print(f"  {len(mute)} can only ever exit 0 or {SENTINEL} — so whatever they print, they cannot")
-print("  stop anything:")
+print(f"  {len(mute)} can neither exit non-zero (other than {SENTINEL}) NOR raise — so whatever")
+print("  they print, they cannot stop anything:")
 for n in sorted(mute):
     v = ", ".join(scripts[n]["verdicts"][:5])
     print(f"      {n:<38} prints {v or 'no verdict vocabulary'}")

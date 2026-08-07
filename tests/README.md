@@ -44,10 +44,19 @@ All twelve July runs carry one.
 
 ## What branch 1 found on the way
 
-**Thirteen of the twenty scripts carry a verdict of their own.** Reproduced independently and it
-matches the build plan's figure exactly. The other seven can only ever exit 0 or 3 — whatever
-they print, they cannot stop anything, and they include the mandatory quality gate and the
-repackager.
+**Seventeen of the twenty scripts carry a verdict of their own.** The three that do not can
+neither exit non-zero (other than the integrity sentinel) nor raise, so whatever they print they
+cannot stop anything: **`quality_check.py` — the mandatory quality gate — plus
+`source_language_markers.py` and `translate_numbering.py`.**
+
+> **This figure was published as "13 of 20, reproducing the build plan's thirteen executable
+> checks exactly" and that was wrong twice over.** The tool read `sys.exit` calls and nothing
+> else, so it missed every script that blocks by RAISING — which is the apply step's entire gate
+> mechanism, an uncaught `RuntimeError`. And because the wrong method happened to land on the
+> plan's number, it was reported as an independent confirmation of it. **It confirmed nothing.**
+> A figure that agrees with the one you expected is the one to re-derive, not the one to relax
+> about. Corrected 2026-08-06 by a verification pass; `tools/check_coverage.py` now counts both
+> mechanisms and names which scripts use which.
 
 **Exit 3 is the shared integrity sentinel, not a check.** All twenty carry it. Counting it makes
 every script look like a validator; the first version of `tools/check_coverage.py` reported
@@ -57,6 +66,12 @@ every script look like a validator; the first version of `tools/check_coverage.p
 warning, cross-references, auxiliary files, and the final validate. A failing input cannot be
 built for any of them because there is nothing to give it to. That is a declared blind spot,
 not an oversight: `tools/check_coverage.py` prints it every run.
+
+> **This number survived the correction above, and it is worth knowing it did so by luck.** The
+> first method (counting the integrity sentinel as a check) said 5. The half-corrected method
+> (sentinel excluded, raises still missed) said **9**. The fully corrected method says 5 again.
+> Two errors cancelled. The list is the same one in the first and third runs — but "the number
+> did not move" is not evidence a method is sound.
 
 **Both predicted failure chains are real in execution** — `tools/confirm_failure_chains.py`.
 Apply restricts blocking to exit code 2 at both call sites, so a validator reporting a truncated
