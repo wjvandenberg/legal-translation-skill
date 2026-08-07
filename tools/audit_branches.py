@@ -20,6 +20,11 @@ EVERY BUG THOSE THREE HAD IS FIXED HERE, and each fix is commented where it live
   5. `(?i)changelog` matched a SCANNER named after changelogs.
   6. A string-prefix path test concluded `legal-translation-logs` sits inside
      `legal-translation`. Paths compare as PARTS, never as text.
+  7. It ran skill scripts without the bytecode guard, leaving `__pycache__` inside the
+     shipped trees -- a RECURRENCE, fixed once in the test runner and back through here.
+  8. It SKIPPED a branch whose ref had been deleted, which is what happens to every branch
+     the moment it is merged. So it stopped checking precisely when the work went live.
+     A merged branch is not a missing one; it falls back to `main`.
 
 AND IT CARRIES NO REAL STRINGS. The earlier versions hardcoded the very names they were
 checking for, which made the auditor itself un-committable -- the exact defect this project
@@ -66,9 +71,16 @@ def git(*a, binary=False):
     return r.stdout if binary else r.stdout.decode("utf-8", "replace")
 
 
-def ref_exists(ref):
-    return subprocess.run(["git", "rev-parse", "--verify", "-q", ref],
-                          capture_output=True, cwd=ROOT).returncode == 0
+def resolve(ref):
+    """The branch ref if it still exists, otherwise `main` — because a MERGED branch is not
+    a missing one. Once a branch is squash-merged and deleted, its content lives on main, and
+    an audit that SKIPS at that point stops checking exactly when the work goes live. The
+    first version skipped branches 1 and 2 the moment they were merged."""
+    for cand in (ref, "main"):
+        if subprocess.run(["git", "rev-parse", "--verify", "-q", cand],
+                          capture_output=True, cwd=ROOT).returncode == 0:
+            return cand
+    return None
 
 
 def claim(cid, text, got, want, conf="MEASURED"):
@@ -124,16 +136,30 @@ def audit_b0():
 
     # Bytes out of the object store, not a recomputed blob id — a different route from the
     # shipped test, so agreement is evidence rather than an echo.
-    bad, n = [], 0
+    #
+    # DELIBERATE CHANGES ARE SUBTRACTED, NOT EXCUSED. The trees stopped being byte-identical
+    # the moment a fix branch legitimately edited them. Deleting this comparison would have
+    # thrown the guarantee away to avoid the paperwork; instead each divergence is named in
+    # tests/baselines/baseline-divergences.json, and anything NOT named is still a failure.
+    _div = ROOT / "tests" / "baselines" / "baseline-divergences.json"
+    declared = (json.loads(_div.read_text(encoding="utf-8"))["divergences"]
+                if _div.exists() else {})
+    bad, n, dec = [], 0, 0
     for variant, arc in ZIPS:
         z = zipfile.ZipFile(ARCH / arc)
         for i in z.infolist():
             if i.is_dir():
                 continue
             n += 1
-            if git("show", f"main:{variant}/{i.filename}", binary=True) != z.read(i):
-                bad.append(f"{variant}/{i.filename}")
-    claim("B0.bytes", "every committed file is byte-identical to its archive",
+            key = f"{variant}/{i.filename}"
+            if git("show", f"main:{key}", binary=True) != z.read(i):
+                if key in declared:
+                    dec += 1
+                else:
+                    bad.append(key)
+    print(f"  ---- {dec} declared divergence(s) from the archive, each named with the commit "
+          f"that made it")
+    claim("B0.bytes", "every file is byte-identical to its archive, or a DECLARED change",
           (n, len(bad)), (396, 0))
 
     touch = [l for l in git("log", "--all", "--format=%H", "--", "uk", "us").splitlines() if l]
@@ -199,11 +225,12 @@ def script_verdicts(folder):
 
 def audit_b1():
     head("BRANCH 1 — the harness")
-    ref = "feature/test-harness"
-    if not ref_exists(ref):
-        SKIP.append("branch 1: ref not found")
-        print("  SKIPPED — branch ref not found.")
+    ref = resolve("feature/test-harness")
+    if ref is None:
+        SKIP.append("branch 1: neither its branch nor main could be resolved")
+        print("  SKIPPED — no ref to read from.")
         return
+    print(f"  reading from: {ref}")
 
     v = script_verdicts(ROOT / "uk" / "scripts")
     claim("B1.scripts", "20 pipeline scripts", len(v), 20)
@@ -301,11 +328,12 @@ def table_entries(path, name):
 
 def audit_b2():
     head("BRANCH 2 — the parity check")
-    ref = "feature/variant-parity-check"
-    if not ref_exists(ref):
-        SKIP.append("branch 2: ref not found")
-        print("  SKIPPED — branch ref not found.")
+    ref = resolve("feature/variant-parity-check")
+    if ref is None:
+        SKIP.append("branch 2: neither its branch nor main could be resolved")
+        print("  SKIPPED — no ref to read from.")
         return
+    print(f"  reading from: {ref}")
 
     for name, want in (("UK_SPELLING", (37, 60)), ("US_SPELLING", (34, 91))):
         claim(f"B2.{name}", f"{name} entry counts",
