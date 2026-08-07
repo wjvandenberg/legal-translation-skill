@@ -535,16 +535,58 @@ rules and the ones that apply to particular kinds of session.*
 
 ### 5.1 The cycle — Explore → Plan → Code → Verify → Test → Commit
 
-**For every branch, always, with no exceptions and no compression.**
+**For every branch, always, with no exceptions and no compression. And for EVERYTHING WRITTEN, not only
+code** — this file, `STEP-B-ANALYSIS.md`, the register, a README. *(Added 2026-08-06. The session that built
+the repository edited this charter twice and treated neither edit as a branch: no verify, no test, no audit.
+Prose that is wrong misdirects the next session exactly as a broken script does, and this file has already
+cost one wrong prediction that way.)*
 
 | | what it requires |
 |---|---|
-| **Explore** | Read the branch's brief in `STEP-B-ANALYSIS.md` §3 **and the register rows behind it** (its §9.3 maps branch → findings). Open the code the branch will touch. **Never work from a précis** — §1.5 |
+| **Explore** | Read the branch's brief in `STEP-B-ANALYSIS.md` §3 **and the register rows behind it** (its §9.3 maps branch → findings). Open the code the branch will touch. **Never work from a précis** — §1.5. **And read what the brief POINTS AT, not only the brief:** §3.3 says option 7's substance lives in §6, and a session that planned branch 2 from §3.3 alone got the arm count, the comparison method and the term-list source all wrong |
 | **Plan** | **With Wouter, before any code.** State what the branch builds, **what it must not do**, and **what counts as done** — all three are in §3 of the build plan; do not invent your own |
 | **Code** | **One feature branch per capability.** Small and orthogonal, because a merge is hard to unpick. Where a change genuinely cannot be decomposed, say so — that is a decision for Wouter, not a risk to bury |
 | **Verify** | **Prove this branch did what it claimed.** The acceptance condition in §3's *Done when* line — the byte comparison, the negative input that makes each new check fail, the named acceptance test. Where a check is meant to catch known defects, **its first run must reproduce them**; if it does not, it is not built correctly |
 | **Test** | **Prove nothing else broke.** The method for that branch kind in `STEP-B-ANALYSIS.md` §4, plus the smoke suite, plus the parity check from branch 2 onward, plus a graded run where §4 says a graded run |
 | **Commit** | §5.2 and §5.3 |
+
+#### The cycle must produce ARTEFACTS, not intentions
+
+**Open a task list before any code, carrying all six phases plus every applicable item from §5.3, and cross
+each off only against the OUTPUT OF A COMMAND YOU HAVE RUN** — not against a recollection, and not against an
+intention to run it later.
+
+**A branch whose VERIFY and TEST entries are not crossed off is not finished, whatever its diff looks like.**
+The pull request may be opened; it may not be presented as complete.
+
+**Where an item does not apply, cross it off as a DECLARED N/A with its reason** — never omit it. *"Branches
+0, 1 and 2 change no skill file, verified as zero files differing under `uk/` or `us/`, so no graded run and
+no rendered visual diff apply"* discharges the requirement. Silence does not.
+
+**And it is enforced mechanically, because prose is what was already read and skipped past.**
+`tools/cycle_evidence.py` records that a verify and a test command ran and exited 0, bound to a hash of the
+staged content — so editing a file after testing it invalidates the evidence automatically. The pre-commit
+hook refuses a commit with no matching evidence. **It proves a command ran against this content and exited
+zero; it cannot prove the command was a good one, and it says so in its own output.**
+
+> **WHY THIS IS A RULE AND NOT AN ENCOURAGEMENT.** *(2026-08-06.)* The repository session ran three branches
+> end to end without pausing once, and the failure was not ignorance — §5.1 had been read. What was missing
+> was any artefact whose absence would show. When VERIFY was finally run properly it found, in work already
+> committed and presented as complete: **a published figure that was wrong and had been reported as an
+> independent confirmation of the plan** · **fixtures that were not byte-reproducible, which broke the one
+> tool that branch existed to enable** · **a parity check that missed the very defect it was built for,
+> because it tested one direction of a symmetric assertion** · and **a `__pycache__` leak into the shipped
+> trees that had been fixed once and returned through the next caller.** None was found by reading. Every one
+> was found by running something.
+
+**Three failure shapes to expect, because each has now happened more than once.** *(1)* **A check that passes
+for the wrong reason** — eleven logged instances, several inside this project's own verification scripts.
+Never a two-word needle; ask the same question a second way; and **when a figure agrees with the one you
+expected, that is the moment to re-derive it, not to relax.** *(2)* **A fix scoped to one caller of a shared
+hazard** — the bytecode leak was fixed in the test runner and came back through the audit tool. Ask what else
+does the same thing. *(3)* **An instrument reporting on an empty set** — `PASS: all 0 paragraphs` is not a
+pass. **Assert the READ COUNT as well as the result;** a control that opened no files must say VOID, never
+CLEAN.
 
 **Two disciplines bind every option, and they are not in tension with taking a leap:** every change points
 at a **specific observed failure or grade**, never at theory; and **the anti-drift safeguards are not on the
@@ -1249,7 +1291,29 @@ Two scripts in `tools/`, run at release time. **The deliverable does not change:
 ## 7. Current status
 
 > **This section is the handoff and nothing else.** Everything that has been done is §2.3; everything still
-> to do is §3. **Replace this section at the end of every session — do not append to it.**
+> to do is §3. **Replace this section at the end of every session — do not append to it. Every handoff opens
+> with the standing block below, verbatim and unedited** — it is the first thing the next session reads, and
+> it exists because a session that had read §5.1 still ran three branches without it.
+
+### HOW THIS SESSION WORKS — read before touching anything
+
+**EVERY BRANCH IS Explore → Plan → Code → VERIFY → TEST → Commit. Including documentation:** this file,
+`STEP-B-ANALYSIS.md`, the register, a README. Prose that is wrong misdirects the next session exactly as a
+broken script does.
+
+**BEFORE ANY CODE, open a task list** carrying all six phases plus §5.3's applicable items, and cross each
+off **only against the output of a command you have run.** An item that does not apply is crossed off as a
+**declared N/A with its reason**, never omitted.
+
+**PLAN MEANS WITH WOUTER, BEFORE CODE.** Autonomy covers running translations and grading them. It has never
+covered code or documents. Present the plan — what it builds, what it must **not** do, what counts as done —
+and wait.
+
+**A BRANCH WHOSE VERIFY AND TEST ARE NOT CROSSED OFF IS NOT FINISHED**, whatever its diff looks like. Open
+the pull request; do not call it complete.
+
+**RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
+Re-reading has never found one.
 ### HANDOFF — 2026-08-06 (second session of the day)
 
 **THE PROJECT HAS VERSION CONTROL.** `legal-translation-skill` exists on GitHub, is **PRIVATE**, and holds
