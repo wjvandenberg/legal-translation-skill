@@ -347,7 +347,7 @@ settled — if you are about to re-open one of these, read the dated entry first
 
 | step | what | status | blocked on |
 |---|---|---|---|
-| **1** | **Foundation: the repository** — version control, the baseline commit, the test harness, the parity check, then the public flip | **IN PROGRESS.** Branch 0 merged to `main`; branches 1 and 2 outstanding — **branch 1 is built and in PR #2, branch 2 is not started.** The repository exists, is **private**, and holds both trees, `tools/`, `tests/`, `README.md`, `.gitignore` and `.gitattributes` | **branch 2, then the public flip — and the flip needs Wouter's explicit OK at the moment it happens** |
+| **1** | **Foundation: the repository** — version control, the baseline commit, the test harness, the parity check, then the public flip | **BUILT, AWAITING MERGE.** All three branches exist and are verified, tested and audited; branch 0 is on `main` and branches 1 and 2 are in pull requests, **with four more beside them**. Nothing has been self-merged. The repository is **private** and holds both trees, `tools/`, `tests/`, `README.md`, `.gitignore` and `.gitattributes` | **Wouter's review and merges, then the public flip — and the flip needs his explicit OK at the moment it happens** |
 | **2** | **Building** (goals ii and iv) — the rest of `STEP-B-ANALYSIS.md`: branches 3 to 19, plus the three deferred items | **NOT STARTED**, fully planned and fully decided | step 1 |
 | **3** | **Opus 5** (goal iii) — two branches, then **Step C**, the full verification run, then **INPUT POINT 2** | **NOT STARTED**, designed. `OPUS-5-MIGRATION.md` | step 2 |
 | **4** | **Revisit, then publish** — **Step D** consolidates everything learned, *then* repackaging and publication | **NOT STARTED** | step 3 |
@@ -1314,121 +1314,98 @@ the pull request; do not call it complete.
 
 **RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
 Re-reading has never found one.
-### HANDOFF — 2026-08-06 (second session of the day)
+### HANDOFF — 2026-08-06 (third session of the day)
 
-**THE PROJECT HAS VERSION CONTROL.** `legal-translation-skill` exists on GitHub, is **PRIVATE**, and holds
-both published trees. Branch 0 is merged to `main`. **Two pull requests are open and awaiting your review;
-nothing has been self-merged.** Branch 2 is not started.
+**STEP 1 IS BUILT.** Branches 0, 1 and 2 all exist, and each has been verified, tested, smoke-tested and
+audited. **`main` still holds only branch 0. Six pull requests are open and nothing has been self-merged.**
+The repository is **PRIVATE**.
 
-| | branch | state |
-|---|---|---|
-| **0** | baseline | **MERGED to `main`** as the initial commit |
-| — | branch-protection fallback | **PR #1, awaiting you — and it contains a decision that is yours** |
-| **1** | the harness | **PR #2, awaiting you.** Built and passing, 14 of 14 |
-| **2** | the parity check | **NOT STARTED.** Session ended here |
+| PR | branch | what it is | changes a skill file? |
+|---|---|---|---|
+| **1** | branch-protection fallback | local hooks, because GitHub refuses protection on a private free-plan repo. **Contains a decision that is yours** | no |
+| **2** | **branch 1** — the harness | 11 synthetic fixtures · 14 negative inputs · byte comparison · `git bisect` | no |
+| **3** | charter | §3.1 status and the §7 handoff | no |
+| **4** | confidentiality | **all four items in the published trees, closed.** 10 lines | **yes — the first deliberate skill-file change** |
+| **5** | **branch 2** — the parity check | two arms, 493 baselined divergences, 5 negative tests | no |
+| **6** | cycle enforcement | §5.1, the §7 standing block, and `tools/cycle_evidence.py` | no |
 
-**1. The pre-`git init` sequence ran in the order §3.2 prescribes, and every step of it mattered.** The gate
-returned CLEAR before anything was created. `.gitignore` is by path and names the frozen intermediates by
-shape for the first time. `tools/` now holds twelve scripts.
+**MERGE ORDER MATTERS, and two of the dependencies are real rather than tidiness.** Suggested: **#1 → #3 →
+#6 → #2 → #5 → #4.** PR #6 edits files introduced by #1 and #3. **PR #5 was based on `main` rather than on
+branch 1**, which was a sequencing error on my part — §2 of the build plan says branch 2 is *"covered by
+branch 1"*, so #2 should land first. All six merge cleanly together; that was tested, not assumed.
 
-**2. `.gitattributes` is the finding of branch 0 and it is not housekeeping.** Git on Windows ships with
-`core.autocrlf=true` and it was **on** — the first `git add` of the two trees warned on every text file. The
-blob would have been LF and every checkout CRLF, so a fresh clone would not byte-match the published archive
-**while showing an empty diff**. That silently falsifies branch 0's premise, the byte comparison the whole
-test method rests on, and the parity check. A local config setting does not travel with a clone; the file
-does. **396 of 396 files are now proved byte-identical to the archives** by recomputing each Git blob id from
-the archive bytes — `tests/test_baseline_unmodified.py`.
+### THE EXIT GATE — the public flip, and it is the next real decision
 
-**3. The trees were scanned and the result was read.** 46 files per tree carry a hit, identically in both.
-Almost all are false positives — ordinary foreign legal vocabulary in the sub-dictionaries, and one pattern
-derived from a filename whose first word is itself a common legal term, which alone accounts for 26.
-**Three findings are real, all already public, so this is cleanup rather than containment:** *(a)* a worked
-example in a shipped script built from two real personal names, where renaming was never applied at all;
-*(b)* a shipped comment and the always-loaded instruction file naming outside law firms and their internal
-Word template style names; and *(c)* **not predicted — the published frontmatter carries a personal email
-address on a domain that is not your current one.** Not a client leak, but personal data in a public package,
-and **that one is a decision for you.** All three go to the claims pass. Branch 0 modified no skill file.
+**Wouter has decided the direction: flip the repository public, after checking again that everything is
+safe.** The check has been run twice, the second time over **every branch merged together**:
 
-**4. THE ONE THING BLOCKED ON YOU, AND IT COSTS MONEY OR A DECISION.** Branch protection was decided "from
-repository creation". **GitHub refuses it — classic protection and the ruleset fallback the charter names
-both return 403, "Upgrade to GitHub Pro or make this repository public".** Both routes are exhausted, so
-three options remain and none is mine: **(i)** GitHub Pro, about $4/month; **(ii)** flip the repo public now,
-which makes protection free but moves the exit gate; **(iii)** accept local-only guards. PR #1 implements
-(iii) — a `pre-push` hook refusing direct pushes to `main` and a `pre-commit` hook running the gate — which
-covers the reason §5.2 gives for wanting protection at all. **It is an accident guard, not a security
-control, and it says so in the hook.**
+| what was checked | result |
+|---|---|
+| **security** — keys, tokens, credentials, private keys | **0.** Never checked before this session |
+| **new exposure** — anything outside `uk/` and `us/` | **0 matches.** The six analysis documents, `tools/`, `tests/`, `README.md`: clean on every probe |
+| inside `uk/` and `us/` | 721 matches, and they have been **downloadable for months**. Overwhelmingly legitimate dictionary content — a tax dictionary contains "VAT", a finance dictionary contains money amounts |
+| the author email | **one distinct address across all history**, deliberately kept, with the LinkedIn added beside it |
 
-**5. Branch 1 measured three things worth carrying forward, AND ONE OF THEM WAS PUBLISHED WRONG BEFORE A
-VERIFICATION PASS CAUGHT IT.** **Seventeen of twenty scripts carry a verdict of their own** — this was first
-published as *thirteen, reproducing the build plan's figure exactly*, and both halves were wrong: the tool
-read `sys.exit` calls and was blind to every script that blocks by RAISING, which is the apply step's whole
-gate mechanism. **The wrong method landed on the number I expected and I reported the agreement as an
-independent confirmation. It confirmed nothing** — a figure that agrees with the one you expected is the one
-to re-derive. **Exit 3 is the shared integrity sentinel, not a check:** all twenty carry it, and counting it
-made the first coverage run report 20 of 20 and say nothing. **Five of seventeen pipeline steps have no check
-that can block** — setup, the host-mode warning, cross-references, auxiliary files, final validate — and that
-number survived the correction **by luck**, two errors cancelling (5 → 9 → 5). **The sharper finding is that
-three scripts can neither exit non-zero nor raise, so whatever they print they cannot stop anything:
-`quality_check.py` — the MANDATORY quality gate — plus `source_language_markers.py` and
-`translate_numbering.py`.**
+**So the flip exposes essentially nothing new.** **But it still needs Wouter's explicit OK at the moment it
+happens** — §3.2, and that has not been given.
 
-**6. Both predicted failure chains are real in execution, and the control found a refinement the plan does
-not carry.** Apply restricts blocking to exit code 2 at both call sites, so a validator reporting a truncated
-install is ignored; the mandatory quality gate invokes its integrity guard at line 918, below its `__main__`
-at 855. **And a truncated script is always caught, but by two mechanisms and only one explains itself:** cut
-deeply (50%, 75%) the guard exits 3 with a diagnosis; cut shallowly (90%, 99%) the file will not compile, so
-Python raises `SyntaxError` and exits 1 before the guard is reached. Safety is unaffected; what the user sees
-is not. **The shallow cut is the likelier one — it is what an install that almost finished produces.**
+**ONE THING TO DECIDE BEFORE THE FLIP, BECAUSE IT IS IRREVERSIBLE AFTERWARDS.** The commit metadata carries
+**the employer's name**, in the author email on every commit. The charter treats the employer as private.
+There are only twenty-odd commits and none of it is public yet, so **this is the cheapest moment it will ever
+be to change**; afterwards a rewrite needs a force-push, which our own protection blocks, and forks may
+already hold it. Publishing under a work email is entirely normal practice — it is a decision, not a defect.
 
-**7. Four negative-test cases were wrong first time because the schema was guessed**, and each wrong guess
-produced `PASS: all 0 paragraphs` — a pass over an empty set, the classic shape of a check passing for the
-wrong reason. The schemas came from a frozen intermediate in the end. **That is now the written rule in
-`tests/README.md`: take the schema from a frozen intermediate, never from the step documents.**
+### WHAT THIS SESSION ESTABLISHED, BEYOND THE BRANCHES
 
-**8. Two corrections landed in instruments I wrote this session, both found by running rather than reading.**
-A first-draft probe in the tree scanner **hardcoded the firm template style names it was hunting for** —
-which would have put them into a committable file, the exact defect fixed in three scripts earlier the same
-day, and it was redundant because the name list already matches them on one pattern. And the failure-chain
-tool counted a **docstring** as a call site and reported "3 of 3" where the truth is 2 of 2.
+**1. The cycle is now enforced mechanically, not only in prose.** §5.1 gained *"the cycle must produce
+ARTEFACTS, not intentions"* and now covers **everything written, not only code**. §7 opens with a standing
+block. `tools/cycle_evidence.py` records that a verify and a test command ran and exited 0, **bound to a hash
+of the working tree**, so editing a file after testing it invalidates the evidence; the pre-commit hook
+refuses without it, **repo-wide including documentation**. *(The house template in `..\CLAUDE-TEMPLATE.md`
+carries the same three changes, plus a rule that verification, testing and auditing are SCRIPTS — reused from
+earlier projects where possible, committed, and fixed when they turn out to be wrong.)*
 
-### WHAT THE MEASUREMENT SAYS NOW
+**2. Verifying properly found defects in work already presented as complete, every single time.** The
+fixtures were not byte-reproducible, which broke `git bisect` — the one tool branch 1 exists to enable. The
+coverage tool counted exits and missed raises, so *"13 of 20"* was wrong twice over: the real figure is
+**17 of 20**, and the wrong method landing on the number I expected had been reported as an independent
+confirmation of the plan. The parity check's within-tree arm was **one-directional and missed the defect that
+actually shipped** — register row U1, whose row renders the US form inside the UK tree. A `__pycache__` leak
+into the shipped trees was fixed once and **came straight back through the next caller**.
 
-**Both trees: 198 files, 3,651,835 bytes UK and 3,667,750 US** — reproducing §6.2 exactly. **`tools/`: twelve
-scripts, all clean on every probe. `tests/`: 11 synthetic fixtures, 14 negative cases, 14 of 14 behaving
-correctly.** All twelve frozen intermediates catalogued by SHA-256, outside the repository. The gate is CLEAR
-and **proved able to fail on five distinct controls** — `tests/test_precommit_gate.py`.
+**3. Every audit written this session found bugs in itself.** A count off by one because it counted
+separators rather than entries; a scan matching a *scanner named after* the thing it hunted; a string-prefix
+path test putting `legal-translation-logs` inside `legal-translation`; an audit run with the wrong branch
+checked out. `tools/audit_branches.py` is committed with all seven fixed and each commented where it lives —
+**three earlier audits were deleted after use, which made their findings unre-testable.**
 
-**9. Four defects were found in branch 1's own work by verifying it, and all four are fixed.** The fixtures
-were **not byte-reproducible** — a `.docx` is a ZIP and ZIPs record build time, so a suite run dirtied the
-tree, blocked `git switch`, and therefore **broke `git bisect`, the one tool branch 1 exists to enable**. The
-coverage tool counted exits and missed raises. The harness left `__pycache__` **inside the skill trees**,
-gitignored and so invisible in a diff, where the packaging script would have zipped it into the `.skill`.
-And `verify_diligence.py` crashes on Windows with a redirected stdout, because cp1252 cannot encode `≤` and
-that character appears **only on the passing path**. **None of these was found by running the suite; all four
-were found by verifying it.**
+**4. Two standing instruments were asserting things that were no longer true.** The claims check still
+demanded `no .git`, `no tools/`, `no uk/` — seven confident failures against a charter that had stopped
+making those claims at all. Baselined against `main` before touching it: 7 failures there, 8 on the edits,
+**so exactly one was newly introduced**, and that one was a false positive from a needle matching any bolded
+digit in any table. And `md_tables` read `| | |` — a header with empty cells — as a delimiter, reporting a
+sound table as four orphan rows. All three fixed and negative-tested.
 
-**10. `git bisect` and the clone are now TESTED rather than asserted.** A real `git bisect run` on a
-throwaway clone with a planted regression found the exact commit; and a **fresh clone byte-matches the
-archives 396 of 396**, which is the only thing that proves `.gitattributes` travels where a local setting
-would not have.
+**5. The both-variants probe moved a status from inferred to measured.** **6 of 9 documents produce different
+bytes under the two variants**, from identical input, through the tidy-up stage alone. *"Converging the trees
+is safe"* was listed among the five most consequential **inferences** in the project. It is now measured, and
+**the divergence is live** — D1 changes what users receive and needs the re-grade it is already scheduled for.
 
 ### THE NEXT ACTION
 
-1. **Review PR #1 and decide the branch-protection question** — it is the only thing blocking the workflow.
-2. **Review PR #2** (the harness).
-3. **Then branch 2, the parity check** — `STEP-B-ANALYSIS.md` §3.3, including the **within-tree arm**, which
-   is what catches the one instance that reached a client: a row identically wrong in *both* trees, which a
-   cross-tree comparison passes as clean. It must **not** converge `SKILL.md`'s variant-selection logic.
-4. **Then the exit gate — the public flip. Never without your explicit OK at the moment of the flip.**
+1. **Review the six pull requests and merge in the order above.** Nothing is blocked on me.
+2. **Decide the commit-metadata question** — employer name in the author email — while it is still cheap.
+3. **Then the public flip**, which needs your explicit OK at the moment it happens.
+4. **Then step 2: branch 3, the scope rule.** `STEP-B-ANALYSIS.md` §3.4 and §3.5. It is a documentation
+   branch and therefore, under the new §5.1, gets the same cycle as any code branch.
 
 ### THREE THINGS LEFT OPEN, NONE BLOCKING
 
 1. **The four open defects in our own harness and review tooling were NOT closed.** They belong to branch 1
    and are declared undone rather than quietly dropped: they live in the private harness, they change no skill
    finding, and **they will corrupt Step C's evidence if they are still open when it runs.**
-2. **`confidentiality_sweep.py` is not committable, and §6.4 lists it as a `tools/` script.** Measured this
-   session by extending the committability probe to the private folder for the first time — it holds a real
+2. **`confidentiality_sweep.py` is not committable, and §6.4 lists it as a `tools/` script.** It holds a real
    corpus descriptor inline. Two other controls were moved to the private folder for the same class of reason
    and the gate now calls all of them by path. **The `tools/` list in §6.4 needs that one correction.**
 3. **Wouter has still never reviewed the adjudications Claude made** during the A3↔A4 comparison — a
-   pre-registered control set aside and recorded as such. Unchanged from the previous handoff.
+   pre-registered control set aside and recorded as such. Unchanged from the previous two handoffs.
