@@ -1330,7 +1330,7 @@ tool counted a **docstring** as a call site and reported "3 of 3" where the trut
 ### WHAT THE MEASUREMENT SAYS NOW
 
 **Both trees: 198 files, 3,651,835 bytes UK and 3,667,750 US** — reproducing §6.2 exactly. **`tools/`: twelve
-scripts, all clean on every probe. `tests/`: 10 synthetic fixtures, 14 negative cases, 14 of 14 behaving
+scripts, all clean on every probe. `tests/`: 11 synthetic fixtures, 14 negative cases, 14 of 14 behaving
 correctly.** All twelve frozen intermediates catalogued by SHA-256, outside the repository. The gate is CLEAR
 and **proved able to fail on five distinct controls** — `tests/test_precommit_gate.py`.
 
