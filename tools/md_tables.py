@@ -7,7 +7,11 @@ import re
 import sys
 
 PIPE = re.compile(r"(?<!\\)\|")
-DELIM = re.compile(r"^\|[\s:|-]+\|$")
+# A delimiter must contain at least one hyphen. Without that requirement the pattern also
+# matched `| | |` -- a legitimate header row whose cells are empty -- so the header was read
+# as a second delimiter and the whole table reported as four orphan rows under a delimiter
+# with no header. Every renderer treats `| | |` as a header; so does this now.
+DELIM = re.compile(r"^\|[\s:|-]*-[\s:|-]*\|$")
 
 
 def check(path: str) -> int:

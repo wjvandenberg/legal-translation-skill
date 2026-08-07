@@ -360,16 +360,30 @@ else:
     warn("5", "the lxml claim could not be located")
 
 head(6, "FILESYSTEM STATE — every claim about what does and does not exist")
+# UPDATED 2026-08-06, AND THE OLD VERSION IS THE POINT. This list used to assert the
+# PRE-REPOSITORY world -- no `.git`, no `tools/`, no `uk/` or `us/`, no `README.md` -- because
+# that is what the charter claimed when the check was written. Branch 0 then created every one
+# of them, deliberately, and the instrument was never updated: it reported seven failures
+# against a charter that had stopped making those claims at all (verified: the string "no
+# `.git`" now appears zero times in CLAUDE.md).
+#
+# Seven confident failures, none of them real, is worse than no check. A reviewer learns to
+# skim it, which is the exact failure mode this project has diagnosed in the skill's own
+# validators. So the assertions now describe the state the charter CURRENTLY claims, and the
+# two rules that genuinely survive the change are kept and marked.
 FS = [
-    ("no `.git`", not (ROOT / ".git").exists()),
-    ("no `.gitignore`", not (ROOT / ".gitignore").exists()),
-    ("no `tools/`", not (ROOT / "tools").exists()),
-    ("no `tests/`", not (ROOT / "tests").exists()),
-    ("no `uk/` or `us/`", not (ROOT / "uk").exists() and not (ROOT / "us").exists()),
-    ("no `docs/`", not (ROOT / "docs").exists()),
-    ("no `README.md`", not (ROOT / "README.md").exists()),
-    ("`.claude\\` is empty", (ROOT / ".claude").exists()
-     and not any((ROOT / ".claude").iterdir())),
+    ("`.git` exists — the repository was created at branch 0", (ROOT / ".git").exists()),
+    ("`.gitignore` exists", (ROOT / ".gitignore").exists()),
+    ("`.gitattributes` exists — it is what stops line-ending translation",
+     (ROOT / ".gitattributes").exists()),
+    ("`tools/` exists", (ROOT / "tools").exists()),
+    ("`tests/` exists", (ROOT / "tests").exists()),
+    ("both variant trees exist", (ROOT / "uk").exists() and (ROOT / "us").exists()),
+    ("`README.md` exists — the public front door, from commit one",
+     (ROOT / "README.md").exists()),
+    # STILL A LIVE RULE, not a leftover: docs/history/ was decided against on 2026-08-06 and
+    # the recovered changelog stays outside the repository.
+    ("no `docs/` — §5.4(c)", not (ROOT / "docs").exists()),
     ("no rev*_smoke.py anywhere", not list(ROOT.rglob("rev*_smoke.py"))),
 ]
 for label, truth in FS:
@@ -383,17 +397,29 @@ if present("the project folder contains `CLAUDE.md`, `FINDINGS-REGISTER.md`, "
     fail("6", f"a second, differently-worded folder-contents claim is also stale: {mds}")
 
 # No client artefact may sit anywhere the first commit could reach. temp/ is gitignored
-# scratch and is reported separately rather than silently excused -- the .gitignore does
-# not exist yet, so today "gitignored" is a plan, not a fact.
+# scratch and is reported separately rather than silently excused.
+#
+# UPDATED 2026-08-06: `tests/fixtures/` is now a SANCTIONED home for document-shaped files.
+# §5.8 makes synthetic fixtures committable by design -- they are what runs on every change
+# and what `git bisect` uses -- and the pre-commit gate already encodes the same rule from
+# the other side, blocking any Word document OUTSIDE that folder. This check predated the
+# folder existing and fired on all eleven the moment branch 1 was merged.
+#
+# Allowing the folder is not a weakening, because it is not taken on trust: every fixture is
+# scanned against the full name and descriptor lists by the pre-commit gate and again by
+# tools/audit_branches.py, and must hit zero. The claim being made here is about PLACE; the
+# claim about CONTENT is made, and enforced, elsewhere.
+ALLOWED_DOC_DIRS = ("temp/", "tests/fixtures/")
 junk = sorted(p.relative_to(ROOT).as_posix() for ext in
               ("docx", "doc", "pdf", "png", "xml", "jsonl")
               for p in ROOT.rglob(f"*.{ext}"))
-outside_temp = [j for j in junk if not j.startswith("temp/")]
-if outside_temp:
-    fail("6", f"document-shaped file(s) in the repo tree outside temp/: {outside_temp}")
+stray = [j for j in junk if not j.startswith(ALLOWED_DOC_DIRS)]
+if stray:
+    fail("6", f"document-shaped file(s) outside {' and '.join(ALLOWED_DOC_DIRS)}: {stray}")
 else:
-    ok(f"no document-shaped file anywhere outside temp/ "
-       f"({len(junk)} inside it, all synthetic test fixtures for our own tooling)")
+    n_fx = sum(1 for j in junk if j.startswith("tests/fixtures/"))
+    ok(f"no document-shaped file outside the two sanctioned places "
+       f"({len(junk) - n_fx} in temp/ scratch, {n_fx} synthetic fixtures in tests/fixtures/)")
 
 # every temp/ script and private tool CLAUDE.md names by filename must exist
 # A named .py is legitimate if it is ours (temp/ or the private tools/) OR one of the
@@ -602,9 +628,19 @@ if [a for a, _ in charter] != list("1234567"):
     fail("14", f"the file does not run 1-7: {[a for a, _ in charter]}")
 else:
     ok("the file runs 1-7, as §1.6 says it does")
-# §1.6's contents table must list every section that exists, and no others
-toc = set(re.findall(r"^\| \*\*(\d)\*\* \| ", CMD, re.M))
-if toc != set("1234567"):
+# §1.6's contents table must list every section that exists, and no others.
+#
+# SCOPED TO §1.6, and it was not before. The needle `^| **N** | ` matches ANY table row
+# beginning with a bolded single digit, anywhere in the file — so §3.1's four-step table and
+# §7's branch-state table were both being read as if they were the contents. It went unnoticed
+# only because those tables happened to use 1-7 too; the moment a handoff table gained a row
+# for BRANCH 0, the check reported that §1.6 lists a section 0. §1.6 was correct throughout.
+# A needle that matches the right thing by coincidence is not a needle.
+_toc_block = re.search(r"^### 1\.6 [^\n]*\n(.*?)(?=^## |\Z)", CMD, re.S | re.M)
+toc = set(re.findall(r"^\| \*\*(\d)\*\* \| ", _toc_block.group(1), re.M)) if _toc_block else set()
+if not _toc_block:
+    fail("14", "§1.6 could not be located, so its contents table was never checked")
+elif toc != set("1234567"):
     fail("14", f"§1.6's contents table lists {sorted(toc)}, not 1-7")
 else:
     ok("§1.6's contents table matches the sections that exist")

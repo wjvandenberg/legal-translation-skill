@@ -23,6 +23,25 @@ root=$(git rev-parse --show-toplevel)
 runner="uv run python"
 command -v uv >/dev/null 2>&1 || runner="python"
 
+# THE CYCLE GATE, first and REPO-WIDE — §5.1. It runs on every commit including
+# documentation-only ones, deliberately: the charter edits are precisely the ones that got
+# committed without a verify or a test, so scoping this to code would reintroduce the hole
+# the rule exists to close.
+#
+# Override, deliberately and rarely:  LT_SKIP_CYCLE=1 git commit
+if [ "$LT_SKIP_CYCLE" != "1" ] && [ -f "$root/tools/cycle_evidence.py" ]; then
+    # shellcheck disable=SC2086
+    $runner "$root/tools/cycle_evidence.py" check
+    if [ $? -ne 0 ]; then
+        echo "" >&2
+        echo "  COMMIT BLOCKED — no VERIFY/TEST evidence matching what you are committing." >&2
+        echo "  A branch whose verify and test are not crossed off is not finished." >&2
+        echo "  If you must:  LT_SKIP_CYCLE=1 git commit" >&2
+        echo "" >&2
+        exit 1
+    fi
+fi
+
 # shellcheck disable=SC2086
 $runner "$root/tools/precommit_gate.py"
 rc=$?
