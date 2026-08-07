@@ -360,16 +360,30 @@ else:
     warn("5", "the lxml claim could not be located")
 
 head(6, "FILESYSTEM STATE — every claim about what does and does not exist")
+# UPDATED 2026-08-06, AND THE OLD VERSION IS THE POINT. This list used to assert the
+# PRE-REPOSITORY world -- no `.git`, no `tools/`, no `uk/` or `us/`, no `README.md` -- because
+# that is what the charter claimed when the check was written. Branch 0 then created every one
+# of them, deliberately, and the instrument was never updated: it reported seven failures
+# against a charter that had stopped making those claims at all (verified: the string "no
+# `.git`" now appears zero times in CLAUDE.md).
+#
+# Seven confident failures, none of them real, is worse than no check. A reviewer learns to
+# skim it, which is the exact failure mode this project has diagnosed in the skill's own
+# validators. So the assertions now describe the state the charter CURRENTLY claims, and the
+# two rules that genuinely survive the change are kept and marked.
 FS = [
-    ("no `.git`", not (ROOT / ".git").exists()),
-    ("no `.gitignore`", not (ROOT / ".gitignore").exists()),
-    ("no `tools/`", not (ROOT / "tools").exists()),
-    ("no `tests/`", not (ROOT / "tests").exists()),
-    ("no `uk/` or `us/`", not (ROOT / "uk").exists() and not (ROOT / "us").exists()),
-    ("no `docs/`", not (ROOT / "docs").exists()),
-    ("no `README.md`", not (ROOT / "README.md").exists()),
-    ("`.claude\\` is empty", (ROOT / ".claude").exists()
-     and not any((ROOT / ".claude").iterdir())),
+    ("`.git` exists — the repository was created at branch 0", (ROOT / ".git").exists()),
+    ("`.gitignore` exists", (ROOT / ".gitignore").exists()),
+    ("`.gitattributes` exists — it is what stops line-ending translation",
+     (ROOT / ".gitattributes").exists()),
+    ("`tools/` exists", (ROOT / "tools").exists()),
+    ("`tests/` exists", (ROOT / "tests").exists()),
+    ("both variant trees exist", (ROOT / "uk").exists() and (ROOT / "us").exists()),
+    ("`README.md` exists — the public front door, from commit one",
+     (ROOT / "README.md").exists()),
+    # STILL A LIVE RULE, not a leftover: docs/history/ was decided against on 2026-08-06 and
+    # the recovered changelog stays outside the repository.
+    ("no `docs/` — §5.4(c)", not (ROOT / "docs").exists()),
     ("no rev*_smoke.py anywhere", not list(ROOT.rglob("rev*_smoke.py"))),
 ]
 for label, truth in FS:
@@ -602,9 +616,19 @@ if [a for a, _ in charter] != list("1234567"):
     fail("14", f"the file does not run 1-7: {[a for a, _ in charter]}")
 else:
     ok("the file runs 1-7, as §1.6 says it does")
-# §1.6's contents table must list every section that exists, and no others
-toc = set(re.findall(r"^\| \*\*(\d)\*\* \| ", CMD, re.M))
-if toc != set("1234567"):
+# §1.6's contents table must list every section that exists, and no others.
+#
+# SCOPED TO §1.6, and it was not before. The needle `^| **N** | ` matches ANY table row
+# beginning with a bolded single digit, anywhere in the file — so §3.1's four-step table and
+# §7's branch-state table were both being read as if they were the contents. It went unnoticed
+# only because those tables happened to use 1-7 too; the moment a handoff table gained a row
+# for BRANCH 0, the check reported that §1.6 lists a section 0. §1.6 was correct throughout.
+# A needle that matches the right thing by coincidence is not a needle.
+_toc_block = re.search(r"^### 1\.6 [^\n]*\n(.*?)(?=^## |\Z)", CMD, re.S | re.M)
+toc = set(re.findall(r"^\| \*\*(\d)\*\* \| ", _toc_block.group(1), re.M)) if _toc_block else set()
+if not _toc_block:
+    fail("14", "§1.6 could not be located, so its contents table was never checked")
+elif toc != set("1234567"):
     fail("14", f"§1.6's contents table lists {sorted(toc)}, not 1-7")
 else:
     ok("§1.6's contents table matches the sections that exist")
