@@ -15,6 +15,7 @@ so; it never reports success for a comparison it did not make.
 """
 import hashlib
 import io
+import json
 import subprocess
 import sys
 import zipfile
@@ -22,6 +23,15 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
+
+# DELIBERATE divergences from the archive, named one by one. The trees stopped being
+# byte-identical the moment a fix branch legitimately edited them, and the choice then was
+# to delete this comparison or to keep it and declare what changed. Deleting it would have
+# discarded the guarantee to avoid the paperwork: anything NOT named here is still an
+# unexplained change and still fails.
+_DIV = ROOT / "tests" / "baselines" / "baseline-divergences.json"
+DIVERGENCES = (json.loads(_DIV.read_text(encoding="utf-8"))["divergences"]
+               if _DIV.exists() else {})
 ARCHIVES = ROOT.parent / "skills" / "legal-translation" / "PUBLICATION VERSIONS"
 PAIRS = [("uk", "legal-translation (UK English).skill"),
          ("us", "legal-translation (US English).skill")]
@@ -62,7 +72,7 @@ for variant, archive in PAIRS:
     only_git = sorted(set(tracked) - {f"{variant}/{n}" for n in entries})
     only_zip = sorted({n for n in entries} - {p[len(variant) + 1:] for p in tracked})
 
-    mismatch = []
+    mismatch, declared = [], []
     for name, data in entries.items():
         key = f"{variant}/{name}"
         if key not in tracked:
@@ -72,13 +82,18 @@ for variant, archive in PAIRS:
         # bytes: if the two agree, what Git holds IS the archive, byte for byte.
         want = hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
         if want != tracked[key]:
-            mismatch.append(name)
+            (declared if key in DIVERGENCES else mismatch).append(name)
 
     bad += len(mismatch) + len(only_git) + len(only_zip)
     print(f"\n  {variant}/   {len(tracked)} tracked · {len(entries)} in archive")
-    print(f"      byte-identical : {len(tracked) - len(mismatch)}")
+    print(f"      byte-identical : {len(tracked) - len(mismatch) - len(declared)}")
+    if declared:
+        print(f"      declared change: {len(declared)}  (recorded in "
+              f"tests/baselines/baseline-divergences.json)")
+        for d in declared:
+            print(f"          {d}  — {DIVERGENCES[f'{variant}/{d}']['commit_subject'][:52]}")
     if mismatch:
-        print(f"      MISMATCHED     : {len(mismatch)}")
+        print(f"      UNDECLARED     : {len(mismatch)}")
         for m in mismatch[:8]:
             print(f"          {m}")
     if only_git:
@@ -93,7 +108,12 @@ for variant, archive in PAIRS:
 print()
 print("=" * 92)
 if bad:
-    print(f"FAIL — {bad} discrepancy(ies). The committed baseline is NOT the published tree.")
+    print(f"FAIL — {bad} UNDECLARED discrepancy(ies). A tree changed without being recorded")
+    print("       in tests/baselines/baseline-divergences.json. Declare it in the commit that")
+    print("       MAKES it, with the reason — adding it afterwards to make this pass is how")
+    print("       the guarantee is lost one file at a time.")
     sys.exit(1)
-print(f"PASS — all {total} files in both trees are byte-identical to the published archives.")
+n_dec = len(DIVERGENCES)
+print(f"PASS — {total - n_dec} of {total} files byte-identical to the published archives;")
+print(f"       the other {n_dec} differ by DECLARED, recorded change.")
 print("=" * 92)

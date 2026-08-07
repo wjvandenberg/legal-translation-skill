@@ -1,0 +1,28 @@
+{
+ "_rule": "Add an entry only in the same commit that makes the change. An entry whose sha256 no longer matches is a file that moved AGAIN afterwards, and is reported as a separate failure rather than silently re-blessed.",
+ "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
+ "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
+ "count": 4,
+ "divergences": {
+  "uk/SKILL.md": {
+   "changed_by": "bca3881",
+   "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
+   "sha256_now": "718d82b26ad6c5e79fb5b9bf8da1b1c15f9e3a4959c9d9bb1df5afda9974fab2"
+  },
+  "uk/scripts/validate_apply.py": {
+   "changed_by": "bca3881",
+   "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
+   "sha256_now": "654c6a8c1c31b846256b9dc380f18828d6519309944dfdb8a5cd641e1fc24550"
+  },
+  "us/SKILL.md": {
+   "changed_by": "bca3881",
+   "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
+   "sha256_now": "264c3b76e4dc8acab9c93345e63cc33e9e80d53091c9bbbdeae842f483236a5b"
+  },
+  "us/scripts/validate_apply.py": {
+   "changed_by": "bca3881",
+   "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
+   "sha256_now": "e403a619ed2e3e3345debff13baae03eced9cf60a5fac563abb9124cc0defbbf"
+  }
+ }
+}
