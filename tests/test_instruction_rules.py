@@ -23,6 +23,7 @@ were safe are the ones that kept the original bytes themselves.
     uv run python tests/test_instruction_rules.py
 """
 import io
+import os
 import re
 import subprocess
 import sys
@@ -284,11 +285,19 @@ for tree in TREES:
         (wd / "final" / "word").mkdir(parents=True)
         (wd / "final" / "word" / "document.xml").write_text(XML, encoding="utf-8")
         (wd / "paragraphs.json").write_text(json.dumps(PARAS), encoding="utf-8")
+        # PYTHONDONTWRITEBYTECODE: running a skill script from inside the tree makes
+        # CPython drop a __pycache__/ next to it, INSIDE the shipped tree. It is gitignored
+        # so it cannot be committed -- but tools/package.py builds the .skill from the tree,
+        # so the bytecode would ship to users. run_tests.py already sets this; the first
+        # version of this file did not, and leaked into both trees on its first run. The
+        # assertion after the loop is the part that matters: it catches the NEXT caller.
+        env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
         rr = subprocess.run(
             [sys.executable, str(ROOT / tree / "scripts" / "post_process.py"),
              str(wd / "final" / "word" / "document.xml"),
              "--paragraphs", str(wd / "paragraphs.json"), "--variant", tree],
-            capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
+            capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT,
+            env=env)
         out = (rr.stdout or "") + (rr.stderr or "")
         check(f"{tree}: the gate actually fires", rr.returncode != 0, f"exit {rr.returncode}")
         check(f"{tree}: and prints the new remedy the operator will read",
@@ -297,6 +306,27 @@ for tree in TREES:
               "Fix paragraphs.json and re-run from Step 5" not in out)
         check(f"{tree}: and still refuses to be worked around",
               "Do NOT work around this gate" in out)
+
+# --------------------------------------------------------------------------------------
+# 8. NOTHING WAS LEFT BEHIND IN THE SHIPPED TREES.
+#
+# The handoff records this exact defect twice: "a __pycache__ leak into the shipped trees,
+# fixed once and back through the next caller". It came back here too -- section 7 executes
+# a skill script from inside the tree, and the first run of this file dropped bytecode into
+# BOTH trees. Fixing only this caller is what failed last time, so the assertion is on the
+# TREES, not on the caller: any tool that leaks, now or later, fails here.
+#
+# It is gitignored, so it can never be committed. That is not the risk. tools/package.py
+# builds each .skill from the tree it finds on disk, so bytecode left lying around is
+# bytecode shipped to a user.
+# --------------------------------------------------------------------------------------
+print("\n8. THE SHIPPED TREES ARE CLEAN — no bytecode, no scratch, left by anything above")
+for tree in TREES:
+    strays = sorted(p.relative_to(ROOT).as_posix()
+                    for p in (ROOT / tree).rglob("*")
+                    if p.is_file() and ("__pycache__" in p.parts or p.suffix == ".pyc"))
+    check(f"{tree}/ carries no bytecode", not strays,
+          f"{len(strays)} stray file(s): {strays[:3]}" if strays else "")
 
 # --------------------------------------------------------------------------------------
 print()
