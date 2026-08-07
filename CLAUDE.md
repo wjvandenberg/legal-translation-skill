@@ -1294,12 +1294,19 @@ which makes protection free but moves the exit gate; **(iii)** accept local-only
 covers the reason §5.2 gives for wanting protection at all. **It is an accident guard, not a security
 control, and it says so in the hook.**
 
-**5. Branch 1 measured three things worth carrying forward.** **Thirteen of twenty scripts carry a verdict of
-their own** — reproduced independently, matching the build plan exactly. **Exit 3 is the shared integrity
-sentinel, not a check:** all twenty carry it, and counting it made the first coverage run report 20 of 20 and
-say nothing. **Five of seventeen pipeline steps have no check that can block** — setup, the host-mode warning,
-cross-references, auxiliary files, final validate — so no failing input can be built for them, and that is
-printed every run rather than left implicit.
+**5. Branch 1 measured three things worth carrying forward, AND ONE OF THEM WAS PUBLISHED WRONG BEFORE A
+VERIFICATION PASS CAUGHT IT.** **Seventeen of twenty scripts carry a verdict of their own** — this was first
+published as *thirteen, reproducing the build plan's figure exactly*, and both halves were wrong: the tool
+read `sys.exit` calls and was blind to every script that blocks by RAISING, which is the apply step's whole
+gate mechanism. **The wrong method landed on the number I expected and I reported the agreement as an
+independent confirmation. It confirmed nothing** — a figure that agrees with the one you expected is the one
+to re-derive. **Exit 3 is the shared integrity sentinel, not a check:** all twenty carry it, and counting it
+made the first coverage run report 20 of 20 and say nothing. **Five of seventeen pipeline steps have no check
+that can block** — setup, the host-mode warning, cross-references, auxiliary files, final validate — and that
+number survived the correction **by luck**, two errors cancelling (5 → 9 → 5). **The sharper finding is that
+three scripts can neither exit non-zero nor raise, so whatever they print they cannot stop anything:
+`quality_check.py` — the MANDATORY quality gate — plus `source_language_markers.py` and
+`translate_numbering.py`.**
 
 **6. Both predicted failure chains are real in execution, and the control found a refinement the plan does
 not carry.** Apply restricts blocking to exit code 2 at both call sites, so a validator reporting a truncated
@@ -1326,6 +1333,20 @@ tool counted a **docstring** as a call site and reported "3 of 3" where the trut
 scripts, all clean on every probe. `tests/`: 10 synthetic fixtures, 14 negative cases, 14 of 14 behaving
 correctly.** All twelve frozen intermediates catalogued by SHA-256, outside the repository. The gate is CLEAR
 and **proved able to fail on five distinct controls** — `tests/test_precommit_gate.py`.
+
+**9. Four defects were found in branch 1's own work by verifying it, and all four are fixed.** The fixtures
+were **not byte-reproducible** — a `.docx` is a ZIP and ZIPs record build time, so a suite run dirtied the
+tree, blocked `git switch`, and therefore **broke `git bisect`, the one tool branch 1 exists to enable**. The
+coverage tool counted exits and missed raises. The harness left `__pycache__` **inside the skill trees**,
+gitignored and so invisible in a diff, where the packaging script would have zipped it into the `.skill`.
+And `verify_diligence.py` crashes on Windows with a redirected stdout, because cp1252 cannot encode `≤` and
+that character appears **only on the passing path**. **None of these was found by running the suite; all four
+were found by verifying it.**
+
+**10. `git bisect` and the clone are now TESTED rather than asserted.** A real `git bisect run` on a
+throwaway clone with a planted regression found the exact commit; and a **fresh clone byte-matches the
+archives 396 of 396**, which is the only thing that proves `.gitattributes` travels where a local setting
+would not have.
 
 ### THE NEXT ACTION
 
