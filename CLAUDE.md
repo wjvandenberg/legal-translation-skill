@@ -351,7 +351,7 @@ settled — if you are about to re-open one of these, read the dated entry first
 | step | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** — version control, the baseline commit, the test harness, the parity check, then the public flip | **DONE, 2026-08-07.** Branches 0, 1 and 2 built, verified, tested, audited and **merged**; the confidentiality cleanup and the cycle enforcement merged beside them. **The repository is PUBLIC and branch protection is live with `enforce_admins`.** The exit gate is closed | — |
-| **2** | **Building** (goals ii and iv) — the rest of `STEP-B-ANALYSIS.md`: branches 3 to 19, plus the three deferred items | **NOT STARTED**, fully planned and fully decided | step 1 |
+| **2** | **Building** (goals ii and iv) — the rest of `STEP-B-ANALYSIS.md`: branches 3 to 19, plus the three deferred items | **IN PROGRESS since 2026-08-07. Branch 3 merged** — the scope rule, the truncation reconciliation, and what the delivery notes must contain. **Next is branch 4, and it ends in Wouter's review of the specification rather than in a merge; branch 5 cannot start until that review closes.** The remaining seventeen branches plus the three deferred items are fully planned and fully decided | — |
 | **3** | **Opus 5** (goal iii) — two branches, then **Step C**, the full verification run, then **INPUT POINT 2** | **NOT STARTED**, designed. `OPUS-5-MIGRATION.md` | step 2 |
 | **4** | **Revisit, then publish** — **Step D** consolidates everything learned, *then* repackaging and publication | **NOT STARTED** | step 3 |
 
@@ -1323,104 +1323,117 @@ the pull request; do not call it complete.
 
 **RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
 Re-reading has never found one.
-### HANDOFF — 2026-08-07 (second session of the day)
+### HANDOFF — 2026-08-07, session closed. Branch 4 is next, after a gap of days.
 
-**STEP 2 HAS STARTED. Branch 3 is built and in review; a claims-pass fix came out of it and is
-in review behind it.** Nothing is blocked.
+**BRANCH 3 IS MERGED. Step 2 is under way and nothing is blocked.** `main` is at `db8c6cb`,
+working tree clean, no open pull requests, no stray branches.
 
-| PR | what | state |
-|---|---|---|
-| **#10** | **Branch 3 — the scope rule.** K1 K2 K3 F35 X3 | **open, awaiting your merge** |
-| **#11** | Four dangling cross-references, plus the check for the class. Register F40 widened | **open, based on #10**; GitHub retargets it to `main` when #10 merges |
-| #8 · #9 | the probe revert, and the previous session close | **merged** |
+**READ THE LAST EIGHT COMMIT MESSAGES BEFORE ANYTHING ELSE** — §5.2 requires it after a gap
+of more than a day, and this handoff is deliberately shorter than they are.
 
-### WHAT BRANCH 3 CHANGED, IN ONE PLACE
+| merged this session | |
+|---|---|
+| **#10** | **Branch 3 — the scope rule.** K1 K2 K3 F35 X3 |
+| **#13** | Four dangling cross-references, plus the check for the class. Register F40 widened |
+| **#12** | Step 1 retired from §3 into §2.3; §7 replaced |
+| **#14** | The stacked-branch rule, into §5.2 |
+| #8 · #9 | the probe revert; the previous session close |
 
-`SKILL.md` gains **rule 5a** — *a check can be wrong IN SCOPE; fix the check, never bypass it,
-and never alter a source-faithful translation to satisfy it* — beside the gate-semantics rule
-where the operator meets a gate. The **two colliding truncation instructions** now say which
-governs. A new section says **what the delivery notes must contain** and states the
-**completion invariant**. The Step 6 gate stops telling the operator to make the JSON agree
-with the document. **Six skill files, three per tree, all mirrored.**
+### WHAT THE SKILL NOW SAYS THAT IT DID NOT
+
+**`SKILL.md` rule 5a** — *a check can be wrong IN SCOPE; fix the check, never bypass it, and
+never alter a source-faithful translation to satisfy it* — placed beside the gate-semantics
+rule, because a check can block at **15 of 15 steps** and only the always-loaded file is
+readable at all of them. **The two colliding truncation instructions** now say which governs.
+A new section says **what the delivery notes must contain** — six items — and states the
+**completion invariant**. The Step 6 gate stopped telling the operator to make the JSON agree
+with the document. **Six skill files, three per tree, mirrored; four dangling cross-references
+fixed on top.**
+
+### FOUR NEW INSTRUMENTS, AND WHAT EACH SETTLES
+
+`tools/reachability.py` — could the operator have READ the rule when it had to decide?
+· `tools/xref_check.py` — does every quoted cross-reference resolve to a real heading?
+· `tools/string_only_edit.py` — did a script edit change anything but its text?
+· `tools/gate_replay.py` — counts over the A1 logs, and prints none of their content.
+**All four are wired into `tests/test_instruction_rules.py`, which branch 4 should EXTEND
+rather than sit a parallel file beside. 45 checks, 7 of them negatives.**
 
 ### THE FOUR THINGS THIS SESSION LEARNED
 
-**1. A graded run was the WRONG instrument here, not merely the expensive one — and that only
-became clear because Wouter asked for alternatives instead of picking one.** §4 prescribed a
-graded run for instruction branches. Measured: this branch only bites when a check fires with
-the wrong scope, attested on **5 of 11** documents, and the grader scores *output* while what
-changed is the *operator's reasoning at a gate*. **Four instruments replace it** — static
-reachability, the static decision on a rule collision, execution against the real gate, and a
-replay over the A1 logs — each with a negative input. **`STEP-B-ANALYSIS.md` §4 was amended in
-the same branch**, because a plan that keeps prescribing an unused instrument is a plan the
-next session follows wrongly. The behavioural residue stays at Step C, per that document's §4.1.
+**1. A graded run was the WRONG instrument, not merely the expensive one — and that surfaced
+only because Wouter refused a two-option question.** `STEP-B-ANALYSIS.md` §4 prescribed one.
+Measured: an instruction branch of this kind only bites when a check fires with the wrong
+scope, attested on **5 of 11** documents, and the grader scores *output* while what changed is
+the *operator's reasoning at a gate*. **§4's method table was amended in the same branch**, and
+the dated reasoning is in `DECISIONS-LOG.md`. The behavioural residue stays at Step C.
 
 **2. `STEP-B-ANALYSIS.md` §4.1 assigned static reachability to branch 3, and neither its §2
-row nor its §3.4 says so.** The branch was planned without it until that section was read. **That is the second time a section
-pointing at another section has been the difference between a right plan and a wrong one** —
-the first was branch 2, planned from §3.3 without §6. **Read what the brief points at.**
+row nor its §3.4 says so.** The branch was planned without it until that section was read.
+**Second time a section pointing at another section decided whether a plan was right** — the
+first was branch 2, planned from §3.3 without §6. **READ WHAT THE BRIEF POINTS AT.**
 
-**3. Every instrument written this session had a bug in itself, and running them is the only
-thing that found any of it.** Reachability parsed **7 of 8** step documents, silently dropping
-the final one, because the reading-order entry for it reads *"— Pre-repack hooks + Steps
-10+11:"* and the regex demanded `Steps` right after the dash. Its normative needle was
+**3. Every instrument written this session had a bug in itself, and only running them found
+any of it.** Reachability parsed **7 of 8** step documents, silently dropping the last, because
+that reading-order entry reads *"— Pre-repack hooks + Steps 10+11:"*. Its normative needle was
 **case-sensitive** while the reference layer writes *"must"* in lower case. Its convention
-patterns matched **nothing across 177 files**. Its scope-rule needle missed the rule's own
-capitalisation. Each is fixed where it lives, with a count assertion or a self-test.
+patterns matched **nothing across 177 files**. Its scope needle missed the rule's own
+capitalisation. The cross-reference check produced a false positive on a bolded list item.
+Each fixed where it lives, with a count assertion or a self-test.
 
-**4. A declared divergence was behaving as a permanent exemption.**
-`tests/test_baseline_unmodified.py` treated the divergence list as a whitelist **by path**, so
-a file already on it could change again unseen. The list's own `_rule` had said the opposite
-all along — the check was simply never written. Now enforced by sha256, and it immediately
-caught `SKILL.md` moving a second time. **A record that describes a check nobody wrote is
-worse than no record.**
+**4. A declared divergence had been behaving as a permanent exemption.**
+`tests/test_baseline_unmodified.py` whitelisted **by path**, so a file already on the list
+could change again unseen — which the list's own `_rule` had forbidden all along. **A record
+describing a check nobody wrote is worse than no record.** Now enforced by sha256.
 
-### THREE MISTAKES WORTH CARRYING FORWARD
+### THE NEXT ACTION — BRANCH 4, THE EXCEPTION CHANNEL
 
-**Merging a base branch with `--delete-branch` while a PR was stacked on it CLOSED that PR,
-and a closed PR cannot be reopened or retargeted once its base is gone.** The cross-reference
-work was opened against branch 3 rather than `main`; merging branch 3 with the branch deleted
-took its PR with it. Recovered by cherry-picking onto the new `main` and opening a fresh PR —
-the content was never at risk, but the PR, its review and its discussion were.
-**The rule is now in §5.2**, and the short form is: **merge a stack from the bottom up, and
-retarget the upper branch to `main` before deleting anything under it.**
+**Read `STEP-B-ANALYSIS.md` §3.4, then §6's Option 5 IN FULL** — including the **fifth gap
+added 2026-08-05: repair is unbounded.** No file in the package bounds a repair loop, so the
+specification must state **the bound as well as the exit**: after a stated number of failed
+repairs the operator stops, records, and uses the channel. **Without the bound the channel is
+optional; with it, it is the only legitimate way the loop can end.**
 
-**A `__pycache__` leak reached both shipped trees again** — the new test executes a skill
-script from inside the tree and did not set `PYTHONDONTWRITEBYTECODE`. Gitignored, so
-uncommittable; but `tools/package.py` builds each `.skill` **from the tree**, so it would have
-shipped. Fixed in the caller **and** guarded on the trees, because last time a caller-scoped
-fix let it back in through the next caller.
+**The four conditions are settled (decision 3 = 3b) and are not re-openable:** the check has
+actually fired · a repair was attempted and recorded · the acceptance names the specific
+consequence in the delivery notes **in the format branch 3 has now laid down, §7 of `SKILL.md`
+item 4** · and never for a check the operator has not tried to satisfy, and never to alter a
+faithful translation.
 
-**A chip I wrote myself carried a stale line number.** It named `SKILL.md:574`; branch 3 had
-already moved the line to 583. Harmless here because the text was quoted too — **quote the
-text, not just the line.**
+> **BRANCH 4 ENDS IN WOUTER'S REVIEW OF THE SPECIFICATION, NOT IN A MERGE.** He approved the
+> principle, not the text, and asked to see it. **Branch 5 cannot start until that review is
+> closed.** This is the one change in the plan that could weaken the discipline if written
+> badly — it must ADD the scope rule and must not soften a word of the anti-drift text.
 
-### THE NEXT ACTION
-
-**Branch 4 — the exception channel.** `STEP-B-ANALYSIS.md` §3.4, and read §6's Option 5 in
-full, including the **fifth gap added 2026-08-05: repair is unbounded.** No file in the
-package bounds a repair loop, so the specification must state **the bound as well as the
-exit** — after a stated number of failed repairs the operator stops, records, and uses the
-channel. Without the bound the channel is optional; with it, it is the only legitimate way the
-loop can end.
-
-**Branch 4 ENDS IN WOUTER'S REVIEW OF THE SPECIFICATION, NOT IN A MERGE**, and **branch 5
-cannot start until that review is closed.** He approved the principle (3b), not the text. The
-four conditions are non-negotiable: the check has actually fired · a repair was attempted and
-recorded · the acceptance names the consequence in the delivery notes **in the format branch 3
-just laid down** · and never for a check the operator has not tried to satisfy.
+**Its test method is the four instruments above plus his review, not a graded run** — the same
+amendment §4 now records. Extend `tests/test_instruction_rules.py`.
 
 ### FIVE THINGS OPEN, NONE BLOCKING
 
-1. **PR #10 and PR #11** — both green, both awaiting merge. #11 is based on #10.
-2. **The four open defects in our own harness and review tooling.** Unchanged and still
+1. **The four open defects in our own harness and review tooling.** Unchanged and still
    declared: they live in the private harness, change no skill finding, and **will corrupt
    Step C's evidence if still open when it runs.**
-3. **The scan list still needs tightening** before it can be trusted as a gate — §5.4(b).
-4. **Wouter has still never reviewed the adjudications Claude made** during the A3↔A4
+2. **The scan list still needs tightening** before it can be trusted as a gate — §5.4(b).
+3. **Wouter has still never reviewed the adjudications Claude made** during the A3↔A4
    comparison, a pre-registered control set aside and recorded as such. Unchanged from the
-   previous four handoffs.
-5. **`tools/reachability.py` carries one candidate for judgement and two suppressed
-   pointers.** Neither is a defect; both are recorded so a later reader does not re-derive
-   them. It also measured that **a check can block at 15 of 15 steps**, which is why the scope
-   rule had to go in the always-loaded file rather than a step document.
+   previous five handoffs.
+4. **`tools/reachability.py` carries one candidate for judgement and two suppressed
+   pointers.** Neither is a defect; both are recorded so nobody re-derives them.
+5. **The register's own counts in §2.3 are unchanged** — F40 was widened rather than a row
+   added, deliberately, so that every count stayed true. Adding a row later means updating
+   §2.3 in the same commit.
+
+### THREE MISTAKES WORTH CARRYING FORWARD
+
+**Merging a base branch with `--delete-branch` while a PR was stacked on it CLOSED that PR**,
+and a closed PR cannot be reopened or retargeted once its base is gone. Recovered by
+cherry-picking onto the new `main`. **The rule is now §5.2** — merge a stack bottom-up, and
+retarget before deleting anything under it.
+
+**A `__pycache__` leak reached both shipped trees again** — a test executing a skill script
+from inside the tree without `PYTHONDONTWRITEBYTECODE`. Gitignored, so uncommittable, but
+`tools/package.py` builds each `.skill` **from the tree**. Fixed in the caller **and** guarded
+on the trees, because last time a caller-scoped fix let it back in through the next caller.
+
+**A task chip I wrote myself carried a stale line number** — `SKILL.md:574` when the line had
+moved to 583. Harmless only because the text was quoted too. **Quote the text, not the line.**
