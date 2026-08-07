@@ -496,7 +496,7 @@ makes this irrelevant — extra entries are skipped, missing entries leave text 
 language.
 
 ### Style-changing scripts destroy numbering
-Never use scripts that change paragraph styles (e.g., LeganceTitle2 → FWBL2) to "fix"
+Never use scripts that change paragraph styles (e.g., FirmTitle2 → ClauseHeading2) to "fix"
 numbering. Styles interact with numbering definitions in complex ways. The text-match
 approach never touches styles.
 
