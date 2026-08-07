@@ -1035,8 +1035,37 @@ check, built to violate that check's stated pass condition.**
 | branch kind | instrument | why |
 |---|---|---|
 | **Script changes** — branches 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18 | **Byte comparison on frozen intermediates**, plus the synthetic set and the negative inputs. Deterministic, seconds | the mechanical half is measured deterministic |
-| **Instruction and dictionary changes** — branches 3, 4, 13, 17, 19 | **A graded run plus your review.** There is no script instrument for these. **CONFIRMED 2026-08-05: Wouter accepted that his own review at Step C is Option 4's verification instrument** — the only approved option whose quality cannot be proved by comparing bytes | they change what the *model* does, and two runs of one document differ in 40% of paragraphs linguistically. And the grader is *differential*, so it structurally cannot ask whether the English suits the instrument class |
+| **Instruction and dictionary changes** — branches 3, 4, 13, 17, 19 | **AMENDED 2026-08-07 — see the four instruments below the table.** Was: *"a graded run plus your review"*. It is now **four static and executable instruments plus your review**, and the graded run moves to Step C. **CONFIRMED 2026-08-05: Wouter accepted that his own review at Step C is Option 4's verification instrument** — the only approved option whose quality cannot be proved by comparing bytes | they change what the *model* does, and two runs of one document differ in 40% of paragraphs linguistically. And the grader is *differential*, so it structurally cannot ask whether the English suits the instrument class |
 | **Measurement-only** — branches 0, 1, 2, 15 | **Self-proving**: branch 1 is the instrument; branch 2 is a script whose output is the assertion; branch 15 is additive and must byte-compare **identical** output | nothing observable changes |
+
+**HOW AN INSTRUCTION BRANCH IS ACTUALLY TESTED — amended 2026-08-07, on branch 3, with
+Wouter's decision recorded.** *(Wouter, asked whether a graded run was the only option:
+**"Can you not test this in any other way? Please let's explore this first."** It was, and
+there are four.)*
+
+**Why the graded run was the wrong instrument here, and this is measured rather than
+argued.** An instruction branch of this kind only bites **when a check fires with the wrong
+scope**. Cluster G is that set, and it is attested on **5 of the 11 corpus documents**, so a
+single graded run reaches the situation slightly under half the time even before asking
+whether it detects anything. And when it does reach it, the grader scores the *output* on 17
+criteria, while what changed is **the operator's reasoning at a gate** — an axis the
+register shows operators already mostly handling well. **So a graded run is not merely
+expensive here; it measures the wrong variable.** That is the ground for moving it, not cost.
+
+**What replaces it. Four instruments, each with a negative input proving it can fail:**
+
+| | instrument | what it settles | model needed? |
+|---|---|---|---|
+| **1** | **`tools/reachability.py`** — §4.1's half one, which this document already assigns to branch 3 | Could the operator have **read** the rule at the moment it had to decide? Measures the steps at which a check can block and asserts the rule is readable at all of them | **no** |
+| **2** | **The static decision** — a contradiction between two mandatory instructions on one observable is a property of the text, not of the operator | Whether the reconciliation exists and states which rule governs. For a rule *collision* this is not a proxy for the test; it **is** the test | **no** |
+| **3** | **Execution** — fire the real gate on a synthetic input and read what it actually prints | Whether the edited wording is on the path the operator hits, rather than merely present in the file | **no** |
+| **4** | **`tools/gate_replay.py`** — the twelve A1 runs recorded every gate met and what happened next | Whether the rule is **aimed** at situations that really arose. Counts only; the logs quote real client text and none of it is printed | **no** |
+
+**What the four cannot do, stated so nobody reads them as more than they are:** none shows
+that a future operator will **apply** the rule. That is behavioural, it needs a model in the
+loop, and **§4.1 already puts it at Step C** as the third arm. The four settle presence,
+placement, reachability, non-regression of the anti-drift text, cross-tree equality and
+aim — everything except persuasion.
 
 **Per-branch specifics worth stating now.**
 

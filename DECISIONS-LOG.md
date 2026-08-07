@@ -441,3 +441,29 @@ layout, the skill-authoring convention no longer points at it, and the archived 
 as a never-committable location in their own right. **A decision that changes the plan and not only a file
 has to change every place the plan is written down** — which is the failure mode the charter overhaul existed
 to fix, applied to itself within the hour.
+
+**2026-08-07 (how an instruction branch is tested — the graded run is replaced, not skipped).** Branch 3 was
+presented with `STEP-B-ANALYSIS.md` §4's method for instruction branches — *"a graded run plus your review"* —
+and with the honest caveat that folding it into Step C would be a **new** decision, since §4 records that
+answer only for option 4. Wouter's response was neither: **"Can you not test this in any other way? Please
+let's explore this first."**
+
+**Exploring it changed the reasoning, and the measurement is the reason.** A branch of this kind only bites
+when a check fires **with the wrong scope**. That situation — register cluster G — is attested on **5 of the
+11 corpus documents**, so a single graded run reaches it slightly under half the time; and where it does, the
+grader scores the *output* while what changed is the *operator's reasoning at a gate*. **So the graded run
+was not merely the expensive instrument here, it was the wrong one.** That is a stronger ground for moving it
+than cost, and it is the ground on which it moved.
+
+**Decided: four instruments replace it — static reachability, the static decision on the rule collision,
+execution against the real gate, and a retrospective replay over the A1 logs — each with a negative input
+proving it can fail.** The behavioural residue (*does an operator meeting a wrongly-scoped gate now do the
+right thing?*) is **not** absorbed: it stays at Step C, where §4.1 had already put it as the third arm.
+**§4's method table was amended in the same branch**, because a plan that keeps prescribing an instrument the
+build does not use is a plan the next session will follow wrongly — the same rule the 2026-08-06 entry above
+states, applied again.
+
+**One thing the exploration found that no graded run would have.** §4.1 assigns *static reachability* to
+branch 3 in terms, and neither §2's branch row nor §3.4 mentions it — so the branch was planned without it
+until §4.1 was read. **That is the second time a section pointing at another section has been the difference
+between a right and a wrong plan** *(the first was branch 2, planned from §3.3 without §6)*.

@@ -1,28 +1,49 @@
 {
- "_rule": "Add an entry only in the same commit that makes the change. An entry whose sha256 no longer matches is a file that moved AGAIN afterwards, and is reported as a separate failure rather than silently re-blessed.",
+ "_rule": "Add an entry only in the same commit that makes the change. An entry whose sha256 no longer matches is a file that moved AGAIN afterwards, and is reported as a separate failure rather than silently re-blessed. THIS IS NOW ENFORCED: tests/test_baseline_unmodified.py compares the staged blob's sha256 against sha256_now. Until branch 3 it did not, and the list behaved as a permanent path whitelist.",
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
- "count": 4,
+ "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
+ "count": 8,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "bca3881",
-   "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
-   "sha256_now": "718d82b26ad6c5e79fb5b9bf8da1b1c15f9e3a4959c9d9bb1df5afda9974fab2"
+   "changed_by": "feature/scope-rule",
+   "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
+   "sha256_now": "ea75c2fda5c92714ccf592f4eb6687f90c2c45e89daebfd31af6c177ab2887ca"
+  },
+  "uk/scripts/post_process.py": {
+   "changed_by": "feature/scope-rule",
+   "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
+   "sha256_now": "0d18d298f129f8bebc2af4f851ad21dc19f5bde80bd923b278cadc5636cf98e0"
   },
   "uk/scripts/validate_apply.py": {
    "changed_by": "bca3881",
    "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
    "sha256_now": "654c6a8c1c31b846256b9dc380f18828d6519309944dfdb8a5cd641e1fc24550"
   },
+  "uk/skill-docs/05-apply.md": {
+   "changed_by": "feature/scope-rule",
+   "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
+   "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
+  },
   "us/SKILL.md": {
-   "changed_by": "bca3881",
-   "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
-   "sha256_now": "264c3b76e4dc8acab9c93345e63cc33e9e80d53091c9bbbdeae842f483236a5b"
+   "changed_by": "feature/scope-rule",
+   "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
+   "sha256_now": "50564eec56df48bc522a7dbcd36a67e436ba505143795df659756283a3b14488"
+  },
+  "us/scripts/post_process.py": {
+   "changed_by": "feature/scope-rule",
+   "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
+   "sha256_now": "d15e7e52f48db8be4283394757cff929f5f558f644a61e5a6cde2c8a39ede001"
   },
   "us/scripts/validate_apply.py": {
    "changed_by": "bca3881",
    "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
    "sha256_now": "e403a619ed2e3e3345debff13baae03eced9cf60a5fac563abb9124cc0defbbf"
+  },
+  "us/skill-docs/05-apply.md": {
+   "changed_by": "feature/scope-rule",
+   "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
+   "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
   }
  }
 }

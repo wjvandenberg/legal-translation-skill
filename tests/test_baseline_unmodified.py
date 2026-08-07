@@ -72,7 +72,7 @@ for variant, archive in PAIRS:
     only_git = sorted(set(tracked) - {f"{variant}/{n}" for n in entries})
     only_zip = sorted({n for n in entries} - {p[len(variant) + 1:] for p in tracked})
 
-    mismatch, declared = [], []
+    mismatch, declared, moved_again = [], [], []
     for name, data in entries.items():
         key = f"{variant}/{name}"
         if key not in tracked:
@@ -81,12 +81,39 @@ for variant, archive in PAIRS:
         # Git's blob id is sha1 over "blob <len>\0<content>". Recompute it from the archive
         # bytes: if the two agree, what Git holds IS the archive, byte for byte.
         want = hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
-        if want != tracked[key]:
-            (declared if key in DIVERGENCES else mismatch).append(name)
+        if want == tracked[key]:
+            continue
+        if key not in DIVERGENCES:
+            mismatch.append(name)
+            continue
+        # A DECLARED DIVERGENCE IS A RECORD OF ONE CHANGE, NOT A PERMANENT EXEMPTION.
+        #
+        # This block did not exist. `key in DIVERGENCES` was the whole test, so the list was
+        # a path whitelist: once a file appeared on it, every LATER edit to that file was
+        # accepted in silence. The divergence file's own _rule already said the opposite --
+        # "an entry whose sha256 no longer matches is a file that moved AGAIN afterwards,
+        # and is reported as a separate failure rather than silently re-blessed" -- so the
+        # record described a check that was never written. Found on branch 3, whose first
+        # edit was to a file already on the list; the run reported "declared change: 2" for
+        # a tree it had just been handed two further modifications of.
+        recorded = DIVERGENCES[key].get("sha256_now")
+        actual, rc_cat = git("cat-file", "blob", tracked[key])
+        now = hashlib.sha256(actual).hexdigest() if rc_cat == 0 else None
+        if recorded and now and recorded != now:
+            moved_again.append(name)
+        else:
+            declared.append(name)
 
-    bad += len(mismatch) + len(only_git) + len(only_zip)
+    bad += len(mismatch) + len(moved_again) + len(only_git) + len(only_zip)
     print(f"\n  {variant}/   {len(tracked)} tracked · {len(entries)} in archive")
-    print(f"      byte-identical : {len(tracked) - len(mismatch) - len(declared)}")
+    print(f"      byte-identical : "
+          f"{len(tracked) - len(mismatch) - len(declared) - len(moved_again)}")
+    if moved_again:
+        print(f"      MOVED AGAIN    : {len(moved_again)}  — on the divergence list, but "
+              f"changed since it was recorded")
+        for m in moved_again:
+            print(f"          {m}  — update its sha256_now and changed_by in the SAME "
+                  f"commit that moves it")
     if declared:
         print(f"      declared change: {len(declared)}  (recorded in "
               f"tests/baselines/baseline-divergences.json)")

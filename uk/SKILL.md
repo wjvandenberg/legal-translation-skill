@@ -219,7 +219,16 @@ The defences are layered and they are non-optional:
 
 5. **Skill-gate semantics.** A gate firing produces a `SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR` banner. This is the script doing its job, not the script breaking. **Do NOT work around a gate by patching the script or skipping the validator** — fix the input (usually paragraphs.json) and re-run.
 
+   **5a. A check can be wrong IN SCOPE, and saying so is not permission to bypass it.** Everything in rule 5 stands: never patch the script, never skip the validator, never pass an override "just this once". But a check can be correctly written and **wrongly scoped** — firing on input that is in fact a faithful translation of the source. A heuristic pattern is the usual case. When that happens:
+   - **Fix the check, never work around it.** Narrow the pattern so it stops firing on the faithful case and still catches the case it was written for. A check you have corrected is worth more than a check you have satisfied.
+   - **Never alter a source-faithful translation to satisfy a check.** If a finding conflicts with fidelity, **fidelity wins and the check gets fixed.** Trimming, rewording or truncating correct English so a pattern stops matching is the one repair that is always wrong: it silently removes content the source author put there.
+   - **Record it in the delivery notes** — what fired, why it was a false positive, and what you did. See "What the delivery notes must contain" below.
+
+   **This is a rule about SCOPE, not about severity.** It is never a reason to proceed past a check that is right. If you cannot show the check is wrongly scoped, it is not wrongly scoped, and rule 5 governs: fix the input and re-run.
+
 6. **Script-integrity errors.** Any script that exits with a `FILE INTEGRITY CHECK FAILED — script truncated` banner indicates a corrupted local install of that script. **STOP** — re-install the skill from the .skill / .zip archive before re-running the affected step. Do NOT work around the failure by skipping the step, calling the script through a wrapper, or treating the result as "optional." Every script in the skill carries the integrity check; a failure on any one of them is a hard install-side problem that can only be fixed by re-installation.
+
+   **THIS RULE TAKES PRECEDENCE OVER THE GATE READING, and you will meet the two together.** A truncated validator exits **3**, and `apply_translations_textmatch.py` reports any non-zero exit from `validate_segment_shapes.py` or `validate_reject_all.py` inside a `SKILL GATE FIRED` banner — so a truncated install is presented to you wearing the costume of an intentional gate. **Before treating any `SKILL GATE FIRED` banner as a gate, read the lines above it.** If the reported exit code is **3**, or a `FILE INTEGRITY CHECK FAILED — script truncated` banner appears anywhere above, this rule governs and rule 5 does not: **STOP and re-install.** Do not re-author paragraphs.json — the input is not the problem and editing it will not clear the error.
 
 7. **Chat-mode discipline.** This skill is designed assuming a working folder (e.g. Cowork mode) where `paragraphs.json`, `final/word/document.xml`, and the `.validate-state.json` checkpoint are real files persisted between steps. **In Chat mode (no working folder, no auto-managed todo list), the discipline must be self-enforced** — and the temptation to skim or compress is materially higher. **At session start, you MUST detect Chat-mode (see `skill-docs/01-setup-and-extract.md` Step 1a) and post the user-facing Chat-mode warning verbatim** — once per session, with `this document` vs `these N documents` phrasing matching the document count. **At Step 11a, pass `--mode chat` to `verify_diligence.py`** so the diligence report can append a Cowork recommendation if drift is detected. Specifically:
    - `paragraphs.json` is still mandatory. If you do not have a workspace folder, write it to `/tmp/<workdir>/paragraphs.json` (or any persistent path your environment offers) and pass that path to every script. Do NOT translate "in-context" without writing a real file — `validate_translations.py` reads the file and writes a state file; both must exist as real files for the per-batch validator to enforce the 35-cap.
@@ -639,6 +648,25 @@ The `quality_check.py` truncation patterns are heuristics. When a heuristic flag
 **Symptoms.** A paragraph in `paragraphs.json` was changed between QC fail and QC pass without the source change being reflected. The paragraph now ends with bare `;` (or some other punctuation rewrite) instead of the connective the source had.
 
 **Mitigation.** When QC flags a paragraph, inspect the issue against the source first. If the source connective (`; e`, `; o`, `, e`, `, o`) is present and the translation faithfully reflects it (`; and`, `; or`, `, and`, `, or`), the QC flag is a false positive — keep the faithful translation, document the false positive in delivery notes, and proceed. **Reaching 0 QC issues is desirable but never at the cost of fidelity.** As of rev34 the truncation check has a list-connector whitelist that suppresses this specific false positive automatically; the rule above still applies to any other class of false-positive that crops up in the future.
+
+## What the delivery notes must contain
+
+Every banner in this skill speaks to **you**, the operator: re-author paragraphs.json, re-install the skill, fix and re-run. **The delivery notes are the only thing that speaks to the person who receives the document** — the lawyer who will read it, mark it up, negotiate it and possibly sign it. They are part of the deliverable, not a courtesy, and they were previously required without ever being specified.
+
+**Post them with the file every time, including when there is nothing to disclose.** "Nothing to disclose" is itself information; silence is not, because the reader cannot tell it apart from an omission.
+
+Include these six items, in this order:
+
+1. **What the file is.** That it is a translation into UK English of the named source document, produced by this skill, and that **the source-language document remains the operative text** — the translation is for reading and negotiating, not a substitute instrument. Say whether tracked changes are preserved.
+2. **What the run actually did to the document beyond translating it** — definitions reordered, tidy-up passes applied, auxiliary parts translated. The reader is receiving a document that differs structurally from the source in ways nobody announced otherwise.
+3. **Anything a reviewing lawyer should look at.** Interpretive choices you made and could reasonably have made otherwise: a term with two defensible renderings, a source drafting error translated faithfully rather than silently repaired, an ambiguity you resolved one way. Say what you chose and why. **A choice disclosed where it was made costs the reviewer a paragraph; the same choice buried costs a re-translation.**
+4. **Anything you know to be WRONG in the deliverable**, where it is, and what the reader must do about it. **A known defect that is disclosed is a repair instruction; the same defect undisclosed is a trap.** This item is a disclosure duty, not permission to ship a defect — if you can fix it, fix it.
+5. **Any check that fired and was resolved as a false positive** — which check, what it flagged, and why the flagged text is faithful to the source. This is the record rule 5a requires.
+6. **What you verified, and the completion statement** — see the invariant below.
+
+**Never put source text, party names or commercial terms in the notes beyond what the document itself already says.** Describe what a passage *does* ("an operative condition"), not what it says.
+
+**THE COMPLETION INVARIANT.** A delivered `.docx` from this skill exists **only** if all 11 steps completed. **There is no partial deliverable.** If a run stops at any step, there is nothing to send: do not send the intermediate file with a caveat, do not describe it as a draft, and do not let the user infer completeness from the fact that a file exists. Say that the run did not complete and what stopped it. **A reader cannot tell a finished document from an unfinished one by looking at it** — the notes are the only place that distinction can be made, which is why the completion statement is mandatory rather than optional.
 
 ## Maintainer discipline
 
