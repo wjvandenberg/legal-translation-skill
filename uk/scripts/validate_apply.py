@@ -350,9 +350,9 @@ def _paragraph_applied_text(p_element):
     treats as token boundaries. Without a corresponding boundary on the
     applied side, paragraphs containing real ``<w:tab/>`` elements (e.g.
     signature blocks, witness rows) produce different tokenisations between
-    declared and applied: declared ``"Vicente\\tSipka"`` →
-    ``{"Vicente", "Sipka"}`` via the \\t boundary, applied ``"VicenteSipka"``
-    → ``{"VicenteSipka"}`` one token, false-positive miss.
+    declared and applied: declared ``"Alpha\\tBeta"`` →
+    ``{"Alpha", "Beta"}`` via the \\t boundary, applied ``"AlphaBeta"``
+    → ``{"AlphaBeta"}`` one token, false-positive miss.
 
     Inserting a single space at every ``<w:tab/>`` / ``<w:br/>`` boundary
     when joining restores symmetric tokenisation. Symmetric on documents

@@ -2,6 +2,7 @@
 name: legal-translation
 metadata:
   author: Wouter van den Berg <wouter@monteclima.com>
+  linkedin: https://www.linkedin.com/in/wjvandenberg/
 description: >
   Translate legal documents from any language into English while preserving .docx formatting
   and translating track changes and headers/footers. Use this skill whenever the user asks to
@@ -494,7 +495,7 @@ makes this irrelevant — extra entries are skipped, missing entries leave text 
 language.
 
 ### Style-changing scripts destroy numbering
-Never use scripts that change paragraph styles (e.g., LeganceTitle2 → FWBL2) to "fix"
+Never use scripts that change paragraph styles (e.g., FirmTitle2 → ClauseHeading2) to "fix"
 numbering. Styles interact with numbering definitions in complex ways. The text-match
 approach never touches styles.
 
