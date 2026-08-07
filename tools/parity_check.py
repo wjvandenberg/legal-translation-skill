@@ -299,13 +299,29 @@ def within_tree(tree_root, label):
                 alts = [re.sub(r"\s*\(.*?\)\s*", " ", a).strip().lower()
                         for a in re.split(r"\s*/\s*|\s*;\s*", row[1])]
                 alts = [a for a in alts if a]
+                # SYMMETRIC, IN BOTH DIRECTIONS. The assertion is that a row rendering a
+                # variant-controlled term carries BOTH forms -- so a US-only rendering is a
+                # defect exactly as a UK-only one is.
+                #
+                # The first version tested one direction only, and that is not a
+                # near-miss: THE INSTANCE THAT ACTUALLY SHIPPED IS THE OTHER DIRECTION. The
+                # Polish general-legal row for the continental section symbol renders
+                # "section / paragraph" -- the US word, no UK word, no marker -- inside the
+                # UK tree. A one-directional check flagged two other rows in that very file
+                # and walked straight past the one that reached a client.
                 for ukw, usw in terms.items():
-                    if ukw in alts and usw not in alts:
-                        note("within-tree", "single-variant-row",
-                             f"{label}/{folder}/{p.name}::{first[:40]}",
-                             f"renders {ukw!r} as a whole alternative without {usw!r}")
-                        single += 1
-                        break
+                    has_uk, has_us = ukw in alts, usw in alts
+                    if has_uk == has_us:
+                        continue
+                    present, absent = (ukw, usw) if has_uk else (usw, ukw)
+                    wrong_tree = (label == "uk" and has_us) or (label == "us" and has_uk)
+                    note("within-tree", "single-variant-row",
+                         f"{label}/{folder}/{p.name}::{first[:40]}",
+                         f"renders {present!r} as a whole alternative without {absent!r}"
+                         + ("  — and it is the OTHER variant's form, in this tree"
+                            if wrong_tree else ""))
+                    single += 1
+                    break
 
     # (b) the two dictionary layers must not give DIFFERENT ANSWERS for the same term.
     ref_rows = {}
