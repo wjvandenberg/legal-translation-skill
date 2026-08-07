@@ -562,6 +562,17 @@ table.**
 - **Pull requests, NOT direct merges.** Open a PR per branch, review the diff — walk it, summarise it, flag
   the risks — and **present that review. Do not merge; Wouter approves.** Merge style is
   **squash-and-merge**. Push and update §7 after each branch.
+- **STACKED BRANCHES: MERGE FROM THE BOTTOM UP, AND DO NOT DELETE A BASE BRANCH WHILE ANYTHING SITS ON IT.**
+  *(2026-08-07, and it cost a pull request.)* Where branch B is opened against branch A rather than `main`,
+  **deleting A on merge makes GitHub CLOSE B**, and a closed PR **cannot be reopened or retargeted** once its
+  base is gone — `gh pr edit --base` fails with *"Cannot change the base branch of a closed pull request"*.
+  The work is not lost, but the PR number, its review and its discussion are. **Either retarget B to `main`
+  BEFORE merging A, or merge A with the branch left in place and delete it afterwards.** The recovery is a
+  fresh branch off the new `main` plus `git cherry-pick`, which applies cleanly because the squash of A
+  already contains everything B was built on — **re-run the full check set on the rebuilt branch before
+  pushing it**, since it is a different commit on a different base and the old evidence does not carry over.
+  **This is why stacking is a cost, not a convenience:** prefer branching from `main` whenever the change is
+  genuinely independent, and stack only when the later branch truly needs the earlier one's content.
 - **Before every commit:** run `git status` and **explain it to Wouter** in plain terms.
 - **Branch protection on `main` — LIVE since the repository went public, 2026-08-07.** Require a PR; block
   force pushes and branch deletion; **`enforce_admins` TRUE**. Required approvals stay **0** — on a solo repo
@@ -1364,7 +1375,15 @@ all along — the check was simply never written. Now enforced by sha256, and it
 caught `SKILL.md` moving a second time. **A record that describes a check nobody wrote is
 worse than no record.**
 
-### TWO MISTAKES WORTH CARRYING FORWARD
+### THREE MISTAKES WORTH CARRYING FORWARD
+
+**Merging a base branch with `--delete-branch` while a PR was stacked on it CLOSED that PR,
+and a closed PR cannot be reopened or retargeted once its base is gone.** The cross-reference
+work was opened against branch 3 rather than `main`; merging branch 3 with the branch deleted
+took its PR with it. Recovered by cherry-picking onto the new `main` and opening a fresh PR —
+the content was never at risk, but the PR, its review and its discussion were.
+**The rule is now in §5.2**, and the short form is: **merge a stack from the bottom up, and
+retarget the upper branch to `main` before deleting anything under it.**
 
 **A `__pycache__` leak reached both shipped trees again** — the new test executes a skill
 script from inside the tree and did not set `PYTHONDONTWRITEBYTECODE`. Gitignored, so
