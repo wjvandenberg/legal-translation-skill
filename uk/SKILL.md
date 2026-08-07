@@ -580,8 +580,8 @@ the redline view.
 
 **Fix (two steps)**:
 1. At translation time: give both `del` and `ins` segments the SAME English text when the
-   source edit is orthographic-only. See "Collapsing orthographic-only TC edits —
-   MANDATORY" in Step 4 for the full rule and decision test.
+   source edit is orthographic-only. See "Collapsing orthographic-only and typo-fix
+   TC edits — MANDATORY" in Step 4 for the full rule and decision test.
 2. After `apply_translations_textmatch.py` and `post_process.py`: run
    `strip_noop_tracked_changes.py`. It finds adjacent del/ins pairs whose text content
    normalises to the same string, removes the del, and unwraps the ins. It also strips
