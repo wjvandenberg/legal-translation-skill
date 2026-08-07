@@ -397,17 +397,29 @@ if present("the project folder contains `CLAUDE.md`, `FINDINGS-REGISTER.md`, "
     fail("6", f"a second, differently-worded folder-contents claim is also stale: {mds}")
 
 # No client artefact may sit anywhere the first commit could reach. temp/ is gitignored
-# scratch and is reported separately rather than silently excused -- the .gitignore does
-# not exist yet, so today "gitignored" is a plan, not a fact.
+# scratch and is reported separately rather than silently excused.
+#
+# UPDATED 2026-08-06: `tests/fixtures/` is now a SANCTIONED home for document-shaped files.
+# §5.8 makes synthetic fixtures committable by design -- they are what runs on every change
+# and what `git bisect` uses -- and the pre-commit gate already encodes the same rule from
+# the other side, blocking any Word document OUTSIDE that folder. This check predated the
+# folder existing and fired on all eleven the moment branch 1 was merged.
+#
+# Allowing the folder is not a weakening, because it is not taken on trust: every fixture is
+# scanned against the full name and descriptor lists by the pre-commit gate and again by
+# tools/audit_branches.py, and must hit zero. The claim being made here is about PLACE; the
+# claim about CONTENT is made, and enforced, elsewhere.
+ALLOWED_DOC_DIRS = ("temp/", "tests/fixtures/")
 junk = sorted(p.relative_to(ROOT).as_posix() for ext in
               ("docx", "doc", "pdf", "png", "xml", "jsonl")
               for p in ROOT.rglob(f"*.{ext}"))
-outside_temp = [j for j in junk if not j.startswith("temp/")]
-if outside_temp:
-    fail("6", f"document-shaped file(s) in the repo tree outside temp/: {outside_temp}")
+stray = [j for j in junk if not j.startswith(ALLOWED_DOC_DIRS)]
+if stray:
+    fail("6", f"document-shaped file(s) outside {' and '.join(ALLOWED_DOC_DIRS)}: {stray}")
 else:
-    ok(f"no document-shaped file anywhere outside temp/ "
-       f"({len(junk)} inside it, all synthetic test fixtures for our own tooling)")
+    n_fx = sum(1 for j in junk if j.startswith("tests/fixtures/"))
+    ok(f"no document-shaped file outside the two sanctioned places "
+       f"({len(junk) - n_fx} in temp/ scratch, {n_fx} synthetic fixtures in tests/fixtures/)")
 
 # every temp/ script and private tool CLAUDE.md names by filename must exist
 # A named .py is legitimate if it is ours (temp/ or the private tools/) OR one of the
