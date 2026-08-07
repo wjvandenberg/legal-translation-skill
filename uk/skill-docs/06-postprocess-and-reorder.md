@@ -65,8 +65,8 @@ The strip pass:
 
 **Companion translation rule**: when drafting `en_segments` for a TC paragraph,
 give both `del` and `ins` segments the **same English text** when the source
-edit is orthographic-only (see "Collapsing orthographic-only TC edits —
-MANDATORY" in Step 4). The auto-strip relies on that. If you translated del
+edit is orthographic-only (see "Collapsing orthographic-only and typo-fix TC
+edits — MANDATORY" in Step 4). The auto-strip relies on that. If you translated del
 and ins to different English where the source edit was orthographic-only, the
 auto-strip cannot detect the no-op and the marker stays visible.
 

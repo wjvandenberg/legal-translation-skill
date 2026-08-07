@@ -3,12 +3,12 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 8,
+ "count": 10,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/scope-rule",
-   "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
-   "sha256_now": "ea75c2fda5c92714ccf592f4eb6687f90c2c45e89daebfd31af6c177ab2887ca"
+   "changed_by": "fix/dangling-cross-references",
+   "commit_subject": "Four quoted cross-references pointed at a heading that does not exist (register row F40, widened from one instance to a class)",
+   "sha256_now": "ca57a976c63dd8e80eb251c784f81ae92a968b3a13af754d15137115ef96b569"
   },
   "uk/scripts/post_process.py": {
    "changed_by": "feature/scope-rule",
@@ -25,10 +25,15 @@
    "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
    "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
   },
+  "uk/skill-docs/06-postprocess-and-reorder.md": {
+   "changed_by": "fix/dangling-cross-references",
+   "commit_subject": "Four quoted cross-references pointed at a heading that does not exist (register row F40, widened from one instance to a class)",
+   "sha256_now": "aa6c0cfa899652812b30644144ac237f7eb46fff330051a8f55bdec0b2a76199"
+  },
   "us/SKILL.md": {
-   "changed_by": "feature/scope-rule",
-   "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
-   "sha256_now": "50564eec56df48bc522a7dbcd36a67e436ba505143795df659756283a3b14488"
+   "changed_by": "fix/dangling-cross-references",
+   "commit_subject": "Four quoted cross-references pointed at a heading that does not exist (register row F40, widened from one instance to a class)",
+   "sha256_now": "202831cd0b066aa8d6940bbf1a369dfb8468cc74c0d12d35e54bfd4d7eefb06c"
   },
   "us/scripts/post_process.py": {
    "changed_by": "feature/scope-rule",
@@ -44,6 +49,11 @@
    "changed_by": "feature/scope-rule",
    "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
    "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
+  },
+  "us/skill-docs/06-postprocess-and-reorder.md": {
+   "changed_by": "fix/dangling-cross-references",
+   "commit_subject": "Four quoted cross-references pointed at a heading that does not exist (register row F40, widened from one instance to a class)",
+   "sha256_now": "698e89485a008023f0d166e65e5ca325c1ea799ed5f09896947c4eac7419c41a"
   }
  }
 }

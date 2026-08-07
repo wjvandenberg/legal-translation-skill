@@ -329,6 +329,35 @@ for tree in TREES:
           f"{len(strays)} stray file(s): {strays[:3]}" if strays else "")
 
 # --------------------------------------------------------------------------------------
+# 9. EVERY QUOTED CROSS-REFERENCE RESOLVES  (register row F40, widened to a class)
+#
+# One misdirected pointer is a typo; two in different files is a class, and a class needs a
+# check rather than another pair of eyes. The negative below is the part that matters: it
+# breaks a citation the way the real ones were broken -- by dropping words from the middle
+# of a quoted title -- and asserts the check notices.
+# --------------------------------------------------------------------------------------
+print("\n9. QUOTED CROSS-REFERENCES RESOLVE TO REAL HEADINGS  (F40)")
+
+
+def _probe_xref():
+    rr = subprocess.run([sys.executable, str(ROOT / "tools" / "xref_check.py")],
+                        capture_output=True, text=True, encoding="utf-8",
+                        errors="replace", cwd=ROOT)
+    return rr.returncode
+
+
+check("tools/xref_check.py exits 0 — no citation points at nothing", _probe_xref() == 0)
+
+broken = with_mutation(
+    "SKILL.md",
+    # Drop "and typo-fix" back out, which is exactly how the four real instances failed.
+    lambda t: t.replace('See "Collapsing orthographic-only and typo-fix\n   TC edits',
+                        'See "Collapsing orthographic-only\n   TC edits'),
+    _probe_xref)
+check("and it FAILS when a quoted title loses a word from the middle", broken == 1,
+      f"exit {broken}")
+
+# --------------------------------------------------------------------------------------
 print()
 print("=" * 96)
 ok = sum(1 for _, c in results if c)
