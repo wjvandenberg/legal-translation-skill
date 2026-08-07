@@ -64,7 +64,13 @@ def run(script, args, cwd):
     The skill runs on Linux under UTF-8 in its real host, so this is the harness's problem
     to solve, not the skill's. But it surfaced a genuine portability defect on the way and
     that is recorded rather than papered over: see tests/README.md."""
-    env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
+    # PYTHONDONTWRITEBYTECODE: without it, importing a skill module drops a
+    # __pycache__ directory INSIDE uk/scripts or us/scripts. It is gitignored, so it
+    # never showed in a diff -- but tools/package.py zips the variant tree, so it
+    # would have shipped inside the .skill. A test harness must not leave anything
+    # in the thing it is testing.
+    env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
+               PYTHONDONTWRITEBYTECODE="1")
     cmd = ["uv", "run", "--with", "lxml", "python", str(SCRIPTS / script), *args]
     try:
         r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
