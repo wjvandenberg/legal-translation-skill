@@ -185,6 +185,7 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 | **A4** — the blind desk review | the same artefact judged from outside by a reader who had seen no test result, no grade and no prior analysis, against eleven criteria frozen before anyone looked | a report of **2,222 lines** with **454 `file:line` citations** · 25 new findings · and the finding no amount of running the pipeline could have surfaced |
 | **the A3↔A4 comparison** | all thirteen steps, with a 20% spot-check that **failed one of its two pairs and changed the result** | a new cluster **X** — the legibility gap · a correction to A3 · a coverage matrix naming what *neither* method reached |
 | **Step B** — the fix exploration | eleven options, four-columned and ranked, three verification passes by three different methods, five audits | **`STEP-B-ANALYSIS.md`** — ten options approved, the rebuild declined, twenty branches sequenced with the instruments first, and a test method per branch kind |
+| **Step 1** — the repository *(branches 0, 1, 2)* | the project had **no version control at all**, so every change was unrecoverable and *"change one thing, re-grade, compare"* was unenforceable. Branch 0 committed both trees unmodified as a provable original; branch 1 built the harness; branch 2 built the parity check. The pre-`git init` order was non-negotiable and was followed: sanitise, `.gitignore` **by path**, write the scan, **run it and read it**, only then `git init` | **The repository exists and is PUBLIC** — `github.com/wjvandenberg/legal-translation-skill`, branch protection live with `enforce_admins`. 11 synthetic fixtures · 14 negative inputs · the byte comparison `git bisect` rides on · the two-tree parity check. **The public flip was measured, not assumed:** every blob in every commit scanned, security 0, nothing outside `uk/`/`us/` matching any probe, and the superseded skill files byte-identical to archives already downloadable. **Four defects in our own measuring tools remain open** — they belong to branch 1, change no skill finding, and will corrupt Step C's evidence if still open when it runs *(§7)* |
 
 **The evidence base as it now stands, and these are the numbers to quote:**
 
@@ -355,56 +356,18 @@ settled — if you are about to re-open one of these, read the dated entry first
 | **4** | **Revisit, then publish** — **Step D** consolidates everything learned, *then* repackaging and publication | **NOT STARTED** | step 3 |
 
 **Steps 1 and 2 share one branch numbering, and this is worth being clear about because two schemes used to
-exist.** `STEP-B-ANALYSIS.md` §2 numbers all the work 0–19 plus D1–D3. **Step 1 below is branches 0, 1 and
+exist.** `STEP-B-ANALYSIS.md` §2 numbers all the work 0–19 plus D1–D3. **Step 1 was branches 0, 1 and
 2 of that sequence. Step 2 is branches 3–19 plus the deferred items.** The old charter names map onto it
 exactly: `feature/baseline-and-inventory` is branch 0, `feature/test-harness` is branch 1, and
 `feature/variant-parity-and-reconcile` split in two — the check is branch 2 and the reconciliation is D1.
 
-### 3.2 Step 1 — Foundation: the repository
+> **Step 1 has no section of its own any more, and that is deliberate** *(Wouter, 2026-08-07)*. **This
+> section is future work; a finished step described here is a step the next session will start planning
+> again.** What it did is in **§2.3**, with the row of this table as its status. The 44 lines that used to
+> sit here — the pre-`git init` order, the three branch briefs, the exit gate — were all discharged, and the
+> two rules among them that still bind live in §5.4 rather than in a plan.
 
-**Why it comes first, and none of the three reasons is a preference.** There is **no version control at
-all**, so every change from here is unrecoverable. The baseline commit is what makes every later diff
-readable. And **the harness is half the never-regress instrument** — without it, *"change one thing,
-re-grade, compare"* is unenforceable and `git bisect` is impossible.
-
-**The pre-`git init` sequence is not negotiable, and its order is the whole point:**
-
-1. **This file is sanitised.** Done — and re-verified by `temp/publication_check.py`, which must exit clean.
-2. **Write `.gitignore`, by path:** `temp/` · the test-document folder · the logs folder · `*.local` ·
-   **and the frozen intermediates, explicitly by path.** They are the most content-rich files the project
-   has ever produced and the location rule has never been applied to them.
-3. **Write the pre-commit secret and client-name scan into `tools/`.**
-4. **Run it, and read what it says** — see §5.4 on the two published trees, which are *not* known-clean.
-5. **Only then** `git init`, create the private repository, and make the first commit.
-6. **Then** enable branch protection.
-
-| branch | what it is | behaviour change? |
-|---|---|---|
-| **0 — baseline** | Commit **both published trees unmodified**, with the confidentiality scan run over them first. Record the twelve graded baselines. **No changelog archive** — see §5.4 | **no** — measurement only |
-| **1 — the harness** | Synthetic test documents; freeze the real intermediates from the July runs; the byte-comparison; **one failing input per check**; wire `git bisect`; the three-command confirmation of the two predicted failure chains; **and close the four open defects in our own measuring tools** | **no** |
-| **2 — the parity check** | The two-tree comparison as a script: dictionary rows, script string literals, **function signatures and rule-table lengths** — not only lexicon rows. Covered by branch 1's tests | **no** |
-
-**Scope for all three lives in `STEP-B-ANALYSIS.md` §3 and §4.** Two things worth knowing before you open
-it. **Branch 2 is what makes deferring the reconciliation safe**, because from that point every new
-divergence is caught as it is introduced. And **branch 1 absorbs the four open defects in our own harness
-and review tooling** — they change no skill finding but **will corrupt Step C's evidence if they are still
-open when it runs.** Two of the four matter enough to name here:
-
-- **The read gate verifies ENDPOINTS, not reading.** The attestation is a byte count plus the last non-blank
-  line, and on a second document the operator already knows both from the first. It was satisfied
-  compliantly by a re-read that covered about 40% of the file, **and the operator had to record that itself
-  because the instrument could not.** The fix: after the first document, demand something
-  position-dependent — a quoted line at a random offset.
-- **The harness cannot tell an artefact it created from one it inherited.** A complete prior run of a
-  document was once found in the workspace at session start; had it been adopted, every batch-behaviour
-  measurement would have been fabricated **and the state file would have looked identical either way.** The
-  fix: fingerprint the working directory at init and refuse, or warn loudly.
-
-> **EXIT GATE — the public flip.** After branch 2 is merged and the history is scanned, **flip the
-> repository public.** This is the cheap moment: the history is shortest and holds only the unmodified trees
-> plus the instruments. **Never make a repo public without Wouter's explicit OK at the moment of the flip.**
-
-### 3.3 Step 2 — Building
+### 3.2 Step 2 — Building
 
 > **`STEP-B-ANALYSIS.md` IS THE LEADING DOCUMENT FOR THIS ENTIRE STEP. Read it and follow it.** Its **§2**
 > is the order — twenty branches plus three deferred items, each with its dependency and its gate. Its **§3**
@@ -444,7 +407,7 @@ did what it claimed, test proves nothing *else* broke.
 deadlocked gate. He approved the principle, not the text, and asked to see it. **That branch ends in his
 review, not in a merge**, and the branch where the checks get teeth cannot start until the review is closed.
 
-### 3.4 Step 3 — Opus 5, and the verification run
+### 3.3 Step 3 — Opus 5, and the verification run
 
 **`OPUS-5-MIGRATION.md` owns this step in full.** In outline: two small branches (a context audit that
 simplifies only the defensive logic written for the previous model's context window, and the effort/batch
@@ -456,7 +419,7 @@ arms and the reachability arm. **Then Wouter reviews all 11 himself — INPUT PO
 **Do this after the build, never alongside it.** Doing them together makes attribution impossible: if a
 grade moves you cannot tell whether it was the fix or the model configuration.
 
-### 3.5 Step 4 — Revisit, then publish
+### 3.4 Step 4 — Revisit, then publish
 
 1. **Step D — consolidate and revisit. This step does NOT open with packaging.** Take all the accumulated
    evidence — the A1 logs, the A2 baselines, A3, A4, everything learned in steps 2 and 3, the Step C logs
@@ -474,7 +437,7 @@ grade moves you cannot tell whether it was the fix or the model configuration.
 first** — a Markdown file cannot carry its own integrity guard, so the truncation-coverage fix cannot be
 built without it.
 
-### 3.6 Autonomy, and the two input points
+### 3.5 Autonomy, and the two input points
 
 Run the translation and grading work **as autonomously as possible**: no mid-run questions, no confirming
 obvious choices, no step-by-step progress reports. **There are exactly two input points, and they bracket
@@ -781,7 +744,7 @@ the only correct response to a committed secret is to **rotate** it, and **for a
 no rotation** — which is why the location rules matter more than any cleanup capability. History *can* be
 rewritten, but it needs a force-push, which our own branch protection blocks, and **after a repo has been
 public it is no longer a remedy** — forks and scrapers may already hold the content. **Hence the
-non-negotiable pre-`git init` order in §3.2.**
+non-negotiable pre-`git init` order, followed in full and recorded in §2.3.**
 
 > **The good news, and it changes what the risk actually is: THERE IS NO HISTORY TO SCAN.** Nothing has ever
 > been committed. Git will only ever see what is added at commit one, so **the exposure is the content of
@@ -1213,7 +1176,7 @@ Chosen over two independent repos and over a shared-core + generated-variant bui
 **`github.com/wjvandenberg/legal-translation-skill`** — distinct from the two public distribution repos.
 
 > **It was created private and flipped public once branches 0, 1 and 2 had merged**, which is the cheap
-> moment §3.2 named: the history was eight commits long and held only the unmodified trees plus the
+> cheap moment the plan had named: the history was eight commits long and held only the unmodified trees plus the
 > instruments. **The flip was measured, not assumed.** Every blob in every commit was scanned: **security
 > 0** · **nothing outside `uk/` and `us/` matched any probe** · no file had ever been deleted, so nothing
 > was hiding in history · and the four superseded skill files are **byte-identical to the published rev44
@@ -1349,87 +1312,96 @@ the pull request; do not call it complete.
 
 **RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
 Re-reading has never found one.
-### HANDOFF — 2026-08-07
+### HANDOFF — 2026-08-07 (second session of the day)
 
-**STEP 1 IS COMPLETE AND THE EXIT GATE IS CLOSED.** The project has version control for the first time. The
-repository is **PUBLIC** at `github.com/wjvandenberg/legal-translation-skill`, branch protection is live with
-`enforce_admins`, and branches 0, 1 and 2 are merged along with the confidentiality cleanup and the cycle
-enforcement. **Eight commits, all reviewed as pull requests, none self-merged without approval.**
+**STEP 2 HAS STARTED. Branch 3 is built and in review; a claims-pass fix came out of it and is
+in review behind it.** Nothing is blocked.
 
-**Nothing is blocked. Step 2 starts at branch 3.**
+| PR | what | state |
+|---|---|---|
+| **#10** | **Branch 3 — the scope rule.** K1 K2 K3 F35 X3 | **open, awaiting your merge** |
+| **#11** | Four dangling cross-references, plus the check for the class. Register F40 widened | **open, based on #10**; GitHub retargets it to `main` when #10 merges |
+| #8 · #9 | the probe revert, and the previous session close | **merged** |
 
-### WHAT IS ON `main`
+### WHAT BRANCH 3 CHANGED, IN ONE PLACE
 
-| | |
-|---|---|
-| `uk/` `us/` | 198 files each. **392 of 396 byte-identical to the rev44 archives; 4 differ by declared, recorded change** — `tests/baselines/baseline-divergences.json` names each one with the commit that made it |
-| `tools/` | 16 scripts — the parity check, the coverage table, the failure-chain confirmation, the frozen-intermediate catalogue, the branch audit, the cycle gate, the confidentiality controls |
-| `tests/` | 11 synthetic fixtures · 14 negative inputs · four `test_*.py` · the baselines |
-| the six analysis documents, `README.md`, `.gitignore`, `.gitattributes` | |
+`SKILL.md` gains **rule 5a** — *a check can be wrong IN SCOPE; fix the check, never bypass it,
+and never alter a source-faithful translation to satisfy it* — beside the gate-semantics rule
+where the operator meets a gate. The **two colliding truncation instructions** now say which
+governs. A new section says **what the delivery notes must contain** and states the
+**completion invariant**. The Step 6 gate stops telling the operator to make the JSON agree
+with the document. **Six skill files, three per tree, all mirrored.**
 
-**Green as at close:** suite **14/14 on both trees** · parity **PASS, 5/5 arms** · branch audit **28 confirmed,
-0 failed, 0 skipped** · cycle gate **8/8** · gate negatives **5/5** · claims **0 failures** · tables **CLEAN** ·
-register **PASS 0/0**.
+### THE FOUR THINGS THIS SESSION LEARNED
 
-### THE FIVE THINGS THIS SESSION LEARNED, AND THEY ARE WHY THE RULES CHANGED
+**1. A graded run was the WRONG instrument here, not merely the expensive one — and that only
+became clear because Wouter asked for alternatives instead of picking one.** §4 prescribed a
+graded run for instruction branches. Measured: this branch only bites when a check fires with
+the wrong scope, attested on **5 of 11** documents, and the grader scores *output* while what
+changed is the *operator's reasoning at a gate*. **Four instruments replace it** — static
+reachability, the static decision on a rule collision, execution against the real gate, and a
+replay over the A1 logs — each with a negative input. **`STEP-B-ANALYSIS.md` §4 was amended in
+the same branch**, because a plan that keeps prescribing an unused instrument is a plan the
+next session follows wrongly. The behavioural residue stays at Step C, per that document's §4.1.
 
-**1. Verifying properly found a defect in EVERY branch, each time in work already presented as complete.**
-Fixtures that were not byte-reproducible, which broke `git bisect` — the one tool branch 1 exists to enable.
-A coverage tool that counted exits and missed raises, so *"13 of 20"* was wrong twice over; the real figure
-is **17 of 20**, and the wrong method landing on the expected number had been reported as an independent
-confirmation of the plan. A parity check whose within-tree arm was **one-directional and missed the very
-defect it was built for**. A `__pycache__` leak into the shipped trees, fixed once and back through the next
-caller.
+**2. `STEP-B-ANALYSIS.md` §4.1 assigned static reachability to branch 3, and neither its §2
+row nor its §3.4 says so.** The branch was planned without it until that section was read. **That is the second time a section
+pointing at another section has been the difference between a right plan and a wrong one** —
+the first was branch 2, planned from §3.3 without §6. **Read what the brief points at.**
 
-**2. So the cycle is now enforced mechanically.** §5.1 covers **everything written, not only code**; §7 opens
-with a standing block; `tools/cycle_evidence.py` binds verify/test evidence to a hash of the working tree, so
-editing a file after testing it invalidates it. The pre-commit hook refuses without it, **repo-wide**.
+**3. Every instrument written this session had a bug in itself, and running them is the only
+thing that found any of it.** Reachability parsed **7 of 8** step documents, silently dropping
+the final one, because the reading-order entry for it reads *"— Pre-repack hooks + Steps
+10+11:"* and the regex demanded `Steps` right after the dash. Its normative needle was
+**case-sensitive** while the reference layer writes *"must"* in lower case. Its convention
+patterns matched **nothing across 177 files**. Its scope-rule needle missed the rule's own
+capitalisation. Each is fixed where it lives, with a count assertion or a self-test.
 
-**3. Every instrument written or touched this session had a bug in itself.** Ten of them, each now fixed and
-commented where it lives. The pattern is always the same: the check answers an easier question than the one
-that matters. **Three earlier audits were deleted after use, which made their findings unre-testable** —
-`tools/audit_branches.py` is committed for that reason.
-
-**4. Two measurements moved from inferred to measured.** **6 of 9 documents produce different bytes under the
-two variants** from identical input, so *"converging the trees is safe"* is now known to be a **live**
-divergence — D1 changes what users receive. And **5 of 17 pipeline steps have no check that can block**,
-which is the harness's declared blind spot rather than an oversight in it.
-
-**5. Publishing exposes history, and it was measured rather than assumed.** No file was ever deleted; every
-superseded version of the documents and tools is clean on all 106 patterns; the four superseded skill files
-are byte-identical to the archives already downloadable from lawve.ai. **Security: 0. New exposure: 0.**
+**4. A declared divergence was behaving as a permanent exemption.**
+`tests/test_baseline_unmodified.py` treated the divergence list as a whitelist **by path**, so
+a file already on it could change again unseen. The list's own `_rule` had said the opposite
+all along — the check was simply never written. Now enforced by sha256, and it immediately
+caught `SKILL.md` moving a second time. **A record that describes a check nobody wrote is
+worse than no record.**
 
 ### TWO MISTAKES WORTH CARRYING FORWARD
 
-**A test push reached the public `main`** — one line, no sensitive content — because `enforce_admins` was
-`false` and the protection did not bind an admin. Reverted in **PR #8**, which is still open. `enforce_admins`
-is now `true` and a direct push is rejected with `GH006`; a pull request stays `MERGEABLE` with no review
-required, so nothing about merging is harder.
+**A `__pycache__` leak reached both shipped trees again** — the new test executes a skill
+script from inside the tree and did not set `PYTHONDONTWRITEBYTECODE`. Gitignored, so
+uncommittable; but `tools/package.py` builds each `.skill` **from the tree**, so it would have
+shipped. Fixed in the caller **and** guarded on the trees, because last time a caller-scoped
+fix let it back in through the next caller.
 
-**Uncommitted charter edits were destroyed twice by `git reset --hard` and `git checkout --`** after a test
-that restored state through git. The other negative tests in this repository hold the original bytes in
-memory and write them back, which is why they are safe. **Commit before touching git state; never restore a
-dirty file through git.**
+**A chip I wrote myself carried a stale line number.** It named `SKILL.md:574`; branch 3 had
+already moved the line to 583. Harmless here because the text was quoted too — **quote the
+text, not just the line.**
 
 ### THE NEXT ACTION
 
-**Branch 3 — the scope rule.** `STEP-B-ANALYSIS.md` §3.4 and §3.5, and read §6's Option 5 as well: §3.3
-pointed at §6 and planning branch 2 without it got the arm count, the comparison method and the term-list
-source all wrong. It is a **documentation branch and gets the full cycle**, including a task list and
-recorded verify/test evidence — the pre-commit hook will refuse otherwise.
+**Branch 4 — the exception channel.** `STEP-B-ANALYSIS.md` §3.4, and read §6's Option 5 in
+full, including the **fifth gap added 2026-08-05: repair is unbounded.** No file in the
+package bounds a repair loop, so the specification must state **the bound as well as the
+exit** — after a stated number of failed repairs the operator stops, records, and uses the
+channel. Without the bound the channel is optional; with it, it is the only legitimate way the
+loop can end.
 
-Branch 3 states that a check can be wrong **in scope**, that the remedy is to fix the check and never to
-bypass it, and never to alter a faithful translation to satisfy it. It also carries the reconciliation of the
-two colliding truncation instructions and what delivery notes must contain. **Branch 4 — the exception
-channel — ends in Wouter's review of the specification, not in a merge, and branch 5 cannot start until that
-review is closed.**
+**Branch 4 ENDS IN WOUTER'S REVIEW OF THE SPECIFICATION, NOT IN A MERGE**, and **branch 5
+cannot start until that review is closed.** He approved the principle (3b), not the text. The
+four conditions are non-negotiable: the check has actually fired · a repair was attempted and
+recorded · the acceptance names the consequence in the delivery notes **in the format branch 3
+just laid down** · and never for a check the operator has not tried to satisfy.
 
-### FOUR THINGS OPEN, NONE BLOCKING
+### FIVE THINGS OPEN, NONE BLOCKING
 
-1. **PR #8** — the revert of the probe commit. Open, mergeable, waiting.
-2. **The four open defects in our own harness and review tooling.** Declared undone rather than dropped: they
-   live in the private harness, change no skill finding, and **will corrupt Step C's evidence if still open
-   when it runs.**
+1. **PR #10 and PR #11** — both green, both awaiting merge. #11 is based on #10.
+2. **The four open defects in our own harness and review tooling.** Unchanged and still
+   declared: they live in the private harness, change no skill finding, and **will corrupt
+   Step C's evidence if still open when it runs.**
 3. **The scan list still needs tightening** before it can be trusted as a gate — §5.4(b).
-4. **Wouter has still never reviewed the adjudications Claude made** during the A3↔A4 comparison, a
-   pre-registered control set aside and recorded as such. Unchanged from the previous three handoffs.
+4. **Wouter has still never reviewed the adjudications Claude made** during the A3↔A4
+   comparison, a pre-registered control set aside and recorded as such. Unchanged from the
+   previous four handoffs.
+5. **`tools/reachability.py` carries one candidate for judgement and two suppressed
+   pointers.** Neither is a defect; both are recorded so a later reader does not re-derive
+   them. It also measured that **a check can block at 15 of 15 steps**, which is why the scope
+   rule had to go in the always-loaded file rather than a step document.
