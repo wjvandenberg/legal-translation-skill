@@ -68,20 +68,46 @@ PNG = bytes.fromhex(
 )
 
 
+# A .docx is a ZIP, and a ZIP records the clock time at which each member was added. Writing
+# a fixture with `writestr(name, data)` therefore produces DIFFERENT BYTES on every build even
+# though the content is identical -- and that is not cosmetic:
+#
+#   * running the suite left every committed fixture "modified", so the working tree went
+#     dirty on a read-only operation;
+#   * a dirty tree makes `git switch` refuse, and `git bisect` works by switching commits
+#     repeatedly -- so the suite broke the one tool it exists to enable;
+#   * and fixtures that cannot be byte-compared are a strange thing for a project whose whole
+#     test method is byte comparison.
+#
+# Found on 2026-08-06 by a verification pass, not by the suite itself. Fixed by stamping every
+# member with the ZIP epoch (1980-01-01, the earliest a ZIP can express) so a build is a pure
+# function of its input.
+FIXED_TIME = (1980, 1, 1, 0, 0, 0)
+
+
+def _member(name):
+    zi = zipfile.ZipInfo(name, date_time=FIXED_TIME)
+    zi.compress_type = zipfile.ZIP_DEFLATED
+    zi.external_attr = 0o600 << 16      # fixed permissions; the default varies by platform
+    zi.create_system = 0                # always report MS-DOS, never the building OS
+    return zi
+
+
 def docx(path, body, extra_parts=None, extra_ct=""):
-    """Write a minimal but genuinely valid .docx."""
+    """Write a minimal but genuinely valid .docx, byte-identically on every run."""
     doc = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
            f'<w:document {W} {R} {WP}><w:body>{body}'
            f'<w:sectPr><w:pgSz w:w="11906" w:h="16838"/></w:sectPr>'
            f'</w:body></w:document>')
     path.parent.mkdir(parents=True, exist_ok=True)
+    parts = [("[Content_Types].xml", CONTENT_TYPES.format(extra=extra_ct)),
+             ("_rels/.rels", RELS),
+             ("word/document.xml", doc),
+             ("word/styles.xml", STYLES)]
+    parts += sorted((extra_parts or {}).items())   # sorted: dict order must not decide bytes
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", CONTENT_TYPES.format(extra=extra_ct))
-        z.writestr("_rels/.rels", RELS)
-        z.writestr("word/document.xml", doc)
-        z.writestr("word/styles.xml", STYLES)
-        for name, data in (extra_parts or {}).items():
-            z.writestr(name, data)
+        for name, data in parts:
+            z.writestr(_member(name), data)
 
 
 def p(*runs, ppr=""):
