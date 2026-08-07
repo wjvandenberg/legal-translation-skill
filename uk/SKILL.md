@@ -2,6 +2,7 @@
 name: legal-translation
 metadata:
   author: Wouter van den Berg <wouter@monteclima.com>
+  linkedin: https://www.linkedin.com/in/wjvandenberg/
 description: >
   Translate legal documents from any language into English while preserving .docx formatting
   and translating track changes and headers/footers. Use this skill whenever the user asks to
