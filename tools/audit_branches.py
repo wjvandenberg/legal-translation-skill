@@ -52,8 +52,17 @@ if "--branch" in sys.argv:
 FAIL, OK, NOTE, SKIP = [], [], [], []
 
 
+# ANY tool that invokes a skill script must carry this, not just the test runner. Importing
+# a skill module drops a __pycache__ directory INSIDE uk/scripts or us/scripts; it is
+# gitignored so it never shows in a diff, but tools/package.py zips the variant tree, so it
+# would ship inside the .skill. The fix was first applied to tests/run_tests.py alone and the
+# leak simply came back through the next tool that ran a skill script.
+CLEAN_ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
+                 PYTHONDONTWRITEBYTECODE="1")
+
+
 def git(*a, binary=False):
-    r = subprocess.run(["git", *a], capture_output=True, cwd=ROOT)
+    r = subprocess.run(["git", *a], capture_output=True, cwd=ROOT, env=CLEAN_ENV)
     return r.stdout if binary else r.stdout.decode("utf-8", "replace")
 
 
@@ -215,7 +224,7 @@ def audit_b1():
     cov = ROOT / "tools" / "check_coverage.py"
     if cov.exists():
         tool = subprocess.run([sys.executable, str(cov)], capture_output=True, text=True,
-                              encoding="utf-8", errors="replace", cwd=ROOT).stdout or ""
+                              encoding="utf-8", errors="replace", cwd=ROOT, env=CLEAN_ENV).stdout or ""
     else:
         blob = git("show", f"{ref}:tools/check_coverage.py", binary=True)
         if blob:
@@ -223,7 +232,7 @@ def audit_b1():
             tmp.parent.mkdir(parents=True, exist_ok=True)
             tmp.write_bytes(blob)
             tool = subprocess.run([sys.executable, str(tmp)], capture_output=True, text=True,
-                                  encoding="utf-8", errors="replace", cwd=ROOT).stdout or ""
+                                  encoding="utf-8", errors="replace", cwd=ROOT, env=CLEAN_ENV).stdout or ""
             tmp.unlink(missing_ok=True)
         else:
             SKIP.append("branch 1: check_coverage.py not found on the checkout or the ref")
@@ -345,7 +354,7 @@ def audit_b2():
     claim("B2.arms", "the within-tree arm produced findings in BOTH trees", arms, ["uk", "us"])
 
     r = subprocess.run([sys.executable, str(ROOT / "tools" / "parity_check.py")],
-                       capture_output=True, text=True, encoding="utf-8", cwd=ROOT)
+                       capture_output=True, text=True, encoding="utf-8", cwd=ROOT, env=CLEAN_ENV)
     claim("B2.exit", "the check exits 0 against its own baseline", r.returncode, 0)
 
 
