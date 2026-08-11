@@ -124,7 +124,15 @@ for s, v in rows.items():
             fail('%s line %d: finding text only %d chars - truncated? %r'
                  % (fid, ln, len(cols[1]), cols[1][:50]))
 # (b) the docs column must contain only recognised document ids / origins
-DOCTOK = re.compile(r'^(D\d{2}B?|WvdB|June|PM|all|—|-|and|\+|vs|probe|code|repro|log|grade)$')
+# The "found on" column answers WHERE a finding was found. For skill findings that is a
+# corpus document; for INSTRUMENT defects it may legitimately be a branch, because a defect in
+# one of the repository's own checks is found when that check is run, not when a document is
+# translated. I-12..I-16 are the first of that population -- the earlier I-rows all came out
+# of A1 runs and so carried document ids. Added 2026-08-11 rather than renaming those rows to
+# a document that had nothing to do with them, which would have made the column lie to keep a
+# pattern quiet.
+DOCTOK = re.compile(r'^(D\d{2}B?|WvdB|June|PM|all|—|-|and|\+|vs|probe|code|repro|log|grade'
+                    r'|branch|\d{1,2}|evidence|guard|harness|review)$')
 for s, v in rows.items():
     for fid, cols, ln in v:
         if fid.startswith('I-') or (s and s.startswith('Positives')):

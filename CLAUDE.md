@@ -54,7 +54,7 @@ wrong conclusion.
 |---|---|---|---|
 | **`CLAUDE.md`** *(this)* | the charter | first, always | goals · order · status · rules · structure |
 | **`STEP-B-ANALYSIS.md`** | **the build plan.** What to build, in what order, and what counts as having built it | **before and during every build branch — it is the leading document for all of step 2** | §2 the order · §3 the brief per option · §4 the test method |
-| **`FINDINGS-REGISTER.md`** | the evidence base — **206 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
+| **`FINDINGS-REGISTER.md`** | the evidence base — **211 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
 | **`A3-STRUCTURAL-ANALYSIS.md`** | the evidence-led structural analysis | when a structural judgement comes up | the measurements: context, runtime, redundancy, divergence |
 | **`OPUS-5-MIGRATION.md`** | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
@@ -189,9 +189,16 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 
 **The evidence base as it now stands, and these are the numbers to quote:**
 
-> **`FINDINGS-REGISTER.md`: 206 rows — 15 clusters · 168 skill findings (156 clustered + 12 single-instance)
-> · 27 positives to preserve · 11 defects in our own measuring instruments (7 fixed, 4 open).** The largest
+> **`FINDINGS-REGISTER.md`: 211 rows — 15 clusters · 168 skill findings (156 clustered + 12 single-instance)
+> · 27 positives to preserve · 16 defects in our own measuring instruments (12 fixed, 4 open).** The largest
 > cluster is the instruction contradictions, at **39**. Validator **PASS, 0 failures, 0 warnings**.
+>
+> **The instrument count moved from 11 to 16 on 2026-08-11, and the five new rows are a different
+> population from the first eleven.** I-1 to I-11 are defects in the **A1 harness and review tooling** —
+> instruments outside the repository that were used to *produce* the evidence, and **four of them are still
+> open** and will corrupt Step C if they still are when it runs. **I-12 to I-16 are defects in the
+> repository's own committed checks** — the ones that now guard the build — and all five are fixed. **The
+> skill-finding counts are untouched**, because none of them is a defect in the skill.
 
 ### 2.4 What was produced, and which documents matter from here
 
