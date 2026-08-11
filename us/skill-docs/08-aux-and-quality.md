@@ -246,6 +246,25 @@ Review the output. Key checks:
 go back to the relevant prior step (paragraphs.json for body issues; the auxiliary
 JSON / source for aux-file issues), fix, then re-run Steps 5-9 in order.
 
+**THAT LOOP IS BOUNDED AT FIVE ATTEMPTS, and this is the more expensive of the two
+bounded loops** — each attempt re-runs five steps, not one. **An attempt is one
+change followed by one re-run of Steps 5-9; re-running without changing anything is
+the same attempt.** If `quality_check.py` still reports the same issue after the
+fifth attempt, do not make a sixth. Two rules cover what happens next and they are
+not interchangeable:
+
+- **The issue is a false positive** — the flagged text is a faithful translation of
+  the source. `SKILL.md` rule **5a** governs: fix the check, and never alter the
+  translation to satisfy it. See also the QC-linter pitfall below, which is the
+  worked example of exactly this.
+- **The issue is real but no compliant repair exists** — every remaining fix is
+  forbidden by another rule. `SKILL.md` rule **5b** governs: satisfy its four
+  conditions and disclose the consequence in the delivery notes.
+
+**Reaching 0 issues remains the objective.** The bound exists because a requirement
+that cannot be met is indistinguishable from one that has not been met yet, and
+without it the instruction above has no end.
+
 **Do NOT silently strip semantic content to satisfy a QC heuristic.** When a QC pattern
 flags a paragraph that is in fact a faithful translation of the source — most commonly a
 list connective like `; and` / `, and` (faithful translation of the Italian `; e`) — the
