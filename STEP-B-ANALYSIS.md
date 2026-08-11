@@ -292,6 +292,33 @@ because the decision comes first.
 with no way out. Branch 11 must follow branch 9, or it cannot be built. Branch 16 must follow branch 15 and
 must contain the off-flag removal.
 
+> **AND A FOURTH GATE ON BRANCH 5, ADDED 2026-08-11 BY WOUTER'S DECISION: THE EXCEPTION CHANNEL MUST BE
+> SHOWN TO WORK BEHAVIOURALLY BEFORE THE CHECKS GET TEETH.**
+>
+> **Why here and not at Step C.** Branch 4 proved rule 5b is *present, reachable, unsoftened and aimed at
+> situations that really arose*. **It did not prove a model will apply it** — that is behavioural and no
+> script can settle it. Branch 5 is what converts **eighteen currently-silent defects into blocked runs**,
+> and the only sanctioned way such a run can now end is 5b. **So if 5b does not work, branch 5 makes the
+> pipeline unusable on real documents — and that would be discovered on a client document rather than in a
+> test.** Step C is after branch 5 has shipped, which is too late for this one question.
+>
+> **The probe.** One document, one **deliberately rigged deadlock** — a check made to fire where no
+> compliant repair exists — observing whether the operator (a) exhausts the five-attempt bound rather than
+> stopping early, (b) reaches rule 5b rather than improvising, and (c) satisfies all four conditions,
+> including the delivery-notes disclosure. Cost: one run plus the rigged input.
+>
+> **Read it in the right direction.** This probe **detects failure far better than it confirms success** —
+> the mirror of §4.1's limit. If the operator improvises anyway, that is strong evidence 5b is not enough. If
+> it uses 5b correctly, that is **n=1 and it knows it is being watched**, so it is encouraging rather than
+> conclusive. The asymmetry is acceptable because the failing direction is the one that would cost a client
+> document.
+>
+> **The failure mode to watch for is NOT the obvious one.** The register shows this model follows prose
+> under pressure, hard — cluster F's 39 findings exist *because* operators obeyed contradictory instructions
+> too literally. The live risk is the opposite: **reaching for 5b too early**, treating a repair it could
+> have found as impossible. Nothing mechanically checks conditions (a) to (d); the disclosure is the only
+> trace. **Score the probe on that, not only on whether the channel was used.**
+
 **The four open defects in our own tooling belong to branch 1, and the first draft omitted them entirely.**
 *(Added 2026-08-05 by the deep audit, which found that none of the four was named anywhere in this
 document.)* They are bugs in the **harness and the review tooling**, not in the skill, and branch 1 is the
@@ -539,7 +566,11 @@ gained one sentence to write.
 > **Needs first:** nothing for branch 3.
 > **Unblocks:** **branch 4 ENDS IN A REVIEW, NOT A MERGE** — Wouter reads the way-out specification before
 > it lands, and branch 5 cannot start until that review is closed. He approved the principle, not the text.
-> **Done when:** a graded run plus his review. There is no script instrument for an instruction change.
+> **Done when:** the four instruments in §4 plus his review. *(Corrected 2026-08-11 on branch 4. This line
+> read "a graded run plus his review. There is no script instrument for an instruction change." Branch 3
+> amended §4's method table to the opposite on 2026-08-07 and built four such instruments, but left this
+> line untouched — so branch 4's own brief still prescribed the superseded method. §4 owns the method and
+> this line is a method statement; it now points there rather than restating a stale one.)*
 > **Must not:** soften a single word of the anti-drift text. An independent reader called that language
 > *mature*. This option **adds** a rule where there is a gap; it never relaxes one. And the way out is
 > available only where all four conditions hold — the check has fired, a repair was attempted and recorded,
@@ -2678,7 +2709,7 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 |---|---|---|
 | 0 baseline · 1 harness · 2 parity check | instruments | C27 (nothing can make a check fail) · V2 (no parity mechanism) · **plus the four OPEN measurement-instrument defects, which are bugs in our own tooling and not in the skill: I-7, I-8, I-9, I-10** · and the harness is the instrument for every branch below |
 | 3 the scope rule | 5, 9 | K1 K2 K3 F35 X3 |
-| 4 the exception channel | 5 | A15 D3 D4 D5 F1 F15 F28 F30 F33 L5 — and the whole eighteen-row set named in §12 routes through here |
+| 4 the exception channel | 5 | A15 D3 D4 D5 F1 F15 F28 F30 F33 L5 **F41** — and the whole eighteen-row set named in §12 routes through here. *(F41, repair is unbounded, added 2026-08-11: §6's Option 5 assigns it here in as many words — "this gap belongs to this option because its answer is this option's answer" — but this row had never carried it. No register row was added, so no count in `CLAUDE.md` §2.3 moves.)* |
 | 5 checks can fail | 2, 8 | C3 C23 C25 W3 W4 L4 (via C3) |
 | 6 stop deleting | 1 | A1 A2 A3 A6 A8 A9 C16 C17 F16 F27 |
 | 7 the container inventory | 1 | A16 A19 N1 C19 |

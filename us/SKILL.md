@@ -226,6 +226,20 @@ The defenses are layered and they are non-optional:
 
    **This is a rule about SCOPE, not about severity.** It is never a reason to proceed past a check that is right. If you cannot show the check is wrongly scoped, it is not wrongly scoped, and rule 5 governs: fix the input and re-run.
 
+   **5b. When a check is RIGHT and there is NO compliant repair: stop, disclose, and say what you tried.** Rule 5a is for a check that is *wrong*. This is the opposite case and it is rarer: the check is correctly written **and** correctly scoped, and **every repair still open to you is forbidden by another rule in this skill.** Real documents have produced exactly this — a defect whose only remaining fixes were to hand-edit `document.xml`, to merge two paragraphs, or to alter a faithful translation, each of which this skill forbids absolutely. **There is no compliant repair; and continuing to loop is not one either.**
+
+   **This is the only sanctioned way a repair loop may end other than the check passing.** It is not permission to skip a check, not a judgement that a defect is minor, and never available because repair is slow, awkward or expensive.
+
+   **All four conditions must hold. If any one of them fails this rule does not apply, and rule 5 governs.**
+   - **(a) The check has actually fired.** Never pre-emptively, never on the expectation that it would fire, never for a check you did not run.
+   - **(b) You attempted repair, and you can say what you tried.** A conclusion that no repair exists is worth nothing until you have looked for one.
+   - **(c) You name the specific consequence in the delivery notes**, under "Anything you know to be WRONG in the deliverable", **in the fixed ACCEPTED CONSEQUENCE block set out there** — check, attempts, consequence, where, and what the reader must do. Free prose does not discharge this condition. **A known defect that is disclosed is a repair instruction; the same defect undisclosed is a trap.**
+   - **(d) You did not alter the translation to get here.** Changing correct English so a check stops firing is prohibited by rule 5a and that prohibition is absolute. If you have done it, you have not earned this channel — you have broken a different rule.
+
+   **THE BOUND — five attempts, then stop.** An attempt is one change followed by one re-run of the check; re-running without changing anything is the same attempt, not a new one. **If the check is still firing after the fifth attempt, do not make a sixth.** Stop, and satisfy (a) to (d) above. **Five is measured, not chosen:** across the twelve forensic runs behind this skill, every repair that ever succeeded did so within five attempts, and the deepest loop that never succeeded ran to eighteen. **The bound is what makes this channel mandatory rather than optional** — without it, "re-run until it passes" has no end, and an unwinnable loop is indistinguishable from a slow one.
+
+   **What this rule does NOT do.** It does not make the requirement satisfied, and you must never record it as satisfied. It does not lower the standard for the next document. It does not apply to a check you could satisfy with more care.
+
 6. **Script-integrity errors.** Any script that exits with a `FILE INTEGRITY CHECK FAILED — script truncated` banner indicates a corrupted local install of that script. **STOP** — re-install the skill from the .skill / .zip archive before re-running the affected step. Do NOT work around the failure by skipping the step, calling the script through a wrapper, or treating the result as "optional." Every script in the skill carries the integrity check; a failure on any one of them is a hard install-side problem that can only be fixed by re-installation.
 
    **THIS RULE TAKES PRECEDENCE OVER THE GATE READING, and you will meet the two together.** A truncated validator exits **3**, and `apply_translations_textmatch.py` reports any non-zero exit from `validate_segment_shapes.py` or `validate_reject_all.py` inside a `SKILL GATE FIRED` banner — so a truncated install is presented to you wearing the costume of an intentional gate. **Before treating any `SKILL GATE FIRED` banner as a gate, read the lines above it.** If the reported exit code is **3**, or a `FILE INTEGRITY CHECK FAILED — script truncated` banner appears anywhere above, this rule governs and rule 5 does not: **STOP and re-install.** Do not re-author paragraphs.json — the input is not the problem and editing it will not clear the error.
@@ -415,7 +429,9 @@ phrase reach a final output.
 
 **How to respond when the compliance scan flags a calque.** Do not fight the finding. The
 Avoid column is authoritative. Open the cited sub-lexicon, go to the row, pick the
-preferred rendering, patch `paragraphs.json`, re-apply, re-scan, repeat until exit 0.
+preferred rendering, patch `paragraphs.json`, re-apply, re-scan, repeat until exit 0 —
+**bounded at five attempts, per rule 5b.** If the row offers no rendering that is both
+correct and permitted, a sixth attempt cannot succeed either: stop and use the channel.
 
 ### Sub-lexicon over-applied where cross-language reference governs (lexicon priority misread)
 
@@ -662,7 +678,20 @@ Include these six items, in this order:
 1. **What the file is.** That it is a translation into US English of the named source document, produced by this skill, and that **the source-language document remains the operative text** — the translation is for reading and negotiating, not a substitute instrument. Say whether tracked changes are preserved.
 2. **What the run actually did to the document beyond translating it** — definitions reordered, tidy-up passes applied, auxiliary parts translated. The reader is receiving a document that differs structurally from the source in ways nobody announced otherwise.
 3. **Anything a reviewing lawyer should look at.** Interpretive choices you made and could reasonably have made otherwise: a term with two defensible renderings, a source drafting error translated faithfully rather than silently repaired, an ambiguity you resolved one way. Say what you chose and why. **A choice disclosed where it was made costs the reviewer a paragraph; the same choice buried costs a re-translation.**
-4. **Anything you know to be WRONG in the deliverable**, where it is, and what the reader must do about it. **A known defect that is disclosed is a repair instruction; the same defect undisclosed is a trap.** This item is a disclosure duty, not permission to ship a defect — if you can fix it, fix it.
+4. **Anything you know to be WRONG in the deliverable**, where it is, and what the reader must do about it. **A known defect that is disclosed is a repair instruction; the same defect undisclosed is a trap.** This item is a disclosure duty, not permission to ship a defect — if you can fix it, fix it. **Where you got here under rule 5b** — a check that was right, with no compliant repair — this item is where its condition (c) is discharged, **and it must take the fixed shape below, not free prose.**
+
+   ```
+   ACCEPTED CONSEQUENCE (SKILL.md rule 5b)
+     check:        <the check that fired, by script name and flag>
+     attempts:     <how many repairs you made; the bound is five>
+     consequence:  <what is wrong in the delivered document>
+     where:        <clause, page or part — enough for the reader to find it>
+     reader must:  <what the reader has to do about it>
+   ```
+
+   **One block per accepted consequence, verbatim keys, all five lines present.** An empty line is not a filled one: if you cannot say what the reader must do, you have not finished thinking about the consequence and you may not accept it yet.
+
+   **Why a fixed shape rather than a sentence.** Nothing in this skill can check that you really made five attempts — you write the number and no gate verifies it. What the shape *does* make impossible is **silence**: a check that fired, a run that finished, and no block, is a discrepancy anyone can see. In free prose an undisclosed exception and a well-handled one look identical from outside. **This does not make you more honest; it makes a lapse visible.**
 5. **Any check that fired and was resolved as a false positive** — which check, what it flagged, and why the flagged text is faithful to the source. This is the record rule 5a requires.
 6. **What you verified, and the completion statement** — see the invariant below.
 

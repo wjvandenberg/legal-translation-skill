@@ -1,0 +1,20 @@
+# EXTRA EVIDENCE FOLDERS FOR tools/hooks/evidence_guard.py
+#
+# Copy this file to `.claude/evidence-dirs.local` — WITHOUT the .example suffix — and put one
+# folder name per line. That file is gitignored and must stay that way.
+#
+# WHY IT IS SEPARATE FROM THE GUARD. Two evidence folders are named in the guard itself
+# because their names are already public in this repository. The TEST-DOCUMENT folder's name
+# is not, and naming it here would publish it — the same reasoning that keeps the 93-pattern
+# scan list and the corpus-descriptor list outside the repo (CLAUDE.md 5.4): the scanner
+# ships, the list never does.
+#
+# UNTIL YOU CREATE THAT FILE, THE TEST-DOCUMENT FOLDER IS NOT GUARDED. That is a real gap and
+# it is stated rather than papered over. `tests/test_evidence_guard.py` says so in its own
+# closing output.
+#
+# Blank lines and lines starting with # are ignored. Matching is case-insensitive and on the
+# folder NAME as it appears in a command, so a bare name is enough — no path, no wildcards.
+#
+# Example (invented, not a real folder):
+# my-test-documents

@@ -3,12 +3,12 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 10,
+ "count": 16,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "fix/dangling-cross-references",
-   "commit_subject": "Four quoted cross-references pointed at a heading that does not exist (register row F40, widened from one instance to a class)",
-   "sha256_now": "ca57a976c63dd8e80eb251c784f81ae92a968b3a13af754d15137115ef96b569"
+   "changed_by": "feature/5b-disclosure-block",
+   "commit_subject": "Rule 5b's disclosure takes a fixed, machine-recognisable shape, so that a SILENT exception becomes a detectable defect rather than an invisible one (register row F41, condition (c))",
+   "sha256_now": "43c91dbc821ee51c48056204ed3352c87519f7cfb9a6dbeedd94adc45c918a97"
   },
   "uk/scripts/post_process.py": {
    "changed_by": "feature/scope-rule",
@@ -20,6 +20,11 @@
    "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
    "sha256_now": "654c6a8c1c31b846256b9dc380f18828d6519309944dfdb8a5cd641e1fc24550"
   },
+  "uk/skill-docs/04b-translate-gates.md": {
+   "changed_by": "feature/exception-channel",
+   "commit_subject": "Branch 4 - the exception channel: the sanctioned way out when a check is right and no compliant repair exists, and the five-attempt bound on every repair loop (register rows F41 and the eighteen-row deadlock set)",
+   "sha256_now": "722a05dd220cbf84f4c058a71d1bf0fa00f6f2f3e052728042546a92f7657eba"
+  },
   "uk/skill-docs/05-apply.md": {
    "changed_by": "feature/scope-rule",
    "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
@@ -30,10 +35,20 @@
    "commit_subject": "Four quoted cross-references pointed at a heading that does not exist (register row F40, widened from one instance to a class)",
    "sha256_now": "aa6c0cfa899652812b30644144ac237f7eb46fff330051a8f55bdec0b2a76199"
   },
+  "uk/skill-docs/08-aux-and-quality.md": {
+   "changed_by": "feature/exception-channel",
+   "commit_subject": "Branch 4 - the exception channel: the sanctioned way out when a check is right and no compliant repair exists, and the five-attempt bound on every repair loop (register rows F41 and the eighteen-row deadlock set)",
+   "sha256_now": "562d3cb022f9ab48788dc4c64599c0bd82b864d43cb960433cf992f38b2633b9"
+  },
+  "uk/skill-docs/10-repack-and-validate.md": {
+   "changed_by": "feature/exception-channel",
+   "commit_subject": "Branch 4 - the exception channel: the sanctioned way out when a check is right and no compliant repair exists, and the five-attempt bound on every repair loop (register rows F41 and the eighteen-row deadlock set)",
+   "sha256_now": "e44fb3e745912036d0cc11b6f522f81d5dd44d8aacdcf2cca2c00b06c264a60d"
+  },
   "us/SKILL.md": {
-   "changed_by": "fix/dangling-cross-references",
-   "commit_subject": "Four quoted cross-references pointed at a heading that does not exist (register row F40, widened from one instance to a class)",
-   "sha256_now": "202831cd0b066aa8d6940bbf1a369dfb8468cc74c0d12d35e54bfd4d7eefb06c"
+   "changed_by": "feature/5b-disclosure-block",
+   "commit_subject": "Rule 5b's disclosure takes a fixed, machine-recognisable shape, so that a SILENT exception becomes a detectable defect rather than an invisible one (register row F41, condition (c))",
+   "sha256_now": "04621b70748d0ee854beb99d66b829d0de1800d856cec6777212384aad997b92"
   },
   "us/scripts/post_process.py": {
    "changed_by": "feature/scope-rule",
@@ -45,6 +60,11 @@
    "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
    "sha256_now": "e403a619ed2e3e3345debff13baae03eced9cf60a5fac563abb9124cc0defbbf"
   },
+  "us/skill-docs/04b-translate-gates.md": {
+   "changed_by": "feature/exception-channel",
+   "commit_subject": "Branch 4 - the exception channel: the sanctioned way out when a check is right and no compliant repair exists, and the five-attempt bound on every repair loop (register rows F41 and the eighteen-row deadlock set)",
+   "sha256_now": "c9c16f5af9a9037a49b3df35233cae7e402a0e848e5e77d6017e257bc56974a8"
+  },
   "us/skill-docs/05-apply.md": {
    "changed_by": "feature/scope-rule",
    "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
@@ -54,6 +74,16 @@
    "changed_by": "fix/dangling-cross-references",
    "commit_subject": "Four quoted cross-references pointed at a heading that does not exist (register row F40, widened from one instance to a class)",
    "sha256_now": "698e89485a008023f0d166e65e5ca325c1ea799ed5f09896947c4eac7419c41a"
+  },
+  "us/skill-docs/08-aux-and-quality.md": {
+   "changed_by": "feature/exception-channel",
+   "commit_subject": "Branch 4 - the exception channel: the sanctioned way out when a check is right and no compliant repair exists, and the five-attempt bound on every repair loop (register rows F41 and the eighteen-row deadlock set)",
+   "sha256_now": "2c1724e4d53a532da317faa0b54526acaee87167165d228a849befa1740e613e"
+  },
+  "us/skill-docs/10-repack-and-validate.md": {
+   "changed_by": "feature/exception-channel",
+   "commit_subject": "Branch 4 - the exception channel: the sanctioned way out when a check is right and no compliant repair exists, and the five-attempt bound on every repair loop (register rows F41 and the eighteen-row deadlock set)",
+   "sha256_now": "43e3a063cdac5b5d19619f8f7bebf0362f341b064cdff805e0b7efe81dc73de0"
   }
  }
 }

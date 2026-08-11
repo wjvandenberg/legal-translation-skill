@@ -65,6 +65,56 @@ REQUIRED = [
     # K2 — the Step 6 gate stops telling the operator to make the JSON match the document.
     ("K2", "scripts/post_process.py", "WORK OUT WHICH SIDE IS WRONG BEFORE EDITING EITHER"),
     ("K2", "scripts/post_process.py", "it clears the gate and ships the defect"),
+
+    # ---- BRANCH 4 — the exception channel -------------------------------------------
+    # The channel is for the case rule 5a is NOT for: the check is right and every repair
+    # left is forbidden. The needles bind the rule to its own conditions, so a file that
+    # merely mentions "no compliant repair" cannot satisfy them.
+    ("F41", "SKILL.md",
+     "When a check is RIGHT and there is NO compliant repair"),
+    ("F41", "SKILL.md",
+     "the only sanctioned way a repair loop may end other than the check passing"),
+    # Each of the four conditions, individually. Decision 3b is not re-openable, so a later
+    # edit that drops one has to delete a line here and show it in the diff.
+    ("F41", "SKILL.md", "(a) The check has actually fired"),
+    ("F41", "SKILL.md", "(b) You attempted repair, and you can say what you tried"),
+    ("F41", "SKILL.md", "(c) You name the specific consequence in the delivery notes"),
+    ("F41", "SKILL.md", "(d) You did not alter the translation to get here"),
+    # The fifth gap: the bound. Without it the channel is optional.
+    ("F41", "SKILL.md", "THE BOUND — five attempts, then stop"),
+    ("F41", "SKILL.md", "do not make a sixth"),
+    # K3 again — condition (c) has to land in the format branch 3 laid down, not a new one.
+    ("F41", "SKILL.md", "this item is where its condition (c) is discharged"),
+    # THE DISCLOSURE BLOCK. Free prose cannot discharge condition (c): an undisclosed
+    # exception and a well-handled one look identical in prose, and no gate can tell them
+    # apart. The fixed shape cannot prove the five attempts happened -- it makes SILENCE
+    # detectable, which is a different and achievable thing. Every key is asserted
+    # individually so dropping one has to show in a diff.
+    ("F41", "SKILL.md", "ACCEPTED CONSEQUENCE (SKILL.md rule 5b)"),
+    ("F41", "SKILL.md", "check:        <the check that fired"),
+    ("F41", "SKILL.md", "attempts:     <how many repairs you made"),
+    ("F41", "SKILL.md", "consequence:  <what is wrong in the delivered document>"),
+    ("F41", "SKILL.md", "where:        <clause, page or part"),
+    ("F41", "SKILL.md", "reader must:  <what the reader has to do about it>"),
+    ("F41", "SKILL.md", "verbatim keys, all five lines present"),
+    ("F41", "SKILL.md", "This does not make you more honest; it makes a lapse visible"),
+    # And condition (c) must POINT at the block, or the rule and the format drift apart.
+    ("F41", "SKILL.md", "in the fixed ACCEPTED CONSEQUENCE block set out there"),
+    ("F41", "SKILL.md", "Free prose does not discharge this condition"),
+
+    # The bound must be stated WHERE THE LOOP IS. All four prose sites, not the two F41
+    # named -- the sweep on branch 4 found two more, one of them in the always-loaded file.
+    ("F41", "skill-docs/04b-translate-gates.md",
+     "THE REPAIR LOOP IS BOUNDED AT FIVE ATTEMPTS"),
+    ("F41", "skill-docs/08-aux-and-quality.md",
+     "THAT LOOP IS BOUNDED AT FIVE ATTEMPTS"),
+    ("F41", "skill-docs/10-repack-and-validate.md",
+     "This loop is bounded at five attempts"),
+    ("F41", "SKILL.md", "bounded at five attempts, per rule 5b"),
+    # 08-aux must send the two cases to DIFFERENT rules. Collapsing them would make 5b the
+    # answer to a false positive, which is the one reading that turns it into a bypass.
+    ("F41", "skill-docs/08-aux-and-quality.md", "governs: fix the check, and never alter"),
+    ("F41", "skill-docs/08-aux-and-quality.md", "no compliant repair exists"),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -103,6 +153,18 @@ PRESERVED = [
     ("skill-docs/05-apply.md",
      "The gates exist because every prior occasion the operator went around them shipped "
      "output below the quality the skill is designed to deliver."),
+    # Branch 4's own guard rails. STEP-B-ANALYSIS.md calls the exception channel "the
+    # highest-risk documentation change in the whole plan" -- written loosely it is a licence
+    # to bypass checks. These four sentences are what stop that reading, so they are asserted
+    # byte-for-byte exactly like the anti-drift text they sit beside.
+    ("SKILL.md", "It is not permission to skip a check, not a judgement that a defect is "
+                 "minor, and never available because repair is slow, awkward or expensive."),
+    ("SKILL.md", "**If the check is still firing after the fifth attempt, do not make a "
+                 "sixth.**"),
+    ("SKILL.md", "It does not make the requirement satisfied, and you must never record it "
+                 "as satisfied."),
+    ("SKILL.md", "If you have done it, you have not earned this channel — you have broken a "
+                 "different rule."),
 ]
 
 # The one place the two trees are ALLOWED to differ inside the added prose. Everything else
@@ -125,7 +187,7 @@ def read(tree, rel):
 
 
 print("=" * 96)
-print("INSTRUCTION-LAYER ACCEPTANCE — branch 3")
+print("INSTRUCTION-LAYER ACCEPTANCE — branches 3 and 4")
 print("=" * 96)
 
 print("\n1. EVERY REQUIRED RULE IS PRESENT, IN BOTH TREES")
@@ -149,15 +211,26 @@ for rel, phrase in PRESERVED:
 print("\n4. THE ADDED PROSE IS THE SAME IN BOTH TREES")
 # Markdown prose is invisible to the parity check -- it compares scripts and the dictionary
 # tables, nothing else -- so without this the two trees could drift here unnoticed.
-for label, start, end in [
-    ("rule 5a (the scope rule)", "   **5a. A check can be wrong IN SCOPE",
-     "\n6. **Script-integrity errors."),
-    ("the delivery-notes section", "## What the delivery notes must contain",
-     "## Maintainer discipline"),
+for label, rel, start, end in [
+    # This span now covers 5a AND 5b, so branch 4's new prose is compared across trees by
+    # the same assertion -- no second block needed, and no way to add a third sub-rule that
+    # escapes it.
+    ("rules 5a + 5b (scope rule and exception channel)", "SKILL.md",
+     "   **5a. A check can be wrong IN SCOPE", "\n6. **Script-integrity errors."),
+    ("the delivery-notes section", "SKILL.md",
+     "## What the delivery notes must contain", "## Maintainer discipline"),
+    # The bound is authored in step docs too, and those are NOT SKILL.md. The first version
+    # of this list left the file hardcoded, so both new entries would have searched SKILL.md,
+    # failed to locate, and reported "section not found" -- a check that fails for the wrong
+    # reason is as bad as one that passes for the wrong reason.
+    ("the bounded loop at Step 4b", "skill-docs/04b-translate-gates.md",
+     "**THE REPAIR LOOP IS BOUNDED AT FIVE ATTEMPTS", "\nWarnings are printed"),
+    ("the bounded loop at Step 9", "skill-docs/08-aux-and-quality.md",
+     "**THAT LOOP IS BOUNDED AT FIVE ATTEMPTS", "\n**Do NOT silently strip"),
 ]:
     blocks = {}
     for t in TREES:
-        s = read(t, "SKILL.md")
+        s = read(t, rel)
         i, j = s.find(start), s.find(end)
         blocks[t] = s[i:j] if i >= 0 and j > i else None
     if None in blocks.values():
@@ -174,8 +247,11 @@ r = subprocess.run([sys.executable, str(ROOT / "tools" / "reachability.py")],
                    errors="replace", cwd=ROOT)
 check("tools/reachability.py exits 0 — the scope rule is readable at every blocking step",
       r.returncode == 0, f"exit {r.returncode}")
-check("and it reports the rule in the ALWAYS-LOADED file, not a step doc",
-      r.stdout.count("the scope rule is stated in: SKILL.md") == len(TREES))
+check("and it reports BOTH gate rules in the ALWAYS-LOADED file, not a step doc",
+      r.stdout.count("stated in: SKILL.md") == 2 * len(TREES),
+      f"saw {r.stdout.count('stated in: SKILL.md')}, expected {2 * len(TREES)}")
+check("and no repair-repeat instruction is left unbounded in either tree",
+      r.stdout.count("still UNBOUNDED in prose: none") == len(TREES))
 
 # --------------------------------------------------------------------------------------
 # 6. THE NEGATIVES. A check that cannot fail is not a check.
@@ -183,9 +259,9 @@ check("and it reports the rule in the ALWAYS-LOADED file, not a step doc",
 print("\n6. NEGATIVE TESTS — each check is shown to FAIL on a tree that violates it")
 
 
-def with_mutation(rel, mutate, probe):
+def with_mutation(rel, mutate, probe, base="uk"):
     """Apply a mutation, run `probe`, restore the original bytes. Never touches git."""
-    p = ROOT / "uk" / rel
+    p = ROOT / base / rel if base else ROOT / rel
     original = p.read_bytes()
     try:
         text = original.decode("utf-8")
@@ -254,6 +330,86 @@ check("string_only_edit PASSES on the real text-only edit", clean_rc == 0,
       f"exit {clean_rc}")
 check("string_only_edit FAILS when control flow changes", flow_rc == 1, f"exit {flow_rc}")
 
+# ---- BRANCH 4's negatives ------------------------------------------------------------
+# (e) remove the exception channel -> reachability must notice it is unreachable. Rule 5a
+#     surviving is not enough: 5a says a check can be WRONG, and an operator facing a check
+#     that is RIGHT with no compliant repair gets no answer from it.
+rc = with_mutation("SKILL.md",
+                   lambda t: t.replace(
+                       "the only sanctioned way a repair loop may end other than the "
+                       "check passing",
+                       "one option among several"),
+                   _probe_reach)
+check("reachability FAILS when the exception channel is removed", rc == 1, f"exit {rc}")
+
+# (f) un-bound one of the four loop sites -> the sweep must notice. This is the negative
+#     that matters most: the bound is what makes the channel mandatory rather than optional,
+#     and a bound present in SKILL.md but absent where the loop is authored is exactly the
+#     shape F41 recorded. Both phrasings have to go, or the site is still bounded.
+rc = with_mutation("skill-docs/04b-translate-gates.md",
+                   lambda t: t.replace("THE REPAIR LOOP IS BOUNDED AT FIVE ATTEMPTS",
+                                       "ON REPAIR")
+                              .replace("but at most five times — see the\n   bound below.",
+                                       "as often as needed."),
+                   _probe_reach)
+check("reachability FAILS when a repair loop loses its bound", rc == 1, f"exit {rc}")
+
+# (g) the sweep must not be satisfied by the bound sitting in a DIFFERENT file. Remove it
+#     from 10-repack only; SKILL.md still carries rule 5b in full.
+rc = with_mutation("skill-docs/10-repack-and-validate.md",
+                   lambda t: t.replace("**This loop is bounded at five attempts, per "
+                                       "`SKILL.md` rule 5b**", "**Take care**"),
+                   _probe_reach)
+check("and FAILS when only ONE site loses it, with rule 5b still intact", rc == 1,
+      f"exit {rc}")
+
+# (i) THE DISCLOSURE BLOCK, KEY BY KEY. A block missing one field is the realistic decay --
+#     nobody deletes the whole thing, someone drops the line they found awkward to fill in.
+#     "reader must" is the one to guard hardest: without it the note records that something
+#     is wrong and leaves the reader with nothing to do about it, which is the trap rule 5b
+#     names in its own text.
+for key in ("reader must:", "attempts:", "where:"):
+    # Probe the MUTATED tree only. The first version asked `any(... for t in TREES)`, so the
+    # untouched US copy kept satisfying it and all three negatives reported a false FAIL --
+    # a check whose own probe was looking in the wrong place.
+    gone = with_mutation(
+        "SKILL.md",
+        lambda t, k=key: t.replace(f"     {k}", f"removed-{k}"),
+        lambda k=key: f"     {k}" in read("uk", "SKILL.md"))
+    check(f"the block check FAILS when the “{key}” line is dropped", gone is False)
+
+# (j) and free prose must not be able to satisfy condition (c) again: the pointer from the
+#     rule to the format is what stops the two drifting apart.
+loose = with_mutation(
+    "SKILL.md",
+    lambda t: t.replace("in the fixed ACCEPTED CONSEQUENCE block set out there",
+                        "in whatever form seems appropriate"),
+    lambda: "in the fixed ACCEPTED CONSEQUENCE block set out there" in read("uk", "SKILL.md"))
+check("and condition (c) FAILS if it stops pointing at the fixed block", loose is False)
+
+# (h) gate_replay must VOID rather than pass when its reconciliation against CLAUDE.md's
+#     baseline table breaks. That assertion is what turned a one-digit error in a published
+#     table into a build failure, so it has to be shown to fail.
+def _probe_replay():
+    rr = subprocess.run([sys.executable, str(ROOT / "tools" / "gate_replay.py")],
+                        capture_output=True, text=True, encoding="utf-8",
+                        errors="replace", cwd=ROOT)
+    return rr.returncode
+
+
+live_rc = _probe_replay()
+if live_rc == 2:
+    check("gate_replay reconciles against the baseline table (logs reachable)", False,
+          "VOID — logs not reachable, or the reconciliation failed")
+else:
+    check("gate_replay reconciles against the baseline table", live_rc == 0,
+          f"exit {live_rc}")
+    broke = with_mutation("tools/gate_replay.py",
+                          lambda t: t.replace('"D03": (56, 1, 41)', '"D03": (56, 1, 40)'),
+                          _probe_replay, base=None)
+    check("and VOIDs when the published re-run column is wrong by one", broke == 2,
+          f"exit {broke}")
+
 # --------------------------------------------------------------------------------------
 # 7. THE K2 MESSAGE, BY EXECUTION.
 #
@@ -269,6 +425,36 @@ print("\n7. THE STEP 6 GATE, FIRED FOR REAL — not a text search")
 import json
 import tempfile
 
+
+# HOW A SKILL SCRIPT IS INVOKED, and this section had it wrong from the day it was written.
+#
+# 7 of the 20 skill scripts import lxml. Under `uv run`, sys.executable is an environment
+# that does NOT carry it, so post_process.py died with ModuleNotFoundError before reaching
+# any gate. The section's only structural assertion was `rc != 0` -- and a crash satisfies
+# that as happily as a gate does. So it reported "the gate actually fires" on every run while
+# nothing had ever fired: a check passing for the wrong reason, inside the one section
+# written specifically to avoid that by executing rather than text-searching.
+#
+# tests/run_tests.py HAD ALREADY SOLVED THIS, with a comment saying why: it invokes every
+# skill script as `uv run --with lxml python`. This file was added later and reached for
+# sys.executable instead. That is the same shape as the __pycache__ leak the handoff records
+# -- a shared hazard fixed in one caller and reintroduced through the next -- so the fix here
+# is to use the SAME mechanism rather than invent a second one.
+#
+# The second half matters more than the first: assert the GATE BANNER, not the exit code, so
+# no future breakage of this kind can be mistaken for a block.
+SKILL_PY = ["uv", "run", "--with", "lxml", "python"]
+
+
+def uv_available():
+    try:
+        return subprocess.run(["uv", "--version"], capture_output=True).returncode == 0
+    except OSError:
+        return False
+
+
+PY = uv_available()
+
 XML = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
        '<w:body><w:p><w:r><w:t>The Supplier shall deliver</w:t></w:r></w:p></w:body>'
@@ -279,7 +465,13 @@ PARAS = [{"idx": 0, "style": "Normal",
           "text": "De leverancier levert de goederen op tijd.",
           "en": "The Supplier shall deliver the goods punctually."}]
 
-for tree in TREES:
+if not PY:
+    for tree in TREES:
+        check(f"{tree}: the Step 6 gate could be executed at all", False,
+              "VOID — `uv` is not on PATH, so the gate scripts cannot be run with their "
+              "lxml dependency. This is not a pass; the gate was never fired.")
+
+for tree in TREES if PY else []:
     with tempfile.TemporaryDirectory() as tmp:
         wd = Path(tmp)
         (wd / "final" / "word").mkdir(parents=True)
@@ -291,15 +483,33 @@ for tree in TREES:
         # so the bytecode would ship to users. run_tests.py already sets this; the first
         # version of this file did not, and leaked into both trees on its first run. The
         # assertion after the loop is the part that matters: it catches the NEXT caller.
-        env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+        # PYTHONIOENCODING/PYTHONUTF8 for the same reason run_tests.py sets them: on Windows
+        # a redirected stdout defaults to cp1252 and a script printing outside it dies before
+        # returning its verdict, which reads as a gate firing.
+        env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1",
+                   PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
         rr = subprocess.run(
-            [sys.executable, str(ROOT / tree / "scripts" / "post_process.py"),
+            SKILL_PY + [str(ROOT / tree / "scripts" / "post_process.py"),
              str(wd / "final" / "word" / "document.xml"),
              "--paragraphs", str(wd / "paragraphs.json"), "--variant", tree],
             capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT,
             env=env)
         out = (rr.stdout or "") + (rr.stderr or "")
-        check(f"{tree}: the gate actually fires", rr.returncode != 0, f"exit {rr.returncode}")
+        # The script must not merely exit non-zero -- it must BLOCK. A crash exits non-zero
+        # too, and that is precisely how this check used to pass while the script was dying
+        # on a missing import before reaching any gate.
+        #
+        # NOT a blanket "no traceback" assertion, which the first version of this fix used
+        # and which was wrong: this gate blocks by RAISING, so a traceback is its normal
+        # designed output and the banner and remedy are inside the exception message. The
+        # discriminator is a STARTUP failure -- the script never reached its own logic.
+        started = "ModuleNotFoundError" not in out and "ImportError" not in out
+        check(f"{tree}: the script started (no import failure)", started,
+              "" if started else "died on a missing dependency before reaching the gate")
+        check(f"{tree}: the gate actually fires",
+              rr.returncode != 0 and "SKILL GATE FIRED" in out,
+              f"exit {rr.returncode}, banner "
+              f"{'present' if 'SKILL GATE FIRED' in out else 'ABSENT'}")
         check(f"{tree}: and prints the new remedy the operator will read",
               "WORK OUT WHICH SIDE IS WRONG BEFORE EDITING EITHER" in out)
         check(f"{tree}: and no longer prints the superseded one",

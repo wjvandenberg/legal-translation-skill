@@ -426,17 +426,47 @@ else:
 # skill's own twenty scripts. The first version of this check knew nothing about the
 # archive and reported five shipped pipeline scripts as missing files.
 skill_scripts = {n.split("/")[-1] for n in ARCH["UK"]["files"] if n.startswith("scripts/")}
-named = set(re.findall(r"`(?:temp[\\/])?([a-z0-9_]+\.py)`", CMD))
-missing = sorted(n for n in named
-                 if not (ROOT / "temp" / n).exists()
-                 and not (PRIV / "tools" / n).exists()
-                 and n not in skill_scripts)
+
+# TWO DEFECTS IN THIS CHECK, BOTH FOUND 2026-08-11 AND BOTH FIXED HERE.
+#
+# (1) IT COULD NOT SEE tools/ OR tests/. It searched temp/, the private tools/ and the skill
+#     archive -- and tools/ did not exist when it was written. So ANY repository tool the
+#     charter names was reported as existing nowhere. There are 23 of them now.
+#
+# (2) THE REGEX ONLY UNDERSTOOD A `temp/` PREFIX, so `tools/gate_replay.py` in backticks
+#     matched NOTHING and was silently never checked, while the bare `gate_replay.py`
+#     matched and then failed to resolve. The check's verdict therefore depended on how the
+#     author happened to punctuate the reference -- one spelling failed loudly, the other was
+#     not checked at all. That is worse than either alone, and it is why the prefix is now
+#     part of the pattern and the search covers every folder we actually keep scripts in.
+SEARCH_DIRS = [ROOT / "temp", ROOT / "tools", ROOT / "tools" / "hooks", ROOT / "tests",
+               PRIV / "tools"]
+named = set(re.findall(r"`(?:(?:temp|tools|tests)[\\/](?:hooks[\\/])?)?([a-z0-9_]+\.py)`",
+                       CMD))
+
+# DECLARED FUTURE, not missing. Widening the pattern above immediately surfaced these two,
+# which the old regex had been skipping because they are written with a `tools/` prefix. They
+# are real absences and the check is right to see them -- but the charter describes them as
+# work to be built at release time, not as tools that exist. Naming them here keeps the check
+# strict (anything NOT listed is still an unexplained absence) while recording why these two
+# are allowed to be absent. Delete an entry the moment its script lands.
+PLANNED = {
+    "package.py": "§6.6 — builds one .skill archive per variant, at release time",
+    "publish.py": "§6.6 — copies each tree into its public repo, at release time",
+}
+absent = {n for n in named
+          if not any((d / n).exists() for d in SEARCH_DIRS) and n not in skill_scripts}
+missing = sorted(absent - set(PLANNED))
+planned_absent = sorted(absent & set(PLANNED))
 if missing:
-    fail("6", f"script(s) named in CLAUDE.md that exist nowhere — not in temp/, not in "
-              f"the private tools/, not in the skill: {missing}")
+    fail("6", f"script(s) named in CLAUDE.md that exist nowhere — not in temp/, tools/, "
+              f"tests/, the private tools/, or the skill: {missing}")
 else:
     ok(f"all {len(named)} named .py files exist "
-       f"({len(named & skill_scripts)} of them the skill's own)")
+       f"({len(named & skill_scripts)} of them the skill's own"
+       + (f"; {len(planned_absent)} declared future: "
+          + ", ".join(f"{n} ({PLANNED[n]})" for n in planned_absent) if planned_absent
+          else "") + ")")
 
 named_private = set(re.findall(r"`(A4-[A-Z\-]+\.md)`", CMD))
 missing_p = sorted(n for n in named_private if not (PRIV / n).exists())

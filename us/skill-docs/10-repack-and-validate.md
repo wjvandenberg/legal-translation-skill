@@ -12,6 +12,8 @@ the output `.docx`. There is no separate command for them and no flag to skip.
   header/footer boilerplate. Exit 1 = blocking; repack aborts. Fix the offending
   `en` / `en_segments` entries in `paragraphs.json`, re-run Step 5, then re-run
   every mandatory post-processing step in order. Do NOT patch the XML directly.
+  **This loop is bounded at five attempts, per `SKILL.md` rule 5b** — if the same
+  entries still block after the fifth, stop and use the channel rather than a sixth.
 * **Post-apply lost-content validation** — re-runs `validate_apply.py --strict`
   comparing the translations declared in `paragraphs.json` (`en`, `en_deleted`,
   `en_segments`) against what landed in the modified `document.xml`. Catches the

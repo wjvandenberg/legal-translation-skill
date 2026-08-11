@@ -467,3 +467,38 @@ states, applied again.
 branch 3 in terms, and neither §2's branch row nor §3.4 mentions it — so the branch was planned without it
 until §4.1 was read. **That is the second time a section pointing at another section has been the difference
 between a right and a wrong plan** *(the first was branch 2, planned from §3.3 without §6)*.
+
+---
+
+**2026-08-11 (branch 4 landed, and its one unanswerable question got a gate).** Rule 5b — the sanctioned
+way out when a check is right and no compliant repair exists — was built, verified and presented for
+Wouter's review. He approved the text with one condition, and the condition is the interesting part:
+*"as long as you are sure this will really work in cowork — that the model will really not deviate."*
+
+**The honest answer was no, and saying so is what produced the decision.** Branch 4 proves 5b is present,
+readable at every step a check can block, identical in both trees, softened nothing, and is aimed at
+situations the logs record — 147 instances across the twelve runs, 7 of them *no compliant repair*, and
+**four repair loops that never went green, the deepest running to eighteen attempts.** None of that shows a
+model will *apply* the rule. That is behavioural, and no script can settle it.
+
+**Decided: a behavioural probe gates branch 5, rather than waiting for Step C.** One document, one
+deliberately rigged deadlock. **The reasoning is sequencing, not thoroughness:** branch 5 is what turns
+eighteen silent defects into blocked runs, and 5b is then the only legitimate way such a run can end — so if
+5b fails, branch 5 makes the pipeline unusable on real documents, and Step C comes *after* branch 5 has
+shipped. Recorded as a fourth sequencing fact in `STEP-B-ANALYSIS.md` §2, with its design and the direction
+to read it in.
+
+**Also decided the same day, both cheap and both converting an unverifiable claim into a checkable one.**
+*(i)* The confidentiality gate now scans the **published trees**, which it never did — by diffing to added
+lines only, because scanning whole trees returns 46 known-benign hits per tree and a reviewer facing those
+starts skimming. Measured: branch 4's eight files give 6 hits, its 102 added lines give 0. *(ii)* An
+**evidence-folder guard** runs before a shell command executes, because the one leak class this project
+cannot scan for is the transcript — §6.5 says session metadata is reachable by neither the scanners nor the
+location rule, and a session proved it by globbing a log folder and printing real corpus filenames into the
+conversation.
+
+**Left open, and put to Wouter rather than decided:** whether a 5b invocation should be required in a
+**fixed, machine-recognisable shape** in the delivery notes. It cannot prove the five attempts happened —
+but it makes a *silent* 5b impossible, which turns an undisclosed exception from invisible into a detectable
+defect. Independent of the probe; ordering it first would make the probe's result mechanical rather than a
+judgement about the operator's prose.

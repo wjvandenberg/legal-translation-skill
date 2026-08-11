@@ -54,7 +54,7 @@ wrong conclusion.
 |---|---|---|---|
 | **`CLAUDE.md`** *(this)* | the charter | first, always | goals · order · status · rules · structure |
 | **`STEP-B-ANALYSIS.md`** | **the build plan.** What to build, in what order, and what counts as having built it | **before and during every build branch — it is the leading document for all of step 2** | §2 the order · §3 the brief per option · §4 the test method |
-| **`FINDINGS-REGISTER.md`** | the evidence base — **206 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
+| **`FINDINGS-REGISTER.md`** | the evidence base — **211 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
 | **`A3-STRUCTURAL-ANALYSIS.md`** | the evidence-led structural analysis | when a structural judgement comes up | the measurements: context, runtime, redundancy, divergence |
 | **`OPUS-5-MIGRATION.md`** | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
@@ -189,9 +189,16 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 
 **The evidence base as it now stands, and these are the numbers to quote:**
 
-> **`FINDINGS-REGISTER.md`: 206 rows — 15 clusters · 168 skill findings (156 clustered + 12 single-instance)
-> · 27 positives to preserve · 11 defects in our own measuring instruments (7 fixed, 4 open).** The largest
+> **`FINDINGS-REGISTER.md`: 211 rows — 15 clusters · 168 skill findings (156 clustered + 12 single-instance)
+> · 27 positives to preserve · 16 defects in our own measuring instruments (12 fixed, 4 open).** The largest
 > cluster is the instruction contradictions, at **39**. Validator **PASS, 0 failures, 0 warnings**.
+>
+> **The instrument count moved from 11 to 16 on 2026-08-11, and the five new rows are a different
+> population from the first eleven.** I-1 to I-11 are defects in the **A1 harness and review tooling** —
+> instruments outside the repository that were used to *produce* the evidence, and **four of them are still
+> open** and will corrupt Step C if they still are when it runs. **I-12 to I-16 are defects in the
+> repository's own committed checks** — the ones that now guard the build — and all five are fixed. **The
+> skill-finding counts are untouched**, because none of them is a defect in the skill.
 
 ### 2.4 What was produced, and which documents matter from here
 
@@ -278,7 +285,7 @@ against:**
 
 | doc | document | var | **grade (v3)** | ACTIVE | script / model | cmds | gates | re-runs | batches |
 |---|---|---|---|---|---|---|---|---|---|
-| D03 | Agreement (Norwegian) — **no sub-lexicon** | UK | **9.3** | 33.1 min | 1% / 99% | 56 | 1 | 40 | 26,18,18 |
+| D03 | Agreement (Norwegian) — **no sub-lexicon** | UK | **9.3** | 33.1 min | 1% / 99% | 56 | 1 | 41 | 26,18,18 |
 | D01 | Power of Attorney (Hungarian) — batch pos 1 | UK | **9.2** | 20.6 min | 0% / 100% | 29 | 0 | 15 | 17 |
 | D09 | Document (Hungarian) — most tables | UK | **9.1** | 27.3 min | 0% / 100% | 41 | 1 | 27 | 29,33 |
 | D10 | Guarantee (Polish) — batch pos 2 | UK | **9.1** | 17.8 min | 0% / 100% | 37 | 0 | 23 | 20,18 |
@@ -296,6 +303,13 @@ from ACTIVE.** **Read D01 and D10 with the simplicity caveat in their grade repo
 no tables, no footnotes, no comments, no definitions section and almost no auxiliary parts, so several
 structure and formatting criteria score 10 on *absence* rather than capability. Their high scores are not
 evidence the pipeline is stronger than the richer documents show.
+
+**One cell was corrected on 2026-08-11: D03's re-runs read 40 and are 41.** Found on branch 4, when a new
+instrument asserted this table against the private `analyse_log.py` that produced it and the assertion
+failed. Confirmed by running that analyser on D03's own forensic log, which reports 41. **All 35 other
+machine-produced cells — commands, gates and re-runs across twelve runs — reproduce exactly**, so the
+corpus total is **400 re-runs, not 399**. `tools/gate_replay.py` now asserts the whole column on every run,
+which is why a one-digit error in a public table is now a build failure rather than a reading exercise.
 
 **Six conclusions from those runs, each replicated across documents:**
 
@@ -656,6 +670,31 @@ includes examples.**
 - **A separate rule for one artefact that DOES ship:** the run report goes inside the skill, so it must be
   **metadata-only by construction** — counts and durations, never document text and never filenames.
 
+> **AND ONE LEAK CLASS THAT NONE OF THE CONTROLS BELOW CAN REACH — THE TRANSCRIPT.** *(2026-08-11.)* A
+> session ran `ls` and `find` over the sibling logs folder to learn its layout, and the output printed real
+> corpus filenames carrying counterparty and personal names **into the conversation**. Nothing was committed
+> and nothing could be: the leak never touched a file. **Every control below reads committed content**, and
+> §6.5 already says session metadata is reachable by neither the scanners nor the location rule — so there
+> is **no after-the-fact remedy at all**, and it cannot be un-said.
+>
+> **The rule existed and was broken anyway** — §6.5's *"any glob over an evidence folder must be explicit
+> about which files it expects"* had been read that same morning. That is §5.1's argument restated: prose is
+> not a control. **So the control runs BEFORE the command:** `tools/hooks/evidence_guard.py`, a PreToolUse
+> hook wired in `.claude/settings.json`, blocks a name-emitting command — `ls`, `find`, `tree`, `cat`,
+> `Get-ChildItem`, or inline code that enumerates a directory — whose target is an evidence folder.
+> **The hazard is OUTPUT, not access:** a script that reads those logs and prints counts is exactly what
+> `gate_replay.py` does and still runs, as does the register validator §5.12 prescribes by path.
+> `tools/evidence_ls.py` is the sanctioned way to see a folder's **shape** — extensions, size buckets,
+> per-directory counts, corpus doc-ids — and it prints no name, ever. **A block with no alternative gets
+> worked around, and then you have a control nobody believes.**
+>
+> **Two limits, stated rather than implied.** Hooks load at **session start**, so this one does not protect
+> the session that adds it — probe with `ls ../legal-translation-logs/NO-SUCH-DIRECTORY-PROBE`, which is
+> BLOCKED if it is live and harmlessly reports a missing directory if it is not. And the **test-document
+> folder is not named in the guard**, because its name is not committable; it is read from
+> `.claude/evidence-dirs.local`, which is gitignored, so **in a fresh clone that folder is unguarded until
+> someone creates that file.** Same shape as the scan list — the scanner ships, the list never does.
+
 **Three controls, and they catch different things. Run all three on every committable file before any
 commit.**
 
@@ -732,6 +771,24 @@ mode this project has already diagnosed in the skill's own validators. **A contr
 control.** *(Partly mitigated: the gate now separates the trees from everything else, and the pre-flip triage
 splits matches into ALREADY PUBLIC and NEW EXPOSURE — the cut that makes 715 hits readable. The list itself
 is unchanged.)*
+
+> **SUBSTANTIALLY MITIGATED 2026-08-11 — THE GATE NOW SCANS THE TREES, BY DIFF.** Separating the trees out
+> meant `tools/precommit_gate.py` did not look at `uk/` or `us/` **at all**: it counted their files and
+> stopped. Defensible while no branch changed them; branch 4 changes eight files, and branches 6, 7, 16 and
+> 17 will change far more. **A confidentiality gate blind to the two directories that actually ship is the
+> wrong blind spot to keep.**
+>
+> **The fix is to judge only what a branch INTRODUCES.** Section 7 diffs `uk/` and `us/` against
+> `origin/main` (override with `LT_TREE_BASELINE`) and runs three controls over the **added lines only** —
+> the 93-pattern name scan, the 13 corpus-descriptor patterns **applied as regex and never `re.escape`d**,
+> and the publication check's forbidden classes. The pre-existing false positives sit in the baseline and
+> cancel out.
+>
+> **Measured on branch 4: the eight whole files give 6 hits; the 102 added lines give 0.** Same evidence,
+> and the second is readable. **It reports VOID and refuses to certify when it cannot resolve a baseline** —
+> a control that established nothing has not passed. `tests/test_gate_tree_scan.py` plants a leak of each
+> class into a tree file and asserts the gate blocks on every one, then asserts the tree is byte-unchanged
+> afterwards.
 
 **(c) — CLOSED THE DAY IT WAS FOUND. THE CHANGELOG IS NOT COMMITTED AND `docs/history/` DOES NOT EXIST.**
 *(Wouter, 2026-08-06: "Changelog should NOT be on commit list… Docs/history should never be committed.")*
@@ -1246,14 +1303,16 @@ legal-translation-skill/          # today: this folder, with no .git in it
 │   ├── README.md                 # the PUBLISHED readme → goes to the public UK repo root
 │   └── LICENSE
 ├── us/                           # identical shape, US-default
-├── tools/                        # never ships — 28 scripts, in three groups:
+├── .claude/                      # settings.json wires the PreToolUse evidence guard;
+│                                 #   evidence-dirs.local is gitignored, its .example is not
+├── tools/                        # never ships — 29 scripts, in three groups:
 │                                 #   THE BUILD GUARDS — parity_check · check_coverage ·
 │                                 #     confirm_failure_chains · freeze_intermediates ·
 │                                 #     audit_branches · cycle_evidence · precommit_gate ·
 │                                 #     md_tables · claudemd_claims · claudemd_disposal ·
 │                                 #     audit_register · install_hooks · scan_trees ·
 │                                 #     gate_replay · reachability · xref_check ·
-│                                 #     string_only_edit · hooks/
+│                                 #     string_only_edit · hooks/ (3)
 │                                 #   CONFIDENTIALITY — leakage_scan · publication_check ·
 │                                 #     descriptor_shape_sweep · script_committability ·
 │                                 #     changelog_confidentiality · evidence_ls
@@ -1261,9 +1320,14 @@ legal-translation-skill/          # today: this folder, with no .git in it
 │                                 #     stepb_harvest · stepb_verify · stepb_audit ·
 │                                 #     stepb_audit3 · stepb_metacheck · stepb_refute
 ├── tests/                        # never ships — run_tests · make_fixtures · negative_inputs ·
-│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · six test_*.py
+│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · seven test_*.py
 └── temp/                         # gitignored scratch — it already exists and sits INSIDE the repo root
 ```
+
+> **The tools count read 16 against a real 23, and the tests count read four against six.**
+> Corrected 2026-08-11 by listing the folders rather than adding to the figure that was
+> there — the same error shape as the register's cluster-F count, which went stale three
+> times because each session added to the previous stale number instead of counting.
 
 > **ONE CORRECTION TO THE ORIGINAL LIST, and it is a rule rather than a typo.** `confidentiality_sweep.py`
 > was named for `tools/` and **may never be committed** — it holds a real corpus descriptor inline, measured

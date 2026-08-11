@@ -95,7 +95,18 @@ finding:
 2. Locate the Avoid row.
 3. Pick the correct rendering from the same row and patch the `en` (and
    `en_segments` if applicable) in `paragraphs.json`.
-4. Re-run the compliance scan until it exits 0.
+4. Re-run the compliance scan until it exits 0, **but at most five times — see the
+   bound below.**
+
+**THE REPAIR LOOP IS BOUNDED AT FIVE ATTEMPTS.** "Until it exits 0" is not a
+licence to loop for ever, and some findings have no compliant repair at all: the
+Avoid row may offer no rendering that is both correct and permitted, in which case
+patching `en` again cannot succeed however many times you try. **An attempt is one
+change followed by one re-run; re-running without changing anything is the same
+attempt.** If the scan still exits 1 after the fifth attempt, do not make a sixth —
+go to `SKILL.md` rule **5b**, satisfy its four conditions, and disclose the
+consequence in the delivery notes. **Check rule 5a first:** if the finding is a
+false positive, the remedy is to fix the check, not to use 5b.
 
 Warnings are printed but do not block — review them for context-dependent
 false positives (e.g. an intentional reference to a statute using "Article N").
