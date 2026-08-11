@@ -1023,11 +1023,47 @@ failures, 0 warnings**:
 uv run python ../legal-translation-private/tools/audit_register.py
 ```
 
-**And after editing `STEP-B-ANALYSIS.md`, run its own suites** — `stepb_harvest.py` (63 prescriptions from
-five sources, 0 missing), `stepb_verify.py` (84 claims, and it generates the traceability appendix),
-`stepb_audit.py` (15 checks), `stepb_audit3.py`, `stepb_metacheck.py` (**ten negative tests: it mutates the
-document to prove each check can fail, then restores it byte-identically**), the four per-option checks, and
-`audit_session_stepb.py`. **All pass as at 2026-08-06.**
+**And after editing `STEP-B-ANALYSIS.md`, run its own suites — they live in `tools/` and are COMMITTED as
+of 2026-08-11**, so a fix to one of them survives the session that makes it. Six of them:
+`tools/stepb_harvest.py` (63 prescriptions from five sources, 0 missing), `tools/stepb_verify.py` (84
+claims, and it generates the traceability appendix), `tools/stepb_audit.py` (15 checks),
+`tools/stepb_audit3.py`, `tools/stepb_metacheck.py` (**ten negative tests: it mutates the document to prove
+each check can fail, then restores it byte-identically**), and `tools/stepb_refute.py`. **All six pass.**
+
+> **THEY WERE IN `temp/`, WHICH IS GITIGNORED, AND THAT WAS THE DEFECT.** The suites guarding this
+> project's three largest documents could not be improved: every fix to one of them died with the session
+> that made it, unreviewable and unrepeatable. **Four were left behind and each for a stated reason, because
+> a promotion that quietly drops things is worse than none:**
+>
+> - **`audit_session_stepb.py` — BLOCKED ON CONFIDENTIALITY and it stays in `temp/` permanently.** It holds
+>   **two corpus subject-matter descriptors**, which is precisely the class §5.4 says the 93-pattern name
+>   scan is structurally blind to. It is the file this session's `§`-resolver fix was made in, so **that fix
+>   does not survive** — the honest cost of the block, recorded rather than worked around.
+> - **`stepb_audit2.py` and `stepb_audit2b.py`** — both crash looking for a heading deleted in the
+>   2026-08-05 reorganisation. Broken on `main` today, and one-off session scripts rather than standing
+>   instruments.
+> - **`stepb_measure.py`** — three hard-coded register counts that went stale.
+>
+> **Committing a broken tool into a public repository implies coverage that does not exist**, which is the
+> same objection this project raises against a check nobody believes. The `temp/` originals are left in
+> place untouched (§5.15) and are now superseded by the `tools/` copies.
+>
+> **One of the six needed a change before it could be committed at all, and `LEGAL_TRANSLATION_A4` must be
+> set to run it.** `stepb_audit.py` hard-coded the **sealed A4 judging directory**, whose location §1.3
+> deliberately keeps in the private `context.md`. It now reads that environment variable, exactly as
+> `tools/gate_replay.py` reads `LEGAL_TRANSLATION_LOGS` — **the tool ships, the location does not.**
+>
+> ```bash
+> LEGAL_TRANSLATION_A4="<the sealed directory>" uv run python tools/stepb_audit.py
+> ```
+>
+> **Without it the script exits 1 and prints a banner saying check 10 cannot be completed** — it does NOT
+> excuse the quotations it could not verify. That distinction was got wrong first: the initial version
+> reasoned that a quotation whose only source is unreadable is *void rather than false* and skipped it, which
+> looked principled and **immediately dropped `stepb_metacheck.py` from 10 of 10 mutations detected to 9.**
+> Softening a check to make it honest had made it blind, which is the failure this project logs more than any
+> other, committed here in one of our own instruments and caught only because the metacheck exists. **An
+> unreadable source is not a pass.**
 
 > **`temp/a3_md_tables.py` has now caught five defects nothing else in this project can see** — including a
 > four-column row inserted into a two-column table, and an appendix that lost its delimiter row and stopped
@@ -1210,13 +1246,22 @@ legal-translation-skill/          # today: this folder, with no .git in it
 │   ├── README.md                 # the PUBLISHED readme → goes to the public UK repo root
 │   └── LICENSE
 ├── us/                           # identical shape, US-default
-├── tools/                        # never ships — 16 scripts. parity_check · check_coverage ·
-│                                 #   confirm_failure_chains · freeze_intermediates · audit_branches ·
-│                                 #   cycle_evidence · precommit_gate · leakage_scan · publication_check ·
-│                                 #   descriptor_shape_sweep · script_committability · md_tables ·
-│                                 #   claudemd_claims · audit_register · install_hooks · hooks/
+├── tools/                        # never ships — 28 scripts, in three groups:
+│                                 #   THE BUILD GUARDS — parity_check · check_coverage ·
+│                                 #     confirm_failure_chains · freeze_intermediates ·
+│                                 #     audit_branches · cycle_evidence · precommit_gate ·
+│                                 #     md_tables · claudemd_claims · claudemd_disposal ·
+│                                 #     audit_register · install_hooks · scan_trees ·
+│                                 #     gate_replay · reachability · xref_check ·
+│                                 #     string_only_edit · hooks/
+│                                 #   CONFIDENTIALITY — leakage_scan · publication_check ·
+│                                 #     descriptor_shape_sweep · script_committability ·
+│                                 #     changelog_confidentiality · evidence_ls
+│                                 #   THE STEP-B SUITES, promoted out of temp/ 2026-08-11 —
+│                                 #     stepb_harvest · stepb_verify · stepb_audit ·
+│                                 #     stepb_audit3 · stepb_metacheck · stepb_refute
 ├── tests/                        # never ships — run_tests · make_fixtures · negative_inputs ·
-│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · four test_*.py
+│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · six test_*.py
 └── temp/                         # gitignored scratch — it already exists and sits INSIDE the repo root
 ```
 
