@@ -656,6 +656,31 @@ includes examples.**
 - **A separate rule for one artefact that DOES ship:** the run report goes inside the skill, so it must be
   **metadata-only by construction** — counts and durations, never document text and never filenames.
 
+> **AND ONE LEAK CLASS THAT NONE OF THE CONTROLS BELOW CAN REACH — THE TRANSCRIPT.** *(2026-08-11.)* A
+> session ran `ls` and `find` over the sibling logs folder to learn its layout, and the output printed real
+> corpus filenames carrying counterparty and personal names **into the conversation**. Nothing was committed
+> and nothing could be: the leak never touched a file. **Every control below reads committed content**, and
+> §6.5 already says session metadata is reachable by neither the scanners nor the location rule — so there
+> is **no after-the-fact remedy at all**, and it cannot be un-said.
+>
+> **The rule existed and was broken anyway** — §6.5's *"any glob over an evidence folder must be explicit
+> about which files it expects"* had been read that same morning. That is §5.1's argument restated: prose is
+> not a control. **So the control runs BEFORE the command:** `tools/hooks/evidence_guard.py`, a PreToolUse
+> hook wired in `.claude/settings.json`, blocks a name-emitting command — `ls`, `find`, `tree`, `cat`,
+> `Get-ChildItem`, or inline code that enumerates a directory — whose target is an evidence folder.
+> **The hazard is OUTPUT, not access:** a script that reads those logs and prints counts is exactly what
+> `gate_replay.py` does and still runs, as does the register validator §5.12 prescribes by path.
+> `tools/evidence_ls.py` is the sanctioned way to see a folder's **shape** — extensions, size buckets,
+> per-directory counts, corpus doc-ids — and it prints no name, ever. **A block with no alternative gets
+> worked around, and then you have a control nobody believes.**
+>
+> **Two limits, stated rather than implied.** Hooks load at **session start**, so this one does not protect
+> the session that adds it — probe with `ls ../legal-translation-logs/NO-SUCH-DIRECTORY-PROBE`, which is
+> BLOCKED if it is live and harmlessly reports a missing directory if it is not. And the **test-document
+> folder is not named in the guard**, because its name is not committable; it is read from
+> `.claude/evidence-dirs.local`, which is gitignored, so **in a fresh clone that folder is unguarded until
+> someone creates that file.** Same shape as the scan list — the scanner ships, the list never does.
+
 **Three controls, and they catch different things. Run all three on every committable file before any
 commit.**
 
@@ -1210,15 +1235,25 @@ legal-translation-skill/          # today: this folder, with no .git in it
 │   ├── README.md                 # the PUBLISHED readme → goes to the public UK repo root
 │   └── LICENSE
 ├── us/                           # identical shape, US-default
-├── tools/                        # never ships — 16 scripts. parity_check · check_coverage ·
-│                                 #   confirm_failure_chains · freeze_intermediates · audit_branches ·
-│                                 #   cycle_evidence · precommit_gate · leakage_scan · publication_check ·
-│                                 #   descriptor_shape_sweep · script_committability · md_tables ·
-│                                 #   claudemd_claims · audit_register · install_hooks · hooks/
+├── .claude/                      # settings.json wires the PreToolUse evidence guard;
+│                                 #   evidence-dirs.local is gitignored, its .example is not
+├── tools/                        # never ships — 23 scripts. audit_branches · audit_register ·
+│                                 #   changelog_confidentiality · check_coverage · claudemd_claims ·
+│                                 #   claudemd_disposal · confirm_failure_chains · cycle_evidence ·
+│                                 #   descriptor_shape_sweep · evidence_ls · freeze_intermediates ·
+│                                 #   gate_replay · install_hooks · leakage_scan · md_tables ·
+│                                 #   parity_check · precommit_gate · publication_check ·
+│                                 #   reachability · scan_trees · script_committability ·
+│                                 #   string_only_edit · xref_check · plus hooks/ (3)
 ├── tests/                        # never ships — run_tests · make_fixtures · negative_inputs ·
-│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · four test_*.py
+│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · six test_*.py
 └── temp/                         # gitignored scratch — it already exists and sits INSIDE the repo root
 ```
+
+> **The tools count read 16 against a real 23, and the tests count read four against six.**
+> Corrected 2026-08-11 by listing the folders rather than adding to the figure that was
+> there — the same error shape as the register's cluster-F count, which went stale three
+> times because each session added to the previous stale number instead of counting.
 
 > **ONE CORRECTION TO THE ORIGINAL LIST, and it is a rule rather than a typo.** `confidentiality_sweep.py`
 > was named for `tools/` and **may never be committed** — it holds a real corpus descriptor inline, measured
