@@ -85,6 +85,22 @@ REQUIRED = [
     ("F41", "SKILL.md", "do not make a sixth"),
     # K3 again — condition (c) has to land in the format branch 3 laid down, not a new one.
     ("F41", "SKILL.md", "this item is where its condition (c) is discharged"),
+    # THE DISCLOSURE BLOCK. Free prose cannot discharge condition (c): an undisclosed
+    # exception and a well-handled one look identical in prose, and no gate can tell them
+    # apart. The fixed shape cannot prove the five attempts happened -- it makes SILENCE
+    # detectable, which is a different and achievable thing. Every key is asserted
+    # individually so dropping one has to show in a diff.
+    ("F41", "SKILL.md", "ACCEPTED CONSEQUENCE (SKILL.md rule 5b)"),
+    ("F41", "SKILL.md", "check:        <the check that fired"),
+    ("F41", "SKILL.md", "attempts:     <how many repairs you made"),
+    ("F41", "SKILL.md", "consequence:  <what is wrong in the delivered document>"),
+    ("F41", "SKILL.md", "where:        <clause, page or part"),
+    ("F41", "SKILL.md", "reader must:  <what the reader has to do about it>"),
+    ("F41", "SKILL.md", "verbatim keys, all five lines present"),
+    ("F41", "SKILL.md", "This does not make you more honest; it makes a lapse visible"),
+    # And condition (c) must POINT at the block, or the rule and the format drift apart.
+    ("F41", "SKILL.md", "in the fixed ACCEPTED CONSEQUENCE block set out there"),
+    ("F41", "SKILL.md", "Free prose does not discharge this condition"),
 
     # The bound must be stated WHERE THE LOOP IS. All four prose sites, not the two F41
     # named -- the sweep on branch 4 found two more, one of them in the always-loaded file.
@@ -346,6 +362,30 @@ rc = with_mutation("skill-docs/10-repack-and-validate.md",
                    _probe_reach)
 check("and FAILS when only ONE site loses it, with rule 5b still intact", rc == 1,
       f"exit {rc}")
+
+# (i) THE DISCLOSURE BLOCK, KEY BY KEY. A block missing one field is the realistic decay --
+#     nobody deletes the whole thing, someone drops the line they found awkward to fill in.
+#     "reader must" is the one to guard hardest: without it the note records that something
+#     is wrong and leaves the reader with nothing to do about it, which is the trap rule 5b
+#     names in its own text.
+for key in ("reader must:", "attempts:", "where:"):
+    # Probe the MUTATED tree only. The first version asked `any(... for t in TREES)`, so the
+    # untouched US copy kept satisfying it and all three negatives reported a false FAIL --
+    # a check whose own probe was looking in the wrong place.
+    gone = with_mutation(
+        "SKILL.md",
+        lambda t, k=key: t.replace(f"     {k}", f"removed-{k}"),
+        lambda k=key: f"     {k}" in read("uk", "SKILL.md"))
+    check(f"the block check FAILS when the “{key}” line is dropped", gone is False)
+
+# (j) and free prose must not be able to satisfy condition (c) again: the pointer from the
+#     rule to the format is what stops the two drifting apart.
+loose = with_mutation(
+    "SKILL.md",
+    lambda t: t.replace("in the fixed ACCEPTED CONSEQUENCE block set out there",
+                        "in whatever form seems appropriate"),
+    lambda: "in the fixed ACCEPTED CONSEQUENCE block set out there" in read("uk", "SKILL.md"))
+check("and condition (c) FAILS if it stops pointing at the fixed block", loose is False)
 
 # (h) gate_replay must VOID rather than pass when its reconciliation against CLAUDE.md's
 #     baseline table breaks. That assertion is what turned a one-digit error in a published
