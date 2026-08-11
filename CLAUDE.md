@@ -1432,117 +1432,113 @@ the pull request; do not call it complete.
 
 **RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
 Re-reading has never found one.
-### HANDOFF — 2026-08-07, session closed. Branch 4 is next, after a gap of days.
+### HANDOFF — 2026-08-11, session closed. Branch 5 is next, and it is GATED.
 
-**BRANCH 3 IS MERGED. Step 2 is under way and nothing is blocked.** `main` is at `db8c6cb`,
-working tree clean, no open pull requests, no stray branches.
+**SEVEN PULL REQUESTS MERGED. `main` is at `db454c3`, working tree clean, no open PRs, no
+stray branches.** Branch 4 is done, so **step 2 has now delivered branches 3 and 4** and the
+exception channel exists in both trees.
 
 **READ THE LAST EIGHT COMMIT MESSAGES BEFORE ANYTHING ELSE** — §5.2 requires it after a gap
 of more than a day, and this handoff is deliberately shorter than they are.
 
 | merged this session | |
 |---|---|
-| **#10** | **Branch 3 — the scope rule.** K1 K2 K3 F35 X3 |
-| **#13** | Four dangling cross-references, plus the check for the class. Register F40 widened |
-| **#12** | Step 1 retired from §3 into §2.3; §7 replaced |
-| **#14** | The stacked-branch rule, into §5.2 |
-| #8 · #9 | the probe revert; the previous session close |
+| **#16** | **Branch 4 — the exception channel.** Rule 5b, its four conditions, the five-attempt bound. F41 + the eighteen-row deadlock set |
+| **#22** | Rule 5b's disclosure takes a **fixed shape**, so a silent exception is detectable |
+| **#21** | **Branch 5 is gated** on a behavioural probe of the channel |
+| **#20** | The confidentiality gate now scans the **published trees**, by diff |
+| **#17** | The **evidence-folder guard** — a control that runs *before* a command does |
+| **#18** | I-12…I-16: five instrument defects into the register |
+| **#19** | Six **STEP-B suites promoted** out of gitignored `temp/` into `tools/` |
 
 ### WHAT THE SKILL NOW SAYS THAT IT DID NOT
 
-**`SKILL.md` rule 5a** — *a check can be wrong IN SCOPE; fix the check, never bypass it, and
-never alter a source-faithful translation to satisfy it* — placed beside the gate-semantics
-rule, because a check can block at **15 of 15 steps** and only the always-loaded file is
-readable at all of them. **The two colliding truncation instructions** now say which governs.
-A new section says **what the delivery notes must contain** — six items — and states the
-**completion invariant**. The Step 6 gate stopped telling the operator to make the JSON agree
-with the document. **Six skill files, three per tree, mirrored; four dangling cross-references
-fixed on top.**
+**`SKILL.md` rule 5b** — *when a check is RIGHT and there is NO compliant repair: stop,
+disclose, and say what you tried.* Rule 5a covers a check that is **wrong**; 5b covers a
+check that is **right** while every remaining repair is forbidden by another rule. Four
+conditions, each stated separately. **A five-attempt bound, written at all FOUR places a
+repair loop is authored** — F41 said two; a sweep found four, one of them an unbounded
+*"repeat until exit 0"* in the always-loaded file itself. And the acceptance is disclosed in
+a fixed `ACCEPTED CONSEQUENCE` block, not free prose.
 
-### FOUR NEW INSTRUMENTS, AND WHAT EACH SETTLES
+**THE BOUND IS FIVE, AND IT IS MEASURED.** Two prose probes failed first and are recorded as
+failures: ordinal vocabulary gave a ceiling of 3, then the confirming pass found the 3 sat on
+the noun *"pass"*. The forensic step records carry it properly — **47 repair sequences that
+closed, deepest 5**; a bound of 5 truncates nothing the corpus ever repaired, 4 would cut one
+short. **Four sequences never went green, the deepest running to eighteen attempts.**
 
-`tools/reachability.py` — could the operator have READ the rule when it had to decide?
-· `tools/xref_check.py` — does every quoted cross-reference resolve to a real heading?
-· `tools/string_only_edit.py` — did a script edit change anything but its text?
-· `tools/gate_replay.py` — counts over the A1 logs, and prints none of their content.
-**All four are wired into `tests/test_instruction_rules.py`, which branch 4 should EXTEND
-rather than sit a parallel file beside. 45 checks, 7 of them negatives.**
+### THE NEXT ACTION — BRANCH 5, AND ITS GATE COMES FIRST
 
-### THE FOUR THINGS THIS SESSION LEARNED
+**`STEP-B-ANALYSIS.md` §2 now carries a FOURTH sequencing fact.** Branch 5 converts eighteen
+silent defects into blocked runs, and 5b is then the only legitimate way such a run can end.
+**So before branch 5 merges, run the behavioural probe:** one document, one deliberately
+rigged deadlock, observing whether the operator exhausts the bound, reaches 5b rather than
+improvising, and satisfies all four conditions.
 
-**1. A graded run was the WRONG instrument, not merely the expensive one — and that surfaced
-only because Wouter refused a two-option question.** `STEP-B-ANALYSIS.md` §4 prescribed one.
-Measured: an instruction branch of this kind only bites when a check fires with the wrong
-scope, attested on **5 of 11** documents, and the grader scores *output* while what changed is
-the *operator's reasoning at a gate*. **§4's method table was amended in the same branch**, and
-the dated reasoning is in `DECISIONS-LOG.md`. The behavioural residue stays at Step C.
+**Read it in the failure direction** — it detects failure far better than it confirms
+success. **And score the likely failure mode, which is the opposite of the obvious one:** the
+register shows this model follows prose *too* literally (cluster F's 39 findings exist
+because of it). The live risk is **reaching for 5b too early**, treating a repair it could
+have found as impossible. Nothing mechanically checks conditions (a) to (d).
 
-**2. `STEP-B-ANALYSIS.md` §4.1 assigned static reachability to branch 3, and neither its §2
-row nor its §3.4 says so.** The branch was planned without it until that section was read.
-**Second time a section pointing at another section decided whether a plan was right** — the
-first was branch 2, planned from §3.3 without §6. **READ WHAT THE BRIEF POINTS AT.**
+### THE FIVE THINGS THIS SESSION LEARNED
 
-**3. Every instrument written this session had a bug in itself, and only running them found
-any of it.** Reachability parsed **7 of 8** step documents, silently dropping the last, because
-that reading-order entry reads *"— Pre-repack hooks + Steps 10+11:"*. Its normative needle was
-**case-sensitive** while the reference layer writes *"must"* in lower case. Its convention
-patterns matched **nothing across 177 files**. Its scope needle missed the rule's own
-capitalisation. The cross-reference check produced a false positive on a bolded list item.
-Each fixed where it lives, with a count assertion or a self-test.
+**1. `sed -i` AND PYTHON'S `write_text` REWRITE LINE ENDINGS AND SAY NOTHING.** `.gitattributes`
+opens with *"NEVER TRANSLATE LINE ENDINGS"*, and three branches converted `CLAUDE.md` from
+CRLF to LF anyway; a fourth put CRLF into both `SKILL.md` files. **Not cosmetic:** Git then
+had no common lines to align, so a nine-line change arrived as a **2,885-line whole-file
+conflict** that could not be resolved by inspection. Diffs went 1446→10, 1484→56, 1457→19.
+**In this repository, edit with the Edit tool.**
 
-**4. A declared divergence had been behaving as a permanent exemption.**
-`tests/test_baseline_unmodified.py` whitelisted **by path**, so a file already on the list
-could change again unseen — which the list's own `_rule` had forbidden all along. **A record
-describing a check nobody wrote is worse than no record.** Now enforced by sha256.
+**2. FIVE DEFECTS IN OUR OWN INSTRUMENTS, AND FOUR HAD BEEN REPORTING A PASS.** I-12 to I-16.
+The gate-replay tool counted the skill's own dictionaries as operator behaviour (210 → **147**);
+nothing bound the baseline table to the analyser that produced it, and **D03's re-run count
+was wrong — 41, not 40, so the corpus total is 400**; the acceptance test's execution section
+had **never fired a gate** because the interpreter lacked `lxml` and `rc != 0` was its only
+assertion; and the claims check could not see `tools/` at all.
 
-### THE NEXT ACTION — BRANCH 4, THE EXCEPTION CHANNEL
+**3. A CONFIDENTIALITY GATE I WROTE MYSELF PASSED A FILE IT SHOULD HAVE BLOCKED.** It
+re-implemented `script_committability.py` instead of calling it, and `re.escape`d the
+descriptor list — **9 of whose 13 entries are regex containing `\s+`**, exactly as §5.4
+requires. Escaping made them unmatchable and it reported CLEAN on a file holding two real
+descriptors. **§5.11: a shared capability lives in one place.**
 
-**Read `STEP-B-ANALYSIS.md` §3.4, then §6's Option 5 IN FULL** — including the **fifth gap
-added 2026-08-05: repair is unbounded.** No file in the package bounds a repair loop, so the
-specification must state **the bound as well as the exit**: after a stated number of failed
-repairs the operator stops, records, and uses the channel. **Without the bound the channel is
-optional; with it, it is the only legitimate way the loop can end.**
+**4. SOFTENING A CHECK TO MAKE IT HONEST MADE IT BLIND.** Promoting `stepb_audit.py`, I
+reasoned that a quotation whose only source is unreadable is *void rather than false* and
+skipped it. `stepb_metacheck.py` immediately dropped from **10 of 10 mutations detected to
+9**. Reverted. **An unreadable source is not a pass.**
 
-**The four conditions are settled (decision 3 = 3b) and are not re-openable:** the check has
-actually fired · a repair was attempted and recorded · the acceptance names the specific
-consequence in the delivery notes **in the format branch 3 has now laid down, §7 of `SKILL.md`
-item 4** · and never for a check the operator has not tried to satisfy, and never to alter a
-faithful translation.
+**5. A COUNT WENT STALE THREE TIMES, ALWAYS THE SAME WAY.** `tools/` read 16 against a real
+23, then 28 and 23 were both predicted and the truth after merging was **29**; `tests/` read
+four against six, then seven. Every error came from **adding to the figure that was there
+instead of listing the folder.**
 
-> **BRANCH 4 ENDS IN WOUTER'S REVIEW OF THE SPECIFICATION, NOT IN A MERGE.** He approved the
-> principle, not the text, and asked to see it. **Branch 5 cannot start until that review is
-> closed.** This is the one change in the plan that could weaken the discipline if written
-> badly — it must ADD the scope rule and must not soften a word of the anti-drift text.
+### FOUR THINGS OPEN, NONE BLOCKING
 
-**Its test method is the four instruments above plus his review, not a graded run** — the same
-amendment §4 now records. Extend `tests/test_instruction_rules.py`.
-
-### FIVE THINGS OPEN, NONE BLOCKING
-
-1. **The four open defects in our own harness and review tooling.** Unchanged and still
-   declared: they live in the private harness, change no skill finding, and **will corrupt
-   Step C's evidence if still open when it runs.**
-2. **The scan list still needs tightening** before it can be trusted as a gate — §5.4(b).
-3. **Wouter has still never reviewed the adjudications Claude made** during the A3↔A4
-   comparison, a pre-registered control set aside and recorded as such. Unchanged from the
-   previous five handoffs.
-4. **`tools/reachability.py` carries one candidate for judgement and two suppressed
-   pointers.** Neither is a defect; both are recorded so nobody re-derives them.
-5. **The register's own counts in §2.3 are unchanged** — F40 was widened rather than a row
-   added, deliberately, so that every count stayed true. Adding a row later means updating
-   §2.3 in the same commit.
+1. **The four open defects in the A1 harness and review tooling** — I-7, I-8, I-9, I-10.
+   Unchanged, and they **will corrupt Step C's evidence if still open when it runs.**
+2. **The evidence guard is not live until a session STARTS with it in place.** Probe it
+   safely with `ls ../legal-translation-logs/NO-SUCH-DIRECTORY-PROBE` — BLOCKED if live, a
+   harmless missing-directory error if not. **And `.claude/evidence-dirs.local` does not
+   exist**, so the test-document folder is unguarded until someone creates it from the
+   committed `.example`.
+3. **`audit_session_stepb.py` stays in `temp/` permanently** — it holds two corpus
+   subject-matter descriptors. Its §-resolver fix from this session **does not survive**, and
+   register row I-15 says so.
+4. **The scan list still needs tightening** — §5.4(b), now substantially mitigated for the
+   trees by the diff-based gate, but the list itself is unchanged.
 
 ### THREE MISTAKES WORTH CARRYING FORWARD
 
-**Merging a base branch with `--delete-branch` while a PR was stacked on it CLOSED that PR**,
-and a closed PR cannot be reopened or retargeted once its base is gone. Recovered by
-cherry-picking onto the new `main`. **The rule is now §5.2** — merge a stack bottom-up, and
-retarget before deleting anything under it.
+**I ran a broad glob over an evidence folder and it printed real corpus filenames carrying
+counterparty and personal names into the conversation.** Nothing was committed and nothing
+could be — the leak never touched a file, which is why no scanner in this project can reach
+it. §6.5's rule had been read that same morning. That is what PR #17 exists for.
 
-**A `__pycache__` leak reached both shipped trees again** — a test executing a skill script
-from inside the tree without `PYTHONDONTWRITEBYTECODE`. Gitignored, so uncommittable, but
-`tools/package.py` builds each `.skill` **from the tree**. Fixed in the caller **and** guarded
-on the trees, because last time a caller-scoped fix let it back in through the next caller.
+**A figure that agreed with the one I expected was wrong.** My first reconciliation derived
+399 re-runs by *assuming* 204 (document, step) pairs instead of measuring the real 176. §5.1
+names this exactly: agreement is the moment to re-derive, not to relax.
 
-**A task chip I wrote myself carried a stale line number** — `SKILL.md:574` when the line had
-moved to 583. Harmless only because the text was quoted too. **Quote the text, not the line.**
+**Three negative tests probed the wrong tree** — mutating `uk/` then asking whether the
+change was visible in *either* tree, so the untouched `us/` copy kept satisfying them. A
+check whose own probe looks in the wrong place reports a false result in both directions.
