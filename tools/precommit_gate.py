@@ -202,6 +202,111 @@ for s in strays[:10]:
 if strays:
     FAIL.append("a Word document sits outside tests/fixtures/")
 
+head("7. THE PUBLISHED TREES — ADDED LINES ONLY, AGAINST THE BASELINE")
+# WHY THIS SECTION EXISTS, AND WHY IT DIFFS RATHER THAN SCANS.
+#
+# Controls 1 to 6 cover the six analysis documents and tools/. THEY DO NOT SCAN uk/ OR us/ AT
+# ALL -- the gate counts their files and stops there. That was defensible while no branch
+# changed them; branch 4 changes eight files, and branches 6, 7, 16 and 17 will change far
+# more. A confidentiality gate blind to the two directories that actually ship is the wrong
+# blind spot to keep.
+#
+# It was left blind for a real reason, recorded in CLAUDE.md 5.4(b): scanning a WHOLE tree
+# returns 46 hits per tree, overwhelmingly ordinary Dutch, Polish, Hungarian, Finnish, French
+# and German legal vocabulary matching short patterns. A reviewer facing 46 known-benign hits
+# starts skimming, which is the exact failure this project diagnoses in the skill's own
+# validators -- a control nobody believes.
+#
+# DIFFING TO ADDED LINES DISSOLVES THAT. The pre-existing false positives are in the baseline
+# and cancel out; only what a branch INTRODUCES is judged. Measured on branch 4: the eight
+# whole files give 6 hits, the 102 added lines give 0. Same evidence, readable.
+#
+# It reports VOID rather than CLEAN when it cannot establish a baseline (CLAUDE.md 5.1: a
+# control that opened no files says VOID, never CLEAN).
+BASE = os.environ.get("LT_TREE_BASELINE", "origin/main")
+
+
+def git_out(*args):
+    r = subprocess.run(["git", *args], capture_output=True, cwd=ROOT)
+    return r.stdout.decode("utf-8", "replace"), r.returncode
+
+
+_, rc_base = git_out("rev-parse", "--verify", "--quiet", BASE)
+if rc_base != 0:
+    print(f"  CONTROL VOID — no baseline to diff against ({BASE} does not resolve).")
+    VOID.append(f"tree diff (baseline {BASE} unresolvable)")
+else:
+    diff, rc_diff = git_out("diff", "--unified=0", BASE, "--", "uk/", "us/")
+    if rc_diff != 0:
+        print("  CONTROL VOID — git diff failed.")
+        VOID.append("tree diff (git diff failed)")
+    else:
+        added = [l[1:] for l in diff.splitlines()
+                 if l.startswith("+") and not l.startswith("+++")]
+        changed, _ = git_out("diff", "--name-only", BASE, "--", "uk/", "us/")
+        n_files = len([f for f in changed.splitlines() if f.strip()])
+        print(f"  baseline {BASE} · {n_files} tree file(s) changed · "
+              f"{len(added)} line(s) added")
+        if not added:
+            print("  nothing added to either tree — nothing for this control to judge.")
+        else:
+            blob = "\n".join(added)
+            tmp = ROOT / "temp"
+            tmp.mkdir(exist_ok=True)
+            probe_file = tmp / ".gate-tree-added.txt"
+            probe_file.write_text(blob, encoding="utf-8")
+            try:
+                # (a) the 93-pattern name list, via the scanner that owns it
+                sc = need("leakage_scan.py") or (ROOT / "tools" / "leakage_scan.py")
+                out, rc = run(sc, probe_file)
+                if rc == 2:
+                    print("  name scan (93 patterns)   CONTROL VOID — list not readable")
+                    VOID.append("tree name scan (list unreadable)")
+                else:
+                    hits = re.search(r"(\d+) hit\(s\)", out)
+                    n = int(hits.group(1)) if hits else (0 if "CLEAN" in out else -1)
+                    print(f"  name scan (93 patterns)   {'CLEAN' if n == 0 else f'{n} hit(s)'}")
+                    if n != 0:
+                        FAIL.append(f"tree added lines: {n} name-scan hit(s)")
+                # (b) the corpus descriptors, applied AS REGEX -- never re.escape'd. Nine of
+                #     the thirteen contain \s+ by design (5.4), and escaping them is exactly
+                #     the bug that made a promotion gate report CLEAN on a file holding two.
+                if _d.exists():
+                    dp = [l.strip() for l in _d.read_text(encoding="utf-8").splitlines()
+                          if l.strip() and not l.lstrip().startswith("#")]
+                    dh = [p for p in dp if re.search(p, blob, re.I)]
+                    print(f"  corpus descriptors        "
+                          f"{'CLEAN' if not dh else f'{len(dh)} PATTERN(S) MATCHED'}"
+                          f"   ({len(dp)} pattern(s), applied as regex)")
+                    if dh:
+                        FAIL.append(f"tree added lines: {len(dh)} corpus descriptor(s)")
+                else:
+                    print("  corpus descriptors        CONTROL VOID — list not found")
+                    VOID.append("tree descriptor scan (list not found)")
+                # (c) the forbidden classes the publication check applies to prose
+                CLASSES = [
+                    ("absolute or home path",
+                     r"[A-Za-z]:[\\/][\w\-.]+(?:[\\/][\w\-. ]+)+|~[\\/][\w\-.]+"),
+                    ("container path", r"(?<![\w.])/(?:home|mnt)/[\w\-./]+"),
+                    ("money or currency", r"(?:EUR|USD|GBP|€|\$|£)\s?[\d.,]{4,}"),
+                    ("capacity figure", r"\b\d[\d.,]*\s?(?:MW|kW|GW|MWh|kWh|MVA)\b"),
+                    ("email or phone", r"[\w.\-]+@[\w.\-]+\.\w+"),
+                    ("three-part personal name",
+                     r"\b[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}\b"),
+                    ("corpus filename shape", r"[\w\-. ()]{3,}\.(?:docx?|pdf)\b"),
+                ]
+                worst = []
+                for label, pat in CLASSES:
+                    k = len(set(re.findall(pat, blob)))
+                    if k:
+                        worst.append(f"{label} x{k}")
+                print(f"  forbidden classes         "
+                      f"{'CLEAN' if not worst else '; '.join(worst)}")
+                if worst:
+                    FAIL.append(f"tree added lines: {'; '.join(worst)}")
+            finally:
+                probe_file.unlink(missing_ok=True)
+
 head("VERDICT")
 if VOID:
     print(f"  CANNOT CERTIFY — {len(VOID)} control(s) did not run:")

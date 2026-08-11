@@ -733,6 +733,24 @@ control.** *(Partly mitigated: the gate now separates the trees from everything 
 splits matches into ALREADY PUBLIC and NEW EXPOSURE — the cut that makes 715 hits readable. The list itself
 is unchanged.)*
 
+> **SUBSTANTIALLY MITIGATED 2026-08-11 — THE GATE NOW SCANS THE TREES, BY DIFF.** Separating the trees out
+> meant `tools/precommit_gate.py` did not look at `uk/` or `us/` **at all**: it counted their files and
+> stopped. Defensible while no branch changed them; branch 4 changes eight files, and branches 6, 7, 16 and
+> 17 will change far more. **A confidentiality gate blind to the two directories that actually ship is the
+> wrong blind spot to keep.**
+>
+> **The fix is to judge only what a branch INTRODUCES.** Section 7 diffs `uk/` and `us/` against
+> `origin/main` (override with `LT_TREE_BASELINE`) and runs three controls over the **added lines only** —
+> the 93-pattern name scan, the 13 corpus-descriptor patterns **applied as regex and never `re.escape`d**,
+> and the publication check's forbidden classes. The pre-existing false positives sit in the baseline and
+> cancel out.
+>
+> **Measured on branch 4: the eight whole files give 6 hits; the 102 added lines give 0.** Same evidence,
+> and the second is readable. **It reports VOID and refuses to certify when it cannot resolve a baseline** —
+> a control that established nothing has not passed. `tests/test_gate_tree_scan.py` plants a leak of each
+> class into a tree file and asserts the gate blocks on every one, then asserts the tree is byte-unchanged
+> afterwards.
+
 **(c) — CLOSED THE DAY IT WAS FOUND. THE CHANGELOG IS NOT COMMITTED AND `docs/history/` DOES NOT EXIST.**
 *(Wouter, 2026-08-06: "Changelog should NOT be on commit list… Docs/history should never be committed.")*
 The recovered rev16→rev44 changelog **sat on the commit list and had never been scanned, because it is not a
@@ -1216,7 +1234,7 @@ legal-translation-skill/          # today: this folder, with no .git in it
 │                                 #   descriptor_shape_sweep · script_committability · md_tables ·
 │                                 #   claudemd_claims · audit_register · install_hooks · hooks/
 ├── tests/                        # never ships — run_tests · make_fixtures · negative_inputs ·
-│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · four test_*.py
+│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · six test_*.py
 └── temp/                         # gitignored scratch — it already exists and sits INSIDE the repo root
 ```
 
