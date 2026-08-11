@@ -6,9 +6,9 @@
  "count": 16,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/exception-channel",
-   "commit_subject": "Branch 4 - the exception channel: the sanctioned way out when a check is right and no compliant repair exists, and the five-attempt bound on every repair loop (register rows F41 and the eighteen-row deadlock set)",
-   "sha256_now": "9fb009ba8621c3e6fe113ebfa85487e01a817ef43ed3a441a67392b63e038546"
+   "changed_by": "feature/5b-disclosure-block",
+   "commit_subject": "Rule 5b's disclosure takes a fixed, machine-recognisable shape, so that a SILENT exception becomes a detectable defect rather than an invisible one (register row F41, condition (c))",
+   "sha256_now": "43c91dbc821ee51c48056204ed3352c87519f7cfb9a6dbeedd94adc45c918a97"
   },
   "uk/scripts/post_process.py": {
    "changed_by": "feature/scope-rule",
@@ -46,9 +46,9 @@
    "sha256_now": "e44fb3e745912036d0cc11b6f522f81d5dd44d8aacdcf2cca2c00b06c264a60d"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/exception-channel",
-   "commit_subject": "Branch 4 - the exception channel: the sanctioned way out when a check is right and no compliant repair exists, and the five-attempt bound on every repair loop (register rows F41 and the eighteen-row deadlock set)",
-   "sha256_now": "4241b5a4f5d2fcd77acfb29270319fcc9c59da6ba1fdd759e6160e8c8f14f2da"
+   "changed_by": "feature/5b-disclosure-block",
+   "commit_subject": "Rule 5b's disclosure takes a fixed, machine-recognisable shape, so that a SILENT exception becomes a detectable defect rather than an invisible one (register row F41, condition (c))",
+   "sha256_now": "04621b70748d0ee854beb99d66b829d0de1800d856cec6777212384aad997b92"
   },
   "us/scripts/post_process.py": {
    "changed_by": "feature/scope-rule",
