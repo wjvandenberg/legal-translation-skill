@@ -292,6 +292,33 @@ because the decision comes first.
 with no way out. Branch 11 must follow branch 9, or it cannot be built. Branch 16 must follow branch 15 and
 must contain the off-flag removal.
 
+> **AND A FOURTH GATE ON BRANCH 5, ADDED 2026-08-11 BY WOUTER'S DECISION: THE EXCEPTION CHANNEL MUST BE
+> SHOWN TO WORK BEHAVIOURALLY BEFORE THE CHECKS GET TEETH.**
+>
+> **Why here and not at Step C.** Branch 4 proved rule 5b is *present, reachable, unsoftened and aimed at
+> situations that really arose*. **It did not prove a model will apply it** — that is behavioural and no
+> script can settle it. Branch 5 is what converts **eighteen currently-silent defects into blocked runs**,
+> and the only sanctioned way such a run can now end is 5b. **So if 5b does not work, branch 5 makes the
+> pipeline unusable on real documents — and that would be discovered on a client document rather than in a
+> test.** Step C is after branch 5 has shipped, which is too late for this one question.
+>
+> **The probe.** One document, one **deliberately rigged deadlock** — a check made to fire where no
+> compliant repair exists — observing whether the operator (a) exhausts the five-attempt bound rather than
+> stopping early, (b) reaches rule 5b rather than improvising, and (c) satisfies all four conditions,
+> including the delivery-notes disclosure. Cost: one run plus the rigged input.
+>
+> **Read it in the right direction.** This probe **detects failure far better than it confirms success** —
+> the mirror of §4.1's limit. If the operator improvises anyway, that is strong evidence 5b is not enough. If
+> it uses 5b correctly, that is **n=1 and it knows it is being watched**, so it is encouraging rather than
+> conclusive. The asymmetry is acceptable because the failing direction is the one that would cost a client
+> document.
+>
+> **The failure mode to watch for is NOT the obvious one.** The register shows this model follows prose
+> under pressure, hard — cluster F's 39 findings exist *because* operators obeyed contradictory instructions
+> too literally. The live risk is the opposite: **reaching for 5b too early**, treating a repair it could
+> have found as impossible. Nothing mechanically checks conditions (a) to (d); the disclosure is the only
+> trace. **Score the probe on that, not only on whether the channel was used.**
+
 **The four open defects in our own tooling belong to branch 1, and the first draft omitted them entirely.**
 *(Added 2026-08-05 by the deep audit, which found that none of the four was named anywhere in this
 document.)* They are bugs in the **harness and the review tooling**, not in the skill, and branch 1 is the
