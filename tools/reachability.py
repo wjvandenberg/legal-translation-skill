@@ -253,30 +253,47 @@ def analyse(tree):
         if can_block:
             blocking_steps.append(step)
 
-    scope_rule_in = [f for f in ["SKILL.md"] + sorted(order)
-                     if (root / f).exists() and SCOPE_NEEDLE.search(
-                         (root / f).read_text(encoding="utf-8"))]
-    always_loaded = "SKILL.md" in scope_rule_in
+    # BOTH gate rules are measured, not just the scope rule. Branch 3 added 5a (the check is
+    # wrong -- fix it); branch 4 adds 5b (the check is right and no compliant repair exists).
+    # They answer different questions at the same moment, so an operator who can reach only
+    # one of them is still stuck at a gate, and the arm would have reported PASS.
+    rule_homes = {}
+    for label, needle in RULES:
+        homes = [f for f in ["SKILL.md"] + sorted(order)
+                 if (root / f).exists() and needle.search(
+                     (root / f).read_text(encoding="utf-8"))]
+        rule_homes[label] = homes
+        if not homes:
+            findings.append({
+                "arm": "gate-rule", "certain": True, "tree": tree,
+                "blocking_steps": blocking_steps,
+                "detail": f"NO file states {label}. A check can block at "
+                          f"{len(blocking_steps)} of {len(pipe)} steps and the operator has "
+                          "no rule to reach at any of them.",
+            })
+        elif "SKILL.md" not in homes:
+            findings.append({
+                "arm": "gate-rule", "certain": True, "tree": tree,
+                "blocking_steps": blocking_steps,
+                "detail": f"{label} is stated only in {', '.join(homes)}, which is not "
+                          f"always loaded. A check can block at {len(blocking_steps)} of "
+                          f"{len(pipe)} steps; the rule is unreachable at any step whose "
+                          "document has not been read.",
+            })
 
-    if not scope_rule_in:
+    # The BOUND is reachability of a different kind: the two instructions that tell the
+    # operator to keep repairing must each carry it, or the loop is unbounded exactly where
+    # the operator meets it. Register row F41 measured ZERO files bounding a repair loop.
+    for rel, line in unbounded_repair_sites(root):
         findings.append({
-            "arm": "gate-scope", "certain": True, "tree": tree,
+            "arm": "repair-bound", "certain": True, "tree": tree,
             "blocking_steps": blocking_steps,
-            "detail": "NO file states that a check can be wrong IN SCOPE. A check can "
-                      f"block at {len(blocking_steps)} of {len(pipe)} steps and the "
-                      "operator has no rule to reach at any of them.",
-        })
-    elif not always_loaded:
-        findings.append({
-            "arm": "gate-scope", "certain": True, "tree": tree,
-            "blocking_steps": blocking_steps,
-            "detail": f"The scope rule is stated only in {', '.join(scope_rule_in)}, which "
-                      f"is not always loaded. A check can block at "
-                      f"{len(blocking_steps)} of {len(pipe)} steps; the rule is unreachable "
-                      "at any step whose document has not been read.",
+            "detail": f"{rel}:{line} tells the operator to repeat a repair and never bounds "
+                      "it (register F41). The bound must be stated where the loop is, not "
+                      "only in the always-loaded file.",
         })
 
-    return findings, read_count, blocking_steps, len(pipe), scope_rule_in, coverage
+    return findings, read_count, blocking_steps, len(pipe), rule_homes, coverage
 
 
 # The needle is a PHRASE, not two words. §5.12 rule 6: eleven checks in this project have
@@ -287,6 +304,58 @@ def analyse(tree):
 # FILE on a tree that carried the rule -- it failed SAFE, which is the right direction, but
 # a needle that only matches one capitalisation is a needle waiting to go quiet.
 SCOPE_NEEDLE = re.compile(r"a check can be wrong IN SCOPE", re.I)
+
+# Branch 4's channel. Same needle discipline: a phrase that cannot occur unless the rule is
+# actually carried. "no compliant repair" alone appears in the register and in analysis prose,
+# so the needle binds it to the instruction that acts on it.
+CHANNEL_NEEDLE = re.compile(
+    r"the only sanctioned way a repair loop may end other than the check passing", re.I)
+
+RULES = [
+    ("that a check can be wrong IN SCOPE (rule 5a)", SCOPE_NEEDLE),
+    ("the sanctioned way out when no compliant repair exists (rule 5b)", CHANNEL_NEEDLE),
+]
+
+# WHERE THE REPAIR LOOP IS AUTHORED, swept rather than listed.
+#
+# F41 says "measured across all 198 files: TWO such instructions". Re-derived on branch 4:
+# there are FOUR in the shipped prose, not two -- the two F41 names plus a repeat-until-exit-0
+# in the always-loaded file's calque pitfall and a re-run-everything remediation at Step 10.
+# A hardcoded list of sites would have shipped the same blind spot F41 had, so this SWEEPS:
+# every repair-repeat instruction in the tree's prose must carry the bound. A new one added
+# later arrives unbounded and fails here.
+#
+# TWO EXCLUSIONS, DECLARED RATHER THAN SILENT:
+#   * `.py` files. Two match -- a docstring describing a script's own internal fixpoint loop
+#     ("iterates until a pass produces no change"), which is an algorithm and not an
+#     instruction to anyone; and an apply-gate message saying "fix the underlying issue, then
+#     re-run", which is a single remediation rather than a loop. Bounding the second is a
+#     SCRIPT edit and branch 4 is doc-only; it belongs with branch 5.
+#   * The bound text itself quotes "re-run until it passes" to explain what it forbids, so
+#     the window below is searched on BOTH sides of a match, not only after it.
+REPEAT_UNTIL = re.compile(
+    r"(?:re-?run|repeat|iterate|loop)[^.\n]{0,80}?until[^.\n]{0,60}"
+    r"(?:exits?\s*0|passe?s?|clean|0\s+issues|green)", re.I)
+RERUN_ONCE = re.compile(
+    r"fix[^.\n]{0,60},?\s*then re-?run|re-?run\s+Steps?\s+\d[^.\n]{0,40}in order|"
+    r"re-?run\s+every\s+mandatory", re.I)
+BOUND_NEEDLE = re.compile(
+    r"bounded at five attempts|at most five times|five attempts, then stop", re.I)
+BOUND_WINDOW = 1500
+
+
+def unbounded_repair_sites(root):
+    """Every repair-repeat instruction in the tree's PROSE that does not carry the bound."""
+    out = []
+    for p in sorted(root.rglob("*.md")):
+        body = p.read_text(encoding="utf-8", errors="replace")
+        for pat in (REPEAT_UNTIL, RERUN_ONCE):
+            for m in pat.finditer(body):
+                lo = max(0, m.start() - BOUND_WINDOW)
+                if not BOUND_NEEDLE.search(body, lo, m.end() + BOUND_WINDOW):
+                    out.append((p.relative_to(root).as_posix(),
+                                body[:m.start()].count("\n") + 1))
+    return out
 
 # "(see X in Step 4)" / "as described in Step 4" -- the statement is pointing at the rule's
 # home rather than being it.
@@ -353,7 +422,7 @@ def main():
         all_findings += f
         total_read += n
         summary[t] = {"read": n, "blocking_steps": blocking, "steps": nsteps,
-                      "scope_rule_in": where, "coverage": cov}
+                      "rule_homes": where, "coverage": cov}
 
     if "--json" in sys.argv:
         print(json.dumps({"findings": all_findings, "summary": summary}, indent=1))
@@ -376,8 +445,12 @@ def main():
         print(f"\n  {t}/  {s['read']:>5} statements examined · "
               f"a check can block at {len(s['blocking_steps'])} of {s['steps']} steps "
               f"({', '.join(s['blocking_steps'])})")
-        print(f"        the scope rule is stated in: "
-              f"{', '.join(s['scope_rule_in']) or 'NO FILE'}")
+        for label, homes in s["rule_homes"].items():
+            print(f"        {label}")
+            print(f"          stated in: {', '.join(homes) or 'NO FILE'}")
+        unb = unbounded_repair_sites(ROOT / t)
+        print(f"        repair-repeat instructions still UNBOUNDED in prose: "
+              f"{len(unb) or 'none'}")
         # Print coverage even when nothing was found. "The arm ran and found no spread" and
         # "the arm did not run" look identical in a report that only prints findings.
         for conv, homes, steps, sk in s["coverage"]:
