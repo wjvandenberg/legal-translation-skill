@@ -54,7 +54,7 @@ wrong conclusion.
 |---|---|---|---|
 | **`CLAUDE.md`** *(this)* | the charter | first, always | goals · order · status · rules · structure |
 | **`STEP-B-ANALYSIS.md`** | **the build plan.** What to build, in what order, and what counts as having built it | **before and during every build branch — it is the leading document for all of step 2** | §2 the order · §3 the brief per option · §4 the test method |
-| **`FINDINGS-REGISTER.md`** | the evidence base — **211 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
+| **`FINDINGS-REGISTER.md`** | the evidence base — **212 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
 | **`A3-STRUCTURAL-ANALYSIS.md`** | the evidence-led structural analysis | when a structural judgement comes up | the measurements: context, runtime, redundancy, divergence |
 | **`OPUS-5-MIGRATION.md`** | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
@@ -189,7 +189,7 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 
 **The evidence base as it now stands, and these are the numbers to quote:**
 
-> **`FINDINGS-REGISTER.md`: 211 rows — 15 clusters · 168 skill findings (156 clustered + 12 single-instance)
+> **`FINDINGS-REGISTER.md`: 212 rows — 15 clusters · 169 skill findings (157 clustered + 12 single-instance)
 > · 27 positives to preserve · 16 defects in our own measuring instruments (12 fixed, 4 open).** The largest
 > cluster is the instruction contradictions, at **39**. Validator **PASS, 0 failures, 0 warnings**.
 >
@@ -220,7 +220,7 @@ Six committable documents exist. **Three are live inputs to the work ahead; thre
 several documents — a deed's only footnote, fourteen of twenty-eight comment anchors, a contract's
 closing bracket and terminal full stop, untranslated source-language text on the first page of a delivered
 document. **In every case the auxiliary part was translated perfectly and the *pointer* destroyed**, so the
-English exists in the package and is unreachable — **and every gate reported PASS.** Twenty-seven of the 168
+English exists in the package and is unreachable — **and every gate reported PASS.** Twenty-seven of the 169
 findings are content losses; six are the worst grade the register has.
 
 **2. Three independent mechanisms explain why nothing was caught, and one sentence is not enough.**
@@ -410,7 +410,7 @@ did what it claimed, test proves nothing *else* broke.
   cannot begin before the delivered-document check exists, and must carry the off-flag removal in the same
   branch.
 - **The leap Wouter asked for is in the plan, and it is not a rebuild.** The rebuild was declined on
-  measured arithmetic — it addresses **at most 94 of the 168 recorded findings**, cannot be decomposed into
+  measured arithmetic — it addresses **at most 94 of the 169 recorded findings**, cannot be decomposed into
   merge-sized steps, and risks the half that measurably works. **The leap is the formatting option,
   delivered in three slices that can each be merged, tested and reverted.** Its first slice is also the
   probe that would reopen the question: whoever runs it must **report explicitly** whether a per-span model
@@ -1534,15 +1534,36 @@ committed trees — but it means **the honest number only appears after `git add
 it named all twelve; the declared list is now 24 entries and the count was recomputed by
 listing, never by adding.
 
+### THE REGISTER GAINED A ROW — G10, ON WOUTER'S DECISION
+
+**`quality_check`'s missing-space rule fires across a `w:tab` ELEMENT.** The harness's own
+fixture lays out `Party A` and `Party B` side by side, separated by a tab rather than by a
+space character; the rule compares adjacent `w:t` elements, sees nothing between them, and
+reports a missing space on a layout that is correct and entirely ordinary. **It was always
+wrong — branch 5 gave it teeth**, because `quality_check` now exits 2 and a false positive
+stops the run. Branch 14 owns the scoping; `STEP-B-ANALYSIS.md` §9.3 carries G10 so it cannot
+be forgotten there.
+
+**Counts moved, and every one was derived by LISTING the rows rather than adding one to the
+figure written down:** register **211 → 212 rows**, skill findings **168 → 169** (157
+clustered + 12 single-instance), cluster **G1–G10**. Positives (27) and instrument defects
+(16: 12 fixed, 4 open) are unchanged — G10 is a defect in the skill, not in an instrument.
+The largest cluster is still F at 39.
+
+**And the edit went in the wrong place first, which is worth more than the row.**
+`STEP-B-ANALYSIS.md` §9.1 and its §9.2 are **generated** from hardcoded lists inside
+`tools/stepb_verify.py`, so hand-editing
+the document left the two disagreeing — `stepb_verify` reported `1 missing ['G10']` twice and
+would not pass until the tool's own lists carried it. **The document's traceability tables are
+not the source; that tool is.**
+
 ### FOUR THINGS OPEN
 
 1. **Both probe rigs, above.** Clearly-scoped, and the instrument that judges them is
    committed rather than left in `temp/`.
-2. **A new cluster-G false positive, not yet a register row.** `quality_check`'s spacing
-   rule fires on `Party A|Party B` in the harness's own fixture, where the separator is a
-   `w:tab` ELEMENT and not a space. It is why that fixture's clean arm started failing.
-   Branch 14 owns the scoping; **adding the row would move counts in two documents, so it
-   is Wouter's call, not mine.**
+2. **G10 is recorded but NOT fixed.** The row names the fix — treat a `w:tab` between two
+   `w:t` elements as a separator, the same distinction §5.10 already draws between tab
+   CHARACTERS and tab STOPS — and it belongs to branch 14, not here.
 3. **The four open defects in the A1 harness tooling** — I-7, I-8, I-9, I-10. Unchanged,
    and they will corrupt Step C's evidence if still open when it runs.
 4. **The scan list still needs tightening** — §5.4(b). One pattern narrowed this session,

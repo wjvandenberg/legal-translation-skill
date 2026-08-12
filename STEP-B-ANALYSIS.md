@@ -2656,7 +2656,7 @@ plain English above becoming hand-waving.**
 |---|---|---|---|
 | 1 | loses content | A1 A2 A3 A6 A8 A9 A15 A16 A19 B3 B8 C2 C12 C13 C14 C16 C17 C19 C23 C28 E4 F16 F27 J1 M1 N1 S3 | CRITICAL:6 HIGH:16 MED:4 LOW:1 |
 | 2 | looks wrong on the page | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 B1 B7 C20 D1 D2 D3 D4 D5 D6 E9 E12 F7 F13 F19 F22 O1 R1 | HIGH:16 MED:9 LOW:2 |
-| 3 | says it worked when it did not | C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9 H1 H2 H4 L1 L4 L6 S1 S2 W3 W4 X1 X2 X4 X6 | CRITICAL:4 HIGH:21 MED:12 LOW:3 —:1 |
+| 3 | says it worked when it did not | C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 H1 H2 H4 L1 L4 L6 S1 S2 W3 W4 X1 X2 X4 X6 | CRITICAL:4 HIGH:21 MED:12 LOW:3 —:1 |
 | 4 | hard to keep correct | E1 E2 E3 E5 E6 E10 E11 E13 E14 F21 F23 F32 F36 F37 F38 L2 L3 Q1 T1 T2 T3 T4 T5 T6 U1 V1 V2 W1 W2 Y1 | CRITICAL:1 HIGH:8 MED:16 LOW:3 POS:2 |
 | 5 | the manual is wrong | B2 B4 B5 B6 E7 E8 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40 F41 F42 H3 K1 K2 K3 L5 X3 X5 Y2 Y3 Y4 | HIGH:17 MED:20 LOW:6 |
 
@@ -2667,7 +2667,7 @@ plain English above becoming hand-waving.**
 | option | what it is | findings it closes or detects | severity mix |
 |---|---|---|---|
 | 1 | preserve-by-default in apply | A1 A2 A3 A6 A8 A9 A16 A19 C16 C17 C19 D4 F16 F27 N1 T1 T6 | CRITICAL:4 HIGH:11 MED:1 POS:1 |
-| 2 | check against the original | B8 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28 D2 D5 E4 G1 G2 G3 G4 G5 G6 G7 G8 G9 H1 H2 H4 J1 L1 L4 L6 M1 S1 S2 S3 U1 V1 | CRITICAL:6 HIGH:23 MED:17 LOW:4 —:1 |
+| 2 | check against the original | B8 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28 D2 D5 E4 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 H1 H2 H4 J1 L1 L4 L6 M1 S1 S2 S3 U1 V1 | CRITICAL:6 HIGH:23 MED:17 LOW:4 —:1 |
 | 3 | say what the formatting is | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 C13 C20 D6 F7 F13 F19 F22 L2 L3 O1 | HIGH:15 MED:4 LOW:1 |
 | 4 | a home for document furniture | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 | CRITICAL:1 HIGH:5 MED:9 LOW:1 |
 | 5 | one authority, one way out, more than one gear | A15 C5 C7 C26 D3 D5 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28 F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 | CRITICAL:1 HIGH:16 MED:23 LOW:5 |
@@ -2719,7 +2719,7 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 | 11 the delivered-document check | 2 | C1 C4 C6 C8 C13 C14 C18 C20 C22 J1 L1 |
 | 12 declare the language | 2 | S1 S2 S3 H1 H2 H4 C9 C2 E4 |
 | 13 declared modes | 5 | H3 L5 R1 — and the runtime problem |
-| 14 check scoping | 2 | G1 G2 G3 G4 G5 G6 G7 G8 G9 C7 C10 F5 F10 |
+| 14 check scoping | 2 | G1 G2 G3 G4 G5 G6 G7 G8 G9 **G10** C7 C10 F5 F10 *(G10 added 2026-08-12: `quality_check`'s missing-space rule fires across a `w:tab` element, and branch 5's exit code turned that false positive into a blocked run. Same shape as G4 — an adjacency rule that cannot see what sits between the two runs.)* |
 | 15–17 formatting, parts 1–3 | 3 | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3 |
 | 18 layout: detect and disclose | 2, 5 | D1 D2 D3 D4 D5 |
 | 19 furniture and prohibition | 4 | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 |

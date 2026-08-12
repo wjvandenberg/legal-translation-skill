@@ -188,9 +188,12 @@ GROUPS = {
  "2 looks wrong on the page": """
    A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 O1 D1 D2 D3 D4 D5 D6 B1 B7 F7 F13 F19 F22 C20 E9 E12 R1
    """,
+ # G10 added 2026-08-12 (branch 5). THIS LIST IS THE SOURCE and §9.1's table is generated
+ # from it — a hand-edit to the document alone leaves the two disagreeing, which is exactly
+ # how this tool caught the omission.
  "3 says it worked when it did not": """
    C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9
-   S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6
+   G10 S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6
    """,
  "4 hard to keep correct": """
    U1 V1 V2 W1 W2 T1 T2 T3 T4 T5 T6 F21 F23 F32 F36 F37 F38 L2 L3 E1 E2 E3 E5 E6 E10 E11 E13 E14 Q1 Y1
@@ -205,9 +208,10 @@ OPTIONS = {
  "1 preserve-by-default in apply": """
    A1 A2 A3 A6 A8 A9 A16 A19 N1 C16 C17 C19 F16 F27 D4 T1 T6
    """,
+ # G10 added 2026-08-12 (branch 5) — see the note on group 3 above.
  "2 check against the original": """
    C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28
-   G1 G2 G3 G4 G5 G6 G7 G8 G9 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
+   G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
    """,
  "3 say what the formatting is": """
    A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3
