@@ -365,7 +365,7 @@ settled — if you are about to re-open one of these, read the dated entry first
 | step | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** — version control, the baseline commit, the test harness, the parity check, then the public flip | **DONE, 2026-08-07.** Branches 0, 1 and 2 built, verified, tested, audited and **merged**; the confidentiality cleanup and the cycle enforcement merged beside them. **The repository is PUBLIC and branch protection is live with `enforce_admins`.** The exit gate is closed | — |
-| **2** | **Building** (goals ii and iv) — the rest of `STEP-B-ANALYSIS.md`: branches 3 to 19, plus the three deferred items | **IN PROGRESS since 2026-08-07. Branch 3 merged** — the scope rule, the truncation reconciliation, and what the delivery notes must contain. **Next is branch 4, and it ends in Wouter's review of the specification rather than in a merge; branch 5 cannot start until that review closes.** The remaining seventeen branches plus the three deferred items are fully planned and fully decided | — |
+| **2** | **Building** (goals ii and iv) — the rest of `STEP-B-ANALYSIS.md`: branches 3 to 19, plus the three deferred items | **IN PROGRESS since 2026-08-07. Branches 3 and 4 merged**; **branch 5 is BUILT AND NOT MERGED.** Its seven code changes are complete and verified in both trees, and its merge is held by the fourth sequencing fact: the behavioural probe of rule 5b must run first. **The probe kit is committed and NEITHER RIG IS CONFIRMED TO FIRE YET** — `tests/probe-5b/preflight.py` says so, and a rig that does not deadlock tests nothing. The remaining fifteen branches plus the three deferred items are fully planned and fully decided | branch 5's merge: the 5b probe |
 | **3** | **Opus 5** (goal iii) — two branches, then **Step C**, the full verification run, then **INPUT POINT 2** | **NOT STARTED**, designed. `OPUS-5-MIGRATION.md` | step 2 |
 | **4** | **Revisit, then publish** — **Step D** consolidates everything learned, *then* repackaging and publication | **NOT STARTED** | step 3 |
 
@@ -1320,7 +1320,10 @@ legal-translation-skill/          # today: this folder, with no .git in it
 │                                 #     stepb_harvest · stepb_verify · stepb_audit ·
 │                                 #     stepb_audit3 · stepb_metacheck · stepb_refute
 ├── tests/                        # never ships — run_tests · make_fixtures · negative_inputs ·
-│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · seven test_*.py
+│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · EIGHT test_*.py ·
+│                                 #   probe-5b/ — the rule-5b behavioural probe: two rigged
+│                                 #     documents, a pre-registered SCORING.md, and preflight.py,
+│                                 #     which says whether either rig actually fires
 └── temp/                         # gitignored scratch — it already exists and sits INSIDE the repo root
 ```
 
@@ -1432,113 +1435,123 @@ the pull request; do not call it complete.
 
 **RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
 Re-reading has never found one.
-### HANDOFF — 2026-08-11, session closed. Branch 5 is next, and it is GATED.
+### HANDOFF — 2026-08-12. Branch 5 is BUILT, VERIFIED, and NOT MERGED.
 
-**SEVEN PULL REQUESTS MERGED. `main` is at `db454c3`, working tree clean, no open PRs, no
-stray branches.** Branch 4 is done, so **step 2 has now delivered branches 3 and 4** and the
-exception channel exists in both trees.
+**Its merge is held by its own gate**, and the gate is not yet runnable: the probe kit
+is committed and **neither rig has been shown to fire.** That is the next action.
 
-**READ THE LAST EIGHT COMMIT MESSAGES BEFORE ANYTHING ELSE** — §5.2 requires it after a gap
-of more than a day, and this handoff is deliberately shorter than they are.
-
-| merged this session | |
+| | |
 |---|---|
-| **#16** | **Branch 4 — the exception channel.** Rule 5b, its four conditions, the five-attempt bound. F41 + the eighteen-row deadlock set |
-| **#22** | Rule 5b's disclosure takes a **fixed shape**, so a silent exception is detectable |
-| **#21** | **Branch 5 is gated** on a behavioural probe of the channel |
-| **#20** | The confidentiality gate now scans the **published trees**, by diff |
-| **#17** | The **evidence-folder guard** — a control that runs *before* a command does |
-| **#18** | I-12…I-16: five instrument defects into the register |
-| **#19** | Six **STEP-B suites promoted** out of gitignored `temp/` into `tools/` |
+| **branch** | `feature/checks-can-fail` — seven changes, both trees, 12 tree files |
+| **state** | verified 50/50 · tested 18/18 green · **not merged** |
+| **blocked on** | the rule-5b behavioural probe, whose rigs do not yet deadlock |
 
-### WHAT THE SKILL NOW SAYS THAT IT DID NOT
+### WHAT BRANCH 5 CHANGED — SEVEN THINGS, NOT FIVE
 
-**`SKILL.md` rule 5b** — *when a check is RIGHT and there is NO compliant repair: stop,
-disclose, and say what you tried.* Rule 5a covers a check that is **wrong**; 5b covers a
-check that is **right** while every remaining repair is forbidden by another rule. Four
-conditions, each stated separately. **A five-attempt bound, written at all FOUR places a
-repair loop is authored** — F41 said two; a sweep found four, one of them an unbounded
-*"repeat until exit 0"* in the always-loaded file itself. And the acceptance is disclosed in
-a fixed `ACCEPTED CONSEQUENCE` block, not free prose.
+§2's table lists five. **§6's Option 2 adds two more**, and calls two of the three
+"implementation specifics" things that change what *make the checks able to fail*
+actually means. Reading §3 alone ships five. The two extra: **the repack sets an
+explicit success code** (its `__main__` set none at all), and **WARN becomes
+distinguishable from PASS** — `verify_diligence` returned `1 if strict else 0`, which
+implements neither its own documented contract nor its own `--strict` help text.
 
-**THE BOUND IS FIVE, AND IT IS MEASURED.** Two prose probes failed first and are recorded as
-failures: ordinal vocabulary gave a ceiling of 3, then the confirming pass found the 3 sat on
-the noun *"pass"*. The forensic step records carry it properly — **47 repair sequences that
-closed, deepest 5**; a bound of 5 truncates nothing the corpus ever repaired, 4 would cut one
-short. **Four sequences never went green, the deepest running to eighteen attempts.**
+`quality_check` now exits **2** on any issue (Wouter's decision, asked and answered:
+FAIL, not WARN). Its guard moved above `__main__`. The repack writes to
+`<output>.docx.tmp` and promotes only if `testzip()` and the case check both pass;
+omitting `--paragraphs` refuses instead of warning. A validator's exit 3 blocks
+unconditionally, with a message that sends the operator to re-install rather than to
+re-author `paragraphs.json`.
 
-### THE NEXT ACTION — BRANCH 5, AND ITS GATE COMES FIRST
+### THE MEASUREMENT THAT SHAPED IT
 
-**`STEP-B-ANALYSIS.md` §2 now carries a FOURTH sequencing fact.** Branch 5 converts eighteen
-silent defects into blocked runs, and 5b is then the only legitimate way such a run can end.
-**So before branch 5 merges, run the behavioural probe:** one document, one deliberately
-rigged deadlock, observing whether the operator exhausts the bound, reaches 5b rather than
-improvising, and satisfies all four conditions.
+Of the seven changes, **six have zero exposure on the twelve recorded runs** — 30 of 30
+repack invocations carried `--paragraphs`; 0 exit-3s; 60 archives opened with 0 `testzip`
+failures and 0 case conflicts. **One carries all the risk:** 6 of 12 runs saw a non-zero
+`quality_check` total, and D05 (8 issues) and D06 (32) never recorded a clean statement
+at all — yet both delivered. **Of D06's 32, at least 19 are documented false positives**:
+11 from L1's positional mispairing, 8 inherited from the `.doc` conversion (M1).
 
-**Read it in the failure direction** — it detects failure far better than it confirms
-success. **And score the likely failure mode, which is the opposite of the obvious one:** the
-register shows this model follows prose *too* literally (cluster F's 39 findings exist
-because of it). The live risk is **reaching for 5b too early**, treating a repair it could
-have found as impossible. Nothing mechanically checks conditions (a) to (d).
+That does not soften the branch, and here is why: **branch 4 already routed Step 9's loop
+to 5a and 5b explicitly** (`08-aux-and-quality.md:249`). A false positive goes to 5a — fix
+the check — which is a sanctioned, non-blocking outcome. Branch 5 forces the operator to
+*engage* rather than sail past a false PASS. **But it makes the 5a/5b choice the ordinary
+encounter, not an exotic one**, which is exactly why the probe needs its decoy arm.
 
-### THE FIVE THINGS THIS SESSION LEARNED
+### THE NEXT ACTION — MAKE ONE RIG FIRE
 
-**1. `sed -i` AND PYTHON'S `write_text` REWRITE LINE ENDINGS AND SAY NOTHING.** `.gitattributes`
-opens with *"NEVER TRANSLATE LINE ENDINGS"*, and three branches converted `CLAUDE.md` from
-CRLF to LF anyway; a fourth put CRLF into both `SKILL.md` files. **Not cosmetic:** Git then
-had no common lines to align, so a nine-line change arrived as a **2,885-line whole-file
-conflict** that could not be resolved by inspection. Diffs went 1446→10, 1484→56, 1457→19.
-**In this repository, edit with the Edit tool.**
+```bash
+uv run python tests/probe-5b/preflight.py
+```
 
-**2. FIVE DEFECTS IN OUR OWN INSTRUMENTS, AND FOUR HAD BEEN REPORTING A PASS.** I-12 to I-16.
-The gate-replay tool counted the skill's own dictionaries as operator behaviour (210 → **147**);
-nothing bound the baseline table to the analyser that produced it, and **D03's re-run count
-was wrong — 41, not 40, so the corpus total is 400**; the acceptance test's execution section
-had **never fired a gate** because the interpreter lacked `lxml` and `rc != 0` was its only
-assertion; and the claims check could not see `tools/` at all.
+**Both arms report NOT CONFIRMED.** Arm 1 (F1's `ins_then_del` phantom): apply emits a
+document with **zero** tracked-change elements, so `post_process` never invokes
+`strip_noop` and F1's middle link never fires. Arm 2 (L1's definitions mispairing):
+blocks at apply before the reorder is reached.
 
-**3. A CONFIDENTIALITY GATE I WROTE MYSELF PASSED A FILE IT SHOULD HAVE BLOCKED.** It
-re-implemented `script_committability.py` instead of calling it, and `re.escape`d the
-descriptor list — **9 of whose 13 entries are regex containing `\s+`**, exactly as §5.4
-requires. Escaping made them unmatchable and it reported CLEAN on a file holding two real
-descriptors. **§5.11: a shared capability lives in one place.**
+**Two things measured on the way, both reproducible with no model, and neither is a
+register finding yet.** Declaring the phantom with its boundary space on the *ins*
+segment blocks at apply on a `transport.This` token mismatch — a deadlock, but G9's not
+F1's. Moving that space into the regular segment clears the block and apply then destroys
+the tracked change with nothing blocking. **A hand-authored intermediate may be malformed
+in a way a real operator's would not be**, so do not write either up without reproducing
+it from a translated run.
 
-**4. SOFTENING A CHECK TO MAKE IT HONEST MADE IT BLIND.** Promoting `stepb_audit.py`, I
-reasoned that a quotation whose only source is unreadable is *void rather than false* and
-skipped it. `stepb_metacheck.py` immediately dropped from **10 of 10 mutations detected to
-9**. Reverted. **An unreadable source is not a pass.**
+`tests/probe-5b/SCORING.md` is the pre-registered scoring sheet — written before the run
+so the result cannot be graded favourably afterwards. It carries the two-arm design, the
+verdict rule, and which questions are mechanical versus judgement.
 
-**5. A COUNT WENT STALE THREE TIMES, ALWAYS THE SAME WAY.** `tools/` read 16 against a real
-23, then 28 and 23 were both predicted and the truth after merging was **29**; `tests/` read
-four against six, then seven. Every error came from **adding to the figure that was there
-instead of listing the folder.**
+### FIVE THINGS THIS SESSION LEARNED
 
-### FOUR THINGS OPEN, NONE BLOCKING
+**1. FIVE OF MY OWN INSTRUMENTS WERE THE DEFECT, AND THE CODE WAS FINE EVERY TIME.** A
+Python chained comparison (`(t or 0) > 0 == want` parses as `and`), a `testzip()` probe
+patching the stored CRC instead of the data, a WARN workdir whose verdict was `OVERALL:
+FAIL` while a two-word needle found "WARN" and passed, a comment-stripper that took a
+count from 3 to **zero** and still reported 6 of 6, and a shell one-liner where
+`printf "%s" "$(basename $c)" "$?"` reset `$?` before reading it — that last one reported
+nine passes over a run containing a failure.
 
-1. **The four open defects in the A1 harness and review tooling** — I-7, I-8, I-9, I-10.
-   Unchanged, and they **will corrupt Step C's evidence if still open when it runs.**
-2. **The evidence guard is not live until a session STARTS with it in place.** Probe it
-   safely with `ls ../legal-translation-logs/NO-SUCH-DIRECTORY-PROBE` — BLOCKED if live, a
-   harmless missing-directory error if not. **And `.claude/evidence-dirs.local` does not
-   exist**, so the test-document folder is unguarded until someone creates it from the
-   committed `.example`.
-3. **`audit_session_stepb.py` stays in `temp/` permanently** — it holds two corpus
-   subject-matter descriptors. Its §-resolver fix from this session **does not survive**, and
-   register row I-15 says so.
-4. **The scan list still needs tightening** — §5.4(b), now substantially mitigated for the
-   trees by the diff-based gate, but the list itself is unchanged.
+**2. A NARROWED PATTERN PASSED THE VECTORS I CHOSE AND FAILED THE TEST'S.** The
+confidentiality gate blocked branch 5's own prose about `.docx` files. Narrowing it to
+require a capital in the stem passed every vector I wrote — all of which began lowercase —
+and failed on a whole SENTENCE, because a capital at the start of a sentence satisfied it.
+**Hand-picked vectors that share a shape test the shape, not the pattern.**
 
-### THREE MISTAKES WORTH CARRYING FORWARD
+**3. THE BYTECODE LEAK ARRIVED THROUGH A THIRD CALLER.** Fixed in `run_tests.py`, back
+through `audit_branches.py`, back again through mine. The remembered fix is
+`PYTHONDONTWRITEBYTECODE` for subprocesses; **an in-process import ignores it and needs
+`sys.dont_write_bytecode`.** Now written into `tests/README.md` beside where the next
+caller gets written.
 
-**I ran a broad glob over an evidence folder and it printed real corpus filenames carrying
-counterparty and personal names into the conversation.** Nothing was committed and nothing
-could be — the leak never touched a file, which is why no scanner in this project can reach
-it. §6.5's rule had been read that same morning. That is what PR #17 exists for.
+**4. AN INVERTED CHECK NEEDS ITS OWN NEGATIVE TESTS, AND MINE FOUND A HOLE.**
+`confirm_failure_chains.py` asserted the defects existed; branch 5 fixed them, so it now
+asserts the repair. Mutating the tree to prove it can still fail exposed a real gap: with
+the guard CALL deleted, `quality_check.py` dropped out of the tool's own population, so
+its comparison had nothing to compare and reported the chain closed.
 
-**A figure that agreed with the one I expected was wrong.** My first reconciliation derived
-399 re-runs by *assuming* 204 (document, step) pairs instead of measuring the real 176. §5.1
-names this exactly: agreement is the moment to re-derive, not to relax.
+**5. `test_baseline_unmodified.py` READS THE INDEX, NOT THE WORKING TREE.** It reported
+380/396 and PASS over twelve uncommitted changes. Deliberate — its question is about
+committed trees — but it means **the honest number only appears after `git add`**. Staged,
+it named all twelve; the declared list is now 24 entries and the count was recomputed by
+listing, never by adding.
 
-**Three negative tests probed the wrong tree** — mutating `uk/` then asking whether the
-change was visible in *either* tree, so the untouched `us/` copy kept satisfying them. A
-check whose own probe looks in the wrong place reports a false result in both directions.
+### FOUR THINGS OPEN
+
+1. **Both probe rigs, above.** Clearly-scoped, and the instrument that judges them is
+   committed rather than left in `temp/`.
+2. **A new cluster-G false positive, not yet a register row.** `quality_check`'s spacing
+   rule fires on `Party A|Party B` in the harness's own fixture, where the separator is a
+   `w:tab` ELEMENT and not a space. It is why that fixture's clean arm started failing.
+   Branch 14 owns the scoping; **adding the row would move counts in two documents, so it
+   is Wouter's call, not mine.**
+3. **The four open defects in the A1 harness tooling** — I-7, I-8, I-9, I-10. Unchanged,
+   and they will corrupt Step C's evidence if still open when it runs.
+4. **The scan list still needs tightening** — §5.4(b). One pattern narrowed this session,
+   with vectors in both directions; the list itself is unchanged.
+
+### ONE MISTAKE WORTH CARRYING FORWARD
+
+**I reported nine instruments as passing when one was failing**, because I put a command
+substitution before `"$?"` in the same `printf`. §5.1 says a check that passes for the
+wrong reason is worse than no check; this was a *report* that passed for the wrong reason,
+in the very sweep meant to prove nothing broke. **Capture `rc=$?` immediately, on its own
+line, before anything else runs.**

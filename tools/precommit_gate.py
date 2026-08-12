@@ -293,7 +293,41 @@ else:
                     ("email or phone", r"[\w.\-]+@[\w.\-]+\.\w+"),
                     ("three-part personal name",
                      r"\b[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}\b"),
-                    ("corpus filename shape", r"[\w\-. ()]{3,}\.(?:docx?|pdf)\b"),
+                    # NARROWED AT BRANCH 5, and the narrowing is a fix to the check rather
+                    # than a concession. The pattern was `[\w\-. ()]{3,}\.(?:docx?|pdf)\b`,
+                    # which fires on ANY prose mentioning a bare extension: branch 5's added
+                    # lines gave " the .docx" and " through left a partial .docx", neither of
+                    # which contains a filename. Section 4 already labels that class benign in
+                    # its own legend ("bare .docx extension mentions, no filenames") — but
+                    # section 7 BLOCKS, so the same class stopped the gate.
+                    #
+                    # What the class exists to catch is a real corpus filename, and §5.4 says
+                    # what makes those dangerous: "the test corpus filenames alone carry
+                    # counterparty names". A counterparty name is a proper noun, so the stem
+                    # must contain a capital. Vectors for both directions live in
+                    # tests/test_gate_tree_scan.py and run in this same commit, per §5.4's
+                    # rule that a pattern is tested against the string it was written for.
+                    #
+                    # THE CAPITAL MUST BE IN THE TOKEN THAT ABUTS THE EXTENSION, not merely
+                    # somewhere earlier in the line — and the first attempt at this narrowing
+                    # got that wrong. It allowed the capital anywhere in a run that included
+                    # spaces, so any SENTENCE beginning with a capital still matched: "The
+                    # repack writes a partial .docx" fired on the "T" of "The". It passed the
+                    # vectors chosen by hand, because those all began lowercase, and was caught
+                    # by the benign plants in tests/test_gate_tree_scan.py, which are whole
+                    # sentences. Hand-picked vectors that share a shape test the shape, not the
+                    # pattern.
+                    #
+                    # So the stem must be one or more CAPITALISED tokens ending at the
+                    # extension, which is what a filename carrying proper nouns looks like and
+                    # what running prose does not.
+                    #
+                    # THE RESIDUAL GAP, STATED: an all-lowercase real filename would now pass
+                    # this pattern. It would not pass the 93-pattern NAME scan, which runs over
+                    # the same added lines two controls above and is the primary defence
+                    # against names; this is a shape backstop, not the name check.
+                    ("corpus filename shape",
+                     r"\b[A-Z][\w\-()]*(?:[ _\-][A-Z0-9][\w\-()]*)*\.(?:docx?|pdf)\b"),
                 ]
                 worst = []
                 for label, pat in CLASSES:

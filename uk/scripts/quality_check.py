@@ -41,6 +41,58 @@ from source_language_markers import (  # noqa: E402
     SUPPORTED_LANGUAGES,
 )
 
+
+def _check_self_integrity():
+    """Detect install-time truncation. Whole-file scan tolerates null-padding."""
+    try:
+        with open(os.path.abspath(__file__), 'r', encoding='utf-8') as f:
+            content = f.read()
+    except OSError:
+        return
+    if '\n# === SKILL FILE COMPLETE ===' not in content:
+        msg = (
+            "\n" + "=" * 60 + "\n"
+            "[skill] FILE INTEGRITY CHECK FAILED — script truncated.\n"
+            f"  File: {os.path.abspath(__file__)}\n"
+            f"  Size: {len(content):,} bytes (sentinel marker missing).\n"
+            "  Re-install the skill from the .skill / .zip archive.\n"
+            "  Step 9 is MANDATORY — do not deliver while this script is\n"
+            "  truncated. Either re-install or block delivery until\n"
+            "  quality_check.py runs cleanly.\n"
+            + "=" * 60 + "\n"
+        )
+        print(msg, file=sys.stderr)
+        sys.exit(3)
+
+
+# Run the integrity check at module-import time so callers (including
+# auto-invokers) discover truncation before any work begins.
+#
+# THIS CALL USED TO SIT AT THE BOTTOM OF THE FILE, BELOW `__main__`, and the
+# comment above it made this same claim while the code did the opposite: Python
+# executes top to bottom, so the entire quality check ran and printed before the
+# guard was reached. It was the only one of the twenty scripts placed that way —
+# the other nineteen already call it here, which is why this is a move back to
+# the house pattern rather than a new idea.
+#
+# AND IT REPAIRS THE DOCUMENTED DIAGNOSTIC, WITH ONE MEASURED LIMIT.
+# `skill-docs/08-aux-and-quality.md` tells the operator to run this script with
+# `--help` to see whether the guard fires. From the bottom of the file that could
+# never work: argparse handles `--help` and exits first, so the check looked clean
+# however truncated the install was. Measured across every truncation point that
+# leaves a file Python can still compile: 0 of 29 fired before this move, 31 of 31
+# fire after it.
+#
+# THE LIMIT IS REAL AND NO PLACEMENT FIXES IT. Python compiles the whole module
+# before executing any of it, so where truncation leaves invalid syntax the guard
+# is unreachable wherever it sits — the operator gets a SyntaxError traceback
+# instead of a diagnosis. Both outcomes are safe, because nothing runs either way;
+# they differ only in whether the message names the cause. Deep cuts to this file
+# tend not to compile and shallow ones do, which is the OPPOSITE of the pattern
+# measured on extract_paragraphs.py — the behaviour is a property of where the cut
+# lands in a particular file, not a general rule.
+_check_self_integrity()
+
 W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 
 # ======================================================================
@@ -885,36 +937,46 @@ if __name__ == '__main__':
 
     source_language = args.source_language.lower() if args.source_language else None
 
-    check(args.xml_path, verbose=args.verbose, source_json=args.source_json,
-          variant=args.variant, source_language=source_language,
-          aux_dir=args.aux_dir)
+    results = check(args.xml_path, verbose=args.verbose,
+                    source_json=args.source_json,
+                    variant=args.variant, source_language=source_language,
+                    aux_dir=args.aux_dir)
 
+    # STEP 9's VERDICT HAS TO BE ABLE TO LEAVE THIS SCRIPT, and until now it
+    # could not. There was no sys.exit for the issues case, so this script
+    # exited 0 whatever it found — and verify_diligence.check_step_9, which
+    # branches on `returncode == 0`, therefore reported PASS on documents
+    # carrying 8 and 32 unresolved issues. Its comment said "quality_check
+    # exits non-zero when issues are reported", which was the opposite of true.
+    #
+    # TWO MANDATORY STEPS DEPENDED ON THIS VERDICT AND NEITHER COULD SEE IT.
+    # Step 7's only cover anywhere in the tree is the definition_order check
+    # above; it reported into a return value nobody read. Step 6 has no check
+    # at all. So one missing exit code silently removed two steps from the
+    # end-of-pipeline audit.
+    #
+    # The total is recomputed the way check() computes it, over the same dict.
+    # The loop raises rather than asserting, because `assert` is stripped under
+    # `python -O` and because a value that is not a list would otherwise be
+    # summed by character count — a wrong exit code instead of a loud failure.
+    total = 0
+    for _name, _issues in results.items():
+        if not isinstance(_issues, list):
+            raise TypeError(
+                f'quality_check: results[{_name!r}] is '
+                f'{type(_issues).__name__}, not a list of issues — the exit '
+                'code below cannot be trusted'
+            )
+        total += len(_issues)
 
-def _check_self_integrity():
-    """Detect install-time truncation. Whole-file scan tolerates null-padding."""
-    try:
-        with open(os.path.abspath(__file__), 'r', encoding='utf-8') as f:
-            content = f.read()
-    except OSError:
-        return
-    if '\n# === SKILL FILE COMPLETE ===' not in content:
-        msg = (
-            "\n" + "=" * 60 + "\n"
-            "[skill] FILE INTEGRITY CHECK FAILED — script truncated.\n"
-            f"  File: {os.path.abspath(__file__)}\n"
-            f"  Size: {len(content):,} bytes (sentinel marker missing).\n"
-            "  Re-install the skill from the .skill / .zip archive.\n"
-            "  Step 9 is MANDATORY — do not deliver while this script is\n"
-            "  truncated. Either re-install or block delivery until\n"
-            "  quality_check.py runs cleanly.\n"
-            + "=" * 60 + "\n"
-        )
-        print(msg, file=sys.stderr)
-        sys.exit(3)
-
-
-# Run the integrity check at module-import time so callers (including
-# auto-invokers) discover truncation before any work begins.
-_check_self_integrity()
+    # 2 = FAIL, matching the 0/1/2 contract verify_diligence documents. Nothing
+    # is printed here: the summary above already ends with either
+    # "*** PASSED: Document is ready for delivery ***" or
+    # "*** FAILED: N issues must be resolved ***", and stdout is deliberately
+    # left byte-identical so the change is provably an exit code and nothing
+    # else. Step 9's own doc routes what happens next — five attempts, then
+    # rule 5a if the finding is a false positive, rule 5b if it is real and no
+    # compliant repair exists.
+    sys.exit(2 if total else 0)
 
 # === SKILL FILE COMPLETE ===

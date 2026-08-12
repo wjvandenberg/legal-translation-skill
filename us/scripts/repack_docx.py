@@ -17,6 +17,18 @@ printed as WARNING lines with their XML-file location so the operator
 can decide whether to re-run translation on the affected part. The scan
 is additive — the repack still exits 0 regardless of hits.
 
+Exit codes:
+  0 — the .docx was written to the delivery path
+  1 — a gate blocked; NOTHING was written to the delivery path. Either a
+      mandatory pre-bundle validator failed, or --paragraphs was not supplied
+      so one could not run, or the finished archive failed its own ZIP
+      integrity or case-conflict check and was deleted.
+  3 — script-integrity check failed (re-install the skill)
+
+The archive is built under `<output>.docx.tmp` and moved into place only after
+both post-write checks pass, so a failure never leaves a partial or unopenable
+file where a deliverable should be.
+
 Usage:
     python repack_docx.py <original.docx> <translated_document.xml> <output.docx> [--numbering <translated_numbering.xml>] [--headers-footers-dir <dir>] [--clean-track-revisions]
 """
@@ -124,10 +136,29 @@ def repack(orig_docx, translated_doc_xml, output_docx,
              '--strict'],
         )
     else:
-        print(
-            "\n[repack] WARNING: --paragraphs not supplied; "
-            "skipping validate_apply.py --strict pre-bundle check. "
-            "Pass --paragraphs <paragraphs.json> to enable."
+        # REFUSE, rather than warn and bundle anyway.
+        #
+        # Three passages in the skill disagreed about whether this gate is
+        # required, and the code settled it by skipping: `10-repack-and-validate.md`
+        # lists this invocation among the UNCONDITIONAL mandatory items, `SKILL.md`
+        # calls validate_apply "MANDATORY pre-apply AND pre-repack", and the same
+        # step doc twice describes the flag as only "strongly recommended". A
+        # reader could not determine whether it was mandatory — so omitting one
+        # optional-looking flag silently removed a mandatory check.
+        #
+        # Nothing legitimate is lost by refusing. paragraphs.json is written at
+        # Step 2 and is mandatory throughout the pipeline, so a repack that cannot
+        # name it is a repack running outside the pipeline.
+        raise RuntimeError(
+            "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. "
+            "--paragraphs was not supplied, so the MANDATORY pre-bundle "
+            "validate_apply.py --strict check cannot run. Repack aborted; no "
+            ".docx written. This gate is unconditional — pass "
+            "--paragraphs <workdir>/paragraphs.json and re-run. Do NOT work "
+            "around it by bundling without the check: that is the path which "
+            "silently ships token drift introduced after apply by "
+            "post_process / strip_noop / reorder_definitions, which is the "
+            "entire reason this pre-bundle re-check exists."
         )
 
     with open(translated_doc_xml, 'rb') as f:
@@ -371,7 +402,15 @@ def repack(orig_docx, translated_doc_xml, output_docx,
                 if new_content != content:
                     rels_fixups[item.filename] = new_content.encode('utf-8')
 
-        with zipfile.ZipFile(output_docx, 'w', zipfile.ZIP_DEFLATED) as zout:
+        # WRITE TO A TEMPORARY NAME, NEVER STRAIGHT TO THE DELIVERY PATH.
+        # This loop used to write output_docx in place, so an exception part-way
+        # through left a partial .docx exactly where a good one should be — while
+        # the completion invariant in SKILL.md says a delivered file exists only if
+        # all 11 steps completed, and a reader cannot tell a finished document from
+        # an unfinished one by looking at it. The temp-then-move idiom is already
+        # used in this tree by clean_conversion_artifacts.py; this is that pattern.
+        tmp_docx = output_docx + '.tmp'
+        with zipfile.ZipFile(tmp_docx, 'w', zipfile.ZIP_DEFLATED) as zout:
             seen_normalized = set()  # track normalized paths to skip duplicates
             for item in zin.infolist():
                 if item.is_dir():
@@ -420,12 +459,26 @@ def repack(orig_docx, translated_doc_xml, output_docx,
                     data = zin.read(item.filename)
                     zout.writestr(new_item, data)
 
-    print(f"Repacked: {output_docx}")
-    # Verify
-    with zipfile.ZipFile(output_docx) as z:
+    # --- VERIFY THE TEMPORARY FILE, AND PROMOTE IT ONLY IF BOTH CHECKS PASS ---
+    #
+    # BOTH CONDITIONS NOW BLOCK. Each used to print a WARNING and continue;
+    # repack() returned None, and __main__ set no exit code at all — so a run that
+    # produced a file Word cannot open reported success and left that file at the
+    # delivery path. Together with quality_check's missing exit code that was the
+    # worst delivery path in the skill: an unopenable deliverable, a failed
+    # mandatory quality check, and a final audit printing "OVERALL: PASS /
+    # Deliver with confidence".
+    #
+    # NEITHER CONDITION WAS EVER OBSERVED, and that is the argument FOR blocking
+    # rather than against it: 60 archives from the twelve recorded runs were opened
+    # and every one passed both checks, so a gate that never fires is
+    # indistinguishable from a gate that passed. Making it block costs nothing the
+    # corpus ever did and closes the one path that ships a broken file silently.
+    problems = []
+    with zipfile.ZipFile(tmp_docx) as z:
         bad = z.testzip()
         if bad:
-            print(f"  WARNING: ZIP integrity check failed on: {bad}")
+            problems.append(f"ZIP integrity check failed on: {bad}")
         else:
             print(f"  ZIP OK ({len(z.namelist())} files)")
 
@@ -434,8 +487,25 @@ def repack(orig_docx, translated_doc_xml, output_docx,
         for name in z.namelist():
             ln = name.lower()
             if ln in lower_map and lower_map[ln] != name:
-                print(f"  WARNING: case conflict: {lower_map[ln]} vs {name}")
+                problems.append(f"case conflict: {lower_map[ln]} vs {name}")
             lower_map[ln] = name
+
+    if problems:
+        os.remove(tmp_docx)
+        raise RuntimeError(
+            "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. "
+            "The repacked archive failed its own integrity checks, so it was "
+            "DELETED instead of delivered:\n  - "
+            + "\n  - ".join(problems)
+            + "\nNothing was written to the delivery path. A file Word cannot "
+              "open is not a deliverable, and shipping one silently is worse "
+              "than stopping. Re-run the repack; if it fails again, the "
+              "translated document.xml or one of the auxiliary parts is "
+              "malformed — fix that, do not work around this gate."
+        )
+
+    shutil.move(tmp_docx, output_docx)
+    print(f"Repacked: {output_docx}")
 
     # --- Post-repack source-language remnant scan ---
     # Re-open the delivered .docx and scan every XML part for source-language
@@ -565,10 +635,12 @@ if __name__ == '__main__':
     parser.add_argument('--no-clean-track-revisions', action='store_true',
                         help='Do not remove trackRevisions from settings.xml')
     parser.add_argument('--paragraphs', default=None,
-                        help='Path to paragraphs.json (enables auto-run of '
-                             'validate_apply.py --strict pre-bundle to catch token '
-                             'drift introduced by post_process / strip_noop / '
-                             'reorder_definitions). Strongly recommended.')
+                        help='REQUIRED. Path to paragraphs.json. Enables the '
+                             'auto-run of validate_apply.py --strict pre-bundle '
+                             'that catches token drift introduced by post_process '
+                             '/ strip_noop / reorder_definitions. The repack '
+                             'REFUSES to bundle without it — the gate is '
+                             'unconditional, not advisory.')
     args = parser.parse_args()
     repack(args.original, args.translated_xml, args.output,
            translated_numbering_xml=args.numbering,
@@ -578,5 +650,13 @@ if __name__ == '__main__':
            translated_endnotes_xml=args.endnotes,
            clean_track_revisions=not args.no_clean_track_revisions,
            paragraphs_json=args.paragraphs)
+
+    # SET SUCCESS EXPLICITLY, rather than merely avoiding a failure code.
+    # This block set no exit code at all, so a 0 from repack was only Python's
+    # default for "the interpreter reached the end of the file" — which a script
+    # that fell off the bottom having done nothing produces just as well. A caller
+    # could not distinguish a completed bundle from a no-op. The gates above block
+    # by raising, which exits 1; this makes the success path equally deliberate.
+    sys.exit(0)
 
 # === SKILL FILE COMPLETE ===
