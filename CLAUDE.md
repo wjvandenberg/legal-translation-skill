@@ -14,8 +14,13 @@ Cowork, before Claude Code, without version control or an up-front structural pl
 > plus the comparison) and Step B (eleven options, ten approved, the rebuild declined) are complete and
 > separately audited. **Nothing in the plan is awaiting a decision.** **Step 1 is finished: the repository
 > exists, it is PUBLIC, branch protection is live, and branches 0, 1 and 2 are merged** — so the project now
-> has version control, a test harness and a parity check. **Ten lines of skill file have been modified**,
-> deliberately, to remove real-document material from the two published trees. The next action is in §7.
+> has version control, a test harness and a parity check. **Ten lines of skill file have been modified —
+> that is ADDED LINES ACROSS BOTH TREES, in two files per tree: five added and four removed each side** —
+> deliberately, to remove real-document material from the two published trees. *(The basis was implicit
+> until 2026-08-18, when an audit re-derived the figure, assumed it meant per-tree, measured four and
+> reported it as a failure. Ten is right under exactly one of six natural readings and four of the six
+> give a different number, so the unit is now stated. A count whose unit is implicit is a count the next
+> session re-derives differently.)* The next action is in §7.
 >
 > **This file was rewritten on 2026-08-06** to the seven-section structure below, after a claims check found
 > 35 factual errors in the previous version — almost all of them counts and statuses that the work had moved
@@ -1617,6 +1622,32 @@ build plan"*.
    fresh clone.** **`tools/run_tests.py` collides by name with the committed `tests/run_tests.py`**
    — worth resolving before either is committed, because the house rule *"prefer a script in
    `tools\`"* would then point at the wrong one.
+
+### BOTH TREES RE-VERIFIED AGAINST THE PUBLISHED rev44, ON WOUTER'S INSTRUCTION
+
+Re-measured rather than re-read, and measured **fresh** rather than by re-running the standing
+instruments alone — though those were reproduced first, as §5.12 requires: baseline **372 of 396
+byte-identical, 24 declared**, parity **PASS (493 known, awaiting D1)**, `test_checks_can_fail`
+**50 of 50**, `confirm_failure_chains` **6 of 6**, `check_coverage` **18 of 20**.
+
+| question | answer |
+|---|---|
+| Which files diverge from rev44? | **12 per tree, 24 in total** — independently derived, and it reproduces the baseline's figure |
+| Is every change **mirrored** in both trees? | **Yes, all 12.** The one property the monorepo exists to enforce, and the one that once shipped to a client broken |
+| Is each tree's change the **same** change? | **11 of 12 byte-identical in their added lines.** The twelfth is `SKILL.md`, differing by exactly one line — *"translation into UK English"* against *"US English"* — which is the variant difference itself |
+| Is every divergence **attributable**? | **Yes.** Every one traces to branch 0, 3, 4 or 5, the confidentiality cleanup, or the cross-reference fix. Nothing unattributed |
+| Confidentiality over **all 764** lines added since rev44 | **CLEAN on all three controls.** Measured against the archive rather than against `origin/main`, so the confidentiality cleanup — which sits inside `main`'s baseline and is therefore invisible to the pre-commit gate — is covered |
+
+**Equal line counts are not equal content, and that was the point of asking.** Branch 5's diffstat
+showed `uk` and `us` matching to the line on all six files it touched, which is either correct
+mirroring or a coincidence; comparing the added lines as multisets is what tells them apart.
+
+**One finding, and it was in my own instrument first.** The audit re-derived the STATE block's
+*"ten lines of skill file have been modified"*, assumed it meant per-tree, measured **four**, and
+printed DOES NOT REPRODUCE over a figure that is arithmetically correct. Ten is right under exactly
+one of six natural readings — added lines across both trees — and four of the six give a different
+number. **Testing one reading of an ambiguous claim and calling the answer a failure is not a
+measurement.** The instrument now prices every reading, and §2's STATE block states the unit.
 
 ### WHAT THIS SESSION DID NOT TOUCH, STATED SO NOBODY LOOKS FOR IT
 
