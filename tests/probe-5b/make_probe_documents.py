@@ -68,20 +68,42 @@ OUT = Path(__file__).resolve().parent.parent.parent / "temp" / "probe-5b-documen
 def tc_paragraph():
     """A paragraph carrying an ins_then_del PHANTOM segment — arm 1's rig.
 
-    The phantom is an insertion that is then deleted: the same words wrapped in `w:ins` and
-    immediately again in `w:del`. Accepting and rejecting both yield the same text, which is
-    why strip_noop deletes the pair as a no-op — and why Step 4's instruction to fill in its
-    English cannot survive Step 6.
+    THE PHANTOM IS A `w:ins` WHOSE ONLY CONTENT IS A `w:del`, NESTED. Author A inserted the
+    words; author B deleted author A's insertion. That is one element containing another, and
+    the nesting is the whole of what makes it a phantom: `extract_paragraphs.py` classifies
+    exactly this shape as segment type `ins_then_del`, `strip_noop_tracked_changes.py`'s third
+    pass removes exactly this shape, and F1's chain runs between those two facts.
+
+    THE FIRST VERSION OF THIS RIG BUILT TWO SIBLINGS INSTEAD — a `w:ins` followed by a
+    `w:del` of the same words — and it could never have fired. Corrected 2026-08-18, and the
+    reason is worth more than the fix, because nothing about the rig looked wrong:
+
+      * `extract_paragraphs.py:332` classifies a `w:ins` by asking whether it has a top-level
+        `w:t`. Two siblings have one each, so they come out as `ins` and `del` — two ordinary
+        segments. The `ins_then_del` branch at :352 is reached only when the `w:ins` has NO
+        top-level `w:t` and DOES have a nested `delText`. So the sibling shape never produced
+        the segment type the rig is named after.
+      * `apply_translations_textmatch.py:691` `_collapse_orthographic_tc_pairs` (rev28) then
+        collapsed the pair into a single regular run, because an adjacent ins+del carrying
+        IDENTICAL English is an orthographic no-op — a source-language spelling fix whose two
+        sides translate to the same string. **That is correct, documented, intended
+        behaviour**, and the sibling rig had identical English on both sides by construction,
+        so it qualified. The wrappers were gone before Step 6 and `strip_noop` never saw them.
+
+    WHERE THE BOUNDARY SPACE LIVES IS PART OF THE RIG, NOT A DETAIL. The space between the
+    regular sentence and the phantom sits on the TRAILING edge of the regular run. Put it on
+    the phantom's leading edge instead and apply's whitespace restoration turns the run into
+    G9's boundary deadlock — which is a real deadlock, and the WRONG ONE. A rig that blocks
+    for another finding's reason measures that finding, so the space is placed deliberately.
     """
     return (
         '<w:p><w:r><w:t xml:space="preserve">De Leverancier draagt de kosten van '
-        'vervoer.</w:t></w:r>'
+        'vervoer. </w:t></w:r>'
         '<w:ins w:id="101" w:author="Reviewer" w:date="2020-01-01T00:00:00Z">'
-        '<w:r><w:t xml:space="preserve"> Deze verplichting vervalt na oplevering.'
-        '</w:t></w:r></w:ins>'
-        '<w:del w:id="102" w:author="Reviewer" w:date="2020-01-01T00:00:00Z">'
-        '<w:r><w:delText xml:space="preserve"> Deze verplichting vervalt na oplevering.'
-        '</w:delText></w:r></w:del>'
+        '<w:del w:id="102" w:author="Controller" w:date="2020-01-02T00:00:00Z">'
+        '<w:r><w:delText xml:space="preserve">Deze verplichting vervalt na '
+        'oplevering.</w:delText></w:r>'
+        '</w:del></w:ins>'
         '</w:p>'
     )
 

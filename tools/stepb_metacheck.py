@@ -130,6 +130,18 @@ MUTATIONS = [
                       "The right formulation is \"preserve by default\"", 1),
   "stepb_audit.py",
   "NEW GUARD: check 15 asserts the analysis still states the retired slogan AS retired"),
+
+ # THIS IS THE MUTATION THAT WOULD HAVE CAUGHT A REAL ERROR, and it is here because it did not
+ # exist when the error shipped. G10 moved consequence group 3 from 41 to 42 on 2026-08-11, the
+ # heading kept saying 41, and check 5 reported the groups SUMMING correctly while one of the
+ # parts was wrong. Found 2026-08-18 by running stepb_audit rather than by reading -- and found
+ # late, because it sat behind check 10's expected LEGAL_TRANSLATION_A4 red. A check that is
+ # already failing for a declared reason hides every new failure behind it.
+ ("state a group heading count the map contradicts (group 3: 42 -> 41)",
+  lambda t: t.replace("### 5.3 Things that say it worked when it did not — 42 findings",
+                      "### 5.3 Things that say it worked when it did not — 41 findings", 1),
+  "stepb_audit.py",
+  "NEW GUARD: check 5d compares EACH group heading to the map, not only their sum"),
 ]
 
 holes, fired = [], 0

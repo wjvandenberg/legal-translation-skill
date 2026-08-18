@@ -6,37 +6,90 @@ before it is used and froze the blind review's criteria before anyone looked.
 
 ---
 
-## STATUS, 2026-08-12: THE KIT IS BUILT AND NEITHER RIG IS CONFIRMED TO FIRE
+## STATUS, 2026-08-18: ARM 1 IS CONFIRMED AND READY TO RUN. ARM 2 IS NOT.
 
 ```bash
-uv run python tests/probe-5b/preflight.py
+uv run python tests/probe-5b/make_probe_documents.py
+uv run python tests/probe-5b/preflight.py            # exit 0 = ARM 1 confirmed
+uv run python tests/probe-5b/preflight_metacheck.py   # 3 of 3 — proves it can still say no
 ```
-
-**Do not run either arm in Cowork yet.** A rigged deadlock that does not deadlock tests nothing,
-and the pre-flight says both arms currently fail to reach the condition they exist to create:
 
 | arm | intended deadlock | pre-flight result |
 |---|---|---|
-| **1** | register **F1** — the `ins_then_del` phantom | **NOT CONFIRMED.** Apply emits a document with **zero** tracked-change elements, so the phantom wrappers are gone before Step 6. `post_process` invokes `strip_noop` only when the XML still carries tracked changes, so F1's middle link never fires |
-| **2** | register **L1** — positional mispairing after the definitions reorder | **NOT CONFIRMED.** Blocks at apply before the reorder is reached |
+| **1** | register **F1** — the `ins_then_del` phantom | **CONFIRMED, 2026-08-18.** All four links of F1's chain run, in order, and the block is F1's rather than merely a block. **This is the arm to run** |
+| **2** | register **L1** — positional mispairing after the definitions reorder | **NOT CONFIRMED**, and now for two *named* reasons rather than one vague one. **Do not run it.** See below |
 
-**Two things were measured on the way, and both reproduce with no model:**
+### Arm 1 — what fires, link by link, and why it is a genuine deadlock
 
-1. Declaring the phantom with its boundary space on the **ins** segment blocks at **apply** —
-   `validate_apply --strict` reports two missing tokens because the applied text reads
-   `transport.This`. That *is* a deadlock, but it is **G9's** whitespace-boundary one, not F1's.
-2. Moving that space into the regular segment clears the block, and apply then **destroys the
-   tracked change entirely** with nothing blocking.
+| | |
+|---|---|
+| **Step 4 obeyed** | The phantom's English is declared, because `04-translate.md:488` says *"Always fill these in"* |
+| **Step 5 apply** | exit 0, wrappers intact, and **the apply-time gate PASSES** — F1's shape is a run that looks clean at Step 5 |
+| **Step 6 strip** | `post_process` auto-invokes `strip_noop`, whose third pass removes the phantom wrapper, **as designed** |
+| **Step 6 gate** | the post-strip drift gate finds the declared English gone, and `post_process` raises `SKILL GATE FIRED` |
 
-> **CONFIDENCE: both observations are MEASURED; their interpretation is NOT settled.** A
-> hand-authored intermediate may be malformed in a way a real operator's would not be, and a
-> malformed input destroying a tracked change is not the same as the pipeline destroying one.
-> **Neither should be recorded as a register finding without reproducing it from a translated
-> run.** Stated here rather than left as a hunch, because the tempting move is to write it up as
-> a discovery.
+**And no compliant repair exists**, which is what makes it a deadlock rather than an error. Step 4
+forbids leaving the segment unfilled. `strip_noop`'s `--keep-phantom-tcs` flag is **unreachable**:
+`post_process._run_strip_noop_subprocess` invokes the script with the XML path and nothing else,
+so reaching the flag means wrapping or patching a script and anti-drift rule 5 forbids both.
+Editing `paragraphs.json` to drop the declared English is the repair **the gate's own message
+names as the wrong one**. Rule 5b is the only sanctioned end.
 
-**What the next session needs to do:** make one arm fire, confirmed by `preflight.py`, then run
-that arm. Arm 1 first — see *Read it in the failure direction* below.
+### Why arm 1 could never have fired before, and it was not a near miss
+
+**The rig built two SIBLINGS — a `w:ins` followed by a `w:del` of the same words — where F1's
+phantom is a `w:ins` whose only content is a `w:del`, NESTED.** Two facts follow, and neither is
+a bug in the skill:
+
+1. `extract_paragraphs.py:332` classifies a `w:ins` by asking whether it has a top-level `w:t`.
+   Two siblings have one each, so they extract as ordinary `ins` and `del` segments. **The
+   document never carried the segment type the arm is named after.**
+2. `apply_translations_textmatch.py:691` `_collapse_orthographic_tc_pairs` then merged the pair
+   into one regular run — **correct, documented, intended behaviour** for an adjacent ins+del
+   carrying identical English, which is what a source-language spelling fix looks like after
+   translation. The sibling rig had identical English on both sides by construction, so it
+   qualified.
+
+> **SO ONE OF THE TWO UNINTERPRETED OBSERVATIONS IS NOW EXPLAINED, AND IT IS NOT A FINDING.**
+> The 2026-08-12 status recorded *"apply destroys the tracked change entirely with nothing
+> blocking"* and flagged it as measured-but-uninterpreted. It was apply's orthographic collapse
+> doing exactly its job on an input that met its condition. **It must NOT become a register row.**
+> The instinct that held it back — *a hand-authored intermediate may be malformed in a way a real
+> operator's would not be* — was right, and this is what it was protecting against.
+>
+> **The other observation still stands unresolved.** Declaring the phantom's boundary space on
+> the ins segment blocked at apply on a `transport.This` token mismatch — G9's whitespace
+> deadlock, not F1's. That is now **avoided by construction rather than resolved**: the rig puts
+> the boundary space on the regular run's trailing edge. It is still not a register row and still
+> needs reproducing from a translated run before it becomes one.
+
+### Arm 2 — the two reasons it stays silent, both measured
+
+It now clears apply. The first cause was **the pre-flight, not the document**:
+`validate_en_runs.py` blocks any detected definitions section whose paragraphs carry no
+`en_runs`, and the hand-authored intermediate had none. A real operator writes them; the
+pre-flight now does too. Past that gate, `quality_check --with-source` reports **0 issues**:
+
+1. **The permutation is too small.** The reorder sorted five definitions and only one moved.
+   L1 fires positionally, so that is the minimum possible disturbance rather than a
+   representative one.
+2. **L1 is silent unless the mispaired definitions differ sharply in length** — the register says
+   so in as many words, and the corpus instance surfaced as bogus *truncation* findings, which is
+   a length-ratio rule. All five definitions here are about one line long.
+
+**One behaviour to look at before redesigning the document, and it is UNDECIDED:** the detector
+reported `'Works' (7 paras) [7,8,9,10,11,12,13]` — it absorbed the whole remainder of the
+document into the last definition, because nothing after the block terminates it. Whether that
+is a rig defect or a register finding is not settled here and must not be assumed either way.
+
+**The route, if arm 2 is ever needed:** definitions whose English renderings differ sharply in
+length *and* whose alphabetical order differs sharply from the source's, with a clear terminator
+after the block. **That is a document change and it was deliberately not made** — the protocol
+runs arm 1 first and a failure there answers the gate on its own, so arm 2's cost is only paid if
+arm 1 passes.
+
+**What the next session needs to do: hand arm 1 to Wouter to run in Cowork**, under the run
+protocol below. Nothing else in this kit is on the critical path.
 
 ---
 

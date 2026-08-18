@@ -439,10 +439,24 @@ skill_scripts = {n.split("/")[-1] for n in ARCH["UK"]["files"] if n.startswith("
 #     author happened to punctuate the reference -- one spelling failed loudly, the other was
 #     not checked at all. That is worse than either alone, and it is why the prefix is now
 #     part of the pattern and the search covers every folder we actually keep scripts in.
-SEARCH_DIRS = [ROOT / "temp", ROOT / "tools", ROOT / "tools" / "hooks", ROOT / "tests",
-               PRIV / "tools"]
-named = set(re.findall(r"`(?:(?:temp|tools|tests)[\\/](?:hooks[\\/])?)?([a-z0-9_]+\.py)`",
-                       CMD))
+# AND THE SAME DEFECT AGAIN, ONE DIRECTORY DEEPER, 2026-08-18. Both fixes above enumerated the
+# directories that existed when they were written -- `tools/hooks/` was named explicitly and
+# `tests/` was named as a flat folder. `tests/probe-5b/` then landed on branch 5, and the check
+# reproduced defect (2) exactly: `tests/probe-5b/preflight.py` in backticks matched NOTHING and
+# was silently never checked, while the bare `preflight.py` matched and failed to resolve. The
+# verdict again depended on punctuation.
+#
+# SO THE FIX IS NOT ANOTHER DIRECTORY IN THE LIST. Adding `tests/probe-5b` would leave the next
+# subdirectory to rediscover this a fourth time, which is the "fix scoped to one caller of a
+# shared hazard" failure §5.1 names. Instead: search each root RECURSIVELY, and let the pattern
+# understand ANY relative path prefix -- more than one segment, and hyphens, which `probe-5b`
+# has and which is precisely why the old pattern skipped it.
+SEARCH_ROOTS = [ROOT / "temp", ROOT / "tools", ROOT / "tests", PRIV / "tools"]
+scripts_on_disk = set()
+for _root in SEARCH_ROOTS:
+    if _root.exists():
+        scripts_on_disk |= {p.name for p in _root.rglob("*.py")}
+named = set(re.findall(r"`(?:[A-Za-z0-9_.\-]+[\\/])*([a-z0-9_]+\.py)`", CMD))
 
 # DECLARED FUTURE, not missing. Widening the pattern above immediately surfaced these two,
 # which the old regex had been skipping because they are written with a `tools/` prefix. They
@@ -455,7 +469,7 @@ PLANNED = {
     "publish.py": "§6.6 — copies each tree into its public repo, at release time",
 }
 absent = {n for n in named
-          if not any((d / n).exists() for d in SEARCH_DIRS) and n not in skill_scripts}
+          if n not in scripts_on_disk and n not in skill_scripts}
 missing = sorted(absent - set(PLANNED))
 planned_absent = sorted(absent & set(PLANNED))
 if missing:
