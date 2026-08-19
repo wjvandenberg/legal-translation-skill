@@ -63,8 +63,31 @@ REQUIRED = [
     ("K3", "SKILL.md", "the source-language document remains the operative text"),
 
     # K2 — the Step 6 gate stops telling the operator to make the JSON match the document.
-    ("K2", "scripts/post_process.py", "WORK OUT WHICH SIDE IS WRONG BEFORE EDITING EITHER"),
+    # WIDENED 2026-08-19 FROM TWO SIDES TO THREE. The needle used to be "WORK OUT WHICH SIDE
+    # IS WRONG BEFORE EDITING EITHER", and the rule-5b probe showed what that framing cost:
+    # the operator accepted the binary the banner offered, concluded every repair was
+    # forbidden, and was one step from invoking 5b on a check that was simply miscounting.
+    # Its own words -- "what made 5b look inevitable was accepting the banner's binary".
+    # So these needles now assert the THIRD possibility is named and routed, which is a
+    # stronger claim than the two-sided one they replace, not a relocated one.
+    ("K2", "scripts/post_process.py", "WORK OUT WHICH OF THREE THINGS IS WRONG"),
     ("K2", "scripts/post_process.py", "it clears the gate and ships the defect"),
+    ("F1", "scripts/post_process.py", "THIS CHECK IS WRONGLY SCOPED"),
+    ("F1", "scripts/post_process.py", "cannot detect (3) about itself"),
+    ("F1", "scripts/post_process.py", "SKILL.md rule 5a"),
+
+    # F1 — rule 5a stops forbidding the repair it mandates. "Never patch the script" and
+    # "narrow the pattern" were the same sentence pointing two ways; for a check implemented
+    # in Python they cannot both be obeyed. The needles bind the resolution to its own five
+    # conditions, so a file that merely says "correct the check" cannot satisfy them.
+    ("F1", "SKILL.md", "never patch the installed skill"),
+    ("F1", "SKILL.md", "Correcting a wrongly-scoped check is not working around it"),
+    ("F1", "SKILL.md", "show the wrong scope from the check's OWN source or stated contract"),
+    ("F1", "SKILL.md", "You correct it in a WORKING COPY, never in the installed skill"),
+    ("F1", "SKILL.md", "narrowed until it fires on nothing is not a fix"),
+    ("F1", "SKILL.md", "that the INSTALLED skill still carries the defect"),
+    ("F1", "SKILL.md", "AND CHECK 5a BEFORE 5b, NOT AFTER"),
+    ("F1", "SKILL.md", "Read the check's source before concluding that no repair exists"),
 
     # ---- BRANCH 4 — the exception channel -------------------------------------------
     # The channel is for the case rule 5a is NOT for: the check is right and every repair
@@ -511,7 +534,14 @@ for tree in TREES if PY else []:
               f"exit {rr.returncode}, banner "
               f"{'present' if 'SKILL GATE FIRED' in out else 'ABSENT'}")
         check(f"{tree}: and prints the new remedy the operator will read",
-              "WORK OUT WHICH SIDE IS WRONG BEFORE EDITING EITHER" in out)
+              "WORK OUT WHICH OF THREE THINGS IS WRONG" in out)
+        # AT RUNTIME, NOT MERELY IN THE FILE. The whole point of the widening is what the
+        # operator READS at the moment it has to decide, so the third possibility and its
+        # governing rule are asserted against the gate's actual output, not the source.
+        check(f"{tree}: and names the third possibility — the check itself",
+              "THIS CHECK IS WRONGLY SCOPED" in out)
+        check(f"{tree}: and routes it to the rule that governs it",
+              "rule 5a" in out)
         check(f"{tree}: and no longer prints the superseded one",
               "Fix paragraphs.json and re-run from Step 5" not in out)
         check(f"{tree}: and still refuses to be worked around",

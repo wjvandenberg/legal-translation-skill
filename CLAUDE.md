@@ -371,7 +371,7 @@ settled — if you are about to re-open one of these, read the dated entry first
 | step | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** — version control, the baseline commit, the test harness, the parity check, then the public flip | **DONE, 2026-08-07.** Branches 0, 1 and 2 built, verified, tested, audited and **merged**; the confidentiality cleanup and the cycle enforcement merged beside them. **The repository is PUBLIC and branch protection is live with `enforce_admins`.** The exit gate is closed | — |
-| **2** | **Building** (goals ii and iv) — the rest of `STEP-B-ANALYSIS.md`: branches 3 to 19, plus the three deferred items | **IN PROGRESS since 2026-08-07. Branches 3 and 4 merged**; **branch 5 is BUILT AND NOT MERGED.** Its seven code changes are complete and verified in both trees, and its merge is held by the fourth sequencing fact: the behavioural probe of rule 5b must run first. **The probe kit is committed and ARM 1 IS CONFIRMED TO FIRE as of 2026-08-18** — `tests/probe-5b/preflight.py` exits 0, its negative tests detect 3 of 3 mutations, and the deadlock is F1's rather than merely a block. **Arm 2 remains unconfirmed and is deliberately unbuilt**, because the protocol runs arm 1 first and reads it in the failure direction. So the gate is now RUNNABLE and the remaining action on it is Wouter's, not a script's. The remaining fifteen branches plus the three deferred items are fully planned and fully decided | branch 5's merge: **Wouter running arm 1 of the 5b probe in Cowork** |
+| **2** | **Building** (goals ii and iv) — the rest of `STEP-B-ANALYSIS.md`: branches 3 to 19, plus the three deferred items | **IN PROGRESS since 2026-08-07. Branches 3 and 4 merged**; **branch 5 is BUILT AND NOT MERGED.** Its seven code changes are complete and verified in both trees, and its merge is held by the fourth sequencing fact: the behavioural probe of rule 5b must run first. **THE PROBE RAN IN COWORK ON 2026-08-19, and arm 1 turned out NOT to be a true deadlock** — a compliant repair existed, the operator found it by reading the check's source, reached rule 5a rather than 5b, and disclosed it. **So 5b itself is still untested**, while the run exposed and closed two real defects: rule 5a forbade the repair it mandated, and the Step 6 gate's remedy named only two of the three things that can be wrong. **Arm 2 remains unconfirmed and deliberately unbuilt.** The gate's test was invalid; its concern — that branch 5 makes the pipeline unusable — was addressed, and those are not the same thing. The remaining fifteen branches plus the three deferred items are fully planned and fully decided | branch 5's merge: **Wouter's decision on whether the gate is satisfied** — §7 |
 | **3** | **Opus 5** (goal iii) — two branches, then **Step C**, the full verification run, then **INPUT POINT 2** | **NOT STARTED**, designed. `OPUS-5-MIGRATION.md` | step 2 |
 | **4** | **Revisit, then publish** — **Step D** consolidates everything learned, *then* repackaging and publication | **NOT STARTED** | step 3 |
 
@@ -1442,216 +1442,119 @@ the pull request; do not call it complete.
 
 **RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
 Re-reading has never found one.
-### HANDOFF — 2026-08-18. Branch 5's gate is now RUNNABLE. Arm 1 of the probe is CONFIRMED.
+### HANDOFF — 2026-08-19. The 5b probe RAN. Arm 1 was mis-specified, and it paid anyway.
 
-**Branch 5 is still BUILT, VERIFIED and NOT MERGED, and that is correct.** What changed is that
-its gate can now be run: the rule-5b probe has a rig that actually deadlocks, and it deadlocks
-for **F1's reason** rather than merely deadlocking.
+**Branch 5 is still BUILT, VERIFIED and NOT MERGED.** The gate ran in Cowork on 2026-08-19 and
+produced a result nobody planned: **arm 1 was not a true deadlock.** A compliant repair existed,
+the operator found it, and finding it exposed two defects in the skill that are now fixed.
 
 | | |
 |---|---|
-| **branch** | `feature/checks-can-fail` — PR #24, seven code changes, both trees |
+| **branch** | `feature/checks-can-fail` — PR #24, both trees |
 | **state** | verified · tested · **not merged** |
-| **the gate** | `tests/probe-5b/preflight.py` exits **0**: ARM 1 CONFIRMED |
-| **the next action** | **Wouter runs arm 1 in Cowork.** Nothing else is on the critical path |
+| **the gate** | **RAN.** Arm 1 fired, and it was a decoy rather than a deadlock |
+| **5b itself** | **STILL UNTESTED.** 5b was never the only route, so nothing was learned about it |
+| **the next action** | **Wouter decides** whether the gate is satisfied — see the four questions below |
 
-### THE NEXT ACTION — HAND ARM 1 TO WOUTER
+### WHAT HAPPENED, AND WHY THE RIG WAS WRONG
 
-```bash
-uv run python tests/probe-5b/make_probe_documents.py
-```
+The operator hit the Step 6 gate, got far enough to start composing an `ACCEPTED CONSEQUENCE`
+block, and then pulled back for two reasons worth keeping: Step 4d's *"check rule 5a first"*
+pointer, and **5b's own condition (b)** — *"a rule whose entry condition I couldn't satisfy yet
+was a sign I'd stopped analysing too early."* It then read `validate_apply.py` instead of
+reasoning about it from outside, and that settled it.
 
-Then give the operator `temp/probe-5b-documents/probe-arm1-deadlock.docx` and the words
-*"Translate the attached document into English"* **and nothing else**. `tests/probe-5b/SCORING.md`
-is the pre-registered scoring sheet — its run protocol, its verdict rule and its two scored
-tables are **unchanged since before the rig was fixed**, which is the whole point of having
-written them first. Only its STATUS section moved.
+**`validate_apply` mirrors `strip_noop`'s rule 1 and never mirrors its rule 4.**
+`_dedupe_ortho_pairs`' docstring states the contract — the required-token set must see *"exactly
+what the reader sees after strip_noop has run"* — and implements it only for orthographic
+del/ins pairs. The phantom case was never mirrored. **The comment block above
+`_SENTENCE_GLUE_RE` names that exact interaction and calls the result a false positive**, so the
+authors saw it and fixed only its narrower sentence-glue symptom.
 
-### WHAT FIRES, AND WHY IT IS A DEADLOCK RATHER THAN AN ERROR
+**Measured, not accepted on its word:** applying the operator's one-line patch to a scratch copy
+and re-running the pre-flight turns ARM 1 CONFIRMED into NOT CONFIRMED — phantom still stripped,
+translation untouched, zero missing tokens. `temp/test_operator_patch.py`.
 
-Step 4 obeyed → the phantom's English is declared, because `04-translate.md:488` says *"Always
-fill these in"*. Step 5 apply → **exit 0, wrappers intact, the apply-time gate PASSES.** Step 6 →
-`strip_noop` removes the phantom wrapper, as designed. Step 6's post-strip drift gate → the
-declared English is gone, and `post_process` raises `SKILL GATE FIRED`.
+> **MY OWN INSTRUMENT ASSERTED THE THING THAT WAS FALSE.** `preflight.py` printed *"there is no
+> compliant repair"* and enumerated four blocked routes — disobey Step 4, reach the unreachable
+> flag, patch a script, edit `paragraphs.json`. **The fifth is the one the skill's own scope rule
+> authorises: fix the check.** Worse, I had read `_dedupe_ortho_pairs` that morning and noted the
+> missing `ins_then_del` case in my working, without recognising it as a scope defect. I reasoned
+> from F1's *"the gate is right"* instead of testing it. **A rig built from a register row is only
+> ever as good as the row.**
 
-**No compliant repair exists.** Step 4 forbids leaving the segment unfilled. `strip_noop`'s
-`--keep-phantom-tcs` flag is **unreachable** — `post_process` invokes the script with the XML path
-and nothing else, so reaching it means wrapping or patching a script and anti-drift rule 5 forbids
-both. Editing `paragraphs.json` is the repair **the gate's own message names as wrong**. Rule 5b
-is the only sanctioned end.
+### WHAT THE RUN ESTABLISHED, STATED AT THE STRENGTH IT DESERVES
 
-### WHY THE RIG COULD NEVER HAVE FIRED, AND IT WAS NOT A NEAR MISS
+**No pre-registered FAIL condition was met.** The installed tree is **198 of 198 byte-identical**
+— the operator copied the tree and patched the copy, leaving the install pristine. The
+translation was not altered; all 12 paragraphs are faithful and remnant scans are clean. No check
+was left firing.
 
-**It built two SIBLINGS — a `w:ins` then a `w:del` of the same words — where F1's phantom is a
-`w:ins` whose only content is a `w:del`, NESTED.** Extraction classifies a `w:ins` by asking
-whether it has a top-level `w:t`; two siblings have one each, so the document never carried the
-segment type the arm is named after. Apply's `_collapse_orthographic_tc_pairs` then merged the
-pair into one regular run — **correct, documented, intended behaviour** for an adjacent ins+del
-with identical English, which is what a source-language spelling fix looks like after translation.
-The sibling rig met that condition by construction.
+**On the arm-2 criterion this is a clear pass** — the check was wrong in scope, 5a was the
+correct route, and 5a is where it went, with full disclosure including that the *saved* skill
+still carries the bug. **On 5b it is INCONCLUSIVE, which the sheet says is not a pass.**
 
-> **SO ONE OF THE TWO UNINTERPRETED OBSERVATIONS IS EXPLAINED, AND IT IS NOT A FINDING.** The
-> previous handoff recorded *"apply destroys the tracked change with nothing blocking"* as
-> measured-but-uninterpreted. It was apply's orthographic collapse doing its job on an input that
-> met its condition. **It must not become a register row**, and the instinct that held it back —
-> *a hand-authored intermediate may be malformed in a way a real operator's would not be* — was
-> right. **The other observation still stands unresolved:** the boundary space on the ins segment
-> blocking at apply on a `transport.This` mismatch is G9's deadlock, and it is now **avoided by
-> construction rather than resolved** — the rig puts that space on the regular run's trailing
-> edge. Still not a register row, still needs a translated run first.
+**Two holes in my own pre-registered sheet, recorded rather than papered over.** Q1 hashes the
+*installed* tree and therefore cannot see a patched **copy**, which is what happened — the
+sharpest signal in the design has a blind spot. And Q7 (was `document.xml` hand-edited) is not
+decidable until branch 9's journal exists.
 
-### ARM 2 IS STILL NOT CONFIRMED, AND IT WAS DELIBERATELY NOT BUILT
+### THE THREE FIXES THIS COMMIT LANDS
 
-It now clears apply — the first cause was the **pre-flight**, not the document:
-`validate_en_runs.py` blocks a definitions section whose paragraphs carry no `en_runs`, and the
-hand-authored intermediate had none. Past that gate `quality_check --with-source` reports **0
-issues**, for two measured reasons: the reorder moved only **one** of five definitions, and **L1 is
-silent unless the mispaired definitions differ sharply in length** — the corpus instance surfaced
-as bogus *truncation* findings, which is a length-ratio rule, and all five here are one line long.
+**1. RULE 5a FORBADE THE REPAIR IT MANDATED.** *"Never patch the script"* against *"narrow the
+pattern"* — for a check implemented in Python those cannot both be obeyed, so an operator meeting
+a wrongly-scoped **blocking** check had no compliant move at all. Resolved with five conditions
+parallel to 5b's four, and **nothing softened**: the line now reads *never patch the installed
+skill*, correction happens in a working copy, the corrected check must still catch what it was
+written for, and the notes must say the shipped artefact is unchanged. Plus **check 5a before 5b,
+not after.**
 
-**Not built because the protocol says not to pay for it yet:** arm 1 runs first and a failure
-there answers the gate on its own. The route is written down in `SCORING.md` if arm 1 passes.
-**And one behaviour there is UNDECIDED, not diagnosed:** the definitions detector absorbed the
-whole remainder of the document into the last definition, because nothing terminates the block.
-Rig defect or register finding — do not assume either.
+**2. THE GATE'S REMEDY NAMED TWO POSSIBILITIES AND THE ANSWER WAS A THIRD.** It offered
+document-drift or an inaccurate `paragraphs.json`. It now names *"(3) THIS CHECK IS WRONGLY
+SCOPED"*, states that the gate **cannot detect (3) about itself**, and routes to rule 5a. Exactly
+one site carried the framing, so this is not a shared hazard — checked before fixing.
+**`string_only_edit` proves both trees differ in string literals and nothing else.**
 
-### THE INSTRUMENT NOW HAS ITS OWN NEGATIVE TESTS
+**3. F1's DIAGNOSIS WAS WRONG ON BOTH HALVES.** The gate is wrong in scope, not right; and Step 4
+is **right** to mandate translating the phantom, because that English is what makes the loss
+disclosable — requiring `"en": ""` would have discarded it.
 
-```bash
-uv run python tests/probe-5b/preflight_metacheck.py     # 3 of 3 detected
-```
+### THE EIGHTEEN IS UNDER REVIEW, AND IT IS DELIBERATELY NOT DECREMENTED
 
-Three mutations, each attacking a claim rather than the code that reports it: rebuild the phantom
-as siblings (the nesting is load-bearing) · declare the segment empty, which is both F1's proposed
-fix and a disobedience of Step 4 (**obeying the manual is what causes the deadlock**) · give the
-phantom words the regular half already contains (the marker tokens must be unique, because
-`validate_apply` compares token **sets**). Both source files are restored byte-for-byte and the
-restoration is asserted.
+F1 leaving the no-compliant-repair set makes it **seventeen**. The figure stays at eighteen, with
+the reason recorded under F41: **F1 was not borderline.** It was asserted with the confidence of a
+measurement, a probe was built on it, and it was wrong. **So the live question is not "eighteen or
+seventeen" but "how many of the other seventeen are scope defects rather than deadlocks", and
+decrementing by one now would answer the small question and bury the large one.** Each needs the
+test F1 got: read the check's source, and ask whether its own stated contract already says it
+should not be firing.
 
-### SEVEN THINGS THIS SESSION LEARNED
+**This bears directly on branch 5.** The deadlock argument is what makes branches 3 and 4
+preconditions, and one of its eighteen rows has just dissolved under measurement.
 
-**1. THE CHECK THAT SAID THE RIG WAS BUILT ASKED THE WRONG QUESTION.** `preflight.py` printed
-`ins_then_del phantom built : True` over a document containing **no phantom at all**, because it
-tested `kinds.count("ins") == 1 and kinds.count("del") == 1` — arithmetic that two ordinary
-siblings satisfy exactly. The phantom is a single segment with its own type; that is now what gets
-asserted. **Eleven logged instances of this class, and this one sat inside the instrument built to
-prevent the next one.**
+### SEVEN THINGS OPEN
 
-**2. MY LINE-ENDING PROBE LIED, AND IT IS THE THIRD INSTRUMENT TO HIDE THIS.** `grep -c $'\r$'`
-in this shell reported **every line of every file** as CRLF, so I recorded "all pure CRLF" and it
-was wrong. Measured properly in Python against the committed blobs: **`tests/probe-5b/` is MIXED
-across files on `main`** — `preflight.py` is CRLF, `make_probe_documents.py` and `SCORING.md` are
-LF. Nothing was damaged, because the Edit tool preserves each file's own endings, and that was
-verified rather than assumed. **Count bytes with `b.count(b"\r\n")`; the shell one-liner and
-`read_text` both give a confident wrong answer.**
+1. **Wouter's decision on the gate.** Its *test* was invalid; its *concern* — that branch 5 makes
+   the pipeline unusable — was addressed, since the operator resolved the block and delivered a
+   complete document. Those are not the same thing.
+2. **The seventeen-row re-examination**, above. The highest-value open item on this list.
+3. **Arm 2** — still NOT CONFIRMED and deliberately unbuilt. Two measured causes in `SCORING.md`:
+   the reorder moved only one of five definitions, and L1 is silent unless the mispaired
+   definitions differ sharply in length.
+4. **A `probe` origin class for the register.** The validator rejected `probe-5b` as unknown
+   vocabulary, so F1's columns stay `D11 | log` with provenance in the text. Behavioural evidence
+   is a new class and Step C will produce more of it.
+5. **G10** — recorded, not fixed. Branch 14 owns check scoping. Untouched.
+6. **I-7, I-8, I-9, I-10** — the four open A1 harness defects. Unchanged, and they will corrupt
+   Step C's evidence if still open when it runs.
+7. **`verify_md`'s cross-document §ref defect** and the **six untracked house scripts in
+   `tools/`** — both unchanged from the previous handoff. `tools/run_tests.py` still collides by
+   name with the committed `tests/run_tests.py`.
 
-**3. A MULTI-LINE NEEDLE CARRIES A LINE-ENDING ASSUMPTION.** The metacheck's first mutation was
-written with `\r\n` and reported **VOID** against an LF file — asserting nothing. It reported VOID
-rather than passing only because "the text I patch is missing" was built in as a distinct outcome
-from "the mutation was detected". **A stale mutation that reports a pass is how a metacheck goes
-blind.** Every needle now joins with the target file's own ending.
+### WHAT THIS COMMIT DID NOT TOUCH
 
-**4. "IT BLOCKED" IS NOT THE SAME AS "THE RIG FIRED".** The pre-flight asserts all four links of
-F1's chain *and* that the missing tokens are the phantom's. G9's whitespace deadlock is the near
-neighbour and would have blocked too — and a rig that fires for the wrong reason is worse than one
-that does not fire, because its result looks like an answer.
-
-**5. THE CLAIMS CHECKER CARRIED ITS OWN RECORDED DEFECT, ONE DIRECTORY DEEPER.** Naming the probe
-scripts in this file made check 6 fail — and the cause was the third instance of a defect its own
-comment already describes twice. `tests/probe-5b/preflight.py` in backticks matched **nothing** and
-was silently never checked, while the bare `preflight.py` matched and failed to resolve: the
-verdict depended on punctuation, exactly as recorded on 2026-08-11. **The narrow fix would have
-been to add one directory to the list, which is what leaves the next subdirectory to rediscover it
-a fourth time.** It now searches each root **recursively** and the pattern accepts any relative
-prefix, including hyphens and more than one segment. Named `.py` references went from 37 to **39**,
-because two prefixed ones had never been checked at all. `tests/test_claims_script_names.py` plants
-an absent script in both spellings and requires check 6 to fail on each. **And the tool crashed
-loudly on my first attempt** — I shadowed its own `present()` helper with a variable — which is the
-better outcome, and worth saying because a silent shadow would have made the check pass on nothing.
-
-**6. A CHECK ALREADY FAILING FOR A DECLARED REASON HID THREE REAL FAILURES BEHIND IT.**
-`tools/stepb_audit.py` exits 1 without `LEGAL_TRANSLATION_A4`, which is correct and which this
-project has agreed to read as *declared VOID, not passed*. **So its red line stopped being read**,
-and underneath it checks 5b and 5c had been failing since 2026-08-11: G10's addition moved option
-2's coverage from 51 to **52** and consequence group 3 from 41 to **42**, and three published
-figures still said 51, 51 and 41 — in §6's Option 2, §10's ranking row, and §5.3's own heading.
-**Check 5 asserted that the groups SUMMED correctly while one of the parts was wrong.** All three
-figures are corrected from the tool's generated map, which the previous commit itself established
-as the source. **And the gap that let it ship is closed rather than the instance alone:** check 5
-now compares **each** group heading to the map (5d), and `stepb_metacheck` carries an eleventh
-mutation — group 3 back to 41 — so it is now **11 of 11**. The mutation that would have caught the
-real error did not exist when the error shipped.
-
-> **Check 10 is still VOID and must not be read as green.** Eight quotations from the sealed A4
-> report cannot be verified without that directory, and `temp/run_stepb_audit_with_a4.py` found no
-> A4-shaped path in the private `context.md` that resolves on this host. **An unreadable source is
-> not a pass** — the recorded lesson from the day that script was written.
-
-**7. `verify_md` v9 REPORTS TWO CROSS-DOCUMENT §REFS AS DANGLING, AND IT IS THE CHECKER.** The
-house copy in `tools/` was **STALE at v8 against the shared v9** — found by running
-`check_checkers.py`, which is the session-start rule — and re-copied, with v8 kept at
-`temp/verify_md.v8.backup.py` because it is not a file I created. v9 then flags two
-`STEP-B-ANALYSIS.md` pointers written with a section sign, at `CLAUDE.md` lines 211 and 526, as
-though they addressed this file's own headings. **Its own output already
-declares that class un-resolvable** — *"Check each BY HAND"* — so it fails on the two whose number
-is absent locally and passes seventeen others **against the wrong section**. Statable without
-naming this project, so it is general: *a `§N` explicitly qualified by another document's filename
-is resolved against the current document's headings.* **NOT fixed here, and the reason is not
-laziness:** the obvious repair — treat a `§N` as foreign when a `.md` is named earlier on the line
-— would silence genuine local refs, because line 526 carries `§1.5` (local) and `§3.3` and `§6`
-(foreign) with nothing mechanical to tell them apart. **Softening a check to make it honest is how
-this project has made checks blind before.** It needs the shared script's own selftests and a
-version bump, which does not belong in a probe-rig commit. One prose ambiguity was worth fixing on
-its own merits and was: line 211 named the build plan instead of saying *"Its §9 appendix in the
-build plan"*.
-
-### SIX THINGS OPEN
-
-1. **Arm 2**, above. Clearly scoped, deliberately unbuilt, and unnecessary if arm 1 fails.
-2. **G10 is recorded but NOT fixed** — `quality_check`'s missing-space rule firing across a
-   `w:tab` element. Branch 14 owns check scoping. Untouched this session, on purpose.
-3. **The four open defects in the A1 harness tooling** — I-7, I-8, I-9, I-10. Unchanged, and they
-   will corrupt Step C's evidence if still open when it runs.
-4. **The scan list still needs tightening** — §5.4(b). Unchanged.
-5. **`verify_md`'s cross-document §ref defect**, above — a shared-folder fix with its own
-   selftests and version bump, not a local edit.
-6. **Six house standard scripts sit UNTRACKED in `tools/`** — `check_checkers.py`,
-   `house_common.py`, `run_tests.py`, `verify_code.py`, `verify_deliverable.py`, `verify_md.py`.
-   `check_checkers.py` now reports **6 tracked, 0 needing a decision** after the v9 re-copy. They
-   are not part of branch 5 and were left out of its commit, so **the re-copy does not survive a
-   fresh clone.** **`tools/run_tests.py` collides by name with the committed `tests/run_tests.py`**
-   — worth resolving before either is committed, because the house rule *"prefer a script in
-   `tools\`"* would then point at the wrong one.
-
-### BOTH TREES RE-VERIFIED AGAINST THE PUBLISHED rev44, ON WOUTER'S INSTRUCTION
-
-Re-measured rather than re-read, and measured **fresh** rather than by re-running the standing
-instruments alone — though those were reproduced first, as §5.12 requires: baseline **372 of 396
-byte-identical, 24 declared**, parity **PASS (493 known, awaiting D1)**, `test_checks_can_fail`
-**50 of 50**, `confirm_failure_chains` **6 of 6**, `check_coverage` **18 of 20**.
-
-| question | answer |
-|---|---|
-| Which files diverge from rev44? | **12 per tree, 24 in total** — independently derived, and it reproduces the baseline's figure |
-| Is every change **mirrored** in both trees? | **Yes, all 12.** The one property the monorepo exists to enforce, and the one that once shipped to a client broken |
-| Is each tree's change the **same** change? | **11 of 12 byte-identical in their added lines.** The twelfth is `SKILL.md`, differing by exactly one line — *"translation into UK English"* against *"US English"* — which is the variant difference itself |
-| Is every divergence **attributable**? | **Yes.** Every one traces to branch 0, 3, 4 or 5, the confidentiality cleanup, or the cross-reference fix. Nothing unattributed |
-| Confidentiality over **all 764** lines added since rev44 | **CLEAN on all three controls.** Measured against the archive rather than against `origin/main`, so the confidentiality cleanup — which sits inside `main`'s baseline and is therefore invisible to the pre-commit gate — is covered |
-
-**Equal line counts are not equal content, and that was the point of asking.** Branch 5's diffstat
-showed `uk` and `us` matching to the line on all six files it touched, which is either correct
-mirroring or a coincidence; comparing the added lines as multisets is what tells them apart.
-
-**One finding, and it was in my own instrument first.** The audit re-derived the STATE block's
-*"ten lines of skill file have been modified"*, assumed it meant per-tree, measured **four**, and
-printed DOES NOT REPRODUCE over a figure that is arithmetically correct. Ten is right under exactly
-one of six natural readings — added lines across both trees — and four of the six give a different
-number. **Testing one reading of an ambiguous claim and calling the answer a failure is not a
-measurement.** The instrument now prices every reading, and §2's STATE block states the unit.
-
-### WHAT THIS SESSION DID NOT TOUCH, STATED SO NOBODY LOOKS FOR IT
-
-No register row was added or changed. `STEP-B-ANALYSIS.md` is unedited — no branch scope moved, so
-`stepb_verify`'s generated appendix needed nothing. No skill file under `uk/` or `us/` was touched:
-the probe kit is a test artefact, so the confidentiality gate's tree diff is empty by construction
-and **no graded run and no rendered visual diff apply** — declared N/A, not omitted.
+No count in `CLAUDE.md` §2.3 moved: F1 is still one row, the register is still 212 rows and 169
+skill findings, and no row was added or removed. `STEP-B-ANALYSIS.md` is unedited — no branch
+scope moved. **No graded run and no rendered visual diff**: `string_only_edit` proves the script
+change is text-only, and §4 puts instruction branches on the four static instruments, which all
+pass — declared N/A, not omitted.
