@@ -292,6 +292,22 @@ because the decision comes first.
 with no way out. Branch 11 must follow branch 9, or it cannot be built. Branch 16 must follow branch 15 and
 must contain the off-flag removal.
 
+> **AND A FOURTH, ADDED 2026-08-19 BY MEASUREMENT RATHER THAN BY ARGUMENT: BRANCH 14's
+> `quality_check` SLICE BELONGS IMMEDIATELY AFTER BRANCH 5.**
+>
+> The seventeen-row review *(§12, "the eighteen partitioned")* measured which of the eighteen
+> no-compliant-repair rows branch 5 can actually convert into a blocked run. **The answer is two —
+> L1 and F28 — and both are `quality_check` false positives.** `quality_check` is the only
+> implicated script whose exit expressions change against rev44; the other blocking rows already
+> block today and one never blocks at all.
+>
+> **So branch 5's risk is not spread across the tree, it is concentrated in one script**, and with
+> G10 and M1's eight inherited false positives that script will stop runs on documents that are
+> fine. Branch 14 in full is the whole false-positive sweep and stays where it is; **its
+> `quality_check` slice is four items and should not wait eight branches.** Each still needs
+> branch 14's own discipline — a pattern change plus a test proving it still catches the true
+> positive.
+
 > **AND A FOURTH GATE ON BRANCH 5, ADDED 2026-08-11 BY WOUTER'S DECISION: THE EXCEPTION CHANNEL MUST BE
 > SHOWN TO WORK BEHAVIOURALLY BEFORE THE CHECKS GET TEETH.**
 >
@@ -3099,7 +3115,7 @@ specific, named change exists in the document. It passes on all twelve.
 
 | # | what was wrong | corrected to |
 |---|---|---|
-| **1** | **The deadlock count was invented.** The document said *fourteen* findings have no compliant repair. A narrow pattern gives 13, a wider one **18**. **Fourteen was neither measurement** — it was asserted with the confidence of a measurement | **18**, with the set enumerated so it can be checked: A11 A12 A14 A15 A16 B7 C9 C16 D3 D4 D5 F1 F15 F28 F30 F33 G9 L1. **The deadlock argument is stronger than it was written**, not weaker |
+| **1** | **The deadlock count was invented.** The document said *fourteen* findings have no compliant repair. A narrow pattern gives 13, a wider one **18**. **Fourteen was neither measurement** — it was asserted with the confidence of a measurement | **18**, with the set enumerated so it can be checked: A11 A12 A14 A15 A16 B7 C9 C16 D3 D4 D5 F1 F15 F28 F30 F33 G9 L1. **And the eighteen are three different things — see the partition below, which is what the count means.** |
 | **2** | **A fabricated fact.** *"given the skill and eleven weeks' worth of nothing else"* — **nothing in any source says eleven weeks.** Probably a contamination from *eleven criteria* | the neutral form now in §1 — *working from the published package and nothing else, with no test result, no grade and no prior analysis* — which is what the sources actually say |
 | **3** | **The rebuild arithmetic was wrong.** *"at most 99 of"* / *"the 160 findings and leaves at least 61 exactly where they are"* | The union of what options 1, 2, 3 and 6 close is **94**, leaving **66** *(92/68 at the first re-derivation, before the three assignment corrections in §9.2)*. The conclusion is unchanged and slightly strengthened |
 | **4** | **A logic error in the ranking.** It said *"each of 2, 3, 4 and 5 has a stated dependency on something above it"*. **False: rank 2 depends on rank 3, which is below it** | The ranking is now stated as **value, not execution order**, with the one place they diverge named. §2 governs where they disagree |
@@ -3108,6 +3124,40 @@ specific, named change exists in the document. It passes on all twelve.
 | **7** | **A document count overstated.** The source-language-text-on-page-one finding was given as **2 documents**; it is **one document run twice** — the batch arm is the same document | **1 (both runs of it)** |
 | **8** | **Three misquotations**, each small and each the kind that erodes trust in the rest: a missing `.py`, an elision that joined non-adjacent clauses, and an Oxford comma inserted into A3's wording | All three now verbatim. **Check 10 verifies all 11 source quotations against the four source files on every run** |
 | **9** | **Three stale references to "the nine options"** after the count became ten | Corrected. And a bare *§N.M* now means *this* document; A3's sections are prefixed |
+
+> ### THE EIGHTEEN PARTITIONED — 2026-08-19, the seventeen-row review, on Wouter's instruction
+>
+> **The count of eighteen stands: those rows' own text does say no compliant repair exists.** What
+> the review measured is that **the phrase covers three unrelated situations**, and only one of
+> them is a deadlock in the sense branch 5 cares about. Every classification rests on an opened
+> check, with 32 needles verified across both trees.
+>
+> | group | what it actually is | rows | n |
+> |---|---|---|---|
+> | **1** | **A check fires and the check is WRONG IN SCOPE** — rule 5a governs, branch 14 owns the fix | C9 F15 F28 G9 L1 | **5** |
+> | **2** | **NO CHECK FIRES AT ALL** — the pipeline cannot produce a correct document and ships silently. Needs code, plus disclosure | A11 A12 A14 A15 A16 B7 C16 D4 D5 | **9** |
+> | **3** | **AN INSTRUCTION CANNOT BE OBEYED** — prose, not code. D3's named gap is closed by branch 4; F33's two halves were settled by Wouter on 2026-07-31 | D3 F30 F33 | **3** |
+>
+> 5 + 9 + 3 = **17**, plus **F1**, which the Cowork probe resolved into group 1 on 2026-08-19 and
+> which is why the review happened. No row double-counted, none unaccounted for.
+>
+> **THE NUMBER THAT BEARS ON BRANCH 5'S MERGE IS TWO, NOT EIGHTEEN.** Branch 5 is what gives a
+> check an exit code, so only a row whose check gains one can newly deadlock. Measured against the
+> published rev44: **`quality_check` is the only one of the four implicated scripts whose exit
+> expressions change** — it gains `sys.exit(2 if total else 0)`. `validate_segment_shapes` (G9) and
+> `translate_headers_footers` (F15) are byte-identical before and after and **already block today**;
+> `lexicon_compliance` (C9) prints PASSED and **never blocks at all**, so the deadlock framing was
+> doubly wrong for it. **That leaves L1 and F28** — both `quality_check` false positives, both
+> branch 14's. With G10 and M1's eight inherited ones, **the entire new blocking risk sits in one
+> script.**
+>
+> **Two errors the review found in the evidence base, reported rather than quietly fixed.** F15 was
+> attributed to the apply script and the warning is in `translate_headers_footers.py:897`. And D3
+> asks for a channel that branch 4 has already built.
+>
+> **What this does NOT license.** Group 2's nine rows never deadlocked and never will; the exception
+> channel was credited with preventing a class of failure that is mostly a different class, but it
+> is still correctly aimed — those rows need **disclosure**, which is what it provides.
 
 **Two omissions the audit found, both now filled.**
 
