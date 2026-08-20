@@ -486,6 +486,27 @@ verify."*
 **Its field list, its scheduling mechanism and the shape of what it presents are NOT decided**, and §3.4's
 rule governs: explored in the Step B style, not patched straight to code.
 
+> **AND ONE TOOL IS ON THE TABLE, UNEXAMINED. NOTION.** *(Wouter, 2026-08-20: he may want to use it to
+> keep track of the automation. **He has never worked with it, has not installed it, and is going on
+> "I heard it is the right tool".** Recorded at that strength deliberately — an option nobody has
+> tested is not a choice yet, and writing it down as though it were is how an inference acquires the
+> confidence of a measurement.)*
+>
+> **What it plausibly fits: the AUTOMATION's own status** — did the monthly job run, when, did it exit
+> clean, what is scheduled next. That is metadata about a process and carries nothing sensitive.
+>
+> **What it must not become without a decision: a home for the ANALYSIS.** Notion is a third-party
+> cloud service, and **2026-07-29 already ruled third-party telemetry non-viable for a skill that
+> processes privileged documents** — the reasoning being that even a filename is unsafe. The monthly
+> analysis derives from logs that quote real client text, so **the sanitisation that §5.13 requires
+> before anything reaches the register becomes load-bearing in a second place**, and this time the
+> destination is someone else's server where a mistake cannot be un-published.
+>
+> **So the line to draw before anything is installed is between tracking that the automation RAN and
+> storing what it FOUND.** The first looks safe on today's reading; the second needs the 2026-07-29
+> reasoning applied to it properly rather than by analogy. **Neither is decided, and the tool has not
+> been evaluated against any alternative** — including the plainest one, a file in the private folder.
+
 ### 3.6 Autonomy, and the two input points
 
 Run the translation and grading work **as autonomously as possible**: no mid-run questions, no confirming
