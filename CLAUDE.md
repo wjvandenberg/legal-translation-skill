@@ -93,7 +93,7 @@ of that strand and lives in the sealed judging directory outside the repository;
 |---|---|---|
 | **1** | How to read this document | communication · the document set · reading order |
 | **2** | Project overview | the skill · the four goals · what has been done · what the evidence says · the decisions that still bind |
-| **3** | Plan of action | **only what is still to be done** — four steps, in order, with their gates |
+| **3** | Plan of action | **only what is still to be done** — five steps, in order, with their gates |
 | **4** | Tech stack | the runtime constraint, the skill's own stack, the dev-host toolchain |
 | **5** | Working method and rules | the build cycle · branches and PRs · confidentiality · never-regress · the instruments · testing · gates · OOXML · the audit gate |
 | **6** | File, folder & repo structure | the skill tree today · what the build changes · the repository, now and after |
@@ -351,6 +351,7 @@ settled — if you are about to re-open one of these, read the dated entry first
 | 2026-08-04 | **Quality is the main driver; speed matters less and must never compromise quality.** A rebuild is presented as a real option but the default is to keep the present architecture. **Frozen translated intermediates from the real corpus are approved as local-only test fixtures** — a new artefact class that must be excluded by path before `git init` |
 | 2026-08-05 | **All eleven options decided: ten GO, the rebuild declined.** No shared library. No separate furniture file. **No cross-language parity check** — none could honestly be written. The sanctioned way out of a deadlocked gate exists, with four conditions, **and Wouter reviews its specification before it lands** |
 | 2026-08-06 | This file rewritten to seven sections; `OPUS-5-MIGRATION.md` and `DECISIONS-LOG.md` split out; **the build plan is no longer restated in the charter**. **A test document is named by its instrument class and its language and by nothing else** — §5.4 — and the qualifier list lives outside the repo, like the name list |
+| 2026-08-20 | **A private run-logging tier plus a monthly replay-and-analyse job is APPROVED as STEP 5** — §3.5. **A CONFIG OVERLAY, never a third variant**, so 2026-07-27 stands rather than being overturned; **built only after the UK and US skills are published**, though the log FORMAT is designed at D3 because it is the same artefact as the shipped run report. **Portable, reproducible and observable from commit one**, because it moves to the cloud later. **The verbose logs contain client text**, so the sibling-folder rule, the evidence guard and sanitised-conclusions-only all apply, and the register gains a **production-evidence origin class** |
 
 ---
 
@@ -364,7 +365,7 @@ settled — if you are about to re-open one of these, read the dated entry first
 
 **Everything that has been done is in §2.3 and is not repeated here.** This section is future work only.
 
-### 3.1 The four steps
+### 3.1 The five steps
 
 `NOT STARTED` · `IN PROGRESS` · `BLOCKED ON <what>` · `DONE`
 
@@ -374,6 +375,7 @@ settled — if you are about to re-open one of these, read the dated entry first
 | **2** | **Building** (goals ii and iv) — the rest of `STEP-B-ANALYSIS.md`: branches 3 to 19, plus the three deferred items | **IN PROGRESS since 2026-08-07. Branches 3 and 4 merged**; **branch 5 is BUILT AND NOT MERGED.** Its seven code changes are complete and verified in both trees, and its merge is held by the fourth sequencing fact: the behavioural probe of rule 5b must run first. **THE PROBE RAN IN COWORK ON 2026-08-19, and arm 1 turned out NOT to be a true deadlock** — a compliant repair existed, the operator found it by reading the check's source, reached rule 5a rather than 5b, and disclosed it. **So 5b itself is still untested**, while the run exposed and closed two real defects: rule 5a forbade the repair it mandated, and the Step 6 gate's remedy named only two of the three things that can be wrong. **Arm 2 remains unconfirmed and deliberately unbuilt.** The gate's test was invalid; its concern — that branch 5 makes the pipeline unusable — was addressed, and those are not the same thing. The remaining fifteen branches plus the three deferred items are fully planned and fully decided | branch 5's merge: **Wouter's decision on whether the gate is satisfied** — §7 |
 | **3** | **Opus 5** (goal iii) — two branches, then **Step C**, the full verification run, then **INPUT POINT 2** | **NOT STARTED**, designed. `OPUS-5-MIGRATION.md` | step 2 |
 | **4** | **Revisit, then publish** — **Step D** consolidates everything learned, *then* repackaging and publication | **NOT STARTED** | step 3 |
+| **5** | **The private run-logging tier, and the monthly analysis of what it records** — Wouter's own instrumented use of the published skill, plus a scheduled job that replays what went wrong against the skill as it then stands. **A config overlay, never a third variant, and never published** | **NOT STARTED.** Approved 2026-08-20; the log FORMAT is designed earlier, at D3, because it is the same artefact as the shipped run report | step 4 — **the overlay is built only after the UK and US skills are published for external users** |
 
 **Steps 1 and 2 share one branch numbering, and this is worth being clear about because two schemes used to
 exist.** `STEP-B-ANALYSIS.md` §2 numbers all the work 0–19 plus D1–D3. **Step 1 was branches 0, 1 and
@@ -457,7 +459,34 @@ grade moves you cannot tell whether it was the fix or the model configuration.
 first** — a Markdown file cannot carry its own integrity guard, so the truncation-coverage fix cannot be
 built without it.
 
-### 3.5 Autonomy, and the two input points
+### 3.5 Step 5 — the private run-logging tier, and the monthly analysis
+
+**`DECISIONS-LOG.md`, 2026-08-20, owns the reasoning. This section owns only where it sits and what it
+waits on.** Wouter's words: *"make sure that all logs of legal translation are logged for me and researched
+by an agent every month, and tested against the then installed skill!! Analyse and present solutions, then
+verify."*
+
+1. **A config overlay, not a third variant** — the same published tree with logging turned up. The
+   2026-07-27 decision against a third variant is about a third *client-internal published* tree and
+   **stands untouched**; this is not one. **The capability ships, the verbosity does not** — §5.4's rule
+   that the scanner ships and the list never does, applied to instrumentation.
+2. **Built only after the UK and US skills are published**, on Wouter's instruction. **But the log FORMAT
+   is designed at D3, with the manifest** — §5.11 and §5.6 make the forensic log and the shipped run report
+   *the same artefact*, so one format with two verbosity tiers is free and two formats is a reconciliation.
+3. **The monthly job replays, it does not merely read.** It takes what the logs record and re-runs it
+   against the skill **as it stands that month**, reporting which failures still reproduce. §5.8's
+   frozen-intermediate trick makes that deterministic and model-free.
+4. **Portable, reproducible and observable from commit one**, because it moves to the cloud later — every
+   location by environment variable, never a hard-coded path, and it exits non-zero on VOID rather than
+   reporting a clean run over an empty set.
+5. **The logs contain client text**, so they live in a sibling folder, the evidence guard must name that
+   folder, only sanitised conclusions reach the register, and the register needs a **new origin class for
+   production evidence** — the same gap the 5b probe hit.
+
+**Its field list, its scheduling mechanism and the shape of what it presents are NOT decided**, and §3.4's
+rule governs: explored in the Step B style, not patched straight to code.
+
+### 3.6 Autonomy, and the two input points
 
 Run the translation and grading work **as autonomously as possible**: no mid-run questions, no confirming
 obvious choices, no step-by-step progress reports. **There are exactly two input points, and they bracket
@@ -1532,7 +1561,28 @@ should not be firing.
 **This bears directly on branch 5.** The deadlock argument is what makes branches 3 and 4
 preconditions, and one of its eighteen rows has just dissolved under measurement.
 
-### SEVEN THINGS OPEN
+### STEP 5 WAS ADDED ON 2026-08-20 — the private run-logging tier
+
+Wouter's own instrumented use of the published skill, plus a monthly job that **replays** what went
+wrong against the skill as it then stands. **§3.5** owns where it sits; **`DECISIONS-LOG.md`,
+2026-08-20** owns the reasoning. Four things a next session must not re-derive:
+
+- **A config overlay, NOT a third variant.** The 2026-07-27 decision was read at source before
+  deciding, not from §2.6's summary of it — it rules out a third *client-internal published* variant,
+  which this is not, so **it stands rather than being overturned.** The measured reason to avoid a
+  third copy: 176 of 198 files already diverge between the two we have.
+- **Built only after the UK and US packages are published**, on his instruction. **But the log FORMAT
+  is designed at D3**, because §5.6 records that the forensic log and the shipped run report are *the
+  same artefact* — design them apart and the project owns two formats.
+- **Portable, reproducible and observable from commit one**, because he will move it to the cloud:
+  every location through an environment variable from the start rather than ported afterwards.
+- **The verbose logs contain client text**, which drags in the sibling-folder rule, the evidence
+  guard, sanitised-conclusions-only, and a **production-evidence origin class** for the register —
+  the same gap the 5b probe hit when the validator rejected `probe-5b`.
+
+**Its field list, scheduling mechanism and presentation format are deliberately NOT decided.**
+
+### EIGHT THINGS OPEN
 
 1. **Wouter's decision on the gate.** Its *test* was invalid; its *concern* — that branch 5 makes
    the pipeline unusable — was addressed, since the operator resolved the block and delivered a
@@ -1550,6 +1600,12 @@ preconditions, and one of its eighteen rows has just dissolved under measurement
 7. **`verify_md`'s cross-document §ref defect** and the **six untracked house scripts in
    `tools/`** — both unchanged from the previous handoff. `tools/run_tests.py` still collides by
    name with the committed `tests/run_tests.py`.
+
+8. **The six untracked house scripts in `tools/` are a MOVING TARGET.** `check_checkers.py` reported
+   a stale copy **three times in one session** — `verify_md` v8→v9, then `house_common` v2→v3 and
+   `check_checkers` v5→v6, then `verify_md` v9→v10. Each was re-copied, with the superseded version
+   kept in `temp/`. They are untracked, so **none of it survives a fresh clone**, and the shared
+   folder moves underneath us. Worth deciding whether they belong in this repository at all.
 
 ### WHAT THIS COMMIT DID NOT TOUCH
 
