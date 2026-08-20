@@ -297,9 +297,15 @@ must contain the off-flag removal.
 >
 > The seventeen-row review *(§12, "the eighteen partitioned")* measured which of the eighteen
 > no-compliant-repair rows branch 5 can actually convert into a blocked run. **The answer is two —
-> L1 and F28 — and both are `quality_check` false positives.** `quality_check` is the only
-> implicated script whose exit expressions change against rev44; the other blocking rows already
-> block today and one never blocks at all.
+> L1 and F28 — and they are NOT the same kind of thing.** *(Corrected 2026-08-20: this cell said
+> "both are `quality_check` false positives", which is right about L1 and wrong about F28.)* **L1 is
+> a false positive** — it pairs positionally after Step 7 permutes, and the census measures 9 of 9 of
+> its findings landing on mispaired entries. **F28 is a TRUE positive the operator cannot legally
+> clear** — the check is right, every route out is forbidden by another rule, and it is one of §5.5's
+> three impossible requirements. So branch 14's slice fixes L1 and **cannot fix F28**: F28's answer
+> is rule 5b, which is why it is the rig for the 5b arm. `quality_check` is the only implicated
+> script whose exit expressions change against rev44; the other blocking rows already block today
+> and one never blocks at all.
 >
 > **So branch 5's risk is not spread across the tree, it is concentrated in one script**, and with
 > G10 and M1's eight inherited false positives that script will stop runs on documents that are
@@ -3134,12 +3140,29 @@ specific, named change exists in the document. It passes on all twelve.
 >
 > | group | what it actually is | rows | n |
 > |---|---|---|---|
-> | **1** | **A check fires and the check is WRONG IN SCOPE** — rule 5a governs, branch 14 owns the fix | C9 F15 F28 G9 L1 | **5** |
+> | **1** | **A check fires and the check is WRONG IN SCOPE** — rule 5a governs, branch 14 owns the fix | C9 F15 G9 L1 | **4** |
 > | **2** | **NO CHECK FIRES AT ALL** — the pipeline cannot produce a correct document and ships silently. Needs code, plus disclosure | A11 A12 A14 A15 A16 B7 C16 D4 D5 | **9** |
-> | **3** | **AN INSTRUCTION CANNOT BE OBEYED** — prose, not code. D3's named gap is closed by branch 4; F33's two halves were settled by Wouter on 2026-07-31 | D3 F30 F33 | **3** |
+> | **3** | **AN INSTRUCTION CANNOT BE OBEYED** — prose, not code. D3's named gap is closed by branch 4 | D3 | **1** |
+> | **4** | **THE CHECK IS RIGHT AND NO COMPLIANT REPAIR EXISTS — RULE 5b's ACTUAL TRIGGER SET.** §5.5 of this document already named these three, and this table's first version did not carry the group at all | F28 F30 F33 | **3** |
 >
-> 5 + 9 + 3 = **17**, plus **F1**, which the Cowork probe resolved into group 1 on 2026-08-19 and
+> 4 + 9 + 1 + 3 = **17**, plus **F1**, which the Cowork probe resolved into group 1 on 2026-08-19 and
 > which is why the review happened. No row double-counted, none unaccounted for.
+>
+> > **GROUP 4 WAS THE REVIEW'S OWN BLIND SPOT, AND THE DOCUMENT HAD IT ALREADY.** Corrected
+> > 2026-08-20 after Wouter asked whether this had been overlooked. **§5.5 states it in its own
+> > words:** *"Three mandatory requirements cannot be met at all… In each case the operator's only
+> > options were to disobey an instruction or to ship against one."* That last clause is rule 5b's
+> > situation, written down before rule 5b existed, and Option 2's cons cell says it a second time —
+> > *"three of them requirements that already cannot be met at all."* The first version of this
+> > partition put **F28** in group 1 as a scope defect; **§9.3 had already routed it to branch 4, the
+> > exception channel, and §9.3 was right.** The review reasoned from §12's eighteen-row enumeration
+> > instead of from §5.5's account of what those rows ARE — the third time in this project that a
+> > derived set beat the source analysis.
+> >
+> > **And only ONE of the three is blocked by branch 5.** `quality_check` exits 2, so **F28** becomes
+> > a stopped run. **F30** is a Step 11b checklist instruction and **F33** a lexicon prohibition;
+> > neither passes through a script that returns a code, so branch 5 does not make either block. That
+> > is why F28 is the rig for the 5b arm and the other two are not.
 >
 > **THE NUMBER THAT BEARS ON BRANCH 5'S MERGE IS TWO, NOT EIGHTEEN.** Branch 5 is what gives a
 > check an exit code, so only a row whose check gains one can newly deadlock. Measured against the

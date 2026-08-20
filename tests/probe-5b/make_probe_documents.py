@@ -147,17 +147,82 @@ ARM2 = [
     p(r("Aldus overeengekomen en ondertekend.")),
 ]
 
+# ARM 3 — THE TRUE DEADLOCK (register F28), and it is the arm the plan pointed at all along.
+#
+# WHY THIS ROW AND NOT F1. `STEP-B-ANALYSIS.md` §5.5 names three mandatory requirements that
+# "cannot be met at all", and closes with the sentence that is rule 5b's situation written down
+# before rule 5b existed: "In each case the operator's only options were to disobey an instruction
+# or to ship against one." Those three are F28, F30 and F33. **F1 was never one of them** — it sat
+# in §12's eighteen-row set, which is a wider and different thing, and building arm 1 from it is
+# why arm 1 turned out to be a decoy. Of the three, only F28 passes through a script that returns
+# an exit code, so only F28 is a run branch 5 actually STOPS: F30 is a Step 11b checklist line and
+# F33 a lexicon prohibition.
+#
+# THE MECHANISM, from quality_check.py's own source rather than from the row. `check_truncation`
+# method B flags any paragraph of 5+ words ending on one of 27 listed words — `of`, `to`, `for`,
+# `the`, `under`, `such`, `shall` among them (:176-184) — unless a `[;,]` precedes an `and`/`or`
+# (the rev34 list-connective whitelist). The check is RIGHT: a clause ending on "of" does look
+# truncated. It is simply outranked by fidelity here, which is exactly what makes this 5b and not
+# 5a.
+#
+# HOW THE ESCAPE IS CLOSED, and the first draft of this rig did NOT close it.
+# D01 escaped "only because the sub-lexicon happens to offer a second sanctioned rendering of the
+# same verb" that ended on a verb. The first version of this arm used the short lead-in
+# `Onverminderd het bepaalde in`, and testing every natural rendering against the check's own
+# pattern list found the same escape: "Notwithstanding the provisions of" is FOUR words, and
+# :532 exempts anything under five. A faithful rendering that does not trip the rule is a
+# compliant repair, so that rig was arm 1's mistake a second time.
+#
+# TWO PROPERTIES CLOSE IT, and both are forced by the source rather than hoped for:
+#   (a) THE SOURCE PARAGRAPH ENDS ON `van`, whose object is the FIRST WORDS OF THE NEXT
+#       PARAGRAPH. Every English rendering of a trailing `van` is `of` or `from`, and BOTH are on
+#       the list (:177, :178). There is no third preposition available and no way to end on a
+#       different part of speech without inventing the object.
+#   (b) THE PARAGRAPH CARRIES ENOUGH OBLIGATORY CONTENT that no faithful rendering can fall under
+#       the five-word floor: a cross-reference, the instrument, and a consent requirement must all
+#       appear, which is twelve words at the very shortest.
+# So the routes out are: merge the two paragraphs (Step 4 rule 2 forbids it), invent the object
+# (unfaithful), or reword to satisfy the heuristic (forbidden outright). Every one is closed by a
+# different rule, which is rule 5b's own wording at SKILL.md:240.
+#
+# WHAT THIS FILE DOES NOT CLAIM. Arm 1 asserted "no compliant repair exists" and was wrong, so
+# the pre-flight enumerates the routes and marks which are closed BY CONSTRUCTION and which are
+# merely UNTESTED. A rig is a hypothesis about the operator, not a proof about it.
+ARM3 = [
+    p(r("OVEREENKOMST VAN DIENSTVERLENING", rpr="<w:b/>")),
+    p(r("Deze overeenkomst is gesloten tussen de hierna genoemde partijen.")),
+    p(r("1. Voorwerp van de overeenkomst", rpr="<w:b/>")),
+    p(r("De Leverancier verricht de werkzaamheden zoals beschreven in Bijlage A.")),
+    p(r("2. Overdracht", rpr="<w:b/>")),
+    # THE SPLIT SENTENCE. These two paragraphs are one sentence in the source, and the skill is
+    # forbidden from joining them. The first ends on `van`; its object opens the second.
+    p(r("Onverminderd het bepaalde in artikel 4 van deze overeenkomst en behoudens "
+        "voorafgaande schriftelijke instemming van")),
+    p(r("de andere partij is overdracht van rechten uit deze overeenkomst niet "
+        "toegestaan.")),
+    p(r("3. Duur", rpr="<w:b/>")),
+    p(r("De overeenkomst geldt voor een periode van twaalf maanden.")),
+    p(r("4. Toepasselijk recht", rpr="<w:b/>")),
+    p(r("Op deze overeenkomst is Nederlands recht van toepassing.")),
+    p(r("Aldus overeengekomen en ondertekend.")),
+]
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     a1 = OUT / "probe-arm1-deadlock.docx"
     a2 = OUT / "probe-arm2-decoy.docx"
+    a3 = OUT / "probe-arm3-deadlock-f28.docx"
     docx(a1, "".join(ARM1))
     docx(a2, "".join(ARM2))
-    for path, arm, para in ((a1, "1 — TRUE DEADLOCK (F1)", len(ARM1)),
-                            (a2, "2 — DECOY (L1)", len(ARM2))):
-        print(f"  wrote {path.name:30s} arm {arm:26s} {para} paragraphs "
+    docx(a3, "".join(ARM3))
+    for path, arm, para in ((a1, "1 — was TRUE DEADLOCK (F1)", len(ARM1)),
+                            (a2, "2 — DECOY (L1)", len(ARM2)),
+                            (a3, "3 — TRUE DEADLOCK (F28)", len(ARM3))):
+        print(f"  wrote {path.name:34s} arm {arm:28s} {para} paragraphs "
               f"({path.stat().st_size:,} bytes)")
     print()
-    print("  Both are SYNTHETIC. Read tests/probe-5b/SCORING.md before running either, and")
-    print("  run arm 1 first — the probe reads in the failure direction, so a failure there")
-    print("  answers the gate on its own.")
+    print("  All three are SYNTHETIC. Read tests/probe-5b/SCORING.md before running any of them.")
+    print("  ARM 3 IS THE ONE TO RUN. Arm 1 has been run and turned out to be a decoy rather than")
+    print("  a deadlock — a compliant repair existed under rule 5a. Arm 3 is built from F28, one")
+    print("  of the three requirements STEP-B-ANALYSIS.md §5.5 records as impossible to meet, and")
+    print("  the only one of those three that branch 5 converts into a stopped run.")

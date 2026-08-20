@@ -97,6 +97,21 @@ MUTATIONS = [
      PREFLIGHT,
      needle(PREFLIGHT, 'PHANTOM = "This obligation shall lapse upon handover."'),
      needle(PREFLIGHT, 'PHANTOM = "The Supplier shall bear the costs."')),
+
+    # ARM 3's MUTATION, AND IT IS THE ONE THAT WOULD HAVE CAUGHT THE FIRST DRAFT OF THAT RIG.
+    # quality_check.py:532 exempts any paragraph under five words, so a SHORT faithful rendering
+    # clears the dangling-ending rule without breaking a single instruction — a compliant repair,
+    # which is precisely what made arm 1 a decoy. The first arm-3 source used a short lead-in and
+    # two of its natural renderings escaped that way. Shortening the declared English must turn
+    # ARM 3 CONFIRMED back into NOT CONFIRMED.
+    ("D  arm 3: a rendering under the five-word floor is a compliant repair",
+     PREFLIGHT,
+     needle(PREFLIGHT,
+            '      5: "Without prejudice to the provisions of Clause 4 of this agreement and subject to "',
+            '         "the prior written consent of",'),
+     needle(PREFLIGHT,
+            '      5: "Notwithstanding Clause 4 of"',
+            '         "",')),
 ]
 
 
@@ -116,11 +131,11 @@ def run_preflight():
 
 
 print("=" * 96)
-print("BASELINE — the unmutated rig must report ARM 1 RIG CONFIRMED")
+print("BASELINE — the unmutated rigs must report ARM 1 and ARM 3 CONFIRMED")
 print("=" * 96)
 build_documents()
 rc, out = run_preflight()
-baseline_ok = rc == 0 and "ARM 1 RIG CONFIRMED" in out
+baseline_ok = "ARM 1 RIG CONFIRMED" in out and "ARM 3 RIG CONFIRMED" in out
 print(f"  exit {rc} · ARM 1 RIG CONFIRMED present: {'ARM 1 RIG CONFIRMED' in out}")
 if not baseline_ok:
     print("  VOID — the baseline does not pass, so a mutation proving it can fail would")
@@ -128,6 +143,12 @@ if not baseline_ok:
     sys.exit(1)
 
 results = []
+# WHICH ARM EACH MUTATION ATTACKS. The exit code tracks ARM 3 now — the arm the gate needs — so
+# a mutation that breaks arm 1 leaves rc at 0 and the old `rc != 0` test reported all four as
+# MISSED the moment arm 3 landed. Detection must therefore read the ARM'S OWN verdict, not the
+# process exit code. That is the same defect this file exists to catch, in this file.
+ARM_OF = {"A": 1, "B": 1, "C": 1, "D": 3}
+
 for label, target, original, replacement in MUTATIONS:
     print("\n" + "=" * 96)
     print(f"MUTATION {label}")
@@ -143,8 +164,9 @@ for label, target, original, replacement in MUTATIONS:
         target.write_bytes(before.replace(original, replacement, 1))
         build_documents()
         rc, out = run_preflight()
-        detected = rc != 0 and "ARM 1 RIG **NOT** CONFIRMED" in out
-        print(f"  exit {rc} · detected as NOT CONFIRMED: {detected}")
+        arm = ARM_OF[label.strip()[0]]
+        detected = f"ARM {arm} RIG **NOT** CONFIRMED" in out
+        print(f"  exit {rc} · arm {arm} detected as NOT CONFIRMED: {detected}")
         for line in out.splitlines():
             if line.strip().startswith(("phantom built", "wrappers survived",
                                         "strip_noop removed", "post_process raised",
