@@ -1633,17 +1633,6 @@ top-level commands, one at a time, never from a parent runner and never concurre
    so "four open" and "four Step C risks" are finally the same set.
 6. **The six untracked house scripts in `tools/`** — still untracked, still Wouter's open
    question, and `tools/run_tests.py` still collides by name with `tests/run_tests.py`.
-7. **§5.16 MAY NEED RECONCILING WITH THE HOUSE TEMPLATE, and this is a live thread rather
-   than a note.** *(2026-08-21.)* Wouter is revising `…\Coding\templates\CLAUDE-TEMPLATE.md`
-   in a separate session, and four candidates were put to him from this session's evidence:
-   a verification-hygiene section; **a THIRD shell hazard beside the two already there — a
-   command substitution or a pipe resets `$?`**, which is one sentence and pure prevention;
-   a rule that a durable lesson goes in the working method and never in the handoff, because
-   the handoff is replaced; and *"a fix scoped to one caller of a shared hazard"* as a house
-   rule. **Nothing in §5.16 is project-specific**, so if any of it lands in the template,
-   §5.16 should point at the template rather than restate it — the template wins where the
-   two disagree, and a duplicated rule is exactly the drift this project keeps recording.
-   **Do not pre-empt it: check the template before editing §5.16.**
 
 ### THE NEXT BRANCH
 
