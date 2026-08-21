@@ -59,7 +59,7 @@ wrong conclusion.
 |---|---|---|---|
 | **`CLAUDE.md`** *(this)* | the charter | first, always | goals · order · status · rules · structure |
 | **`STEP-B-ANALYSIS.md`** | **the build plan.** What to build, in what order, and what counts as having built it | **before and during every build branch — it is the leading document for all of step 2** | §2 the order · §3 the brief per option · §4 the test method |
-| **`FINDINGS-REGISTER.md`** | the evidence base — **216 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
+| **`FINDINGS-REGISTER.md`** | the evidence base — **217 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
 | **`A3-STRUCTURAL-ANALYSIS.md`** | the evidence-led structural analysis | when a structural judgement comes up | the measurements: context, runtime, redundancy, divergence |
 | **`OPUS-5-MIGRATION.md`** | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
@@ -194,8 +194,8 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 
 **The evidence base as it now stands, and these are the numbers to quote:**
 
-> **`FINDINGS-REGISTER.md`: 216 rows — 15 clusters · 171 skill findings (159 clustered + 12 single-instance)
-> · 27 positives to preserve · 18 defects in our own measuring instruments (13 fixed, 5 open).** The largest
+> **`FINDINGS-REGISTER.md`: 217 rows — 15 clusters · 171 skill findings (159 clustered + 12 single-instance)
+> · 27 positives to preserve · 19 defects in our own measuring instruments (14 fixed, 5 open).** The largest
 > cluster is the instruction contradictions, at **39**. Validator **PASS, 0 failures, 0 warnings**.
 >
 > **The instrument count moved from 11 to 16 on 2026-08-11, and the five new rows are a different
@@ -1650,6 +1650,34 @@ artefact can only be caught by a check that looks at the directory rather than a
 **The corpus numbers did not move**: D03 1 · D05 5 · D06 21 · D07 0 before `--original`, and
 16 in total after it, exactly as measured the first time. **The defects were in the pathology
 and the plumbing, not in the result** — which is the one thing that makes them easy to ship.
+
+### AND THE MERGE ITSELF EXPOSED A THIRD — READ THIS BEFORE TRUSTING ANY SWEEP IN THIS FILE
+
+**Register I-19, two defects found together minutes after the merge, and both are in the
+MEASURING rather than in the fixes.**
+
+**The before-and-after suites destroyed themselves on merge.** They loaded the pre-branch
+code with `git show origin/main:…` — correct while the branch was in flight, false the
+instant it merged, because `origin/main` then resolved to the FIXED code and every *"proved
+it fired before"* assertion compared the fix with itself. Nine went red at once, **which is
+the good outcome**: the same suite going green would have been the twelfth logged case of a
+check passing for the wrong reason, in the very file written to argue against that. The
+resolver also had a fallback chain — `origin/main`, then `main`, then `HEAD~1` — which reads
+as defensive and is the opposite. **Fixed:** pinned to the commit before the branch, fallback
+chain deleted, and both suites now exit **VOID** if the baseline file is byte-identical to
+the working tree, so a rebase cannot make them vacuous in silence. Proved both ways.
+
+**AND MY OWN SWEEPS COULD NOT SEE A FAILING TEST.** They used
+`printf "… rc=%s\n" "$(basename $t)" "$?"`, and the command substitution runs before `$?` is
+expanded — so **every line reported `basename`'s exit code, which is always 0.** Twelve test
+files were reported green while two were exiting 1. Piping into `tail` and then echoing `$?`
+has the same defect. **The session prompt warned about exactly this and it was done anyway**,
+which is the useful half: a written warning is not a control. **Use `temp/b14_runall.py`** —
+it runs each command through `subprocess.run` and reports `returncode`, which cannot be
+detached from the process that produced it.
+
+**What this did NOT change: the fixes.** Re-run against the true pre-branch commit, all 51
+case assertions and all 11 properties pass, and every corpus figure above is unchanged.
 
 ### WHAT WAS RUN
 
