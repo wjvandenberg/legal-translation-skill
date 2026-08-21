@@ -39,6 +39,13 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
+# AND THE SAME GUARD FOR EVERY CHILD PROCESS, which the line above cannot give.
+# `sys.dont_write_bytecode` is a runtime flag: it governs this interpreter's imports and
+# is not inherited. A suite here calls skill code that spawns validators as subprocesses,
+# and one of those imports post_process -- so a .pyc appeared inside uk/scripts every run.
+# It is gitignored, invisible to a diff, and the release packager zips that tree. Setting
+# the ENV VAR is the only form of this guard that reaches a grandchild. Register I-18.
+os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 ROOT = Path(__file__).resolve().parent.parent
 
 # PINNED TO A COMMIT, NOT A BRANCH NAME — see the same note in test_check_scoping.py.
