@@ -529,8 +529,21 @@ def check_that_precedes(root, verbose):
     return issues
 
 def _norm_text(s):
-    """Whitespace-normalised text, for pairing a notes entry to a paragraph."""
-    return re.sub(r'\s+', ' ', s or '').strip()
+    """Whitespace-normalised text, for pairing a notes entry to a paragraph.
+
+    COERCES RATHER THAN TRUSTING THE TYPE. paragraphs.json is hand-edited during a run and
+    this project has twice recorded quiet errors from that, so a numeric or otherwise
+    non-string `en` is a real input. `s or ''` alone let one through: a number is truthy,
+    so it reached re.sub and raised TypeError. Found by the property tests, which is also
+    where the same probe showed `text: null` and a non-integer `idx` crashing the check
+    BEFORE this branch — those are fixed here too, and measured as pre-existing rather
+    than claimed as this branch's doing.
+    """
+    if s is None:
+        return ''
+    if not isinstance(s, str):
+        s = str(s)
+    return re.sub(r'\s+', ' ', s).strip()
 
 
 def _pair_entries_to_paragraphs(root, source_data):
@@ -554,6 +567,17 @@ def _pair_entries_to_paragraphs(root, source_data):
     entry's own declared English rather than guessing at a paragraph -- a wrong
     unique pairing is worse than none, because it would compare two unrelated
     paragraphs, which is the defect being repaired.
+
+    AND THE `idx` IS NOT CONSULTED AT ALL, WHICH IS A CORRECTION TO THIS FUNCTION'S
+    FIRST VERSION. That version kept the positional candidate whenever it happened
+    to hold the right English, on the reasoning that a document with no definitions
+    section would then keep exactly the findings it had before. The reasoning was
+    fine and the consequence was not: where the same English appears in TWO
+    paragraphs, whether the positional shortcut hits decides whether the entry
+    pairs at all -- so the verdict depended on position again, in precisely the
+    case the pairing exists to handle. Measured by the property tests at 287 of 320
+    random permutations invariant instead of 320. Dropping the shortcut costs
+    nothing: where the key is unique it is what the lookup below returns anyway.
     """
     texts = [''.join(t.text or '' for t in p.iter(f'{{{W}}}t'))
              for p in root.iter(f'{{{W}}}p')]
@@ -567,15 +591,8 @@ def _pair_entries_to_paragraphs(root, source_data):
     for entry in source_data:
         if not isinstance(entry, dict):
             continue
-        key = _norm_text(entry.get('en') or '')
+        key = _norm_text(entry.get('en'))
         if not key:
-            continue
-        idx = entry.get('idx', -1)
-        # Keep the positional candidate when it is actually right: on a document
-        # with no definitions section it always is, so those runs keep the exact
-        # findings they had before, which is what makes this change reviewable.
-        if 0 <= idx < len(texts) and _norm_text(texts[idx]) == key:
-            paired[id(entry)] = texts[idx]
             continue
         hits = by_text.get(key, [])
         if len(hits) == 1:
@@ -606,8 +623,15 @@ def check_truncation(root, verbose, source_data=None):
         for entry in source_data:
             if not isinstance(entry, dict):
                 continue
+            # COERCED, NOT TRUSTED. `entry.get('text', '')` returns None when the key
+            # is PRESENT and null, which then crashed on .strip() -- measured as a
+            # pre-existing crash, not one this branch introduced, and fixed here
+            # because this is the line that reads it. `idx` is now used only in the
+            # message, so a non-integer one no longer needs to be comparable.
             idx = entry.get('idx', -1)
-            src_text = entry.get('text', '')
+            src_text = entry.get('text') or ''
+            if not isinstance(src_text, str):
+                src_text = str(src_text)
             if not src_text.strip() or len(src_text) < 20:
                 continue
 
@@ -620,6 +644,8 @@ def check_truncation(root, verbose, source_data=None):
             en_text = paired.get(id(entry))
             if en_text is None:
                 en_text = entry.get('en') or ''
+            if not isinstance(en_text, str):
+                en_text = str(en_text)
 
             if not en_text.strip():
                 if len(src_text.strip()) > 30:
@@ -645,10 +671,13 @@ def check_truncation(root, verbose, source_data=None):
             if pt is None:
                 continue
             k = _norm_text(pt)
-            if k in src_by_para and src_by_para[k] != (entry.get('text') or ''):
+            src = entry.get('text') or ''
+            if not isinstance(src, str):
+                src = str(src)
+            if k in src_by_para and src_by_para[k] != src:
                 src_by_para[k] = None          # ambiguous: refuse to exempt
             else:
-                src_by_para.setdefault(k, entry.get('text') or '')
+                src_by_para.setdefault(k, src)
 
     # Method B: Dangling endings. Skip drafter placeholder tokens
     # (faithful annotations preserved from source, not truncations).

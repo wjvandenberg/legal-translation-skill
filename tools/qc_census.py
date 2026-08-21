@@ -182,13 +182,14 @@ for pj, dx in workdirs:
         if fires(texts[idx], src):                            # BASELINE: positional
             a_candidates += 1
             a_on_mispaired += 1 if wrong_pair else 0
+        # NO POSITIONAL SHORTCUT. The first version of this recomputation had one, mirroring
+        # the first version of the check -- and the check dropped it because it made the
+        # verdict position-dependent again wherever two paragraphs share their English.
+        # An instrument that models a shortcut the code no longer has is an instrument
+        # measuring a version of the code that does not exist.
         k = norm(en)
-        if k and norm(texts[idx]) == k:
-            paired = texts[idx]
-        elif k and len(by_text.get(k, [])) == 1:
-            paired = texts[by_text[k][0]]
-        else:
-            paired = en                                       # the declared-English fallback
+        hits = by_text.get(k, []) if k else []
+        paired = texts[hits[0]] if len(hits) == 1 else en     # else the declared-English fallback
         if fires(paired, src):                                # CURRENT: paired by text
             a_now += 1
 

@@ -59,7 +59,7 @@ wrong conclusion.
 |---|---|---|---|
 | **`CLAUDE.md`** *(this)* | the charter | first, always | goals · order · status · rules · structure |
 | **`STEP-B-ANALYSIS.md`** | **the build plan.** What to build, in what order, and what counts as having built it | **before and during every build branch — it is the leading document for all of step 2** | §2 the order · §3 the brief per option · §4 the test method |
-| **`FINDINGS-REGISTER.md`** | the evidence base — **215 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
+| **`FINDINGS-REGISTER.md`** | the evidence base — **216 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
 | **`A3-STRUCTURAL-ANALYSIS.md`** | the evidence-led structural analysis | when a structural judgement comes up | the measurements: context, runtime, redundancy, divergence |
 | **`OPUS-5-MIGRATION.md`** | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
@@ -194,8 +194,8 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 
 **The evidence base as it now stands, and these are the numbers to quote:**
 
-> **`FINDINGS-REGISTER.md`: 215 rows — 15 clusters · 171 skill findings (159 clustered + 12 single-instance)
-> · 27 positives to preserve · 17 defects in our own measuring instruments (12 fixed, 5 open).** The largest
+> **`FINDINGS-REGISTER.md`: 216 rows — 15 clusters · 171 skill findings (159 clustered + 12 single-instance)
+> · 27 positives to preserve · 18 defects in our own measuring instruments (13 fixed, 5 open).** The largest
 > cluster is the instruction contradictions, at **39**. Validator **PASS, 0 failures, 0 warnings**.
 >
 > **The instrument count moved from 11 to 16 on 2026-08-11, and the five new rows are a different
@@ -1618,6 +1618,39 @@ the comparison did not happen goes from printed to silent.
    repository is Wouter's open question and `tools/run_tests.py` still collides by name with
    `tests/run_tests.py`.
 
+### THE RE-VERIFICATION FOUND TWO REAL DEFECTS THAT 51 CASE ASSERTIONS HAD PASSED
+
+**Wouter asked whether it had been tested heavily. It had not been, and re-running proved
+it.** Both findings are recorded because the shape of the mistake is worth more than either
+repair.
+
+**1. THE FIX ITSELF WAS STILL POSITION-DEPENDENT.** L1's first version kept the positional
+candidate whenever `all_p[idx]` happened to hold the right English — sound reasoning, wrong
+consequence: **where the same English appears in two paragraphs, whether that shortcut hits
+decides whether the entry pairs at all**, so the verdict depended on position again in
+exactly the case the pairing exists for. **Cases cannot find this; a property can.**
+`tests/test_check_scoping_properties.py` states the repair as what it actually claims — *the
+truncation verdict does not depend on where a paragraph sits* — and measured **287 of 320**
+random permutations invariant. Dropping the shortcut costs nothing and gives **320 of 320**,
+against **34 of 320** for the pre-branch code, so the property is not vacuous. The same
+suite found **two crashes this branch had introduced** (a non-string `en`) and **four that
+predate it** (a null `text`, a non-integer `idx`); all six fixed, the split measured.
+
+**2. A `.pyc` WAS SITTING IN `uk/scripts/` AFTER THE COMMIT, AND THE GATE HAD REPORTED
+CLEAR.** Register **I-18**. Reproduced, not reasoned: the same test leaves 0 `.pyc` run
+directly and 1 run through `tools/cycle_evidence.py`, which spawns the runner and so passes
+its own environment rather than the runner's. **This is the third recurrence** — fixed in
+`tests/run_tests.py`, again in `tools/audit_branches.py`, and back through a third caller.
+It keeps returning because **`__pycache__` is gitignored, so it is invisible to a diff, to
+`git status`, and until now to every control.** The caller is patched, but the repair is a
+new pre-commit assertion that fails when anything development-only sits inside `uk/` or
+`us/`, with two negative tests planting a `.pyc` and an editor backup. **A gitignored
+artefact can only be caught by a check that looks at the directory rather than at the diff.**
+
+**The corpus numbers did not move**: D03 1 · D05 5 · D06 21 · D07 0 before `--original`, and
+16 in total after it, exactly as measured the first time. **The defects were in the pathology
+and the plumbing, not in the result** — which is the one thing that makes them easy to ship.
+
 ### WHAT WAS RUN
 
 **Verify.** `tests/test_check_scoping.py` — **51 assertions**, and every false-positive
@@ -1628,7 +1661,14 @@ test_no_delivered_byte_moves.py` — **12 assertions**: the two reporters leave 
 byte-identical, and the two scripts that write produce byte-identical output, including every
 member of the delivered `.docx` on two fixtures.
 
-**Test.** 11 of 11 test files · smoke suite PASS on **both** variants · parity check PASS,
+**Property.** `tests/test_check_scoping_properties.py` — **11 properties** over generated
+inputs at a fixed seed: permutation invariance (320 of 320, against the old code's 34),
+determinism, **56 hostile document/notes combinations without an exception**, a rendered
+break suppressing G10's finding in all 12 placements while a declared tab STOP never does,
+M1's multiset arithmetic exact on 60 random sequences, and C9's detector never raising on
+any of 7 hostile containers.
+
+**Test.** 12 of 12 test files · smoke suite PASS on **both** variants · parity check PASS,
 0 NEW divergences · `test_baseline_unmodified` 368 of 396 byte-identical with **28 declared**
 · register PASS 0/0 · claims 0/0 · tables CLEAN · branch audit and xref 0 · five STEP-B suites
 0 · `precommit_gate` **CLEAR on all seven controls**.

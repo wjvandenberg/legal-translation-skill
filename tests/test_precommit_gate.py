@@ -144,6 +144,44 @@ case("a tools/ script holding an absolute home path is caught",
      lambda: planted.exists() and planted.unlink())
 
 # ---------------------------------------------------------------------------
+# 6. A development-only file sits inside a SHIPPED tree.
+#    Added 2026-08-21 on branch 14, and it is here because the leak came back for the THIRD
+#    time through a new caller: fixed in tests/run_tests.py, returned via
+#    tools/audit_branches.py, returned again via tools/cycle_evidence.py -- which runs the
+#    tests as a subprocess and so passed its own environment, not the test runner's.
+#
+#    Every one of those fixes was correct and none stopped the next caller, because
+#    __pycache__ is gitignored: invisible to a diff, to git status, and until now to this
+#    gate, which reported CLEAR with a .pyc sitting in uk/scripts. So the fix is not a
+#    fourth patched caller, it is this assertion -- and the assertion has to be seen to
+#    fail, or it is one more line in a report.
+# ---------------------------------------------------------------------------
+pycache = ROOT / "uk" / "scripts" / "__pycache__"
+planted_pyc = pycache / "negative_test.cpython-000.pyc"
+
+
+def _plant_pyc():
+    pycache.mkdir(parents=True, exist_ok=True)
+    planted_pyc.write_bytes(b"\x00not real bytecode\x00")
+
+
+def _remove_pyc():
+    if planted_pyc.exists():
+        planted_pyc.unlink()
+    if pycache.is_dir() and not any(pycache.iterdir()):
+        pycache.rmdir()
+
+
+case("a .pyc inside uk/scripts is caught", 1, "development-only file",
+     _plant_pyc, _remove_pyc)
+
+# And an editor backup, so the check is not narrowly about Python bytecode.
+planted_bak = ROOT / "us" / "scripts" / "quality_check.py.orig"
+case("an editor backup inside us/scripts is caught", 1, "development-only file",
+     lambda: planted_bak.write_text("stale copy\n", encoding="utf-8"),
+     lambda: planted_bak.exists() and planted_bak.unlink())
+
+# ---------------------------------------------------------------------------
 print()
 print("=" * 92)
 ok = sum(1 for _, c, _, _ in results if c)

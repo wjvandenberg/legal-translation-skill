@@ -23,7 +23,7 @@
     "uk/scripts/quality_check.py": {
       "changed_by": "feature/check-scoping-quality-check",
       "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-      "sha256_now": "a2eac6a0a970819886b57d988678608900d2b471fc730344c5f2da1d733d4270"
+      "sha256_now": "e03ea24a8145cf01d3c811a949249cab85e1d06f5b056187fe04e0f572c28736"
     },
     "uk/scripts/repack_docx.py": {
       "changed_by": "feature/check-scoping-quality-check",
@@ -83,7 +83,7 @@
     "us/scripts/quality_check.py": {
       "changed_by": "feature/check-scoping-quality-check",
       "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-      "sha256_now": "96657ff50f213c124c61a3f2655bc0c42a1fdcfd59c90ce49707346ffeecced5"
+      "sha256_now": "97ea321e81b22567de8cb9f91c3cd5b48530aead263949ccff9b29a02084ba25"
     },
     "us/scripts/repack_docx.py": {
       "changed_by": "feature/check-scoping-quality-check",
