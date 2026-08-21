@@ -324,14 +324,14 @@ which is why a one-digit error in a public table is now a build failure rather t
 2. **Runtime is `24.6 + 0.040 × paragraphs` minutes** — about **25 minutes of fixed overhead and 2.4 seconds
    a paragraph.** Translating is **43%** of the time; on a 24-paragraph document **96%** of the run is fixed
    cost. **The skill has one gear**, and that is the runtime problem.
-3. **The 35-paragraph batch cap is correctly calibrated, and it is an ATTENTION cap, not a context cap.**
+2. **The 35-paragraph batch cap is correctly calibrated, and it is an ATTENTION cap, not a context cap.**
    Context was never the binding constraint on any run. **Evidence against raising it under Opus 5.**
-4. **Context is not a constraint:** the skill-side peak is **6.4% of the 1M window** (8.3% on a profile
+3. **Context is not a constraint:** the skill-side peak is **6.4% of the 1M window** (8.3% on a profile
    heavier than anything observed). The live reasons to care about file size are **findability and
    truncation, not tokens.**
-5. **The over-engineering is in capabilities, not in files.** No dead scripts, no orphan lexicons, only 4%
+4. **The over-engineering is in capabilities, not in files.** No dead scripts, no orphan lexicons, only 4%
    duplicated prose — but **four shared capabilities across thirteen independent implementations**.
-6. **Batch position degrades the POLICING, not the translation.** The controlled pair (same document, batch
+5. **Batch position degrades the POLICING, not the translation.** The controlled pair (same document, batch
    position the only variable) scored 9/9/9 on the translation criteria in both runs; every point the arm
    lost, it lost to out-of-pipeline defects the single run had found and repaired. **The consequence is an
    argument for the fixes, not for a batch rule.**
@@ -1492,18 +1492,19 @@ the pull request; do not call it complete.
 
 **RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
 Re-reading has never found one.
-### HANDOFF — 2026-08-20. The 5b gate is DISCHARGED. Branch 5 is ready to merge, on Wouter's approval.
+### HANDOFF — 2026-08-20. BRANCH 5 IS MERGED. Step 2 has delivered branches 3, 4 and 5.
 
-**Branch 5 is BUILT, VERIFIED, TESTED and NOT MERGED — and nothing technical is holding it any
-more.** The gate that held it ran twice in Cowork and is discharged, for reasons recorded in
-`DECISIONS-LOG.md`, 2026-08-20. **The remaining step is Wouter's approval, then a squash-merge.**
+**Branch 5 is MERGED.** Wouter approved it on 2026-08-20, after the 5b gate was discharged and
+all six confidentiality controls came back clear over the **3,613 lines** the branch adds to
+`main`. **The checks can now fail: a run that finds a problem STOPS instead of reporting success
+over it.** That was the point of the branch, and it is the first change in step 2 a user can feel.
 
 | | |
 |---|---|
-| **branch** | `feature/checks-can-fail` — PR #24, 11 commits, both trees |
-| **state** | verified · tested · **not merged** |
-| **the gate** | **DISCHARGED 2026-08-20.** Three rigs, three scope defects, two live runs |
-| **next** | **Wouter approves → squash-merge → branch 14's `quality_check` slice** |
+| **merged** | `feature/checks-can-fail` — PR #24, squash-merged 2026-08-20 |
+| **step 2 so far** | branches **3, 4 and 5** delivered. Fifteen branches plus three deferred items remain |
+| **the gate** | **DISCHARGED.** Three rigs, three scope defects, two live runs, `DECISIONS-LOG.md` 2026-08-20 |
+| **NEXT** | **branch 14's `quality_check` slice** — §2's fourth sequencing fact puts it immediately after branch 5, and it is specified below |
 
 ### WHY THE GATE IS DISCHARGED AND NOT SATISFIED — the one thing not to re-derive
 
@@ -1544,10 +1545,9 @@ catches the true positive** — that discipline is the branch.
 **The census measured 9 of 9 of L1's findings as artefacts**, and six of the ten reachable
 documents come through `quality_check` completely clean. `tools/qc_census.py` re-runs it.
 
-### SIX THINGS OPEN
+### FIVE THINGS OPEN
 
-1. **Wouter's approval to merge branch 5.** Nothing else blocks it.
-2. **Arm 2** — unconfirmed, deliberately unbuilt, and now unnecessary.
+1. **Arm 2** — unconfirmed, deliberately unbuilt, and now unnecessary.
 3. **A `probe` origin class for the register.** The validator rejects `probe-5b`, so F1's and
    G11's provenance sits in their text. Step C will produce more behavioural evidence.
 4. **I-7, I-8, I-9, I-10** — the four open A1 harness defects. They will corrupt Step C's evidence
