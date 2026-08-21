@@ -191,9 +191,13 @@ GROUPS = {
  # G10 added 2026-08-12 (branch 5). THIS LIST IS THE SOURCE and §9.1's table is generated
  # from it — a hand-edit to the document alone leaves the two disagreeing, which is exactly
  # how this tool caught the omission.
+ # G12 added 2026-08-21 (branch 14): the residue the quality_check slice leaves behind,
+ # measured and deliberately UNCLASSIFIED because classifying it needs the finding text read
+ # and each finding embeds real instrument text. It belongs in group 3 for the same reason
+ # every other G row does — the check says something about the document that may not be so.
  "3 says it worked when it did not": """
    C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9
-   G10 G11 S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6
+   G10 G11 G12 S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6
    """,
  "4 hard to keep correct": """
    U1 V1 V2 W1 W2 T1 T2 T3 T4 T5 T6 F21 F23 F32 F36 F37 F38 L2 L3 E1 E2 E3 E5 E6 E10 E11 E13 E14 Q1 Y1
@@ -211,7 +215,7 @@ OPTIONS = {
  # G10 added 2026-08-12 (branch 5) — see the note on group 3 above.
  "2 check against the original": """
    C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28
-   G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
+   G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
    """,
  "3 say what the formatting is": """
    A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3
@@ -307,6 +311,40 @@ for k in GROUPS:
 print()
 for k in OPTIONS:
     print(f"  {k:<52} {sevmix(O[k])}")
+
+print("\n=== A3b. THE ARITHMETIC LINE UNDER §9.1 MUST MATCH THE TABLE ABOVE IT ===")
+# THE TABLES IN §9.1 AND §9.2 ARE GENERATED FROM THIS FILE; THE SUM UNDER THEM IS TYPED.
+# So every regeneration that adds a row leaves that sum behind, and nothing noticed: found
+# 2026-08-21 reading `27 + 27 + 41 + 30 + 43 = 168` above a table already holding 43 in
+# group 3 and 170 in total -- stale by two, in a line whose own severity-mix column
+# disagreed with it as well. This asserts the typed line against the generated groups, per
+# group and in total, so it cannot drift again.
+_doc = (ROOT / "STEP-B-ANALYSIS.md").read_text(encoding="utf-8")
+_m = re.search(r"\*\*([\d]+(?:\s*\+\s*[\d]+)+)\s*=\s*(\d+)\s*.\*\*", _doc)
+if not _m:
+    FAIL.append("A3b: no `a + b + ... = n` arithmetic line found under §9.1 — it is the "
+                "only human-maintained statement of these counts and must exist")
+    print("  FAIL  the arithmetic line under §9.1 is missing")
+else:
+    _stated = [int(x) for x in re.split(r"\s*\+\s*", _m.group(1))]
+    _stated_total = int(_m.group(2))
+    _actual = [len(G[k]) for k in GROUPS]
+    _bad = [(i + 1, s, a) for i, (s, a) in enumerate(zip(_stated, _actual)) if s != a]
+    if len(_stated) != len(_actual):
+        FAIL.append(f"A3b: the line lists {len(_stated)} groups, the table has "
+                    f"{len(_actual)}")
+        print(f"  FAIL  group-count mismatch: line {len(_stated)}, table {len(_actual)}")
+    elif _bad or _stated_total != sum(_actual):
+        for g, s, a in _bad:
+            FAIL.append(f"A3b: §9.1's line says group {g} = {s}, the table has {a}")
+            print(f"  FAIL  group {g}: line says {s}, table has {a}")
+        if _stated_total != sum(_actual):
+            FAIL.append(f"A3b: §9.1's line totals {_stated_total}, the table totals "
+                        f"{sum(_actual)}")
+            print(f"  FAIL  total: line says {_stated_total}, table has {sum(_actual)}")
+    else:
+        print(f"  OK    {' + '.join(map(str, _actual))} = {sum(_actual)}  — the typed line "
+              f"matches the generated groups")
 
 print("\n=== A4. Which options carry the 11 CRITICAL findings ===")
 crit = [f for f in SKILL if rows[f]["sev"].startswith("CRITICAL")]

@@ -35,6 +35,7 @@ Usage:
 import sys
 import os
 import re
+import tempfile
 import zipfile
 import shutil
 
@@ -73,6 +74,102 @@ try:
 except Exception:  # pragma: no cover — scan is best-effort.
     _detect_lang = None
     _scan_remnants = None
+try:
+    from lexicon_compliance import _guess_language as _guess_lang
+except Exception:  # pragma: no cover — the agreement control is best-effort.
+    _guess_lang = None
+
+_TAG_STRIP_RE = re.compile(r'<[^>]+>')
+
+
+def _original_body_text(orig_docx):
+    """The ORIGINAL .docx's body text, tags stripped, or '' if unreadable.
+
+    Tags are stripped BEFORE any detector sees it. Otherwise single-letter
+    function-word markers (Polish `\\bw\\b`, `\\bz\\b`, `\\bi\\b`; Dutch `\\bde\\b`)
+    false-match against `<w:r>`, `<w:p>` and attribute names like `w:rsidR` and
+    dominate the score.
+    """
+    try:
+        with zipfile.ZipFile(orig_docx) as zin:
+            if 'word/document.xml' not in zin.namelist():
+                return ''
+            raw = zin.read('word/document.xml').decode('utf-8', errors='ignore')
+    except Exception:
+        return ''
+    return _TAG_STRIP_RE.sub(' ', raw)
+
+
+def _detect_source_language(orig_docx):
+    """Detect the source language from the ORIGINAL, and only when two
+    independent detectors agree. Returns a language name, or None.
+
+    WHY THE ORIGINAL AND NOT THE TRANSLATION. Register C9. The pre-repack
+    lexicon scan below is handed the TRANSLATED document.xml with no --language,
+    so its own auto-detection reads English prose and guesses the source language
+    from it. Measured over the recorded corpus: reading the translated body gets
+    the source language right 2 times in 13; reading the original gets it right 9
+    in 13. The detector was never the defect — its input was. The eight lines
+    that already read the original for the post-repack remnant scan are the
+    source of truth, and now both use them.
+
+    WHY TWO DETECTORS AND NOT ONE, WHICH IS THE HALF THE ROW DOES NOT STATE.
+    Reading the original still gets it wrong 4 times in 13, and a wrong SPECIFIC
+    language is not a milder version of "unknown" — it silently SKIPS the correct
+    language's rules, whereas unknown runs them all. So the answer is only used
+    where two independently-written detectors agree: `source_language_markers`
+    scores marker frequencies, `lexicon_compliance` matches token markers and
+    counts diacritics. Measured: 9 agreements (8 of them correct) and 4 honest
+    disagreements, in place of 4 confident wrong answers. On disagreement this
+    returns None and the scan keeps today's behaviour, which errs towards running
+    every language's rules rather than towards silence.
+
+    Norwegian is in neither detector's vocabulary, so D03-class documents cannot
+    be detected by anything and correctly reach the disagreement branch. Making
+    the check SAY it is guessing is branch 12's, not this one's.
+    """
+    if _detect_lang is None:
+        return None
+    text = _original_body_text(orig_docx)
+    if not text.strip():
+        return None
+    try:
+        primary = _detect_lang(text)
+    except Exception:
+        return None
+    if not primary:
+        return None
+    if _guess_lang is None:
+        return None
+    # The second detector reads a path, not a string, so give it the original's
+    # body in a temporary .xml rather than reimplementing its marker tables here.
+    second = None
+    tmp_path = None
+    try:
+        fd, tmp_path = tempfile.mkstemp(suffix='.xml')
+        with os.fdopen(fd, 'w', encoding='utf-8') as fh:
+            fh.write('<w:document xmlns:w="x"><w:body><w:p><w:r><w:t>')
+            fh.write(text[:200000].replace('&', ' ').replace('<', ' ').replace('>', ' '))
+            fh.write('</w:t></w:r></w:p></w:body></w:document>')
+        second = _guess_lang(tmp_path)
+    except Exception:
+        second = None
+    finally:
+        if tmp_path:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+    if second == primary:
+        return primary
+    print(
+        f"  [repack] source-language detectors DISAGREE on the original "
+        f"({primary} vs {second}); passing no --language to the pre-repack "
+        f"lexicon scan, so it applies every language's rules rather than one "
+        f"chosen wrongly."
+    )
+    return None
+
 
 def _run_pre_repack_validator(label, args):
     """Auto-invoke a validator script as a subprocess before bundling.
@@ -119,12 +216,21 @@ def repack(orig_docx, translated_doc_xml, output_docx,
     # --- PRE-REPACK MANDATORY GATES ------------------------------------
     # Run before any byte is written to output_docx so failures abort
     # cleanly without producing a half-baked .docx.
+    #
+    # The source language comes from the ORIGINAL, not from the translation the
+    # scan is about to read. Register C9 — see _detect_source_language.
+    _lex_args = [sys.executable,
+                 os.path.join(scripts_dir, 'lexicon_compliance.py'),
+                 translated_doc_xml,
+                 '--stage', 'pre-repack']
+    _src_lang_for_scan = _detect_source_language(orig_docx)
+    if _src_lang_for_scan:
+        print(f"  [repack] source language from the ORIGINAL: {_src_lang_for_scan} "
+              "(two detectors agree) — passing it to the pre-repack lexicon scan")
+        _lex_args += ['--language', _src_lang_for_scan]
     _run_pre_repack_validator(
         'lexicon_compliance.py --stage pre-repack',
-        [sys.executable,
-         os.path.join(scripts_dir, 'lexicon_compliance.py'),
-         translated_doc_xml,
-         '--stage', 'pre-repack'],
+        _lex_args,
     )
     if paragraphs_json:
         _run_pre_repack_validator(
@@ -518,19 +624,13 @@ def repack(orig_docx, translated_doc_xml, output_docx,
     # language, or source_language_markers not importable), the scan is
     # skipped silently — the repack itself is not affected.
     if _detect_lang is not None and _scan_remnants is not None:
-        _TAG_STRIP_RE = re.compile(r'<[^>]+>')
+        # ONE PLACE READS THE ORIGINAL'S BODY TEXT. This block used to carry its
+        # own copy of the zip-read and the tag strip, which is how the pre-repack
+        # gate came to be missing a language the post-repack scan already had
+        # (register C9): the capability existed eight lines away and was not
+        # reachable. `_original_body_text` is now that one place.
         try:
-            with zipfile.ZipFile(orig_docx) as zin:
-                orig_doc_xml = ''
-                if 'word/document.xml' in zin.namelist():
-                    orig_doc_xml = zin.read('word/document.xml').decode(
-                        'utf-8', errors='ignore')
-            # Strip XML tags BEFORE auto-detecting. Otherwise single-letter
-            # function-word markers (Polish `\bw\b`, `\bz\b`, `\bi\b`;
-            # Dutch `\bde\b`) false-match against `<w:r>`, `<w:p>`, attribute
-            # names like `w:rsidR`, etc., and dominate the score.
-            orig_doc_text = _TAG_STRIP_RE.sub(' ', orig_doc_xml)
-            src_lang = _detect_lang(orig_doc_text)
+            src_lang = _detect_lang(_original_body_text(orig_docx))
         except Exception:
             src_lang = None
 

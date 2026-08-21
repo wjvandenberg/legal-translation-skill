@@ -1293,7 +1293,7 @@ a **blank page** in a delivered contract. **[measured]**
 empty-paragraph page breaks and manual line breaks alike. Preserving *how many* there are does not preserve
 *what they do* once the English is 30% longer than the source.
 
-### 5.3 Things that say it worked when it did not — 43 findings
+### 5.3 Things that say it worked when it did not — 44 findings
 
 **The strictest check compares bags of words.** No order, no punctuation, not even a count — so a word can
 be deleted and the check still passes, as long as the same word occurs somewhere else in the paragraph.
@@ -1610,7 +1610,7 @@ failures that were previously invisible — which is the point."*
 
 | pros | cons | what it would break | what it does NOT fix |
 |---|---|---|---|
-| Detects or closes **53 findings, 6 of them the worst grade** — more than any other option · It is the only option that **changes what the project can find next time**; every other one fixes what we already found · It is the only route to the never-regress rule you require and that is unenforceable today · The extraction-completeness half is a **same-language exact comparison**: cheap, deterministic, and it closes the one blind spot the planned gate leaves open · The one-line exit-code fix has independent confirmation from two methods with nothing in common · Reuses eight lines that already exist and get the language right where another script gets it wrong | Cost **low-to-medium**, risk **low** *(inference)* — one new program plus wiring, no change to how anything translates · **The real risk is scope creep into a second grader.** It must stay strictly mechanical: text inventories, character diffs, reference counts, span counts, bracket balance, invisible-character sweeps. The moment it starts judging whether English reads well, it stops being repeatable and cannot be a regression gate · The character-exact half **cannot be built** until the tidy-up script declares what it changed — see option 6 | **This is the big one, and it is a sequencing fact rather than an objection.** Making the checks discerning converts silent defects into **blocked runs** — and **18 findings say in their own text that no compliant repair exists**, three of them requirements that already cannot be met at all. Turn on a discerning check before the repair or the escape hatch exists and the pipeline **deadlocks on real documents.** So this option cannot ship without option 5's cheap half beside it · It will also fire on legitimate output until the false-positive scoping is done | **Every defect itself.** It detects; it does not repair. Nothing in the content-loss, formatting, layout or dictionary groups is *closed* by it · It cannot see whether a dictionary row is *wrong* — only whether the text moved · It cannot ask whether the English suits the instrument class, which is what the human review is for |
+| Detects or closes **54 findings, 6 of them the worst grade** — more than any other option · It is the only option that **changes what the project can find next time**; every other one fixes what we already found · It is the only route to the never-regress rule you require and that is unenforceable today · The extraction-completeness half is a **same-language exact comparison**: cheap, deterministic, and it closes the one blind spot the planned gate leaves open · The one-line exit-code fix has independent confirmation from two methods with nothing in common · Reuses eight lines that already exist and get the language right where another script gets it wrong | Cost **low-to-medium**, risk **low** *(inference)* — one new program plus wiring, no change to how anything translates · **The real risk is scope creep into a second grader.** It must stay strictly mechanical: text inventories, character diffs, reference counts, span counts, bracket balance, invisible-character sweeps. The moment it starts judging whether English reads well, it stops being repeatable and cannot be a regression gate · The character-exact half **cannot be built** until the tidy-up script declares what it changed — see option 6 | **This is the big one, and it is a sequencing fact rather than an objection.** Making the checks discerning converts silent defects into **blocked runs** — and **18 findings say in their own text that no compliant repair exists**, three of them requirements that already cannot be met at all. Turn on a discerning check before the repair or the escape hatch exists and the pipeline **deadlocks on real documents.** So this option cannot ship without option 5's cheap half beside it · It will also fire on legitimate output until the false-positive scoping is done | **Every defect itself.** It detects; it does not repair. Nothing in the content-loss, formatting, layout or dictionary groups is *closed* by it · It cannot see whether a dictionary row is *wrong* — only whether the text moved · It cannot ask whether the English suits the instrument class, which is what the human review is for |
 
 ---
 
@@ -2688,18 +2688,30 @@ plain English above becoming hand-waving.**
 |---|---|---|---|
 | 1 | loses content | A1 A2 A3 A6 A8 A9 A15 A16 A19 B3 B8 C2 C12 C13 C14 C16 C17 C19 C23 C28 E4 F16 F27 J1 M1 N1 S3 | CRITICAL:6 HIGH:16 MED:4 LOW:1 |
 | 2 | looks wrong on the page | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 B1 B7 C20 D1 D2 D3 D4 D5 D6 E9 E12 F7 F13 F19 F22 O1 R1 | HIGH:16 MED:9 LOW:2 |
-| 3 | says it worked when it did not | C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 H1 H2 H4 L1 L4 L6 S1 S2 W3 W4 X1 X2 X4 X6 | CRITICAL:4 HIGH:21 MED:14 LOW:3 —:1 |
+| 3 | says it worked when it did not | C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 H1 H2 H4 L1 L4 L6 S1 S2 W3 W4 X1 X2 X4 X6 | CRITICAL:4 HIGH:21 MED:15 LOW:3 —:1 |
 | 4 | hard to keep correct | E1 E2 E3 E5 E6 E10 E11 E13 E14 F21 F23 F32 F36 F37 F38 L2 L3 Q1 T1 T2 T3 T4 T5 T6 U1 V1 V2 W1 W2 Y1 | CRITICAL:1 HIGH:8 MED:16 LOW:3 POS:2 |
 | 5 | the manual is wrong | B2 B4 B5 B6 E7 E8 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40 F41 F42 H3 K1 K2 K3 L5 X3 X5 Y2 Y3 Y4 | HIGH:17 MED:20 LOW:6 |
 
-**27 + 27 + 41 + 30 + 43 = 168 ✓**
+**27 + 27 + 44 + 30 + 43 = 171 ✓**
+
+> **THIS LINE WAS STALE BY TWO, AND IT HAD BEEN FOR SOME TIME.** *(Corrected 2026-08-21 on
+> branch 14.)* It read **27 + 27 + 41 + 30 + 43 = 168** while the table directly above it
+> already held **43** in group 3 and **170** in total — and its own severity-mix column
+> summed to 43 as well, so the row disagreed with itself in two places at once. The tables
+> are GENERATED from `tools/stepb_verify.py`; this line was typed, so every regeneration
+> that added a row left it further behind. **Found by counting the ids rather than by adding
+> one to the number already written down** — which is the rule that exists because the
+> register's cluster-F count went stale three times, each time from a session adding a delta
+> to a stale figure. **And `tools/stepb_verify.py` now ASSERTS this line against the tables
+> it generates**, so it cannot drift again: the check that would have caught this did not
+> exist, which is the more useful half of the finding.
 
 ### 9.2 Options — complete; a finding may need more than one
 
 | option | what it is | findings it closes or detects | severity mix |
 |---|---|---|---|
 | 1 | preserve-by-default in apply | A1 A2 A3 A6 A8 A9 A16 A19 C16 C17 C19 D4 F16 F27 N1 T1 T6 | CRITICAL:4 HIGH:11 MED:1 POS:1 |
-| 2 | check against the original | B8 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28 D2 D5 E4 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 H1 H2 H4 J1 L1 L4 L6 M1 S1 S2 S3 U1 V1 | CRITICAL:6 HIGH:23 MED:19 LOW:4 —:1 |
+| 2 | check against the original | B8 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28 D2 D5 E4 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 H1 H2 H4 J1 L1 L4 L6 M1 S1 S2 S3 U1 V1 | CRITICAL:6 HIGH:23 MED:20 LOW:4 —:1 |
 | 3 | say what the formatting is | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 C13 C20 D6 F7 F13 F19 F22 L2 L3 O1 | HIGH:15 MED:4 LOW:1 |
 | 4 | a home for document furniture | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 | CRITICAL:1 HIGH:5 MED:9 LOW:1 |
 | 5 | one authority, one way out, more than one gear | A15 C5 C7 C26 D3 D5 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28 F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 | CRITICAL:1 HIGH:16 MED:23 LOW:5 |
@@ -2751,7 +2763,7 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 | 11 the delivered-document check | 2 | C1 C4 C6 C8 C13 C14 C18 C20 C22 J1 L1 |
 | 12 declare the language | 2 | S1 S2 S3 H1 H2 H4 C9 C2 E4 |
 | 13 declared modes | 5 | H3 L5 R1 — and the runtime problem |
-| 14 check scoping | 2 | G1 G2 G3 G4 G5 G6 G7 G8 G9 **G10** C7 C10 F5 F10 *(G10 added 2026-08-12: `quality_check`'s missing-space rule fires across a `w:tab` element, and branch 5's exit code turned that false positive into a blocked run. Same shape as G4 — an adjacency rule that cannot see what sits between the two runs.)* |
+| 14 check scoping | 2 | G1 G2 G3 G4 G5 G6 G7 G8 G9 **G10 G11 G12** C7 C10 F5 F10 *(G10 added 2026-08-12: `quality_check`'s missing-space rule fires across a `w:tab` element, and branch 5's exit code turned that false positive into a blocked run. Same shape as G4 — an adjacency rule that cannot see what sits between the two runs.)* *(**G11 and G12 added 2026-08-21.** G11 is `check_truncation`'s method B ignoring the `source_data` method A uses in the same function, found by the rule-5b probe's arm 3 and never added to this row. G12 is the residue branch 14's slice leaves behind, measured and deliberately unclassified.)* **THE `quality_check` SLICE IS BUILT, and it fixed FOUR rows this row does not own** — L1 (branch 11's), M1 (branch 8's), C9's input half (branch 12's) and F15 (branch 4's, reassigned to branch 14 by its own row on 2026-08-19). **That is the fourth sequencing fact executing, not a scope grab:** §2 owns the order and puts the slice immediately after branch 5, while this column owns row-level accountability. The two disagreed for four rows and the disagreement is recorded rather than resolved by editing one of them. **G9 is HALF closed** — the del/ins double-space scoping is fixed; the alpha-collision half is measured UNFIXABLE by scoping, because `en_segments` carry only `type` and `en` and the source text the rule would need is not in the file it reads. |
 | 15–17 formatting, parts 1–3 | 3 | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3 |
 | 18 layout: detect and disclose | 2, 5 | D1 D2 D3 D4 D5 |
 | 19 furniture and prohibition | 4 | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 |
@@ -2824,7 +2836,7 @@ call** rather than twice.
 | rank | option | why here |
 |---|---|---|
 | **1** | **Stop deleting what you do not recognise** (option 1) | Every argument points the same way and none points away. Four of the six worst content losses, closed outright rather than detected. One file. No data-format change. Provable by comparing bytes. Nothing depends on it. **The cheapest high-severity work in the project**, and the register's own headline is that this is a content-loss project |
-| **2** | **Check against the original** (option 2) | Highest total value — 53 findings, six of them worst-grade — and the only option that changes what we can find next time. Ranked second rather than first for one reason: it **detects** rather than repairs, and the deadlock finding means its discerning half cannot land before rank 3. Its instrument half (one failing input per check) belongs with the harness and should go first |
+| **2** | **Check against the original** (option 2) | Highest total value — 54 findings, six of them worst-grade — and the only option that changes what we can find next time. Ranked second rather than first for one reason: it **detects** rather than repairs, and the deadlock finding means its discerning half cannot land before rank 3. Its instrument half (one failing input per check) belongs with the harness and should go first |
 | **3** | **One authority, one way out, more than one gear** (option 5, cheap half first) | Promoted from A3's fifth place, on a fact A3 did not have: **it is a precondition for rank 2.** Eighteen findings have no compliant repair, so a discerning check without an escape hatch stops the pipeline permanently. It also contains the cheapest fix in the project and the only sanctioned speed lever. Do the scope rule and the exception channel **before** the checks get teeth |
 | **4** | **Take the tidy-up script's authority** (option 6) | The strongest single piece of evidence in the register, and — newly — **option 2's character-exact check cannot be built until this stage declares its changes.** The journal is small and should land early even if the shape decision takes longer |
 | **5** | **Say what the formatting is** (option 3) | The biggest quality gain on the page: 20 findings, 15 visible. Ranked fifth only because it is the most expensive and the riskiest, it needs rank 2 underneath it to be believed, and its own claim on the layout group is refuted. **This is the leap.** It is fifth in *order*, not in importance |
