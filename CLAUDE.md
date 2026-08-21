@@ -59,7 +59,7 @@ wrong conclusion.
 |---|---|---|---|
 | **`CLAUDE.md`** *(this)* | the charter | first, always | goals · order · status · rules · structure |
 | **`STEP-B-ANALYSIS.md`** | **the build plan.** What to build, in what order, and what counts as having built it | **before and during every build branch — it is the leading document for all of step 2** | §2 the order · §3 the brief per option · §4 the test method |
-| **`FINDINGS-REGISTER.md`** | the evidence base — **217 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
+| **`FINDINGS-REGISTER.md`** | the evidence base — **218 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
 | **`A3-STRUCTURAL-ANALYSIS.md`** | the evidence-led structural analysis | when a structural judgement comes up | the measurements: context, runtime, redundancy, divergence |
 | **`OPUS-5-MIGRATION.md`** | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
@@ -194,26 +194,21 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 
 **The evidence base as it now stands, and these are the numbers to quote:**
 
-> **`FINDINGS-REGISTER.md`: 217 rows — 15 clusters · 171 skill findings (159 clustered + 12 single-instance)
-> · 27 positives to preserve · 19 defects in our own measuring instruments (14 fixed, 5 open).** The largest
+> **`FINDINGS-REGISTER.md`: 218 rows — 15 clusters · 171 skill findings (159 clustered + 12 single-instance)
+> · 27 positives to preserve · 20 defects in our own measuring instruments (16 fixed, 4 open).** The largest
 > cluster is the instruction contradictions, at **39**. Validator **PASS, 0 failures, 0 warnings**.
 >
-> **The instrument count moved from 11 to 16 on 2026-08-11, and the five new rows are a different
-> population from the first eleven.** I-1 to I-11 are defects in the **A1 harness and review tooling** —
-> instruments outside the repository that were used to *produce* the evidence, and **four of them are still
-> open** and will corrupt Step C if they still are when it runs. **I-12 onward are defects in the
-> repository's own committed checks** — the ones that now guard the build. **The skill-finding counts are
+> **The instrument rows are two populations and the distinction is what makes the "open" count
+> readable.** I-1 to I-11 are defects in the **A1 harness and review tooling** — instruments outside the
+> repository that were used to *produce* the evidence. **I-12 onward are defects in the repository's own
+> committed checks and fixtures** — the ones that now guard the build. **The skill-finding counts are
 > untouched by any of them**, because none is a defect in the skill.
 >
-> **THE FIFTH OPEN ONE IS I-17 AND IT IS NOT A STEP C RISK — read the two populations before quoting
-> "five open".** *(Added 2026-08-21 on branch 14.)* The four that threaten Step C are still exactly
-> **I-7, I-8, I-9, I-10**, all in the A1 harness. **I-17 is in our own fixture set**: one of the eleven
-> synthetic documents cannot be opened by any renderer, because it carries auxiliary parts with no
-> relationship part pointing at them. It cost nothing here — the byte comparison covers that fixture
-> exactly — but **branch 18's test IS a render**, so it has to be repaired before that branch, and it
-> means no render-based test can currently reach the comment and footnote anchors that fixture exists
-> to carry. It is left open deliberately: fixing a fixture is harness work, and several arms of the
-> negative-input suite read that file.
+> **AND THE FOUR THAT ARE OPEN ARE NOW EXACTLY THE FOUR THAT THREATEN STEP C: I-7, I-8, I-9, I-10, all
+> in the A1 harness.** *(True again as of 2026-08-21; it was briefly five.)* Everything in the second
+> population is closed. **So "four open" and "four Step C risks" are the same set, and a session can quote
+> either without qualifying it** — which was not true between 2026-08-11 and 2026-08-21 and cost a
+> paragraph of explanation each time.
 
 ### 2.4 What was produced, and which documents matter from here
 
@@ -624,14 +619,18 @@ zero; it cannot prove the command was a good one, and it says so in its own outp
 > trees that had been fixed once and returned through the next caller.** None was found by reading. Every one
 > was found by running something.
 
-**Three failure shapes to expect, because each has now happened more than once.** *(1)* **A check that passes
+**Four failure shapes to expect, because each has now happened more than once.** *(1)* **A check that passes
 for the wrong reason** — eleven logged instances, several inside this project's own verification scripts.
 Never a two-word needle; ask the same question a second way; and **when a figure agrees with the one you
 expected, that is the moment to re-derive it, not to relax.** *(2)* **A fix scoped to one caller of a shared
-hazard** — the bytecode leak was fixed in the test runner and came back through the audit tool. Ask what else
-does the same thing. *(3)* **An instrument reporting on an empty set** — `PASS: all 0 paragraphs` is not a
-pass. **Assert the READ COUNT as well as the result;** a control that opened no files must say VOID, never
-CLEAN.
+hazard** — the bytecode leak was fixed in the test runner, came back through the audit tool, came back again
+through the cycle gate, and came back a **fourth** time through the tests added alongside the fix for the
+third. Ask what else does the same thing, and note that **three of four callers patched reads exactly like
+four of four until somebody greps.** *(3)* **An instrument reporting on an empty set** — `PASS: all 0
+paragraphs` is not a pass. **Assert the READ COUNT as well as the result;** a control that opened no files
+must say VOID, never CLEAN. *(4)* **AN EXIT CODE OF 0 THAT IS NOT EVIDENCE THE WORK WAS DONE** — six
+instances in one session, 2026-08-21, each dressed differently. See §5.16, which exists because this one
+cost more time than the other three together.
 
 **Two disciplines bind every option, and they are not in tension with taking a leap:** every change points
 at a **specific observed failure or grade**, never at theory; and **the anti-drift safeguards are not on the
@@ -1257,6 +1256,47 @@ skill (the review feeds the analysis, not a patch).
 - New scratch scripts go in **`temp/`**.
 - **Verify** that the solution fully addresses the request before marking anything done.
 
+### 5.16 "IT EXITED 0" IS NOT "IT DID THE WORK" — and this section is here because §7 gets replaced
+
+**Six instances in one session, 2026-08-21, every one of them a green number reporting on something other
+than the thing being checked.** §5.1's *run, do not read* rule assumes the run tells you the truth. These are
+the ways it does not.
+
+| what was read | what it was actually reporting |
+|---|---|
+| `printf "… rc=%s" "$(basename $t)" "$?"` | **`basename`'s** exit code. A command substitution runs before `$?` is expanded, so this is always 0. Twelve test files were reported green while two were exiting 1 |
+| `cmd \| tail -4; echo "rc=$?"` | **`tail`'s** exit code, never `cmd`'s |
+| a long runner returning 0 | a process that **stopped part-way**. Four reproductions. Proved only because a sentinel FILE it should have written was absent |
+| a monitor reporting "failed, exit 1" | **`grep`** finding nothing, on a sweep that was entirely green |
+| a before/after suite reporting green | the fix **compared with itself**, because "before" was pinned to a branch name that had since moved. Worst on a byte comparison, where a file against itself is trivially identical and the vacuous case looks exactly like the passing case |
+| `make_fixtures` returning 0 | a build **killed part-way** that had already deleted 8 of 11 fixtures |
+
+**So, five rules, each bought with real time:**
+
+1. **CAPTURE `rc=$?` ON ITS OWN LINE, IMMEDIATELY.** Never inside a `printf`, never after a pipe, never
+   alongside a command substitution. Better still, orchestrate from Python and read `subprocess.returncode`,
+   which cannot be detached from the process that produced it.
+2. **A LONG RUNNER MUST WRITE A COMPLETION SENTINEL — a FILE, not a line.** stdout can be truncated by
+   whatever is capturing it; a file written by the script itself cannot. Without one, *"did it finish?"* and
+   *"was its output captured?"* are indistinguishable, and both look like success.
+3. **ASSERT THE ARTEFACT, NOT THE EXIT CODE.** Count the files that exist, hash the bytes, read the verdict
+   line. `make_fixtures` now counts its own output against the declared set and returns non-zero if they
+   disagree, which is the shape to copy.
+4. **PIN A BEFORE/AFTER BASELINE TO A COMMIT, NEVER TO A BRANCH NAME**, and make the suite exit **VOID** when
+   the baseline turns out byte-identical to the working tree. A branch name stops meaning *before* the moment
+   the branch merges, and a fallback chain that lands on the fixed code manufactures a tautology.
+5. **RUN THIS PROJECT'S SUITES AS TOP-LEVEL COMMANDS, NOT FROM A PARENT RUNNER.** Two measured reasons.
+   `tests/make_fixtures.py` run as a captured child was measured to **kill its parent**, which is how a
+   fixture set came to be half-deleted. And the suites **share `tests/fixtures/` and rewrite it**, so anything
+   run alongside a sweep invalidates it and is invalidated by it — a foreground suite caught a fixture
+   mid-write and died with `BadZipFile`, which reads exactly like a corrupt document rather than a race.
+
+> **AND THE REASON THIS IS IN §5 RATHER THAN IN THE HANDOFF.** All of it was first written into §7, whose own
+> rule is *replace this section every session, do not append*. Lessons filed there are deleted by the next
+> session by design. **A durable rule belongs in §5 by subject; §7 carries only what the next session must
+> not re-derive about the CURRENT state.** That distinction is §5.14's rule, and putting the lessons in the
+> wrong place first is a small worked example of why it exists.
+
 ---
 
 ## 6. File, folder & repo structure
@@ -1502,211 +1542,124 @@ the pull request; do not call it complete.
 
 **RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
 Re-reading has never found one.
-### HANDOFF — 2026-08-21. BRANCH 14's `quality_check` SLICE IS BUILT AND NOT MERGED.
+### HANDOFF — 2026-08-21. BRANCH 14's `quality_check` SLICE IS MERGED. I-17 IS CLOSED.
 
-**PR #25 was merged first** — it repaired two numbered lists a blind `str.replace` had
-damaged, and every numbered list in this file is now sequential. **Then branch 14's slice
-was built: EIGHT false-positive fixes, each with a test proving it still catches its true
-positive.** That discipline is the branch, and it is why the branch is mostly tests.
+**Six pull requests landed: #25 · #26 · #27 · #28 · #29, plus this one.** `main` carries
+branch 14's slice, three repairs to the instruments that verified it, and the fixture fix
+that branch 18 was waiting on. **Step 2 has now delivered branches 3, 4, 5 and 14's slice.**
 
-| | |
-|---|---|
-| **branch** | `feature/check-scoping-quality-check`, from `main` @ `2178cce` |
-| **what it fixes** | L1 · G11 · G10 · M1 · C9 · F15 — plus **G5 and G9**, added on Wouter's decision |
-| **the measured effect** | the recorded corpus goes **44 findings → 16**, and **D07 becomes clean** — blocked deliverables 4 of 13 → **3 of 13** |
-| **NEXT** | **Wouter's review and approval. Nothing technical remains.** |
+### WHAT IS ON main, AND THE FIGURES NOT TO RE-DERIVE
 
-### WHAT MOVED, MEASURED — the numbers not to re-derive
+**Eight false-positive fixes**, each with a test proving it still catches its true positive:
+L1 · G11 · G10 · M1 · C9 · F15 · G5 · G9's second half. `tools/qc_census.py` reports both
+sides, so the pre-branch figures stay reproducible from the recorded evidence.
 
-`tools/qc_census.py` is the instrument and it now reports BOTH sides, so the pre-branch
-figures stay reproducible from the recorded evidence rather than from a memory of them.
+| rule class | before | after | with `--original` |
+|---|---|---|---|
+| truncation | 17 | **0** | 0 |
+| numbering | 11 | 11 | **0** |
+| internal_article_refs | 15 | 15 | 15 |
+| formatting | 1 | 1 | 1 |
+| **TOTAL** | **44** | **27** | **16** |
 
-| rule class | before | after | after, with `--original` | what closed it |
-|---|---|---|---|---|
-| truncation | 17 | **0** | 0 | L1 (9, method A) · G11 (5) · G5 (3) |
-| numbering | 11 | 11 | **0** | M1 — needs the new `--original` flag |
-| internal_article_refs | 15 | 15 | 15 | **nothing — this is the residue, now register G12** |
-| formatting | 1 | 1 | 1 | **nothing — residue, G12** |
-| **TOTAL** | **44** | **27** | **16** | |
+Per document with `--original`: **D03 1 · D05 2 · D06 13 · D07 0.** Blocked deliverables
+**4 of 13 → 3 of 13, and D07 is clean.** Every figure re-measured after every repair and
+unchanged throughout: the defects were in the measuring, never in the result.
 
-Per document, with `--original`: **D03 1 · D05 2 · D06 13 · D07 0**. Proved end to end by
-`temp/b14_m1_endtoend.py`, which runs the shipped command line rather than calling the
-function: D05 5→2, D06 21→13, all eleven numbering findings gone, and the notice that says
-the comparison did not happen goes from printed to silent.
+### WHAT THE NEXT SESSION MUST NOT RE-DERIVE
 
-### THE FOUR THINGS THAT WOULD OTHERWISE BE RE-DERIVED
-
-1. **L1's fix had four hidden decisions and one of them is a negative result.** Pairing on
-   the declared English leaves **46 of 1,158 eligible entries unpairable**, and **neither
-   the accept-all nor the reject-all reading recovers a single one** — so the tracked-change
-   explanation is refuted. A four-key ladder (exact · containment · prefix · tail) was built
-   and measured to add **nothing**, so it was dropped. The shipped rule pairs on the declared
-   English and falls back to the entry's own `en`, which judges **every** entry and adds no
-   finding the paired route would not have produced.
+1. **L1's fix had four hidden decisions and two are negative results.** Pairing on the
+   declared English leaves **46 of 1,158 eligible entries** unpairable, and **neither the
+   accept-all nor the reject-all reading recovers one** — the tracked-change explanation is
+   refuted. A four-key ladder was built and measured to add **nothing**, so it was dropped.
+   And the fix must consult **no** positional information: keeping the `idx` shortcut made
+   the verdict position-dependent again wherever two paragraphs share their English.
 2. **G9 IS HALF-CLOSED AND THE OTHER HALF CANNOT BE CLOSED BY SCOPING.** `en_segments` carry
-   exactly two keys — `type` and `en`, on 412 of 412 segments across all 13 workdirs. The
-   source text the alpha-collision rule would need **is not in the file the check reads**, and
-   putting it there is a notes-SCHEMA change, which is branch 15's and invalidates the frozen
-   intermediates. **The operator had no third option because the CHECK has none.**
+   exactly two keys — `type` and `en`, on 412 of 412 segments. The source text the
+   alpha-collision rule needs **is not in the file the check reads**, and putting it there is
+   a notes-SCHEMA change: **branch 15's**, and it invalidates the frozen intermediates.
 3. **`validate_segment_shapes` finds NOTHING on the whole recorded corpus** — 0 findings over
    81 tracked-change paragraphs — because the recorded `paragraphs.json` is the
-   **post-compliance** artefact: the operator satisfied the gate during the run, so the file
-   records the outcome and not the collision. **A frozen intermediate cannot reproduce a gate
-   that was satisfied while the run was happening.** Know that before branch 11 leans on the
-   method.
-4. **C9's stated fix is not sufficient on its own.** Reading the translated body gets the
-   source language right **2 times in 13**; reading the original gets it right **9 in 13** —
-   so the detector was never the defect, its input was. But a wrong SPECIFIC language
-   silently SKIPS the correct language's rules while `*` runs them all, so the naive fix
-   trades noise for silence. The shipped version passes the language **only where two
-   independently-written detectors agree**: 9 agreements (8 correct) and 4 honest
-   disagreements. **Norwegian is in neither detector's vocabulary**, so a D03-class document
-   correctly reaches the disagreement branch. Making it SAY so is branch 12's.
+   **post-compliance** artefact. **A frozen intermediate cannot reproduce a gate that was
+   satisfied while the run was happening.** Know this before branch 11 leans on the method.
+4. **C9's stated fix is not sufficient alone.** The translated body gets the source language
+   right **2 times in 13**; the original gets it right **9 in 13** — so the detector was never
+   the defect, its input was. But a wrong SPECIFIC language silently SKIPS the correct
+   language's rules while `*` runs them all, so the naive fix trades noise for silence. The
+   shipped version passes the language **only where two independent detectors agree**.
+   **Norwegian is in neither vocabulary**, so a D03-class document correctly reaches the
+   disagreement branch; making it SAY so is branch 12's.
+5. **The residue is register G12 and a script cannot classify it.** 16 findings — 15
+   `internal_article_refs`, 1 `formatting` — each embedding 60–70 characters of a real
+   instrument. Deciding whether `Article N` is a terminology defect or a civil-law citation
+   needs **Wouter, or a sanitised route reporting the citation shape without its text.**
+   Three of the four blocked deliverables are still blocked and this is the whole reason.
 
-### WHAT THIS BRANCH FOUND THAT IT WAS NOT LOOKING FOR
+### THE INSTRUMENTS CHANGED MORE THAN THE SKILL DID — read §5.16 before trusting a sweep
 
-- **`STEP-B-ANALYSIS.md` §9.1's arithmetic line was stale by two, and had been.** It read `27 + 27 + 41 + 30 + 43
-  = 168` above a generated table already holding 43 in group 3 and 170 in total — and its own
-  severity column disagreed with it as well. The tables are generated; that line was typed.
-  **`tools/stepb_verify.py` now asserts the line against the tables**, and the assertion was
-  proved able to fail before being trusted.
-- **I-17, a new OPEN instrument defect: one of the eleven fixtures cannot be rendered at
-  all.** LibreOffice refuses `anchors-and-tabs.docx` — and refuses the *original* fixture, so
-  the cause is not this branch: it carries `comments.xml` and `footnotes.xml` with no
-  relationship part pointing at them. 8 of the 9 valid fixtures render. **Branch 18's test IS
-  a render**, so this has to be repaired before it. Left open deliberately — fixing a fixture
-  is harness work and several negative-input arms read that file. **The irony is the point:
-  the fixture is unreadable for cluster A's own reason — the content is there and the pointer
-  is not.**
-- **The harness had the very blindness the branch was fixing.** The byte-identity test's
-  first notes-builder concatenated `w:t` only, so it declared `Party AParty B` where
-  `validate_apply`'s own joiner reads `Party A Party B` — and the gate correctly refused it.
-  §5.1's second failure shape, in our own test: ask what else does the same thing.
-- **ADDING A REGISTER ROW MOVES COUNTS IN FOUR PLACES AND AN ANCHOR IN A FIFTH — and no two
-  instruments agreed on how many.** G12 and I-17 between them moved the register's own
-  header, `CLAUDE.md` §1.3 and §2.3, and the build plan's two generated appendix tables. With all
-  of those green, **`tools/stepb_audit.py` then found three more** — §5.3's heading, option
-  2's pros cell and its ranking row, each still saying 43 or 53. And with THOSE green,
-  **`tools/stepb_metacheck.py` reported one of its own eleven mutations INERT**, because its
-  anchor carries the group-3 count and that count had moved; re-anchored, 11 of 11 again.
-  **So: run the register validator, the claims check, `stepb_audit` AND `stepb_metacheck`
-  after any register edit** — each of the last three found what the ones before it had
-  passed. A probe whose mutation silently stops applying is a test that has become a
-  decoration, and only the metacheck can see that.
-- **`validate_apply` already had G10's answer.** It treats `w:tab` **and `w:br`** as
-  separators and its docstring documents this exact false positive. So the fix is a
-  convergence, not a widening — and that is why it covers manual line breaks too.
+**Five repairs to our own measuring tools, four of them found only by re-verifying.** The
+durable rules are now in **§5.16** rather than here, because this section gets replaced.
+
+- **I-18** the bytecode leak, third and fourth recurrence. The repair is not a patched
+  caller: `precommit_gate` now fails when anything development-only sits inside `uk/` or
+  `us/`, with two negative tests. **7 of 7 gate controls demonstrated able to fail, up from 5.**
+- **I-19** before/after suites that pinned "before" to `origin/main` and so **compared the fix
+  with itself** once merged. All three now pin a commit and exit **VOID** if the baseline is
+  byte-identical to the working tree. Proved by surviving their own merge.
+- **I-20** `make_fixtures.py` was destroy-then-rebuild, so an interrupted run left **3 of 11**
+  fixtures on disk and the next suite died with `BadZipFile`. Now overwrites in place, prunes
+  afterwards, and **asserts the artefact count** rather than trusting its own exit.
+- **I-17 CLOSED** — the fixture no renderer would open. Two causes: auxiliary parts with no
+  relationship part, and a `w:hyperlink` referencing a relationship that did not exist.
+  **9 of 9 valid fixtures now render**, and that fixture is back INSIDE the rendered
+  comparison rather than declared N/A beside it.
+
+**And the finding that cost the most time, stated as a rule in §5.16: an exit code of 0 is
+not evidence the work was done.** Six instances in one session. Two measured facts a next
+session should simply inherit: `tests/make_fixtures.py` run as a captured child **kills its
+parent**, and the suites **share `tests/fixtures/` and rewrite it** — so run them as
+top-level commands, one at a time, never from a parent runner and never concurrently.
 
 ### WHAT IS OPEN
 
-1. **The 16 residual findings, now register G12, are UNCLASSIFIED and a script cannot
-   classify them.** Each finding embeds 60–70 characters of a real instrument, so deciding
-   whether `Article N` is a terminology defect or a civil-law citation needs **Wouter, or a
-   sanitised route that reports the citation shape without its text.** Three of the four
-   blocked deliverables are still blocked and this is the whole reason.
-2. **G9's first half** — needs branch 15's schema change; see point 2 above.
-3. **`--original` must be added to Step 9's step document**, or the numbering comparison is
-   a flag nobody passes. **NOT done in this branch** — it is a doc change and §4 tests those
-   differently. The check announces its own absence in the meantime, which is the mitigation,
-   not the fix.
+1. **G12's 16 findings** — unclassified, and only Wouter or a sanitised route can classify
+   them. This is what keeps D03, D05 and D06 blocked.
+2. **G9's first half** — needs branch 15's schema change.
+3. **`--original` is not in Step 9's step document**, so M1's fix is a flag nobody passes.
+   The check announces its own absence meanwhile, which is the mitigation, not the fix.
+   **A doc change, and §4 tests those differently.**
 4. **A `probe` origin class for the register** — still unbuilt, still needed.
-5. **I-7, I-8, I-9, I-10** — the four open A1 harness defects, unchanged, and still the ones
-   that will corrupt Step C. **I-17 is a fifth open instrument defect but is NOT a Step C
-   risk** — read §2.3 before quoting "five open".
-6. **The six untracked house scripts in `tools/`.** Still untracked, deliberately: they were
-   staged by a `git add -A` and **unstaged again**, because whether they belong in this
-   repository is Wouter's open question and `tools/run_tests.py` still collides by name with
-   `tests/run_tests.py`.
+5. **I-7, I-8, I-9, I-10** — the four open A1 harness defects, and now the ONLY open ones,
+   so "four open" and "four Step C risks" are finally the same set.
+6. **The six untracked house scripts in `tools/`** — still untracked, still Wouter's open
+   question, and `tools/run_tests.py` still collides by name with `tests/run_tests.py`.
 
-### THE RE-VERIFICATION FOUND TWO REAL DEFECTS THAT 51 CASE ASSERTIONS HAD PASSED
+### THE NEXT BRANCH
 
-**Wouter asked whether it had been tested heavily. It had not been, and re-running proved
-it.** Both findings are recorded because the shape of the mistake is worth more than either
-repair.
+**§2's sequencing facts govern, and the fourth is now discharged** — branch 14's slice sat
+immediately after branch 5 and has landed. **The next piece of work is branch 6, "stop
+deleting"** (option 1, register A1 A2 A3 A6 A8 A9 C16 C17 F16 F27): the writing-back step
+stops deleting what it does not recognise. It is **the first fix branch that changes a
+delivered document**, so §4's byte comparison on the frozen intermediates is the instrument
+and it will move — which is the point, and is why the acceptance condition is that the
+movement is explained finding by finding.
 
-**1. THE FIX ITSELF WAS STILL POSITION-DEPENDENT.** L1's first version kept the positional
-candidate whenever `all_p[idx]` happened to hold the right English — sound reasoning, wrong
-consequence: **where the same English appears in two paragraphs, whether that shortcut hits
-decides whether the entry pairs at all**, so the verdict depended on position again in
-exactly the case the pairing exists for. **Cases cannot find this; a property can.**
-`tests/test_check_scoping_properties.py` states the repair as what it actually claims — *the
-truncation verdict does not depend on where a paragraph sits* — and measured **287 of 320**
-random permutations invariant. Dropping the shortcut costs nothing and gives **320 of 320**,
-against **34 of 320** for the pre-branch code, so the property is not vacuous. The same
-suite found **two crashes this branch had introduced** (a non-string `en`) and **four that
-predate it** (a null `text`, a non-integer `idx`); all six fixed, the split measured.
+**Read before starting it, all in `STEP-B-ANALYSIS.md`:** its §2 for the order, its
+option-1 build brief under §3, its §4 for the method, and **its §6 Option 1 IN FULL** —
+four sessions have now planned from that document's §3 alone and got scope wrong.
 
-**2. A `.pyc` WAS SITTING IN `uk/scripts/` AFTER THE COMMIT, AND THE GATE HAD REPORTED
-CLEAR.** Register **I-18**. Reproduced, not reasoned: the same test leaves 0 `.pyc` run
-directly and 1 run through `tools/cycle_evidence.py`, which spawns the runner and so passes
-its own environment rather than the runner's. **This is the third recurrence** — fixed in
-`tests/run_tests.py`, again in `tools/audit_branches.py`, and back through a third caller.
-It keeps returning because **`__pycache__` is gitignored, so it is invisible to a diff, to
-`git status`, and until now to every control.** The caller is patched, but the repair is a
-new pre-commit assertion that fails when anything development-only sits inside `uk/` or
-`us/`, with two negative tests planting a `.pyc` and an editor backup. **A gitignored
-artefact can only be caught by a check that looks at the directory rather than at the diff.**
+### WHAT WAS RUN TO CLOSE THIS SESSION
 
-**The corpus numbers did not move**: D03 1 · D05 5 · D06 21 · D07 0 before `--original`, and
-16 in total after it, exactly as measured the first time. **The defects were in the pathology
-and the plumbing, not in the result** — which is the one thing that makes them easy to ship.
+**All exit codes captured immediately, per §5.16.** 12 of 12 test files · smoke PASS on both
+variants · parity 0 NEW · `test_baseline_unmodified` 368 of 396 with 28 DECLARED · register
+PASS 0/0 · claims 0/0 · tables CLEAN · branch audit and xref 0 · five STEP-B suites 0
+including metacheck 11 of 11 · `precommit_gate` CLEAR on all eight controls · publication
+check, script committability and changelog check 0. `stepb_audit`'s sole failure remains
+check 10's **declared** `LEGAL_TRANSLATION_A4` VOID, which is not a pass.
 
-### AND THE MERGE ITSELF EXPOSED A THIRD — READ THIS BEFORE TRUSTING ANY SWEEP IN THIS FILE
-
-**Register I-19, two defects found together minutes after the merge, and both are in the
-MEASURING rather than in the fixes.**
-
-**The before-and-after suites destroyed themselves on merge.** They loaded the pre-branch
-code with `git show origin/main:…` — correct while the branch was in flight, false the
-instant it merged, because `origin/main` then resolved to the FIXED code and every *"proved
-it fired before"* assertion compared the fix with itself. Nine went red at once, **which is
-the good outcome**: the same suite going green would have been the twelfth logged case of a
-check passing for the wrong reason, in the very file written to argue against that. The
-resolver also had a fallback chain — `origin/main`, then `main`, then `HEAD~1` — which reads
-as defensive and is the opposite. **Fixed:** pinned to the commit before the branch, fallback
-chain deleted, and both suites now exit **VOID** if the baseline file is byte-identical to
-the working tree, so a rebase cannot make them vacuous in silence. Proved both ways.
-
-**AND MY OWN SWEEPS COULD NOT SEE A FAILING TEST.** They used
-`printf "… rc=%s\n" "$(basename $t)" "$?"`, and the command substitution runs before `$?` is
-expanded — so **every line reported `basename`'s exit code, which is always 0.** Twelve test
-files were reported green while two were exiting 1. Piping into `tail` and then echoing `$?`
-has the same defect. **The session prompt warned about exactly this and it was done anyway**,
-which is the useful half: a written warning is not a control. **Use `temp/b14_runall.py`** —
-it runs each command through `subprocess.run` and reports `returncode`, which cannot be
-detached from the process that produced it.
-
-**What this did NOT change: the fixes.** Re-run against the true pre-branch commit, all 51
-case assertions and all 11 properties pass, and every corpus figure above is unchanged.
-
-### WHAT WAS RUN
-
-**Verify.** `tests/test_check_scoping.py` — **51 assertions**, and every false-positive
-control is proved to have fired against the pre-branch script loaded out of git, so a control
-that tests nothing shows up as a failure. It caught one: a G9 control that reversed the
-segment types without moving the spaces, which could not have fired. `tests/
-test_no_delivered_byte_moves.py` — **12 assertions**: the two reporters leave a workdir
-byte-identical, and the two scripts that write produce byte-identical output, including every
-member of the delivered `.docx` on two fixtures.
-
-**Property.** `tests/test_check_scoping_properties.py` — **11 properties** over generated
-inputs at a fixed seed: permutation invariance (320 of 320, against the old code's 34),
-determinism, **56 hostile document/notes combinations without an exception**, a rendered
-break suppressing G10's finding in all 12 placements while a declared tab STOP never does,
-M1's multiset arithmetic exact on 60 random sequences, and C9's detector never raising on
-any of 7 hostile containers.
-
-**Test.** 12 of 12 test files · smoke suite PASS on **both** variants · parity check PASS,
-0 NEW divergences · `test_baseline_unmodified` 368 of 396 byte-identical with **28 declared**
-· register PASS 0/0 · claims 0/0 · tables CLEAN · branch audit and xref 0 · five STEP-B suites
-0 · `precommit_gate` **CLEAR on all seven controls**.
-
-**The rendered comparison, which Wouter asked for beside the byte proof.** Five fixtures
-repacked with the baseline scripts and with this branch's, converted by LibreOffice and
-rasterised at 150 dpi: **every page pixel-identical**. A second instrument agreeing with the
-byte comparison rather than repeating it. `anchors-and-tabs.docx` is **declared N/A with its
-reason** — I-17, it cannot be rendered at all — and its coverage is the byte comparison,
-which does include it.
+**Rendered comparison: SIX fixtures, every page pixel-identical**, now including the repaired
+one — no declared N/A left. **Fixtures byte-reproducible**, 11 of 11 present, and the four
+shapes `anchors-and-tabs.docx` exists to carry asserted still present.
 
 **No graded run.** Declared N/A: §4 puts script branches on byte comparison, the grader is
 frozen at v3 until Step C, and a graded run measures the wrong variable for a change that
