@@ -41,7 +41,15 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parent.parent
-REF = os.environ.get("LT_BASELINE_REF", "origin/main")
+# PINNED TO A COMMIT, NOT A BRANCH NAME — and this file is the reason to state the rule as
+# "ask what else does the same thing" rather than as three separate fixes. The pin was
+# corrected in test_check_scoping.py and test_check_scoping_properties.py and MISSED HERE,
+# so once branch 14 merged this suite compared the current code against ITSELF and reported
+# twelve green assertions for a comparison it was no longer making. Byte-identity is the
+# worst place for that to happen: comparing a thing with itself is trivially identical, so
+# the vacuous case looks exactly like the passing case. §5.1's second failure shape, in the
+# same session that recorded it twice.
+REF = os.environ.get("LT_BASELINE_REF", "2178cce")
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 FIX = ROOT / "tests" / "fixtures"
 FAIL, CHECKED = [], 0
@@ -70,6 +78,7 @@ OLD = TMP / "old_scripts"
 OLD.mkdir(parents=True)
 for f in sorted((ROOT / "uk" / "scripts").glob("*.py")):
     shutil.copyfile(f, OLD / f.name)
+_identical = []
 for name in ("quality_check.py", "validate_segment_shapes.py",
              "translate_headers_footers.py", "repack_docx.py"):
     blob = subprocess.run(["git", "show", f"{REF}:uk/scripts/{name}"],
@@ -77,7 +86,22 @@ for name in ("quality_check.py", "validate_segment_shapes.py",
     if blob.returncode != 0:
         print(f"VOID — cannot read {name} at {REF}")
         sys.exit(1)
+    if blob.stdout == (ROOT / "uk" / "scripts" / name).read_bytes():
+        _identical.append(name)
     (OLD / name).write_bytes(blob.stdout)
+
+# A comparison that established nothing has not passed — and here the vacuous case is
+# INVISIBLE without this guard, because comparing a file with itself produces identical
+# bytes, which is exactly the result the suite is looking for.
+if len(_identical) == 4:
+    print(f"VOID — all four scripts at {REF} are BYTE-IDENTICAL to the working tree, so")
+    print("every comparison below would be a file against itself and would pass for that")
+    print("reason alone. Point LT_BASELINE_REF at a commit that predates the change.")
+    sys.exit(1)
+if _identical:
+    print(f"  NOTE: {len(_identical)} of 4 scripts are unchanged since {REF} "
+          f"({', '.join(_identical)}) —\n  their comparisons below are trivially "
+          "identical and prove nothing about those files.")
 
 
 def load(path, modname):
