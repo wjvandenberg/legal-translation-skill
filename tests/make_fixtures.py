@@ -163,7 +163,42 @@ def _anchors(path):
     )
     ct = ('<Override PartName="/word/footnotes.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml"/>\n'
           '<Override PartName="/word/comments.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml"/>\n')
-    docx(path, body, {"word/footnotes.xml": footnotes, "word/comments.xml": comments}, ct)
+    # A RELATIONSHIP PART, WITHOUT WHICH NO RENDERER WILL OPEN THIS FILE AT ALL. Register
+    # I-17, found 2026-08-21 while running branch 14's rendered comparison: LibreOffice
+    # refused this fixture outright -- "source file could not be loaded" -- and refused the
+    # ORIGINAL, so the cause was the fixture and not the branch. 8 of the 9 valid fixtures
+    # rendered; this one did not.
+    #
+    # TWO CAUSES, AND BOTH HAD TO GO. The container held word/footnotes.xml and
+    # word/comments.xml with nothing pointing at them, and the body already carried
+    # `<w:hyperlink r:id="rId9">` referring to a relationship that did not exist. Either is
+    # enough for a consumer to reject the package.
+    #
+    # WHY IT MATTERED ENOUGH TO FIX RATHER THAN NOTE. §4 puts BRANCH 18 on a rendered
+    # comparison and says in terms that it cannot be byte-compared, so a fixture the renderer
+    # will not open is a fixture branch 18 cannot use -- and this is the only fixture carrying
+    # a footnote anchor and a comment anchor, which is precisely what a layout check needs to
+    # see. Leaving it unrenderable meant no render-based test could ever reach the shapes this
+    # fixture exists to carry.
+    #
+    # AND THE IRONY IS THE LESSON, KEPT RATHER THAN SMOOTHED AWAY: the fixture was unreadable
+    # for exactly cluster A's reason. The content was in the container and the POINTER was not.
+    rels = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/styles" Target="styles.xml"/>'
+            '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/footnotes" Target="footnotes.xml"/>'
+            '<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/comments" Target="comments.xml"/>'
+            # The hyperlink the body already referenced. External, TargetMode="External", and
+            # deliberately example.invalid: RFC 2606 reserves it, so nothing here can resolve
+            # to a real host if a renderer ever tries.
+            '<Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/hyperlink" Target="https://example.invalid/schedule-1" '
+            'TargetMode="External"/></Relationships>')
+    docx(path, body, {"word/footnotes.xml": footnotes, "word/comments.xml": comments,
+                      "word/_rels/document.xml.rels": rels}, ct)
 
 
 # ---------------------------------------------------------------------------
@@ -339,9 +374,26 @@ def main():
             print(f"  {name:<26} {why}")
         return 0
 
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    OUT.mkdir(parents=True)
+    # OVERWRITE IN PLACE, THEN PRUNE — never rmtree first. This used to be
+    #
+    #     if OUT.exists(): shutil.rmtree(OUT)
+    #     OUT.mkdir(parents=True)
+    #
+    # which opens a window in which the fixture set does not exist, and EVERY suite in this
+    # project needs it. An interrupted build therefore does not merely fail: it leaves the
+    # harness unable to run at all, and the failure that follows looks like a corrupt fixture
+    # rather than a missing one.
+    #
+    # THAT IS NOT HYPOTHETICAL. On 2026-08-21 a build was killed partway and left 3 of 11
+    # fixtures on disk; the next suite to run died with BadZipFile, which reads exactly like a
+    # damaged document. Recovery was only possible because the fixtures are committed. The
+    # killed build reported exit 0, so nothing announced it.
+    #
+    # Overwriting is safe precisely BECAUSE a build is byte-reproducible (see FIXED_TIME):
+    # rewriting a fixture with identical bytes is a no-op, so there is no reason to clear the
+    # directory first. Anything stale is removed afterwards, once the replacements exist.
+    OUT.mkdir(parents=True, exist_ok=True)
+    _expected = set(FIXTURES)
 
     print("=" * 96)
     print("SYNTHETIC FIXTURES — every one invented; none derived from a real document")
@@ -362,8 +414,25 @@ def main():
             ok = "deliberately invalid"
         print(f"  {name:<26} {size:>7,} B  {ok}")
         print(f"  {'':<26} {why}")
+    # PRUNE ONLY NOW, once every replacement is on disk. A fixture that is no longer declared
+    # is removed; nothing is removed before its successor exists.
+    stale = sorted(p for p in OUT.glob("*.docx") if p.name not in _expected)
+    for p in stale:
+        p.unlink()
+        print(f"  removed stale fixture: {p.name}")
+
     print("=" * 96)
-    print(f"  {len(FIXTURES)} fixtures in {OUT.relative_to(ROOT)}")
+    # ASSERT THE ARTEFACT, NOT THE EXIT CODE. A killed build reports 0, so the count of files
+    # actually on disk is the only trustworthy statement that this finished — and it is
+    # returned as a non-zero exit if it disagrees, so a caller reading only the code still
+    # learns something true.
+    on_disk = sorted(p.name for p in OUT.glob("*.docx"))
+    if set(on_disk) != _expected:
+        print(f"  INCOMPLETE — {len(on_disk)} of {len(FIXTURES)} fixtures on disk")
+        for miss in sorted(_expected - set(on_disk)):
+            print(f"    MISSING {miss}")
+        return 1
+    print(f"  {len(FIXTURES)} fixtures in {OUT.relative_to(ROOT)}, all present on disk")
     return 0
 
 
