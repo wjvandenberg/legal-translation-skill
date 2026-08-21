@@ -137,9 +137,9 @@ MUTATIONS = [
  # parts was wrong. Found 2026-08-18 by running stepb_audit rather than by reading -- and found
  # late, because it sat behind check 10's expected LEGAL_TRANSLATION_A4 red. A check that is
  # already failing for a declared reason hides every new failure behind it.
- ("state a group heading count the map contradicts (group 3: 42 -> 41)",
-  lambda t: t.replace("### 5.3 Things that say it worked when it did not — 42 findings",
-                      "### 5.3 Things that say it worked when it did not — 41 findings", 1),
+ ("state a group heading count the map contradicts (group 3: 43 -> 42)",
+  lambda t: t.replace("### 5.3 Things that say it worked when it did not — 43 findings",
+                      "### 5.3 Things that say it worked when it did not — 42 findings", 1),
   "stepb_audit.py",
   "NEW GUARD: check 5d compares EACH group heading to the map, not only their sum"),
 ]

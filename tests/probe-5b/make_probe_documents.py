@@ -111,16 +111,16 @@ def tc_paragraph():
 # ARM 1 — the deadlock. Short on purpose: the runtime model is 24.6 + 0.040 x paragraphs
 # minutes, so a small document keeps the probe to about half an hour.
 ARM1 = [
-    p(r("OVEREENKOMST VAN DIENSTVERLENING", rpr="<w:b/>")),
+    p(r("OVEREENKOMST VAN DIENSTVERLENING", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("Deze overeenkomst is gesloten tussen de hierna genoemde partijen.")),
-    p(r("1. Voorwerp van de overeenkomst", rpr="<w:b/>")),
+    p(r("1. Voorwerp van de overeenkomst", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("De Leverancier verricht de werkzaamheden zoals beschreven in Bijlage A.")),
     tc_paragraph(),
-    p(r("2. Duur", rpr="<w:b/>")),
+    p(r("2. Duur", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("De overeenkomst geldt voor een periode van twaalf maanden.")),
-    p(r("3. Aansprakelijkheid", rpr="<w:b/>")),
+    p(r("3. Aansprakelijkheid", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("De aansprakelijkheid van elke partij is beperkt tot directe schade.")),
-    p(r("4. Toepasselijk recht", rpr="<w:b/>")),
+    p(r("4. Toepasselijk recht", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("Op deze overeenkomst is Nederlands recht van toepassing.")),
     p(r("Aldus overeengekomen en ondertekend.")),
 ]
@@ -130,19 +130,19 @@ ARM1 = [
 # definitions detector needs a recognised heading plus at least three predicate-shaped
 # paragraphs, and the permutation has to be large enough to mispair.
 ARM2 = [
-    p(r("RAAMOVEREENKOMST", rpr="<w:b/>")),
+    p(r("RAAMOVEREENKOMST", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("Deze raamovereenkomst is gesloten tussen de hierna genoemde partijen.")),
-    p(r("1. Definities", rpr="<w:b/>")),
+    p(r("1. Definities", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("“Aanvangsdatum” betekent de datum waarop de werkzaamheden beginnen.")),
     p(r("“Bijlage” betekent een bij deze overeenkomst gevoegd document.")),
     p(r("“Leverancier” betekent de partij die de werkzaamheden verricht.")),
     p(r("“Vergoeding” betekent het bedrag dat voor de werkzaamheden "
         "verschuldigd is.")),
     p(r("“Werkzaamheden” betekent de in Bijlage A beschreven prestaties.")),
-    p(r("2. Verplichtingen van de Leverancier", rpr="<w:b/>")),
+    p(r("2. Verplichtingen van de Leverancier", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("De Leverancier verricht de Werkzaamheden met inachtneming van de Bijlage.")),
     p(r("De Vergoeding is verschuldigd binnen dertig dagen na de Aanvangsdatum.")),
-    p(r("3. Toepasselijk recht", rpr="<w:b/>")),
+    p(r("3. Toepasselijk recht", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("Op deze raamovereenkomst is Nederlands recht van toepassing.")),
     p(r("Aldus overeengekomen en ondertekend.")),
 ]
@@ -189,20 +189,20 @@ ARM2 = [
 # the pre-flight enumerates the routes and marks which are closed BY CONSTRUCTION and which are
 # merely UNTESTED. A rig is a hypothesis about the operator, not a proof about it.
 ARM3 = [
-    p(r("OVEREENKOMST VAN DIENSTVERLENING", rpr="<w:b/>")),
+    p(r("OVEREENKOMST VAN DIENSTVERLENING", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("Deze overeenkomst is gesloten tussen de hierna genoemde partijen.")),
-    p(r("1. Voorwerp van de overeenkomst", rpr="<w:b/>")),
+    p(r("1. Voorwerp van de overeenkomst", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("De Leverancier verricht de werkzaamheden zoals beschreven in Bijlage A.")),
-    p(r("2. Overdracht", rpr="<w:b/>")),
+    p(r("2. Overdracht", rpr="<w:rPr><w:b/></w:rPr>")),
     # THE SPLIT SENTENCE. These two paragraphs are one sentence in the source, and the skill is
     # forbidden from joining them. The first ends on `van`; its object opens the second.
     p(r("Onverminderd het bepaalde in artikel 4 van deze overeenkomst en behoudens "
         "voorafgaande schriftelijke instemming van")),
     p(r("de andere partij is overdracht van rechten uit deze overeenkomst niet "
         "toegestaan.")),
-    p(r("3. Duur", rpr="<w:b/>")),
+    p(r("3. Duur", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("De overeenkomst geldt voor een periode van twaalf maanden.")),
-    p(r("4. Toepasselijk recht", rpr="<w:b/>")),
+    p(r("4. Toepasselijk recht", rpr="<w:rPr><w:b/></w:rPr>")),
     p(r("Op deze overeenkomst is Nederlands recht van toepassing.")),
     p(r("Aldus overeengekomen en ondertekend.")),
 ]
@@ -215,6 +215,23 @@ if __name__ == "__main__":
     docx(a1, "".join(ARM1))
     docx(a2, "".join(ARM2))
     docx(a3, "".join(ARM3))
+    # GUARD, added 2026-08-20 after the arm-3 operator found the defect this replaces.
+    # A run property must sit inside <w:rPr>; a bare <w:b/> as a direct child of <w:r> is
+    # schema-invalid and a compliant reader ignores it, so the "bold" heading renders plain.
+    # The rig had shipped that way through three arms. Asserting it here means the next caller
+    # to get it wrong finds out at build time rather than in a delivery note.
+    import re as _re
+    import zipfile as _zip
+    for _p in (a1, a2, a3):
+        _xml = _zip.ZipFile(_p).read("word/document.xml").decode("utf-8")
+        _bad = _re.findall(r"<w:r>\s*<w:(?:b|i|u|strike|sz|color|rStyle)\b", _xml)
+        if _bad:
+            raise SystemExit(
+                f"REFUSING — {_p.name} carries {len(_bad)} run propert(ies) OUTSIDE <w:rPr>. "
+                f"A compliant reader ignores them, so the formatting they express does not "
+                f"exist in the rendered document. Wrap them: rpr=\"<w:rPr>...</w:rPr>\"."
+            )
+
     for path, arm, para in ((a1, "1 — was TRUE DEADLOCK (F1)", len(ARM1)),
                             (a2, "2 — DECOY (L1)", len(ARM2)),
                             (a3, "3 — TRUE DEADLOCK (F28)", len(ARM3))):

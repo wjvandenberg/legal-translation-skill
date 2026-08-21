@@ -59,7 +59,7 @@ wrong conclusion.
 |---|---|---|---|
 | **`CLAUDE.md`** *(this)* | the charter | first, always | goals · order · status · rules · structure |
 | **`STEP-B-ANALYSIS.md`** | **the build plan.** What to build, in what order, and what counts as having built it | **before and during every build branch — it is the leading document for all of step 2** | §2 the order · §3 the brief per option · §4 the test method |
-| **`FINDINGS-REGISTER.md`** | the evidence base — **212 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
+| **`FINDINGS-REGISTER.md`** | the evidence base — **213 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
 | **`A3-STRUCTURAL-ANALYSIS.md`** | the evidence-led structural analysis | when a structural judgement comes up | the measurements: context, runtime, redundancy, divergence |
 | **`OPUS-5-MIGRATION.md`** | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
@@ -194,7 +194,7 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 
 **The evidence base as it now stands, and these are the numbers to quote:**
 
-> **`FINDINGS-REGISTER.md`: 212 rows — 15 clusters · 169 skill findings (157 clustered + 12 single-instance)
+> **`FINDINGS-REGISTER.md`: 213 rows — 15 clusters · 170 skill findings (158 clustered + 12 single-instance)
 > · 27 positives to preserve · 16 defects in our own measuring instruments (12 fixed, 4 open).** The largest
 > cluster is the instruction contradictions, at **39**. Validator **PASS, 0 failures, 0 warnings**.
 >
@@ -226,7 +226,7 @@ Six committable documents exist. **Three are live inputs to the work ahead; thre
 several documents — a deed's only footnote, fourteen of twenty-eight comment anchors, a contract's
 closing bracket and terminal full stop, untranslated source-language text on the first page of a delivered
 document. **In every case the auxiliary part was translated perfectly and the *pointer* destroyed**, so the
-English exists in the package and is unreachable — **and every gate reported PASS.** Twenty-seven of the 169
+English exists in the package and is unreachable — **and every gate reported PASS.** Twenty-seven of the 170
 findings are content losses; six are the worst grade the register has.
 
 **2. Three independent mechanisms explain why nothing was caught, and one sentence is not enough.**
@@ -418,7 +418,7 @@ did what it claimed, test proves nothing *else* broke.
   cannot begin before the delivered-document check exists, and must carry the off-flag removal in the same
   branch.
 - **The leap Wouter asked for is in the plan, and it is not a rebuild.** The rebuild was declined on
-  measured arithmetic — it addresses **at most 94 of the 169 recorded findings**, cannot be decomposed into
+  measured arithmetic — it addresses **at most 94 of the 170 recorded findings**, cannot be decomposed into
   merge-sized steps, and risks the half that measurably works. **The leap is the formatting option,
   delivered in three slices that can each be merged, tested and reverted.** Its first slice is also the
   probe that would reopen the question: whoever runs it must **report explicitly** whether a per-span model
@@ -1630,8 +1630,10 @@ wrong against the skill as it then stands. **§3.5** owns where it sits; **`DECI
 
 ### WHAT THIS COMMIT DID NOT TOUCH
 
-No count in `CLAUDE.md` §2.3 moved: F1 is still one row, the register is still 212 rows and 169
-skill findings, and no row was added or removed. `STEP-B-ANALYSIS.md` is unedited — no branch
-scope moved. **No graded run and no rendered visual diff**: `string_only_edit` proves the script
+**Counts as at the 5b commit:** F1 stayed one row and nothing was added or removed *there*.
+**They moved afterwards** — G11 landed on 2026-08-20 and took the register to **213 rows and 170
+skill findings** (158 clustered + 12 single-instance), cluster G to **G1–G11**, consequence group
+3 to **43** and option 2's coverage to **53**, each figure taken from the tools' own maps rather
+than by adding one. **No graded run and no rendered visual diff**: `string_only_edit` proves the script
 change is text-only, and §4 puts instruction branches on the four static instruments, which all
 pass — declared N/A, not omitted.
