@@ -40,7 +40,12 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parent.parent
-REF = os.environ.get("LT_BASELINE_REF", "origin/main")
+
+# PINNED TO A COMMIT, NOT A BRANCH NAME — see the same note in test_check_scoping.py.
+# `origin/main` stopped being the pre-branch code the moment the branch merged, which turned
+# the "OLD code VIOLATES it" half of every property into a comparison of the fix with
+# itself. 2178cce is the commit before branch 14 and does not move.
+REF = os.environ.get("LT_BASELINE_REF", "2178cce")
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 SEED = 20260821
 FAIL, CHECKED = [], 0
@@ -72,6 +77,14 @@ blob = subprocess.run(["git", "show", f"{REF}:uk/scripts/quality_check.py"],
                       capture_output=True, cwd=ROOT)
 if blob.returncode != 0:
     print(f"VOID — cannot read quality_check.py at {REF}")
+    sys.exit(1)
+# A comparison that established nothing has not passed: if the baseline copy IS the
+# working-tree copy, the "OLD code violates it" half of every property below is a
+# tautology and this suite must say so rather than go green.
+if blob.stdout == (ROOT / "uk" / "scripts" / "quality_check.py").read_bytes():
+    print(f"VOID — quality_check.py at {REF} is BYTE-IDENTICAL to the working tree, so")
+    print("the 'old code violates it' half of every property would compare the fix with")
+    print("itself. Point LT_BASELINE_REF at a commit that predates the change.")
     sys.exit(1)
 (OLD / "quality_check.py").write_bytes(blob.stdout)
 

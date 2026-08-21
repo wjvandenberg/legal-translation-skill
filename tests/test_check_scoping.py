@@ -41,7 +41,20 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parent.parent
-BASELINE = os.environ.get("LT_BASELINE_REF", "origin/main")
+
+# THE BASELINE IS PINNED TO A COMMIT, NOT TO A BRANCH NAME, AND THAT IS THE WHOLE POINT.
+#
+# The first version of this file used `origin/main`. That WAS the pre-branch code while the
+# branch was in flight, and it STOPPED BEING IT the moment the branch merged: `origin/main`
+# then resolved to the fixed code, so every "PROVED it fired before" assertion was comparing
+# the fix against itself. Nine of them went red within seconds of the merge, which is the
+# good outcome — a self-invalidating test that went GREEN instead would have been the
+# eleventh logged case of a check passing for the wrong reason, and this file exists to
+# argue against exactly that.
+#
+# 2178cce is the commit before branch 14. It is a historical fact and it does not move.
+# Override with LT_BASELINE_REF when re-pointing this suite at a different comparison.
+BASELINE = os.environ.get("LT_BASELINE_REF", "2178cce")
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
 FAIL = []
@@ -60,19 +73,41 @@ def ok(label, condition, detail=""):
 
 # ---------------------------------------------------------------- baseline loading
 def resolve_baseline():
-    """The commit this branch is measured against. VOID rather than a guess."""
-    for ref in (BASELINE, "main", "HEAD~1"):
-        r = subprocess.run(["git", "rev-parse", "--verify", ref],
-                           capture_output=True, text=True, cwd=ROOT)
-        if r.returncode == 0:
-            return ref, r.stdout.strip()
-    return None, None
+    """The commit this branch is measured against. VOID rather than a guess.
+
+    Only the PINNED ref is tried. The earlier version fell back to `main` and then `HEAD~1`,
+    which sounds defensive and is the opposite: a fallback that silently lands on the fixed
+    code turns every before/after assertion into a comparison of the fix with itself. If the
+    pin does not resolve, say so and stop.
+    """
+    r = subprocess.run(["git", "rev-parse", "--verify", BASELINE],
+                       capture_output=True, text=True, cwd=ROOT)
+    return (BASELINE, r.stdout.strip()) if r.returncode == 0 else (None, None)
+
+
+def assert_baseline_differs(script):
+    """The baseline copy of `script` must NOT be the working-tree copy.
+
+    A comparison that established nothing has not passed. If a rebase, a squash or a moved
+    pin makes the two identical, this suite must say VOID and exit non-zero rather than
+    report a green before/after it never made.
+    """
+    b = subprocess.run(["git", "show", f"{REF}:uk/scripts/{script}"],
+                       capture_output=True, cwd=ROOT)
+    if b.returncode != 0:
+        print(f"VOID — cannot read {script} at {REF}. Nothing compared, nothing passed.")
+        sys.exit(1)
+    if b.stdout == (ROOT / "uk" / "scripts" / script).read_bytes():
+        print(f"VOID — {script} at {REF} is BYTE-IDENTICAL to the working tree, so every")
+        print("before/after assertion below would compare the fix against itself. That is")
+        print("not a pass. Point LT_BASELINE_REF at a commit that predates the change.")
+        sys.exit(1)
 
 
 REF, SHA = resolve_baseline()
 if REF is None:
-    print("VOID — no baseline ref resolved (tried LT_BASELINE_REF, origin/main, "
-          "HEAD~1).\nNothing was compared, so nothing passed.")
+    print(f"VOID — the pinned baseline {BASELINE!r} does not resolve in this clone.")
+    print("Nothing was compared, so nothing passed. Set LT_BASELINE_REF.")
     sys.exit(1)
 
 TMP = Path(tempfile.mkdtemp(prefix="b14-baseline-"))
@@ -123,6 +158,10 @@ print(f"baseline: {REF} = {SHA[:12]}")
 print("=" * 96)
 
 from lxml import etree  # noqa: E402
+
+for _s in ("quality_check.py", "validate_segment_shapes.py",
+           "translate_headers_footers.py"):
+    assert_baseline_differs(_s)
 
 OLD_QC = load_old("quality_check.py")
 NEW_QC = load_new("quality_check.py")
