@@ -69,10 +69,26 @@ def save(d):
 
 
 def record(phase, cmd):
-    """Run the command, and record it ONLY if it exits 0."""
+    """Run the command, and record it ONLY if it exits 0.
+
+    PYTHONDONTWRITEBYTECODE IS NOT OPTIONAL HERE, AND THIS IS THE THIRD TIME THIS LEAK
+    HAS COME BACK THROUGH A NEW CALLER. Importing a skill module drops a __pycache__
+    INSIDE uk/scripts or us/scripts. It is gitignored, so it never shows in a diff -- and
+    the release-time packager zips the variant tree, so it would ship inside the .skill.
+    tests/run_tests.py sets this for the subprocesses IT spawns; tools/audit_branches.py
+    had to be fixed the same way; and this wrapper then reintroduced it, because a test run
+    THROUGH the cycle gate inherits this process's environment and not the test runner's.
+    Reproduced on 2026-08-21: the same test leaves 0 .pyc run directly and 1 run through
+    here. Register I-18.
+
+    Patching this caller is not the fix -- it is caller number three. The fix is the
+    assertion in tools/precommit_gate.py that fails when a shipped tree carries anything
+    development-only, so caller number four cannot pass unnoticed.
+    """
     print(f"  [{phase}] {' '.join(cmd)}")
     sys.stdout.flush()
-    rc = subprocess.run(cmd, cwd=ROOT).returncode
+    env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+    rc = subprocess.run(cmd, cwd=ROOT, env=env).returncode
     d = load()
     b = branch()
     if rc != 0:

@@ -59,7 +59,7 @@ wrong conclusion.
 |---|---|---|---|
 | **`CLAUDE.md`** *(this)* | the charter | first, always | goals · order · status · rules · structure |
 | **`STEP-B-ANALYSIS.md`** | **the build plan.** What to build, in what order, and what counts as having built it | **before and during every build branch — it is the leading document for all of step 2** | §2 the order · §3 the brief per option · §4 the test method |
-| **`FINDINGS-REGISTER.md`** | the evidence base — **213 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
+| **`FINDINGS-REGISTER.md`** | the evidence base — **216 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
 | **`A3-STRUCTURAL-ANALYSIS.md`** | the evidence-led structural analysis | when a structural judgement comes up | the measurements: context, runtime, redundancy, divergence |
 | **`OPUS-5-MIGRATION.md`** | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
@@ -194,16 +194,26 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 
 **The evidence base as it now stands, and these are the numbers to quote:**
 
-> **`FINDINGS-REGISTER.md`: 213 rows — 15 clusters · 170 skill findings (158 clustered + 12 single-instance)
-> · 27 positives to preserve · 16 defects in our own measuring instruments (12 fixed, 4 open).** The largest
+> **`FINDINGS-REGISTER.md`: 216 rows — 15 clusters · 171 skill findings (159 clustered + 12 single-instance)
+> · 27 positives to preserve · 18 defects in our own measuring instruments (13 fixed, 5 open).** The largest
 > cluster is the instruction contradictions, at **39**. Validator **PASS, 0 failures, 0 warnings**.
 >
 > **The instrument count moved from 11 to 16 on 2026-08-11, and the five new rows are a different
 > population from the first eleven.** I-1 to I-11 are defects in the **A1 harness and review tooling** —
 > instruments outside the repository that were used to *produce* the evidence, and **four of them are still
-> open** and will corrupt Step C if they still are when it runs. **I-12 to I-16 are defects in the
-> repository's own committed checks** — the ones that now guard the build — and all five are fixed. **The
-> skill-finding counts are untouched**, because none of them is a defect in the skill.
+> open** and will corrupt Step C if they still are when it runs. **I-12 onward are defects in the
+> repository's own committed checks** — the ones that now guard the build. **The skill-finding counts are
+> untouched by any of them**, because none is a defect in the skill.
+>
+> **THE FIFTH OPEN ONE IS I-17 AND IT IS NOT A STEP C RISK — read the two populations before quoting
+> "five open".** *(Added 2026-08-21 on branch 14.)* The four that threaten Step C are still exactly
+> **I-7, I-8, I-9, I-10**, all in the A1 harness. **I-17 is in our own fixture set**: one of the eleven
+> synthetic documents cannot be opened by any renderer, because it carries auxiliary parts with no
+> relationship part pointing at them. It cost nothing here — the byte comparison covers that fixture
+> exactly — but **branch 18's test IS a render**, so it has to be repaired before that branch, and it
+> means no render-based test can currently reach the comment and footnote anchors that fixture exists
+> to carry. It is left open deliberately: fixing a fixture is harness work, and several arms of the
+> negative-input suite read that file.
 
 ### 2.4 What was produced, and which documents matter from here
 
@@ -1492,89 +1502,184 @@ the pull request; do not call it complete.
 
 **RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
 Re-reading has never found one.
-### HANDOFF — 2026-08-20. BRANCH 5 IS MERGED. Step 2 has delivered branches 3, 4 and 5.
+### HANDOFF — 2026-08-21. BRANCH 14's `quality_check` SLICE IS BUILT AND NOT MERGED.
 
-**Branch 5 is MERGED.** Wouter approved it on 2026-08-20, after the 5b gate was discharged and
-all six confidentiality controls came back clear over the **3,613 lines** the branch adds to
-`main`. **The checks can now fail: a run that finds a problem STOPS instead of reporting success
-over it.** That was the point of the branch, and it is the first change in step 2 a user can feel.
+**PR #25 was merged first** — it repaired two numbered lists a blind `str.replace` had
+damaged, and every numbered list in this file is now sequential. **Then branch 14's slice
+was built: EIGHT false-positive fixes, each with a test proving it still catches its true
+positive.** That discipline is the branch, and it is why the branch is mostly tests.
 
 | | |
 |---|---|
-| **merged** | `feature/checks-can-fail` — PR #24, squash-merged 2026-08-20 |
-| **step 2 so far** | branches **3, 4 and 5** delivered. Fifteen branches plus three deferred items remain |
-| **the gate** | **DISCHARGED.** Three rigs, three scope defects, two live runs, `DECISIONS-LOG.md` 2026-08-20 |
-| **NEXT** | **branch 14's `quality_check` slice** — §2's fourth sequencing fact puts it immediately after branch 5, and it is specified below |
+| **branch** | `feature/check-scoping-quality-check`, from `main` @ `2178cce` |
+| **what it fixes** | L1 · G11 · G10 · M1 · C9 · F15 — plus **G5 and G9**, added on Wouter's decision |
+| **the measured effect** | the recorded corpus goes **44 findings → 16**, and **D07 becomes clean** — blocked deliverables 4 of 13 → **3 of 13** |
+| **NEXT** | **Wouter's review and approval. Nothing technical remains.** |
 
-### WHY THE GATE IS DISCHARGED AND NOT SATISFIED — the one thing not to re-derive
+### WHAT MOVED, MEASURED — the numbers not to re-derive
 
-Three rigs were built to force rule 5b. **Every one turned out to be a check that was WRONGLY
-SCOPED, and the operator proved it from the check's own source each time** — arm 1 (F1:
-`validate_apply` mirrors `strip_noop`'s rule 1 and never its rule 4), arm 2 (L1, a decoy by
-design, unbuilt), arm 3 (F28: `check_truncation`'s method B ignores the `source_data` method A
-uses in the same function — now register **G11**).
+`tools/qc_census.py` is the instrument and it now reports BOTH sides, so the pre-branch
+figures stay reproducible from the recorded evidence rather than from a memory of them.
 
-**Both live runs left the installed tree 198 of 198 byte-identical**, measured against a manifest
-built before the run, never altered the translation, and delivered a complete document. Arm 3
-discharged all five of rule 5a's conditions.
+| rule class | before | after | after, with `--original` | what closed it |
+|---|---|---|---|---|
+| truncation | 17 | **0** | 0 | L1 (9, method A) · G11 (5) · G5 (3) |
+| numbering | 11 | 11 | **0** | M1 — needs the new `--original` flag |
+| internal_article_refs | 15 | 15 | 15 | **nothing — this is the residue, now register G12** |
+| formatting | 1 | 1 | 1 | **nothing — residue, G12** |
+| **TOTAL** | **44** | **27** | **16** | |
 
-**So the gate's TEST could not be constructed, and its CONCERN was answered.** A test aimed at a
-situation that does not arise is not a failed test; it is the wrong test. **And the plan's
-reasoning was wrong on the point that matters: 5b is not what makes branch 5 safe.** The census
-measured the real risk as **false-alarm load**, which is 5a's and branch 14's. 5b is kept as
-insurance plus a forcing function — it made arm 1's operator go back and analyse rather than
-reach for it.
+Per document, with `--original`: **D03 1 · D05 2 · D06 13 · D07 0**. Proved end to end by
+`temp/b14_m1_endtoend.py`, which runs the shipped command line rather than calling the
+function: D05 5→2, D06 21→13, all eleven numbering findings gone, and the notice that says
+the comparison did not happen goes from printed to silent.
 
-**Do not build a fourth arm.** Three have been read as 5a, each correctly.
+### THE FOUR THINGS THAT WOULD OTHERWISE BE RE-DERIVED
 
-### WHAT BRANCH 14's `quality_check` SLICE CONTAINS — specified, ready to start
+1. **L1's fix had four hidden decisions and one of them is a negative result.** Pairing on
+   the declared English leaves **46 of 1,158 eligible entries unpairable**, and **neither
+   the accept-all nor the reject-all reading recovers a single one** — so the tracked-change
+   explanation is refuted. A four-key ladder (exact · containment · prefix · tail) was built
+   and measured to add **nothing**, so it was dropped. The shipped rule pairs on the declared
+   English and falls back to the entry's own `en`, which judges **every** entry and adds no
+   finding the paired route would not have produced.
+2. **G9 IS HALF-CLOSED AND THE OTHER HALF CANNOT BE CLOSED BY SCOPING.** `en_segments` carry
+   exactly two keys — `type` and `en`, on 412 of 412 segments across all 13 workdirs. The
+   source text the alpha-collision rule would need **is not in the file the check reads**, and
+   putting it there is a notes-SCHEMA change, which is branch 15's and invalidates the frozen
+   intermediates. **The operator had no third option because the CHECK has none.**
+3. **`validate_segment_shapes` finds NOTHING on the whole recorded corpus** — 0 findings over
+   81 tracked-change paragraphs — because the recorded `paragraphs.json` is the
+   **post-compliance** artefact: the operator satisfied the gate during the run, so the file
+   records the outcome and not the collision. **A frozen intermediate cannot reproduce a gate
+   that was satisfied while the run was happening.** Know that before branch 11 leans on the
+   method.
+4. **C9's stated fix is not sufficient on its own.** Reading the translated body gets the
+   source language right **2 times in 13**; reading the original gets it right **9 in 13** —
+   so the detector was never the defect, its input was. But a wrong SPECIFIC language
+   silently SKIPS the correct language's rules while `*` runs them all, so the naive fix
+   trades noise for silence. The shipped version passes the language **only where two
+   independently-written detectors agree**: 9 agreements (8 correct) and 4 honest
+   disagreements. **Norwegian is in neither detector's vocabulary**, so a D03-class document
+   correctly reaches the disagreement branch. Making it SAY so is branch 12's.
 
-§2's fourth sequencing fact puts it **immediately after branch 5**, and the review, the census and
-three runs have specified it. Each item needs a pattern change **plus a test proving it still
-catches the true positive** — that discipline is the branch.
+### WHAT THIS BRANCH FOUND THAT IT WAS NOT LOOKING FOR
 
-| row | the defect | the fix, where known |
-|---|---|---|
-| **L1** | pairs source to target by index after Step 7 permutes the document | match by text, not position |
-| **G11** | method B ignores the `source_data` method A uses | exempt a dangling ending only where the source paragraph also lacks terminal punctuation — **with the operator's two controls** |
-| **G10** | missing-space rule fires across a `w:tab` element | treat a `w:tab` between two `w:t` as a separator |
-| **M1** | eight false positives inherited from `.doc` conversion | — |
-| **C9** | language auto-detection guesses from the translation | read the ORIGINAL, as `repack_docx` already does |
-| **F15** | counts `en == text` as an unfilled scaffold, which Step 8b mandates | — |
+- **`STEP-B-ANALYSIS.md` §9.1's arithmetic line was stale by two, and had been.** It read `27 + 27 + 41 + 30 + 43
+  = 168` above a generated table already holding 43 in group 3 and 170 in total — and its own
+  severity column disagreed with it as well. The tables are generated; that line was typed.
+  **`tools/stepb_verify.py` now asserts the line against the tables**, and the assertion was
+  proved able to fail before being trusted.
+- **I-17, a new OPEN instrument defect: one of the eleven fixtures cannot be rendered at
+  all.** LibreOffice refuses `anchors-and-tabs.docx` — and refuses the *original* fixture, so
+  the cause is not this branch: it carries `comments.xml` and `footnotes.xml` with no
+  relationship part pointing at them. 8 of the 9 valid fixtures render. **Branch 18's test IS
+  a render**, so this has to be repaired before it. Left open deliberately — fixing a fixture
+  is harness work and several negative-input arms read that file. **The irony is the point:
+  the fixture is unreadable for cluster A's own reason — the content is there and the pointer
+  is not.**
+- **The harness had the very blindness the branch was fixing.** The byte-identity test's
+  first notes-builder concatenated `w:t` only, so it declared `Party AParty B` where
+  `validate_apply`'s own joiner reads `Party A Party B` — and the gate correctly refused it.
+  §5.1's second failure shape, in our own test: ask what else does the same thing.
+- **ADDING A REGISTER ROW MOVES COUNTS IN FOUR PLACES AND AN ANCHOR IN A FIFTH — and no two
+  instruments agreed on how many.** G12 and I-17 between them moved the register's own
+  header, `CLAUDE.md` §1.3 and §2.3, and the build plan's two generated appendix tables. With all
+  of those green, **`tools/stepb_audit.py` then found three more** — §5.3's heading, option
+  2's pros cell and its ranking row, each still saying 43 or 53. And with THOSE green,
+  **`tools/stepb_metacheck.py` reported one of its own eleven mutations INERT**, because its
+  anchor carries the group-3 count and that count had moved; re-anchored, 11 of 11 again.
+  **So: run the register validator, the claims check, `stepb_audit` AND `stepb_metacheck`
+  after any register edit** — each of the last three found what the ones before it had
+  passed. A probe whose mutation silently stops applying is a test that has become a
+  decoration, and only the metacheck can see that.
+- **`validate_apply` already had G10's answer.** It treats `w:tab` **and `w:br`** as
+  separators and its docstring documents this exact false positive. So the fix is a
+  convergence, not a widening — and that is why it covers manual line breaks too.
 
-**The census measured 9 of 9 of L1's findings as artefacts**, and six of the ten reachable
-documents come through `quality_check` completely clean. `tools/qc_census.py` re-runs it.
+### WHAT IS OPEN
 
-### FIVE THINGS OPEN
+1. **The 16 residual findings, now register G12, are UNCLASSIFIED and a script cannot
+   classify them.** Each finding embeds 60–70 characters of a real instrument, so deciding
+   whether `Article N` is a terminology defect or a civil-law citation needs **Wouter, or a
+   sanitised route that reports the citation shape without its text.** Three of the four
+   blocked deliverables are still blocked and this is the whole reason.
+2. **G9's first half** — needs branch 15's schema change; see point 2 above.
+3. **`--original` must be added to Step 9's step document**, or the numbering comparison is
+   a flag nobody passes. **NOT done in this branch** — it is a doc change and §4 tests those
+   differently. The check announces its own absence in the meantime, which is the mitigation,
+   not the fix.
+4. **A `probe` origin class for the register** — still unbuilt, still needed.
+5. **I-7, I-8, I-9, I-10** — the four open A1 harness defects, unchanged, and still the ones
+   that will corrupt Step C. **I-17 is a fifth open instrument defect but is NOT a Step C
+   risk** — read §2.3 before quoting "five open".
+6. **The six untracked house scripts in `tools/`.** Still untracked, deliberately: they were
+   staged by a `git add -A` and **unstaged again**, because whether they belong in this
+   repository is Wouter's open question and `tools/run_tests.py` still collides by name with
+   `tests/run_tests.py`.
 
-1. **Arm 2** — unconfirmed, deliberately unbuilt, and now unnecessary.
-2. **A `probe` origin class for the register.** The validator rejects `probe-5b`, so F1's and
-   G11's provenance sits in their text. Step C will produce more behavioural evidence.
-3. **I-7, I-8, I-9, I-10** — the four open A1 harness defects. They will corrupt Step C's evidence
-   if still open when it runs.
-4. **`verify_md`'s cross-document §ref defect** — a shared-folder fix with its own selftests and
-   version bump, not a local edit. The obvious repair would silence genuine local refs.
-5. **The six untracked house scripts in `tools/`.** The shared folder changed **six times** in one
-   session — `verify_md` v8→v9→v10, `house_common` v2→v3→v4, `check_checkers` v5→v6,
-   `verify_deliverable` v2→v3 — so `check_checkers` flipped between two sweep runs minutes apart.
-   Each was re-copied with the superseded version kept in `temp/`. **They are untracked, so none
-   of it survives a fresh clone.** `check_checkers` is now a reported NOTE rather than a
-   pass/fail line, because it tracks an external folder rather than this branch. **Whether those
-   six belong in this repository at all is Wouter's open question.**
+### THE RE-VERIFICATION FOUND TWO REAL DEFECTS THAT 51 CASE ASSERTIONS HAD PASSED
 
-### THE FOUR MEASUREMENTS THIS SESSION ADDED, so nobody re-derives them
+**Wouter asked whether it had been tested heavily. It had not been, and re-running proved
+it.** Both findings are recorded because the shape of the mistake is worth more than either
+repair.
 
-- **`tools/qc_census.py`** — the false-positive census over the recorded corpus. 13 workdirs, 10
-  doc-ids. **D05's 8 and D06's 32 reproduce the published figures exactly.**
-- **The eighteen partitioned** — §12 of the build plan. Four groups, not one set.
-- **`tests/probe-5b/preflight.py`** — three arms, exit code tracks arm 3.
-  **`preflight_metacheck.py` — 4 of 4 mutations detected.**
-- **G11** and the probe documents' schema-invalid bold, both found by the arm-3 operator.
+**1. THE FIX ITSELF WAS STILL POSITION-DEPENDENT.** L1's first version kept the positional
+candidate whenever `all_p[idx]` happened to hold the right English — sound reasoning, wrong
+consequence: **where the same English appears in two paragraphs, whether that shortcut hits
+decides whether the entry pairs at all**, so the verdict depended on position again in
+exactly the case the pairing exists for. **Cases cannot find this; a property can.**
+`tests/test_check_scoping_properties.py` states the repair as what it actually claims — *the
+truncation verdict does not depend on where a paragraph sits* — and measured **287 of 320**
+random permutations invariant. Dropping the shortcut costs nothing and gives **320 of 320**,
+against **34 of 320** for the pre-branch code, so the property is not vacuous. The same
+suite found **two crashes this branch had introduced** (a non-string `en`) and **four that
+predate it** (a null `text`, a non-integer `idx`); all six fixed, the split measured.
 
-### WHAT THIS SESSION DID NOT TOUCH
+**2. A `.pyc` WAS SITTING IN `uk/scripts/` AFTER THE COMMIT, AND THE GATE HAD REPORTED
+CLEAR.** Register **I-18**. Reproduced, not reasoned: the same test leaves 0 `.pyc` run
+directly and 1 run through `tools/cycle_evidence.py`, which spawns the runner and so passes
+its own environment rather than the runner's. **This is the third recurrence** — fixed in
+`tests/run_tests.py`, again in `tools/audit_branches.py`, and back through a third caller.
+It keeps returning because **`__pycache__` is gitignored, so it is invisible to a diff, to
+`git status`, and until now to every control.** The caller is patched, but the repair is a
+new pre-commit assertion that fails when anything development-only sits inside `uk/` or
+`us/`, with two negative tests planting a `.pyc` and an editor backup. **A gitignored
+artefact can only be caught by a check that looks at the directory rather than at the diff.**
 
-No skill file under `uk/` or `us/` changed after `e0fe85e`. `STEP-B-ANALYSIS.md`'s branch table is
-unedited — no branch scope moved, and the fourth sequencing fact gained a discharge note rather
-than a rewrite, because rewriting it would hide what changed. **No graded run and no rendered
-visual diff** — §4 puts script branches on byte comparison, and the 60-archive comparison is
-strictly stronger than rendering two identical files. Declared N/A, not omitted.
+**The corpus numbers did not move**: D03 1 · D05 5 · D06 21 · D07 0 before `--original`, and
+16 in total after it, exactly as measured the first time. **The defects were in the pathology
+and the plumbing, not in the result** — which is the one thing that makes them easy to ship.
+
+### WHAT WAS RUN
+
+**Verify.** `tests/test_check_scoping.py` — **51 assertions**, and every false-positive
+control is proved to have fired against the pre-branch script loaded out of git, so a control
+that tests nothing shows up as a failure. It caught one: a G9 control that reversed the
+segment types without moving the spaces, which could not have fired. `tests/
+test_no_delivered_byte_moves.py` — **12 assertions**: the two reporters leave a workdir
+byte-identical, and the two scripts that write produce byte-identical output, including every
+member of the delivered `.docx` on two fixtures.
+
+**Property.** `tests/test_check_scoping_properties.py` — **11 properties** over generated
+inputs at a fixed seed: permutation invariance (320 of 320, against the old code's 34),
+determinism, **56 hostile document/notes combinations without an exception**, a rendered
+break suppressing G10's finding in all 12 placements while a declared tab STOP never does,
+M1's multiset arithmetic exact on 60 random sequences, and C9's detector never raising on
+any of 7 hostile containers.
+
+**Test.** 12 of 12 test files · smoke suite PASS on **both** variants · parity check PASS,
+0 NEW divergences · `test_baseline_unmodified` 368 of 396 byte-identical with **28 declared**
+· register PASS 0/0 · claims 0/0 · tables CLEAN · branch audit and xref 0 · five STEP-B suites
+0 · `precommit_gate` **CLEAR on all seven controls**.
+
+**The rendered comparison, which Wouter asked for beside the byte proof.** Five fixtures
+repacked with the baseline scripts and with this branch's, converted by LibreOffice and
+rasterised at 150 dpi: **every page pixel-identical**. A second instrument agreeing with the
+byte comparison rather than repeating it. `anchors-and-tabs.docx` is **declared N/A with its
+reason** — I-17, it cannot be rendered at all — and its coverage is the byte comparison,
+which does include it.
+
+**No graded run.** Declared N/A: §4 puts script branches on byte comparison, the grader is
+frozen at v3 until Step C, and a graded run measures the wrong variable for a change that
+provably moves no delivered byte.

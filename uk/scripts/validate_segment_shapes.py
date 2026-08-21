@@ -279,10 +279,26 @@ def _rule_digit_at_tc_boundary(left, right):
     return None
 
 def _rule_double_space_across_boundary(left, right):
-    """left ends with space AND right starts with space → double space."""
+    """left ends with space AND right starts with space → double space.
+
+    EXCEPT ACROSS A del↔ins BOUNDARY, WHICH CANNOT PRODUCE ONE. Register G9,
+    second half. An insertion and a deletion are mutually exclusive by
+    construction: accept-all renders the ins and drops the del, reject-all does
+    the reverse. Neither view ever shows both spaces, so a finding here reports a
+    double space that no reader of either reading can see — and since branch 5
+    this rule's script aborts apply, so it stopped a run over a defect that does
+    not exist in any rendering of the document.
+
+    This is the same scoping fix as F10, which is the identical mistake in the
+    reject-all validator: a rule reasoning about the concatenation of two segments
+    that are never concatenated.
+    """
     lt = _seg_text(left)
     rt = _seg_text(right)
     if not lt or not rt:
+        return None
+    pair = {_seg_type(left), _seg_type(right)}
+    if pair == {'del', 'ins'}:
         return None
     if lt.endswith(' ') and rt.startswith(' '):
         return (

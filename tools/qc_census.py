@@ -12,11 +12,27 @@ deliverable, not lifted from the narrative logs -- CLAUDE.md 5.12 rule 1, and 5.
 the narratives under-report counts (14/12/11 against a real 18/16/11).
 
 HOW L1's SHARE IS ESTABLISHED WITHOUT JUDGEMENT, and this is the heart of it. `check_truncation`
-method A does `p = all_p[idx]` -- it indexes the DOCUMENT by the JSON's idx (quality_check.py:494).
-Step 7 permutes the document first. So for every entry that yields a finding, ask a question that
-needs no human: DOES all_p[idx] ACTUALLY HOLD THE ENGLISH THIS ENTRY DECLARED? If it does not, the
-rule compared two unrelated paragraphs and the finding is a positional artefact BY CONSTRUCTION.
-No patch, no re-run, no reading of any finding's text.
+method A used to do `p = all_p[idx]` -- indexing the DOCUMENT by the JSON's idx. Step 7 permutes
+the document first. So for every entry that yields a finding, ask a question that needs no human:
+DOES all_p[idx] ACTUALLY HOLD THE ENGLISH THIS ENTRY DECLARED? If it does not, the rule compared
+two unrelated paragraphs and the finding is a positional artefact BY CONSTRUCTION. No patch, no
+re-run, no reading of any finding's text.
+
+BRANCH 14 FIXED THAT RULE, AND THIS INSTRUMENT NOW REPORTS BOTH SIDES. The positional
+recomputation below is kept and RELABELLED as the BASELINE: it is computed here, from the recorded
+artefacts, so it stays reproducible for ever regardless of what the script does next -- which is
+what makes "9 of 9 were artefacts" a permanent measurement rather than a claim about a version of
+the code that no longer exists. Beside it is the same computation under the pairing the script uses
+now. Both columns come from this file, so neither can quietly inherit the other's answer.
+
+READ THE HEADLINE FIGURES THIS WAY, AND NOTE WHAT IS AND IS NOT A BASELINE HERE. `TOTAL` is what
+the CURRENT script reports, so it moves whenever a fix lands -- that is the point of a fix branch,
+not a regression. The only baseline this file recomputes is method A's, in the `A base` column, and
+it is exact: 9 findings, 9 of them on a mispaired entry. The published pre-branch-14 totals of
+D05=8 and D06=32 are NOT recomputed here and cannot be, because the other classes are read from the
+script's own output. To reproduce those, run this against the baseline commit; to see each fix's
+own before-and-after, run `tests/test_check_scoping.py`, which loads the pre-branch scripts out of
+git and asserts both directions per rule.
 
 OUTPUT POLICY. Prints rule-class names, counts, and corpus doc-ids. NEVER a finding's text, a
 paragraph's text, a filename or a path -- every finding string embeds 50-70 characters of the
@@ -138,7 +154,23 @@ for pj, dx in workdirs:
     # --verbose, so parsing the output measured a capped sample and would have understated
     # D06 by six. Recomputing asks the same question a second way, which CLAUDE.md 5.1
     # prescribes for exactly this reason.
-    a_candidates, a_on_mispaired = 0, 0
+    a_candidates, a_on_mispaired, a_now = 0, 0, 0
+    # The pairing the script uses SINCE BRANCH 14: locate the paragraph holding the
+    # English the entry declared, and fall back to that declared English where it cannot
+    # be located uniquely. Recomputed here rather than imported, so this instrument and
+    # the script are two independent statements of the same rule and can disagree
+    # audibly instead of agreeing by construction.
+    by_text = {}
+    for i, t in enumerate(texts):
+        k = norm(t)
+        if k:
+            by_text.setdefault(k, []).append(i)
+
+    def fires(en_text, src_text):
+        if not en_text.strip():
+            return len(src_text.strip()) > 30                 # the EMPTY branch
+        return len(src_text) > 50 and (len(en_text) / len(src_text)) < 0.4
+
     for e in entries:
         idx, src, en = e.get("idx", -1), e.get("text") or "", e.get("en") or ""
         if not src.strip() or len(src) < 20 or idx < 0 or idx >= len(texts):
@@ -147,15 +179,19 @@ for pj, dx in workdirs:
         wrong_pair = bool(en.strip()) and norm(texts[idx]) != norm(en)
         if wrong_pair:
             mispaired_idx.add(idx)
-        doc_en = texts[idx]
-        if not doc_en.strip():
-            if len(src.strip()) > 30:                     # the EMPTY-translation branch, :499
-                a_candidates += 1
-                a_on_mispaired += 1 if wrong_pair else 0
-            continue
-        if len(src) > 50 and (len(doc_en) / len(src)) < 0.4:   # the ratio branch, :504
+        if fires(texts[idx], src):                            # BASELINE: positional
             a_candidates += 1
             a_on_mispaired += 1 if wrong_pair else 0
+        # NO POSITIONAL SHORTCUT. The first version of this recomputation had one, mirroring
+        # the first version of the check -- and the check dropped it because it made the
+        # verdict position-dependent again wherever two paragraphs share their English.
+        # An instrument that models a shortcut the code no longer has is an instrument
+        # measuring a version of the code that does not exist.
+        k = norm(en)
+        hits = by_text.get(k, []) if k else []
+        paired = texts[hits[0]] if len(hits) == 1 else en     # else the declared-English fallback
+        if fires(paired, src):                                # CURRENT: paired by text
+            a_now += 1
 
     # AND CORRELATE, because the mispairing RATE is not the finding count. Each truncation
     # finding carries `idx=N` in its own text; parsing the number tells us which entry it fired
@@ -177,42 +213,123 @@ for pj, dx in workdirs:
     l1_split[docid(pj)] += l1_findings
     rows.append((docid(pj), r.returncode, total, eligible, len(mispaired_idx),
                  classes.get("truncation", 0), a_candidates, a_on_mispaired, n_dangling,
-                 len(fired_idx), l1_findings))
+                 len(fired_idx), l1_findings, a_now, dict(classes)))
 
 print(f"  {'doc':8s} {'rc':>3s} {'TOTAL':>6s} {'mispaired':>10s} {'trunc-cls':>10s} "
-      f"{'A total':>8s} {'A mispaired':>12s} {'B printed':>10s}")
+      f"{'A base':>7s} {'A mispd':>8s} {'A now':>6s} {'B printed':>10s}")
 stops = 0
-for d, rc, total, elig, mis, trunc, acand, amis, dang, fired, l1 in rows:
+for (d, rc, total, elig, mis, trunc, acand, amis, dang, fired, l1, anow,
+     _cls) in rows:
     if total:
         stops += 1
     print(f"  {d:8s} {rc:>3d} {('-' if total is None else total):>6} "
-          f"{mis:>10d} {trunc:>10d} {acand:>8d} {amis:>12d} {dang:>10d}")
+          f"{mis:>10d} {trunc:>10d} {acand:>7d} {amis:>8d} {anow:>6d} {dang:>10d}")
 
 n_fired = sum(r[6] for r in rows)
 n_l1 = sum(r[7] for r in rows)
 n_dang_all = sum(r[8] for r in rows)
 n_printed = sum(r[9] for r in rows)
+n_now = sum(r[11] for r in rows)
 print(f"\n  DELIVERABLES THAT WOULD STILL BE BLOCKED AT STEP 9: {stops} of {len(rows)} workdir(s)")
 print(f"  distinct doc-ids blocked                          : "
       f"{len({r[0] for r in rows if r[2]})} of {len({r[0] for r in rows})}")
 print(f"  entries whose all_p[idx] holds the WRONG English   : {sum(r[4] for r in rows)}")
-print(f"  method A findings, recomputed past the display cap : {n_fired}")
+print(f"  method A under the BASELINE positional pairing     : {n_fired}"
+      f"   (pre-branch-14; recomputed here, not read from the script)")
 print(f"  of those, ON A MISPAIRED ENTRY = L1 artefact       : {n_l1}"
       f"  ({'n/a' if not n_fired else str(round(100 * n_l1 / n_fired)) + '%'})")
+print(f"  method A under the CURRENT text pairing            : {n_now}"
+      f"   (what the script reports today)")
 print(f"  method B (dangling endings) findings PRINTED       : {n_dang_all}"
-      f"   — capped at 5 per class by quality_check.py:893")
+      f"   — capped at 5 per class by the display cap in quality_check")
 print(f"  cross-check, finding lines parsed from output      : {n_printed}"
-      f"   (capped; the recomputation above is the measurement)")
+      f"   (capped; the recomputations above are the measurement)")
 
 print("\n  FINDINGS BY RULE CLASS, all workdirs")
 for k, v in sorted(class_totals.items(), key=lambda kv: -kv[1]):
     if v:
         print(f"    {k:32s} {v:>5d}")
 
+# PER DOCUMENT, PER CLASS -- because a class total of 11 could be one document or five,
+# and the answer decides which fix moves which document. The first version of this
+# instrument printed only the totals, and the per-document split had to be rebuilt from
+# scratch to plan branch 14. It belongs here.
+live = [k for k in sorted(class_totals) if class_totals[k]]
+if live:
+    print("\n  BY DOCUMENT AND CLASS  (blank = clean)")
+    print(f"    {'doc':8s} " + " ".join(f"{k[:13]:>14s}" for k in live))
+    for row in rows:
+        d, cls = row[0], row[12]
+        print(f"    {d:8s} " + " ".join(
+            f"{(cls.get(k) or ''):>14}" for k in live))
+    print(f"    {'ALL':8s} " + " ".join(f"{class_totals[k]:>14d}" for k in live))
+
+# ---------------------------------------------------------------------------------------
+# ARE THE NUMBERING FINDINGS EVEN OURS? Register M1. The numbering rule reads the sequence
+# of numPr references, and the pipeline does not translate numbering -- so an anomaly the
+# document ARRIVED with is inherited, and on a legacy .doc the converter rewrote the list
+# structure wholesale before the pipeline ever ran. That is testable without judgement:
+# find a .docx container in the workdir whose body differs from the delivered one, and
+# compare the anomaly count on both sides.
+#
+# Containers are identified BY INDEX, never by name. A corpus filename carries counterparty
+# and personal names and this output goes into a transcript, which CLAUDE.md 5.4 says no
+# scanner in this project can reach afterwards.
+print("\n  IS THE NUMBERING INHERITED? (M1) — containers numbered, never named")
+sys.path.insert(0, str(ROOT / "uk" / "scripts"))
+try:
+    from lxml import etree as _et
+    import quality_check as _QC
+except Exception as _exc:                                   # pragma: no cover
+    print(f"    VOID — cannot import the checker to compare: {type(_exc).__name__}")
+    _QC = None
+finally:
+    sys.path.remove(str(ROOT / "uk" / "scripts"))
+
+if _QC is not None:
+    import zipfile as _zip
+    agree = disagree = nosource = 0
+    for pj, dx in workdirs:
+        d = docid(pj)
+        delivered_bytes = dx.read_bytes()
+        t_num = len(_QC.check_numbering(_et.parse(str(dx)).getroot(), False))
+        notes = []
+        for n, c in enumerate(sorted(pj.parent.glob("*.docx"))
+                              + sorted(pj.parent.glob("*/*.docx")), 1):
+            try:
+                with _zip.ZipFile(c) as z:
+                    if "word/document.xml" not in z.namelist():
+                        continue
+                    raw = z.read("word/document.xml")
+            except Exception:
+                continue
+            if raw == delivered_bytes:
+                continue
+            try:
+                s_num = len(_QC.check_numbering(_et.fromstring(raw), False))
+            except Exception:
+                continue
+            notes.append(f"#{n}:source={s_num}")
+            if s_num == t_num:
+                agree += 1
+            else:
+                disagree += 1
+        if not notes:
+            nosource += 1
+        print(f"    {d:8s} delivered={t_num:<3d} " + ("  ".join(notes) or
+              "no differing container in this workdir"))
+    print(f"\n    containers whose anomaly count MATCHES the delivered body : {agree}")
+    print(f"    containers that DISAGREE (would mean we introduced some)   : {disagree}")
+    print(f"    workdirs with no differing container to compare against    : {nosource}")
+    print("    A match means the anomaly was already there. It is the evidence for passing")
+    print("    --original to the numbering check rather than reporting inherited structure")
+    print("    as though the translation had caused it.")
+
 print("\n  WHAT IS AND IS NOT ESTABLISHED")
 print("    MISPAIRED is measured and needs no judgement: all_p[idx] does not hold the English")
-print("    that entry declared, so the truncation rule compared unrelated paragraphs. Every")
-print("    finding it produced on such an entry is L1's positional artefact by construction.")
+print("    that entry declared, so the pre-branch-14 truncation rule compared unrelated")
+print("    paragraphs. Every finding it produced on such an entry is L1's positional artefact")
+print("    by construction — which is why the `A base` and `A mispd` columns are equal.")
 print("    The other rule classes are COUNTS ONLY. Classifying an individual finding true or")
 print("    false needs its text read, and each finding embeds client document text — so that")
 print("    residue is for Wouter or a sanitised route, NOT for this script to guess.")

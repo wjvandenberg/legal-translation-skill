@@ -29,6 +29,7 @@ import sys
 import os
 import json
 import re
+from collections import Counter
 from lxml import etree
 
 # Import the shared per-language marker module from the same scripts/ folder.
@@ -188,15 +189,72 @@ TRUNCATION_ENDINGS = [
 # weakening detection of genuine truncations (which lack the ;/, prefix).
 LIST_CONNECTOR_RE = re.compile(r'(?:[;,]\s*)(?:and|or)\s*$', re.IGNORECASE)
 
+# Terminal punctuation, for the source-side test the dangling-ending rule needs.
+# A source paragraph that itself ends mid-sentence cannot have a faithful English
+# rendering that ends on a full stop, so the rule must not read the English's
+# dangling ending as damage the translator did. Register G11.
+TERMINAL_PUNCT = tuple('.!?:;。！？"\')]}”’')
+
+# EXECUTION-BLOCK LEAD-IN. A formulaic opener whose grammatical object IS the
+# signature block below it, so it ends on a preposition BY DESIGN. Register G5.
+#
+# Both conditions are required, and the second is what keeps the exemption narrow:
+# an ordinary sentence that merely ends on "of" is untouched unless it also
+# carries an execution keyword. The residual cost is stated rather than hidden --
+# a real sentence containing "signed" AND ending on "of" is silenced. The
+# alternative would key on the paragraph's POSITION inside an execution block,
+# which this check cannot see, and G5 is LOW severity precisely because of that
+# trade. Measured on the recorded corpus: silences exactly the three findings on
+# the one document the register attests, and nothing on the other twelve workdirs.
+SIG_LEADIN_RE = re.compile(
+    r'\b(?:sign(?:ed|ature)|execut(?:ed|ion)|on\s+behalf|behalf\s+of|'
+    r'witness(?:ed|es)?|duly\s+authoris|duly\s+authoriz|as\s+a\s+deed|'
+    r'in\s+the\s+presence)\b', re.IGNORECASE)
+SIG_TAIL_RE = re.compile(r'\b(?:of|by|for)\s*$', re.IGNORECASE)
+
 # ======================================================================
 # CHECK FUNCTIONS
 # ======================================================================
 
+# Elements that RENDER a break between two runs, so no space character is needed
+# between them. `w:tab` here means a rendered tab CHARACTER; a `w:tab` inside
+# `w:pPr/w:tabs` is a tab STOP and is excluded below, which is the distinction the
+# OOXML rules draw and the trap a naive iteration falls into.
+BREAK_TAGS = frozenset((f'{{{W}}}tab', f'{{{W}}}br', f'{{{W}}}cr'))
+
+
 def check_spacing(root, verbose):
-    """Check 1: Missing spaces between adjacent w:t elements."""
+    """Check 1: Missing spaces between adjacent w:t elements.
+
+    WALKS THE PARAGRAPH IN DOCUMENT ORDER, NOT JUST ITS w:t ELEMENTS. Register G10.
+    Collecting only the w:t elements makes what sits BETWEEN two runs invisible, so
+    a party grid laid out as `Party A` <w:tab/> `Party B` -- entirely ordinary in a
+    signature block -- read as two adjacent runs with nothing between them and was
+    reported as a missing space. Branch 5 gave `quality_check` an exit code, so that
+    false positive stopped being a wasted glance and started stopping the run.
+
+    THIS IS A CONVERGENCE, NOT A WIDENING. `validate_apply._paragraph_applied_text`
+    already treats `w:tab` AND `w:br` as whitespace separators when it joins a
+    paragraph, and its docstring documents this very mechanism as a false positive
+    it had to fix. One check in the package saw what sits between two runs and
+    another did not; they now agree. Restricting the fix to tabs alone would leave
+    the identical false positive on a manual line break, which is the same defect
+    wearing a different element name.
+    """
     issues = []
     for p in root.iter(f'{{{W}}}p'):
-        t_elems = [(t, t.text) for t in p.iter(f'{{{W}}}t') if t.text]
+        # (element, text) for every w:t, with a None entry marking a rendered break.
+        t_elems = []
+        for el in p.iter():
+            if el.tag in BREAK_TAGS:
+                # A tab STOP declares a position in w:pPr/w:tabs and renders nothing.
+                parent = el.getparent()
+                if el.tag == f'{{{W}}}tab' and parent is not None \
+                        and parent.tag == f'{{{W}}}tabs':
+                    continue
+                t_elems.append((None, None))
+            elif el.tag == f'{{{W}}}t' and el.text:
+                t_elems.append((el, el.text))
         for i in range(1, len(t_elems)):
             prev = t_elems[i-1][1]
             curr = t_elems[i][1]
@@ -470,39 +528,156 @@ def check_that_precedes(root, verbose):
                 issues.append(f"'{m.group()}' in '{full[:70]}'")
     return issues
 
+def _norm_text(s):
+    """Whitespace-normalised text, for pairing a notes entry to a paragraph.
+
+    COERCES RATHER THAN TRUSTING THE TYPE. paragraphs.json is hand-edited during a run and
+    this project has twice recorded quiet errors from that, so a numeric or otherwise
+    non-string `en` is a real input. `s or ''` alone let one through: a number is truthy,
+    so it reached re.sub and raised TypeError. Found by the property tests, which is also
+    where the same probe showed `text: null` and a non-integer `idx` crashing the check
+    BEFORE this branch — those are fixed here too, and measured as pre-existing rather
+    than claimed as this branch's doing.
+    """
+    if s is None:
+        return ''
+    if not isinstance(s, str):
+        s = str(s)
+    return re.sub(r'\s+', ' ', s).strip()
+
+
+def _pair_entries_to_paragraphs(root, source_data):
+    """Pair each notes entry to the paragraph that holds the English it declared.
+
+    WHY NOT BY POSITION, WHICH IS WHAT THIS USED TO DO. Step 7 (reorder_definitions)
+    permutes document.xml, so `all_p[idx]` and `source_data[i]` stop describing the
+    same paragraph the moment a document has a definitions section -- which, per
+    Step 7's own rationale, is almost all of them. Measured on the recorded corpus:
+    127 entries whose all_p[idx] holds text that is not the English that entry
+    declared, and 9 of 9 of this check's method-A findings sat on one of them.
+    Register L1.
+
+    SO PAIR THE WAY `apply` ITSELF PAIRS -- on the text. That is not a new idea
+    imported into this script; it is the property the whole pipeline rests on
+    (text-matching, not index-matching), and index-based application was removed
+    from `apply` for exactly this class of corruption.
+
+    Returns {id(entry): paragraph_text}. An entry whose declared English cannot be
+    located UNIQUELY is absent from the map, and the caller falls back to the
+    entry's own declared English rather than guessing at a paragraph -- a wrong
+    unique pairing is worse than none, because it would compare two unrelated
+    paragraphs, which is the defect being repaired.
+
+    AND THE `idx` IS NOT CONSULTED AT ALL, WHICH IS A CORRECTION TO THIS FUNCTION'S
+    FIRST VERSION. That version kept the positional candidate whenever it happened
+    to hold the right English, on the reasoning that a document with no definitions
+    section would then keep exactly the findings it had before. The reasoning was
+    fine and the consequence was not: where the same English appears in TWO
+    paragraphs, whether the positional shortcut hits decides whether the entry
+    pairs at all -- so the verdict depended on position again, in precisely the
+    case the pairing exists to handle. Measured by the property tests at 287 of 320
+    random permutations invariant instead of 320. Dropping the shortcut costs
+    nothing: where the key is unique it is what the lookup below returns anyway.
+    """
+    texts = [''.join(t.text or '' for t in p.iter(f'{{{W}}}t'))
+             for p in root.iter(f'{{{W}}}p')]
+    by_text = {}
+    for i, t in enumerate(texts):
+        k = _norm_text(t)
+        if k:
+            by_text.setdefault(k, []).append(i)
+
+    paired = {}
+    for entry in source_data:
+        if not isinstance(entry, dict):
+            continue
+        key = _norm_text(entry.get('en'))
+        if not key:
+            continue
+        hits = by_text.get(key, [])
+        if len(hits) == 1:
+            paired[id(entry)] = texts[hits[0]]
+    return paired
+
+
 def check_truncation(root, verbose, source_data=None):
     """Check 14: Truncated translations (sentences cut off mid-thought).
 
     Two methods:
-    A) If source_data (paragraphs.json) is provided, compare English vs Italian length.
-       Flag if English is less than 40% the length of Italian (suggests truncation).
-    B) Always check for dangling endings (sentences ending with articles/prepositions).
+    A) If source_data (paragraphs.json) is provided, compare English vs source length.
+       Flag if English is less than 40% the length of the source (suggests truncation).
+       The English is read from the paragraph PAIRED BY TEXT -- see
+       _pair_entries_to_paragraphs -- and from the entry's own declared `en` where no
+       unique pairing exists, so every eligible entry is judged.
+    B) Dangling endings (sentences ending with articles/prepositions), EXCEPT where
+       the source paragraph also lacks terminal punctuation, or where the paragraph
+       is an execution-block lead-in.
     """
     issues = []
+    paired = {}
+    if source_data:
+        paired = _pair_entries_to_paragraphs(root, source_data)
 
     # Method A: Length comparison with source
     if source_data:
-        all_p = list(root.iter(f'{{{W}}}p'))
         for entry in source_data:
+            if not isinstance(entry, dict):
+                continue
+            # COERCED, NOT TRUSTED. `entry.get('text', '')` returns None when the key
+            # is PRESENT and null, which then crashed on .strip() -- measured as a
+            # pre-existing crash, not one this branch introduced, and fixed here
+            # because this is the line that reads it. `idx` is now used only in the
+            # message, so a non-integer one no longer needs to be comparable.
             idx = entry.get('idx', -1)
-            src_text = entry.get('text', '')
+            src_text = entry.get('text') or ''
+            if not isinstance(src_text, str):
+                src_text = str(src_text)
             if not src_text.strip() or len(src_text) < 20:
                 continue
-            if idx < 0 or idx >= len(all_p):
-                continue
 
-            p = all_p[idx]
-            en_text = ''.join(t.text or '' for t in p.iter(f'{{{W}}}t'))
+            # The English to judge. The paired paragraph where one was found --
+            # which also catches an edit made after apply -- otherwise the entry's
+            # own declared English, which is what this rule is about: the docstring
+            # says "truncated TRANSLATIONS", i.e. damage the translator did. Post-
+            # apply loss is branch 8's and branch 11's subject, and validate_apply
+            # --strict already re-checks token presence after post-processing.
+            en_text = paired.get(id(entry))
+            if en_text is None:
+                en_text = entry.get('en') or ''
+            if not isinstance(en_text, str):
+                en_text = str(en_text)
 
             if not en_text.strip():
                 if len(src_text.strip()) > 30:
                     issues.append(f"EMPTY translation for non-empty source (idx={idx}): '{src_text[:60]}'")
                 continue
 
-            # Length ratio check (English is typically 0.8-1.2x Italian length for legal text)
+            # Length ratio check (English is typically 0.8-1.2x source length for legal text)
             ratio = len(en_text) / len(src_text) if len(src_text) > 0 else 1
             if ratio < 0.4 and len(src_text) > 50:
-                issues.append(f"TRUNCATED? ratio={ratio:.2f} (idx={idx}): EN='{en_text[:50]}' IT='{src_text[:50]}'")
+                issues.append(f"TRUNCATED? ratio={ratio:.2f} (idx={idx}): EN='{en_text[:50]}' SRC='{src_text[:50]}'")
+
+    # The source text for each paragraph, keyed by the paragraph text, so method B
+    # can ask whether the SOURCE dangled too. Built from the same pairing, so the
+    # two methods cannot disagree about which source paragraph a paragraph came
+    # from -- they did before, which is how L1's mispairing reached a rule that
+    # never used source_data at all.
+    src_by_para = {}
+    if source_data:
+        for entry in source_data:
+            if not isinstance(entry, dict):
+                continue
+            pt = paired.get(id(entry))
+            if pt is None:
+                continue
+            k = _norm_text(pt)
+            src = entry.get('text') or ''
+            if not isinstance(src, str):
+                src = str(src)
+            if k in src_by_para and src_by_para[k] != src:
+                src_by_para[k] = None          # ambiguous: refuse to exempt
+            else:
+                src_by_para.setdefault(k, src)
 
     # Method B: Dangling endings. Skip drafter placeholder tokens
     # (faithful annotations preserved from source, not truncations).
@@ -532,6 +707,32 @@ def check_truncation(root, verbose, source_data=None):
                 # Don't flag if it's clearly a heading or short label
                 if len(full.split()) < 5:
                     continue
+
+                # G5. An execution-block lead-in ends on its preposition by design:
+                # its object is the signature block that follows it.
+                if SIG_TAIL_RE.search(stripped) and SIG_LEADIN_RE.search(stripped):
+                    break
+
+                # G11. THE DATA THIS RULE NEEDED WAS ALREADY IN THE FUNCTION'S OWN
+                # PARAMETER, UNUSED. The docstring's subject is "truncated
+                # TRANSLATIONS", but where the SOURCE paragraph itself ends
+                # mid-sentence, a faithful English rendering must also end on a
+                # preposition or article -- so this rule was reporting fidelity as
+                # damage, and no compliant repair existed: rewriting the English to
+                # satisfy it would breach the rule that a faithful translation is
+                # never altered to satisfy a linter.
+                #
+                # Exempt ONLY where the paired source paragraph also lacks terminal
+                # punctuation. Over-truncation of a dangling source paragraph stays
+                # covered by method A's length ratio, so nothing is left unguarded.
+                # No pairing means NO exemption: absence of evidence that the source
+                # dangled is not evidence that it did.
+                src = src_by_para.get(_norm_text(full))
+                if src:
+                    s = src.strip()
+                    if s and not s.endswith(TERMINAL_PUNCT):
+                        break
+
                 issues.append(f"Dangling ending '{full[-20:].strip()}' in '{full[:60]}'")
                 break
 
@@ -617,19 +818,15 @@ def check_formatting(root, verbose):
 
     return issues
 
-def check_numbering(root, verbose):
-    """Check 16: Numbering/structure validation.
+def _numbering_anomalies(root):
+    """Every numbering anomaly in one body, as (structural_signature, message).
 
-    Detects:
-    - Paragraphs with numId references that point to numbering definitions
-      where the sequence appears broken (e.g., level 0 jumps from 1 to 3)
-    - Orphaned sub-items (level 1+ without a preceding level 0 parent)
+    The signature deliberately excludes the paragraph TEXT, because the same
+    anomaly has source-language text on one side and English on the other and
+    would never compare equal. What it carries is the numId, the level and the
+    level it jumped from -- the structure, which the pipeline does not translate.
     """
-    issues = []
-
-    # Track numbering sequences by numId and ilvl
-    # This is a heuristic check — we track the text-based numbering we see
-    # and flag obvious gaps
+    out = []
     current_nums = {}  # numId -> last seen ilvl
 
     for p in root.iter(f'{{{W}}}p'):
@@ -654,14 +851,60 @@ def check_numbering(root, verbose):
             current_nums[numid] = ilvl
             # First occurrence at level > 0 is suspicious (orphaned sub-item)
             if ilvl > 1:
-                issues.append(f"Numbering starts at level {ilvl} (numId={numid}): '{full[:60]}'")
+                out.append((('orphan', numid, ilvl),
+                            f"Numbering starts at level {ilvl} (numId={numid}): '{full[:60]}'"))
         else:
             prev = current_nums[numid]
             # Jumping down more than 1 level is suspicious
             if ilvl > prev + 1:
-                issues.append(f"Numbering level jump {prev}->{ilvl} (numId={numid}): '{full[:60]}'")
+                out.append((('jump', numid, prev, ilvl),
+                            f"Numbering level jump {prev}->{ilvl} (numId={numid}): '{full[:60]}'"))
             current_nums[numid] = ilvl
 
+    return out
+
+
+def check_numbering(root, verbose, source_root=None):
+    """Check 16: Numbering/structure validation.
+
+    Detects:
+    - Paragraphs with numId references that point to numbering definitions
+      where the sequence appears broken (e.g., level 0 jumps from 1 to 3)
+    - Orphaned sub-items (level 1+ without a preceding level 0 parent)
+
+    WITH source_root, REPORTS ONLY WHAT THE SOURCE DID NOT ALREADY HAVE.
+    Register M1. This rule reads the sequence of numPr references, and the
+    pipeline does not translate numbering -- so an anomaly present in the source
+    body is INHERITED and reporting it says nothing about the translation. Where
+    the source arrived as a legacy binary .doc, the converter rewrote the list
+    structure wholesale, and every anomaly it left behind was then reported
+    against us. Re-measured on the recorded corpus: on both documents that
+    produce numbering findings, a body that differs from the delivered one
+    yields the SAME anomaly count -- 8 against 8, and 3 against 3 -- so all
+    eleven are inherited and none was introduced here.
+
+    A REAL INTRODUCED DEFECT STILL FIRES, which is the point of differencing
+    rather than disabling: Step 7 permutes the definitions block, and a
+    permutation that breaks a numbering sequence produces an anomaly present in
+    the delivered body and absent from the source.
+
+    Without source_root the behaviour is exactly as before -- and `check` then
+    says so out loud, because a comparison that silently did not happen is the
+    failure shape this branch is repairing elsewhere (F15, C9).
+    """
+    delivered = _numbering_anomalies(root)
+    if source_root is None:
+        return [msg for _sig, msg in delivered]
+
+    # Multiset difference, so three identical jumps in the source cancel three in
+    # the delivered body and a fourth is still reported.
+    inherited = Counter(sig for sig, _msg in _numbering_anomalies(source_root))
+    issues = []
+    for sig, msg in delivered:
+        if inherited.get(sig):
+            inherited[sig] -= 1
+            continue
+        issues.append(msg)
     return issues
 
 def check_definition_order(root, verbose):
@@ -816,7 +1059,7 @@ def check_aux_files(aux_dir, source_language, verbose=False):
 # ======================================================================
 
 def check(xml_path, verbose=False, source_json=None, variant='uk',
-          source_language=None, aux_dir=None):
+          source_language=None, aux_dir=None, original_xml=None):
     tree = etree.parse(xml_path)
     root = tree.getroot()
 
@@ -824,6 +1067,13 @@ def check(xml_path, verbose=False, source_json=None, variant='uk',
     if source_json:
         with open(source_json, 'r', encoding='utf-8') as f:
             source_data = json.load(f)
+
+    # The UNTRANSLATED body, for the checks that must not report an anomaly the
+    # document arrived with. Optional: without it those checks behave exactly as
+    # before and say below that they could not tell inherited from introduced.
+    source_root = None
+    if original_xml:
+        source_root = etree.parse(original_xml).getroot()
 
     # Auto-detect source language from paragraphs.json if not provided.
     if not source_language and source_data:
@@ -848,7 +1098,7 @@ def check(xml_path, verbose=False, source_json=None, variant='uk',
         ('internal_article_refs', check_article_refs),
         ('that_precedes_follows', check_that_precedes),
         ('formatting', check_formatting),
-        ('numbering', check_numbering),
+        ('numbering', lambda r, v: check_numbering(r, v, source_root)),
         ('definition_order', check_definition_order),
     ]
 
@@ -897,6 +1147,19 @@ def check(xml_path, verbose=False, source_json=None, variant='uk',
     print(f"{'='*60}")
     print(f"  {'TOTAL':30s} {total} issues")
 
+    # SAY WHEN A COMPARISON DID NOT HAPPEN. The numbering rule reads structure the
+    # pipeline never translates, so without the untranslated body it cannot tell an
+    # anomaly the document ARRIVED with from one introduced here -- and on the
+    # recorded corpus every such anomaly was inherited. A check that silently does
+    # nothing is the failure shape this branch repairs twice over (F15, C9), so this
+    # one announces the gap instead of leaving the operator to infer it.
+    if results.get('numbering') and source_root is None:
+        print(f"\n  NOTE: numbering reported {len(results['numbering'])} issue(s) and "
+              "--original was not\n        supplied, so it cannot tell an anomaly "
+              "INHERITED from the source document\n        from one introduced by the "
+              "pipeline. Re-run with --original <original document.xml>\n        before "
+              "treating these as ours.")
+
     if total == 0:
         print("\n  *** PASSED: Document is ready for delivery ***")
     else:
@@ -927,6 +1190,12 @@ if __name__ == '__main__':
     ap.add_argument('--language', '--source-language', dest='source_language',
                     default=None,
                     help='Source language (overrides auto-detection from paragraphs.json).')
+    ap.add_argument('--original', dest='original_xml', default=None,
+                    help='The UNTRANSLATED word/document.xml. Lets the numbering '
+                         'check report only anomalies the source did not already '
+                         'have — a legacy .doc conversion rewrites list structure '
+                         'wholesale, and those anomalies are not the translation\'s. '
+                         'Strongly recommended whenever numbering is reported.')
     ap.add_argument('--aux-dir', dest='aux_dir', default=None,
                     help='Rev12+: directory containing translated auxiliary XML '
                          '(numbering.xml, headerN.xml, footerN.xml, comments.xml, '
@@ -940,7 +1209,7 @@ if __name__ == '__main__':
     results = check(args.xml_path, verbose=args.verbose,
                     source_json=args.source_json,
                     variant=args.variant, source_language=source_language,
-                    aux_dir=args.aux_dir)
+                    aux_dir=args.aux_dir, original_xml=args.original_xml)
 
     # STEP 9's VERDICT HAS TO BE ABLE TO LEAVE THIS SCRIPT, and until now it
     # could not. There was no sys.exit for the issues case, so this script

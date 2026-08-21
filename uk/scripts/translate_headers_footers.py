@@ -826,6 +826,14 @@ def apply_from_scaffold(docx_path, scaffold_json, output_dir):
     treated as "preserve verbatim" — their XML paragraph is left exactly
     as it was, and the output file is still written (so repack_docx.py's
     --headers-footers-dir picks up every file consistently).
+
+    BUT THE THREE ARE NOT THE SAME FOR THE EXIT CODE. `en == text` is a
+    DELIBERATE, MANDATED value — Step 8b.2a requires placeholders to be
+    preserved verbatim and --extract tells the operator to copy an
+    already-English header across unchanged — whereas `en == null` and
+    `en == ""` mean nobody filled that entry in. Counting all three as
+    "nothing happened" is register F15, and it made the only clean exit
+    require writing something the same step document forbids.
     """
     with open(scaffold_json, 'r', encoding='utf-8') as f:
         entries = json.load(f)
@@ -837,6 +845,10 @@ def apply_from_scaffold(docx_path, scaffold_json, output_dir):
 
     written = []
     changed_counts = {}
+    # Entries that were DEALT WITH without a replacement, kept apart from entries
+    # nobody filled in. Conflating the two is register F15.
+    verbatim_counts = {}
+    unfilled_counts = {}
     with zipfile.ZipFile(docx_path, 'r') as zf:
         available = set(zf.namelist())
         for source, file_entries in by_source.items():
@@ -849,12 +861,22 @@ def apply_from_scaffold(docx_path, scaffold_json, output_dir):
             for e in file_entries:
                 en = e.get('en')
                 if en is None:
+                    unfilled_counts[source] = unfilled_counts.get(source, 0) + 1
                     continue
                 en_str = str(en)
                 if en_str.strip() == '':
+                    unfilled_counts[source] = unfilled_counts.get(source, 0) + 1
                     continue
                 if en_str == e.get('text'):
-                    # operator chose to preserve verbatim — no replacement needed.
+                    # PRESERVED VERBATIM ON PURPOSE, AND THAT IS A FILLED SCAFFOLD.
+                    # Register F15. Step 8b.2a requires that placeholders "MUST be
+                    # preserved verbatim in the `en` field", and --extract prints the
+                    # same instruction for a header already in English. So en == text
+                    # is a value the step doc MANDATES -- and counting it as evidence
+                    # that nobody filled the scaffold in made following the manual
+                    # exactly produce a warning and a non-zero exit, with the only
+                    # clean exit being to write something the same manual forbids.
+                    verbatim_counts[source] = verbatim_counts.get(source, 0) + 1
                     continue
                 apply_map[e['p_idx']] = (en_str, e.get('fields'))
 
@@ -885,18 +907,39 @@ def apply_from_scaffold(docx_path, scaffold_json, output_dir):
             changed_counts[source] = changes
 
     total_changes = sum(changed_counts.values())
+    total_verbatim = sum(verbatim_counts.values())
+    total_unfilled = sum(unfilled_counts.values())
     print(
         f'Applied translations to {len(written)} file(s), '
         f'{total_changes} paragraph replacement(s) total.'
     )
     for src in written:
-        print(f'  {src}: {changed_counts[src]} paragraph(s) replaced')
-    if total_changes == 0:
+        print(f'  {src}: {changed_counts[src]} paragraph(s) replaced'
+              + (f', {verbatim_counts[src]} preserved verbatim'
+                 if verbatim_counts.get(src) else '')
+              + (f', {unfilled_counts[src]} NOT FILLED IN'
+                 if unfilled_counts.get(src) else ''))
+    if total_verbatim:
         print(
-            'NOTE: no paragraphs were replaced — every scaffold entry either had '
-            'en == null, en == "", or en == text. Verify the scaffold is filled in.'
+            f'  {total_verbatim} entry/entries were preserved verbatim (en == text). '
+            'That is a\n  FILLED scaffold, not an empty one — Step 8b.2a requires it '
+            'for placeholders and\n  for a header already in English.'
         )
-    return total_changes > 0
+    if total_unfilled:
+        print(
+            f'  {total_unfilled} entry/entries were NOT filled in (en == null or "") '
+            'and were left\n  exactly as they were. Check whether that was intended.'
+        )
+    # REFUSE ONLY WHEN NOTHING WAS DEALT WITH AT ALL. An entry preserved verbatim was
+    # dealt with; an entry with en == null or "" was not. The old condition summed the
+    # two and so reported a correctly-completed step as an unfilled scaffold.
+    if total_changes == 0 and total_verbatim == 0:
+        print(
+            'NOTE: no paragraphs were replaced and none was preserved verbatim — every '
+            'scaffold\n      entry had en == null or en == "". Verify the scaffold is '
+            'filled in.'
+        )
+    return (total_changes + total_verbatim) > 0
 
 # ──────────────────────────────────────────────────────────────────────
 # MODE 3 — Legacy dictionary-lookup translation.

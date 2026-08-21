@@ -202,6 +202,47 @@ for s in strays[:10]:
 if strays:
     FAIL.append("a Word document sits outside tests/fixtures/")
 
+# AND NOTHING DEVELOPMENT-ONLY MAY SIT IN A SHIPPED TREE. Added 2026-08-21 on branch 14,
+# after the bytecode leak came back for the THIRD time through a new caller.
+#
+# The history is the argument for putting the check here rather than patching callers.
+# Importing a skill module drops a __pycache__ into uk/scripts or us/scripts. It was fixed
+# in tests/run_tests.py; it returned through tools/audit_branches.py; it returned again
+# through tools/cycle_evidence.py, which runs the tests as a subprocess and so passes its
+# OWN environment rather than the test runner's. Each fix was correct and none of them
+# stopped the next caller, because __pycache__ is gitignored and therefore invisible to
+# every diff, every git status and -- until now -- to this gate, which reported CLEAR with
+# a .pyc sitting in uk/scripts.
+#
+# The consequence is stated at its real strength rather than inflated: the release-time
+# packager zips the variant tree, so this WOULD ship inside the .skill -- and that packager
+# is itself declared future and not yet built, so today the leak is latent. It becomes real
+# the moment packaging is built at D3, which is exactly when nobody will be looking for it.
+_SHIPPED_STRAYS = []
+for _v in ("uk", "us"):
+    _root = ROOT / _v
+    if not _root.is_dir():
+        continue
+    for _p in _root.rglob("*"):
+        _rel = _p.relative_to(ROOT)
+        if _p.is_dir() and _p.name == "__pycache__":
+            _SHIPPED_STRAYS.append(str(_rel))
+        elif _p.is_file() and (_p.suffix in {".pyc", ".pyo"}
+                               or _p.name.endswith(".orig")
+                               or _p.name.endswith(".rej")
+                               or _p.name.endswith("~")):
+            _SHIPPED_STRAYS.append(str(_rel))
+print(f"  development-only files inside uk/ or us/: {len(_SHIPPED_STRAYS)}")
+for _s in _SHIPPED_STRAYS[:10]:
+    print(f"      {_s}")
+if _SHIPPED_STRAYS:
+    FAIL.append(
+        f"{len(_SHIPPED_STRAYS)} development-only file(s) sit inside a SHIPPED tree "
+        "(__pycache__ / .pyc / .orig / .rej / editor backup). They are gitignored, so no "
+        "diff shows them — and the release packager zips the tree. Delete them and set "
+        "PYTHONDONTWRITEBYTECODE in whatever ran last."
+    )
+
 head("7. THE PUBLISHED TREES — ADDED LINES ONLY, AGAINST THE BASELINE")
 # WHY THIS SECTION EXISTS, AND WHY IT DIFFS RATHER THAN SCANS.
 #
