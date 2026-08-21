@@ -324,14 +324,14 @@ which is why a one-digit error in a public table is now a build failure rather t
 2. **Runtime is `24.6 + 0.040 × paragraphs` minutes** — about **25 minutes of fixed overhead and 2.4 seconds
    a paragraph.** Translating is **43%** of the time; on a 24-paragraph document **96%** of the run is fixed
    cost. **The skill has one gear**, and that is the runtime problem.
-2. **The 35-paragraph batch cap is correctly calibrated, and it is an ATTENTION cap, not a context cap.**
+3. **The 35-paragraph batch cap is correctly calibrated, and it is an ATTENTION cap, not a context cap.**
    Context was never the binding constraint on any run. **Evidence against raising it under Opus 5.**
-3. **Context is not a constraint:** the skill-side peak is **6.4% of the 1M window** (8.3% on a profile
+4. **Context is not a constraint:** the skill-side peak is **6.4% of the 1M window** (8.3% on a profile
    heavier than anything observed). The live reasons to care about file size are **findability and
    truncation, not tokens.**
-4. **The over-engineering is in capabilities, not in files.** No dead scripts, no orphan lexicons, only 4%
+5. **The over-engineering is in capabilities, not in files.** No dead scripts, no orphan lexicons, only 4%
    duplicated prose — but **four shared capabilities across thirteen independent implementations**.
-5. **Batch position degrades the POLICING, not the translation.** The controlled pair (same document, batch
+6. **Batch position degrades the POLICING, not the translation.** The controlled pair (same document, batch
    position the only variable) scored 9/9/9 on the translation criteria in both runs; every point the arm
    lost, it lost to out-of-pipeline defects the single run had found and repaired. **The consequence is an
    argument for the fixes, not for a batch rule.**
@@ -1548,13 +1548,13 @@ documents come through `quality_check` completely clean. `tools/qc_census.py` re
 ### FIVE THINGS OPEN
 
 1. **Arm 2** — unconfirmed, deliberately unbuilt, and now unnecessary.
-3. **A `probe` origin class for the register.** The validator rejects `probe-5b`, so F1's and
+2. **A `probe` origin class for the register.** The validator rejects `probe-5b`, so F1's and
    G11's provenance sits in their text. Step C will produce more behavioural evidence.
-4. **I-7, I-8, I-9, I-10** — the four open A1 harness defects. They will corrupt Step C's evidence
+3. **I-7, I-8, I-9, I-10** — the four open A1 harness defects. They will corrupt Step C's evidence
    if still open when it runs.
-5. **`verify_md`'s cross-document §ref defect** — a shared-folder fix with its own selftests and
+4. **`verify_md`'s cross-document §ref defect** — a shared-folder fix with its own selftests and
    version bump, not a local edit. The obvious repair would silence genuine local refs.
-6. **The six untracked house scripts in `tools/`.** The shared folder changed **six times** in one
+5. **The six untracked house scripts in `tools/`.** The shared folder changed **six times** in one
    session — `verify_md` v8→v9→v10, `house_common` v2→v3→v4, `check_checkers` v5→v6,
    `verify_deliverable` v2→v3 — so `check_checkers` flipped between two sweep runs minutes apart.
    Each was re-copied with the superseded version kept in `temp/`. **They are untracked, so none
