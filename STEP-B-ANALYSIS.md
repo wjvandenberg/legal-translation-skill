@@ -292,6 +292,38 @@ because the decision comes first.
 with no way out. Branch 11 must follow branch 9, or it cannot be built. Branch 16 must follow branch 15 and
 must contain the off-flag removal.
 
+> **AND A FOURTH, ADDED 2026-08-19 BY MEASUREMENT RATHER THAN BY ARGUMENT: BRANCH 14's
+> `quality_check` SLICE BELONGS IMMEDIATELY AFTER BRANCH 5.**
+>
+> The seventeen-row review *(§12, "the eighteen partitioned")* measured which of the eighteen
+> no-compliant-repair rows branch 5 can actually convert into a blocked run. **The answer is two —
+> L1 and F28 — and they are NOT the same kind of thing.** *(Corrected 2026-08-20: this cell said
+> "both are `quality_check` false positives", which is right about L1 and wrong about F28.)* **L1 is
+> a false positive** — it pairs positionally after Step 7 permutes, and the census measures 9 of 9 of
+> its findings landing on mispaired entries. **F28 is a TRUE positive the operator cannot legally
+> clear** — the check is right, every route out is forbidden by another rule, and it is one of §5.5's
+> three impossible requirements. So branch 14's slice fixes L1 and **cannot fix F28**: F28's answer
+> is rule 5b, which is why it is the rig for the 5b arm. `quality_check` is the only implicated
+> script whose exit expressions change against rev44; the other blocking rows already block today
+> and one never blocks at all.
+>
+> **So branch 5's risk is not spread across the tree, it is concentrated in one script**, and with
+> G10 and M1's eight inherited false positives that script will stop runs on documents that are
+> fine. Branch 14 in full is the whole false-positive sweep and stays where it is; **its
+> `quality_check` slice is four items and should not wait eight branches.** Each still needs
+> branch 14's own discipline — a pattern change plus a test proving it still catches the true
+> positive.
+
+> **THIS GATE IS DISCHARGED, 2026-08-20 — read `DECISIONS-LOG.md`, 2026-08-20, before acting on the text
+> below.** Three rigs were built; every one turned out to be a check that was **wrongly scoped** rather than
+> a deadlock, and in each case the operator proved it from the check's own source and exited under rule 5a
+> with full disclosure, leaving the installed tree 198 of 198 byte-identical. **The gate's concern was
+> answered; its test was aimed at a situation that does not arise in the recorded evidence.** And the
+> reasoning below is wrong on one point that matters: it treats 5b as what makes branch 5 safe. **The census
+> measured the real risk as false-alarm load**, which is 5a's and branch 14's. 5b is kept as insurance plus a
+> forcing function. **The text below is preserved as written, because it is the reasoning the gate was set
+> on and rewriting it would hide what changed.**
+>
 > **AND A FOURTH GATE ON BRANCH 5, ADDED 2026-08-11 BY WOUTER'S DECISION: THE EXCEPTION CHANNEL MUST BE
 > SHOWN TO WORK BEHAVIOURALLY BEFORE THE CHECKS GET TEETH.**
 >
@@ -1261,7 +1293,7 @@ a **blank page** in a delivered contract. **[measured]**
 empty-paragraph page breaks and manual line breaks alike. Preserving *how many* there are does not preserve
 *what they do* once the English is 30% longer than the source.
 
-### 5.3 Things that say it worked when it did not — 41 findings
+### 5.3 Things that say it worked when it did not — 43 findings
 
 **The strictest check compares bags of words.** No order, no punctuation, not even a count — so a word can
 be deleted and the check still passes, as long as the same word occurs somewhere else in the paragraph.
@@ -1578,7 +1610,7 @@ failures that were previously invisible — which is the point."*
 
 | pros | cons | what it would break | what it does NOT fix |
 |---|---|---|---|
-| Detects or closes **51 findings, 6 of them the worst grade** — more than any other option · It is the only option that **changes what the project can find next time**; every other one fixes what we already found · It is the only route to the never-regress rule you require and that is unenforceable today · The extraction-completeness half is a **same-language exact comparison**: cheap, deterministic, and it closes the one blind spot the planned gate leaves open · The one-line exit-code fix has independent confirmation from two methods with nothing in common · Reuses eight lines that already exist and get the language right where another script gets it wrong | Cost **low-to-medium**, risk **low** *(inference)* — one new program plus wiring, no change to how anything translates · **The real risk is scope creep into a second grader.** It must stay strictly mechanical: text inventories, character diffs, reference counts, span counts, bracket balance, invisible-character sweeps. The moment it starts judging whether English reads well, it stops being repeatable and cannot be a regression gate · The character-exact half **cannot be built** until the tidy-up script declares what it changed — see option 6 | **This is the big one, and it is a sequencing fact rather than an objection.** Making the checks discerning converts silent defects into **blocked runs** — and **18 findings say in their own text that no compliant repair exists**, three of them requirements that already cannot be met at all. Turn on a discerning check before the repair or the escape hatch exists and the pipeline **deadlocks on real documents.** So this option cannot ship without option 5's cheap half beside it · It will also fire on legitimate output until the false-positive scoping is done | **Every defect itself.** It detects; it does not repair. Nothing in the content-loss, formatting, layout or dictionary groups is *closed* by it · It cannot see whether a dictionary row is *wrong* — only whether the text moved · It cannot ask whether the English suits the instrument class, which is what the human review is for |
+| Detects or closes **53 findings, 6 of them the worst grade** — more than any other option · It is the only option that **changes what the project can find next time**; every other one fixes what we already found · It is the only route to the never-regress rule you require and that is unenforceable today · The extraction-completeness half is a **same-language exact comparison**: cheap, deterministic, and it closes the one blind spot the planned gate leaves open · The one-line exit-code fix has independent confirmation from two methods with nothing in common · Reuses eight lines that already exist and get the language right where another script gets it wrong | Cost **low-to-medium**, risk **low** *(inference)* — one new program plus wiring, no change to how anything translates · **The real risk is scope creep into a second grader.** It must stay strictly mechanical: text inventories, character diffs, reference counts, span counts, bracket balance, invisible-character sweeps. The moment it starts judging whether English reads well, it stops being repeatable and cannot be a regression gate · The character-exact half **cannot be built** until the tidy-up script declares what it changed — see option 6 | **This is the big one, and it is a sequencing fact rather than an objection.** Making the checks discerning converts silent defects into **blocked runs** — and **18 findings say in their own text that no compliant repair exists**, three of them requirements that already cannot be met at all. Turn on a discerning check before the repair or the escape hatch exists and the pipeline **deadlocks on real documents.** So this option cannot ship without option 5's cheap half beside it · It will also fire on legitimate output until the false-positive scoping is done | **Every defect itself.** It detects; it does not repair. Nothing in the content-loss, formatting, layout or dictionary groups is *closed* by it · It cannot see whether a dictionary row is *wrong* — only whether the text moved · It cannot ask whether the English suits the instrument class, which is what the human review is for |
 
 ---
 
@@ -2656,7 +2688,7 @@ plain English above becoming hand-waving.**
 |---|---|---|---|
 | 1 | loses content | A1 A2 A3 A6 A8 A9 A15 A16 A19 B3 B8 C2 C12 C13 C14 C16 C17 C19 C23 C28 E4 F16 F27 J1 M1 N1 S3 | CRITICAL:6 HIGH:16 MED:4 LOW:1 |
 | 2 | looks wrong on the page | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 B1 B7 C20 D1 D2 D3 D4 D5 D6 E9 E12 F7 F13 F19 F22 O1 R1 | HIGH:16 MED:9 LOW:2 |
-| 3 | says it worked when it did not | C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9 H1 H2 H4 L1 L4 L6 S1 S2 W3 W4 X1 X2 X4 X6 | CRITICAL:4 HIGH:21 MED:12 LOW:3 —:1 |
+| 3 | says it worked when it did not | C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 H1 H2 H4 L1 L4 L6 S1 S2 W3 W4 X1 X2 X4 X6 | CRITICAL:4 HIGH:21 MED:14 LOW:3 —:1 |
 | 4 | hard to keep correct | E1 E2 E3 E5 E6 E10 E11 E13 E14 F21 F23 F32 F36 F37 F38 L2 L3 Q1 T1 T2 T3 T4 T5 T6 U1 V1 V2 W1 W2 Y1 | CRITICAL:1 HIGH:8 MED:16 LOW:3 POS:2 |
 | 5 | the manual is wrong | B2 B4 B5 B6 E7 E8 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40 F41 F42 H3 K1 K2 K3 L5 X3 X5 Y2 Y3 Y4 | HIGH:17 MED:20 LOW:6 |
 
@@ -2667,7 +2699,7 @@ plain English above becoming hand-waving.**
 | option | what it is | findings it closes or detects | severity mix |
 |---|---|---|---|
 | 1 | preserve-by-default in apply | A1 A2 A3 A6 A8 A9 A16 A19 C16 C17 C19 D4 F16 F27 N1 T1 T6 | CRITICAL:4 HIGH:11 MED:1 POS:1 |
-| 2 | check against the original | B8 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28 D2 D5 E4 G1 G2 G3 G4 G5 G6 G7 G8 G9 H1 H2 H4 J1 L1 L4 L6 M1 S1 S2 S3 U1 V1 | CRITICAL:6 HIGH:23 MED:17 LOW:4 —:1 |
+| 2 | check against the original | B8 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28 D2 D5 E4 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 H1 H2 H4 J1 L1 L4 L6 M1 S1 S2 S3 U1 V1 | CRITICAL:6 HIGH:23 MED:19 LOW:4 —:1 |
 | 3 | say what the formatting is | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 C13 C20 D6 F7 F13 F19 F22 L2 L3 O1 | HIGH:15 MED:4 LOW:1 |
 | 4 | a home for document furniture | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 | CRITICAL:1 HIGH:5 MED:9 LOW:1 |
 | 5 | one authority, one way out, more than one gear | A15 C5 C7 C26 D3 D5 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28 F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 | CRITICAL:1 HIGH:16 MED:23 LOW:5 |
@@ -2719,7 +2751,7 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 | 11 the delivered-document check | 2 | C1 C4 C6 C8 C13 C14 C18 C20 C22 J1 L1 |
 | 12 declare the language | 2 | S1 S2 S3 H1 H2 H4 C9 C2 E4 |
 | 13 declared modes | 5 | H3 L5 R1 — and the runtime problem |
-| 14 check scoping | 2 | G1 G2 G3 G4 G5 G6 G7 G8 G9 C7 C10 F5 F10 |
+| 14 check scoping | 2 | G1 G2 G3 G4 G5 G6 G7 G8 G9 **G10** C7 C10 F5 F10 *(G10 added 2026-08-12: `quality_check`'s missing-space rule fires across a `w:tab` element, and branch 5's exit code turned that false positive into a blocked run. Same shape as G4 — an adjacency rule that cannot see what sits between the two runs.)* |
 | 15–17 formatting, parts 1–3 | 3 | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3 |
 | 18 layout: detect and disclose | 2, 5 | D1 D2 D3 D4 D5 |
 | 19 furniture and prohibition | 4 | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 |
@@ -2792,7 +2824,7 @@ call** rather than twice.
 | rank | option | why here |
 |---|---|---|
 | **1** | **Stop deleting what you do not recognise** (option 1) | Every argument points the same way and none points away. Four of the six worst content losses, closed outright rather than detected. One file. No data-format change. Provable by comparing bytes. Nothing depends on it. **The cheapest high-severity work in the project**, and the register's own headline is that this is a content-loss project |
-| **2** | **Check against the original** (option 2) | Highest total value — 51 findings, six of them worst-grade — and the only option that changes what we can find next time. Ranked second rather than first for one reason: it **detects** rather than repairs, and the deadlock finding means its discerning half cannot land before rank 3. Its instrument half (one failing input per check) belongs with the harness and should go first |
+| **2** | **Check against the original** (option 2) | Highest total value — 53 findings, six of them worst-grade — and the only option that changes what we can find next time. Ranked second rather than first for one reason: it **detects** rather than repairs, and the deadlock finding means its discerning half cannot land before rank 3. Its instrument half (one failing input per check) belongs with the harness and should go first |
 | **3** | **One authority, one way out, more than one gear** (option 5, cheap half first) | Promoted from A3's fifth place, on a fact A3 did not have: **it is a precondition for rank 2.** Eighteen findings have no compliant repair, so a discerning check without an escape hatch stops the pipeline permanently. It also contains the cheapest fix in the project and the only sanctioned speed lever. Do the scope rule and the exception channel **before** the checks get teeth |
 | **4** | **Take the tidy-up script's authority** (option 6) | The strongest single piece of evidence in the register, and — newly — **option 2's character-exact check cannot be built until this stage declares its changes.** The journal is small and should land early even if the shape decision takes longer |
 | **5** | **Say what the formatting is** (option 3) | The biggest quality gain on the page: 20 findings, 15 visible. Ranked fifth only because it is the most expensive and the riskiest, it needs rank 2 underneath it to be believed, and its own claim on the layout group is refuted. **This is the leap.** It is fifth in *order*, not in importance |
@@ -3099,7 +3131,7 @@ specific, named change exists in the document. It passes on all twelve.
 
 | # | what was wrong | corrected to |
 |---|---|---|
-| **1** | **The deadlock count was invented.** The document said *fourteen* findings have no compliant repair. A narrow pattern gives 13, a wider one **18**. **Fourteen was neither measurement** — it was asserted with the confidence of a measurement | **18**, with the set enumerated so it can be checked: A11 A12 A14 A15 A16 B7 C9 C16 D3 D4 D5 F1 F15 F28 F30 F33 G9 L1. **The deadlock argument is stronger than it was written**, not weaker |
+| **1** | **The deadlock count was invented.** The document said *fourteen* findings have no compliant repair. A narrow pattern gives 13, a wider one **18**. **Fourteen was neither measurement** — it was asserted with the confidence of a measurement | **18**, with the set enumerated so it can be checked: A11 A12 A14 A15 A16 B7 C9 C16 D3 D4 D5 F1 F15 F28 F30 F33 G9 L1. **And the eighteen are three different things — see the partition below, which is what the count means.** |
 | **2** | **A fabricated fact.** *"given the skill and eleven weeks' worth of nothing else"* — **nothing in any source says eleven weeks.** Probably a contamination from *eleven criteria* | the neutral form now in §1 — *working from the published package and nothing else, with no test result, no grade and no prior analysis* — which is what the sources actually say |
 | **3** | **The rebuild arithmetic was wrong.** *"at most 99 of"* / *"the 160 findings and leaves at least 61 exactly where they are"* | The union of what options 1, 2, 3 and 6 close is **94**, leaving **66** *(92/68 at the first re-derivation, before the three assignment corrections in §9.2)*. The conclusion is unchanged and slightly strengthened |
 | **4** | **A logic error in the ranking.** It said *"each of 2, 3, 4 and 5 has a stated dependency on something above it"*. **False: rank 2 depends on rank 3, which is below it** | The ranking is now stated as **value, not execution order**, with the one place they diverge named. §2 governs where they disagree |
@@ -3108,6 +3140,57 @@ specific, named change exists in the document. It passes on all twelve.
 | **7** | **A document count overstated.** The source-language-text-on-page-one finding was given as **2 documents**; it is **one document run twice** — the batch arm is the same document | **1 (both runs of it)** |
 | **8** | **Three misquotations**, each small and each the kind that erodes trust in the rest: a missing `.py`, an elision that joined non-adjacent clauses, and an Oxford comma inserted into A3's wording | All three now verbatim. **Check 10 verifies all 11 source quotations against the four source files on every run** |
 | **9** | **Three stale references to "the nine options"** after the count became ten | Corrected. And a bare *§N.M* now means *this* document; A3's sections are prefixed |
+
+> ### THE EIGHTEEN PARTITIONED — 2026-08-19, the seventeen-row review, on Wouter's instruction
+>
+> **The count of eighteen stands: those rows' own text does say no compliant repair exists.** What
+> the review measured is that **the phrase covers three unrelated situations**, and only one of
+> them is a deadlock in the sense branch 5 cares about. Every classification rests on an opened
+> check, with 32 needles verified across both trees.
+>
+> | group | what it actually is | rows | n |
+> |---|---|---|---|
+> | **1** | **A check fires and the check is WRONG IN SCOPE** — rule 5a governs, branch 14 owns the fix | C9 F15 G9 L1 | **4** |
+> | **2** | **NO CHECK FIRES AT ALL** — the pipeline cannot produce a correct document and ships silently. Needs code, plus disclosure | A11 A12 A14 A15 A16 B7 C16 D4 D5 | **9** |
+> | **3** | **AN INSTRUCTION CANNOT BE OBEYED** — prose, not code. D3's named gap is closed by branch 4 | D3 | **1** |
+> | **4** | **THE CHECK IS RIGHT AND NO COMPLIANT REPAIR EXISTS — RULE 5b's ACTUAL TRIGGER SET.** §5.5 of this document already named these three, and this table's first version did not carry the group at all | F28 F30 F33 | **3** |
+>
+> 4 + 9 + 1 + 3 = **17**, plus **F1**, which the Cowork probe resolved into group 1 on 2026-08-19 and
+> which is why the review happened. No row double-counted, none unaccounted for.
+>
+> > **GROUP 4 WAS THE REVIEW'S OWN BLIND SPOT, AND THE DOCUMENT HAD IT ALREADY.** Corrected
+> > 2026-08-20 after Wouter asked whether this had been overlooked. **§5.5 states it in its own
+> > words:** *"Three mandatory requirements cannot be met at all… In each case the operator's only
+> > options were to disobey an instruction or to ship against one."* That last clause is rule 5b's
+> > situation, written down before rule 5b existed, and Option 2's cons cell says it a second time —
+> > *"three of them requirements that already cannot be met at all."* The first version of this
+> > partition put **F28** in group 1 as a scope defect; **§9.3 had already routed it to branch 4, the
+> > exception channel, and §9.3 was right.** The review reasoned from §12's eighteen-row enumeration
+> > instead of from §5.5's account of what those rows ARE — the third time in this project that a
+> > derived set beat the source analysis.
+> >
+> > **And only ONE of the three is blocked by branch 5.** `quality_check` exits 2, so **F28** becomes
+> > a stopped run. **F30** is a Step 11b checklist instruction and **F33** a lexicon prohibition;
+> > neither passes through a script that returns a code, so branch 5 does not make either block. That
+> > is why F28 is the rig for the 5b arm and the other two are not.
+>
+> **THE NUMBER THAT BEARS ON BRANCH 5'S MERGE IS TWO, NOT EIGHTEEN.** Branch 5 is what gives a
+> check an exit code, so only a row whose check gains one can newly deadlock. Measured against the
+> published rev44: **`quality_check` is the only one of the four implicated scripts whose exit
+> expressions change** — it gains `sys.exit(2 if total else 0)`. `validate_segment_shapes` (G9) and
+> `translate_headers_footers` (F15) are byte-identical before and after and **already block today**;
+> `lexicon_compliance` (C9) prints PASSED and **never blocks at all**, so the deadlock framing was
+> doubly wrong for it. **That leaves L1 and F28** — both `quality_check` false positives, both
+> branch 14's. With G10 and M1's eight inherited ones, **the entire new blocking risk sits in one
+> script.**
+>
+> **Two errors the review found in the evidence base, reported rather than quietly fixed.** F15 was
+> attributed to the apply script and the warning is in `translate_headers_footers.py:897`. And D3
+> asks for a channel that branch 4 has already built.
+>
+> **What this does NOT license.** Group 2's nine rows never deadlocked and never will; the exception
+> channel was credited with preventing a class of failure that is mostly a different class, but it
+> is still correctly aimed — those rows need **disclosure**, which is what it provides.
 
 **Two omissions the audit found, both now filled.**
 

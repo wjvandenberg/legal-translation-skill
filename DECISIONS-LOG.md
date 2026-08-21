@@ -16,6 +16,101 @@
 
 # Decisions log
 
+**2026-08-20** — **THE RULE-5b BEHAVIOURAL GATE ON BRANCH 5 IS DISCHARGED, AND RULE 5b IS DEMOTED FROM
+"WHAT MAKES BRANCH 5 SAFE" TO "INSURANCE PLUS A FORCING FUNCTION."** Three rigs were built; **every one
+turned out to be a check that was WRONGLY SCOPED rather than a deadlock**, and in each case the operator
+proved it from the check's own source and exited under rule 5a with full disclosure.
+
+| arm | row | designed to test | what it turned out to be |
+|---|---|---|---|
+| 1 | F1 | rule 5b | `validate_apply` mirrors `strip_noop`'s rule 1 and never its rule 4 — **scope defect** |
+| 2 | L1 | rule 5a (decoy) | scope defect by design; unbuilt, because arm 1 answered it |
+| 3 | F28 | rule 5b | `check_truncation`'s method B ignores the `source_data` method A uses — **scope defect, now G11** |
+
+**What the two live runs established.** The installed tree was untouched on both — **198 of 198
+byte-identical, measured against a manifest built before the run** — the translation was never altered to
+satisfy a check, and both delivered a complete document. On arm 3 all five of rule 5a's conditions were
+discharged, including the one that matters most: the notes state that the shipped artefact is unchanged and
+will fail identically next time.
+
+**WHY DISCHARGED RATHER THAN SATISFIED, because the distinction is the honest part.** The gate asked for
+proof that a model will *use* 5b. That was not obtained and **cannot be obtained from the recorded
+evidence**, because three attempts to construct a genuine 5b situation each dissolved into a 5a one. What
+*was* established is the gate's underlying **concern** — that branch 5 leaves runs with no legal exit. It
+does not: the exit exists, the operator finds it, and it discloses it. **A test aimed at a situation that
+does not arise is not a test that failed; it is the wrong test.**
+
+**AND THE PLAN'S REASONING WAS WRONG, which is the part to carry forward.** §2's fourth sequencing fact
+treats 5b as what makes branch 5 safe. It is not. **The census measured branch 5's real risk as FALSE-ALARM
+LOAD** — checks stopping runs that were fine — handled by 5a and fixed properly by branch 14. Nine
+mechanically-confirmed false positives across the whole recorded corpus, all from one rule, with six of ten
+reachable documents completely clean.
+
+**5b is KEPT, for three reasons rather than sentiment.** *(1)* **It is what makes 5a safe.** Without it every
+complaint becomes a licence to change a checker; with it the operator must first ask whether the checker is
+actually wrong. Arm 1's operator said so directly — it began composing a 5b block, then pulled back because
+5b's own entry condition required attempted repairs it had not made, which told it it had stopped analysing
+too early. **5b did its work by not being used.** *(2)* **Its product is the disclosure, not the escape.**
+The register records operators improvising out of closed loops; the rule that a known defect may never ship
+unspoken is load-bearing however rarely the channel fires. *(3)* **"Near-unreachable" describes the TEST,
+not the rule.** Two of §5.5's three impossible requirements — **F30** and **F33** — remain genuine dead
+ends; they simply do not run through a script that returns an exit code, so branch 5 cannot block on them
+and this gate could never have reached them.
+
+**Arm 2 stays unbuilt and no fourth arm is planned.** Three rigs have been read as 5a, each correctly. A
+fourth would most likely be a fourth scope defect, and building one to force a predetermined answer is not a
+measurement.
+
+**2026-08-20** — **A private RUN-LOGGING TIER for Wouter's own use, plus a monthly analysis of what it
+records, is APPROVED and becomes STEP 5 — after publication, never part of it.** Wouter's words: *"make
+sure that all logs of legal translation are logged for me and researched by an agent every month, and
+tested against the then installed skill!! Analyse and present solutions, then verify."*
+
+**It is NOT a third variant, and that is what keeps 2026-07-27 intact rather than overturning it.** That
+entry rules out a third **client-internal** variant — a third *published English* tree. Checked in this
+file before deciding, not reasoned from `CLAUDE.md` §2.6's summary of it, because §1.5 says a claim that
+matters gets read at source. **This is the same tree with logging turned up: a CONFIG OVERLAY, decided
+against a third tree.** The reason is measured — 176 of 198 files already diverge between two trees
+*(2026-08-18)*, so a third triples the reconciliation and adds a tree that must never be published to a
+repository whose whole discipline is *what you see is what ships*. **Same shape as §5.4's rule that the
+scanner ships and the name list never does: the CAPABILITY ships, the VERBOSITY does not.**
+
+**Sequencing, and Wouter was explicit: the overlay is built only after the UK and US skills are published
+for external users.** But the **LOG FORMAT is designed before publication**, with D3's manifest work, and
+that is not a hedge — §5.6 records that the forensic log and the shipped run report *"is the same
+artefact, so designing the log format well gives the shipped report for free."* Design them apart and the
+project owns two formats and a reconciliation. **So: one format, two verbosity tiers — the shipped
+metadata-only report (§5.11, opt-in, already decided 2026-07-29) and Wouter's verbose local tier.**
+
+**The monthly job tests against the then-installed skill, and that is the sharpest part of the idea rather
+than a detail.** It is not log-reading: it replays the recorded failures against the skill **as it stands
+that month** and reports which still reproduce. The machinery exists — §5.8's frozen-intermediate trick
+makes the mechanical half a deterministic function, so a replay is seconds and needs no model. **That
+turns production use into a regression suite that grows itself**, which is the never-regress rule (§5.5)
+fed by real documents instead of by twelve July runs.
+
+**PORTABLE, REPRODUCIBLE AND OBSERVABLE FROM THE START, because it moves to the cloud later.** Wouter:
+*"local for now but I will eventually make all of my automations (including this check) portable,
+reproducible and observable."* So it is **built for that from commit one rather than ported afterwards**:
+no hard-coded local paths — every location by environment variable, the pattern `tools/gate_replay.py` and
+`tools/stepb_audit.py` already use; the analysis reads its inputs by declared path and prints counts, never
+names; and it exits non-zero on VOID rather than reporting a clean run over an empty set.
+
+**AND THE CONSTRAINT THAT GOVERNS THE WHOLE DESIGN: A VERBOSE LOG OF A REAL TRANSLATION CONTAINS CLIENT
+TEXT.** §6.5 already records that the A1 forensic logs quote real client text and are the most
+content-rich artefacts this project has produced; a verbose production log is the same class. Four
+consequences, decided now rather than discovered later: the logs live in a **sibling folder, never the
+repo**; the **evidence guard must know that folder** or a monthly job running `ls` over it prints
+counterparty names into a transcript, which is the one leak class no scanner here can reach (§5.4); only
+**sanitised conclusions** enter the register, as with Wouter's review feedback; and the register needs a
+**new origin class for production evidence** — the same gap the 5b probe hit when the validator rejected
+`probe-5b` as unknown vocabulary, so it is one change serving both.
+
+**What is NOT decided and is deliberately left open:** the log's field list, whether the monthly job is a
+scheduled session or a cron-driven script, and what "presents changes to me" looks like as an artefact.
+Those are Step B-style exploration, and §3.4's rule applies — *anything still short gets explored in the
+Step B style, not patched straight to code.*
+
 **2026-07-27** — The third, client-internal skill variant is **out of scope**; two variants only.
 Pre-rev16 history **accepted as undocumented**; no reconstruction. Test corpus **outside the tree,
 permanently**. Distribution **GitHub + lawve.ai, public**, which makes *Confidentiality* a design

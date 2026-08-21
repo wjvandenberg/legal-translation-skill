@@ -279,6 +279,34 @@ def _vd(tmp):
     shutil.copyfile(FIXTURES / "anchors-and-tabs.docx", good / "final.docx")
     with zipfile.ZipFile(FIXTURES / "anchors-and-tabs.docx") as z:
         z.extractall(good / "final")
+    # THE CLEAN ARM'S document.xml IS REPLACED, and branch 5 is what made that necessary.
+    #
+    # This arm exists to prove verify_diligence can tell a workdir where the pipeline ran
+    # from one where it did not. It used the anchors-and-tabs fixture's own document.xml --
+    # which trips quality_check's spacing rule on `Party A|Party B`, a tab-separated party
+    # grid where the separator is a `w:tab` ELEMENT and not a space, so the rule sees two
+    # adjacent runs with nothing between them. A FALSE POSITIVE on an entirely ordinary
+    # legal-document construct.
+    #
+    # It never showed, because quality_check had no exit code: Step 9 reported PASS on every
+    # document whatever it found (register C3). Branch 5 gave it one, the verdict now reaches
+    # verify_diligence, and this arm started failing on a defect that was always there.
+    #
+    # The fix here is to give the arm a document that is genuinely quality-clean, NOT to
+    # widen the rule: the rule's scoping belongs to branch 14, cluster G. Fixing it here
+    # would be a check narrowed outside the branch that owns it and with no test proving it
+    # still catches the true positive.
+    (good / "final" / "word").mkdir(parents=True, exist_ok=True)
+    (good / "final" / "word" / "document.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/'
+        '2006/main"><w:body>'
+        '<w:p><w:r><w:t xml:space="preserve">This Agreement is made between the '
+        'parties named below.</w:t></w:r></w:p>'
+        '<w:p><w:r><w:t xml:space="preserve">The Supplier shall deliver the goods on '
+        'the agreed date.</w:t></w:r></w:p>'
+        '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/></w:sectPr>'
+        '</w:body></w:document>', encoding="utf-8")
     return bad, good
 
 

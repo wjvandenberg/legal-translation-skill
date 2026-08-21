@@ -43,8 +43,42 @@ import os
 import re
 import subprocess
 import sys
+import tokenize
 import zipfile
 from pathlib import Path
+
+
+def strip_comments(text):
+    """Remove comment tokens, keeping code and string literals intact.
+
+    A REGEX OVER SOURCE COUNTS A MECHANISM WHEREVER A MESSAGE MERELY DESCRIBES IT. Branch 5
+    added a comment to apply_translations_textmatch.py explaining the new exit-3 test, and
+    that comment contains the literal `block_codes={2}` -- so the B1.chain1 scan below
+    counted three call sites where the code has two. Filtering on shape cannot separate code
+    from prose about code; tokenising can.
+
+    DELIBERATELY DUPLICATED from tools/confirm_failure_chains.py, which needs the identical
+    fix for the identical scan. These are standalone scripts with no shared module between
+    them, and importing one from the other would execute its whole body. Named here so the
+    duplication is a recorded decision rather than a discovery.
+
+    BLANK THE COMMENT SPANS IN PLACE; do not rebuild the source from tokens. Joining token
+    strings back together destroys the layout the regex depends on -- `block_codes={2}` comes
+    back as five tokens on five lines and matches nothing, taking the count from 3 to ZERO.
+    That is worse than the 3 it was fixing: a check reporting on an empty population.
+    """
+    lines = text.splitlines(keepends=True)
+    try:
+        toks = list(tokenize.generate_tokens(io.StringIO(text).readline))
+    except (tokenize.TokenError, IndentationError):
+        return text                      # never silently return LESS than we were given
+    for tok in toks:
+        if tok.type == tokenize.COMMENT:
+            (r1, c1), (r2, c2) = tok.start, tok.end
+            if r1 == r2:
+                ln = lines[r1 - 1]
+                lines[r1 - 1] = ln[:c1] + " " * (c2 - c1) + ln[c2:]
+    return "".join(lines)
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
@@ -236,11 +270,17 @@ def audit_b1():
     claim("B1.scripts", "20 pipeline scripts", len(v), 20)
     claim("B1.sentinel", "all 20 carry the exit-3 integrity sentinel",
           sum(x["sentinel"] for x in v.values()), 20)
-    claim("B1.verdict", "17 of 20 can block by exit or by raise",
-          sum(x["blocks"] for x in v.values()), 17)
-    claim("B1.mute", "the three that cannot block",
+    # BRANCH 5 MOVED BOTH OF THESE, and they are claims about the state branch 1 MEASURED
+    # rather than about branch 1's work, so they follow the code. quality_check.py now
+    # exits 2 on issues (register C3), which makes it the eighteenth script able to block
+    # and removes it from the mute list. The figures are not edited toward an expectation:
+    # tools/check_coverage.py derives the same two independently, and B1.agree below is what
+    # asserts the two agree.
+    claim("B1.verdict", "18 of 20 can block by exit or by raise",
+          sum(x["blocks"] for x in v.values()), 18)
+    claim("B1.mute", "the two that cannot block",
           sorted(n for n, x in v.items() if not x["blocks"]),
-          ["quality_check.py", "source_language_markers.py", "translate_numbering.py"])
+          ["source_language_markers.py", "translate_numbering.py"])
 
     # RUN THE TOOL FROM THE REF, not from the checkout. This is the bug listed as (1) at the
     # top of this file, and the first attempt at fixing it only covered files READ from a
@@ -264,22 +304,47 @@ def audit_b1():
         else:
             SKIP.append("branch 1: check_coverage.py not found on the checkout or the ref")
     m = re.search(r"(\d+) of (\d+) scripts carry a verdict", tool)
+    # COMPARE THE TWO DERIVED FIGURES, not each against a literal. This claim is named "the
+    # standing coverage tool agrees with this scan" and it compared check_coverage's number
+    # against a hardcoded 17 — so it asserted a constant twice and never once asserted
+    # agreement. Both tools would have had to be edited to the same new literal, and if they
+    # ever drifted TOGETHER the claim would still have failed for the wrong reason. It now
+    # compares the two scans, which is what its own text says it does.
     claim("B1.agree", "the standing coverage tool agrees with this scan",
-          int(m.group(1)) if m else "no parseable output", 17)
+          int(m.group(1)) if m else "no parseable output",
+          sum(x["blocks"] for x in v.values()))
     m = re.search(r"NO CHECK THAT CAN BLOCK\D+(\d+) of (\d+)", tool)
     claim("B1.steps", "5 of 17 pipeline steps have no blocking check",
           (int(m.group(1)), int(m.group(2))) if m else None, (5, 17))
 
-    ap = (ROOT / "uk" / "scripts" / "apply_translations_textmatch.py").read_text(encoding="utf-8")
+    # BOTH CHAINS WERE CLOSED BY BRANCH 5, so these two claims describe the repair rather
+    # than the defect. tools/confirm_failure_chains.py is the standing guard on both and
+    # measures chain 1 BEHAVIOURALLY; these stay as the cheap static half, because two
+    # instruments asking the same question different ways is how this project catches a
+    # check that passes for the wrong reason.
+    ap_raw = (ROOT / "uk" / "scripts" / "apply_translations_textmatch.py").read_text(
+        encoding="utf-8")
+    ap = strip_comments(ap_raw)
     sites = [s for s in re.findall(r"block_codes=\{([^}]*)\}", ap) if re.search(r"\d", s)]
-    claim("B1.chain1", "apply blocks at 2 call sites, neither treating exit 3 as blocking",
-          (len(sites), [s for s in sites if "3" in re.findall(r"\d+", s)]), (2, []))
+    # The two block_codes sets still omit 3, and that is no longer the defect: exit 3 is
+    # tested explicitly BEFORE block_codes is consulted. So the claim asserts both halves —
+    # the sets are unchanged, and the explicit test is present.
+    claim("B1.chain1",
+          "apply's 2 block_codes sites still omit 3, and exit 3 blocks before them",
+          (len(sites), [s for s in sites if "3" in re.findall(r"\d+", s)],
+           "if rc == _INTEGRITY_EXIT:" in ap),
+          (2, [], True))
 
     ql = (ROOT / "uk" / "scripts" / "quality_check.py").read_text(encoding="utf-8").splitlines()
     g = next((i for i, l in enumerate(ql, 1) if re.match(r"^_?\w*integrity\w*\(\)", l)), None)
     mn = next((i for i, l in enumerate(ql, 1) if l.startswith("if __name__")), None)
-    claim("B1.chain2", "the quality gate's guard sits BELOW its __main__",
-          (g is not None and mn is not None and g > mn), True)
+    # ASSERT THE GUARD EXISTS AS WELL AS ITS POSITION. Testing only `g > mn` is satisfied by
+    # a file with no guard call at all, because `g` is then None — a hole found in the
+    # equivalent check in confirm_failure_chains.py by a negative test that DELETED the call
+    # and watched the tool report the chain closed.
+    claim("B1.chain2", "the quality gate's guard is present and sits ABOVE its __main__",
+          (g is not None, mn is not None, g is not None and mn is not None and g < mn),
+          (True, True, True))
 
     fx = [l for l in git("ls-tree", "-r", ref, "--name-only", "tests/fixtures").splitlines() if l]
     claim("B1.fixtures", "committed synthetic fixtures", len(fx), 11)

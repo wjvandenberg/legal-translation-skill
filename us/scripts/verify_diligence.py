@@ -398,7 +398,21 @@ def check_step_9(report, workdir, variant):
         report.add(label, PASS,
                    'quality_check.py exited 0 (no issues)')
     else:
-        # quality_check exits non-zero when issues are reported.
+        # quality_check.py exits 2 when it reports issues — and until now it did
+        # not. This comment asserted that while the script had no sys.exit at all,
+        # so the PASS branch above ran on EVERY document and this branch on none:
+        # the audit printed "[PASS] Step 9 — quality_check.py exited 0 (no issues)"
+        # minutes after quality_check itself had printed "*** FAILED: 32 issues
+        # must be resolved ***". The comment was an accurate description of the
+        # intent and an inaccurate description of the code, which is the worst of
+        # the two ways a comment can be wrong: it reassured every reader who
+        # checked.
+        #
+        # THIS BRANCH IS LOAD-BEARING FOR TWO STEPS, NOT ONE. Step 7's only cover
+        # anywhere in the tree is quality_check's definition_order check, and Step 6
+        # has no check at all — so for as long as this branch was unreachable, both
+        # were silently absent from the audit whose stated purpose is catching
+        # skipped steps.
         first_lines = (r.stdout + r.stderr).splitlines()[:8]
         report.add(label, FAIL,
                    f'quality_check.py reported issues (exit {r.returncode})',
@@ -486,7 +500,14 @@ def main(argv=None):
     if overall == FAIL:
         return 2
     if overall == WARN:
-        return 1 if args.strict else 0
+        # `2 if strict else 1` — which is the contract this script's OWN docstring
+        # documents (0 PASS / 1 WARN / 2 FAIL) and the effect --strict's own help
+        # text claims ("treat WARN as FAIL"). It returned `1 if strict else 0`,
+        # which implements NEITHER: without --strict a WARN was indistinguishable
+        # from a PASS, and with it a WARN became 1 rather than the documented FAIL
+        # code. One line contradicted both the exit-code table above and the flag
+        # description below it.
+        return 2 if args.strict else 1
     return 0
 
 

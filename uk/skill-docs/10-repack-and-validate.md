@@ -114,14 +114,23 @@ python <skill-path>/scripts/repack_docx.py \
   --endnotes <workdir>/final/word/endnotes.xml
 ```
 
-`--paragraphs` is strongly recommended: it enables the auto-run pre-bundle
+`--paragraphs` is **REQUIRED**: it enables the auto-run pre-bundle
 `validate_apply.py --strict` check that catches token drift introduced by
 post_process / strip_noop / reorder_definitions between Step 5 and the pre-bundle gate inside Step 10.
+**Omitting it no longer skips that check — the repack refuses and writes no `.docx`.**
 
-Every flag after the first three positional arguments is optional in CLI terms —
-include each only if the corresponding step produced a translated file:
+*Three passages used to disagree about this, and the code settled it the wrong way.*
+The mandatory-items list above already carried that invocation as unconditional, and
+`SKILL.md` already called `validate_apply` mandatory pre-repack — while these two
+lines called the flag only "strongly recommended", so a reader could not tell whether
+the gate was required. Omitting one optional-looking flag removed a mandatory check
+and printed a warning nobody had to act on.
 
-- `--paragraphs` — strongly recommended; enables the pre-bundle `validate_apply` check
+Every flag after the first three positional arguments **except `--paragraphs`** is
+optional in CLI terms — include each only if the corresponding step produced a
+translated file:
+
+- `--paragraphs` — **REQUIRED**; the repack refuses to bundle without it
 - `--numbering` — if Step 8a produced translated `numbering.xml`
 - `--headers-footers-dir` — if Step 8b produced translated `headerN.xml` / `footerN.xml` files
 - `--comments` — if Step 8c produced translated `comments.xml`
@@ -130,7 +139,11 @@ include each only if the corresponding step produced a translated file:
 The script also automatically:
 - Removes `<w:trackRevisions>` from `word/settings.xml` (disabling track changes mode)
 - Skips ZIP directory entries (which cause case-sensitivity problems on Windows)
-- Verifies ZIP integrity and checks for case conflicts
+- Verifies ZIP integrity and checks for case conflicts — **both of these now BLOCK.**
+  The archive is built under `<output>.docx.tmp` and moved into place only if both
+  pass; if either fails, the temporary file is **deleted** and the repack exits 1. A
+  file Word cannot open is therefore never left at the delivery path, and a run that
+  produced one can no longer report success
 - **Runs a post-repack source-language remnant scan** on the delivered
   `.docx`: auto-detects the source language from the ORIGINAL `word/document.xml`
   and then scans every prose XML part in the output (`word/document.xml`,

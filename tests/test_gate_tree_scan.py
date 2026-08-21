@@ -33,6 +33,12 @@ ROOT = Path(__file__).resolve().parent.parent
 GATE = ROOT / "tools" / "precommit_gate.py"
 TARGET = ROOT / "uk" / "SKILL.md"
 
+# Snapshot the bytes of every file this test plants into, BEFORE anything is written. Section
+# 5 compares against these rather than against `git diff`, which answers a different question
+# — see the comment there.
+PLANT_TARGETS = [TARGET]
+BEFORE_BYTES = {p: p.read_bytes() for p in PLANT_TARGETS}
+
 results = []
 
 
@@ -109,6 +115,25 @@ check("with nothing planted, the gate is not blocked by section 7",
       "name scan" not in sec3 or "CLEAN" in sec3, "")
 check("the gate's own exit is 0 on the unmodified tree", rc3 == 0, f"exit {rc3}")
 
+# THE OTHER DIRECTION OF THE FILENAME-SHAPE NARROWING, and it is required rather than nice:
+# §5.4 says every pattern must be tested against the string it was written for, in the same
+# commit. The plant above proves the class still catches a filename carrying proper nouns.
+# These prove it no longer fires on prose that merely names the extension — which is what the
+# unnarrowed pattern did to branch 5's own added lines (" the .docx", " a partial .docx"),
+# blocking the gate on text containing no filename at all.
+BENIGN = [
+    "The repack writes a partial .docx only under a temporary name.",
+    "Pass the delivered .docx to the reviewer, not the intermediate one.",
+    "Build under <output>.docx.tmp and move it into place afterwards.",
+]
+for benign in BENIGN:
+    def _b():
+        s, rc_, _o = gate()
+        return s, rc_
+    secb, rcb = with_planted(benign, _b)
+    check(f"stays quiet on a bare extension mention: {benign[:38]!r}...", rcb == 0,
+          f"exit {rcb}")
+
 # --------------------------------------------------------------------------------------
 # 4. VOID, NOT CLEAN. A control that could not establish a baseline has not passed.
 print("\n4. IT SAYS VOID — NOT CLEAN — WHEN IT CANNOT ESTABLISH A BASELINE")
@@ -120,11 +145,21 @@ check("and the verdict says so in words",
 
 # --------------------------------------------------------------------------------------
 print("\n5. THE TREE IS EXACTLY AS IT WAS")
-r = subprocess.run(["git", "diff", "--name-only", "--", "uk/", "us/"],
-                   capture_output=True, cwd=ROOT)
-dirty = [f for f in r.stdout.decode().splitlines() if f.strip()]
-check("no planted line survived — the working tree is unchanged by this test",
-      not dirty, f"{dirty[:3]}" if dirty else "")
+# THIS ASSERTED THE WRONG THING UNTIL BRANCH 5, and branch 5 is the first branch to expose
+# it. It ran `git diff --name-only -- uk/ us/` and required the result to be EMPTY — which
+# is not "this test changed nothing", it is "the working tree matches HEAD". Every branch
+# from 6 onward legitimately modifies the published trees, so on exactly the branches this
+# test exists to protect it reported a false failure and named the branch's own edits as
+# surviving plants. It passed on the branch that introduced it only because that branch
+# touched tools/ and tests/ and nothing under uk/ or us/.
+#
+# What it must compare is the bytes of the files this test PLANTS INTO, snapshotted before
+# and after. That is independent of what else the branch has changed.
+after = {p: p.read_bytes() for p in PLANT_TARGETS}
+changed = [str(p.relative_to(ROOT)) for p in PLANT_TARGETS
+           if after[p] != BEFORE_BYTES[p]]
+check("no planted line survived — every file this test wrote to is byte-identical",
+      not changed, f"{changed[:3]}" if changed else f"{len(PLANT_TARGETS)} file(s) verified")
 
 print()
 print("=" * 92)

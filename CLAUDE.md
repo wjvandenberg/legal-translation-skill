@@ -14,8 +14,13 @@ Cowork, before Claude Code, without version control or an up-front structural pl
 > plus the comparison) and Step B (eleven options, ten approved, the rebuild declined) are complete and
 > separately audited. **Nothing in the plan is awaiting a decision.** **Step 1 is finished: the repository
 > exists, it is PUBLIC, branch protection is live, and branches 0, 1 and 2 are merged** — so the project now
-> has version control, a test harness and a parity check. **Ten lines of skill file have been modified**,
-> deliberately, to remove real-document material from the two published trees. The next action is in §7.
+> has version control, a test harness and a parity check. **Ten lines of skill file have been modified —
+> that is ADDED LINES ACROSS BOTH TREES, in two files per tree: five added and four removed each side** —
+> deliberately, to remove real-document material from the two published trees. *(The basis was implicit
+> until 2026-08-18, when an audit re-derived the figure, assumed it meant per-tree, measured four and
+> reported it as a failure. Ten is right under exactly one of six natural readings and four of the six
+> give a different number, so the unit is now stated. A count whose unit is implicit is a count the next
+> session re-derives differently.)* The next action is in §7.
 >
 > **This file was rewritten on 2026-08-06** to the seven-section structure below, after a claims check found
 > 35 factual errors in the previous version — almost all of them counts and statuses that the work had moved
@@ -54,7 +59,7 @@ wrong conclusion.
 |---|---|---|---|
 | **`CLAUDE.md`** *(this)* | the charter | first, always | goals · order · status · rules · structure |
 | **`STEP-B-ANALYSIS.md`** | **the build plan.** What to build, in what order, and what counts as having built it | **before and during every build branch — it is the leading document for all of step 2** | §2 the order · §3 the brief per option · §4 the test method |
-| **`FINDINGS-REGISTER.md`** | the evidence base — **211 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
+| **`FINDINGS-REGISTER.md`** | the evidence base — **213 rows**, every finding with its per-document proof. **The fastest way to understand what the project has learned** | whenever you need the proof behind any claim | every finding, clustered by root cause |
 | **`A3-STRUCTURAL-ANALYSIS.md`** | the evidence-led structural analysis | when a structural judgement comes up | the measurements: context, runtime, redundancy, divergence |
 | **`OPUS-5-MIGRATION.md`** | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
@@ -88,7 +93,7 @@ of that strand and lives in the sealed judging directory outside the repository;
 |---|---|---|
 | **1** | How to read this document | communication · the document set · reading order |
 | **2** | Project overview | the skill · the four goals · what has been done · what the evidence says · the decisions that still bind |
-| **3** | Plan of action | **only what is still to be done** — four steps, in order, with their gates |
+| **3** | Plan of action | **only what is still to be done** — five steps, in order, with their gates |
 | **4** | Tech stack | the runtime constraint, the skill's own stack, the dev-host toolchain |
 | **5** | Working method and rules | the build cycle · branches and PRs · confidentiality · never-regress · the instruments · testing · gates · OOXML · the audit gate |
 | **6** | File, folder & repo structure | the skill tree today · what the build changes · the repository, now and after |
@@ -189,7 +194,7 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 
 **The evidence base as it now stands, and these are the numbers to quote:**
 
-> **`FINDINGS-REGISTER.md`: 211 rows — 15 clusters · 168 skill findings (156 clustered + 12 single-instance)
+> **`FINDINGS-REGISTER.md`: 213 rows — 15 clusters · 170 skill findings (158 clustered + 12 single-instance)
 > · 27 positives to preserve · 16 defects in our own measuring instruments (12 fixed, 4 open).** The largest
 > cluster is the instruction contradictions, at **39**. Validator **PASS, 0 failures, 0 warnings**.
 >
@@ -207,8 +212,9 @@ Six committable documents exist. **Three are live inputs to the work ahead; thre
 - **LIVE — `STEP-B-ANALYSIS.md`.** The build plan and **the leading document for the whole of step 2**. Its
   §2 is the order, §3 the brief per option, §4 the test method. It is in four parts and **only Part One is
   needed to build.**
-- **LIVE — `FINDINGS-REGISTER.md`.** Every claim in the build plan traces to a row here. Its §9 appendix in
-  the build plan maps branch → findings, and is generated by script so it cannot drift.
+- **LIVE — `FINDINGS-REGISTER.md`.** Every claim in the build plan traces to a row here. The build
+  plan's own `STEP-B-ANALYSIS.md` §9 appendix maps branch → findings, and is generated by script so
+  it cannot drift.
 - **LIVE — `A3-STRUCTURAL-ANALYSIS.md`.** The measurements. Consult it when a structural judgement comes up
   inside a branch.
 - Reference — **`OPUS-5-MIGRATION.md`** (step 3), **`DECISIONS-LOG.md`** (why things were settled), and
@@ -220,7 +226,7 @@ Six committable documents exist. **Three are live inputs to the work ahead; thre
 several documents — a deed's only footnote, fourteen of twenty-eight comment anchors, a contract's
 closing bracket and terminal full stop, untranslated source-language text on the first page of a delivered
 document. **In every case the auxiliary part was translated perfectly and the *pointer* destroyed**, so the
-English exists in the package and is unreachable — **and every gate reported PASS.** Twenty-seven of the 168
+English exists in the package and is unreachable — **and every gate reported PASS.** Twenty-seven of the 170
 findings are content losses; six are the worst grade the register has.
 
 **2. Three independent mechanisms explain why nothing was caught, and one sentence is not enough.**
@@ -318,14 +324,14 @@ which is why a one-digit error in a public table is now a build failure rather t
 2. **Runtime is `24.6 + 0.040 × paragraphs` minutes** — about **25 minutes of fixed overhead and 2.4 seconds
    a paragraph.** Translating is **43%** of the time; on a 24-paragraph document **96%** of the run is fixed
    cost. **The skill has one gear**, and that is the runtime problem.
-3. **The 35-paragraph batch cap is correctly calibrated, and it is an ATTENTION cap, not a context cap.**
+2. **The 35-paragraph batch cap is correctly calibrated, and it is an ATTENTION cap, not a context cap.**
    Context was never the binding constraint on any run. **Evidence against raising it under Opus 5.**
-4. **Context is not a constraint:** the skill-side peak is **6.4% of the 1M window** (8.3% on a profile
+3. **Context is not a constraint:** the skill-side peak is **6.4% of the 1M window** (8.3% on a profile
    heavier than anything observed). The live reasons to care about file size are **findability and
    truncation, not tokens.**
-5. **The over-engineering is in capabilities, not in files.** No dead scripts, no orphan lexicons, only 4%
+4. **The over-engineering is in capabilities, not in files.** No dead scripts, no orphan lexicons, only 4%
    duplicated prose — but **four shared capabilities across thirteen independent implementations**.
-6. **Batch position degrades the POLICING, not the translation.** The controlled pair (same document, batch
+5. **Batch position degrades the POLICING, not the translation.** The controlled pair (same document, batch
    position the only variable) scored 9/9/9 on the translation criteria in both runs; every point the arm
    lost, it lost to out-of-pipeline defects the single run had found and repaired. **The consequence is an
    argument for the fixes, not for a batch rule.**
@@ -345,6 +351,7 @@ settled — if you are about to re-open one of these, read the dated entry first
 | 2026-08-04 | **Quality is the main driver; speed matters less and must never compromise quality.** A rebuild is presented as a real option but the default is to keep the present architecture. **Frozen translated intermediates from the real corpus are approved as local-only test fixtures** — a new artefact class that must be excluded by path before `git init` |
 | 2026-08-05 | **All eleven options decided: ten GO, the rebuild declined.** No shared library. No separate furniture file. **No cross-language parity check** — none could honestly be written. The sanctioned way out of a deadlocked gate exists, with four conditions, **and Wouter reviews its specification before it lands** |
 | 2026-08-06 | This file rewritten to seven sections; `OPUS-5-MIGRATION.md` and `DECISIONS-LOG.md` split out; **the build plan is no longer restated in the charter**. **A test document is named by its instrument class and its language and by nothing else** — §5.4 — and the qualifier list lives outside the repo, like the name list |
+| 2026-08-20 | **A private run-logging tier plus a monthly replay-and-analyse job is APPROVED as STEP 5** — §3.5. **A CONFIG OVERLAY, never a third variant**, so 2026-07-27 stands rather than being overturned; **built only after the UK and US skills are published**, though the log FORMAT is designed at D3 because it is the same artefact as the shipped run report. **Portable, reproducible and observable from commit one**, because it moves to the cloud later. **The verbose logs contain client text**, so the sibling-folder rule, the evidence guard and sanitised-conclusions-only all apply, and the register gains a **production-evidence origin class** |
 
 ---
 
@@ -358,16 +365,17 @@ settled — if you are about to re-open one of these, read the dated entry first
 
 **Everything that has been done is in §2.3 and is not repeated here.** This section is future work only.
 
-### 3.1 The four steps
+### 3.1 The five steps
 
 `NOT STARTED` · `IN PROGRESS` · `BLOCKED ON <what>` · `DONE`
 
 | step | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** — version control, the baseline commit, the test harness, the parity check, then the public flip | **DONE, 2026-08-07.** Branches 0, 1 and 2 built, verified, tested, audited and **merged**; the confidentiality cleanup and the cycle enforcement merged beside them. **The repository is PUBLIC and branch protection is live with `enforce_admins`.** The exit gate is closed | — |
-| **2** | **Building** (goals ii and iv) — the rest of `STEP-B-ANALYSIS.md`: branches 3 to 19, plus the three deferred items | **IN PROGRESS since 2026-08-07. Branch 3 merged** — the scope rule, the truncation reconciliation, and what the delivery notes must contain. **Next is branch 4, and it ends in Wouter's review of the specification rather than in a merge; branch 5 cannot start until that review closes.** The remaining seventeen branches plus the three deferred items are fully planned and fully decided | — |
+| **2** | **Building** (goals ii and iv) — the rest of `STEP-B-ANALYSIS.md`: branches 3 to 19, plus the three deferred items | **IN PROGRESS since 2026-08-07. Branches 3 and 4 merged**; **branch 5 is BUILT AND NOT MERGED.** Its seven code changes are complete and verified in both trees, and its merge is held by the fourth sequencing fact: the behavioural probe of rule 5b must run first. **THE PROBE RAN IN COWORK ON 2026-08-19, and arm 1 turned out NOT to be a true deadlock** — a compliant repair existed, the operator found it by reading the check's source, reached rule 5a rather than 5b, and disclosed it. **So 5b itself is still untested**, while the run exposed and closed two real defects: rule 5a forbade the repair it mandated, and the Step 6 gate's remedy named only two of the three things that can be wrong. **THE GATE IS DISCHARGED, 2026-08-20** — three rigs, three checks that turned out to be wrongly scoped rather than deadlocked, two live runs leaving the installed tree 198 of 198 byte-identical. Its test could not be constructed; its concern was answered. **`DECISIONS-LOG.md`, 2026-08-20 owns the reasoning, including that the plan was wrong to treat 5b as what makes branch 5 safe** — the census measured the real risk as false-alarm load, which is branch 14's. **Arm 2 stays unbuilt and no fourth arm is planned.** The remaining fifteen branches plus the three deferred items are fully planned and fully decided | branch 5's merge: **Wouter's approval. Nothing technical remains** |
 | **3** | **Opus 5** (goal iii) — two branches, then **Step C**, the full verification run, then **INPUT POINT 2** | **NOT STARTED**, designed. `OPUS-5-MIGRATION.md` | step 2 |
 | **4** | **Revisit, then publish** — **Step D** consolidates everything learned, *then* repackaging and publication | **NOT STARTED** | step 3 |
+| **5** | **The private run-logging tier, and the monthly analysis of what it records** — Wouter's own instrumented use of the published skill, plus a scheduled job that replays what went wrong against the skill as it then stands. **A config overlay, never a third variant, and never published** | **NOT STARTED.** Approved 2026-08-20; the log FORMAT is designed earlier, at D3, because it is the same artefact as the shipped run report | step 4 — **the overlay is built only after the UK and US skills are published for external users** |
 
 **Steps 1 and 2 share one branch numbering, and this is worth being clear about because two schemes used to
 exist.** `STEP-B-ANALYSIS.md` §2 numbers all the work 0–19 plus D1–D3. **Step 1 was branches 0, 1 and
@@ -410,7 +418,7 @@ did what it claimed, test proves nothing *else* broke.
   cannot begin before the delivered-document check exists, and must carry the off-flag removal in the same
   branch.
 - **The leap Wouter asked for is in the plan, and it is not a rebuild.** The rebuild was declined on
-  measured arithmetic — it addresses **at most 94 of the 168 recorded findings**, cannot be decomposed into
+  measured arithmetic — it addresses **at most 94 of the 170 recorded findings**, cannot be decomposed into
   merge-sized steps, and risks the half that measurably works. **The leap is the formatting option,
   delivered in three slices that can each be merged, tested and reverted.** Its first slice is also the
   probe that would reopen the question: whoever runs it must **report explicitly** whether a per-span model
@@ -451,7 +459,55 @@ grade moves you cannot tell whether it was the fix or the model configuration.
 first** — a Markdown file cannot carry its own integrity guard, so the truncation-coverage fix cannot be
 built without it.
 
-### 3.5 Autonomy, and the two input points
+### 3.5 Step 5 — the private run-logging tier, and the monthly analysis
+
+**`DECISIONS-LOG.md`, 2026-08-20, owns the reasoning. This section owns only where it sits and what it
+waits on.** Wouter's words: *"make sure that all logs of legal translation are logged for me and researched
+by an agent every month, and tested against the then installed skill!! Analyse and present solutions, then
+verify."*
+
+1. **A config overlay, not a third variant** — the same published tree with logging turned up. The
+   2026-07-27 decision against a third variant is about a third *client-internal published* tree and
+   **stands untouched**; this is not one. **The capability ships, the verbosity does not** — §5.4's rule
+   that the scanner ships and the list never does, applied to instrumentation.
+2. **Built only after the UK and US skills are published**, on Wouter's instruction. **But the log FORMAT
+   is designed at D3, with the manifest** — §5.11 and §5.6 make the forensic log and the shipped run report
+   *the same artefact*, so one format with two verbosity tiers is free and two formats is a reconciliation.
+3. **The monthly job replays, it does not merely read.** It takes what the logs record and re-runs it
+   against the skill **as it stands that month**, reporting which failures still reproduce. §5.8's
+   frozen-intermediate trick makes that deterministic and model-free.
+4. **Portable, reproducible and observable from commit one**, because it moves to the cloud later — every
+   location by environment variable, never a hard-coded path, and it exits non-zero on VOID rather than
+   reporting a clean run over an empty set.
+5. **The logs contain client text**, so they live in a sibling folder, the evidence guard must name that
+   folder, only sanitised conclusions reach the register, and the register needs a **new origin class for
+   production evidence** — the same gap the 5b probe hit.
+
+**Its field list, its scheduling mechanism and the shape of what it presents are NOT decided**, and §3.4's
+rule governs: explored in the Step B style, not patched straight to code.
+
+> **AND ONE TOOL IS ON THE TABLE, UNEXAMINED. NOTION.** *(Wouter, 2026-08-20: he may want to use it to
+> keep track of the automation. **He has never worked with it, has not installed it, and is going on
+> "I heard it is the right tool".** Recorded at that strength deliberately — an option nobody has
+> tested is not a choice yet, and writing it down as though it were is how an inference acquires the
+> confidence of a measurement.)*
+>
+> **What it plausibly fits: the AUTOMATION's own status** — did the monthly job run, when, did it exit
+> clean, what is scheduled next. That is metadata about a process and carries nothing sensitive.
+>
+> **What it must not become without a decision: a home for the ANALYSIS.** Notion is a third-party
+> cloud service, and **2026-07-29 already ruled third-party telemetry non-viable for a skill that
+> processes privileged documents** — the reasoning being that even a filename is unsafe. The monthly
+> analysis derives from logs that quote real client text, so **the sanitisation that §5.13 requires
+> before anything reaches the register becomes load-bearing in a second place**, and this time the
+> destination is someone else's server where a mistake cannot be un-published.
+>
+> **So the line to draw before anything is installed is between tracking that the automation RAN and
+> storing what it FOUND.** The first looks safe on today's reading; the second needs the 2026-07-29
+> reasoning applied to it properly rather than by analogy. **Neither is decided, and the tool has not
+> been evaluated against any alternative** — including the plainest one, a file in the private folder.
+
+### 3.6 Autonomy, and the two input points
 
 Run the translation and grading work **as autonomously as possible**: no mid-run questions, no confirming
 obvious choices, no step-by-step progress reports. **There are exactly two input points, and they bracket
@@ -1084,7 +1140,7 @@ uv run python ../legal-translation-private/tools/audit_register.py
 of 2026-08-11**, so a fix to one of them survives the session that makes it. Six of them:
 `tools/stepb_harvest.py` (63 prescriptions from five sources, 0 missing), `tools/stepb_verify.py` (84
 claims, and it generates the traceability appendix), `tools/stepb_audit.py` (15 checks),
-`tools/stepb_audit3.py`, `tools/stepb_metacheck.py` (**ten negative tests: it mutates the document to prove
+`tools/stepb_audit3.py`, `tools/stepb_metacheck.py` (**eleven negative tests: it mutates the document to prove
 each check can fail, then restores it byte-identically**), and `tools/stepb_refute.py`. **All six pass.**
 
 > **THEY WERE IN `temp/`, WHICH IS GITIGNORED, AND THAT WAS THE DEFECT.** The suites guarding this
@@ -1320,7 +1376,11 @@ legal-translation-skill/          # today: this folder, with no .git in it
 │                                 #     stepb_harvest · stepb_verify · stepb_audit ·
 │                                 #     stepb_audit3 · stepb_metacheck · stepb_refute
 ├── tests/                        # never ships — run_tests · make_fixtures · negative_inputs ·
-│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · seven test_*.py
+│                                 #   fixtures/ (11 SYNTHETIC .docx) · baselines/ · NINE test_*.py ·
+│                                 #   probe-5b/ — the rule-5b behavioural probe: two rigged
+│                                 #     documents, a pre-registered SCORING.md, preflight.py,
+│                                 #     which says whether either rig actually fires, and
+│                                 #     preflight_metacheck.py, which proves it can say no
 └── temp/                         # gitignored scratch — it already exists and sits INSIDE the repo root
 ```
 
@@ -1432,113 +1492,89 @@ the pull request; do not call it complete.
 
 **RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
 Re-reading has never found one.
-### HANDOFF — 2026-08-11, session closed. Branch 5 is next, and it is GATED.
+### HANDOFF — 2026-08-20. BRANCH 5 IS MERGED. Step 2 has delivered branches 3, 4 and 5.
 
-**SEVEN PULL REQUESTS MERGED. `main` is at `db454c3`, working tree clean, no open PRs, no
-stray branches.** Branch 4 is done, so **step 2 has now delivered branches 3 and 4** and the
-exception channel exists in both trees.
+**Branch 5 is MERGED.** Wouter approved it on 2026-08-20, after the 5b gate was discharged and
+all six confidentiality controls came back clear over the **3,613 lines** the branch adds to
+`main`. **The checks can now fail: a run that finds a problem STOPS instead of reporting success
+over it.** That was the point of the branch, and it is the first change in step 2 a user can feel.
 
-**READ THE LAST EIGHT COMMIT MESSAGES BEFORE ANYTHING ELSE** — §5.2 requires it after a gap
-of more than a day, and this handoff is deliberately shorter than they are.
-
-| merged this session | |
+| | |
 |---|---|
-| **#16** | **Branch 4 — the exception channel.** Rule 5b, its four conditions, the five-attempt bound. F41 + the eighteen-row deadlock set |
-| **#22** | Rule 5b's disclosure takes a **fixed shape**, so a silent exception is detectable |
-| **#21** | **Branch 5 is gated** on a behavioural probe of the channel |
-| **#20** | The confidentiality gate now scans the **published trees**, by diff |
-| **#17** | The **evidence-folder guard** — a control that runs *before* a command does |
-| **#18** | I-12…I-16: five instrument defects into the register |
-| **#19** | Six **STEP-B suites promoted** out of gitignored `temp/` into `tools/` |
+| **merged** | `feature/checks-can-fail` — PR #24, squash-merged 2026-08-20 |
+| **step 2 so far** | branches **3, 4 and 5** delivered. Fifteen branches plus three deferred items remain |
+| **the gate** | **DISCHARGED.** Three rigs, three scope defects, two live runs, `DECISIONS-LOG.md` 2026-08-20 |
+| **NEXT** | **branch 14's `quality_check` slice** — §2's fourth sequencing fact puts it immediately after branch 5, and it is specified below |
 
-### WHAT THE SKILL NOW SAYS THAT IT DID NOT
+### WHY THE GATE IS DISCHARGED AND NOT SATISFIED — the one thing not to re-derive
 
-**`SKILL.md` rule 5b** — *when a check is RIGHT and there is NO compliant repair: stop,
-disclose, and say what you tried.* Rule 5a covers a check that is **wrong**; 5b covers a
-check that is **right** while every remaining repair is forbidden by another rule. Four
-conditions, each stated separately. **A five-attempt bound, written at all FOUR places a
-repair loop is authored** — F41 said two; a sweep found four, one of them an unbounded
-*"repeat until exit 0"* in the always-loaded file itself. And the acceptance is disclosed in
-a fixed `ACCEPTED CONSEQUENCE` block, not free prose.
+Three rigs were built to force rule 5b. **Every one turned out to be a check that was WRONGLY
+SCOPED, and the operator proved it from the check's own source each time** — arm 1 (F1:
+`validate_apply` mirrors `strip_noop`'s rule 1 and never its rule 4), arm 2 (L1, a decoy by
+design, unbuilt), arm 3 (F28: `check_truncation`'s method B ignores the `source_data` method A
+uses in the same function — now register **G11**).
 
-**THE BOUND IS FIVE, AND IT IS MEASURED.** Two prose probes failed first and are recorded as
-failures: ordinal vocabulary gave a ceiling of 3, then the confirming pass found the 3 sat on
-the noun *"pass"*. The forensic step records carry it properly — **47 repair sequences that
-closed, deepest 5**; a bound of 5 truncates nothing the corpus ever repaired, 4 would cut one
-short. **Four sequences never went green, the deepest running to eighteen attempts.**
+**Both live runs left the installed tree 198 of 198 byte-identical**, measured against a manifest
+built before the run, never altered the translation, and delivered a complete document. Arm 3
+discharged all five of rule 5a's conditions.
 
-### THE NEXT ACTION — BRANCH 5, AND ITS GATE COMES FIRST
+**So the gate's TEST could not be constructed, and its CONCERN was answered.** A test aimed at a
+situation that does not arise is not a failed test; it is the wrong test. **And the plan's
+reasoning was wrong on the point that matters: 5b is not what makes branch 5 safe.** The census
+measured the real risk as **false-alarm load**, which is 5a's and branch 14's. 5b is kept as
+insurance plus a forcing function — it made arm 1's operator go back and analyse rather than
+reach for it.
 
-**`STEP-B-ANALYSIS.md` §2 now carries a FOURTH sequencing fact.** Branch 5 converts eighteen
-silent defects into blocked runs, and 5b is then the only legitimate way such a run can end.
-**So before branch 5 merges, run the behavioural probe:** one document, one deliberately
-rigged deadlock, observing whether the operator exhausts the bound, reaches 5b rather than
-improvising, and satisfies all four conditions.
+**Do not build a fourth arm.** Three have been read as 5a, each correctly.
 
-**Read it in the failure direction** — it detects failure far better than it confirms
-success. **And score the likely failure mode, which is the opposite of the obvious one:** the
-register shows this model follows prose *too* literally (cluster F's 39 findings exist
-because of it). The live risk is **reaching for 5b too early**, treating a repair it could
-have found as impossible. Nothing mechanically checks conditions (a) to (d).
+### WHAT BRANCH 14's `quality_check` SLICE CONTAINS — specified, ready to start
 
-### THE FIVE THINGS THIS SESSION LEARNED
+§2's fourth sequencing fact puts it **immediately after branch 5**, and the review, the census and
+three runs have specified it. Each item needs a pattern change **plus a test proving it still
+catches the true positive** — that discipline is the branch.
 
-**1. `sed -i` AND PYTHON'S `write_text` REWRITE LINE ENDINGS AND SAY NOTHING.** `.gitattributes`
-opens with *"NEVER TRANSLATE LINE ENDINGS"*, and three branches converted `CLAUDE.md` from
-CRLF to LF anyway; a fourth put CRLF into both `SKILL.md` files. **Not cosmetic:** Git then
-had no common lines to align, so a nine-line change arrived as a **2,885-line whole-file
-conflict** that could not be resolved by inspection. Diffs went 1446→10, 1484→56, 1457→19.
-**In this repository, edit with the Edit tool.**
+| row | the defect | the fix, where known |
+|---|---|---|
+| **L1** | pairs source to target by index after Step 7 permutes the document | match by text, not position |
+| **G11** | method B ignores the `source_data` method A uses | exempt a dangling ending only where the source paragraph also lacks terminal punctuation — **with the operator's two controls** |
+| **G10** | missing-space rule fires across a `w:tab` element | treat a `w:tab` between two `w:t` as a separator |
+| **M1** | eight false positives inherited from `.doc` conversion | — |
+| **C9** | language auto-detection guesses from the translation | read the ORIGINAL, as `repack_docx` already does |
+| **F15** | counts `en == text` as an unfilled scaffold, which Step 8b mandates | — |
 
-**2. FIVE DEFECTS IN OUR OWN INSTRUMENTS, AND FOUR HAD BEEN REPORTING A PASS.** I-12 to I-16.
-The gate-replay tool counted the skill's own dictionaries as operator behaviour (210 → **147**);
-nothing bound the baseline table to the analyser that produced it, and **D03's re-run count
-was wrong — 41, not 40, so the corpus total is 400**; the acceptance test's execution section
-had **never fired a gate** because the interpreter lacked `lxml` and `rc != 0` was its only
-assertion; and the claims check could not see `tools/` at all.
+**The census measured 9 of 9 of L1's findings as artefacts**, and six of the ten reachable
+documents come through `quality_check` completely clean. `tools/qc_census.py` re-runs it.
 
-**3. A CONFIDENTIALITY GATE I WROTE MYSELF PASSED A FILE IT SHOULD HAVE BLOCKED.** It
-re-implemented `script_committability.py` instead of calling it, and `re.escape`d the
-descriptor list — **9 of whose 13 entries are regex containing `\s+`**, exactly as §5.4
-requires. Escaping made them unmatchable and it reported CLEAN on a file holding two real
-descriptors. **§5.11: a shared capability lives in one place.**
+### FIVE THINGS OPEN
 
-**4. SOFTENING A CHECK TO MAKE IT HONEST MADE IT BLIND.** Promoting `stepb_audit.py`, I
-reasoned that a quotation whose only source is unreadable is *void rather than false* and
-skipped it. `stepb_metacheck.py` immediately dropped from **10 of 10 mutations detected to
-9**. Reverted. **An unreadable source is not a pass.**
+1. **Arm 2** — unconfirmed, deliberately unbuilt, and now unnecessary.
+3. **A `probe` origin class for the register.** The validator rejects `probe-5b`, so F1's and
+   G11's provenance sits in their text. Step C will produce more behavioural evidence.
+4. **I-7, I-8, I-9, I-10** — the four open A1 harness defects. They will corrupt Step C's evidence
+   if still open when it runs.
+5. **`verify_md`'s cross-document §ref defect** — a shared-folder fix with its own selftests and
+   version bump, not a local edit. The obvious repair would silence genuine local refs.
+6. **The six untracked house scripts in `tools/`.** The shared folder changed **six times** in one
+   session — `verify_md` v8→v9→v10, `house_common` v2→v3→v4, `check_checkers` v5→v6,
+   `verify_deliverable` v2→v3 — so `check_checkers` flipped between two sweep runs minutes apart.
+   Each was re-copied with the superseded version kept in `temp/`. **They are untracked, so none
+   of it survives a fresh clone.** `check_checkers` is now a reported NOTE rather than a
+   pass/fail line, because it tracks an external folder rather than this branch. **Whether those
+   six belong in this repository at all is Wouter's open question.**
 
-**5. A COUNT WENT STALE THREE TIMES, ALWAYS THE SAME WAY.** `tools/` read 16 against a real
-23, then 28 and 23 were both predicted and the truth after merging was **29**; `tests/` read
-four against six, then seven. Every error came from **adding to the figure that was there
-instead of listing the folder.**
+### THE FOUR MEASUREMENTS THIS SESSION ADDED, so nobody re-derives them
 
-### FOUR THINGS OPEN, NONE BLOCKING
+- **`tools/qc_census.py`** — the false-positive census over the recorded corpus. 13 workdirs, 10
+  doc-ids. **D05's 8 and D06's 32 reproduce the published figures exactly.**
+- **The eighteen partitioned** — §12 of the build plan. Four groups, not one set.
+- **`tests/probe-5b/preflight.py`** — three arms, exit code tracks arm 3.
+  **`preflight_metacheck.py` — 4 of 4 mutations detected.**
+- **G11** and the probe documents' schema-invalid bold, both found by the arm-3 operator.
 
-1. **The four open defects in the A1 harness and review tooling** — I-7, I-8, I-9, I-10.
-   Unchanged, and they **will corrupt Step C's evidence if still open when it runs.**
-2. **The evidence guard is not live until a session STARTS with it in place.** Probe it
-   safely with `ls ../legal-translation-logs/NO-SUCH-DIRECTORY-PROBE` — BLOCKED if live, a
-   harmless missing-directory error if not. **And `.claude/evidence-dirs.local` does not
-   exist**, so the test-document folder is unguarded until someone creates it from the
-   committed `.example`.
-3. **`audit_session_stepb.py` stays in `temp/` permanently** — it holds two corpus
-   subject-matter descriptors. Its §-resolver fix from this session **does not survive**, and
-   register row I-15 says so.
-4. **The scan list still needs tightening** — §5.4(b), now substantially mitigated for the
-   trees by the diff-based gate, but the list itself is unchanged.
+### WHAT THIS SESSION DID NOT TOUCH
 
-### THREE MISTAKES WORTH CARRYING FORWARD
-
-**I ran a broad glob over an evidence folder and it printed real corpus filenames carrying
-counterparty and personal names into the conversation.** Nothing was committed and nothing
-could be — the leak never touched a file, which is why no scanner in this project can reach
-it. §6.5's rule had been read that same morning. That is what PR #17 exists for.
-
-**A figure that agreed with the one I expected was wrong.** My first reconciliation derived
-399 re-runs by *assuming* 204 (document, step) pairs instead of measuring the real 176. §5.1
-names this exactly: agreement is the moment to re-derive, not to relax.
-
-**Three negative tests probed the wrong tree** — mutating `uk/` then asking whether the
-change was visible in *either* tree, so the untouched `us/` copy kept satisfying them. A
-check whose own probe looks in the wrong place reports a false result in both directions.
+No skill file under `uk/` or `us/` changed after `e0fe85e`. `STEP-B-ANALYSIS.md`'s branch table is
+unedited — no branch scope moved, and the fourth sequencing fact gained a discharge note rather
+than a rewrite, because rewriting it would hide what changed. **No graded run and no rendered
+visual diff** — §4 puts script branches on byte comparison, and the 60-archive comparison is
+strictly stronger than rendering two identical files. Declared N/A, not omitted.

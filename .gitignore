@@ -62,6 +62,26 @@ venv/
 *.egg-info/
 
 # ─────────────────────────────────────────────────────────────────────────────
+# GENERATED PROBE DOCUMENTS — the builder ships, the output does not
+# ─────────────────────────────────────────────────────────────────────────────
+# tests/probe-5b/make_probe_documents.py builds these from entirely invented text, so they
+# are not a confidentiality risk — they are excluded because a GENERATED artefact does not
+# need committing when its generator is committed, and because committing them would mean
+# widening the "no real document has wandered in" control to a second directory. That
+# control allowlists tests/fixtures/ only, and every allowlisted directory is a hole in it.
+#
+# The distinction from tests/fixtures/, which IS committed: `git bisect` rides on those
+# byte-identically, so they have to be stable artefacts. The probe documents have no such
+# requirement — regenerate them with one command.
+#
+# They are written to temp/probe-5b-documents/, so `temp/` above already excludes them from
+# git. The path is named here anyway because the CONTROL that matters is not this file: the
+# pre-commit gate and the claims check both refuse to see a Word document anywhere outside
+# `temp/` and `tests/fixtures/`, and they read the FILESYSTEM rather than the index. A
+# gitignored client document is still a client document sitting in the repo (§5.4).
+temp/probe-5b-documents/
+
+# ─────────────────────────────────────────────────────────────────────────────
 # OS and editor
 # ─────────────────────────────────────────────────────────────────────────────
 Thumbs.db

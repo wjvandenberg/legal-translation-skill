@@ -278,9 +278,22 @@ for n in sorted(scripts):
             flag = ""
             if re.fullmatch(r"1 if \w*strict\w* else 0", r):
                 flag = "   <-- WARN IS INDISTINGUISHABLE FROM PASS"
+            elif re.fullmatch(r"2 if \w*strict\w* else 1", r):
+                flag = "   <-- CORRECT: matches the documented contract"
             print(f"      return {r}{flag}")
-        print("      -> the prescription is `2 if strict else 1`, which matches the")
-        print("         documented contract rather than inventing a third one.")
+        # BRANCH 5 IMPLEMENTED THE PRESCRIPTION, so this stopped being advice and became an
+        # assertion. Left as a standing check rather than deleted: it is the only thing that
+        # would notice the line reverting to `1 if strict else 0`, which is how the defect
+        # arrived in the first place — a contract documented in one place and contradicted in
+        # another, with nothing comparing the two.
+        bad = [r for r in rets if re.fullmatch(r"1 if \w*strict\w* else 0", r)]
+        if bad:
+            print("      -> STILL WRONG. The prescription is `2 if strict else 1`, which")
+            print("         matches the documented contract rather than inventing a third")
+            print("         one. Register row C3's family; do not ship this.")
+        else:
+            print("      -> the documented contract 0 PASS / 1 WARN / 2 FAIL is now the")
+            print("         contract the code implements. Asserted, not prescribed.")
 if not found_any:
     print("  no strict-conditional return found in any check's main()")
 print("=" * 100)

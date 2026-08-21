@@ -856,13 +856,51 @@ def _doc_has_tracked_changes(paragraphs_json_path):
             return True
     return False
 
+# The truncated-install sentinel. All twenty scripts in the tree exit 3 when their
+# own integrity check fires, and that is the one condition SKILL.md rule 6 says must
+# STOP the run. It is a shared constant rather than a literal at each test, because
+# the defect below was a magic number in one place disagreeing with a magic number in
+# another.
+_INTEGRITY_EXIT = 3
+
+
 def _run_validator(label, args, block_codes=None):
     """Invoke a validator subprocess; raise RuntimeError on block.
-    block_codes={set} or None (any non-zero blocks)."""
+    block_codes={set} or None (any non-zero blocks).
+    Exit 3 — a truncated install — blocks unconditionally, whatever block_codes says."""
     import subprocess
     print(f"\n{'=' * 60}\n[apply] auto-running {label}\n{'=' * 60}")
     result = subprocess.run(args, capture_output=False)
     rc = result.returncode
+
+    # EXIT 3 BLOCKS UNCONDITIONALLY, AND IS TESTED BEFORE ANYTHING ELSE.
+    #
+    # This is the one condition SKILL.md says must stop the run, and it was the one
+    # being waved through. Both of the calls below pass block_codes={2}, while
+    # validate_en_runs.py and validate_translations.py each exit 3 when their OWN
+    # integrity check fires — so a sub-validator that had detected its own
+    # truncation fell into the `elif rc != 0` branch and printed
+    # "returned WARN (exit 3). Continuing." Detection worked perfectly; the caller
+    # threw it away. That is goal (iv) failing at the point of USE rather than at
+    # install, and it is why this test is first rather than folded into block_codes.
+    #
+    # THE MESSAGE IS DELIBERATELY NOT THE GATE MESSAGE. SKILL.md rule 6 records that
+    # a truncated install arrives "wearing the costume of an intentional gate", and
+    # the remedy is the opposite of a gate's: re-install. Telling the operator to fix
+    # the input here would send them to re-author paragraphs.json, which cannot help
+    # and which rule 6 forbids — the input is not the problem.
+    if rc == _INTEGRITY_EXIT:
+        raise RuntimeError(
+            f"FILE INTEGRITY — THE INSTALL IS TRUNCATED. This is NOT a gate and "
+            f"NOT an input problem. {label} exited {rc}, the sentinel a script "
+            f"returns when its own integrity check fires. Apply aborted. SKILL.md "
+            f"rule 6 governs and rule 5 does not: STOP and re-install the skill "
+            f"from the .skill / .zip archive, then re-run the affected step. Do "
+            f"NOT edit paragraphs.json, do NOT pass an override flag, and do not "
+            f"treat this as a gate to be satisfied — no change to the input can "
+            f"repair a truncated script."
+        )
+
     if block_codes is None:
         if rc != 0:
             raise RuntimeError(
