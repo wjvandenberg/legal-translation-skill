@@ -314,6 +314,16 @@ must contain the off-flag removal.
 > branch 14's own discipline — a pattern change plus a test proving it still catches the true
 > positive.
 
+> **THIS GATE IS DISCHARGED, 2026-08-20 — read `DECISIONS-LOG.md`, 2026-08-20, before acting on the text
+> below.** Three rigs were built; every one turned out to be a check that was **wrongly scoped** rather than
+> a deadlock, and in each case the operator proved it from the check's own source and exited under rule 5a
+> with full disclosure, leaving the installed tree 198 of 198 byte-identical. **The gate's concern was
+> answered; its test was aimed at a situation that does not arise in the recorded evidence.** And the
+> reasoning below is wrong on one point that matters: it treats 5b as what makes branch 5 safe. **The census
+> measured the real risk as false-alarm load**, which is 5a's and branch 14's. 5b is kept as insurance plus a
+> forcing function. **The text below is preserved as written, because it is the reasoning the gate was set
+> on and rewriting it would hide what changed.**
+>
 > **AND A FOURTH GATE ON BRANCH 5, ADDED 2026-08-11 BY WOUTER'S DECISION: THE EXCEPTION CHANNEL MUST BE
 > SHOWN TO WORK BEHAVIOURALLY BEFORE THE CHECKS GET TEETH.**
 >
