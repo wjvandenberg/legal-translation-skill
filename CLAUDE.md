@@ -115,7 +115,7 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,101 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,140 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
 > because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run, and caught this line stale twice on the day it landed.)*
@@ -876,19 +876,55 @@ working) · modify the source or delivered documents (read-only; they are the ev
 skill (the review feeds the analysis, not a patch).
 
 ### 5.14 Adding to this file
+**REWRITTEN 2026-08-24, at the end of the reduction, because a rule about what goes in a file has to
+describe THAT file.** The old version described a 1,666-line document with no cap, no routes and no rule
+about the section sign. **The general mechanism — the six relocation routes, the size classes, the
+one-line-pointer rule, what `§` means — is the auto-loaded house working method and is NOT restated here.**
+What follows is what is true of *this* charter and is written down nowhere else.
 
-**A rule, because this file grew to 168 KB and 35 factual errors before anyone checked it.**
+**1. DECIDE WHERE IT GOES BEFORE WRITING IT.** Everything belongs in **§2 to §6, by subject**. §1 is
+navigation; **§7 is the handoff and nothing else, and it is REPLACED every session.** So the moment you
+find yourself writing a lesson, a decision or a structural change into §7, it is already in the wrong
+place — a decision goes to §2.6, a lesson to §5, a structural change to §6. **Two rules had to be rescued
+from §7 during this reduction**, which is what "replaced, not appended to" costs when it is forgotten.
 
-1. **Decide WHERE it goes before writing it.** Everything belongs in **§2 to §6, by subject**. §1 is
-   navigation and §7 is the handoff and nothing else. **If you cannot name the section, you do not yet know
-   what the thing is.**
-2. **If it is extensive, ask Wouter first whether it should be its own document** rather than a section
-   here — as was done for the Opus 5 workstream and the decisions log. A charter that carries a workstream
-   inside it stops being readable and starts going stale.
-3. **Never restate what another document owns.** Point at it. The one thing this file may carry about
-   another document is *what it is for* and *where in it to look*.
-4. **Re-run the claims check and the table check after any substantial edit** — §5.12. A count typed into
-   prose here is a count that will be wrong within a week.
+**2. THIS CHARTER'S CAP IS MEASURED, AND §1.7 IS THE ONLY PLACE IT STATES ITS OWN LENGTH.** Class **L,
+350**, §7 at **35**; both live in `verify.config.json`. **`file length` FAILS on every run by design while
+§1.7's exemption stands** — not a regression, and **never silence it by setting the cap to 0**, which
+reports *exempt* and measures nothing. **A declaration is prose, so no ordinary checker can see it going
+stale:** `tools/verify_charter_continuity.py` compares that sentence against the measurement, and it caught
+it twice within an hour of being promoted. **Re-derive it on the commit that changes it.**
+
+**3. THREE THINGS THE REDUCTION MEASURED ABOUT THE ROUTES, and each costs a rule if forgotten.** A
+path-scoped rule is good for **one use per session** and does not return after a compact. **A skill's body
+is not in context until invoked.** **Neither can be exercised in the session that creates it**, so a route
+whose proof needs a session boundary splits the step in two. **Therefore nothing whose absence is
+irreversible goes behind either — §5.4 and §6.5 are route 1 entire**, and `verify_charter_continuity.py`
+check 6b asserts it.
+
+**4. THE TEST THAT A RELOCATION WAS SAFE IS A COUNT, NOT A READING: 2 → 1, and NEVER 2 → 0.** Relocation
+can promote a duplicate into the only copy, and cutting it as "redundant" then removes the rule outright.
+**And never delete a heading or renumber one** — a heading is what every pointer resolves against.
+
+**5. A `§` HERE MEANS THIS FILE. For another document, write it in words:** *"section 4 of
+`STEP-B-ANALYSIS.md`"*. A sign aimed elsewhere **passes silently against the wrong section of this file**,
+so nothing fails and no checker can tell which is which — **nineteen were found, eleven genuinely
+misdirected, one pointing at the wrong section of the right file.** `tools/xdoc_signs.py` holds the
+judgement on the survivors and **fails on a new one.**
+
+**6. NEVER SUMMARISE A COMPANION DOCUMENT — POINT AT IT.** A summary invites the next session to reason
+from the summary instead of the evidence, which is how a wrong conclusion gets reached confidently, and it
+has happened here. §1.3 says what each document owns; **where two could disagree, this one wins**, and the
+disagreement is a defect to fix rather than a judgement call. **If it is extensive, ask Wouter first
+whether it should be its own document.**
+
+**7. COUNT BY LISTING, NEVER BY ADDING, and prefer a relationship to a number.** Every stale count in this
+project came from adding a delta to the figure already written down. **Delete a superseded count** rather
+than leaving it beside the new one. *"§7 is under its cap"* cannot go stale; *"§7 is 18 lines"* can.
+
+**8. AFTER ANY SUBSTANTIAL EDIT, RUN:** `verify_md.py` · `verify_charter_continuity.py` · `xdoc_signs.py` ·
+`md_tables.py` · and **all three confidentiality controls** *(§5.4)*. **Invoke the `audit-gate` skill for
+the method; do not improvise it.**
 
 ### 5.15 Inherited house rules
 
@@ -1086,16 +1122,19 @@ the one irreversible act here — never publish without Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.14, and the 35-line cap in §1.7)*.
 
-### HANDOFF — 2026-08-24. THE CHARTER REDUCTION IS MID-FLIGHT; THE SKILL BUILD IS PAUSED, NOT MOVED
+### HANDOFF — 2026-08-24. PHASES 3b AND 3c OF THE CHARTER REDUCTION ARE COMPLETE
 
-**Produced: documentation and tooling only.** **Not one byte of `uk/` or `us/` changed** — measured, not asserted: `git diff --name-only` over both trees is empty across every branch, and each still holds 198 files. **Reducing the skill files is the project's own work, not the reduction's.**
+**Produced: documentation and tooling only. Not one byte of `uk/` or `us/` changed** — measured, not asserted: `git diff --name-only origin/main -- uk/ us/` is empty on every branch, and each tree still holds 198 files.
 
-**THE CHARTER'S LENGTH IS DECLARED IN §1.7 AND NOWHERE ELSE — do not restate it here.** *(It read 1,322 against a measured 1,305 until `tools/verify_charter_continuity.py` was pointed at it; a second copy of a number is a second thing to go stale, and this one did.)* It has a cap for the first time — class **L 350**, §7 against its own 35. `file length` therefore FAILS on every run **by design**; do not read it as a regression, and **never silence it by setting the cap to 0**, which reports *exempt* and measures nothing.
+**1,666 → 1,140 lines.** Section 5 is **527**, down from 686 at the pin. **48 headings before and after — none deleted, nothing renumbered.** The deep audit accounts for **780 removed lines with 0 in the "gone" band.** §1.7 declares the length and **is the only place that does**; `tools/verify_charter_continuity.py` compares that sentence to the measurement, and caught it stale twice in one hour.
 
-**Three things moved and a session that assumes otherwise will look in the wrong file.** §5.10's ten OOXML rules and five of §5.11's seven are now `.claude/rules/ooxml.md` and `skill-authoring.md`, loaded only on a matching read. **§5.11's other two stay in the charter and must never move** — forgetting either publishes client names into a distributed archive. And the **A2 grade baselines** — the 12-run table and its six conclusions — are **section 11 of `A3-STRUCTURAL-ANALYSIS.md`**, which §1.3 now declares owns them.
+**Three blocks left the charter and a session that assumes otherwise will look in the wrong file.** §6.6, §5.8 and §5.12 are now the skills `publish-skill-archives`, `frozen-intermediate-test` and `audit-gate` in `.claude/skills/`. §5.4's ~100 lines of dated evidence are **`EVIDENCE-confidentiality.md`**; §5.7's corpus table and §5.6's cost stories are **`EVIDENCE-measurement.md`**. **Both evidence documents own NO RULE** — every rule stayed here, and `temp/prohibition2_check.py` asserts all 26.
 
-**THE SINGLE NEXT ACTION: phase 3b steps 7a, 7b and 8, then phase 3c's 9 and 10** — the plan files are `..\templates\PLAN-3b-lt-judgement.md` and `PLAN-3c-lt-confidentiality.md`. **3c is the only irreversible phase:** this repository is public, so §5.4's rules bind and there is no un-publishing.
+**What we learned that changes the next phase. ROUTE 3 NEEDS A SESSION BOUNDARY EXACTLY AS ROUTE 4 DOES** — a skill created this session could not be invoked in it, measured two ways. **And FOUR confidentiality controls were carrying the same hard-coded six-file list**, written before `.claude/` or any `EVIDENCE-` document existed; all four now discover by glob and print what they read. Without that, the evidence document about past leaks would have been committed to a public repo with the gate reporting CLEAR.
 
-**Open, none of it blocking the reduction.** **(1)** the skill build's own next action is unchanged — **branch 6, "stop deleting"**, the first fix branch that moves a delivered byte. **(2)** register **G12**'s 16 unclassified findings, which keep D03, D05 and D06 blocked. **(3)** G9's first half, needing branch 15's notes-schema change. **(4)** `--original` absent from Step 9's step document. **(5)** a `probe` origin class for the register. **(6)** **I-7 to I-10**, the four open A1 harness defects. **(7)** `tools/run_tests.py` still collides by name with `tests/run_tests.py` — both exist, and the collision is recorded nowhere else.
+**THE SINGLE NEXT ACTION: merge the stack, bottom up — #36 → #37 → #38 → #39 → #40 → #41 → #42 → #43.** Do not delete a base branch while anything sits on it *(§5.2)*. **Then phase 3d — §5.1, §5.15 and §5.16, the only sections this session was forbidden to touch.**
 
-**What a new session would get wrong.** It would trust a line count from an older handoff — every one has moved. It would look for the OOXML rules in §5.10. And it would treat the **19 misdirected `§` references** as a find-and-replace: they already resolve, each onto a real section of the wrong document, so nothing fails and no tool says which is which. **Every one needs a reader, and the count RISES as earlier steps add pointers** — which is why step 8 runs last.
+**Open, none of it blocking.** **(1)** the skill build's own next action is unchanged — **branch 6, "stop deleting"**. **(2)** register **G12**'s 16 unclassified findings, blocking D03, D05 and D06. **(3)** G9's first half, needing branch 15's notes-schema change. **(4)** `--original` absent from Step 9's step document. **(5)** a `probe` origin class for the register. **(6)** **I-7 to I-10**, the four open A1 harness defects. **(7)** `tools/run_tests.py` still collides by name with `tests/run_tests.py`. **(8) NEW: three of the fourteen `tests/` suites cannot run under `uv run python`** — the shared venv has no `lxml`, so they need the system interpreter; all three PASS there, and nothing reports the gap. **(9)** the scan list still needs tightening — `EVIDENCE-confidentiality.md` section 5.2.
+
+**What a new session would get wrong.** It would trust a line count from an older handoff. It would look for the audit gate in §5.12 and the corpus table in §5.7. It would read `claudemd_claims`' **8 warnings** as regressions — they are *"pattern not found"* on figures the reduction deliberately relocated, against **0 failures**. And it would assume the charter is near its cap: **1,140 against 350 is still 790 over**, and the remaining weight is §2 (149), §3 (137) and §6 (140), none of which this phase was scoped to touch.
+
