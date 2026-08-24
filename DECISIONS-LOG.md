@@ -342,6 +342,37 @@ wanted**, and the only defence is someone checking a pair they did not propose.*
 
 ---
 
+## 2026-08-24 — the companion files keep their legacy names until after phase 3d
+
+**The names hide what the documents ARE.** `STEP-B-ANALYSIS.md` is a **PLAN** — formally step 2's plan file
+— and reads as an analysis. `A3-STRUCTURAL-ANALYSIS.md` is **EVIDENCE**. `OPUS-5-MIGRATION.md` is a
+**PLAN**. The house naming convention would call them `PLAN-`, `EVIDENCE-` and `REGISTER-`, and a reader
+who does not already know cannot tell which is which. *(Wouter raised it in exactly those terms.)*
+
+**DECIDED: rename at the very end, after phase 3d, as ONE scripted commit** — the names, the kind labels,
+and the six `tools/stepb_*.py` scripts whose own filenames carry one of them.
+
+**The cost was measured by listing rather than estimated: ~178 references across ~30 files.**
+
+| document | references | in files |
+|---|---:|---:|
+| `STEP-B-ANALYSIS.md` | 68 | 24 |
+| `FINDINGS-REGISTER.md` | 40 | 17 |
+| `A3-STRUCTURAL-ANALYSIS.md` | 31 | 14 |
+| `DECISIONS-LOG.md` | 22 | 11 |
+| `OPUS-5-MIGRATION.md` | 17 | 11 |
+
+**Why not now, and it is the same reasoning `PLAN-3d-lt-route0.md` already uses against renumbering:**
+phase 3d is still **moving content between these files**, so a cross-reference audit run today is an audit
+against a moving target — it would pass and prove nothing. **Why not never:** every session that passes
+adds references, so the migration only gets more expensive, and the confusion is real rather than cosmetic.
+
+**What this decision does NOT include.** It was offered as an option to label each document's KIND in §1.3
+immediately — a column, breaking zero references — and **that was not taken**: the whole migration happens
+once, at the end, rather than in two disturbances. **So until then the names stay misleading, and §1.3's
+prose is the only thing telling a reader what each document is.** Recorded plainly because a reader
+arriving mid-project will hit this, and the answer must not be *"nobody noticed"*.
+
 ## The closed decisions that had their own sections
 
 # Observability — decided 2026-07-29, and closed
