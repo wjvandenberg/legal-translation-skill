@@ -57,6 +57,16 @@ DECLARED_BENIGN = [
      "§5.4 is this charter's confidentiality section"),
     ("Never work from a précis",
      "§1.5 is this charter's reading rule; the same line's other signs were rewritten in words"),
+    # ADDED BY PHASE 3c STEP 9, WHICH IS THE MECHANISM STEP 8 RUNS LAST TO AVOID -- and it still
+    # produced two, because step 9 came after step 8 in the same session. Both are §1.3 rows
+    # saying what an evidence document received FROM this charter, so the sign names the SOURCE
+    # section here, not a section of the document being described.
+    ("the dated evidence behind",
+     "§5.4 names the charter section this evidence document was split OUT of — the source, not a "
+     "section of `EVIDENCE-confidentiality.md`, which has numbered sections of its own"),
+    ("the twelve-row test-corpus listing",
+     "§5.7 and §5.6 name the two charter sections this document received content from; its own "
+     "sections are cited elsewhere in words as 'section 1' and 'section 3'"),
 ]
 
 
