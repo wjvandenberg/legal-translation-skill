@@ -537,6 +537,37 @@ as a never-committable location in their own right. **A decision that changes th
 has to change every place the plan is written down** — which is the failure mode the charter overhaul existed
 to fix, applied to itself within the hour.
 
+**2026-08-07 (the repository went PUBLIC, and the flip was MEASURED rather than assumed).** *(Recorded here
+on 2026-08-24, moved out of `CLAUDE.md` §6.4 by phase 3a step 4 — the charter keeps the standing facts and
+this log keeps the measurement. It had no entry here before, so this is a relocation, not a duplicate.)*
+
+**The moment was chosen, not stumbled into.** The repository was created private on 2026-08-06 and flipped
+once branches 0, 1 and 2 had merged — **the cheapest possible moment**, because the history was then **eight
+commits long** and held only the two unmodified trees plus the instruments. Every later commit is a commit
+that would have had to be scanned.
+
+**MAKING A REPOSITORY PUBLIC EXPOSES THE WHOLE HISTORY, NOT THE CURRENT STATE**, which is why the
+measurement was taken over the history and not over the checkout. **Every blob in every commit was scanned:**
+
+- **security: 0.**
+- **Nothing outside `uk/` and `us/` matched any probe.**
+- **No file had ever been deleted**, so nothing was hiding in history behind a removal.
+- **The four superseded skill files are byte-identical to the published rev44 archives**, which had been
+  downloadable for months — so the only pre-existing content the flip exposed was already public.
+
+**Branch protection was live at the moment of the flip, with `enforce_admins` TRUE**, and was tested both
+ways on the day: a direct push to `main` is rejected with `GH006` even for an admin with the local override
+set, and a pull request stays `MERGEABLE` with no review required, so nothing about Wouter's own merging was
+made harder. **Required approvals stay 0 deliberately** — on a solo repository GitHub would otherwise refuse
+to let him merge his own pull request, which breaks the agreed workflow rather than protecting it.
+
+**AND THE LIMIT MATTERS MORE THAN THE SETTING, stated here because it is easy to read the protection as more
+than it is.** No GitHub configuration can make Claude ask Wouter's permission, because Claude operates under
+his own account — to GitHub they are one identity. **The setting stops the accident; it cannot stop the
+decision.** What actually requires his approval is the charter rule, the local hooks, and compliance.
+
+---
+
 **2026-08-07 (how an instruction branch is tested — the graded run is replaced, not skipped).** Branch 3 was
 presented with `STEP-B-ANALYSIS.md` §4's method for instruction branches — *"a graded run plus your review"* —
 and with the honest caveat that folding it into Step C would be a **new** decision, since §4 records that
