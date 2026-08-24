@@ -71,6 +71,33 @@ PHASE_BASELINE = os.environ.get("LT_PHASE_BASELINE", "").strip() or "fab2050"
 # point of the check that it names them explicitly rather than inferring them.
 MUST_NOT_TOUCH = ["5.1", "5.15", "5.16"]          # phase 3d
 
+# A DECLARED TOUCH IS NOT AN EXEMPTION -- IT IS A NARROWER ASSERTION.
+#
+# Phase 3b step 8 had to rewrite the misdirected `§` references wherever they were, and two of the
+# eleven sat inside 5.1's cycle table. That is a genuine collision between two instructions: "do
+# not touch 5.1" and "every misdirected reference needs a reader". Silencing the check would train
+# a reader to skim it, which is this project's own objection to a bad control.
+#
+# So instead: each row below is (section, new_text, old_text). The check REVERSES the declared
+# substitutions and requires the result to be BYTE-IDENTICAL to the phase pin. Anything else that
+# changed in that section still fails, and a declaration that no longer applies fails too.
+DECLARED_TOUCHES = [
+    ("5.1",
+     "Read the branch's brief in **section 3 of `STEP-B-ANALYSIS.md`**",
+     "Read the branch's brief in `STEP-B-ANALYSIS.md` §3"),
+    ("5.1",
+     "**that document's section 3.3** says option 7's substance lives in **its section 6**, and a "
+     "session that planned branch 2 from section 3.3 alone",
+     "§3.3 says option 7's substance lives in §6, and a session that planned branch 2 from §3.3 "
+     "alone"),
+    ("5.1",
+     "The method for that branch kind in **section 4 of `STEP-B-ANALYSIS.md`**, plus the smoke "
+     "suite, plus the parity check from branch 2 onward, plus a graded run where **that section** "
+     "says a graded run",
+     "The method for that branch kind in `STEP-B-ANALYSIS.md` §4, plus the smoke suite, plus the "
+     "parity check from branch 2 onward, plus a graded run where §4 says a graded run"),
+]
+
 # Headings that did not exist at the baseline and are allowed to now.
 HEADINGS_ADDED_SINCE_BASELINE = ["1.7"]
 
@@ -296,12 +323,29 @@ def run(charter_path="CLAUDE.md", root=None):
             if was is None or now is None:
                 bad("1", f"section {num} could not be located in "
                          f"{'the phase pin' if was is None else 'the working tree'} — renamed?")
-            elif was != now:
-                bad("1", f"section {num} CHANGED ({len(was.splitlines())} -> "
-                         f"{len(now.splitlines())} lines) and it is not this phase's to touch")
+                continue
+            touches = [(new, old) for s, new, old in DECLARED_TOUCHES if s == num]
+            reversed_now = now
+            unused = []
+            for new, old in touches:
+                if flat(new) in reversed_now:
+                    reversed_now = reversed_now.replace(flat(new), flat(old))
+                else:
+                    unused.append(new[:44])
+            if unused:
+                bad("1", f"section {num}: declared touch(es) no longer present — {unused}. A "
+                         f"declaration that does not apply is a stale exemption, not a pass")
+            elif reversed_now == was:
+                if touches:
+                    ok(f"section {num:5} changed ONLY in the {len(touches)} declared way(s); "
+                       f"reversing them is byte-identical to the phase pin")
+                else:
+                    ok(f"section {num:5} byte-unchanged since phase entry "
+                       f"({len(now.splitlines())} lines)")
             else:
-                ok(f"section {num:5} byte-unchanged since phase entry "
-                   f"({len(now.splitlines())} lines)")
+                bad("1", f"section {num} CHANGED beyond its declared touches "
+                         f"({len(was.splitlines())} -> {len(now.splitlines())} lines) and it is "
+                         f"not this phase's to touch")
 
     # ------------------------------------------------------------------ 2
     head(2, "NO HEADING LOST, NO RENUMBER — headings are what every pointer resolves against")
@@ -375,19 +419,31 @@ def run(charter_path="CLAUDE.md", root=None):
 
     # ------------------------------------------------------------------ 6
     head(6, "2 -> 1, NEVER 2 -> 0 — relocation can promote a duplicate into the ONLY copy")
+    # THE NEEDLE IS NORMALISED, AND SO IS THE HAYSTACK -- case, whitespace and emphasis. Three
+    # separate case-sensitivity bugs in this ledger in one day, each reporting a rule that is
+    # plainly present as GONE: 'no changelog' against "No changelog...", 'A comment ships' against
+    # "A COMMENT SHIPS...". A rule gets SHOUTED when it is rewritten to be more prominent, which
+    # is exactly when a case-sensitive needle breaks. That is §5.12's sixth point: never a needle
+    # that a rewrap or a capital can defeat.
+    def needle_norm(t):
+        return re.sub(r"\s+", " ", re.sub(r"[*`]", "", t)).lower()
+
+    charter_n = needle_norm(charter)
+    base_n = needle_norm(base)
     for label, needle, homes in LEDGER:
+        n = needle_norm(needle)
         found = {}
         for h in homes:
             p = root / h
             if p.exists():
-                c = p.read_text(encoding="utf-8").count(needle)
+                c = (charter_n if h == charter_path else
+                     needle_norm(p.read_text(encoding="utf-8"))).count(n)
                 if c:
                     found[h] = c
         if not found:
             bad("6", f"{label}: {needle!r} is in NONE of {homes} — 2 -> 0, the rule is gone")
         else:
-            was_n = base.count(needle)
-            ok(f"{label:38} baseline {was_n} -> " +
+            ok(f"{label:38} baseline {base_n.count(n)} -> " +
                " · ".join(f"{k} {v}" for k, v in found.items()))
 
     head("6b", "PROHIBITION 2 — no route-1 rule may sit ONLY in a path-scoped rule file")

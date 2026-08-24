@@ -9,7 +9,7 @@ right order on the right file set.
 WHAT IS ON THE COMMIT LIST, and the list is the point -- the recovered changelog sat on it
 unscanned for weeks because nobody had written the list down:
 
-    committed, and checked here    the six analysis documents
+    committed, and checked here    the analysis and EVIDENCE- documents, DISCOVERED not listed
                                    tools/ -- every script in it
                                    uk/ and us/ -- the two published trees
     committed, do not exist yet    tests/fixtures/ (synthetic only)
@@ -44,8 +44,32 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 ROOT = Path(__file__).resolve().parent.parent
 PRIV = Path(os.environ.get("LT_PRIVATE_DIR", ROOT.parent / "legal-translation-private"))
 
-DOCS = ["CLAUDE.md", "FINDINGS-REGISTER.md", "A3-STRUCTURAL-ANALYSIS.md",
-        "STEP-B-ANALYSIS.md", "DECISIONS-LOG.md", "OPUS-5-MIGRATION.md"]
+# THE FOURTH CONTROL FOUND WITH A HARD-CODED SIX-FILE LIST ON 2026-08-24, and the most serious of
+# the four because this one is the gate the pre-commit hook calls. The six names were written
+# before any EVIDENCE- or REGISTER- document existed, so phase 3c's `EVIDENCE-confidentiality.md`
+# -- a file whose entire subject is past leaks -- would have been committed to a PUBLIC repository
+# without this gate ever opening it, while the gate reported CLEAR.
+#
+# The six stay by NAME so a rename is caught rather than silently dropped; everything else is a
+# glob, so a document added later is gated without anybody remembering to add it here.
+_CORE_DOCS = ["CLAUDE.md", "FINDINGS-REGISTER.md", "A3-STRUCTURAL-ANALYSIS.md",
+              "STEP-B-ANALYSIS.md", "DECISIONS-LOG.md", "OPUS-5-MIGRATION.md"]
+_DISCOVER_DOCS = ["EVIDENCE-*.md", "REGISTER-*.md", "PLAN-*.md"]
+
+
+def _all_docs(root):
+    out = [d for d in _CORE_DOCS if (root / d).exists()]
+    for g in _DISCOVER_DOCS:
+        out.extend(sorted(p.name for p in root.glob(g)))
+    seen, uniq = set(), []
+    for d in out:
+        if d not in seen:
+            seen.add(d)
+            uniq.append(d)
+    return uniq
+
+
+DOCS = _all_docs(ROOT)
 
 FAIL, VOID = [], []
 
@@ -246,7 +270,7 @@ if _SHIPPED_STRAYS:
 head("7. THE PUBLISHED TREES — ADDED LINES ONLY, AGAINST THE BASELINE")
 # WHY THIS SECTION EXISTS, AND WHY IT DIFFS RATHER THAN SCANS.
 #
-# Controls 1 to 6 cover the six analysis documents and tools/. THEY DO NOT SCAN uk/ OR us/ AT
+# Controls 1 to 6 cover the discovered documents and tools/. THEY DO NOT SCAN uk/ OR us/ AT
 # ALL -- the gate counts their files and stops there. That was defensible while no branch
 # changed them; branch 4 changes eight files, and branches 6, 7, 16 and 17 will change far
 # more. A confidentiality gate blind to the two directories that actually ship is the wrong
