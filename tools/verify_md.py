@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""verify_md.py - the document checker.  CHECKER VERSION 13 (2026-08-21)
+"""verify_md.py - the document checker.  CHECKER VERSION 14 (2026-08-24)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -90,7 +90,7 @@ DEFAULT_CONFIG = {
 }
 
 CONFIG_COMMENT = {
-    "files": "Documents to check when no filenames are given on the command line.",
+    "files": "Documents to check when no filenames are given on the command line. GLOBS ARE ALLOWED and are how you cover a KIND rather than a list - 'PLAN-*.md' checks the next plan file too, which a literal list never does. A glob matching NOTHING is VOID, not a silent pass.",
     "required_sections": "Headings that must exist, e.g. ['7. Current status']. Empty = do not check.",
     "forbidden_phrases": "Strings that must never appear, listed INLINE. For an ordinary list only - a retired product name, an old spelling. THIS FILE IS COMMITTED.",
     "forbidden_phrases_file": "Path to a list whose CONTENTS are themselves sensitive - one phrase per line, '#' comments ignored. Keep it OUTSIDE the repository, not merely gitignored. " + FORBIDDEN_LIST_ENV + " overrides this path, so CI can supply its own copy as a secret. Declared and not found = VOID, never a silent pass.",
@@ -551,6 +551,42 @@ def section_sizes(lines):
                 break
         out[key] = end - i
     return out
+
+
+def expand_targets(root, entries):
+    """Expand any glob in 'md.files'; return (paths, globs-that-matched-nothing).
+
+    WHY THIS EXISTS. 'md.files' was a literal list, so a bare run checked only what somebody
+    had remembered to name. In practice that meant the CHARTER and nothing else -- and the
+    internal-reference check, which is the one that catches a section sign pointing at another
+    document, never ran over the PLAN files at all. Three such references were written into
+    plan files in one day before anyone noticed, each caught only by naming the file on the
+    command line by hand.
+
+    Listing plan files literally instead would move the defect rather than fix it: the NEXT
+    plan file is not in the list, and nothing says so. A glob covers the kind. And because a
+    glob can itself stop matching, main() reports an empty one as VOID rather than passing.
+
+    Sorted, so the report order is stable and a diff of two runs is readable.
+    """
+    paths, empty = [], []
+    for entry in entries:
+        s = str(entry)
+        if any(ch in s for ch in "*?["):
+            hits = sorted(root.glob(s))
+            if hits:
+                paths.extend(hits)
+            else:
+                empty.append(s)
+        else:
+            paths.append(Path(s))
+    seen, out = set(), []
+    for p in paths:
+        key = str(p).lower()
+        if key not in seen:
+            seen.add(key)
+            out.append(p)
+    return out, empty
 
 
 def in_size_scope(path, globs):
@@ -1244,12 +1280,22 @@ def main(argv):
 
     cfg = load_config(root)
     named = [a for a in args if not a.startswith("-")]
-    targets = [Path(p) for p in (named or cfg["files"])]
+    targets, empty_globs = expand_targets(root, named or cfg["files"])
     targets = [p for p in targets if p.exists()]
 
     if not targets:
         print("VOID: no documents to check. Name files, or list them under 'md.files' "
               "in verify.config.json. A run that checked nothing has not passed.")
+        return 2
+
+    # A GLOB THAT MATCHED NOTHING IS REPORTED, NEVER SWALLOWED. The whole reason globs exist
+    # here is that a literal list silently omits the NEXT file of a kind; a glob that has
+    # stopped matching would reintroduce exactly that, one level up.
+    for g in empty_globs:
+        print(f"VOID: the pattern {g!r} in 'md.files' matched no file. Either the pattern is "
+              f"wrong or the documents it names are gone - both mean this run checked less "
+              f"than it was configured to.")
+    if empty_globs:
         return 2
 
     # resolved ONCE, not per document: a missing list is a fact about this run, and

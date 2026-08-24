@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""verify_code.py - the code checker.  CHECKER VERSION 3 (2026-08-17)
+"""verify_code.py - the code checker.  CHECKER VERSION 5 (2026-08-24)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -32,6 +32,7 @@ unestablished one; both are non-zero, so any gate wired to "non-zero blocks" is 
 """
 from __future__ import annotations
 
+import fnmatch
 import os
 import re
 import shutil
@@ -72,6 +73,13 @@ DEFAULT_CONFIG = {
                               "expect_fail", "should_fail", "_fails", "rejects"],
     "max_file_bytes": 2_000_000,
     "byte_baselines": [],
+    "check_commit_authors": True,
+    # noreply@github.com is GitHub's OWN committer on a web merge or squash - it appears
+    # once per merged PR and is not anybody's address. Omitting it made the check fire on
+    # 34 legitimate commits on its first real run, and a check that cries wolf gets
+    # switched off rather than read.
+    "author_allow": ["*@users.noreply.github.com", "noreply@github.com"],
+    "author_allow_before": "",
 }
 
 CONFIG_COMMENT = {
@@ -84,6 +92,8 @@ CONFIG_COMMENT = {
     "debug_allow_globs": "Files where debug statements are legitimate (tests, loggers).",
     "negative_test_markers": "Substrings proving a test asserts a FAILURE, not just a success.",
     "byte_baselines": "[{'command': '...', 'expect_sha256': '...'}] - proves a change is non-behavioural.",
+    "author_allow": "Globs for acceptable commit author AND committer emails. An author address is metadata on EVERY commit, so no content scan can see it and going public exposes it once per commit. Default allows only a GitHub noreply address; widen it deliberately, never by accident.",
+    "author_allow_before": "A commit-ish. Everything reachable from it is GRANDFATHERED - for a history that cannot be rewritten. The count is reported in the check's name, so an accepted exposure stays visible instead of becoming invisible. Set it to the commit where the identity was fixed, so every NEW commit is still checked. A value that does not resolve is VOID, never clean.",
 }
 
 # Each pattern is paired with a must-match and a must-not-match vector in SECRET_VECTORS.
@@ -292,6 +302,103 @@ def check_file_sizes(rep, root, cfg):
     rep.record("no oversized files", len(files), problems)
 
 
+def check_commit_authors(rep, root, cfg):
+    """Every commit's AUTHOR and COMMITTER email against author_allow.
+
+    WHY THIS IS NOT A CONTENT SCAN, and why every content scan missed it. An author
+    address is metadata on every commit. A leak scanner reads files; a publication check
+    reads files; both report CLEAN over a history in which every commit carries a work
+    address. The failure is invisible to the whole existing control set, and going public
+    exposes it once per commit rather than once.
+
+    IT REPORTS SHAs AND COUNTS, NEVER THE ADDRESS. The report ends up in terminals and CI
+    logs, and echoing the thing you are trying to keep out of public view leaks it by a
+    route nothing can clean up afterwards. Whoever needs the value runs git log.
+
+    NOT A PASS WHEN IT CANNOT RUN. No git, or not a repository, is N/A - the question does
+    not apply. A git call that FAILS is VOID, never CLEAN: a check that could not read its
+    subject has not checked it.
+    """
+    name = "commit author identity"
+    if not cfg.get("check_commit_authors", True):
+        rep.record(name, 0, [], na_reason="disabled in config")
+        return
+    allow = cfg.get("author_allow") or []
+    if not allow:
+        rep.record(name, 0, [], na_reason="author_allow is empty (disabled)")
+        return
+    if not (root / ".git").exists():
+        rep.record(name, 0, [], na_reason="not a git repository")
+        return
+    try:
+        r = subprocess.run(["git", "log", "--all", "--format=%h%x1f%ae%x1f%ce"],
+                           cwd=root, capture_output=True, text=True, timeout=120)
+    except (OSError, subprocess.SubprocessError) as exc:
+        rep.record(name, 0, [f"git could not be run: {exc.__class__.__name__}"])
+        return
+    if r.returncode != 0:
+        rep.record(name, 0, [f"git log failed with exit {r.returncode}"])
+        return
+
+    # THE GRANDFATHER BOUNDARY. Everything reachable from author_allow_before is accepted,
+    # so a history that cannot be rewritten is DECLARED ONCE instead of re-reported for
+    # ever. That is the whole point: a check that always fails gets switched off, and a
+    # switched-off check protects nothing - including the new commits it would have caught.
+    #
+    # A BOUNDARY THAT DOES NOT RESOLVE IS VOID, NEVER CLEAN. A typo here would otherwise
+    # grandfather nothing while looking deliberate, or - far worse in a later version -
+    # grandfather everything. It has to fail loudly.
+    grandfathered = set()
+    boundary = (cfg.get("author_allow_before") or "").strip()
+    if boundary:
+        b = subprocess.run(["git", "rev-list", boundary],
+                           cwd=root, capture_output=True, text=True)
+        if b.returncode != 0:
+            rep.record(name, 0, [
+                f"author_allow_before does not resolve to a commit: {boundary!r}",
+                "  the boundary is unusable, so nothing was checked"])
+            return
+        grandfathered = {s[:len(s)] for s in b.stdout.split()}
+
+    lines = [l for l in r.stdout.splitlines() if l.strip()]
+    bad, addresses, skipped = [], set(), 0
+    for line in lines:
+        parts = line.split("\x1f")
+        if len(parts) != 3:
+            continue
+        sha, author, committer = parts
+        # %h is abbreviated; rev-list gives full SHAs. Match on the prefix.
+        if any(full.startswith(sha) for full in grandfathered):
+            skipped += 1
+            continue
+        for who, addr in (("author", author), ("committer", committer)):
+            if addr and not any(fnmatch.fnmatch(addr, pat) for pat in allow):
+                bad.append((sha, who))
+                addresses.add(addr)
+
+    # THE GRANDFATHERED COUNT GOES IN THE CHECK'S NAME, so it is visible on a PASS as well
+    # as on a FAIL - the same shape as "no secrets in source (3 excluded)" above. A
+    # grandfathered commit is an ACCEPTED exposure, not an absent one, and a reader who
+    # cannot see the count cannot re-open the decision. Putting it in the problem list
+    # instead would fail a repository that is in exactly the state we declared acceptable.
+    if skipped:
+        name = f"{name} ({skipped} grandfathered)"
+
+    problems = []
+    if bad:
+        shown = ", ".join(f"{s} ({w})" for s, w in bad[:8])
+        more = f" and {len(bad) - 8} more" if len(bad) > 8 else ""
+        problems.append(
+            f"{len(bad)} commit identit{'y' if len(bad) == 1 else 'ies'} outside author_allow, "
+            f"across {len(addresses)} distinct address(es): {shown}{more}")
+        problems.append(
+            "  addresses are NOT printed - run: git log --all --format='%h %ae %ce'")
+        problems.append(
+            "  history is what gets published: a rewrite after a repo is public and cloned "
+            "does not reliably unserve it")
+    rep.record(name, len(lines), problems)
+
+
 def check_byte_baselines(rep, root, cfg):
     from hashlib import sha256
     baselines = cfg["byte_baselines"]
@@ -328,6 +435,55 @@ def tree(sub, files, cfg):
             q.parent.mkdir(parents=True, exist_ok=True)
             q.write_text(body, encoding="utf-8")
         return cfg, d
+    return build
+
+
+def gitrepo(sub, emails, cfg):
+    """Builder: a real one-commit-per-email git repository, plus the config to read it with.
+
+    A REAL REPOSITORY, not a stub, because the check shells out to git and a stub would
+    prove only that the stub matches the parser. The identity is passed per-commit with
+    -c so the machine's global config cannot decide the outcome - which would make the
+    result depend on who ran the suite.
+    """
+    def build(tmp):
+        d = tmp / sub
+        shutil.rmtree(d, ignore_errors=True)
+        d.mkdir(parents=True)
+        q = lambda *a: subprocess.run(list(a), cwd=d, capture_output=True, text=True)
+        q("git", "init", "-q")
+        for i, email in enumerate(emails):
+            (d / f"f{i}.txt").write_text(f"{i}\n", encoding="utf-8")
+            q("git", "add", "-A")
+            q("git", "-c", f"user.email={email}", "-c", "user.name=T",
+              "commit", "-q", "-m", f"c{i}")
+        return cfg, d
+    return build
+
+
+def gitrepo_boundary(sub, emails, cfg, boundary_index):
+    """Builder: a repo whose author_allow_before points at the commit at boundary_index.
+
+    THE BOUNDARY SHA IS ONLY KNOWABLE AFTER THE COMMITS EXIST, so the config is built
+    here rather than passed in. That is what lets the pair below differ ONLY in where the
+    boundary sits relative to the bad commit - which is the thing that has to be proved.
+    A pair that differed in the emails too would show that grandfathering can pass, never
+    that it discriminates.
+    """
+    def build(tmp):
+        d = tmp / sub
+        shutil.rmtree(d, ignore_errors=True)
+        d.mkdir(parents=True)
+        q = lambda *a: subprocess.run(list(a), cwd=d, capture_output=True, text=True)
+        q("git", "init", "-q")
+        shas = []
+        for i, email in enumerate(emails):
+            (d / f"f{i}.txt").write_text(f"{i}\n", encoding="utf-8")
+            q("git", "add", "-A")
+            q("git", "-c", f"user.email={email}", "-c", "user.name=T",
+              "commit", "-q", "-m", f"c{i}")
+            shas.append(q("git", "rev-parse", "HEAD").stdout.strip())
+        return dict(cfg, author_allow_before=shas[boundary_index]), d
     return build
 
 
@@ -373,6 +529,24 @@ def cases(cfg):
         Case("failing test command", runs(check_tests, False),
              tree("cmd_bad", {"x.py": "\n"}, failing),
              tree("cmd_good", {"x.py": "\n"}, passing)),
+        # The bad tree mixes a conforming commit with a non-conforming one. A repo where
+        # EVERY commit is bad would pass a check that fires on "any commit at all", which
+        # is the shape a one-sided vector cannot tell apart from a working check.
+        Case("work email in commit metadata", runs(check_commit_authors),
+             gitrepo("auth_bad", ["9@users.noreply.github.com", "person@company.example"], cfg),
+             # the good tree carries GitHub's own web-merge committer alongside a personal
+             # noreply, so the allow-list is proved to admit BOTH shapes rather than one.
+             gitrepo("auth_good", ["9@users.noreply.github.com", "noreply@github.com"], cfg)),
+        # BOTH TREES HAVE THE SAME BAD ADDRESS. They differ ONLY in where the boundary
+        # sits, so this proves the grandfather DISCRIMINATES BY POSITION rather than
+        # merely being able to pass. bad: boundary at commit 0, the work address lands at
+        # commit 1, AFTER it -> still caught. good: the work address IS commit 0 and the
+        # boundary is commit 0 -> accepted.
+        Case("work email AFTER the grandfather boundary", runs(check_commit_authors),
+             gitrepo_boundary("gf_bad",
+                              ["9@users.noreply.github.com", "person@company.example"], cfg, 0),
+             gitrepo_boundary("gf_good",
+                              ["person@company.example", "9@users.noreply.github.com"], cfg, 0)),
     ]
 
 
@@ -457,6 +631,7 @@ def main(argv):
     check_debug(rep, root, cfg)
     check_negative_tests(rep, root, cfg)
     check_file_sizes(rep, root, cfg)
+    check_commit_authors(rep, root, cfg)
     check_byte_baselines(rep, root, cfg)
 
     print(rep.render())
