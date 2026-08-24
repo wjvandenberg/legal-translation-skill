@@ -13,8 +13,26 @@
 # it is stated rather than papered over. `tests/test_evidence_guard.py` says so in its own
 # closing output.
 #
-# Blank lines and lines starting with # are ignored. Matching is case-insensitive and on the
-# folder NAME as it appears in a command, so a bare name is enough — no path, no wildcards.
+# Blank lines and lines starting with # are ignored. Matching is case-insensitive and is a plain
+# SUBSTRING test against the whole command line — so a bare name is usually enough, and no
+# wildcards are needed or supported.
+#
+# BUT A BARE NAME MATCHES THE WORD ANYWHERE IN THE COMMAND, WHICH IS SHARPER THAN IT SOUNDS.
+# An entry of `skills` blocked every command whose text contained that word — including reads of
+# `.claude/skills/`, which is where Claude Code requires a project skill to live and which holds
+# no evidence at all. It fired three times in one session on commands that touched nothing
+# sensitive (2026-08-24).
+#
+# SO: WHERE A FOLDER NAME IS ALSO AN ORDINARY WORD, GIVE A PATH FRAGMENT INSTEAD — and give it
+# under BOTH separators, because commands here are written with either:
+#
+#   skills/legal-translation
+#   skills\legal-translation
+#
+# That is a NARROWING, not a loosening, and the difference has to be proved rather than asserted:
+# after any change here, drive the hook with real command lines and require BOTH arms — the
+# guarded path still BLOCKED, the freed path ALLOWED. A change that only ever loosens is a
+# removal with a better name. `temp/test_guard_narrowing.py` is the shape to copy.
 #
 # Example (invented, not a real folder):
 # my-test-documents
