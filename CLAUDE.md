@@ -115,7 +115,7 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,140 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,142 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
 > because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run, and caught this line stale twice on the day it landed.)*
@@ -1126,15 +1126,17 @@ the one irreversible act here — never publish without Wouter's explicit OK.)*
 
 **Produced: documentation and tooling only. Not one byte of `uk/` or `us/` changed** — measured, not asserted: `git diff --name-only origin/main -- uk/ us/` is empty on every branch, and each tree still holds 198 files.
 
-**1,666 → 1,140 lines.** Section 5 is **527**, down from 686 at the pin. **48 headings before and after — none deleted, nothing renumbered.** The deep audit accounts for **780 removed lines with 0 in the "gone" band.** §1.7 declares the length and **is the only place that does**; `tools/verify_charter_continuity.py` compares that sentence to the measurement, and caught it stale twice in one hour.
+**1,666 → 1,142 lines.** Section 5 is **527**, down from 686 at the pin. **48 headings before and after — none deleted, nothing renumbered.** The deep audit accounts for **780 removed lines with 0 in the "gone" band.** §1.7 declares the length and **is the only place that does**; `tools/verify_charter_continuity.py` compares that sentence to the measurement, and caught it stale twice in one hour.
 
 **Three blocks left the charter and a session that assumes otherwise will look in the wrong file.** §6.6, §5.8 and §5.12 are now the skills `publish-skill-archives`, `frozen-intermediate-test` and `audit-gate` in `.claude/skills/`. §5.4's ~100 lines of dated evidence are **`EVIDENCE-confidentiality.md`**; §5.7's corpus table and §5.6's cost stories are **`EVIDENCE-measurement.md`**. **Both evidence documents own NO RULE** — every rule stayed here, and `temp/prohibition2_check.py` asserts all 26.
 
 **What we learned that changes the next phase. ROUTE 3 NEEDS A SESSION BOUNDARY EXACTLY AS ROUTE 4 DOES** — a skill created this session could not be invoked in it, measured two ways. **And FOUR confidentiality controls were carrying the same hard-coded six-file list**, written before `.claude/` or any `EVIDENCE-` document existed; all four now discover by glob and print what they read. Without that, the evidence document about past leaks would have been committed to a public repo with the gate reporting CLEAR.
 
-**THE SINGLE NEXT ACTION: merge the stack, bottom up — #36 → #37 → #38 → #39 → #40 → #41 → #42 → #43.** Do not delete a base branch while anything sits on it *(§5.2)*. **Then phase 3d — §5.1, §5.15 and §5.16, the only sections this session was forbidden to touch.**
+**AND ONE FINDING FROM OUTSIDE THE PLAN, FOUND BY `git status` AT THE END AND BY NOTHING ELSE.** `tests/test_gate_tree_scan.py` was **killed by a timeout mid-run** and left a planted line inside **`uk/SKILL.md`** — a shipped file in a public repository. **The next run then CERTIFIED it**, because that suite read its "before" bytes from the working tree, so the orphan became the baseline. §5.16 rules 4 and 5 in one event, in a test that writes to a published tree. Fixed in **#45**: the baseline is pinned to `HEAD` and a leftover reports **VOID**, never a pass.
+
+**THE SINGLE NEXT ACTION: merge the stack, bottom up — #36 → #37 → #38 → #39 → #40 → #41 → #42 → #43 → #44 → #45.** Do not delete a base branch while anything sits on it *(§5.2)*. **Then phase 3d — §5.1, §5.15 and §5.16, the only sections this session was forbidden to touch.**
 
 **Open, none of it blocking.** **(1)** the skill build's own next action is unchanged — **branch 6, "stop deleting"**. **(2)** register **G12**'s 16 unclassified findings, blocking D03, D05 and D06. **(3)** G9's first half, needing branch 15's notes-schema change. **(4)** `--original` absent from Step 9's step document. **(5)** a `probe` origin class for the register. **(6)** **I-7 to I-10**, the four open A1 harness defects. **(7)** `tools/run_tests.py` still collides by name with `tests/run_tests.py`. **(8) NEW: three of the fourteen `tests/` suites cannot run under `uv run python`** — the shared venv has no `lxml`, so they need the system interpreter; all three PASS there, and nothing reports the gap. **(9)** the scan list still needs tightening — `EVIDENCE-confidentiality.md` section 5.2.
 
-**What a new session would get wrong.** It would trust a line count from an older handoff. It would look for the audit gate in §5.12 and the corpus table in §5.7. It would read `claudemd_claims`' **8 warnings** as regressions — they are *"pattern not found"* on figures the reduction deliberately relocated, against **0 failures**. And it would assume the charter is near its cap: **1,140 against 350 is still 790 over**, and the remaining weight is §2 (149), §3 (137) and §6 (140), none of which this phase was scoped to touch.
+**What a new session would get wrong.** It would trust a line count from an older handoff. It would look for the audit gate in §5.12 and the corpus table in §5.7. It would read `claudemd_claims`' **8 warnings** as regressions — they are *"pattern not found"* on figures the reduction deliberately relocated, against **0 failures**. And it would assume the charter is near its cap: **1,142 against 350 is still 792 over**, and the remaining weight is §2 (149), §3 (137) and §6 (140), none of which this phase was scoped to touch.
 
