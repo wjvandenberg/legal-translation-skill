@@ -920,6 +920,11 @@ never delete it in the name of tidying up.
 
 ### 5.10 OOXML hard rules — all confirmed in production
 
+> **THESE TEN RULES NOW ALSO EXIST AT `.claude/rules/ooxml.md`, scoped to `uk/**`, `us/**`, `tools/**/*.py`
+> and `tests/**/*.py`. THE DUPLICATION IS DELIBERATE AND TEMPORARY:** the cut waits on `trace_instructions.py`
+> showing them load on a matching read and NOT at launch, and **that hook only takes effect at the START of a
+> session**, so the session that wired it cannot be the session that proves it. **Phase 3b step 6b.**
+
 - **Never use `xml.etree.ElementTree` to write OOXML.** It rebinds namespace prefixes on serialisation and
   Word rejects the file. Use lxml or pure string/regex edits, and keep an `assert 'ns0:' not in xml` guard
   after every edit.
@@ -956,6 +961,10 @@ never delete it in the name of tidying up.
   Keep the buckets distinct: **A** = introduced by us, **B** = inherited.
 
 ### 5.11 Skill-authoring conventions
+
+> **FIVE OF THE SEVEN RULES BELOW NOW ALSO EXIST AT `.claude/rules/skill-authoring.md`, scoped to `uk/**`
+> and `us/**` — pending the same proof as §5.10.** **The first two did NOT go and never will:** forgetting
+> either publishes client names into a distributed archive, which is irreversible, so they are route 1.
 
 - **No changelog inside the archive, ever.** The packaged `.skill` contains zero changelog entries, and
   there is no `CHANGELOG.md` going forward. **The rev16→rev44 history is not committed either** — it stays
