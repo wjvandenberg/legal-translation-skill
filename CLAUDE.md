@@ -63,6 +63,8 @@ wrong conclusion.
 | **`A3-STRUCTURAL-ANALYSIS.md`** | the evidence-led structural analysis | when a structural judgement comes up, **and whenever a run is compared against baseline** | the measurements: context, runtime, redundancy, divergence — **and, since 2026-08-24, the A2 GRADE BASELINES: the 12-run performance table and the six conclusions drawn from it, in its section 11** |
 | **`OPUS-5-MIGRATION.md`** | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
+| **`EVIDENCE-confidentiality.md`** | the dated evidence behind §5.4 — **and it owns no rule at all**, deliberately: every rule stayed in the charter under route 1 | **before touching any confidentiality control**, and never in place of §5.4 | the measurements, the dated incidents, the three controls' history, the 90-script census, the (a)/(b)/(c) closures |
+| **`EVIDENCE-measurement.md`** | the twelve-row test-corpus listing *(from §5.7)* and the dated cost stories behind the measurement rules *(from §5.6)* | when you need a corpus document's paragraph count or what it uniquely tests | the corpus as a listing · the grader's package and its three gaps · the two cost stories |
 | **the private sibling folder** | `context.md` (real paths, employer, corpus composition), `leakage-names.txt`, the whole A4 set, the grader backups, the harness | before anything touching confidentiality, packaging or publication | **never committable** |
 
 **Three of these are live inputs to the work ahead — the build plan, the register and the structural
@@ -113,7 +115,7 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,208 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,101 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
 > because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run, and caught this line stale twice on the day it landed.)*
@@ -568,11 +570,16 @@ source, page by page, BOTH documents** · `git status` explained to Wouter · wh
 publication check run** · PR opened and reviewed, **Wouter approves the merge** · squash-merge · push ·
 **§7 updated.**
 
-### 5.4 Confidentiality — a hard constraint on every commit
+### 5.4 Confidentiality
+**THE DATED EVIDENCE MOVED TO `EVIDENCE-confidentiality.md` ON 2026-08-24. NOT ONE RULE MOVED WITH IT, AND
+NONE MAY:** a confidentiality rule that is absent when it is needed is a publication that cannot be undone,
+so this is **route 1** — **not one line of this section may ever become a path-scoped rule or a skill.**
+That document holds the measurements, the dated incidents, the three controls' history, the 90-script
+committability census and the (a)/(b)/(c) closures. **Read it before touching a control.**
 
-The skill is **published publicly**. Treat every file in the repo as world-readable from the moment it is
-committed: a private repo made public later exposes its entire history, and **a commit cannot be
-un-published.**
+The skill is **published publicly**, and **the repository has been PUBLIC since 2026-08-07, so its whole
+history is served.** Treat every file in the repo as world-readable from the moment it is committed: **a
+commit cannot be un-published.**
 
 **No confidential or sensitive business data in the skill, in the repo, or in the commit history. This
 includes examples.**
@@ -593,16 +600,9 @@ includes examples.**
   **Deed (Italian)** · **MOU (Japanese)**. **Never say what the instrument is about.** The subject-matter
   qualifier — the noun that says what the agreement is *over*, what the guarantee is *for*, what the deed
   *conveys* — plus a language plus a date range identifies a real instrument far more sharply than a name
-  does, to anyone who knows the market. **And the 93-pattern scan is structurally blind to it:** it reported
-  0 hits on every one of the qualifiers this project had been using, correctly, because none of it is a
-  name. It is the same class of leak as the commercial terms found in July, and it gets the same two-control
-  answer — a blocking probe in `temp/publication_check.py`, and `temp/descriptor_shape_sweep.py`, which is
-  list-free and found four that the term list had missed.
+  does, to anyone who knows the market, **and a name-based scan is STRUCTURALLY BLIND to it.**
   **The qualifiers themselves are NOT listed here, and the omission is the point.** They live with the scan
-  list in the private folder; the probe reads them by path or from an environment variable. *(The first
-  version of that probe carried them inline and this rule listed them as examples — so the probe fired on
-  the rule. It was right to. Enumerating them here would publish exactly what the rule protects, which is
-  the same reasoning that keeps the name list outside the repo.)*
+  list in the private folder; the probe reads them by path or from an environment variable.
   **The same rule covers clause content:** say what a lost span *did* — *"an operative condition"* — never
   what it said.
   **What stays, because it is the evidence and it is not sensitive:** the technical character of the file.
@@ -619,156 +619,63 @@ includes examples.**
   public artefact.
 - **A separate rule for one artefact that DOES ship:** the run report goes inside the skill, so it must be
   **metadata-only by construction** — counts and durations, never document text and never filenames.
+- **A COMMENT SHIPS, AND AN EXAMPLE IN A DOCSTRING IS PUBLISHED PROSE. Invent the examples.** Three scripts
+  intended for `tools/` were caught this way — `EVIDENCE-confidentiality.md` section 4.
+- **A PROBE CANNOT SEE WHAT A SCRIPT REVEALS ABOUT THE CONTROL.** §6.4's never-commit list is a floor and
+  not a ceiling: read a script and ask what it discloses about *which candidates get waved through*, not
+  only what strings it holds.
 
-> **AND ONE LEAK CLASS THAT NONE OF THE CONTROLS BELOW CAN REACH — THE TRANSCRIPT.** *(2026-08-11.)* A
-> session ran `ls` and `find` over the sibling logs folder to learn its layout, and the output printed real
-> corpus filenames carrying counterparty and personal names **into the conversation**. Nothing was committed
-> and nothing could be: the leak never touched a file. **Every control below reads committed content**, and
-> §6.5 already says session metadata is reachable by neither the scanners nor the location rule — so there
-> is **no after-the-fact remedy at all**, and it cannot be un-said.
+> **AND ONE LEAK CLASS NO CONTROL CAN REACH — THE TRANSCRIPT.** Every control here reads **committed**
+> content, and §6.5 says session metadata is reachable by neither the scanners nor the location rule, so
+> **there is no after-the-fact remedy at all and it cannot be un-said.** *(It has happened —
+> `EVIDENCE-confidentiality.md` section 2, and the rule it broke had been read that same morning, which is
+> §5.1's argument: prose is not a control.)* **So the control runs BEFORE the command:**
+> `tools/hooks/evidence_guard.py`, a PreToolUse hook wired in `.claude/settings.json`, blocks a
+> name-emitting command — `ls`, `find`, `tree`, `cat`, `Get-ChildItem`, or inline code that enumerates a
+> directory — whose target is an evidence folder. **THE HAZARD IS OUTPUT, NOT ACCESS:** a script that reads
+> those logs and prints counts still runs, and `tools/evidence_ls.py` is the sanctioned way to see a
+> folder's **shape**, printing no name ever — because **a block with no alternative gets worked around.**
 >
-> **The rule existed and was broken anyway** — §6.5's *"any glob over an evidence folder must be explicit
-> about which files it expects"* had been read that same morning. That is §5.1's argument restated: prose is
-> not a control. **So the control runs BEFORE the command:** `tools/hooks/evidence_guard.py`, a PreToolUse
-> hook wired in `.claude/settings.json`, blocks a name-emitting command — `ls`, `find`, `tree`, `cat`,
-> `Get-ChildItem`, or inline code that enumerates a directory — whose target is an evidence folder.
-> **The hazard is OUTPUT, not access:** a script that reads those logs and prints counts is exactly what
-> `gate_replay.py` does and still runs, as does the register validator §5.12 prescribes by path.
-> `tools/evidence_ls.py` is the sanctioned way to see a folder's **shape** — extensions, size buckets,
-> per-directory counts, corpus doc-ids — and it prints no name, ever. **A block with no alternative gets
-> worked around, and then you have a control nobody believes.**
->
-> **Two limits, stated rather than implied.** Hooks load at **session start**, so this one does not protect
-> the session that adds it — probe with `ls ../legal-translation-logs/NO-SUCH-DIRECTORY-PROBE`, which is
-> BLOCKED if it is live and harmlessly reports a missing directory if it is not. And the **test-document
-> folder is not named in the guard**, because its name is not committable; it is read from
-> `.claude/evidence-dirs.local`, which is gitignored, so **in a fresh clone that folder is unguarded until
-> someone creates that file.** Same shape as the scan list — the scanner ships, the list never does.
+> **Two limits, stated rather than implied. Hooks load at SESSION START**, so this one never protects the
+> session that adds it — probe it with a command naming a non-existent directory under an evidence folder,
+> which is BLOCKED if it is live. And the **test-document folder is not named in the guard**, because its
+> name is not committable; it is read from **gitignored `.claude/evidence-dirs.local`**, so **in a fresh
+> clone that folder is unguarded until someone creates that file.**
 
-**Three controls, and they catch different things. Run all three on every committable file before any
-commit.**
+**Three controls, they catch different things, and all three run on every committable file before any
+commit. EACH MUST REPORT WHAT IT READ** — a clean report from a control that could not reach the file is
+not a pass, and both list-readers were measured blind to `.claude/` on 2026-08-24.
 
-1. **The name-and-term scan** — 93 patterns, every one with a test vector. **A name-based scan is not
-   sufficient on its own**, which was proved when an audit found the operative commercial terms of real
-   client instruments in two committable files: the scan reported 0 hits, correctly, because none of it is a
-   name. **Genericise commercial terms in committable prose** — *"the seven-figure guaranteed amount"*, *"a
-   three-digit two-decimal figure with a comma decimal separator"* — which preserves every analytical point
-   without the value.
-2. **The shape-based sweep** — list-free. Non-ASCII tokens, capitalised multi-word sequences, money and
-   capacity figures, identifier-shaped strings, filenames, absolute paths, long quoted strings. Everything
-   it prints is a candidate for human judgement, not a hit.
-3. **`temp/publication_check.py`** — asserts the specific forbidden classes and **fails rather than
-   listing.** *(Its regex-metacharacter filter used to suppress one real hit — a home-relative path, because
-   the path contains a backslash followed by a capital D and the filter read that as a quoted regex. It
-   reported four findings of five and said nothing about the fifth. **Narrowed and given seven test vectors
-   on 2026-08-06** — `temp/test_pubcheck_suppressor.py`. **A check that suppresses a real finding for the
-   wrong reason is the failure class this project keeps logging**, and it is why every pattern needs a test
-   vector next to it.)*
+1. **`tools/leakage_scan.py`** — the name-and-term scan. **93 patterns, and it exits 2 when the list is
+   unreadable, so the pattern count in its output is the proof it ran.** **Not sufficient on its own:** it
+   reports 0 hits, correctly, on commercial terms and on subject-matter qualifiers, because neither is a
+   name. **Genericise commercial terms in committable prose** — *"the seven-figure guaranteed amount"* —
+   which preserves every analytical point without the value.
+2. **`tools/descriptor_shape_sweep.py`** — the shape-based sweep, **list-free**, so it can find a qualifier
+   nobody put on a list. Everything it prints is a candidate for judgement, not a hit.
+3. **`tools/publication_check.py`** — asserts the specific forbidden classes and **fails rather than
+   listing.** It has suppressed a real finding once, so **every pattern needs a test vector beside it.**
 
 **Two list-maintenance rules, both learned the hard way.** Use `\s+` for every space in a multi-word
-pattern, never a literal space — a bank-name pattern written with one space silently failed against a
-document containing a doubled space, and **a missed name is invisible: the scan simply reports clean.** And
-**every pattern must be tested against the string it was written for, in the same commit** — in Python,
-`'\bName\b'` in a non-raw literal is BACKSPACE+Name+BACKSPACE and will never match.
+pattern, never a literal space — one written with a single space silently failed against a doubled space,
+and **a missed name is invisible: the scan simply reports clean.** And **every pattern must be tested
+against the string it was written for, in the same commit** — in Python, `'\bName\b'` in a non-raw literal
+is BACKSPACE+Name+BACKSPACE and will never match.
 
-**Which files may never be committed — measured, not assumed.** **The rule that decides it is not *"is this a
+**Which files may never be committed — measured, not assumed. THE RULE THAT DECIDES IT is not *"is this a
 script?"* but *"does this file hold one real string per pattern?"*** — which is why a scanner is publishable
-and the list it reads never is.
+and the list it reads never is. **The four files are listed in §6.4**, which is route 1; the 90-script
+census behind the rule is `EVIDENCE-confidentiality.md` section 4.
 
-**Re-measured across all 90 scripts on 2026-08-06** (`temp/script_committability.py`, which runs the same
-probes over the code that the publication check runs over the prose): **69 are clean and 21 hold a real
-string.** The 21 fall into four kinds, and only the first was on the old list:
+**ONE ITEM IS STILL OPEN, and it is the only one:** the scan list needs tightening before it is trusted as
+a pre-commit gate — its false-positive rate against the skill trees is high enough that a reviewer starts
+skimming, and **a control nobody believes is not a control.** Mitigated, not closed:
+`EVIDENCE-confidentiality.md` section 5.2.
 
-1. **The lists and their test vectors** — the name list, the corpus-descriptor list, and the pattern-test
-   file, which holds one real string per vector *by design* and is therefore exactly as sensitive as the
-   list itself.
-2. **The two workspace-building scripts** that map document ids to real corpus filenames.
-3. **The replacement scripts** written to apply a genericisation. A counted replacement has to carry the
-   *before* text, so a script that removes a real string necessarily contains every one it removed.
-4. **One-off measurement scripts with a hard-coded local path** — the A3 and A4 tooling. They were never
-   destined for `tools/`; they are named here so nobody assumes otherwise.
-
-> **Three of the scripts intended for `tools/` were caught by this and fixed the same day**, and the way they
-> failed is worth more than the fix: **each had quoted a real string inside an explanatory COMMENT.** The
-> publication check's own comment quoted the home-relative path it exists to block, and the list-free
-> descriptor sweep illustrated itself with two real qualifiers. **A comment ships. An example in a docstring
-> is published prose.** Invent the examples.
-
-> **AND ONE FILE IS WITHHELD BY JUDGEMENT RATHER THAN BY PROBE.** *(Wouter, 2026-08-06: "I don't want
-> confidentiality review to be committed.")* `temp/confidentiality_review.py` is clean on every probe, and it
-> still does not ship: it sets out which shapes we scan for **and which candidates we accept**, which is a
-> map of what gets waved through. **A probe cannot see that class of exposure**, so the list above is a floor
-> and not a ceiling — read a script and ask what it reveals about the control, not only what strings it
-> holds.
-
-**Three things were known and open at branch 0. (a) and (c) are CLOSED; (b) is still open.**
-
-**(a) — CLOSED 2026-08-07. The two published trees were scanned, read, and cleaned.** The scan hit 46 files
-per tree, identically in both — overwhelmingly false positives from short patterns matching ordinary Dutch,
-Polish, Hungarian, Finnish, French and German legal vocabulary inside the sub-lexicons, plus one pattern
-derived from a filename whose first word is itself a common legal term, which alone accounted for 26.
-**Four items were real, all already public, so cleanup rather than containment.** Two were replaced: a
-worked example in a shipped script built from **two real people's names taken from real source documents**,
-where renaming had never been applied at all; and **named outside law firms in the always-loaded file's
-prose**. Two were kept by Wouter's decision: the author email, with his LinkedIn added beside it; and the
-**firm heading-style patterns in `reorder_definitions.py`, which are FUNCTIONAL** — they are what lets the
-skill recognise those firms' heading styles in a real document, so deleting them removes capability rather
-than a reference. **Capability over disclosure, decided knowingly.**
-
-**(b) The scan list still needs tightening before it is trusted as a pre-commit gate**: its false-positive
-rate against the skill trees is high enough that a reviewer will start skimming, which is the exact failure
-mode this project has already diagnosed in the skill's own validators. **A control nobody believes is not a
-control.** *(Partly mitigated: the gate now separates the trees from everything else, and the pre-flip triage
-splits matches into ALREADY PUBLIC and NEW EXPOSURE — the cut that makes 715 hits readable. The list itself
-is unchanged.)*
-
-> **SUBSTANTIALLY MITIGATED 2026-08-11 — THE GATE NOW SCANS THE TREES, BY DIFF.** Separating the trees out
-> meant `tools/precommit_gate.py` did not look at `uk/` or `us/` **at all**: it counted their files and
-> stopped. Defensible while no branch changed them; branch 4 changes eight files, and branches 6, 7, 16 and
-> 17 will change far more. **A confidentiality gate blind to the two directories that actually ship is the
-> wrong blind spot to keep.**
->
-> **The fix is to judge only what a branch INTRODUCES.** Section 7 diffs `uk/` and `us/` against
-> `origin/main` (override with `LT_TREE_BASELINE`) and runs three controls over the **added lines only** —
-> the 93-pattern name scan, the 13 corpus-descriptor patterns **applied as regex and never `re.escape`d**,
-> and the publication check's forbidden classes. The pre-existing false positives sit in the baseline and
-> cancel out.
->
-> **Measured on branch 4: the eight whole files give 6 hits; the 102 added lines give 0.** Same evidence,
-> and the second is readable. **It reports VOID and refuses to certify when it cannot resolve a baseline** —
-> a control that established nothing has not passed. `tests/test_gate_tree_scan.py` plants a leak of each
-> class into a tree file and asserts the gate blocks on every one, then asserts the tree is byte-unchanged
-> afterwards.
-
-**(c) — CLOSED THE DAY IT WAS FOUND. THE CHANGELOG IS NOT COMMITTED AND `docs/history/` DOES NOT EXIST.**
-*(Wouter, 2026-08-06: "Changelog should NOT be on commit list… Docs/history should never be committed.")*
-The recovered rev16→rev44 changelog **sat on the commit list and had never been scanned, because it is not a
-file yet** — it is recovered from the `CHANGELOG.md` inside the archived `.skill` revisions, and an artefact
-that does not exist cannot be scanned. Measured on 2026-08-06
-(`temp/changelog_confidentiality.py`): **four name-shaped patterns matching 69 times, one a multi-word proper
-name**, plus **three corpus descriptors**, a company-form suffix, two capacity figures and three document
-filenames — rising monotonically by revision, from 10 hits in the earliest to 32 by rev20, which is what a
-working log kept while translating real documents looks like. **Not a defect in the archive; a defect in the
-plan.** It is now closed the clean way rather than by sanitisation: **the changelog stays in the archived
-revisions, outside the repository, where it already was.** It did its job as an input to the structural
-analysis and the build plan, and **nothing downstream needs it** — every lesson it carried is already in §5,
-sourced and dated.
-
-**On credentials and history.** This project has **no credentials at all** — the skill authenticates against
-nothing — so that rule is preventative and the live risk is client names and document content. **`.gitignore`
-prevents accident; it is not a security control.** It does not remove anything already committed and does not
-stop a deliberate `git add -f`. **Making a repo public exposes the entire history, not the current state**;
-the only correct response to a committed secret is to **rotate** it, and **for a leaked client name there is
-no rotation** — which is why the location rules matter more than any cleanup capability. History *can* be
-rewritten, but it needs a force-push, which our own branch protection blocks, and **after a repo has been
-public it is no longer a remedy** — forks and scrapers may already hold the content. **Hence the
-non-negotiable pre-`git init` order, followed in full and recorded in §2.3.**
-
-> **The good news, and it changes what the risk actually is: THERE IS NO HISTORY TO SCAN.** Nothing has ever
-> been committed. Git will only ever see what is added at commit one, so **the exposure is the content of
-> commit one and everything after it** — a better position than "scan the history" implies. Every earlier,
-> less-sanitised version of this file exists only as a dated file in the private archive folder, outside the
-> repo, and stays there permanently.
+**`.gitignore` prevents accident; it is not a security control.** It removes nothing already committed and
+does not stop a deliberate `git add -f`. **Making a repo public exposes the entire history, not the current
+state**; the only correct response to a committed secret is to **rotate** it, and **for a leaked client name
+there is no rotation** — which is why the location rules matter more than any cleanup capability.
 
 ### 5.5 Never-regress — the rule, and how it becomes enforceable
 
@@ -793,10 +700,10 @@ paragraphs differ linguistically and the mechanical output is identical.** That 
 only same-document repeat, not assumed. **So run-to-run variance is large in prose and nil in mechanics** —
 the case for a scripted mechanical gate as the primary instrument and against an LLM re-grade.
 
-### 5.6 The measuring instruments — hold all four constant
-
+### 5.6 The measuring instruments
 **These are properties of the measurement, not of the skill. State them wherever numbers appear, and never
-vary one inside a comparison.** Two of the four have already cost this project real time.
+vary one inside a comparison.** Two of the four have already cost this project real time, and **the two
+dated cost stories moved to `EVIDENCE-measurement.md` section 3 on 2026-08-24.**
 
 | instrument | state | the rule |
 |---|---|---|
@@ -805,18 +712,15 @@ vary one inside a comparison.** Two of the four have already cost this project r
 | **Thinking level** | **`extra` on all 12 runs.** The ladder is `low` < `high` < `extra` < `max` | **`max` has never been used, so every A1 grade is a LOWER BOUND** |
 | **Batch versus single** | Two documents have **batch-run** baselines; one document has **both** | **Reproduce the configuration** or the before/after is not like-for-like |
 
-**The grader is v3 and has 17 criteria** (its own package: `SKILL.md`, `references/methodology.md` and
-`variant-conformance.md`). It was validated, found usable but with three gaps, and extended twice.
-*(Where a comparison of two runs reports "twelve of sixteen criteria identical", that is the register's own
-pairwise comparison, which excludes one criterion that cannot be compared across runs — not a different
-rubric.)* **Its bash paths are Cowork container paths; substitute local equivalents.**
+**The grader is v3 and has 17 criteria.** `EVIDENCE-measurement.md` section 2 owns its package, its three
+gaps, and why a pairwise comparison of two runs reports sixteen rather than a different rubric. **Its bash
+paths are Cowork container paths; substitute local equivalents.**
 
 **Eight measurement rules came out of building it, and every one generalises beyond the grader:**
 
 - **Never score ANY run property from element counts — compare the affected TEXT, then render.** Translation
   consolidates runs, so nearly every count falls even when nothing is lost — and **it fails in both
   directions**, because putting the English back emits an explicit *off*-flag on every non-emphasised run.
-  This produced a false positive on seven consecutive documents.
 - **Count auxiliary REFERENCES, not just auxiliary parts.** A translated footnotes part whose pointer was
   destroyed is unreachable, and the part-inventory check passes.
 - **Compare auxiliary part CONTENT, not the inventory.** Empty footnote and header parts exist as
@@ -833,40 +737,29 @@ rubric.)* **Its bash paths are Cowork container paths; substitute local equivale
 log **everything** — every file read, every tool call, every reasoning step, every gate firing, every wasted
 call and iteration loop, every ambiguous instruction, plus per-step token and time cost. **A summary is not
 a log.** Every real fix in the rev16→rev44 history came out of exactly this kind of observation. **And take
-counts from the log analyser, never from the narrative:** across one batch the self-reported note totals were
-14 / 12 / 11 against the analyser's **18 / 16 / 11**, and one document's non-zero exits were reported as 4
-against a real **7**. The narratives remain the only source for *reasoning*.
+counts from the log analyser, never from the narrative** — measured, and the figures are in
+`EVIDENCE-measurement.md` section 3.2. **The narratives remain the only source for *reasoning*.**
 
 ### 5.7 The test corpus
+**THE TWELVE-ROW LISTING MOVED TO `EVIDENCE-measurement.md` SECTION 1 ON 2026-08-24** — with the paragraph
+counts, the *what it uniquely tests* column and the full variant assignment. **What stays is the rule, and
+the three facts other sections point here for.**
 
 **Eleven real client documents, outside the repo tree, permanently.** Referred to **by instrument class and
 language only, per §5.4** — never by filename, because the filenames carry counterparty names, and never by
-subject matter. **The *what it uniquely tests* column is a property of the file, not of the deal**, which is
-why it stays.
+subject matter.
 
-| doc | document | paras | what it uniquely tests |
-|---|---|---|---|
-| D01 | Power of Attorney (Hungarian) | 24 | the shortest run; batch position 1 |
-| D02 | Agreement (Dutch) | 316 | the richest: heavy tracked changes, 24 highlights, comments, full auxiliary parts |
-| D03 | Agreement (Norwegian) | 98 | **the only language with NO sub-lexicon** — the sole evidence for *"others translate very well too"*, and the only isolation of the lexicon's second layer |
-| **D03B** | **the same document, batch position 3** | 98 | **the most controlled pair in the project** — batch position is the only variable |
-| D04 | Contract (Spanish) | 137 | the heaviest tracked-change load |
-| D05 | Deed (Italian) | 241 | 160 bold runs; the lost-footnote case |
-| D06 | Contract (Italian) | 613 | **the only TRUE legacy binary `.doc`** — the sole exercise of the conversion path; the largest document |
-| D07 | Novation (English) | 97 | **source language == target language**, which nothing in the pipeline notices |
-| D08 | Agreement (Finnish) | 57 | comments plus highlights |
-| D09 | Document (Hungarian) | 96 | the most tables; **four known-answer judgement calls**, which is why it is the Step C arm document |
-| D10 | Guarantee (Polish) | 45 | delivered both the positive and the negative highlight control in one file |
-| D11 | MOU (Japanese) | 43 | **the only non-Latin script**, plus tracked changes |
-
-**Variant assignment — 3 US / 8 UK, and the principle is not arbitrary.** The **hard technical paths run on
-UK**, the default, so a failure is unambiguously a pipeline defect rather than a variant defect; **US goes to
-terminologically rich but technically straightforward documents**, so variant divergence is what gets tested.
-**US: D04, D05, D07. UK: the other eight**, including both hard paths.
-
-**Two things the corpus cannot reach, so they need synthetic fixtures:** there are **no `Symbol` or
-`Wingdings` runs anywhere**, so the Greek-glyph defect cannot be reproduced from a real document; and
-content controls, smart tags, images with alt text and charts with titles appear in none of the eleven.
+- **D03, Agreement (Norwegian), is the only language with NO sub-lexicon** — so it is the sole evidence for
+  §2.1's *"others translate very well too"*, and the only isolation of the lexicon's second layer.
+  **D03/D03B is the most controlled pair in the project**, batch position the only variable. **D09 is the
+  Step C arm document**, for its four known-answer judgement calls.
+- **Variant assignment — 3 US / 8 UK, and the principle is not arbitrary.** The **hard technical paths run
+  on UK**, the default, so a failure is unambiguously a pipeline defect rather than a variant defect; **US
+  goes to terminologically rich but technically straightforward documents**, so variant divergence is what
+  gets tested.
+- **Two things the corpus cannot reach, so they need synthetic fixtures:** there are **no `Symbol` or
+  `Wingdings` runs anywhere**, so the Greek-glyph defect cannot be reproduced from a real document; and
+  content controls, smart tags, images with alt text and charts with titles appear in none of the eleven.
 
 ### 5.8 How a change is actually tested
 **MOVED TO `.claude/skills/frozen-intermediate-test/SKILL.md` ON 2026-08-24** — the
