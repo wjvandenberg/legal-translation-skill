@@ -113,7 +113,7 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,429 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,305 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is AT its 35 and needs no exemption.)*
 > **Reason:** the reduction that brings this file under 350 is planned, agreed and under way — what remains
 > is content with a named destination, not content that cannot go lower. **Trigger that ends it:** that
@@ -1287,36 +1287,19 @@ Two scripts in `tools/`, run at release time. **The deliverable does not change:
 
 ## 7. Current status
 
-> **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session, never
-> appended to; fold anything durable into §1–§6 first** *(§5.14, and the 35-line cap declared in §1.7)*.
+> **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
+> never appended to; fold anything durable into §1–§6 first** *(§5.14, and the 35-line cap in §1.7)*.
 
-### HANDOFF — 2026-08-24. TWO THREADS ARE LIVE: the skill build, and this charter's own reduction
+### HANDOFF — 2026-08-24. THE CHARTER REDUCTION IS MID-FLIGHT; THE SKILL BUILD IS PAUSED, NOT MOVED
 
-**Produced: documentation only, no code.** Nothing under `uk/` or `us/` was touched, so the graded run and
-the rendered visual diff are crossed off as **declared N/A**, not skipped.
+**Produced: documentation and tooling only.** **Not one byte of `uk/` or `us/` changed** — measured, not asserted: `git diff --name-only` over both trees is empty across every branch, and each still holds 198 files. **Reducing the skill files is the project's own work, not the reduction's.**
 
-**THIS CHARTER NOW HAS A CAP AND DID NOT BEFORE.** There was no `verify.config.json` in the repository at
-all, so `file length` and `section length` reported **N/A** while the file stood at **1,666 lines** — every
-cut in the reduction plan was aimed at a number nothing measured. Class **L, 350**; §7 capped at **35**;
-overage declared in §1.7. **§1.6's contents table and §6.2's byte table are cut**, each leaving a pointer,
-and two rules were moved out of this section into **§5.1** and **§5.8** before it was rewritten. **Phase 3a
-sub-step 1.0 and steps 1 and 2 are done; step 3 is material, needs Wouter, and has NOT started.**
+**THE CHARTER IS 1,322 LINES, NOT 1,666.** It has a cap for the first time — class **L 350**, §7 at **35/35**, the overage declared in **§1.7** with a trigger. `file length` therefore FAILS on every run **by design**; do not read it as a regression, and **never silence it by setting the cap to 0**, which reports *exempt* and measures nothing.
 
-**THE SKILL BUILD IS UNTOUCHED AND ITS NEXT ACTION STILL STANDS: branch 6, "stop deleting"** *(option 1,
-register A1 A2 A3 A6 A8 A9 C16 C17 F16 F27)* — the writing-back step stops deleting what it does not
-recognise. **The first fix branch that changes a delivered document**, so the byte comparison on the frozen
-intermediates is the instrument and **it will move**; the acceptance condition is that the movement is
-explained finding by finding. **Read `STEP-B-ANALYSIS.md` §2, its option-1 brief under §3, its §4, then its
-§6 Option 1 IN FULL** — four sessions have planned from §3 alone and got the scope wrong.
+**Three things moved and a session that assumes otherwise will look in the wrong file.** §5.10's ten OOXML rules and five of §5.11's seven are now `.claude/rules/ooxml.md` and `skill-authoring.md`, loaded only on a matching read. **§5.11's other two stay in the charter and must never move** — forgetting either publishes client names into a distributed archive. And the **A2 grade baselines** — the 12-run table and its six conclusions — are **section 11 of `A3-STRUCTURAL-ANALYSIS.md`**, which §1.3 now declares owns them.
 
-**Open, none of it blocking.** **(1)** register **G12**'s 16 unclassified findings, which only Wouter or a
-sanitised route can classify — **this is what keeps D03, D05 and D06 blocked.** **(2)** G9's first half,
-needing branch 15's notes-schema change. **(3)** `--original` is absent from Step 9's step document, so M1's
-fix is a flag nobody passes. **(4)** a `probe` origin class for the register. **(5)** **I-7 to I-10**, the
-four open A1 harness defects and the only open ones. **(6)** `tools/run_tests.py` still collides by name
-with `tests/run_tests.py`.
+**THE SINGLE NEXT ACTION: phase 3b steps 7a, 7b and 8, then phase 3c's 9 and 10** — the plan files are `..\templates\PLAN-3b-lt-judgement.md` and `PLAN-3c-lt-confidentiality.md`. **3c is the only irreversible phase:** this repository is public, so §5.4's rules bind and there is no un-publishing.
 
-**What a new session would get wrong without this.** It would trust the reduction plans' numbers: they say
-**1,685** lines and **41** cut at step 1; measured, **1,666** and **26** — 41 assumed deleting two headings
-and leaving no pointer, which the continuity rule forbids. **Branch 14's figures are deliberately not
-repeated: `tools/qc_census.py` reproduces them and the register owns the findings.**
+**Open, none of it blocking the reduction.** **(1)** the skill build's own next action is unchanged — **branch 6, "stop deleting"**, the first fix branch that moves a delivered byte. **(2)** register **G12**'s 16 unclassified findings, which keep D03, D05 and D06 blocked. **(3)** G9's first half, needing branch 15's notes-schema change. **(4)** `--original` absent from Step 9's step document. **(5)** a `probe` origin class for the register. **(6)** **I-7 to I-10**, the four open A1 harness defects. **(7)** `tools/run_tests.py` still collides by name with `tests/run_tests.py` — both exist, and the collision is recorded nowhere else.
+
+**What a new session would get wrong.** It would trust a line count from an older handoff — every one has moved. It would look for the OOXML rules in §5.10. And it would treat the **19 misdirected `§` references** as a find-and-replace: they already resolve, each onto a real section of the wrong document, so nothing fails and no tool says which is which. **Every one needs a reader, and the count RISES as earlier steps add pointers** — which is why step 8 runs last.
