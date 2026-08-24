@@ -919,76 +919,25 @@ never delete it in the name of tidying up.
 - **Script-integrity failure means a corrupted install.** Stop and reinstall; never work around it.
 
 ### 5.10 OOXML hard rules — all confirmed in production
-
-> **THESE TEN RULES NOW ALSO EXIST AT `.claude/rules/ooxml.md`, scoped to `uk/**`, `us/**`, `tools/**/*.py`
-> and `tests/**/*.py`. THE DUPLICATION IS DELIBERATE AND TEMPORARY:** the cut waits on `trace_instructions.py`
-> showing them load on a matching read and NOT at launch, and **that hook only takes effect at the START of a
-> session**, so the session that wired it cannot be the session that proves it. **Phase 3b step 6b.**
-
-- **Never use `xml.etree.ElementTree` to write OOXML.** It rebinds namespace prefixes on serialisation and
-  Word rejects the file. Use lxml or pure string/regex edits, and keep an `assert 'ns0:' not in xml` guard
-  after every edit.
-- **Never let an XML regex cross an element boundary.** A non-greedy `.*?` under `re.DOTALL` will silently
-  jump runs. Two production incidents: one inserted **464** highlights and scrambled paragraph order; one
-  silently swallowed an `"E-mail address:"` label. Bound it with a negative lookahead —
-  `(?:(?!</w:r>).)*?`. Prefer lxml for structural edits.
-- **Never match `<w:t>` as `<w:t[^>]*>`** — that also matches `<w:tcPr>`, `<w:tbl>` and `<w:tab/>`. Use
-  `<w:t(?:\s[^>]*)?>`.
-- **`<w:b w:val="0"/>` means bold OFF.** Any bold check must read `w:val` and treat `0|false|off` as
-  not-bold. The same applies to `w:i`, `w:strike` and `w:u`.
-- **Count tab CHARACTERS separately from tab STOPS.** A `w:tab` inside `pPr/tabs` is a stop and carries the
-  same tag name as a rendered tab, so a naive iteration sums the two.
-- **Table-nested paragraphs are first-class.** Signature blocks, schedules, form fields and party grids live
-  in `w:tbl/w:tr/w:tc/w:p`. Extraction and apply must both recurse, or those paragraphs ship untranslated.
-  **The same asymmetry exists for containers the skill never lists** — `w:sdt` content controls and
-  `w:smartTag`.
-- **Text-matching, not index-matching, is why this works.** One real document produced 577 JSON entries for
-  564 XML paragraphs — a 6–13 position drift that under index-matching corrupted styles, numbering and
-  indentation and left the last ~60 paragraphs in the source language. **Do not reintroduce index-based
-  application.**
-- **Non-Latin tracked changes need the visible-space plus ZWSP hybrid.** Source text in CJK carries no
-  inter-word whitespace, so `.strip()` in apply eats the operator's authored boundary space. A zero-width
-  space (U+200B) is Unicode category `Cf`, so `str.isspace()` is False and it survives `.strip()`. **Do not**
-  iterate through NBSP, ideographic space or thin/en/em spaces — that path is documented and dead. **And a
-  ZWSP in the deliverable is always a defect:** the fix is a pre-repack scrub, not a prohibition on the
-  device.
-- **Terminology rewrites must protect multi-word defined terms.** An `Annex → Schedule` rule collided with
-  the defined term "Service and Maintenance Schedule", and a blanket revert produced "Annexs". Use ordered
-  rules with negative lookbehind.
-- **Upstream PDF→Word conversion is lossy and lies about it.** Where the source was itself converted from
-  PDF, highlighting, strikethrough, hyperlinks, checkboxes and table borders may already be gone,
-  *inconsistently*. **Never attribute such a loss to the pipeline without rendering the SOURCE Word file.**
-  Keep the buckets distinct: **A** = introduced by us, **B** = inherited.
+**ALL TEN OOXML RULES MOVED TO `.claude/rules/ooxml.md` ON 2026-08-24**, scoped to `uk/**`, `us/**`,
+`tools/**/*.py` and `tests/**/*.py`. **They load when you open such a file and not at launch — observed
+in both directions, not assumed.** Forgetting one produces a file Word rejects, which is reversible; that
+is why they are route 4 and not route 1. **A scoped rule is good for ONE USE PER SESSION**, so re-open
+that file deliberately if you need them twice.
 
 ### 5.11 Skill-authoring conventions
+**FIVE OF THE SEVEN MOVED TO `.claude/rules/skill-authoring.md` ON 2026-08-24**, scoped to `uk/**` and
+`us/**` — the anti-drift, step-numbering, run-report, sub-agent and shared-capability rules. Each keeps
+an unconditional twin here *(§2.5 item 5 · §6.3 · §2.6 and §3.5)*, so that file is the DETAIL.
 
-> **FIVE OF THE SEVEN RULES BELOW NOW ALSO EXIST AT `.claude/rules/skill-authoring.md`, scoped to `uk/**`
-> and `us/**` — pending the same proof as §5.10.** **The first two did NOT go and never will:** forgetting
-> either publishes client names into a distributed archive, which is irreversible, so they are route 1.
+**THESE TWO DID NOT MOVE AND MUST NOT: forgetting either publishes client names into a distributed
+archive, and a commit cannot be un-published.** That is route 1, and a path-scoped rule is absent until a
+matching file is read.
 
 - **No changelog inside the archive, ever.** The packaged `.skill` contains zero changelog entries, and
   there is no `CHANGELOG.md` going forward. **The rev16→rev44 history is not committed either** — it stays
   in the archived revisions, outside the repository *(§5.4(c))*.
 - **No confidential data and no real-document examples** — §5.4.
-- **Anti-drift safeguards are load-bearing.** The layered defences — mandatory step-file reads, the five
-  hard rules, auto-invoked gates, per-batch validation with the batch-cap state file, gate semantics,
-  integrity checks, transcript-mode discipline, the compaction-resume trigger — **exist because of repeated
-  real post-mortems. Do not remove or soften any of them** as part of an Opus 5 or context-optimisation
-  change unless proven redundant by testing.
-- **Keep the eleven-step structure and the gate nomenclature stable** unless there is a positive reason to
-  change them. **No renumbering of the steps:** a renumbering invalidates every step id in the existing
-  forensic logs, which are the project's only behavioural evidence base. The cheap version first — fix the
-  hole and the inconsistent letters.
-- **The shipped run report is metadata-only by construction.** Steps run, per-step duration, gates fired and
-  what satisfied them, validator warnings, iteration loops, integrity results, file manifest. **Never
-  document text, never filenames. And no third-party telemetry, ever** — this skill processes privileged
-  documents. *(It is the same artefact as the forensic log, so designing the log format well gives the
-  shipped report for free.)*
-- **No sub-agents inside the skill** — §3 of `OPUS-5-MIGRATION.md`.
-- **A shared capability lives in one place.** This is a rule for **our** maintenance of the artefact, not an
-  instruction to the skill's operator, and it belongs here rather than in a shipped step document —
-  putting a maintenance convention into a shipped document is how a 221-entry phrase map came to be a de
-  facto thirteenth dictionary inside the scripts folder.
 
 ### 5.12 The audit gate — for any analysis deliverable
 
