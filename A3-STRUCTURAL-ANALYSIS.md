@@ -1414,3 +1414,69 @@ three would have been caught by reading more carefully; all three were caught by
 **One thing A3 deliberately did not do, and Step B should not read the omission as an oversight:** it did
 not rank the keystones. Severity ranks KS2 first, verifiability ranks KS3 first, ambition ranks KS1 first, and
 Wouter's own review ranks KS4 first. Those are four different questions and the answer is his.
+
+---
+
+## 11. The A1/A2 run record — RELOCATED FROM `CLAUDE.md` SECTION 2.5, 2026-08-24
+
+**This section owns the A2 grade baselines, and nothing else did.** It arrived here in phase 3b
+step 5: the charter carried it as *"the numbers to quote"*, but a 31-row measurement read only when a
+claim is disputed is evidence, and the charter's own rule forbids it holding a summary of evidence.
+**Checked before the move: neither this document nor `FINDINGS-REGISTER.md` held it** — the register's
+origin classes are A4 27, WvdB 10, code 10 and **A3 just 1**, so the two documents are largely
+independent sources rather than one derived from the other. **A3 was chosen because it already owns the
+measurements** *(section 3 derives the runtime formula from exactly these runs)*, **because it is
+evidence and therefore uncapped**, and **because it is the least-read of the three — which is correct
+for a baseline you consult rather than follow.** `STEP-B-ANALYSIS.md` was rejected: it is a PLAN file
+already 3,447 lines against a declared cap of 400, and its overage trigger is its evidence being SPENT.
+
+**The text below is byte-identical to what the charter held.** Moved by script, asserted, not retyped.
+**The measured performance record — the never-regress baseline, and the thing every later run is compared
+against:**
+
+| doc | document | var | **grade (v3)** | ACTIVE | script / model | cmds | gates | re-runs | batches |
+|---|---|---|---|---|---|---|---|---|---|
+| D03 | Agreement (Norwegian) — **no sub-lexicon** | UK | **9.3** | 33.1 min | 1% / 99% | 56 | 1 | 41 | 26,18,18 |
+| D01 | Power of Attorney (Hungarian) — batch pos 1 | UK | **9.2** | 20.6 min | 0% / 100% | 29 | 0 | 15 | 17 |
+| D09 | Document (Hungarian) — most tables | UK | **9.1** | 27.3 min | 0% / 100% | 41 | 1 | 27 | 29,33 |
+| D10 | Guarantee (Polish) — batch pos 2 | UK | **9.1** | 17.8 min | 0% / 100% | 37 | 0 | 23 | 20,18 |
+| D04 | Contract (Spanish) — heaviest tracked changes | US | **9.0** | 33.2 min | 1% / 99% | 75 | 1 | 60 | 31,34 |
+| D11 | MOU (Japanese) — only non-Latin | UK | **8.8** | 25.6 min | 0% / 100% | 41 | 1 | 25 † | 14,12 |
+| D06 | Contract (Italian) — legacy `.doc` | UK | **8.8** | 49.6 min | 1% / 99% | 84 | 4 | 69 | 18 × ≤35 |
+| D07 | Novation (English) | US | **8.6** | 35.0 min | 0% / 100% | 28 | 2 | 13 | 35,17 |
+| **D03B** | **same document as D03 — batch pos 3, ARM** | UK | **8.6** | 32.0 min | 0% / 100% | 42 | 1 | 27 | 29,19,14 |
+| D08 | Agreement (Finnish) | UK | **8.5** | 27.6 min | 0% / 100% | 43 | 2 | 28 | 21,16 |
+| D02 | Agreement (Dutch) — richest | UK | **8.4** | 28.7 min | 1% / 99% | 59 | 5 | 43 † | 6 × ≤26 |
+| D05 | Deed (Italian) | US | **8.4** | 38.8 min | 0% / 100% | 41 | 2 | 29 | 6×35,21 |
+
+† ran on harness v1 — re-run, gate and iteration counts are not comparable. **Interruptions are excluded
+from ACTIVE.** **Read D01 and D10 with the simplicity caveat in their grade reports:** between them they have
+no tables, no footnotes, no comments, no definitions section and almost no auxiliary parts, so several
+structure and formatting criteria score 10 on *absence* rather than capability. Their high scores are not
+evidence the pipeline is stronger than the richer documents show.
+
+**One cell was corrected on 2026-08-11: D03's re-runs read 40 and are 41.** Found on branch 4, when a new
+instrument asserted this table against the private `analyse_log.py` that produced it and the assertion
+failed. Confirmed by running that analyser on D03's own forensic log, which reports 41. **All 35 other
+machine-produced cells — commands, gates and re-runs across twelve runs — reproduce exactly**, so the
+corpus total is **400 re-runs, not 399**. `tools/gate_replay.py` now asserts the whole column on every run,
+which is why a one-digit error in a public table is now a build failure rather than a reading exercise.
+
+**Six conclusions from those runs, each replicated across documents:**
+
+1. **Script time is 0–1%; model time 99–100%. Twelve runs from twelve.** **No efficiency work should touch
+   the Python.**
+2. **Runtime is `24.6 + 0.040 × paragraphs` minutes** — about **25 minutes of fixed overhead and 2.4 seconds
+   a paragraph.** Translating is **43%** of the time; on a 24-paragraph document **96%** of the run is fixed
+   cost. **The skill has one gear**, and that is the runtime problem.
+3. **The 35-paragraph batch cap is correctly calibrated, and it is an ATTENTION cap, not a context cap.**
+   Context was never the binding constraint on any run. **Evidence against raising it under Opus 5.**
+4. **Context is not a constraint:** the skill-side peak is **6.4% of the 1M window** (8.3% on a profile
+   heavier than anything observed). The live reasons to care about file size are **findability and
+   truncation, not tokens.**
+5. **The over-engineering is in capabilities, not in files.** No dead scripts, no orphan lexicons, only 4%
+   duplicated prose — but **four shared capabilities across thirteen independent implementations**.
+6. **Batch position degrades the POLICING, not the translation.** The controlled pair (same document, batch
+   position the only variable) scored 9/9/9 on the translation criteria in both runs; every point the arm
+   lost, it lost to out-of-pipeline defects the single run had found and repaired. **The consequence is an
+   argument for the fixes, not for a batch rule.**

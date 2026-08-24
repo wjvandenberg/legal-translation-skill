@@ -669,7 +669,19 @@ else:
        + " ".join(f"{d}={tbl[d]}" for d in common))
 
 head(13, "TWO SMALLER FIGURES, and the runtime range against the A1 table")
-active = [float(x) for x in re.findall(r"\| \*?\*?\d\.\d\*?\*? \| ([\d.]+) min", CMD)]
+# THE A1 TABLE MOVED TO A3 SECTION 11 IN PHASE 3b STEP 5, so this reads A3 and falls back to the
+# charter only for the transition. It used to read CMD alone and, the moment the table left,
+# reported "could not read the ACTIVE column" as a WARNING -- the quiet-stop pattern this file
+# names elsewhere. A table that is in NEITHER document is now a FAILURE, because that is the
+# state where the never-regress baseline has actually been lost.
+NEEDLE = r"\| \*?\*?\d\.\d\*?\*? \| ([\d.]+) min"
+active = [float(x) for x in re.findall(NEEDLE, A3)]
+_where = "A3-STRUCTURAL-ANALYSIS.md section 11"
+if not active:
+    active = [float(x) for x in re.findall(NEEDLE, CMD)]
+    _where = "CLAUDE.md (pre-3b location)"
+if active:
+    print(f"  read from {_where}")
 if active:
     lo, hi = min(active), max(active)
     print(f"  the A1 table's ACTIVE column runs {lo} to {hi} minutes over {len(active)} runs")
@@ -681,7 +693,9 @@ if active:
         else:
             ok("the 18–50 minute range matches the table")
 else:
-    warn("13", "could not read the ACTIVE column")
+    fail("13", "the A1 ACTIVE column is in NEITHER A3-STRUCTURAL-ANALYSIS.md nor CLAUDE.md. "
+               "That table is the never-regress baseline every later run is compared against, "
+               "so its absence from both is a loss, not a relocation")
 
 if present("has 17 criteria"):
     if present("excludes one criterion that cannot be compared across runs"):
