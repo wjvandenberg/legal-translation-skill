@@ -671,23 +671,40 @@ print(f"  sections: {[f'{a}. {b[:44]}' for a, b in charter]}")
 if [a for a, _ in charter] != list("1234567"):
     fail("14", f"the file does not run 1-7: {[a for a, _ in charter]}")
 else:
-    ok("the file runs 1-7, as §1.6 says it does")
-# §1.6's contents table must list every section that exists, and no others.
+    ok("the file runs 1-7")
+# §1.6 HELD A CONTENTS TABLE UNTIL 2026-08-24, AND THIS CHECK IS NOW THE INVERSE OF WHAT IT WAS.
 #
-# SCOPED TO §1.6, and it was not before. The needle `^| **N** | ` matches ANY table row
-# beginning with a bolded single digit, anywhere in the file — so §3.1's four-step table and
-# §7's branch-state table were both being read as if they were the contents. It went unnoticed
-# only because those tables happened to use 1-7 too; the moment a handoff table gained a row
-# for BRANCH 0, the check reported that §1.6 lists a section 0. §1.6 was correct throughout.
+# It used to assert that §1.6's table listed every section that exists and no others. Phase 3a
+# step 1 CUT that table as derivable — the headings are the contents — so the thing to guard is
+# no longer that the table agrees with the file; it is that the table does not COME BACK, and
+# that the pointer explaining its absence is still there. A rule that simply vanishes is
+# indistinguishable from a rule that was repealed, which is why the pointer is checked too.
+#
+# SCOPED TO §1.6 ALONE, and the scope had to be TIGHTENED to keep it that way. The old needle
+# `^| **N** | ` matched ANY table row beginning with a bolded single digit, anywhere in the file
+# — so §3.1's step table and §7's branch-state table were both read as if they were the
+# contents. It went unnoticed only because those tables happened to use 1-7 too; the moment a
+# handoff table gained a row for BRANCH 0, the check reported that §1.6 lists a section 0.
 # A needle that matches the right thing by coincidence is not a needle.
-_toc_block = re.search(r"^### 1\.6 [^\n]*\n(.*?)(?=^## |\Z)", CMD, re.S | re.M)
-toc = set(re.findall(r"^\| \*\*(\d)\*\* \| ", _toc_block.group(1), re.M)) if _toc_block else set()
+#
+# AND THE BLOCK NOW STOPS AT THE NEXT `###`, NOT THE NEXT `##`. §1.7 was added in the same pass,
+# so a block running to `## 2.` swallows it, and this check would be reading a neighbour's text.
+# temp/test_claims_check14.py carries the three negative inputs that prove each arm can fail.
+_toc_block = re.search(r"^### 1\.6 [^\n]*\n(.*?)(?=^#{2,3} |\Z)", CMD, re.S | re.M)
 if not _toc_block:
-    fail("14", "§1.6 could not be located, so its contents table was never checked")
-elif toc != set("1234567"):
-    fail("14", f"§1.6's contents table lists {sorted(toc)}, not 1-7")
+    fail("14", "§1.6 could not be located, so neither arm of this check ran")
 else:
-    ok("§1.6's contents table matches the sections that exist")
+    _body = _toc_block.group(1)
+    _rows = sorted(set(re.findall(r"^\| \*\*(\d)\*\* \| ", _body, re.M)))
+    if _rows:
+        fail("14", f"§1.6's contents table is BACK, listing {_rows} — it was cut 2026-08-24 as "
+                   "derivable from the headings, and a second copy of the navigation goes stale "
+                   "in silence. Delete the table, keep the pointer")
+    elif not re.search(r"\bCUT 2026-08-24\b", _body):
+        fail("14", "§1.6 has no contents table AND no pointer saying it was cut, so a reader "
+                   "cannot tell a moved rule from a repealed one")
+    else:
+        ok("§1.6 carries the pointer and no contents table has been reintroduced")
 # every subsection referenced as §N.M must exist
 # strip references that name another document first -- "`STEP-B-ANALYSIS.md` §9.3" is not
 # an internal reference, and treating it as one reported a false dangling link.
