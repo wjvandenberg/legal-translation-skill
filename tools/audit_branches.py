@@ -215,15 +215,42 @@ def audit_b0():
     bl = json.loads((ROOT / "tests" / "baselines" / "graded-baselines.json")
                     .read_text(encoding="utf-8"))
     claim("B0.baselines", "twelve graded runs recorded", len(bl["runs"]), 12)
+    # THE GRADE TABLE MOVED TO A3 SECTION 11 IN PHASE 3b STEP 5. This read CLAUDE.md alone and
+    # so reported every one of the twelve as a mismatch the moment the table left -- one FAIL
+    # standing for a relocation, which is a false alarm and no more useful than a false pass.
+    # It searches A3 first now, then the charter for the transition. A table in NEITHER is still
+    # a real failure: these grades are the never-regress baseline.
+    #
+    # FOUND BY audit_branches, NOT by the checks I re-ran after step 5. I re-ran
+    # claudemd_claims and verify_md and neither touches this file -- which is the plan file's own
+    # instruction to grep tools/ before moving a subsection, and I had written it without
+    # following it.
     charter = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
-    mism = []
-    for r in bl["runs"]:
-        m = re.search(r"^\|\s*\*?\*?" + re.escape(r["doc"]) + r"\*?\*?\s*\|(.+)$",
-                      charter, re.M)
-        g = re.findall(r"\*\*(\d\.\d)\*\*", m.group(1)) if m else []
-        if not g or float(g[0]) != r["grade"]:
-            mism.append(f"{r['doc']}: json {r['grade']} vs charter {g}")
-    claim("B0.grades", "every recorded grade matches the charter's own table", mism, [])
+    a3_full = (ROOT / "A3-STRUCTURAL-ANALYSIS.md").read_text(encoding="utf-8")
+    # SCOPED TO SECTION 11, and the scope is the whole fix. A3 ALREADY had a `| D03 | 98 | 33.1 |`
+    # table of its own -- paragraphs and minutes, no grades -- hundreds of lines above the one
+    # that arrived in step 5. An unscoped `re.search` finds that one first, reads no grade out of
+    # it, and reports all twelve runs as mismatched. A needle that matches the wrong table by
+    # position is the same defect class as a needle that matches the right thing by coincidence.
+    _m11 = re.search(r"^## 11\..*", a3_full, re.S | re.M)
+    a3 = _m11.group(0) if _m11 else ""
+    mism, where = [], None
+    for source, label in ((a3, "A3-STRUCTURAL-ANALYSIS.md section 11"),
+                          (charter, "CLAUDE.md (pre-3b location)")):
+        trial = []
+        for r in bl["runs"]:
+            m = re.search(r"^\|\s*\*?\*?" + re.escape(r["doc"]) + r"\*?\*?\s*\|(.+)$",
+                          source, re.M)
+            g = re.findall(r"\*\*(\d\.\d)\*\*", m.group(1)) if m else []
+            if not g or float(g[0]) != r["grade"]:
+                trial.append(f"{r['doc']}: json {r['grade']} vs table {g}")
+        if not trial:
+            mism, where = [], label
+            break
+        mism = trial
+    print(f"    grade table read from: {where or 'NEITHER — that is the failure'}")
+    claim("B0.grades", "every recorded grade matches the run table, wherever it lives",
+          mism, [])
 
 
 # =========================================================================== BRANCH 1
