@@ -1,0 +1,45 @@
+{
+  "md": {
+    "files": [
+      "CLAUDE.md"
+    ],
+    "required_sections": [],
+    "forbidden_phrases": [],
+    "forbidden_phrases_file": "",
+    "placeholder_markers": [
+      "{{FILL",
+      "[[FILL",
+      "\\[\\[FILL",
+      "TODO",
+      "TBD",
+      "FIXME",
+      "XXX",
+      "<placeholder>"
+    ],
+    "check_formatter_damage": true,
+    "flag_trailing_hard_breaks": true,
+    "check_numbered_headings": "auto",
+    "check_internal_refs": true,
+    "check_file_links": true,
+    "report_numeric_claims": true,
+    "max_line_length": 0,
+    "max_lines": {
+      "CLAUDE.md": 350
+    },
+    "section_caps": {
+      "7": 35
+    },
+    "report_section_sizes": true,
+    "size_scope": [
+      "CLAUDE.md",
+      "*/CLAUDE.md"
+    ]
+  },
+  "_comments_md": {
+    "why_this_file_exists": "Until 2026-08-24 this repository had NO verify.config.json at all, so 'file length' and 'section length' both reported N/A and every reduction was being made toward a number nothing measured. Written at sub-step 1.0 of phase 3a, with the class confirmed by Wouter.",
+    "max_lines": "CLAUDE.md is size class L - 350 lines - because this project runs far past 8 sessions. It is a MAP rather than one number so that a later step can give another document its own declared cap without changing this one. A file matching no glob reports N/A, which is honest: a README and an evidence document have no size class.",
+    "section_caps": "Section 7 is the handoff. It is replaced every session, so it is the section that bloats fastest, and 35 is the number in CLAUDE-TEMPLATE.md and in templates/verify.config.json. EVIDENCE-lt-charter-reduction.md says 60 in two places; the template wins where the two disagree, so 35 is what is enforced here.",
+    "forbidden_phrases_file": "DELIBERATELY EMPTY. This project's scan lists live OUTSIDE the repository and are read by tools/leakage_scan.py and tools/publication_check.py, which are the controls that own confidentiality here. Declaring a path that is not found would report VOID, and wiring a second reader of those lists is section 5.4 work, not a checker setting.",
+    "size_scope": "Only CLAUDE.md. The six analysis documents at the root are evidence and plan content, not charters, so they have no size class - and uk/ and us/ contain SKILL.md, never a CLAUDE.md, so nothing in a shipped tree is in scope."
+  }
+}

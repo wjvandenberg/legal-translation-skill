@@ -89,15 +89,25 @@ of that strand and lives in the sealed judging directory outside the repository;
 
 ### 1.6 Contents
 
-| § | section | what it covers |
-|---|---|---|
-| **1** | How to read this document | communication · the document set · reading order |
-| **2** | Project overview | the skill · the four goals · what has been done · what the evidence says · the decisions that still bind |
-| **3** | Plan of action | **only what is still to be done** — five steps, in order, with their gates |
-| **4** | Tech stack | the runtime constraint, the skill's own stack, the dev-host toolchain |
-| **5** | Working method and rules | the build cycle · branches and PRs · confidentiality · never-regress · the instruments · testing · gates · OOXML · the audit gate |
-| **6** | File, folder & repo structure | the skill tree today · what the build changes · the repository, now and after |
-| **7** | Current status | the handoff, and nothing else |
+**CUT 2026-08-24 AND MUST NOT COME BACK** — a table of the seven headings, derivable by reading them and
+stale in silence whenever one moved. **The headings are the contents;** §1.3 and §1.4 own the navigation.
+
+### 1.7 The size class, and the cap this charter is held to
+
+**SIZE CLASS: L — cap 350 lines. §7 alone: 35 lines.** L rather than M because this project has run far past
+eight sessions, which is the observable test rather than a judgement about how big it feels. Both caps are
+**enforced, not aspirational**: they live in `verify.config.json`, and `uv run python tools/verify_md.py
+CLAUDE.md` reports each of them with a per-section breakdown showing where the weight sits. **Until
+2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
+nothing measures is not a cap.
+
+> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,557 lines against a cap of 350.** *(Taken from the checker on
+> the commit that declares it, never typed from memory. §7 is AT its 35 and needs no exemption.)*
+> **Reason:** the reduction that brings this file under 350 is planned, agreed and under way — what remains
+> is content with a named destination, not content that cannot go lower. **Trigger that ends it:** that
+> reduction completing. **Over the cap means RELOCATE, never delete**, and every relocation leaves a
+> one-line pointer. **A number that does not move between sessions is this exemption going stale, not this
+> exemption working.**
 
 ---
 
@@ -619,6 +629,11 @@ zero; it cannot prove the command was a good one, and it says so in its own outp
 > trees that had been fixed once and returned through the next caller.** None was found by reading. Every one
 > was found by running something.
 
+**SO THE MAXIM, AND IT IS THE ONE §5.16 CALLS *"§5.1's run, do not read rule"*: RUN, DO NOT READ.** Every
+error worth finding in this project has been found by running something; **re-reading has never found one.**
+*(Moved here from §7 on 2026-08-24 — §7 is replaced every session, so a rule left there is deleted by
+design.)*
+
 **Four failure shapes to expect, because each has now happened more than once.** *(1)* **A check that passes
 for the wrong reason** — eleven logged instances, several inside this project's own verification scripts.
 Never a two-word needle; ask the same question a second way; and **when a figure agrees with the one you
@@ -1001,6 +1016,14 @@ content controls, smart tags, images with alt text and charts with titles appear
 | **Synthetic** | hand-built documents with no client text, in `tests/fixtures/` | **YES** — and these are what runs on every change and what `git bisect` uses | every commit |
 | **Real, frozen** | the frozen intermediates from the eleven corpus documents; they contain the **full client text** | **NEVER.** They live with the logs, outside the repo, and must be excluded **by path** before `git init` | before every merge |
 
+> **AND THE TRICK HAS ONE BLIND SPOT, WHICH IT DOES NOT ANNOUNCE.** A frozen intermediate is the
+> **post-compliance** artefact — the `paragraphs.json` the run left behind *after* its gates were satisfied.
+> **So it cannot reproduce a gate that was satisfied while the run was happening**, and a check that leans on
+> it reports a clean sweep over the very cases the gate already fixed. Measured on 2026-08-21:
+> `validate_segment_shapes` finds **0 findings over 81 tracked-change paragraphs** on the whole recorded
+> corpus. **A frozen-intermediate result is evidence about the mechanical half only.** *(Moved here from §7,
+> 2026-08-24 — it is a property of this method, not of one branch, and §7 is replaced every session.)*
+
 **Negative test inputs are mandatory, not optional.** Nothing in the shipped package can currently make a
 check fail, so a fixture set of only-passing cases produces tests that pass because nothing is being tested.
 **One input per check, built to violate that check's stated pass condition.**
@@ -1327,31 +1350,12 @@ The measurement behind each is in `A3-STRUCTURAL-ANALYSIS.md` §5.
 
 ### 6.2 The skill tree today
 
-**198 files per variant, both trees, re-measured from the two rev44 publication archives.** Exact bytes.
-
-```
-                                    UK bytes    US bytes
-SKILL.md                              57,269      57,532   # always loaded — discipline, hard rules, pipeline map
-skill-docs/                          128,106     131,115   # 8 step docs, read in full at their step
-  01-setup-and-extract.md             10,168      10,168   #   Steps 1 + 2  (+ Step 1a host-mode warning)
-  03-lexicons-and-segments.md         14,632      14,759   #   Steps 3 + 3b
-  04-translate.md                     47,707      50,463   #   Step 4 — the heaviest step
-  04b-translate-gates.md               7,019       7,150   #   Steps 4b + 4c + 4d
-  05-apply.md                          5,255       5,255   #   Step 5
-  06-postprocess-and-reorder.md       12,814      12,811   #   Steps 6 + 7
-  08-aux-and-quality.md               15,905      15,903   #   Steps 8 + 9
-  10-repack-and-validate.md           14,606      14,606   #   Steps 10 + 11 (+ 11a diligence audit)
-references/                          444,766     446,998   # 15 cross-language English domain lexicons
-scripts/                             518,726     525,629   # 20 Python scripts (extract → apply → validate → repack)
-sub-lexicons/                      2,502,968   2,506,476   # 154 files = 11 languages x 14 domains
-TOTAL                              3,651,835   3,667,750   # ~3.7 MB unpacked, either way
-```
-
 **Latest published version: `v2026.04.22-rev44`** (13 May 2026). 198 files, 20 scripts, per variant.
 
-> **Three files per tree sit past the only install-truncation position ever OBSERVED (byte 55,466)** — the
-> apply script, `SKILL.md` and the post-processing script. The larger figure this project has measured
-> against since rev30 is a *reported* number, not an observed one, and nothing is near it.
+**The per-file byte table was CUT 2026-08-24** — stale on every commit, and `A3-STRUCTURAL-ANALYSIS.md` holds
+the same figures per file and per directory. The line above stays because that revision token is **nowhere
+else in the repository and nowhere in either tree.** The byte-**55,466** truncation finding this section
+carried is register row **W1**; the rule it supports is §6.1's question 6.
 
 ### 6.3 What the build changes — the envisaged tree
 
@@ -1518,149 +1522,36 @@ Two scripts in `tools/`, run at release time. **The deliverable does not change:
 
 ## 7. Current status
 
-> **This section is the handoff and nothing else.** Everything that has been done is §2.3; everything still
-> to do is §3. **Replace this section at the end of every session — do not append to it. Every handoff opens
-> with the standing block below, verbatim and unedited** — it is the first thing the next session reads, and
-> it exists because a session that had read §5.1 still ran three branches without it.
+> **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session, never
+> appended to; fold anything durable into §1–§6 first** *(§5.14, and the 35-line cap declared in §1.7)*.
 
-### HOW THIS SESSION WORKS — read before touching anything
+### HANDOFF — 2026-08-24. TWO THREADS ARE LIVE: the skill build, and this charter's own reduction
 
-**EVERY BRANCH IS Explore → Plan → Code → VERIFY → TEST → Commit. Including documentation:** this file,
-`STEP-B-ANALYSIS.md`, the register, a README. Prose that is wrong misdirects the next session exactly as a
-broken script does.
+**Produced: documentation only, no code.** Nothing under `uk/` or `us/` was touched, so the graded run and
+the rendered visual diff are crossed off as **declared N/A**, not skipped.
 
-**BEFORE ANY CODE, open a task list** carrying all six phases plus §5.3's applicable items, and cross each
-off **only against the output of a command you have run.** An item that does not apply is crossed off as a
-**declared N/A with its reason**, never omitted.
+**THIS CHARTER NOW HAS A CAP AND DID NOT BEFORE.** There was no `verify.config.json` in the repository at
+all, so `file length` and `section length` reported **N/A** while the file stood at **1,666 lines** — every
+cut in the reduction plan was aimed at a number nothing measured. Class **L, 350**; §7 capped at **35**;
+overage declared in §1.7. **§1.6's contents table and §6.2's byte table are cut**, each leaving a pointer,
+and two rules were moved out of this section into **§5.1** and **§5.8** before it was rewritten. **Phase 3a
+sub-step 1.0 and steps 1 and 2 are done; step 3 is material, needs Wouter, and has NOT started.**
 
-**PLAN MEANS WITH WOUTER, BEFORE CODE.** Autonomy covers running translations and grading them. It has never
-covered code or documents. Present the plan — what it builds, what it must **not** do, what counts as done —
-and wait.
+**THE SKILL BUILD IS UNTOUCHED AND ITS NEXT ACTION STILL STANDS: branch 6, "stop deleting"** *(option 1,
+register A1 A2 A3 A6 A8 A9 C16 C17 F16 F27)* — the writing-back step stops deleting what it does not
+recognise. **The first fix branch that changes a delivered document**, so the byte comparison on the frozen
+intermediates is the instrument and **it will move**; the acceptance condition is that the movement is
+explained finding by finding. **Read `STEP-B-ANALYSIS.md` §2, its option-1 brief under §3, its §4, then its
+§6 Option 1 IN FULL** — four sessions have planned from §3 alone and got the scope wrong.
 
-**A BRANCH WHOSE VERIFY AND TEST ARE NOT CROSSED OFF IS NOT FINISHED**, whatever its diff looks like. Open
-the pull request; do not call it complete.
+**Open, none of it blocking.** **(1)** register **G12**'s 16 unclassified findings, which only Wouter or a
+sanitised route can classify — **this is what keeps D03, D05 and D06 blocked.** **(2)** G9's first half,
+needing branch 15's notes-schema change. **(3)** `--original` is absent from Step 9's step document, so M1's
+fix is a flag nobody passes. **(4)** a `probe` origin class for the register. **(5)** **I-7 to I-10**, the
+four open A1 harness defects and the only open ones. **(6)** `tools/run_tests.py` still collides by name
+with `tests/run_tests.py`.
 
-**RUN, DO NOT READ.** Every error worth finding in this project has been found by running something.
-Re-reading has never found one.
-### HANDOFF — 2026-08-21. BRANCH 14's `quality_check` SLICE IS MERGED. I-17 IS CLOSED.
-
-**Six pull requests landed: #25 · #26 · #27 · #28 · #29, plus this one.** `main` carries
-branch 14's slice, three repairs to the instruments that verified it, and the fixture fix
-that branch 18 was waiting on. **Step 2 has now delivered branches 3, 4, 5 and 14's slice.**
-
-### WHAT IS ON main, AND THE FIGURES NOT TO RE-DERIVE
-
-**Eight false-positive fixes**, each with a test proving it still catches its true positive:
-L1 · G11 · G10 · M1 · C9 · F15 · G5 · G9's second half. `tools/qc_census.py` reports both
-sides, so the pre-branch figures stay reproducible from the recorded evidence.
-
-| rule class | before | after | with `--original` |
-|---|---|---|---|
-| truncation | 17 | **0** | 0 |
-| numbering | 11 | 11 | **0** |
-| internal_article_refs | 15 | 15 | 15 |
-| formatting | 1 | 1 | 1 |
-| **TOTAL** | **44** | **27** | **16** |
-
-Per document with `--original`: **D03 1 · D05 2 · D06 13 · D07 0.** Blocked deliverables
-**4 of 13 → 3 of 13, and D07 is clean.** Every figure re-measured after every repair and
-unchanged throughout: the defects were in the measuring, never in the result.
-
-### WHAT THE NEXT SESSION MUST NOT RE-DERIVE
-
-1. **L1's fix had four hidden decisions and two are negative results.** Pairing on the
-   declared English leaves **46 of 1,158 eligible entries** unpairable, and **neither the
-   accept-all nor the reject-all reading recovers one** — the tracked-change explanation is
-   refuted. A four-key ladder was built and measured to add **nothing**, so it was dropped.
-   And the fix must consult **no** positional information: keeping the `idx` shortcut made
-   the verdict position-dependent again wherever two paragraphs share their English.
-2. **G9 IS HALF-CLOSED AND THE OTHER HALF CANNOT BE CLOSED BY SCOPING.** `en_segments` carry
-   exactly two keys — `type` and `en`, on 412 of 412 segments. The source text the
-   alpha-collision rule needs **is not in the file the check reads**, and putting it there is
-   a notes-SCHEMA change: **branch 15's**, and it invalidates the frozen intermediates.
-3. **`validate_segment_shapes` finds NOTHING on the whole recorded corpus** — 0 findings over
-   81 tracked-change paragraphs — because the recorded `paragraphs.json` is the
-   **post-compliance** artefact. **A frozen intermediate cannot reproduce a gate that was
-   satisfied while the run was happening.** Know this before branch 11 leans on the method.
-4. **C9's stated fix is not sufficient alone.** The translated body gets the source language
-   right **2 times in 13**; the original gets it right **9 in 13** — so the detector was never
-   the defect, its input was. But a wrong SPECIFIC language silently SKIPS the correct
-   language's rules while `*` runs them all, so the naive fix trades noise for silence. The
-   shipped version passes the language **only where two independent detectors agree**.
-   **Norwegian is in neither vocabulary**, so a D03-class document correctly reaches the
-   disagreement branch; making it SAY so is branch 12's.
-5. **The residue is register G12 and a script cannot classify it.** 16 findings — 15
-   `internal_article_refs`, 1 `formatting` — each embedding 60–70 characters of a real
-   instrument. Deciding whether `Article N` is a terminology defect or a civil-law citation
-   needs **Wouter, or a sanitised route reporting the citation shape without its text.**
-   Three of the four blocked deliverables are still blocked and this is the whole reason.
-
-### THE INSTRUMENTS CHANGED MORE THAN THE SKILL DID — read §5.16 before trusting a sweep
-
-**Five repairs to our own measuring tools, four of them found only by re-verifying.** The
-durable rules are now in **§5.16** rather than here, because this section gets replaced.
-
-- **I-18** the bytecode leak, third and fourth recurrence. The repair is not a patched
-  caller: `precommit_gate` now fails when anything development-only sits inside `uk/` or
-  `us/`, with two negative tests. **7 of 7 gate controls demonstrated able to fail, up from 5.**
-- **I-19** before/after suites that pinned "before" to `origin/main` and so **compared the fix
-  with itself** once merged. All three now pin a commit and exit **VOID** if the baseline is
-  byte-identical to the working tree. Proved by surviving their own merge.
-- **I-20** `make_fixtures.py` was destroy-then-rebuild, so an interrupted run left **3 of 11**
-  fixtures on disk and the next suite died with `BadZipFile`. Now overwrites in place, prunes
-  afterwards, and **asserts the artefact count** rather than trusting its own exit.
-- **I-17 CLOSED** — the fixture no renderer would open. Two causes: auxiliary parts with no
-  relationship part, and a `w:hyperlink` referencing a relationship that did not exist.
-  **9 of 9 valid fixtures now render**, and that fixture is back INSIDE the rendered
-  comparison rather than declared N/A beside it.
-
-**And the finding that cost the most time, stated as a rule in §5.16: an exit code of 0 is
-not evidence the work was done.** Six instances in one session. Two measured facts a next
-session should simply inherit: `tests/make_fixtures.py` run as a captured child **kills its
-parent**, and the suites **share `tests/fixtures/` and rewrite it** — so run them as
-top-level commands, one at a time, never from a parent runner and never concurrently.
-
-### WHAT IS OPEN
-
-1. **G12's 16 findings** — unclassified, and only Wouter or a sanitised route can classify
-   them. This is what keeps D03, D05 and D06 blocked.
-2. **G9's first half** — needs branch 15's schema change.
-3. **`--original` is not in Step 9's step document**, so M1's fix is a flag nobody passes.
-   The check announces its own absence meanwhile, which is the mitigation, not the fix.
-   **A doc change, and §4 tests those differently.**
-4. **A `probe` origin class for the register** — still unbuilt, still needed.
-5. **I-7, I-8, I-9, I-10** — the four open A1 harness defects, and now the ONLY open ones,
-   so "four open" and "four Step C risks" are finally the same set.
-6. **The six untracked house scripts in `tools/`** — still untracked, still Wouter's open
-   question, and `tools/run_tests.py` still collides by name with `tests/run_tests.py`.
-
-### THE NEXT BRANCH
-
-**§2's sequencing facts govern, and the fourth is now discharged** — branch 14's slice sat
-immediately after branch 5 and has landed. **The next piece of work is branch 6, "stop
-deleting"** (option 1, register A1 A2 A3 A6 A8 A9 C16 C17 F16 F27): the writing-back step
-stops deleting what it does not recognise. It is **the first fix branch that changes a
-delivered document**, so §4's byte comparison on the frozen intermediates is the instrument
-and it will move — which is the point, and is why the acceptance condition is that the
-movement is explained finding by finding.
-
-**Read before starting it, all in `STEP-B-ANALYSIS.md`:** its §2 for the order, its
-option-1 build brief under §3, its §4 for the method, and **its §6 Option 1 IN FULL** —
-four sessions have now planned from that document's §3 alone and got scope wrong.
-
-### WHAT WAS RUN TO CLOSE THIS SESSION
-
-**All exit codes captured immediately, per §5.16.** 12 of 12 test files · smoke PASS on both
-variants · parity 0 NEW · `test_baseline_unmodified` 368 of 396 with 28 DECLARED · register
-PASS 0/0 · claims 0/0 · tables CLEAN · branch audit and xref 0 · five STEP-B suites 0
-including metacheck 11 of 11 · `precommit_gate` CLEAR on all eight controls · publication
-check, script committability and changelog check 0. `stepb_audit`'s sole failure remains
-check 10's **declared** `LEGAL_TRANSLATION_A4` VOID, which is not a pass.
-
-**Rendered comparison: SIX fixtures, every page pixel-identical**, now including the repaired
-one — no declared N/A left. **Fixtures byte-reproducible**, 11 of 11 present, and the four
-shapes `anchors-and-tabs.docx` exists to carry asserted still present.
-
-**No graded run.** Declared N/A: §4 puts script branches on byte comparison, the grader is
-frozen at v3 until Step C, and a graded run measures the wrong variable for a change that
-provably moves no delivered byte.
+**What a new session would get wrong without this.** It would trust the reduction plans' numbers: they say
+**1,685** lines and **41** cut at step 1; measured, **1,666** and **26** — 41 assumed deleting two headings
+and leaving no pointer, which the continuity rule forbids. **Branch 14's figures are deliberately not
+repeated: `tools/qc_census.py` reproduces them and the register owns the findings.**
