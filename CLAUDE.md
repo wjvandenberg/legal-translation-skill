@@ -115,7 +115,7 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,101 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,137 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
 > because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run, and caught this line stale twice on the day it landed.)*
@@ -876,19 +876,55 @@ working) · modify the source or delivered documents (read-only; they are the ev
 skill (the review feeds the analysis, not a patch).
 
 ### 5.14 Adding to this file
+**REWRITTEN 2026-08-24, at the end of the reduction, because a rule about what goes in a file has to
+describe THAT file.** The old version described a 1,666-line document with no cap, no routes and no rule
+about the section sign. **The general mechanism — the six relocation routes, the size classes, the
+one-line-pointer rule, what `§` means — is the auto-loaded house working method and is NOT restated here.**
+What follows is what is true of *this* charter and is written down nowhere else.
 
-**A rule, because this file grew to 168 KB and 35 factual errors before anyone checked it.**
+**1. DECIDE WHERE IT GOES BEFORE WRITING IT.** Everything belongs in **§2 to §6, by subject**. §1 is
+navigation; **§7 is the handoff and nothing else, and it is REPLACED every session.** So the moment you
+find yourself writing a lesson, a decision or a structural change into §7, it is already in the wrong
+place — a decision goes to §2.6, a lesson to §5, a structural change to §6. **Two rules had to be rescued
+from §7 during this reduction**, which is what "replaced, not appended to" costs when it is forgotten.
 
-1. **Decide WHERE it goes before writing it.** Everything belongs in **§2 to §6, by subject**. §1 is
-   navigation and §7 is the handoff and nothing else. **If you cannot name the section, you do not yet know
-   what the thing is.**
-2. **If it is extensive, ask Wouter first whether it should be its own document** rather than a section
-   here — as was done for the Opus 5 workstream and the decisions log. A charter that carries a workstream
-   inside it stops being readable and starts going stale.
-3. **Never restate what another document owns.** Point at it. The one thing this file may carry about
-   another document is *what it is for* and *where in it to look*.
-4. **Re-run the claims check and the table check after any substantial edit** — §5.12. A count typed into
-   prose here is a count that will be wrong within a week.
+**2. THIS CHARTER'S CAP IS MEASURED, AND §1.7 IS THE ONLY PLACE IT STATES ITS OWN LENGTH.** Class **L,
+350**, §7 at **35**; both live in `verify.config.json`. **`file length` FAILS on every run by design while
+§1.7's exemption stands** — not a regression, and **never silence it by setting the cap to 0**, which
+reports *exempt* and measures nothing. **A declaration is prose, so no ordinary checker can see it going
+stale:** `tools/verify_charter_continuity.py` compares that sentence against the measurement, and it caught
+it twice within an hour of being promoted. **Re-derive it on the commit that changes it.**
+
+**3. THREE THINGS THE REDUCTION MEASURED ABOUT THE ROUTES, and each costs a rule if forgotten.** A
+path-scoped rule is good for **one use per session** and does not return after a compact. **A skill's body
+is not in context until invoked.** **Neither can be exercised in the session that creates it**, so a route
+whose proof needs a session boundary splits the step in two. **Therefore nothing whose absence is
+irreversible goes behind either — §5.4 and §6.5 are route 1 entire**, and `verify_charter_continuity.py`
+check 6b asserts it.
+
+**4. THE TEST THAT A RELOCATION WAS SAFE IS A COUNT, NOT A READING: 2 → 1, and NEVER 2 → 0.** Relocation
+can promote a duplicate into the only copy, and cutting it as "redundant" then removes the rule outright.
+**And never delete a heading or renumber one** — a heading is what every pointer resolves against.
+
+**5. A `§` HERE MEANS THIS FILE. For another document, write it in words:** *"section 4 of
+`STEP-B-ANALYSIS.md`"*. A sign aimed elsewhere **passes silently against the wrong section of this file**,
+so nothing fails and no checker can tell which is which — **nineteen were found, eleven genuinely
+misdirected, one pointing at the wrong section of the right file.** `tools/xdoc_signs.py` holds the
+judgement on the survivors and **fails on a new one.**
+
+**6. NEVER SUMMARISE A COMPANION DOCUMENT — POINT AT IT.** A summary invites the next session to reason
+from the summary instead of the evidence, which is how a wrong conclusion gets reached confidently, and it
+has happened here. §1.3 says what each document owns; **where two could disagree, this one wins**, and the
+disagreement is a defect to fix rather than a judgement call. **If it is extensive, ask Wouter first
+whether it should be its own document.**
+
+**7. COUNT BY LISTING, NEVER BY ADDING, and prefer a relationship to a number.** Every stale count in this
+project came from adding a delta to the figure already written down. **Delete a superseded count** rather
+than leaving it beside the new one. *"§7 is under its cap"* cannot go stale; *"§7 is 18 lines"* can.
+
+**8. AFTER ANY SUBSTANTIAL EDIT, RUN:** `verify_md.py` · `verify_charter_continuity.py` · `xdoc_signs.py` ·
+`md_tables.py` · and **all three confidentiality controls** *(§5.4)*. **Invoke the `audit-gate` skill for
+the method; do not improvise it.**
 
 ### 5.15 Inherited house rules
 
