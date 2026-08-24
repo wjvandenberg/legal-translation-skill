@@ -11,15 +11,62 @@ specific classes the charter names as forbidden, and FAILS rather than listing c
 Written with raw strings throughout: two earlier attempts at this check were written through a
 shell heredoc, which ate the backslashes and reported a clean result on a file that was not.
 
-    uv run python temp/publication_check.py
+    uv run python tools/publication_check.py                 # every committable markdown
+    uv run python tools/publication_check.py EVIDENCE-x.md   # or just these
+
+THE FILE LIST USED TO BE SIX HARD-CODED NAMES -- written before `.claude/rules/` and
+`.claude/skills/` existed, so THE BLOCKING CONTROL WAS NOT LOOKING AT THEM AT ALL. Found
+2026-08-24, alongside the same defect in `descriptor_shape_sweep.py`. It is the worse of the two
+because this one is the gate: a file it does not open is a file that cannot fail it, and the
+output is indistinguishable from coverage. Phase 3c adds an EVIDENCE- document whose subject is
+past leaks, which is the likeliest place in the repository to hold one.
+
+It now DISCOVERS the committable markdown by glob, honours an explicit list, PRINTS WHAT IT READ,
+and exits 2 as VOID on an empty set rather than certifying nothing.
 """
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FILES = ["CLAUDE.md", "FINDINGS-REGISTER.md", "A3-STRUCTURAL-ANALYSIS.md", "STEP-B-ANALYSIS.md",
-         "DECISIONS-LOG.md", "OPUS-5-MIGRATION.md"]
+
+# The six that were hard-coded, kept by NAME so a rename is noticed rather than silently dropped.
+CORE = ["CLAUDE.md", "FINDINGS-REGISTER.md", "A3-STRUCTURAL-ANALYSIS.md", "STEP-B-ANALYSIS.md",
+        "DECISIONS-LOG.md", "OPUS-5-MIGRATION.md"]
+# Globs, so a document added later is checked without anybody remembering to add it here.
+DISCOVER = ["README.md", "EVIDENCE-*.md", "REGISTER-*.md", "PLAN-*.md",
+            ".claude/rules/*.md", ".claude/skills/*/SKILL.md", "tests/README.md"]
+
+
+def _targets(argv):
+    if argv:
+        return [Path(a) if Path(a).is_absolute() else ROOT / a for a in argv]
+    out = [ROOT / n for n in CORE if (ROOT / n).exists()]
+    for g in DISCOVER:
+        out.extend(sorted(ROOT.glob(g)))
+    seen, uniq = set(), []
+    for p in out:
+        if p.resolve() not in seen:
+            seen.add(p.resolve())
+            uniq.append(p)
+    return uniq
+
+
+_PATHS = _targets(sys.argv[1:])
+_ABSENT = [n for n in CORE if not (ROOT / n).exists()] if not sys.argv[1:] else []
+print("=" * 88)
+print(f"FILES READ: {len(_PATHS)}")
+for _p in _PATHS:
+    print(f"    {_p.resolve().relative_to(ROOT) if _p.resolve().is_relative_to(ROOT) else _p}")
+if _ABSENT:
+    print(f"  MISSING from the core list, so NOT checked: {_ABSENT}")
+if not _PATHS:
+    print("VOID -- no file was opened. Nothing has been established; this is not a pass.")
+    sys.exit(2)
+print("=" * 88)
+
+FILES = [str(p.resolve().relative_to(ROOT)).replace("\\", "/")
+         if p.resolve().is_relative_to(ROOT) else str(p) for p in _PATHS]
 
 # (label, pattern, is_failure) -- a failure blocks; otherwise it is reported for judgement
 PROBES = [

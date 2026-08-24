@@ -15,7 +15,18 @@ Everything it prints is a CANDIDATE for judgement, not a hit. That is deliberate
 project's own lesson is that a list-based control cannot see the class of leak it was not
 written for, and the shape-based sweep is what caught the commercial-terms leak in July.
 
-    uv run python temp/descriptor_shape_sweep.py
+    uv run python tools/descriptor_shape_sweep.py                 # every committable markdown
+    uv run python tools/descriptor_shape_sweep.py EVIDENCE-x.md   # or just these
+
+THE FILE LIST USED TO BE SIX HARD-CODED NAMES AND IT SILENTLY IGNORED ITS ARGUMENTS -- found
+2026-08-24, when it was pointed at a new `.claude/skills/*/SKILL.md` and cheerfully reported on
+CLAUDE.md instead. **A control that cannot reach the file you asked it about is worse than one
+that refuses**, because its output looks exactly like coverage. The six names were written before
+`.claude/rules/` and `.claude/skills/` existed, and phase 3c is about to add an EVIDENCE- document
+whose whole subject is past leaks -- the single likeliest place in the repository for one.
+
+So: it now DISCOVERS the committable markdown, takes an explicit list when given one, and PRINTS
+WHAT IT READ. A sweep that opened no files exits 2 as VOID rather than reporting clean.
 """
 import io
 import re
@@ -25,8 +36,48 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-FILES = ["CLAUDE.md", "FINDINGS-REGISTER.md", "A3-STRUCTURAL-ANALYSIS.md",
-         "STEP-B-ANALYSIS.md", "DECISIONS-LOG.md", "OPUS-5-MIGRATION.md"]
+
+# The six that were hard-coded, kept as names so a rename is noticed rather than silently dropped.
+CORE = ["CLAUDE.md", "FINDINGS-REGISTER.md", "A3-STRUCTURAL-ANALYSIS.md",
+        "STEP-B-ANALYSIS.md", "DECISIONS-LOG.md", "OPUS-5-MIGRATION.md"]
+# Everything else committable that carries prose. Globs, so a document added later is swept
+# without anybody remembering to add it here.
+DISCOVER = ["README.md", "EVIDENCE-*.md", "REGISTER-*.md", "PLAN-*.md",
+            ".claude/rules/*.md", ".claude/skills/*/SKILL.md", "tests/README.md"]
+
+
+def targets(argv):
+    if argv:
+        return [Path(a) for a in argv]
+    out = [ROOT / n for n in CORE if (ROOT / n).exists()]
+    for g in DISCOVER:
+        out.extend(sorted(ROOT.glob(g)))
+    seen, uniq = set(), []
+    for p in out:
+        if p.resolve() not in seen:
+            seen.add(p.resolve())
+            uniq.append(p)
+    return uniq
+
+
+PATHS = targets(sys.argv[1:])
+missing = [n for n in CORE if not (ROOT / n).exists()] if not sys.argv[1:] else []
+print("=" * 96)
+print(f"FILES READ: {len(PATHS)}")
+for p in PATHS:
+    try:
+        rel = p.resolve().relative_to(ROOT)
+    except ValueError:
+        rel = p
+    print(f"    {rel}")
+if missing:
+    print(f"  MISSING from the core list, so NOT swept: {missing}")
+if not PATHS:
+    print("VOID -- no file was opened, so nothing has been established. This is not a clean run.")
+    sys.exit(2)
+
+FILES = [str(p.resolve().relative_to(ROOT)) if p.resolve().is_relative_to(ROOT) else str(p)
+         for p in PATHS]
 
 INSTRUMENT = r"(?:agreement|contract|deed|guarantee|MOU|memorandum|novation|power of attorney|" \
              r"instrument|lease|licence|license|charter|mandate|undertaking|indenture|covenant)"

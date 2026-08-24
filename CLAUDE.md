@@ -113,8 +113,10 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,305 lines against a cap of 350.** *(Taken from the checker on
-> the commit that declares it, never typed from memory. §7 is AT its 35 and needs no exemption.)*
+> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,320 lines against a cap of 350.** *(Taken from the checker on
+> the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
+> because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
+> figure against the measurement on every run, and caught this line stale twice on the day it landed.)*
 > **Reason:** the reduction that brings this file under 350 is planned, agreed and under way — what remains
 > is content with a named destination, not content that cannot go lower. **Trigger that ends it:** that
 > reduction completing. **Over the cap means RELOCATE, never delete**, and every relocation leaves a
@@ -868,6 +870,8 @@ content controls, smart tags, images with alt text and charts with titles appear
 
 ### 5.8 How a change is actually tested
 
+**EMITTED TO `.claude/skills/frozen-intermediate-test/` AT STEP 7a. A DELIBERATE DUPLICATE UNTIL 7b.**
+
 **`STEP-B-ANALYSIS.md` §4 owns the method per branch kind. This is the principle behind it.**
 
 > **THE TRICK: FREEZE THE TRANSLATED INTERMEDIATE FROM AN EXISTING RUN.** The expensive, non-repeatable part
@@ -940,6 +944,9 @@ matching file is read.
 - **No confidential data and no real-document examples** — §5.4.
 
 ### 5.12 The audit gate — for any analysis deliverable
+
+**EMITTED TO `.claude/skills/audit-gate/` AT STEP 7a. A DELIBERATE DUPLICATE UNTIL 7b.** The skill also
+corrects three command paths this block has stale — all three instruments are in `tools/`, not `temp/`.
 
 **Wouter's standing requirement:** *"triple check, do a deep audit and verify your summary. This summary is
 the basis of the changes, and I REALLY don't want it to contain errors or omissions."*
@@ -1217,11 +1224,16 @@ scripts against a real **36** · and `tests/` **nine** `test_*.py` against a rea
 footnote recorded the same counts going stale once before, corrected then by listing rather than by
 adding to the figure already there — which is the house rule that now governs every count in this file.)*
 
-> **THREE SCRIPTS MAY NEVER BE COMMITTED, and this stays because forgetting it is irreversible:**
-> `confidentiality_sweep.py`, `corpus_descriptor_scan.py` and `confidentiality_review.py`. They live outside
-> the repository and the gate calls all three **by path**. The rule that decides it is §5.4's — *does this
-> file hold one real string per pattern?* — and `leakage_scan.py` is the pattern to copy: **the scanner
-> ships, the list never does.** *(There is no `docs/history/` either, decided 2026-08-06 — §5.4(c).)*
+> **FOUR SCRIPTS MAY NEVER BE COMMITTED, and this stays because forgetting it is irreversible.** Counted
+> by listing them, not by adding one to a figure: `confidentiality_sweep.py`, `corpus_descriptor_scan.py`,
+> `confidentiality_review.py` — these three live outside the repository and the gate calls them **by
+> path** — and **`temp/audit_session_stepb.py`, which holds two corpus subject-matter descriptors and
+> stays in gitignored `temp/` permanently.** *(Added here 2026-08-24. §5.12 was its ONLY home, so moving
+> that subsection to the `audit-gate` skill would have taken an irreversible rule behind an invocation —
+> 2 → 0. The skill repeats it; this line is the copy that always loads.)* The rule that decides all four is
+> §5.4's — *does this file hold one real string per pattern?* — and `leakage_scan.py` is the pattern to
+> copy: **the scanner ships, the list never does.** *(There is no `docs/history/` either, decided
+> 2026-08-06 — §5.4(c).)*
 
 **THE LOAD-BEARING PROPERTY: `uk/` *IS* the publishable tree.** No assembly, no generator, **what you see in
 the repo is what ships** — and **`tools/` and `tests/` are siblings of the variant trees, never inside them**,
@@ -1269,6 +1281,9 @@ name. **Session metadata is reachable by neither scanner nor the location rule.*
 folder must be explicit about which files it expects.
 
 ### 6.6 Publishing from the monorepo
+
+**EMITTED TO `.claude/skills/publish-skill-archives/` AT STEP 7a. THIS BLOCK IS A DELIBERATE DUPLICATE
+UNTIL STEP 7b PROVES THE ROUTE.** Do not cut it on the strength of the skill existing.
 
 Two scripts in `tools/`, run at release time. **The deliverable does not change:** still two independent
 `.skill` archives of 198-odd files each, uploaded and installed separately.
