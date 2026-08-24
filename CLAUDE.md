@@ -113,7 +113,7 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,320 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,208 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
 > because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run, and caught this line stale twice on the day it landed.)*
@@ -869,40 +869,22 @@ terminologically rich but technically straightforward documents**, so variant di
 content controls, smart tags, images with alt text and charts with titles appear in none of the eleven.
 
 ### 5.8 How a change is actually tested
+**MOVED TO `.claude/skills/frozen-intermediate-test/SKILL.md` ON 2026-08-24** — the
+freeze-the-intermediate trick and why it is deterministic, the two fixture tiers, the mandatory negative
+inputs, and the two ways a green suite means nothing. **Route 3: a test method somebody follows start to
+finish.** **Section 4 of `STEP-B-ANALYSIS.md` still owns the method per branch kind**; the skill is the
+principle behind it.
 
-**EMITTED TO `.claude/skills/frozen-intermediate-test/` AT STEP 7a. A DELIBERATE DUPLICATE UNTIL 7b.**
+**Three things stay, because each binds OUTSIDE a test run.**
 
-**`STEP-B-ANALYSIS.md` §4 owns the method per branch kind. This is the principle behind it.**
-
-> **THE TRICK: FREEZE THE TRANSLATED INTERMEDIATE FROM AN EXISTING RUN.** The expensive, non-repeatable part
-> of a run is the translation — a model, 20 to 50 minutes, and 40% of paragraphs differing between two runs.
-> But **mechanically two runs are identical**, and that is measured. So with the translated notes frozen,
-> **the whole mechanical half — put the English back, tidy up, reorder, auxiliary parts, repackage — becomes
-> a deterministic function.** Run the scripts, compare the bytes. Seconds, repeatable, no model, no Cowork.
-> **The frozen intermediates already exist from the July runs.**
-
-**Two tiers, and the distinction is a confidentiality requirement rather than a convenience:**
-
-| tier | what | committable? | when it runs |
-|---|---|---|---|
-| **Synthetic** | hand-built documents with no client text, in `tests/fixtures/` | **YES** — and these are what runs on every change and what `git bisect` uses | every commit |
-| **Real, frozen** | the frozen intermediates from the eleven corpus documents; they contain the **full client text** | **NEVER.** They live with the logs, outside the repo, and must be excluded **by path** before `git init` | before every merge |
-
-> **AND THE TRICK HAS ONE BLIND SPOT, WHICH IT DOES NOT ANNOUNCE.** A frozen intermediate is the
-> **post-compliance** artefact — the `paragraphs.json` the run left behind *after* its gates were satisfied.
-> **So it cannot reproduce a gate that was satisfied while the run was happening**, and a check that leans on
-> it reports a clean sweep over the very cases the gate already fixed. Measured on 2026-08-21:
-> `validate_segment_shapes` finds **0 findings over 81 tracked-change paragraphs** on the whole recorded
-> corpus. **A frozen-intermediate result is evidence about the mechanical half only.** *(Moved here from §7,
-> 2026-08-24 — it is a property of this method, not of one branch, and §7 is replaced every session.)*
-
-**Negative test inputs are mandatory, not optional.** Nothing in the shipped package can currently make a
-check fail, so a fixture set of only-passing cases produces tests that pass because nothing is being tested.
-**One input per check, built to violate that check's stated pass condition.**
-
-**And for any change claimed to be non-behavioural, prove it** — SHA-256 compare the affected files and
-byte-compare pipeline output on the fixtures. That discipline is exactly what makes `git bisect` possible;
-never delete it in the name of tidying up.
+1. **The synthetic fixtures in `tests/fixtures/` are committable and the frozen intermediates NEVER
+   are** — that is a location rule and §5.4 and §6.5 own it. This is the pointer, not the rule.
+2. **A FROZEN-INTERMEDIATE RESULT IS EVIDENCE ABOUT THE MECHANICAL HALF ONLY.** It is the
+   *post-compliance* artefact, so it cannot reproduce a gate that was satisfied while the run was
+   happening — measured 2026-08-21, `validate_segment_shapes` finding 0 over 81 tracked-change
+   paragraphs. **A result reported without that qualifier reads as coverage it does not have.**
+3. **A change claimed to be non-behavioural is PROVED byte-for-byte, or it is not claimed.** That
+   discipline is what makes `git bisect` possible; never delete it in the name of tidying up.
 
 ### 5.9 Gate philosophy and error handling — do not weaken this
 
@@ -944,109 +926,20 @@ matching file is read.
 - **No confidential data and no real-document examples** — §5.4.
 
 ### 5.12 The audit gate — for any analysis deliverable
+**MOVED TO `.claude/skills/audit-gate/SKILL.md` ON 2026-08-24** — the seven-point method, the standing
+instruments with their commands, `STEP-B-ANALYSIS.md`'s six suites, and the four scripts deliberately left
+in `temp/`. **Route 3: a procedure followed start to finish.** The skill also carries **corrected paths**:
+`md_tables.py`, `publication_check.py` and `audit_register.py` are all in `tools/` now, and this block had
+all three wrong. **The register validator every other section points here for is
+`uv run python tools/audit_register.py`.**
 
-**EMITTED TO `.claude/skills/audit-gate/` AT STEP 7a. A DELIBERATE DUPLICATE UNTIL 7b.** The skill also
-corrects three command paths this block has stale — all three instruments are in `tools/`, not `temp/`.
-
-**Wouter's standing requirement:** *"triple check, do a deep audit and verify your summary. This summary is
-the basis of the changes, and I REALLY don't want it to contain errors or omissions."*
-
-**It exists because the same request has found real errors EVERY time it has been made** — a note count
-taken from another document's report, two runs described as one operator, a tab count that was one
-paragraph's rather than the block's, a character count off by one, **a lexicon instruction that does not
-exist in the file it was attributed to**, keystone totals that summed to 134 against a real 122, **seven
-per-file byte counts written into a table without ever being measured**, and three stale counts in the build
-plan. **None would have been caught by re-reading.**
-
-**So the gate prescribes the method that actually worked, not diligence in general:**
-
-1. **RE-MEASURE, DO NOT RE-READ.** Every numeric claim re-derived from the artefact by a script written
-   fresh. **And where a standing instrument already measures the thing, reproduce ITS answer before trusting
-   your own.**
-2. **CHECK EVERY CITATION AGAINST THE FILE IT CITES.** If the report says a file says something, **open that
-   file.** Note the trap that has caught this project twice: **a search over source counts a mechanism
-   wherever a message merely describes it.**
-3. **AUDIT THE BOOKKEEPING SEPARATELY FROM THE PROSE.** The errors cluster in counts, id sets,
-   cross-references and every claim of the form *"N of M"*. Prose review does not see them.
-4. **HUNT OMISSIONS, NOT ONLY ERRORS.** Walk the evidence row by row and confirm each row is either
-   accounted for or explicitly recorded as out of scope. **State the arithmetic;** if it does not reconcile,
-   the work is not done.
-5. **STATE CONFIDENCE PER CLAIM, and distinguish MEASURED from INFERRED.** A claim asserted with the
-   confidence of a measurement, when it is an inference, is exactly the error that mis-scopes the next step.
-6. **NEVER A TWO-WORD NEEDLE.** Eleven checks in this project have passed for the wrong reason. **Normalise
-   whitespace and emphasis by default, and make every needle a phrase that could only appear if the thing is
-   actually carried.**
-7. **RUN BOTH CONFIDENTIALITY CONTROLS, THE PUBLICATION CHECK AND THE RELEVANT VALIDATORS** on every
-   committable file at the end.
-
-**Report the audit's findings openly, including its own corrections. An audit that reports NOTHING found
-should be treated as evidence the audit was too shallow, not that the work was clean.**
-
-**The standing instruments live in `temp/` and are all re-runnable.** Run these after editing any of the
-committable documents:
-
-```bash
-uv run python temp/a3_md_tables.py CLAUDE.md FINDINGS-REGISTER.md A3-STRUCTURAL-ANALYSIS.md STEP-B-ANALYSIS.md DECISIONS-LOG.md OPUS-5-MIGRATION.md
-```
-
-```bash
-uv run python temp/publication_check.py
-```
-
-**Before editing `FINDINGS-REGISTER.md`, and after, run its validator** — hand-editing it has produced quiet
-errors twice, and two of the validator's checks exist because they caught real ones. Expect **PASS, 0
-failures, 0 warnings**:
-
-```bash
-uv run python ../legal-translation-private/tools/audit_register.py
-```
-
-**And after editing `STEP-B-ANALYSIS.md`, run its own suites — they live in `tools/` and are COMMITTED as
-of 2026-08-11**, so a fix to one of them survives the session that makes it. Six of them:
-`tools/stepb_harvest.py` (63 prescriptions from five sources, 0 missing), `tools/stepb_verify.py` (84
-claims, and it generates the traceability appendix), `tools/stepb_audit.py` (15 checks),
-`tools/stepb_audit3.py`, `tools/stepb_metacheck.py` (**eleven negative tests: it mutates the document to prove
-each check can fail, then restores it byte-identically**), and `tools/stepb_refute.py`. **All six pass.**
-
-> **THEY WERE IN `temp/`, WHICH IS GITIGNORED, AND THAT WAS THE DEFECT.** The suites guarding this
-> project's three largest documents could not be improved: every fix to one of them died with the session
-> that made it, unreviewable and unrepeatable. **Four were left behind and each for a stated reason, because
-> a promotion that quietly drops things is worse than none:**
->
-> - **`audit_session_stepb.py` — BLOCKED ON CONFIDENTIALITY and it stays in `temp/` permanently.** It holds
->   **two corpus subject-matter descriptors**, which is precisely the class §5.4 says the 93-pattern name
->   scan is structurally blind to. It is the file this session's `§`-resolver fix was made in, so **that fix
->   does not survive** — the honest cost of the block, recorded rather than worked around.
-> - **`stepb_audit2.py` and `stepb_audit2b.py`** — both crash looking for a heading deleted in the
->   2026-08-05 reorganisation. Broken on `main` today, and one-off session scripts rather than standing
->   instruments.
-> - **`stepb_measure.py`** — three hard-coded register counts that went stale.
->
-> **Committing a broken tool into a public repository implies coverage that does not exist**, which is the
-> same objection this project raises against a check nobody believes. The `temp/` originals are left in
-> place untouched (§5.15) and are now superseded by the `tools/` copies.
->
-> **One of the six needed a change before it could be committed at all, and `LEGAL_TRANSLATION_A4` must be
-> set to run it.** `stepb_audit.py` hard-coded the **sealed A4 judging directory**, whose location §1.3
-> deliberately keeps in the private `context.md`. It now reads that environment variable, exactly as
-> `tools/gate_replay.py` reads `LEGAL_TRANSLATION_LOGS` — **the tool ships, the location does not.**
->
-> ```bash
-> LEGAL_TRANSLATION_A4="<the sealed directory>" uv run python tools/stepb_audit.py
-> ```
->
-> **Without it the script exits 1 and prints a banner saying check 10 cannot be completed** — it does NOT
-> excuse the quotations it could not verify. That distinction was got wrong first: the initial version
-> reasoned that a quotation whose only source is unreadable is *void rather than false* and skipped it, which
-> looked principled and **immediately dropped `stepb_metacheck.py` from 10 of 10 mutations detected to 9.**
-> Softening a check to make it honest had made it blind, which is the failure this project logs more than any
-> other, committed here in one of our own instruments and caught only because the metacheck exists. **An
-> unreadable source is not a pass.**
-
-> **`temp/a3_md_tables.py` has now caught five defects nothing else in this project can see** — including a
-> four-column row inserted into a two-column table, and an appendix that lost its delimiter row and stopped
-> being a table. **The register's own validator passed both.** It should be promoted out of `temp/` into
-> `tools/` at branch 0.
+**What stays is the TRIGGER, not the method.** **Wouter's standing requirement:** *"triple check, do a deep
+audit and verify your summary. This summary is the basis of the changes, and I REALLY don't want it to
+contain errors or omissions."* **It has found real errors EVERY time it has been asked for, and not one
+would have been caught by re-reading** — so **RE-MEASURE, DO NOT RE-READ**, and **an audit that reports
+NOTHING found is evidence it was too shallow, not that the work was clean.** **Invoke the skill; do not
+improvise the method** — the seven points exist because seven different kinds of error got through without
+them.
 
 ### 5.13 The review protocol — for INPUT POINT 2
 
@@ -1282,21 +1175,16 @@ folder must be explicit about which files it expects.
 
 ### 6.6 Publishing from the monorepo
 
-**EMITTED TO `.claude/skills/publish-skill-archives/` AT STEP 7a. THIS BLOCK IS A DELIBERATE DUPLICATE
-UNTIL STEP 7b PROVES THE ROUTE.** Do not cut it on the strength of the skill existing.
+**MOVED TO `.claude/skills/publish-skill-archives/SKILL.md` ON 2026-08-24** — a release procedure, run at
+one moment rather than every session, so route 3. **It is a SPECIFICATION, not a runbook: `tools/package.py`
+and `tools/publish.py` DO NOT EXIST** — checked by listing, named nowhere else, and **building them is
+§3.4's**, not step 2's.
 
-Two scripts in `tools/`, run at release time. **The deliverable does not change:** still two independent
-`.skill` archives of 198-odd files each, uploaded and installed separately.
-
-1. **`tools/package.py`** → one `.skill` per variant. Each is a zip of the corresponding variant tree
-   **excluding `README.md` and `LICENSE`** — verified: the published archives contain 198 files and carry
-   neither.
-2. **`tools/publish.py`** → copies the contents of `uk/` (this time *including* `README.md` and `LICENSE`)
-   into a local clone of the public UK repo, commits and pushes; same for `us/`. **Deliberately a plain
-   copy-and-commit rather than a subtree**, so Wouter can read the diff before it pushes.
-
-**Three public repos will then exist, and users need that disambiguated:** `legal-translation-skill` is the
-**source**; the two variant repos remain the **install channels**. **Every README must say which is which.**
+**What stays, because it binds outside a release.** The deliverable does not change: **two independent
+`.skill` archives of 198-odd files each, no build step**, uploaded and installed separately. And **three
+public repos will exist, which users need disambiguated:** `legal-translation-skill` is the **source**, the
+two variant repos are the **install channels**, and **every README must say which is which.** *(§3.4 owns
+the one irreversible act here — never publish without Wouter's explicit OK.)*
 
 ---
 
