@@ -113,7 +113,7 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,429 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,305 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is AT its 35 and needs no exemption.)*
 > **Reason:** the reduction that brings this file under 350 is planned, agreed and under way — what remains
 > is content with a named destination, not content that cannot go lower. **Trigger that ends it:** that
@@ -919,67 +919,25 @@ never delete it in the name of tidying up.
 - **Script-integrity failure means a corrupted install.** Stop and reinstall; never work around it.
 
 ### 5.10 OOXML hard rules — all confirmed in production
-
-- **Never use `xml.etree.ElementTree` to write OOXML.** It rebinds namespace prefixes on serialisation and
-  Word rejects the file. Use lxml or pure string/regex edits, and keep an `assert 'ns0:' not in xml` guard
-  after every edit.
-- **Never let an XML regex cross an element boundary.** A non-greedy `.*?` under `re.DOTALL` will silently
-  jump runs. Two production incidents: one inserted **464** highlights and scrambled paragraph order; one
-  silently swallowed an `"E-mail address:"` label. Bound it with a negative lookahead —
-  `(?:(?!</w:r>).)*?`. Prefer lxml for structural edits.
-- **Never match `<w:t>` as `<w:t[^>]*>`** — that also matches `<w:tcPr>`, `<w:tbl>` and `<w:tab/>`. Use
-  `<w:t(?:\s[^>]*)?>`.
-- **`<w:b w:val="0"/>` means bold OFF.** Any bold check must read `w:val` and treat `0|false|off` as
-  not-bold. The same applies to `w:i`, `w:strike` and `w:u`.
-- **Count tab CHARACTERS separately from tab STOPS.** A `w:tab` inside `pPr/tabs` is a stop and carries the
-  same tag name as a rendered tab, so a naive iteration sums the two.
-- **Table-nested paragraphs are first-class.** Signature blocks, schedules, form fields and party grids live
-  in `w:tbl/w:tr/w:tc/w:p`. Extraction and apply must both recurse, or those paragraphs ship untranslated.
-  **The same asymmetry exists for containers the skill never lists** — `w:sdt` content controls and
-  `w:smartTag`.
-- **Text-matching, not index-matching, is why this works.** One real document produced 577 JSON entries for
-  564 XML paragraphs — a 6–13 position drift that under index-matching corrupted styles, numbering and
-  indentation and left the last ~60 paragraphs in the source language. **Do not reintroduce index-based
-  application.**
-- **Non-Latin tracked changes need the visible-space plus ZWSP hybrid.** Source text in CJK carries no
-  inter-word whitespace, so `.strip()` in apply eats the operator's authored boundary space. A zero-width
-  space (U+200B) is Unicode category `Cf`, so `str.isspace()` is False and it survives `.strip()`. **Do not**
-  iterate through NBSP, ideographic space or thin/en/em spaces — that path is documented and dead. **And a
-  ZWSP in the deliverable is always a defect:** the fix is a pre-repack scrub, not a prohibition on the
-  device.
-- **Terminology rewrites must protect multi-word defined terms.** An `Annex → Schedule` rule collided with
-  the defined term "Service and Maintenance Schedule", and a blanket revert produced "Annexs". Use ordered
-  rules with negative lookbehind.
-- **Upstream PDF→Word conversion is lossy and lies about it.** Where the source was itself converted from
-  PDF, highlighting, strikethrough, hyperlinks, checkboxes and table borders may already be gone,
-  *inconsistently*. **Never attribute such a loss to the pipeline without rendering the SOURCE Word file.**
-  Keep the buckets distinct: **A** = introduced by us, **B** = inherited.
+**ALL TEN OOXML RULES MOVED TO `.claude/rules/ooxml.md` ON 2026-08-24**, scoped to `uk/**`, `us/**`,
+`tools/**/*.py` and `tests/**/*.py`. **They load when you open such a file and not at launch — observed
+in both directions, not assumed.** Forgetting one produces a file Word rejects, which is reversible; that
+is why they are route 4 and not route 1. **A scoped rule is good for ONE USE PER SESSION**, so re-open
+that file deliberately if you need them twice.
 
 ### 5.11 Skill-authoring conventions
+**FIVE OF THE SEVEN MOVED TO `.claude/rules/skill-authoring.md` ON 2026-08-24**, scoped to `uk/**` and
+`us/**` — the anti-drift, step-numbering, run-report, sub-agent and shared-capability rules. Each keeps
+an unconditional twin here *(§2.5 item 5 · §6.3 · §2.6 and §3.5)*, so that file is the DETAIL.
+
+**THESE TWO DID NOT MOVE AND MUST NOT: forgetting either publishes client names into a distributed
+archive, and a commit cannot be un-published.** That is route 1, and a path-scoped rule is absent until a
+matching file is read.
 
 - **No changelog inside the archive, ever.** The packaged `.skill` contains zero changelog entries, and
   there is no `CHANGELOG.md` going forward. **The rev16→rev44 history is not committed either** — it stays
   in the archived revisions, outside the repository *(§5.4(c))*.
 - **No confidential data and no real-document examples** — §5.4.
-- **Anti-drift safeguards are load-bearing.** The layered defences — mandatory step-file reads, the five
-  hard rules, auto-invoked gates, per-batch validation with the batch-cap state file, gate semantics,
-  integrity checks, transcript-mode discipline, the compaction-resume trigger — **exist because of repeated
-  real post-mortems. Do not remove or soften any of them** as part of an Opus 5 or context-optimisation
-  change unless proven redundant by testing.
-- **Keep the eleven-step structure and the gate nomenclature stable** unless there is a positive reason to
-  change them. **No renumbering of the steps:** a renumbering invalidates every step id in the existing
-  forensic logs, which are the project's only behavioural evidence base. The cheap version first — fix the
-  hole and the inconsistent letters.
-- **The shipped run report is metadata-only by construction.** Steps run, per-step duration, gates fired and
-  what satisfied them, validator warnings, iteration loops, integrity results, file manifest. **Never
-  document text, never filenames. And no third-party telemetry, ever** — this skill processes privileged
-  documents. *(It is the same artefact as the forensic log, so designing the log format well gives the
-  shipped report for free.)*
-- **No sub-agents inside the skill** — §3 of `OPUS-5-MIGRATION.md`.
-- **A shared capability lives in one place.** This is a rule for **our** maintenance of the artefact, not an
-  instruction to the skill's operator, and it belongs here rather than in a shipped step document —
-  putting a maintenance convention into a shipped document is how a 221-entry phrase map came to be a de
-  facto thirteenth dictionary inside the scripts folder.
 
 ### 5.12 The audit gate — for any analysis deliverable
 
@@ -1329,36 +1287,19 @@ Two scripts in `tools/`, run at release time. **The deliverable does not change:
 
 ## 7. Current status
 
-> **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session, never
-> appended to; fold anything durable into §1–§6 first** *(§5.14, and the 35-line cap declared in §1.7)*.
+> **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
+> never appended to; fold anything durable into §1–§6 first** *(§5.14, and the 35-line cap in §1.7)*.
 
-### HANDOFF — 2026-08-24. TWO THREADS ARE LIVE: the skill build, and this charter's own reduction
+### HANDOFF — 2026-08-24. THE CHARTER REDUCTION IS MID-FLIGHT; THE SKILL BUILD IS PAUSED, NOT MOVED
 
-**Produced: documentation only, no code.** Nothing under `uk/` or `us/` was touched, so the graded run and
-the rendered visual diff are crossed off as **declared N/A**, not skipped.
+**Produced: documentation and tooling only.** **Not one byte of `uk/` or `us/` changed** — measured, not asserted: `git diff --name-only` over both trees is empty across every branch, and each still holds 198 files. **Reducing the skill files is the project's own work, not the reduction's.**
 
-**THIS CHARTER NOW HAS A CAP AND DID NOT BEFORE.** There was no `verify.config.json` in the repository at
-all, so `file length` and `section length` reported **N/A** while the file stood at **1,666 lines** — every
-cut in the reduction plan was aimed at a number nothing measured. Class **L, 350**; §7 capped at **35**;
-overage declared in §1.7. **§1.6's contents table and §6.2's byte table are cut**, each leaving a pointer,
-and two rules were moved out of this section into **§5.1** and **§5.8** before it was rewritten. **Phase 3a
-sub-step 1.0 and steps 1 and 2 are done; step 3 is material, needs Wouter, and has NOT started.**
+**THE CHARTER IS 1,322 LINES, NOT 1,666.** It has a cap for the first time — class **L 350**, §7 at **35/35**, the overage declared in **§1.7** with a trigger. `file length` therefore FAILS on every run **by design**; do not read it as a regression, and **never silence it by setting the cap to 0**, which reports *exempt* and measures nothing.
 
-**THE SKILL BUILD IS UNTOUCHED AND ITS NEXT ACTION STILL STANDS: branch 6, "stop deleting"** *(option 1,
-register A1 A2 A3 A6 A8 A9 C16 C17 F16 F27)* — the writing-back step stops deleting what it does not
-recognise. **The first fix branch that changes a delivered document**, so the byte comparison on the frozen
-intermediates is the instrument and **it will move**; the acceptance condition is that the movement is
-explained finding by finding. **Read `STEP-B-ANALYSIS.md` §2, its option-1 brief under §3, its §4, then its
-§6 Option 1 IN FULL** — four sessions have planned from §3 alone and got the scope wrong.
+**Three things moved and a session that assumes otherwise will look in the wrong file.** §5.10's ten OOXML rules and five of §5.11's seven are now `.claude/rules/ooxml.md` and `skill-authoring.md`, loaded only on a matching read. **§5.11's other two stay in the charter and must never move** — forgetting either publishes client names into a distributed archive. And the **A2 grade baselines** — the 12-run table and its six conclusions — are **section 11 of `A3-STRUCTURAL-ANALYSIS.md`**, which §1.3 now declares owns them.
 
-**Open, none of it blocking.** **(1)** register **G12**'s 16 unclassified findings, which only Wouter or a
-sanitised route can classify — **this is what keeps D03, D05 and D06 blocked.** **(2)** G9's first half,
-needing branch 15's notes-schema change. **(3)** `--original` is absent from Step 9's step document, so M1's
-fix is a flag nobody passes. **(4)** a `probe` origin class for the register. **(5)** **I-7 to I-10**, the
-four open A1 harness defects and the only open ones. **(6)** `tools/run_tests.py` still collides by name
-with `tests/run_tests.py`.
+**THE SINGLE NEXT ACTION: phase 3b steps 7a, 7b and 8, then phase 3c's 9 and 10** — the plan files are `..\templates\PLAN-3b-lt-judgement.md` and `PLAN-3c-lt-confidentiality.md`. **3c is the only irreversible phase:** this repository is public, so §5.4's rules bind and there is no un-publishing.
 
-**What a new session would get wrong without this.** It would trust the reduction plans' numbers: they say
-**1,685** lines and **41** cut at step 1; measured, **1,666** and **26** — 41 assumed deleting two headings
-and leaving no pointer, which the continuity rule forbids. **Branch 14's figures are deliberately not
-repeated: `tools/qc_census.py` reproduces them and the register owns the findings.**
+**Open, none of it blocking the reduction.** **(1)** the skill build's own next action is unchanged — **branch 6, "stop deleting"**, the first fix branch that moves a delivered byte. **(2)** register **G12**'s 16 unclassified findings, which keep D03, D05 and D06 blocked. **(3)** G9's first half, needing branch 15's notes-schema change. **(4)** `--original` absent from Step 9's step document. **(5)** a `probe` origin class for the register. **(6)** **I-7 to I-10**, the four open A1 harness defects. **(7)** `tools/run_tests.py` still collides by name with `tests/run_tests.py` — both exist, and the collision is recorded nowhere else.
+
+**What a new session would get wrong.** It would trust a line count from an older handoff — every one has moved. It would look for the OOXML rules in §5.10. And it would treat the **19 misdirected `§` references** as a find-and-replace: they already resolve, each onto a real section of the wrong document, so nothing fails and no tool says which is which. **Every one needs a reader, and the count RISES as earlier steps add pointers** — which is why step 8 runs last.

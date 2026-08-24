@@ -19,6 +19,16 @@
           }
         ]
       }
+    ],
+    "InstructionsLoaded": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run \"$CLAUDE_PROJECT_DIR/tools/trace_instructions.py\" --hook"
+          }
+        ]
+      }
     ]
   }
 }
