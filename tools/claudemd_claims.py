@@ -216,10 +216,35 @@ COUNT_CLAIMS = [
 # whitespace. It reported "no occurrence" rather than a failure, which is the quiet way
 # for a check to stop checking.
 UNQUOTED = re.sub(r"\s+", " ", re.sub(r"(?m)^>\s?", "", CMD))
+# A COUNT THAT IS DELIBERATELY GONE IS NOT THE SAME AS A NEEDLE THAT QUIETLY STOPPED MATCHING,
+# and the comment above says why that distinction matters. Phase 3a step 3 removed the register
+# count blockquote from 2.3 on purpose -- the validator prints those figures, and 1.5 records the
+# one time a session reasoned from this file's summary of the register instead of the register.
+#
+# So the charter now DECLARES the removal, and this check reads the declaration:
+#   count present            -> assert it against the register, exactly as before
+#   absent + declared        -> N/A, with the reason, and NOT a warning
+#   absent + NOT declared    -> FAIL, because that is the quiet stop this check exists to catch
+# It can still fail in both directions: reintroduce a wrong count and the assertion fires;
+# delete the declaration and every missing count fires.
+COUNTS_MOVED = "THE EVIDENCE-BASE COUNTS ARE NO LONGER TYPED HERE"
+declared_moved = COUNTS_MOVED.lower() in re.sub(r"\s+", " ", CMD).lower()
+if declared_moved:
+    print(f"  [N/A ] 2.3 declares the register counts moved to the validator, so a count that is")
+    print(f"         absent here is deliberate. Any count still present is asserted below.")
 for label, pat, key in COUNT_CLAIMS:
     hits = Counter(int(h) for h in re.findall(pat, UNQUOTED))
-    if not hits:
-        warn("3", f"{label}: no occurrence — the needle {pat!r} matched nothing")
+    if not hits and declared_moved:
+        # `continue`, and it is not cosmetic. Falling through printed
+        # "[OK] clusters: consistently 15 (0 mentions)" -- an OK for a check that examined
+        # nothing, which is 5.1's third failure shape verbatim: "PASS: all 0 paragraphs is
+        # not a pass". An empty set reports N/A here and never OK.
+        print(f"  [N/A ] {label}: not stated in the charter — moved to audit_register.py")
+        continue
+    elif not hits:
+        fail("3", f"{label}: no occurrence — the needle {pat!r} matched nothing, and the charter "
+                  f"does not declare the counts moved. Either the needle rotted or the figure "
+                  f"was dropped silently; both are this check stopping without saying so")
         continue
     wrong = {v: c for v, c in hits.items() if v != TRUTH[key]}
     if wrong:
