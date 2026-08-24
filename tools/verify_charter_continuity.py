@@ -65,7 +65,12 @@ ONLY_IN_BASELINE = "| **1** | How to read this document | communication · the d
 # pin at THIS PHASE'S ENTRY. Measured against the pre-reduction pin, section 5.1 reads as CHANGED --
 # and it was, legitimately, when phase 3a moved RUN, DO NOT READ into it from section 7. An alarming
 # false report is no more useful than a reassuring one.
-PHASE_BASELINE = os.environ.get("LT_PHASE_BASELINE", "").strip() or "fab2050"
+# MOVED 2026-08-24, WHEN PHASES 3b AND 3c MERGED. The old pin was fab2050, a commit on the
+# pre-squash branch history -- which `main` does not contain, because squash-merging creates new
+# commit objects. The check did the right thing and reported VOID rather than a false pass, which
+# is the whole reason the ancestor test is here. MOVING THIS PIN IS PART OF CLOSING A PHASE, and
+# it is why DECLARED_TOUCHES below is now empty: those touches are in the baseline itself.
+PHASE_BASELINE = os.environ.get("LT_PHASE_BASELINE", "").strip() or "6e714ad"
 
 # Sections owned by a phase that is NOT running. Update this when the phase changes; it is the whole
 # point of the check that it names them explicitly rather than inferring them.
@@ -81,22 +86,16 @@ MUST_NOT_TOUCH = ["5.1", "5.15", "5.16"]          # phase 3d
 # So instead: each row below is (section, new_text, old_text). The check REVERSES the declared
 # substitutions and requires the result to be BYTE-IDENTICAL to the phase pin. Anything else that
 # changed in that section still fails, and a declaration that no longer applies fails too.
-DECLARED_TOUCHES = [
-    ("5.1",
-     "Read the branch's brief in **section 3 of `STEP-B-ANALYSIS.md`**",
-     "Read the branch's brief in `STEP-B-ANALYSIS.md` §3"),
-    ("5.1",
-     "**that document's section 3.3** says option 7's substance lives in **its section 6**, and a "
-     "session that planned branch 2 from section 3.3 alone",
-     "§3.3 says option 7's substance lives in §6, and a session that planned branch 2 from §3.3 "
-     "alone"),
-    ("5.1",
-     "The method for that branch kind in **section 4 of `STEP-B-ANALYSIS.md`**, plus the smoke "
-     "suite, plus the parity check from branch 2 onward, plus a graded run where **that section** "
-     "says a graded run",
-     "The method for that branch kind in `STEP-B-ANALYSIS.md` §4, plus the smoke suite, plus the "
-     "parity check from branch 2 onward, plus a graded run where §4 says a graded run"),
-]
+# EMPTIED 2026-08-24 when phases 3b and 3c merged, and the emptying is the POINT rather than
+# tidying up. The three rows here recorded step 8's pointer-only rewrites inside 5.1 -- a section
+# phase 3d owns -- and asserted that reversing them was byte-identical to the phase pin. Now that
+# the pin has moved to the merged `main`, those rewrites ARE the baseline, so the assertion is
+# discharged. A declaration left standing after its pin moves is a stale exemption, and the
+# stale-declaration check below would have caught it; it is emptied deliberately, not silently.
+#
+# THE RULE FOR THE NEXT PHASE: a declared touch lives exactly as long as the pin it was measured
+# against. Move the pin, empty the list, and re-declare only what THIS phase touches out of turn.
+DECLARED_TOUCHES = []
 
 # Headings that did not exist at the baseline and are allowed to now.
 HEADINGS_ADDED_SINCE_BASELINE = ["1.7"]
