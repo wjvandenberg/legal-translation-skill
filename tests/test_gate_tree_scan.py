@@ -39,6 +39,70 @@ TARGET = ROOT / "uk" / "SKILL.md"
 PLANT_TARGETS = [TARGET]
 BEFORE_BYTES = {p: p.read_bytes() for p in PLANT_TARGETS}
 
+
+# ---------------------------------------------------------------------------------------
+# THE ENTRY GUARD, AND IT EXISTS BECAUSE THIS TEST LEFT A PLANT IN A SHIPPED FILE (2026-08-24).
+#
+# WHAT HAPPENED. This suite was run inside a batch that hit a two-minute timeout and was KILLED
+# mid-run, leaving `Pass the delivered .docx to the reviewer, not the intermediate one.` appended
+# to uk/SKILL.md. It was then re-run on its own — and PASSED, exit 0, section 5 reporting "no
+# planted line survived". It was telling the truth about the wrong question: BEFORE_BYTES is read
+# FROM THE WORKING TREE at import, so the orphaned plant had become the new baseline. The test
+# faithfully restored the file to its contaminated state and certified it unchanged.
+#
+# THAT IS §5.16 RULE 4 IN A TEST THAT WRITES TO A PUBLISHED TREE: a baseline pinned to "the
+# current file" instead of to a revision, where the vacuous case is indistinguishable from the
+# passing case. Here the cost is not a wrong number — it is a line of invented prose shipping
+# inside a public skill, and only `git status` at the very end of the session caught it.
+#
+# THE FIX IS TO PIN THE BASELINE TO A COMMIT and refuse to run when the working file already
+# differs from it in a way this test could have caused. It reports VOID rather than failing a
+# check, because an orphaned plant is a finding about a PREVIOUS run, not about this one.
+def _committed_bytes(path):
+    rel = str(path.relative_to(ROOT)).replace(os.sep, "/")
+    r = subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=str(ROOT), capture_output=True)
+    return r.stdout if r.returncode == 0 else None
+
+
+# IT IS DELIBERATELY SHAPE-BASED, NOT A LIST OF THE PLANT STRINGS. A list would have to be kept
+# in step with every plant this suite ever adds, and the one thing measured here is that such a
+# list goes stale silently. `with_planted` leaves exactly one shape: the committed bytes followed
+# by a short appended fragment. So that shape is what is refused.
+#
+# AND IT ERRS TOWARD VOID. A legitimate branch edit that happens to be a pure short append will
+# stop this suite until a person looks — recoverable in ten seconds. The other error ships
+# invented prose inside a public skill and is not recoverable at all.
+_APPEND_LIMIT = 600
+
+
+def _entry_guard():
+    dirty = []
+    for p in PLANT_TARGETS:
+        committed = _committed_bytes(p)
+        if committed is None or BEFORE_BYTES[p] == committed:
+            continue                      # untracked, or clean — the normal case
+        if not BEFORE_BYTES[p].startswith(committed):
+            continue                      # a real edit in the body; not this suite's shape
+        extra = BEFORE_BYTES[p][len(committed):]
+        if 0 < len(extra) <= _APPEND_LIMIT:
+            dirty.append((p, extra.decode("utf-8", "replace").strip()[:120]))
+    if dirty:
+        print("=" * 92)
+        print("VOID — A PUBLISHED TREE FILE CARRIES A SHORT APPENDED FRAGMENT.")
+        print("This is the exact shape this suite leaves when it is killed before it restores,")
+        print("and if it is one, snapshotting it now would make it the baseline FOREVER — which")
+        print("is how it survived once already. Nothing below has run. This is NOT a pass.")
+        for p, what in dirty:
+            print(f"    {p.relative_to(ROOT)}  trailing: {what!r}")
+        print("If it is a leftover: `git checkout -- <path>` (confirm nothing of yours is staged")
+        print("there first), then re-run. If it is a real edit your branch made, commit it and")
+        print("re-run — the guard compares against HEAD, so a committed edit is invisible to it.")
+        print("=" * 92)
+        sys.exit(2)
+
+
+_entry_guard()
+
 results = []
 
 
