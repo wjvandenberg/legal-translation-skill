@@ -55,8 +55,11 @@ DECLARED_BENIGN = [
      "§6.4 is this charter's repository section"),
     ("This file rewritten to seven sections",
      "§5.4 is this charter's confidentiality section"),
-    ("Never work from a précis",
-     "§1.5 is this charter's reading rule; the same line's other signs were rewritten in words"),
+    # REMOVED 2026-08-25 BY PHASE 12, and the tool is what noticed. The declared line lived in
+    # §5.1's Explore row; that row now carries only what THIS project adds, because "never work
+    # from a précis" is the auto-loaded house file's rule and was counted 2 -> 1. The sign went
+    # with the sentence, so the declaration became stale -- and a stale declaration is a FAIL
+    # here by design, since it would otherwise sit forever vouching for text nobody can find.
     # ADDED BY PHASE 3c STEP 9, WHICH IS THE MECHANISM STEP 8 RUNS LAST TO AVOID -- and it still
     # produced two, because step 9 came after step 8 in the same session. Both are §1.3 rows
     # saying what an evidence document received FROM this charter, so the sign names the SOURCE

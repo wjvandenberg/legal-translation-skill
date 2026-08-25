@@ -74,7 +74,17 @@ PHASE_BASELINE = os.environ.get("LT_PHASE_BASELINE", "").strip() or "6e714ad"
 
 # Sections owned by a phase that is NOT running. Update this when the phase changes; it is the whole
 # point of the check that it names them explicitly rather than inferring them.
-MUST_NOT_TOUCH = ["5.1", "5.15", "5.16"]          # phase 3d
+#
+# EMPTIED 2026-08-25, AND THE EMPTYING IS THE POINT rather than a silencing. The three entries here
+# were 5.1, 5.15 and 5.16, reserved for "phase 3d" -- which is the house-tooling queue's phase 12
+# under its pre-2026-08-24 number. THAT PHASE HAS NOW RUN: it swept all three plus 5.3 and 5.14
+# against the auto-loaded house file, so the sections are this phase's to touch and the check was
+# correctly reporting a real change against a list that had gone stale.
+#
+# No remaining LT work owns a section 5 subsection -- branch 6 is skill code and the companion-file
+# rename is filenames -- so the list is empty rather than re-pointed. RE-DECLARE HERE the moment a
+# phase again owns a subsection another phase must leave alone.
+MUST_NOT_TOUCH = []
 
 # A DECLARED TOUCH IS NOT AN EXEMPTION -- IT IS A NARROWER ASSERTION.
 #
@@ -554,8 +564,15 @@ def selftest():
     case("the continuity baseline is a full sha, not a branch name", len(BASELINE), 40)
     case("the phase pin and the continuity pin are DIFFERENT commits — the two-baseline design",
          BASELINE.startswith(PHASE_BASELINE), False)
-    case("the must-not list names the phase that is NOT running",
-         MUST_NOT_TOUCH, ["5.1", "5.15", "5.16"])
+    # WAS A FROZEN LITERAL, ['5.1', '5.15', '5.16'], AND PHASE 12 SHOWED WHY THAT IS WRONG.
+    # Those three were reserved for the phase that has now RUN, so emptying the list is what
+    # closing the phase means -- and the selftest then failed on the correct state. A literal
+    # here has to be edited at every phase boundary, and the one thing it never catches is the
+    # case it exists for: an entry that is stale. So assert the SHAPE, which still catches a
+    # typo like "5,1" or a stray integer, and let empty-between-phases be legitimate.
+    case("every must-not entry looks like a subsection number",
+         [s for s in MUST_NOT_TOUCH
+          if not (isinstance(s, str) and re.fullmatch(r"\d+\.\d+", s))], [])
     case("prohibition 2 is tested as SOLE presence, not presence",
          "NEVER_ONLY_PATH_SCOPED" in Path(__file__).read_text(encoding="utf-8"), True)
     case("no home-relative path is hard-coded in this file",

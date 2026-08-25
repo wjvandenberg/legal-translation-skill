@@ -64,7 +64,7 @@ wrong conclusion.
 | **`OPUS-5-MIGRATION.md`** | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
 | **`EVIDENCE-confidentiality.md`** | the dated evidence behind §5.4 — **and it owns no rule at all**, deliberately: every rule stayed in the charter under route 1 | **before touching any confidentiality control**, and never in place of §5.4 | the measurements, the dated incidents, the three controls' history, the 90-script census, the (a)/(b)/(c) closures |
-| **`EVIDENCE-measurement.md`** | the twelve-row test-corpus listing *(from §5.7)* and the dated cost stories behind the measurement rules *(from §5.6)* | when you need a corpus document's paragraph count or what it uniquely tests | the corpus as a listing · the grader's package and its three gaps · the two cost stories |
+| **`EVIDENCE-measurement.md`** | the twelve-row test-corpus listing *(from §5.7)*, the dated cost stories behind the measurement rules *(from §5.6)*, and **the dated instances behind the verification-hygiene rules** *(from §5.16 and §5.1, phase 12)* | when you need a corpus document's paragraph count or what it uniquely tests, or what a verification defect cost | the corpus as a listing · the grader's package and its three gaps · **every dated cost story, measurement and verification alike** |
 | **the private sibling folder** | `context.md` (real paths, employer, corpus composition), `leakage-names.txt`, the whole A4 set, the grader backups, the harness | before anything touching confidentiality, packaging or publication | **never committable** |
 
 **Three of these are live inputs to the work ahead — the build plan, the register and the structural
@@ -115,15 +115,19 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, DECLARED 2026-08-24: 1,139 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, RE-DECLARED 2026-08-25: 1,086 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
 > because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run, and caught this line stale twice on the day it landed.)*
-> **Reason:** the reduction that brings this file under 350 is planned, agreed and under way — what remains
-> is content with a named destination, not content that cannot go lower. **Trigger that ends it:** that
-> reduction completing. **Over the cap means RELOCATE, never delete**, and every relocation leaves a
-> one-line pointer. **A number that does not move between sessions is this exemption going stale, not this
-> exemption working.**
+> **Reason, REWRITTEN 2026-08-25 BECAUSE THE OLD TRIGGER FIRED.** It read *"the reduction that brings this
+> file under 350 is under way; trigger: that reduction completing"* — and **the reduction has now completed**
+> *(phases 3a, 3b, 3c and 12)*, leaving the file **736 over**. So the honest reason is no longer *"content
+> with a named destination"*: it is that **every subsection the reduction was SCOPED to touch has been
+> touched**, and the weight that remains sits in **§2 (149), §3 (137) and §6 (140) — 426 lines no phase was
+> ever scoped to reach.** **NEW TRIGGER: a phase scoped to §2, §3 and §6.** Until one exists this number
+> will not move, and **a trigger that has fired is worse than no trigger**, which is why it was replaced
+> rather than re-dated. **Over the cap means RELOCATE, never delete**, and every relocation leaves a
+> one-line pointer.
 
 ---
 
@@ -457,67 +461,41 @@ rules and the ones that apply to particular kinds of session.*
 
 ### 5.1 The cycle — Explore → Plan → Code → Verify → Test → Commit
 
-**For every branch, always, with no exceptions and no compression. And for EVERYTHING WRITTEN, not only
-code** — this file, `STEP-B-ANALYSIS.md`, the register, a README. *(Added 2026-08-06. The session that built
-the repository edited this charter twice and treated neither edit as a branch: no verify, no test, no audit.
-Prose that is wrong misdirects the next session exactly as a broken script does, and this file has already
-cost one wrong prediction that way.)*
+**THE SIX STAGES — AND THAT THEY APPLY TO EVERYTHING WRITTEN, NOT ONLY CODE — ARE IN
+`…\Coding\.claude\CLAUDE.md`, WHICH AUTO-LOADS HERE, AND ARE NOT RESTATED** *(phase 12, 2026-08-25)*.
+**Probed rule by rule: 14 of this section's 16 rules have a twin there.** The table below is what **this
+project** adds at each stage, and nothing else.
 
-| | what it requires |
+| | what THIS PROJECT adds to the stage |
 |---|---|
-| **Explore** | Read the branch's brief in **section 3 of `STEP-B-ANALYSIS.md`** **and the register rows behind it** (section 9.3 of that document maps branch → findings). Open the code the branch will touch. **Never work from a précis** — §1.5. **And read what the brief POINTS AT, not only the brief:** **that document's section 3.3** says option 7's substance lives in **its section 6**, and a session that planned branch 2 from section 3.3 alone got the arm count, the comparison method and the term-list source all wrong |
-| **Plan** | **With Wouter, before any code.** State what the branch builds, **what it must not do**, and **what counts as done** — all three are in §3 of the build plan; do not invent your own |
-| **Code** | **One feature branch per capability.** Small and orthogonal, because a merge is hard to unpick. Where a change genuinely cannot be decomposed, say so — that is a decision for Wouter, not a risk to bury |
-| **Verify** | **Prove this branch did what it claimed.** The acceptance condition in §3's *Done when* line — the byte comparison, the negative input that makes each new check fail, the named acceptance test. Where a check is meant to catch known defects, **its first run must reproduce them**; if it does not, it is not built correctly |
-| **Test** | **Prove nothing else broke.** The method for that branch kind in **section 4 of `STEP-B-ANALYSIS.md`**, plus the smoke suite, plus the parity check from branch 2 onward, plus a graded run where **that section** says a graded run |
+| **Explore** | Read the branch's brief in **section 3 of `STEP-B-ANALYSIS.md`** **and the register rows behind it** (section 9.3 of that document maps branch → findings). **And read what the brief POINTS AT, not only the brief:** **that document's section 3.3** says option 7's substance lives in **its section 6**, and a session that planned branch 2 from section 3.3 alone got the arm count, the comparison method and the term-list source all wrong |
+| **Plan** | *What it builds*, *what it must not do* and *what counts as done* are all three in §3 of the build plan; **do not invent your own** |
+| **Verify** | The acceptance condition in §3's *Done when* line — the byte comparison, the negative input that makes each new check fail, the named acceptance test |
+| **Test** | The method for that branch kind in **section 4 of `STEP-B-ANALYSIS.md`**, plus the smoke suite, plus the parity check from branch 2 onward, plus a graded run where **that section** says a graded run |
 | **Commit** | §5.2 and §5.3 |
 
 #### The cycle must produce ARTEFACTS, not intentions
 
-**Open a task list before any code, carrying all six phases plus every applicable item from §5.3, and cross
-each off only against the OUTPUT OF A COMMAND YOU HAVE RUN** — not against a recollection, and not against an
-intention to run it later.
+**THE RULE IS THE HOUSE FILE'S** — a step list opened before any code, every item crossed off only against
+the output of a command that has been run, a **declared N/A with its reason** where an item does not apply,
+and a branch whose VERIFY and TEST entries are not crossed off is **not finished** whatever its diff looks
+like. **WHAT THIS PROJECT ADDS IS MECHANICAL ENFORCEMENT, because prose is what was already read and skipped
+past:** `tools/cycle_evidence.py` records that a verify and a test command ran and exited 0, bound to a hash
+of the staged content — so editing a file after testing it invalidates the evidence automatically. The
+pre-commit hook refuses a commit with no matching evidence. **It proves a command ran against this content
+and exited zero; it cannot prove the command was a good one, and it says so in its own output.**
 
-**A branch whose VERIFY and TEST entries are not crossed off is not finished, whatever its diff looks like.**
-The pull request may be opened; it may not be presented as complete.
+**AND THE MAXIM §5.16 CITES BY NAME AS *"§5.1's run, do not read rule"*: RUN, DO NOT READ.** Every error
+worth finding in this project has been found by running something; **re-reading has never found one.** *(The
+house file states the same rule as* re-measure, do not re-read; *this wording stays because §5.16 points at
+it.)*
 
-**Where an item does not apply, cross it off as a DECLARED N/A with its reason** — never omit it. *"Branches
-0, 1 and 2 change no skill file, verified as zero files differing under `uk/` or `us/`, so no graded run and
-no rendered visual diff apply"* discharges the requirement. Silence does not.
-
-**And it is enforced mechanically, because prose is what was already read and skipped past.**
-`tools/cycle_evidence.py` records that a verify and a test command ran and exited 0, bound to a hash of the
-staged content — so editing a file after testing it invalidates the evidence automatically. The pre-commit
-hook refuses a commit with no matching evidence. **It proves a command ran against this content and exited
-zero; it cannot prove the command was a good one, and it says so in its own output.**
-
-> **WHY THIS IS A RULE AND NOT AN ENCOURAGEMENT.** *(2026-08-06.)* The repository session ran three branches
-> end to end without pausing once, and the failure was not ignorance — §5.1 had been read. What was missing
-> was any artefact whose absence would show. When VERIFY was finally run properly it found, in work already
-> committed and presented as complete: **a published figure that was wrong and had been reported as an
-> independent confirmation of the plan** · **fixtures that were not byte-reproducible, which broke the one
-> tool that branch existed to enable** · **a parity check that missed the very defect it was built for,
-> because it tested one direction of a symmetric assertion** · and **a `__pycache__` leak into the shipped
-> trees that had been fixed once and returned through the next caller.** None was found by reading. Every one
-> was found by running something.
-
-**SO THE MAXIM, AND IT IS THE ONE §5.16 CALLS *"§5.1's run, do not read rule"*: RUN, DO NOT READ.** Every
-error worth finding in this project has been found by running something; **re-reading has never found one.**
-*(Moved here from §7 on 2026-08-24 — §7 is replaced every session, so a rule left there is deleted by
-design.)*
-
-**Four failure shapes to expect, because each has now happened more than once.** *(1)* **A check that passes
-for the wrong reason** — eleven logged instances, several inside this project's own verification scripts.
-Never a two-word needle; ask the same question a second way; and **when a figure agrees with the one you
-expected, that is the moment to re-derive it, not to relax.** *(2)* **A fix scoped to one caller of a shared
-hazard** — the bytecode leak was fixed in the test runner, came back through the audit tool, came back again
-through the cycle gate, and came back a **fourth** time through the tests added alongside the fix for the
-third. Ask what else does the same thing, and note that **three of four callers patched reads exactly like
-four of four until somebody greps.** *(3)* **An instrument reporting on an empty set** — `PASS: all 0
-paragraphs` is not a pass. **Assert the READ COUNT as well as the result;** a control that opened no files
-must say VOID, never CLEAN. *(4)* **AN EXIT CODE OF 0 THAT IS NOT EVIDENCE THE WORK WAS DONE** — six
-instances in one session, 2026-08-21, each dressed differently. See §5.16, which exists because this one
-cost more time than the other three together.
+**THE FAILURE SHAPE WITH NO HOUSE TWIN — A CHECK THAT PASSES FOR THE WRONG REASON.** Eleven logged instances,
+several inside this project's own verification scripts. **Never a two-word needle; ask the same question a
+second way; and when a figure agrees with the one you expected, that is the moment to re-derive it, not to
+relax.** *(The other three shapes — a fix scoped to one caller, an instrument reporting on an empty set, and
+an exit code of 0 that is not evidence — are the house file's. **What all of it cost here is
+`EVIDENCE-measurement.md` sections 3.3 and 3.5.**)*
 
 **Two disciplines bind every option, and they are not in tension with taking a leap:** every change points
 at a **specific observed failure or grade**, never at theory; and **the anti-drift safeguards are not on the
@@ -562,13 +540,13 @@ table.**
 
 ### 5.3 Definition of done — every branch, every step
 
-Smoke suite green · parity check green (from branch 2 onward) · **the branch's own *Done when* condition in
-section 3 of `STEP-B-ANALYSIS.md` met** · tested by the method its branch kind requires in **that document's section 4** · **where a graded run
-applies, no criterion regressed against the frozen v3 baseline** · **rendered PDF visual diff against the
-source, page by page, BOTH documents** · `git status` explained to Wouter · whole-picture review
-(consistency, completeness, accuracy, code quality, security) · **both confidentiality controls and the
-publication check run** · PR opened and reviewed, **Wouter approves the merge** · squash-merge · push ·
-**§7 updated.**
+**THE HOUSE DEFINITION OF DONE APPLIES IN FULL AND IS NOT RESTATED** *(phase 12, 2026-08-25 — probed, 8 of
+its 12 items have a twin there)*. It ends *"plus any gate the project's own charter adds"*; **these are
+those gates.** Parity check green from branch 2 onward · **the branch's own *Done when* condition in
+section 3 of `STEP-B-ANALYSIS.md` met**, tested by the method its branch kind requires in **that document's
+section 4** · **no criterion regressed against the frozen v3 baseline** wherever a graded run applies ·
+**rendered PDF visual diff against the source, page by page, BOTH documents** · **both confidentiality
+controls and the publication check run.**
 
 ### 5.4 Confidentiality
 **THE DATED EVIDENCE MOVED TO `EVIDENCE-confidentiality.md` ON 2026-08-24. NOT ONE RULE MOVED WITH IT, AND
@@ -876,104 +854,69 @@ working) · modify the source or delivered documents (read-only; they are the ev
 skill (the review feeds the analysis, not a patch).
 
 ### 5.14 Adding to this file
-**REWRITTEN 2026-08-24, at the end of the reduction, because a rule about what goes in a file has to
-describe THAT file.** The old version described a 1,666-line document with no cap, no routes and no rule
-about the section sign. **The general mechanism — the six relocation routes, the size classes, the
-one-line-pointer rule, what `§` means — is the auto-loaded house working method and is NOT restated here.**
-What follows is what is true of *this* charter and is written down nowhere else.
+**REWRITTEN 2026-08-24 because a rule about what goes in a file has to describe THAT file. CUT AGAIN
+2026-08-25, phase 12, because its own opening claim was not true:** it declared the general mechanism *not
+restated*, and then five of its eight items restated it. **NOW GENUINELY NOT RESTATED, because
+`…\Coding\.claude\CLAUDE.md` AUTO-LOADS HERE AND CARRIES ALL OF IT** — the six relocation routes, the size
+classes, the one-line-pointer rule, what `§` means, **2 → 1 and never 2 → 0**, never delete a heading, never
+summarise a companion document, decide-where-before-writing, and count-by-listing-never-by-adding. **Probed
+one grep per rule: 14 of this section's 20 rules have a twin there.** These six do not. *(Two rules had to be
+rescued from §7 during the 2026-08-24 reduction — which is what "replaced, not appended to" costs when it is
+forgotten.)*
 
-**1. DECIDE WHERE IT GOES BEFORE WRITING IT.** Everything belongs in **§2 to §6, by subject**. §1 is
-navigation; **§7 is the handoff and nothing else, and it is REPLACED every session.** So the moment you
-find yourself writing a lesson, a decision or a structural change into §7, it is already in the wrong
-place — a decision goes to §2.6, a lesson to §5, a structural change to §6. **Two rules had to be rescued
-from §7 during this reduction**, which is what "replaced, not appended to" costs when it is forgotten.
-
-**2. THIS CHARTER'S CAP IS MEASURED, AND §1.7 IS THE ONLY PLACE IT STATES ITS OWN LENGTH.** Class **L,
+**1. THIS CHARTER'S CAP IS MEASURED, AND §1.7 IS THE ONLY PLACE IT STATES ITS OWN LENGTH.** Class **L,
 350**, §7 at **35**; both live in `verify.config.json`. **`file length` FAILS on every run by design while
 §1.7's exemption stands** — not a regression, and **never silence it by setting the cap to 0**, which
 reports *exempt* and measures nothing. **A declaration is prose, so no ordinary checker can see it going
 stale:** `tools/verify_charter_continuity.py` compares that sentence against the measurement, and it caught
 it twice within an hour of being promoted. **Re-derive it on the commit that changes it.**
 
-**3. THREE THINGS THE REDUCTION MEASURED ABOUT THE ROUTES, and each costs a rule if forgotten.** A
-path-scoped rule is good for **one use per session** and does not return after a compact. **A skill's body
-is not in context until invoked.** **Neither can be exercised in the session that creates it**, so a route
-whose proof needs a session boundary splits the step in two. **Therefore nothing whose absence is
-irreversible goes behind either — §5.4 and §6.5 are route 1 entire**, and `verify_charter_continuity.py`
-check 6b asserts it.
+**2. TWO THINGS THE REDUCTION MEASURED ABOUT ROUTES 3 AND 4 THAT THE HOUSE FILE DOES NOT CARRY.** **A
+skill's body is not in context until it is invoked**, and **neither a skill nor a scoped rule can be
+exercised in the session that creates it** — so a route whose proof needs a session boundary splits the step
+in two. **Therefore nothing whose absence is irreversible goes behind either — §5.4 and §6.5 are route 1
+entire**, and `verify_charter_continuity.py` check 6b asserts it.
 
-**4. THE TEST THAT A RELOCATION WAS SAFE IS A COUNT, NOT A READING: 2 → 1, and NEVER 2 → 0.** Relocation
-can promote a duplicate into the only copy, and cutting it as "redundant" then removes the rule outright.
-**And never delete a heading or renumber one** — a heading is what every pointer resolves against.
+**3. PREFER A RELATIONSHIP TO A NUMBER.** *"§7 is under its cap"* cannot go stale; *"§7 is 18 lines"* can.
+Every stale count in this project came from adding a delta to the figure already written down.
 
-**5. A `§` HERE MEANS THIS FILE. For another document, write it in words:** *"section 4 of
-`STEP-B-ANALYSIS.md`"*. A sign aimed elsewhere **passes silently against the wrong section of this file**,
-so nothing fails and no checker can tell which is which — **nineteen were found, eleven genuinely
-misdirected, one pointing at the wrong section of the right file.** `tools/xdoc_signs.py` holds the
-judgement on the survivors and **fails on a new one.**
+**4. WHAT THE `§` RULE HAS ALREADY COST HERE:** **nineteen were found, eleven genuinely misdirected, one
+pointing at the wrong section of the right file** — because a sign aimed elsewhere **passes silently against
+the wrong section of this file**, so nothing fails. `tools/xdoc_signs.py` holds the judgement on the
+survivors and **fails on a new one.** *(Nine more were found in `EVIDENCE-measurement.md` on 2026-08-25 and
+rewritten in words.)*
 
-**6. NEVER SUMMARISE A COMPANION DOCUMENT — POINT AT IT.** A summary invites the next session to reason
-from the summary instead of the evidence, which is how a wrong conclusion gets reached confidently, and it
-has happened here. §1.3 says what each document owns; **where two could disagree, this one wins**, and the
-disagreement is a defect to fix rather than a judgement call. **If it is extensive, ask Wouter first
-whether it should be its own document.**
+**5. WHERE THIS CHARTER AND A COMPANION DOCUMENT COULD DISAGREE, THIS ONE WINS** — the house rule says write
+down which wins, and this is that answer. The disagreement is a defect to fix, never a judgement call. §1.3
+says what each document owns.
 
-**7. COUNT BY LISTING, NEVER BY ADDING, and prefer a relationship to a number.** Every stale count in this
-project came from adding a delta to the figure already written down. **Delete a superseded count** rather
-than leaving it beside the new one. *"§7 is under its cap"* cannot go stale; *"§7 is 18 lines"* can.
-
-**8. AFTER ANY SUBSTANTIAL EDIT, RUN:** `verify_md.py` · `verify_charter_continuity.py` · `xdoc_signs.py` ·
+**6. AFTER ANY SUBSTANTIAL EDIT, RUN:** `verify_md.py` · `verify_charter_continuity.py` · `xdoc_signs.py` ·
 `md_tables.py` · and **all three confidentiality controls** *(§5.4)*. **Invoke the `audit-gate` skill for
 the method; do not improvise it.**
 
 ### 5.15 Inherited house rules
 
-- **Never delete files you didn't create.** Especially: the archived `.skill` revisions and the test corpus
-  are irreplaceable.
-- Run Python via **`uv run`**.
-- New scratch scripts go in **`temp/`**.
-- **Verify** that the solution fully addresses the request before marking anything done.
+**THE FOUR CRITICAL RULES LIVE IN `…\Coding\.claude\CLAUDE.md`, WHICH AUTO-LOADS INTO EVERY SESSION HERE,
+AND ARE NOT RESTATED** *(phase 12, 2026-08-25)*. **Probed one grep per rule: all four have a twin there.**
+**THE ONE RIDER WITH NO TWIN, so it stays:** the archived `.skill` revisions and the test corpus are
+**irreplaceable** — which is the half *"never delete files you didn't create"* does not say.
 
 ### 5.16 "IT EXITED 0" IS NOT "IT DID THE WORK" — and this section is here because §7 gets replaced
 
-**Six instances in one session, 2026-08-21, every one of them a green number reporting on something other
-than the thing being checked.** §5.1's *run, do not read* rule assumes the run tells you the truth. These are
-the ways it does not.
+**THE VERIFICATION-HYGIENE RULES ARE IN `…\Coding\.claude\CLAUDE.md`, WHICH AUTO-LOADS HERE, AND ARE NOT
+RESTATED** *(phase 12, 2026-08-25)* — assert the artefact, not the exit code · a long runner writes a
+**sentinel FILE** as its last act · never run two suites concurrently · pin a comparison baseline to a
+**revision**, never to a branch name or `HEAD` · a control that opened no files is **VOID, never CLEAN** ·
+and, from the user-global file, **`$?` is reset by a pipe or a command substitution, so capture `rc=$?` on
+the very next line.** **Probed one grep per rule: six of the eight have a twin there.**
 
-| what was read | what it was actually reporting |
-|---|---|
-| `printf "… rc=%s" "$(basename $t)" "$?"` | **`basename`'s** exit code. A command substitution runs before `$?` is expanded, so this is always 0. Twelve test files were reported green while two were exiting 1 |
-| `cmd \| tail -4; echo "rc=$?"` | **`tail`'s** exit code, never `cmd`'s |
-| a long runner returning 0 | a process that **stopped part-way**. Four reproductions. Proved only because a sentinel FILE it should have written was absent |
-| a monitor reporting "failed, exit 1" | **`grep`** finding nothing, on a sweep that was entirely green |
-| a before/after suite reporting green | the fix **compared with itself**, because "before" was pinned to a branch name that had since moved. Worst on a byte comparison, where a file against itself is trivially identical and the vacuous case looks exactly like the passing case |
-| `make_fixtures` returning 0 | a build **killed part-way** that had already deleted 8 of 11 fixtures |
+**THE ONE RULE WITH NO TWIN, so it stays: RUN THIS PROJECT'S SUITES AS TOP-LEVEL COMMANDS, NEVER FROM A
+PARENT RUNNER** — and make a before/after suite exit **VOID** when the baseline turns out byte-identical to
+the working tree. **Its two measurements are `EVIDENCE-measurement.md` section 3.4.**
 
-**So, five rules, each bought with real time:**
-
-1. **CAPTURE `rc=$?` ON ITS OWN LINE, IMMEDIATELY.** Never inside a `printf`, never after a pipe, never
-   alongside a command substitution. Better still, orchestrate from Python and read `subprocess.returncode`,
-   which cannot be detached from the process that produced it.
-2. **A LONG RUNNER MUST WRITE A COMPLETION SENTINEL — a FILE, not a line.** stdout can be truncated by
-   whatever is capturing it; a file written by the script itself cannot. Without one, *"did it finish?"* and
-   *"was its output captured?"* are indistinguishable, and both look like success.
-3. **ASSERT THE ARTEFACT, NOT THE EXIT CODE.** Count the files that exist, hash the bytes, read the verdict
-   line. `make_fixtures` now counts its own output against the declared set and returns non-zero if they
-   disagree, which is the shape to copy.
-4. **PIN A BEFORE/AFTER BASELINE TO A COMMIT, NEVER TO A BRANCH NAME**, and make the suite exit **VOID** when
-   the baseline turns out byte-identical to the working tree. A branch name stops meaning *before* the moment
-   the branch merges, and a fallback chain that lands on the fixed code manufactures a tautology.
-5. **RUN THIS PROJECT'S SUITES AS TOP-LEVEL COMMANDS, NOT FROM A PARENT RUNNER.** Two measured reasons.
-   `tests/make_fixtures.py` run as a captured child was measured to **kill its parent**, which is how a
-   fixture set came to be half-deleted. And the suites **share `tests/fixtures/` and rewrite it**, so anything
-   run alongside a sweep invalidates it and is invalidated by it — a foreground suite caught a fixture
-   mid-write and died with `BadZipFile`, which reads exactly like a corrupt document rather than a race.
-
-> **AND THE REASON THIS IS IN §5 RATHER THAN IN THE HANDOFF.** All of it was first written into §7, whose own
-> rule is *replace this section every session, do not append*. Lessons filed there are deleted by the next
-> session by design. **A durable rule belongs in §5 by subject; §7 carries only what the next session must
-> not re-derive about the CURRENT state.** That distinction is §5.14's rule, and putting the lessons in the
-> wrong place first is a small worked example of why it exists.
+**THE SIX DATED INSTANCES MOVED TO `EVIDENCE-measurement.md` SECTION 3.3 ON 2026-08-25** — six green numbers
+in one session, each reporting on something other than the thing being checked. §5.1's *run, do not read*
+rule assumes the run tells you the truth; those are the ways it does not.
 
 ---
 
@@ -1122,18 +1065,22 @@ the one irreversible act here — never publish without Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.14, and the 35-line cap in §1.7)*.
 
-### HANDOFF — 2026-08-24. THE CHARTER REDUCTION'S PHASES 3b AND 3c ARE MERGED
+### HANDOFF — 2026-08-25. PHASE 12 IS DONE: THE HOUSE-FILE DUPLICATE SWEEP
 
-**Produced: documentation and tooling only. Not one byte of `uk/` or `us/` changed** — measured, not asserted: `git diff --name-only origin/main -- uk/ us/` is empty and each tree still holds 198 files.
+**Produced: documentation only. Not one byte of `uk/` or `us/` changed** — measured, not asserted: `git diff --name-only origin/main -- uk/ us/` is empty.
 
-**1,666 → 1,139 lines**, section 5 **686 → 527**. **48 headings before and after — none deleted, nothing renumbered.** The deep audit accounts for **780 removed lines, 0 in the "gone" band, 0 unjudged tokens.** §1.7 declares the length and **is the only place that does.**
+**1,139 → 1,086 lines**, §5 **527 → 466**. **48 headings before and after — none deleted, nothing renumbered.** `EVIDENCE-measurement.md` went **105 → 165**: the charter lost 61 and the evidence document gained 60, **which is what relocation looks like and what deletion would not.**
 
-**Three blocks left this file and a session that assumes otherwise will look in the wrong place.** §6.6, §5.8 and §5.12 are the skills `publish-skill-archives`, `frozen-intermediate-test` and `audit-gate` in `.claude/skills/`. §5.4's dated evidence is **`EVIDENCE-confidentiality.md`**; §5.7's corpus table and §5.6's cost stories are **`EVIDENCE-measurement.md`**. **Both evidence documents own NO RULE** — all 26 stayed here, asserted by `temp/prohibition2_check.py`.
+**FIVE BLOCKS SWEPT AGAINST `…\Coding\.claude\CLAUDE.md`, WHICH AUTO-LOADS INTO EVERY SESSION HERE.** §5.15 and §5.16 cut to pointers · §5.1, §5.3 and §5.14 trimmed to their project delta. **60 rules probed, one `grep` each: 45 had a twin there, 15 did not and stayed.** **THE METHOD IS THE DELIVERABLE: probe, never text-diff.** A rule restated in this project's own words with project nouns inside it is invisible to a text comparison — §5.1 was exactly that, and a diff would have reported almost nothing to do.
 
-**THIS PROJECT HAS NO ACTIVE PHASE RIGHT NOW, AND THAT IS THE THING TO KNOW.** The remaining reduction work here — the house-file duplicate sweep of §5.1, §5.15 and §5.16 — **waits on the house-tooling repo doing the same job on its own charter first.** That is `…\Coding\templates\`, and its plan file is `PLAN-3d-lt-route0.md`. **Do not start it here.**
+**WHERE THINGS NOW LIVE.** §6.6, §5.8 and §5.12 are the skills `publish-skill-archives`, `frozen-intermediate-test` and `audit-gate`. §5.4's dated evidence is `EVIDENCE-confidentiality.md`. §5.7's corpus table, §5.6's cost stories **and now §5.16's six instances and §5.1's four 2026-08-06 defects** are `EVIDENCE-measurement.md` **sections 3.3 and 3.5**. **Both evidence documents still own NO RULE** — `temp/prohibition2_check.py` asserts it, and the one swept rule with no house twin *(suites run top-level, never from a parent runner)* deliberately stayed in §5.16.
 
-**The skill build's own next action is unchanged: branch 6, "stop deleting"** — the first fix branch that moves a delivered byte, and the first HEAVY step in a long time. **One branch, one session.**
+**THREE DECLARATIONS WERE STALE AND ALL THREE ARE FIXED — none was found by reading.** §1.7's exemption said 1,139. **Its TRIGGER HAD ALSO FIRED:** it read *"that reduction completing"*, and the reduction has completed — **new trigger: a phase scoped to §2, §3 and §6**, the 426 lines no phase was ever scoped to reach. And `verify_charter_continuity.py`'s `MUST_NOT_TOUCH` still reserved §5.1/§5.15/§5.16 for *"phase 3d"*, which is this phase under its old number; now empty.
 
-**Open, none of it blocking.** **(1)** register **G12**'s 16 unclassified findings, blocking D03, D05 and D06. **(2)** G9's first half, needing branch 15's notes-schema change. **(3)** `--original` absent from Step 9's step document. **(4)** a `probe` origin class for the register. **(5)** **I-7 to I-10**, the four open A1 harness defects. **(6)** `tools/run_tests.py` still collides by name with `tests/run_tests.py`. **(7)** three of the fourteen `tests/` suites cannot run under `uv run python` — the shared venv has no `lxml`, so they need the system interpreter; all three PASS there, and nothing reports the gap. **(8)** the scan list still needs tightening — `EVIDENCE-confidentiality.md` section 5.2. **(9)** the companion files keep their legacy names until after the duplicate sweep — decided, `DECISIONS-LOG.md` 2026-08-24, ~178 references measured.
+**TWO THINGS THIS SESSION DID NOT DO, BOTH DELIBERATE.** `PHASE_BASELINE` is still `6e714ad` — **moving the pin is part of closing a phase and must happen AFTER this PR merges**, or it pins to a commit `main` does not contain. And nine cross-file `§` signs in `EVIDENCE-measurement.md` were rewritten in words as a declared side-fix; `xdoc_signs.py` had never covered that file.
 
-**What a new session would get wrong.** It would look for the audit gate in §5.12 and the corpus table in §5.7. It would read `claudemd_claims`' **8 warnings** as regressions — they are *"pattern not found"* on figures the reduction deliberately relocated, against **0 failures**. And it would assume this file is near its cap: **1,139 against 350 is 789 over**, and the remaining weight is §2 (149), §3 (137) and §6 (140) — **426 lines no phase of this reduction was scoped to touch.**
+**The next action is unchanged: branch 6, "stop deleting"** — the first fix branch that moves a delivered byte, and the first HEAVY step in a long time. **One branch, one session.**
+
+**Open, none of it blocking.** **(1)** register **G12**'s 16 unclassified findings, blocking D03, D05 and D06. **(2)** G9's first half, needing branch 15's notes-schema change. **(3)** `--original` absent from Step 9's step document. **(4)** a `probe` origin class for the register. **(5)** **I-7 to I-10**, the four open A1 harness defects. **(6)** `tools/run_tests.py` still collides by name with `tests/run_tests.py`. **(7)** three of the fourteen `tests/` suites cannot run under `uv run python` — the shared venv has no `lxml`, so they need the system interpreter; all three PASS there, and nothing reports the gap. **(8)** the scan list still needs tightening — `EVIDENCE-confidentiality.md` section 5.2. **(9)** **THE COMPANION-FILE RENAME IS NOW DUE** — it was gated on the duplicate sweep, which is finished. ~178 references measured, `DECISIONS-LOG.md` 2026-08-24.
+
+**What a new session would get wrong.** It would look for the audit gate in §5.12 and the corpus table in §5.7. It would read `claudemd_claims`' warnings as regressions — they are *"pattern not found"* on figures the reduction relocated. **It would RESTATE A HOUSE RULE here**, not knowing that `…\Coding\.claude\CLAUDE.md` auto-loads and already carries the entire working method — after this phase, a copy of one is a duplicate to delete, not a rule to write. And it would run `verify_charter_continuity.py` **without `LT_HOUSE_TEMPLATES` set to `…\Coding\templates`**, whose check 7 then reports **VOID — which is not a pass.** Finally, it would assume the cap is nearly met: **1,086 against 350 is 736 over.**
