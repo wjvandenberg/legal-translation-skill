@@ -70,7 +70,12 @@ ONLY_IN_BASELINE = "| **1** | How to read this document | communication · the d
 # commit objects. The check did the right thing and reported VOID rather than a false pass, which
 # is the whole reason the ancestor test is here. MOVING THIS PIN IS PART OF CLOSING A PHASE, and
 # it is why DECLARED_TOUCHES below is now empty: those touches are in the baseline itself.
-PHASE_BASELINE = os.environ.get("LT_PHASE_BASELINE", "").strip() or "6e714ad"
+# MOVED 2026-08-25, ON THE MERGE OF PHASE 12 — and moving it is the phase-closing act this
+# comment block describes, not a tidy-up. The old pin 6e714ad is still an ancestor of `main`,
+# so nothing was broken; it had simply stopped meaning "this phase's entry" and started
+# meaning "two phases ago", which would make every session read phase 12's own changes as
+# unexplained ones. Left standing, check 1 grows a false alarm per closed phase.
+PHASE_BASELINE = os.environ.get("LT_PHASE_BASELINE", "").strip() or "9d05bf5"
 
 # Sections owned by a phase that is NOT running. Update this when the phase changes; it is the whole
 # point of the check that it names them explicitly rather than inferring them.
