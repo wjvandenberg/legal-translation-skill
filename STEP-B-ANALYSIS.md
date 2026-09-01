@@ -1554,6 +1554,35 @@ It is three clauses: **rebuild only text; preserve every non-text child in its o
 delete only what you can prove is now redundant.** The third clause is needed because one of the fixes in
 this option is a *deletion* — dropping a cross-reference skeleton once the number it held has been consumed.
 
+> **CORRECTED 2026-09-01, ON BUILDING IT: THE POSITION CLAUSE CANNOT CLOSE THE RELOCATION CASE, AND THIS
+> OPTION'S OWN "what it does NOT fix" CELL SAYS OTHERWISE.** That cell states that the relocation case needs
+> the position clause, and that this is why the clause is in the proposal. Built, it does not follow, and the
+> reason is
+> structural rather than a coding slip: **apply rebuilds a paragraph from ONE unbroken English string**, so a
+> tab that sat BETWEEN two text atoms cannot be put back between them. There is no offset in `en` saying
+> where it belonged, because `en` carries no per-run structure at all.
+>
+> **What clause 2 DOES deliver, measured on all thirteen frozen intermediates:** the tab is no longer
+> DESTROYED — every tab count returned exactly to its source value, D06 10→80 and D02 61→73 — and a
+> non-text child is placed correctly relative to the text **within a single run's own children**. Where the
+> tab's run is the paragraph's FIRST text-bearing run, that is a real fix.
+>
+> **Where it is not, the rendered page is unchanged from the broken state, and that was confirmed by
+> RENDERING rather than inferred from XML** *(`tools/render_diff.py`, built for this)*. On the synthetic
+> fixture the source reads `(a)⇥If to the first party:` and the deliverable reads `(a)If to the first party:`
+> — the tab is present in the file and stranded after the collapsed English. **That is Wouter's D05 notices
+> clause exactly**, and it is the sharpest available illustration of §2.5 item 7: *the pipeline preserves
+> form as COUNTS and FLAGS, never as EFFECTS*, so a count restored to source is not a layout restored.
+>
+> **This belongs to branches 15–17, not here, and the register already separates the two:** the apply-side
+> deletion problem is fixable in this file, and the data contract being unable to describe the formatting is
+> a different fix in a different file. **Branch 15 makes extraction emit effective formatting per RUN; only
+> then can the English be split at the boundary the tab sat on.** The current outcome is ASSERTED in
+> `tests/test_stop_deleting.py` so that branch must change it deliberately rather than silently.
+>
+> **The option's verdict does not change** — it closes 17 findings including four of the six worst, and it
+> did. What changes is one sentence about how much of the tab defect it reaches.
+
 **And stop listing containers.** Three text-bearing containers are now known to sit outside the inventory —
 content controls, smart tags, and text held in graphic metadata such as image alt text and chart titles.
 Three instances is enough to replace the list with a rule: **the reading and the writing halves must share

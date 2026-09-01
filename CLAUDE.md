@@ -115,13 +115,13 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, RE-DECLARED 2026-09-01: 1,090 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, RE-DECLARED 2026-09-01: 1,092 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
 > because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run, and caught this line stale twice on the day it landed.)*
 > **Reason, REWRITTEN 2026-08-25 BECAUSE THE OLD TRIGGER FIRED.** It read *"the reduction that brings this
 > file under 350 is under way; trigger: that reduction completing"* — and **the reduction has now completed**
-> *(phases 3a, 3b, 3c and 12)*, leaving the file **740 over**. So the honest reason is no longer *"content
+> *(phases 3a, 3b, 3c and 12)*, leaving the file **742 over**. So the honest reason is no longer *"content
 > with a named destination"*: it is that **every subsection the reduction was SCOPED to touch has been
 > touched**, and the weight that remains sits in **§2 (149), §3 (137) and §6 (143) — 429 lines no phase was
 > ever scoped to reach.** *(§6 gained 3 lines on 2026-09-01, when a stale internal-reference count in §6.4
@@ -1076,6 +1076,8 @@ the one irreversible act here — never publish without Wouter's explicit OK.)*
 **THE ACCEPTANCE CONDITION WAS INVERTED, AND IT HELD.** Every branch before this proved no delivered byte moved; here the bytes had to move and each movement had to be explained. `tools/apply_corpus_diff.py` runs apply twice over all 13 frozen intermediates — a pinned commit against the working tree — and judges every movement against **the SOURCE document's own count**, which is stronger than old-versus-new. **6 documents moved, 7 byte-quiet, 0 unexplained**, and every preservation-critical count landed EXACTLY on source: D02 comments 14→28, D05 footnote 0→1, D06 hyperlinks 1→34 and tabs 10→80, D08 comments 12→13, D09 footnote 0→2.
 
 **THE PLAN IS WRONG ON ONE POINT AND IT IS THE MOST IMPORTANT THING HERE.** `STEP-B-ANALYSIS.md` §6's Option 1 says the relocation case *"needs the position clause"*. Built, that does not follow: apply rebuilds from ONE unbroken English string, so a tab that sat BETWEEN two text atoms cannot be put back between them. D06's table of contents is navigable again with all 80 tabs restored, and its entry text and page number are **still** not separated on the page. **That is cluster A's data-contract half — branches 15–17's, not this one's — and it is ASSERTED as the current outcome so branch 16 must change it deliberately rather than silently.**
+
+**§5.3's RENDERED DIFF IS NOW A TOOL — `tools/render_diff.py` — AND ITS DESIGN IS FORCED BY §6.5 RATHER THAN BY TECHNIQUE. A rendered page of a corpus document is client text as an image, and the transcript is the one leak class no control here can reach, so CLAUDE MAY NEVER LOOK AT A RENDER OF A REAL DOCUMENT.** The gate therefore splits: **real corpus mechanically**, page counts and per-page pixel percentages, every image deleted and none displayed; **synthetic fixtures visually**, because they carry no client text. Judging real pages *by eye* remains a human's job and the tool says so. Measured: **D06 36→36 pages, exactly the source's 36; D05 20→20** — page-count stability is the strongest layout signal available. And the fixture render **confirmed A1 and A8 by eye and exposed what the counts hid**: the tab is back in the file and still stranded after the collapsed English, so `(a)⇥If to the first party:` delivers as `(a)If to the first party:`. A count restored to source is not a layout restored — §2.5 item 7, seen rather than inferred.
 
 **THREE INSTRUMENTS CAUGHT THREE REAL DEFECTS IN THIS SESSION'S OWN WORK, and none was found by reading.** The corpus tool flagged `lastRenderedPageBreak` — a rendering cache Word regenerates — being salvaged on 10 of 13 documents. `audit_branches` caught a stale catalogue claim. `verify_charter_continuity` caught §1.7's declared figure going stale. **And clause 3 was narrowed on a measurement rather than a hunch:** deleting every consumed field skeleton would freeze a `PAGE` field at its cached value, so it is restricted to the REF family — measured, the only cached-result fields anywhere in the corpus are D06's 45 REF fields, so the guard exists for the document that is not in the corpus.
 
