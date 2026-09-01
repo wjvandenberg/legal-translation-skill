@@ -895,13 +895,27 @@ def _split_run_non_text(r):
                            them -- and strictly better than deletion, which is what happens
                            today. Declared rather than hidden.
 
-    Returns (before, after) as lists of the original child elements. `rPr` is never salvaged:
-    it is run PROPERTIES, and properties are branches 15-17's problem, not this branch's.
+    THREE BUCKETS, NOT TWO, AND THE THIRD IS THE ONE THAT MATTERED. A run's children can be
+    `[t, tab, t]` — the tab sits BETWEEN two text children of the SAME run. A two-bucket split
+    put it in `after`, and since such a run is often the paragraph's only text-bearing run it
+    then counted as "follows all the text" and was kept. Rendered, that is D06's table of
+    contents: the tab emitted at the end, the page number glued to the title, and a forced
+    line wrap. Caught by the fixture on 2026-09-01, having been missed by every count.
+
+    Returns (before, between, after) as lists of the original child elements. `between` can
+    never be placed truly, because the text on both sides of it has collapsed into one string.
+    `rPr` is never salvaged: it is run PROPERTIES, and properties are branches 15-17's
+    problem, not this branch's.
     """
-    before, after, seen_text = [], [], False
+    before, mid, after, seen_text = [], [], [], False
     for child in r:
         tag = child.tag
         if tag in (f'{W}t', f'{W}delText'):
+            if seen_text:
+                # More text after things we had provisionally called trailing: everything
+                # banked so far sat BETWEEN text and cannot be placed.
+                mid.extend(after)
+                after = []
             seen_text = True
             continue
         if tag == f'{W}rPr':
@@ -923,7 +937,69 @@ def _split_run_non_text(r):
             # existing behaviour is unchanged there.
             continue
         (after if seen_text else before).append(child)
-    return before, after
+    return before, mid, after
+
+
+# WHITESPACE WITH A POSITION, versus a POINTER that has none. The distinction was missing
+# until Wouter read the rendered pages on 2026-09-01, and it is the whole reason clause 2 had
+# to be narrowed.
+#
+# A `w:footnoteReference` works wherever in the paragraph it lands: it is a POINTER, and the
+# footnote appears at the foot of the page regardless. A `w:tab` does not — it is whitespace
+# whose entire meaning is WHERE it sits. Put it back in the wrong place and it does visible
+# harm rather than none:
+#
+#   D06's table of contents: source runs are number, tab, title, tab, page number. Both tabs
+#   returned at the paragraph END, so the page number stayed glued to the title exactly as
+#   before AND two trailing tabs advanced past the right margin, forcing a line wrap. The
+#   register had predicted precisely this and called it latent -- "on a row whose text already
+#   reaches the right margin a trailing tab forces a wrap" -- and it was quoted in this file's
+#   own comments while nothing tested for it.
+#
+#   D05: the same shape broke the line carrying the restored footnote anchor.
+#
+# SO A MISPLACED TAB IS WORSE THAN A MISSING ONE, measured on the page rather than argued.
+# Wouter's decision, 2026-09-01: keep a tab only where its TRUE position survives the
+# collapse; where it does not, DROP it, which is what the old code did, so the page is no
+# worse than before. A3 and A6 are therefore NOT closed by this branch and belong to branch
+# 16, where per-run English makes the position knowable.
+#
+# AN EXACT PREFIX/SUFFIX SPLIT WAS CONSIDERED AND MEASURED FIRST, not dismissed: if a source
+# fragment is still an exact affix of `en` the boundary is proved, not guessed. It fires on
+# 4 of D06's 231 multi-fragment paragraphs and 12% corpus-wide, so it would not have fixed
+# the page in question. Recorded so nobody rediscovers it as an idea.
+_POSITION_CRITICAL = (f'{W}tab', f'{W}br')
+
+
+def _is_position_critical(child):
+    """True if this run child's meaning depends on WHERE it sits, not merely on being present."""
+    return child.tag in _POSITION_CRITICAL
+
+
+def _run_is_only_position_critical(r):
+    """True if everything this structural-only run carries is position-critical.
+
+    A run holding a tab AND a drawing is not dropped: the drawing must survive. Only a run
+    whose entire content is positional whitespace can be dropped for being unplaceable.
+    """
+    kids = [c for c in r if c.tag != f'{W}rPr']
+    return bool(kids) and all(_is_position_critical(c) for c in kids)
+
+
+def _text_span(container):
+    """(first, last) child index of this container's text-bearing runs, or (None, None).
+
+    All of a container's text collapses into ONE rebuilt block at the first of these, so these
+    two indices are what decide whether a positional child can still be put on the correct
+    side of the text.
+    """
+    first = last = None
+    for i, child in enumerate(container):
+        if child.tag == f'{W}r' and _run_is_text_bearing(child):
+            if first is None:
+                first = i
+            last = i
+    return first, last
 
 
 def _wrap_salvaged(children, template_rpr):
@@ -1407,7 +1483,13 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
             # CLAUSE 3, computed per container before anything is touched: the runs of any
             # field whose cached result we are about to consume. A9.
             dead_field = _consumed_field_runs(container)
-            for child in list(container):
+            # CLAUSE 2's LIMIT, computed before anything is emitted. All of this container's
+            # text collapses into one block at `first_txt`, so a positional child is keepable
+            # only if it sat outside that span — and only if the rebuilt English lands in THIS
+            # container at all.
+            first_txt, last_txt = _text_span(container)
+            is_target = container is target
+            for i, child in enumerate(list(container)):
                 tag = child.tag
                 if tag == f'{W}r':
                     if child in dead_field:
@@ -1422,7 +1504,7 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                         continue
                     if _run_is_text_bearing(child):
                         rpr = child.find(f'{W}rPr')
-                        before, after = _split_run_non_text(child)
+                        before, mid, after = _split_run_non_text(child)
                         if authored_tab:
                             # CLAUSE 3 — the only deletion in this step, and it is
                             # the one A3/D01 demands. That document's operator read
@@ -1441,12 +1523,44 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                             # purpose: it fires only when a tab was authored, and
                             # only for runs being rebuilt.
                             before = [c for c in before if c.tag != f'{W}tab']
+                            mid = [c for c in mid if c.tag != f'{W}tab']
                             after = [c for c in after if c.tag != f'{W}tab']
+                        # A POINTER IS NEVER DROPPED, WHEREVER IT SAT. A footnoteReference or
+                        # a commentReference in `mid` still belongs in the paragraph, because
+                        # it works from anywhere in it — so only POSITION-CRITICAL children
+                        # are filtered below. That distinction is what separates the CRITICAL
+                        # rows this branch closes from the layout row it defers.
+                        mid = [c for c in mid if not _is_position_critical(c)]
+                        # CLAUSE 2's LIMIT. A positional child is emitted only where its
+                        # true side of the text survives: `before` needs this to be the
+                        # FIRST text-bearing run, `after` the LAST. Anywhere else the
+                        # child sat BETWEEN text that has now collapsed, so there is no
+                        # correct place for it and a wrong one does visible harm.
+                        before = [c for c in before if not _is_position_critical(c)
+                                  or (is_target and i == first_txt)]
+                        after = [c for c in after if not _is_position_critical(c)
+                                 or (is_target and i == last_txt)]
                         kept.extend(_wrap_salvaged(before, rpr))
                         if slot is None and container is target:
                             slot = len(kept)
+                        # `mid` holds only pointers by now, and a pointer works from anywhere
+                        # in the paragraph — so it is emitted straight after the English
+                        # rather than thrown away.
+                        kept.extend(_wrap_salvaged(mid, rpr))
                         kept.extend(_wrap_salvaged(after, rpr))
                     elif _run_should_be_preserved(child):
+                        # THE SAME LIMIT FOR A PRESERVED TAB-ONLY RUN, and it reaches a
+                        # defect older than this branch. Such a run was always kept at its
+                        # own index while the English moved to the first text position, so
+                        # one sitting BETWEEN text-bearing runs was already stranded — that
+                        # is A3/D01's orphan shape, where tab characters went 18 -> 24 and
+                        # the layout still looked right. Where the English is not in this
+                        # container at all, no position in it is the correct one.
+                        if (_run_is_only_position_critical(child)
+                                and first_txt is not None
+                                and not (is_target
+                                         and (i < first_txt or i > last_txt))):
+                            continue
                         kept.append(child)
                     # else: an empty run or a plain <w:br/> line break — dropped,
                     # exactly as before. The break is recreated from \n in en.

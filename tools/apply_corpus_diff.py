@@ -96,7 +96,7 @@ ROW = {
 # REPORT    printed and never flagged. Run, paragraph and text-element counts change whenever
 #           runs are split or consolidated, which this branch does by design.
 RESTORE = ("footnoteReference", "endnoteReference", "commentReference",
-           "commentRangeStart", "commentRangeEnd", "hyperlink", "tab_chars",
+           "commentRangeStart", "commentRangeEnd", "hyperlink",
            "drawing", "pict", "object", "sym", "br_page",
            # br_plain WAS IN 'REPORT' UNTIL 2026-09-01, AND THAT HID F27's ONLY REAL-CORPUS
            # EVIDENCE. Measured across all 1,891 frozen notes entries: ZERO boundary tabs
@@ -112,6 +112,18 @@ RESTORE = ("footnoteReference", "endnoteReference", "commentReference",
 # have reported the A9 fix as "AWAY FROM SOURCE — DEFECT": the instrument would have called
 # its own branch's intended behaviour a regression.
 DELETE = ("fldChar", "instrText")
+# tab_chars WAS IN 'RESTORE' UNTIL WOUTER READ THE PAGES ON 2026-09-01, and that was wrong in
+# BOTH directions. A3 is a PARTIAL row: a tab whose true position survives the collapse is
+# restored, and one that sat BETWEEN text is DROPPED, because emitting it at the paragraph end
+# glued D06's page numbers exactly as before AND forced a line wrap. So a count BELOW source is
+# the intended outcome here, and only a count ABOVE source could be a defect.
+#
+# THE COUNT IS NOT THE CRITERION AND THIS IS THE MEASUREMENT THAT PROVES IT: D02 went 61 -> 16
+# tab characters, 45 fewer than the OLD code kept, and NOT ONE PIXEL moved on any of its 11
+# pages. A stranded tab advances into empty space. CLAUDE.md 2.5 item 7 -- judge a layout
+# device on its RENDERED EFFECT, never on its element count -- so the verdict for this key
+# points at tools/render_diff.py rather than pretending a number settles it.
+PARTIAL = ("tab_chars",)
 HOLD = ("tab_stops", "sdt", "smartTag", "lastRenderedPageBreak")
 REPORT = ("r", "p", "t", "delText", "ins", "del", "trailing_tabs", "br_plain")
 
@@ -364,6 +376,16 @@ for wd in wds:
             else:
                 verdict = f"same distance from source ({sv}) — EXPLAIN"
                 unexplained.append(f"{label}/{k}: {bv} -> {av}, source {sv} ({verdict})")
+        elif k in PARTIAL:
+            if av > sv:
+                verdict = (f"ABOVE the source count ({sv}) — DEFECT until shown otherwise: "
+                           "this branch never adds a tab")
+                unexplained.append(f"{label}/{k}: {bv} -> {av}, source {sv} ({verdict})")
+            elif av == sv:
+                verdict = f"every tab placeable, and all {sv} restored — A3, in full here"
+            else:
+                verdict = (f"{sv - av} of {sv} not placeable, so DROPPED rather than stranded "
+                           "— A3's deferral to branch 16; judge it on render_diff, not here")
         elif k in DELETE:
             if av < bv:
                 verdict = (f"DELETED as redundant (source {sv}) — {row or 'no row'}; "

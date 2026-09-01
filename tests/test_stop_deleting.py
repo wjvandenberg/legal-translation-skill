@@ -204,9 +204,33 @@ ok(f"A2  w:commentRangeStart/End hold  {b['commentRangeStart']}/{b['commentRange
 ok(f"A8  w:hyperlink survives          {b['hyperlink']} -> {a['hyperlink']}",
    a["hyperlink"] == b["hyperlink"],
    "the wrapper was deleted whole, taking the tab-only run inside it")
-ok(f"A3  tab CHARACTERS survive        {b['tab_chars']} -> {a['tab_chars']}",
-   a["tab_chars"] == b["tab_chars"],
-   "destroyed tabs collapse a hanging indent or a column with nothing to fall back on")
+# A3 IS NOW A SPLIT VERDICT, AND WOUTER'S RENDER REVIEW IS WHY. A tab whose true position
+# survives the collapse is KEPT; one that sat between text is DROPPED, because emitting it at
+# the paragraph end glued D06's page numbers exactly as before AND forced a line wrap. A
+# misplaced tab is worse than a missing one, measured on the page.
+#
+# THE COUNT IS DERIVED FROM THE FIXTURE, NOT TYPED: a tab is placeable when it precedes all
+# the text in its container or follows all of it.
+placeable = 0
+for p in SRC_PARAS:
+    at = content_atoms(p)
+    if "tab" not in at:
+        continue
+    first_t = at.index("text") if "text" in at else None
+    last_t = len(at) - 1 - at[::-1].index("text") if "text" in at else None
+    for j, k in enumerate(at):
+        if k != "tab":
+            continue
+        if first_t is None or j < first_t or j > last_t:
+            placeable += 1
+ok(f"A3  only PLACEABLE tabs survive   {b['tab_chars']} -> {a['tab_chars']}   "
+   f"(the fixture has {placeable} placeable of {b['tab_chars']})",
+   a["tab_chars"] == placeable,
+   "a tab that precedes all the text, or follows all of it, has a knowable position and "
+   "must be kept; one between text has none and must be dropped")
+ok(f"A3  and at least one tab IS kept  ({a['tab_chars']})", a["tab_chars"] > 0,
+   "if every tab is dropped, this suite would pass against code that deleted them all — "
+   "which is the defect the branch started from")
 ok(f"A3  tab STOPS untouched           {b['tab_stops']} -> {a['tab_stops']}   "
    "(negative control: a stop is not a character)",
    a["tab_stops"] == b["tab_stops"],
@@ -251,19 +275,14 @@ else:
     i = mixed[0]
     src_atoms = content_atoms(SRC_PARAS[i])
     out_atoms = content_atoms(OUT_PARAS[i])
-    ok(f"A-ii the mixed run keeps its tab   {src_atoms} -> {out_atoms}",
-       "tab" in out_atoms,
-       "the run carried text AND a tab, so _run_is_text_bearing matched first and the "
-       "whitelist that protects w:tab was never consulted")
-    # THE DECLARED LIMITATION, ASSERTED RATHER THAN LEFT AS A COMMENT. The English is one
-    # unbroken string, so where inside it the tab belonged is not knowable; the two source
-    # text atoms collapse and the tab follows them. Wouter's decision, 2026-09-01: strictly
-    # better than deletion, imperfect, and written down instead of hidden. Pinning it as an
-    # assertion means a later branch that DOES split the English by span (branch 16) will
-    # fail here and have to change this line deliberately, rather than silently.
-    ok(f"A-ii  and it lands after the collapsed text, as decided   {out_atoms}",
-       out_atoms == ["text", "tab"],
-       "expected ['text', 'tab'] — the agreed outcome for a tab between two fragments")
+    # A TAB BETWEEN TWO TEXT ATOMS IS DROPPED, AND THAT IS THE CORRECTED RULE. The English is
+    # one unbroken string, so where inside it the tab belonged is not knowable. The first
+    # version emitted it at the paragraph end and called that "strictly better than deletion";
+    # Wouter's render review falsified exactly that phrase — on D06 it left the page numbers
+    # glued AND added a forced line wrap. Dropping restores the old, harmless outcome.
+    ok(f"A-ii the between-text tab is DROPPED, not stranded   {src_atoms} -> {out_atoms}",
+       out_atoms == ["text"],
+       "expected ['text']: emitting it at the end glues the page number and forces a wrap")
 
 # =========================================================================================
 # D05's SHAPE — AND WHAT IT PROVES THE POSITION CLAUSE CANNOT DO. Measured 2026-09-01.
@@ -299,15 +318,26 @@ if not d05:
 else:
     i = d05[0]
     src_a, out_a = content_atoms(SRC_PARAS[i]), content_atoms(OUT_PARAS[i])
-    ok(f"A3  the hanging-indent tab is NOT DESTROYED   {src_a} -> {out_a}",
-       out_a.count("tab") == src_a.count("tab"),
-       "this is the case Wouter reported as an indent ~1.25 cm too far left, with every "
-       "paragraph property byte-identical — the tab was the whole cause")
-    ok(f"A3  its position between text atoms is DEFERRED to branch 16, not silently lost   "
-       f"{out_a}",
-       out_a == ["text", "tab"],
+    ok(f"A3  the hanging-indent tab is DEFERRED to branch 16   {src_a} -> {out_a}",
+       out_a == ["text"],
        "the outcome changed — if branch 15/16 now supplies per-run English, update this "
        "assertion deliberately; if not, something else moved")
+
+# AND THE OTHER HALF OF THE RULE, WITHOUT WHICH THE ONE ABOVE IS UNFALSIFIABLE. A tab that
+# precedes ALL the text in its paragraph HAS a knowable position and must come back in front
+# of the rebuilt English. If this fails while the drops above pass, the code is not applying a
+# rule — it is deleting every tab, which is the defect the branch began with.
+lead = [i for i, p in enumerate(SRC_PARAS) if content_atoms(p) == ["tab", "text"]]
+if not lead:
+    void("A3 placeable tab (leading)",
+         "no [tab, text] paragraph in the fixture — the KEEP half is untested")
+else:
+    i = lead[0]
+    out_a = content_atoms(OUT_PARAS[i])
+    ok(f"A3  a tab that precedes all the text IS KEPT, and stays in front   "
+       f"{content_atoms(SRC_PARAS[i])} -> {out_a}",
+       out_a == ["tab", "text"],
+       "expected ['tab', 'text'] — this position is recoverable and must survive")
 
 # The hyperlink: its only child run is tab-only. Rebuilding must happen INSIDE it.
 hl = [i for i, p in enumerate(SRC_PARAS) if p.find(f"{{{W}}}hyperlink") is not None]
@@ -352,9 +382,12 @@ else:
         void("F27", "the authored-separator rebuild produced nothing comparable")
     else:
         c2 = census(B2)
+        # Baseline is the PLAIN REBUILD's surviving count, not the source's: the placement
+        # rule drops the unplaceable source tabs either way, and F27 is about the two the
+        # OPERATOR authored. Measuring against the source would conflate the two rows.
         ok(f"F27 authored boundary TABS reach the XML   tab chars "
-           f"{b['tab_chars']} -> {c2['tab_chars']} (expect {b['tab_chars'] + 2})",
-           c2["tab_chars"] == b["tab_chars"] + 2,
+           f"{a['tab_chars']} -> {c2['tab_chars']} (expect {a['tab_chars'] + 2})",
+           c2["tab_chars"] == a["tab_chars"] + 2,
            "en.strip() runs unconditionally BEFORE the \\t -> <w:tab/> conversion, so a "
            "boundary tab is destroyed while an interior one works")
         ok(f"F27 authored boundary NEWLINES reach the XML   plain w:br "

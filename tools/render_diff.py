@@ -307,7 +307,7 @@ if args.doc:
     CORPUS = corpus_dirs()
     print(f"\n  corpus folder(s) reachable: {len(CORPUS)}")
     wds = [w for w in (sorted(LOGS.rglob("wd")) + sorted(LOGS.rglob("wd-*"))) if w.is_dir()]
-    seen, rendered = {}, 0
+    seen, rendered, changed_docs = {}, 0, []
     for wd in wds:
         doc = wd.name[3:] if wd.name.startswith("wd-") else wd.parent.name
         seen[doc] = seen.get(doc, 0) + 1
@@ -434,9 +434,22 @@ if args.doc:
                 encoding="utf-8")
             print(f"       {written} PNG(s) for a HUMAN to read: "
                   f"{LOGS.name}/branch6-render/{dest.name}/  (not displayed here)")
-        ok(f"{label}: at least one page changed — this branch MOVES delivered bytes, so "
-           "zero changed pages would mean it did nothing",
-           len(changed) > 0)
+        # NOT AN ASSERTION, AND IT USED TO BE ONE. "At least one page changed" is true of a
+        # BRANCH that moves delivered bytes; it is NOT true of every document, and asserting
+        # it per document produced a failure that was actually the most useful result of the
+        # run. On 2026-09-01 D02 lost 45 stranded tabs and had 14 comment anchors restored,
+        # and NOT ONE PIXEL moved on any of its 11 pages — because a stranded tab advances
+        # into empty space and a comment anchor is not printed at all. The count said 45
+        # destroyed; the page said nothing happened. CLAUDE.md 2.5 item 7: judge a layout
+        # device on its RENDERED EFFECT, never on its element count.
+        if not changed:
+            print("       0 pages re-rendered — every change on this document is "
+                  "structural and invisible in print. Not a failure; a result.")
+        changed_docs.append(label if changed else None)
+    ok(f"at least one document re-rendered ({sum(1 for c in changed_docs if c)} of "
+       f"{len(changed_docs)}) \u2014 a branch that moves delivered bytes must change "
+       "SOME page, though not every document need change one",
+       any(changed_docs))
     shutil.rmtree(TMP, ignore_errors=True)
     if not rendered:
         print("\n  VOID — no document was rendered. Not a clean run.")
