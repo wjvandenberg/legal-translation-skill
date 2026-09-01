@@ -115,13 +115,13 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, RE-DECLARED 2026-09-01: 1,092 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, RE-DECLARED 2026-09-01: 1,094 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
 > because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run, and caught this line stale twice on the day it landed.)*
 > **Reason, REWRITTEN 2026-08-25 BECAUSE THE OLD TRIGGER FIRED.** It read *"the reduction that brings this
 > file under 350 is under way; trigger: that reduction completing"* — and **the reduction has now completed**
-> *(phases 3a, 3b, 3c and 12)*, leaving the file **742 over**. So the honest reason is no longer *"content
+> *(phases 3a, 3b, 3c and 12)*, leaving the file **744 over**. So the honest reason is no longer *"content
 > with a named destination"*: it is that **every subsection the reduction was SCOPED to touch has been
 > touched**, and the weight that remains sits in **§2 (149), §3 (137) and §6 (143) — 429 lines no phase was
 > ever scoped to reach.** *(§6 gained 3 lines on 2026-09-01, when a stale internal-reference count in §6.4
@@ -1085,7 +1085,9 @@ the one irreversible act here — never publish without Wouter's explicit OK.)*
 
 **Side-fixes, declared rather than smuggled.** `freeze_intermediates.py` keyed its catalogue by doc-id, so D01's second run silently overwrote the first: **12→13 run directories, 37→39 artefacts**. And §3.1 plus `STEP-B-ANALYSIS.md` line 5 both still said branch 5 was unmerged — it merged 2026-08-21.
 
-**The single next action: branch 7, the container inventory** — one explicit tested inventory SHARED by extraction and apply, failing loudly on anything unlisted (A16 A19 N1 C19). Its four fixtures already exist in `tests/fixtures/containers.docx`.
+**THE SINGLE NEXT ACTION IS WOUTER'S, NOT A BRANCH: read the rendered pages. PR #57 is OPEN and MERGEABLE and is HELD ON THAT** *(his decision, 2026-09-01)*. Everything mechanical is green and every byte movement is explained, but §5.3's gate has a half no scanner and no script can discharge — and it is the half §2.5 item 4 calls the PRIMARY instrument. **126 PNGs are waiting in `<logs>/branch6-render/D05/` and `/D06/`, one per CHANGED page in three arms — old, new, source — with a `READ-ME.txt` naming what to look for in order.** The two that matter: **D06's table of contents** (34 hyperlinks and 80 tabs restored, and 45 REF fields now static) and **D05's notices clause** (footnote anchor restored, hanging indent still wrong). **After the merge: branch 7, the container inventory** — one explicit tested inventory SHARED by extraction and apply, failing loudly on anything unlisted (A16 A19 N1 C19), whose four fixtures already exist in `tests/fixtures/containers.docx`.
+
+**Context at close: 56%** *(read by Wouter, never estimated — §5.8)*. Roughly 25 units: the instrument in two arms, the classification rewrite, F27, A9, the render gate built from nothing, and the close. **The unit classes still under-predict document-and-instrument work** — this was planned as 2–3 HEAVY units and ran as a MEDIUM session.
 
 **Open, none of it blocking.** **(1)** C16 C17 F16, this branch's follow-on slice. **(2)** A3's relocation and D06's TOC layout — branch 16. **(3)** register **G12**'s 16 unclassified findings. **(4)** G9's first half, needing branch 15. **(5)** `--original` absent from Step 9's step document. **(6)** a `probe` origin class for the register. **(7)** **I-7 to I-10**, the four open A1 harness defects. **(8)** `tools/run_tests.py` still collides by name with `tests/run_tests.py`. **(9)** three `tests/` suites need the system interpreter, the shared venv having no `lxml`. **(10)** the scan list still needs tightening. **(11)** the companion-file rename is due.
 

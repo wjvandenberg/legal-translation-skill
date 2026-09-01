@@ -182,6 +182,9 @@ ap.add_argument("--doc", action="append", default=[], help="corpus doc-id (real,
 ap.add_argument("--fixture", action="append", default=[],
                 help="synthetic fixture stem (renders are kept and may be viewed)")
 ap.add_argument("--variant", default="uk", choices=("uk", "us"))
+ap.add_argument("--keep-into-logs", action="store_true",
+                help="write the real-corpus renders into the LOGS folder for a HUMAN to "
+                     "open. They are still never displayed here.")
 args = ap.parse_args()
 
 SOFFICE = find_soffice()
@@ -388,6 +391,49 @@ if args.doc:
             print(f"           … and {len(changed) - 12} more")
         if worst[1]:
             print(f"       largest change: page {worst[1]} at {worst[0] * 100:.2f}%")
+
+        # THE HALF THIS TOOL CANNOT DO. Section 5.3 wants a page-by-page READ, and Claude may
+        # not perform it on a real document — so hand the pages to someone who may. They go
+        # into the LOGS folder, which is where CLAUDE.md 6.5 already puts renders, and only
+        # the pages that actually CHANGED, because those are the ones worth a human's time.
+        if args.keep_into_logs:
+            dest = LOGS / "branch6-render" / label.replace(" ", "").replace("#", "n")
+            dest.mkdir(parents=True, exist_ok=True)
+            import pymupdf
+            wanted = {pg for pg, _ in changed}
+            written = 0
+            for arm, pdf in (("old", pdfs["old"]), ("new", pdfs["new"]),
+                             ("source", spdf)):
+                if pdf is None:
+                    continue
+                with pymupdf.open(pdf) as doc:
+                    for i, page in enumerate(doc):
+                        if (i + 1) not in wanted:
+                            continue
+                        page.get_pixmap(dpi=150).save(
+                            str(dest / f"p{i + 1:03d}-{arm}.png"))
+                        written += 1
+            (dest / "READ-ME.txt").write_text(
+                "Branch 6 rendered comparison. One PNG per CHANGED page, three arms:\n"
+                "  p<NNN>-old.png     the deliverable as the code stood at the pinned\n"
+                "                     baseline, i.e. WITHOUT branch 6\n"
+                "  p<NNN>-new.png     the deliverable WITH branch 6\n"
+                "  p<NNN>-source.png  the original document, for reference\n\n"
+                "What to look for, in order:\n"
+                "  1. footnote and comment markers PRESENT in -new where they were absent\n"
+                "     in -old, with the footnote text at the foot of its page\n"
+                "  2. table-of-contents entries: the dot leader and the right-aligned page\n"
+                "     number should be back, and each entry should be a working link\n"
+                "  3. cross-references should appear ONCE in -new. In -old some appear\n"
+                "     twice, and six carry 'Error: Reference source not found'\n"
+                "  4. THE KNOWN LIMITATION: where a tab sat between two pieces of text, it\n"
+                "     is back in the file but lands AFTER the text, so a hanging-indent\n"
+                "     list item still reads glued. That is branch 16's, not branch 6's.\n\n"
+                "These are renders of a real client document. They live here, outside the\n"
+                "repository, and must never be committed or pasted anywhere.\n",
+                encoding="utf-8")
+            print(f"       {written} PNG(s) for a HUMAN to read: "
+                  f"{LOGS.name}/branch6-render/{dest.name}/  (not displayed here)")
         ok(f"{label}: at least one page changed — this branch MOVES delivered bytes, so "
            "zero changed pages would mean it did nothing",
            len(changed) > 0)
