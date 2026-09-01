@@ -391,8 +391,16 @@ def audit_b1():
                ) / "frozen-intermediates.json"
     if cat.exists():
         c = json.loads(cat.read_text(encoding="utf-8"))["runs"]
+        # (12, 37) UNTIL 2026-09-01, AND THE AUDIT IS WHAT CAUGHT THE CORRECTION. The
+        # catalogue was keyed by DOC-ID, and D01 has two run directories -- the register
+        # cites "an independently abandoned earlier run of the same document" as its proof
+        # that A3's tab relocation is deterministic -- so the second silently overwrote the
+        # first and one whole run's artefacts were never catalogued at all. Fixed in
+        # tools/freeze_intermediates.py (keyed by directory) during branch 6, which needed
+        # this catalogue as its byte-comparison baseline. The count rose 12 -> 13 and 37 ->
+        # 39; nothing was added to the logs folder, and nothing moved.
         claim("B1.frozen", "documents catalogued / artefacts",
-              (len(c), sum(len(x["files"]) for x in c.values())), (12, 37))
+              (len(c), sum(len(x["files"]) for x in c.values())), (13, 39))
         # FIXED: a string-prefix test said legal-translation-logs sits inside
         # legal-translation. Paths compare as PARTS.
         claim("B1.outside", "the catalogue lives OUTSIDE the repository",

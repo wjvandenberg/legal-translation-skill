@@ -50,7 +50,19 @@ if not LOGS.exists():
     print("  This is a SKIP, not a pass. Set LT_LOGS_DIR.")
     sys.exit(0)
 
+# KEYED BY DIRECTORY, NOT BY DOC-ID — A BUG FIX, NOT A REFACTOR. This read
+# `runs[doc] = ...`. D01 has TWO run directories, and that is deliberate evidence rather
+# than clutter: the register cites "an independently abandoned earlier run of the same
+# document" as the proof that A3's tab relocation is DETERMINISTIC. Keyed by doc-id the
+# second silently overwrote the first, so the tool reported 12 run directories where 13
+# exist, and the catalogue it wrote was missing one run's artefacts entirely.
+#
+# THE ONLY SYMPTOM WAS A COUNT, which is why it survived: "12 run director(ies)" over a
+# corpus everyone thinks of as twelve documents reads exactly right. A frozen BASELINE
+# that quietly drops one of its own members is the one thing a baseline may not do.
+# Found 2026-09-01 while pinning branch 6's byte comparison to this catalogue.
 runs = {}
+seen_docs = {}
 for wd in sorted(LOGS.rglob("wd")) + sorted(LOGS.rglob("wd-*")):
     if not wd.is_dir():
         continue
@@ -63,20 +75,31 @@ for wd in sorted(LOGS.rglob("wd")) + sorted(LOGS.rglob("wd-*")):
             files[name] = {"bytes": p.stat().st_size,
                            "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
     if files:
-        runs[doc] = {"dir": str(wd.relative_to(LOGS)).replace("\\", "/"), "files": files}
+        rel = str(wd.relative_to(LOGS)).replace("\\", "/")
+        seen_docs[doc] = seen_docs.get(doc, 0) + 1
+        # THE LABEL IS THE DOC-ID PLUS AN ORDINAL, AND NEVER THE DIRECTORY NAME. A run
+        # directory can sit under a batch folder whose name is not committable, and this
+        # label is PRINTED — so it carries a file's place in the corpus and nothing else,
+        # which is the same licence tools/evidence_ls.py operates under. CLAUDE.md 5.4.
+        label = doc if seen_docs[doc] == 1 else f"{doc} #{seen_docs[doc]}"
+        runs[rel] = {"doc": doc, "label": label, "dir": rel, "files": files}
 
 print("=" * 96)
 print("FROZEN INTERMEDIATES — the July runs, catalogued where they lie")
 print("=" * 96)
-for doc in sorted(runs):
-    f = runs[doc]["files"]
+for key in sorted(runs, key=lambda k: runs[k]["label"]):
+    f = runs[key]["files"]
     total = sum(v["bytes"] for v in f.values())
     core = "paragraphs.json" in f
-    print(f"  {doc:<7} {len(f)} file(s)  {total:>9,} B  "
+    print(f"  {runs[key]['label']:<9} {len(f)} file(s)  {total:>9,} B  "
           f"{'translation present' if core else 'NO paragraphs.json — not usable as a fixture'}")
-usable = [d for d in runs if "paragraphs.json" in runs[d]["files"]]
+usable = [k for k in runs if "paragraphs.json" in runs[k]["files"]]
+docs = sorted({m["doc"] for m in runs.values()})
 print()
 print(f"  {len(runs)} run director(ies) · {len(usable)} carry a translated intermediate")
+# BOTH NUMBERS, BECAUSE THEY DIFFER AND THE DIFFERENCE IS THE THING THAT WAS HIDDEN.
+print(f"  {len(docs)} distinct corpus doc-id(s) — a doc-id with more than one run is "
+      f"labelled #2, #3 …")
 print(f"  location: {LOGS}   —  OUTSIDE the repository, and it stays there")
 
 if VERIFY:
@@ -85,13 +108,38 @@ if VERIFY:
         sys.exit(1)
     old = json.loads(CATALOGUE.read_text(encoding="utf-8"))["runs"]
     drift = []
-    for doc, meta in old.items():
+    # A CATALOGUE WRITTEN BEFORE 2026-09-01 IS KEYED BY DOC-ID; ONE WRITTEN AFTER IS KEYED
+    # BY DIRECTORY. Accept both, or the key-shape fix would report every artefact GONE and
+    # look exactly like the drift it exists to detect.
+    by_dir = {m["dir"]: k for k, m in runs.items()}
+    for key, meta in old.items():
+        label = meta.get("label") or meta.get("doc") or key
+        cur = runs.get(key)
+        if cur is None and meta.get("dir") in by_dir:
+            cur = runs[by_dir[meta["dir"]]]
+        if cur is None:
+            # Old-shape key: fall back to the first run carrying that doc-id.
+            cur = next((m for m in runs.values() if m["doc"] == key), None)
+        files_now = (cur or {}).get("files", {})
         for name, want in meta["files"].items():
-            got = runs.get(doc, {}).get("files", {}).get(name)
+            got = files_now.get(name)
             if got is None:
-                drift.append(f"{doc}/{name}: GONE")
+                drift.append(f"{label}/{name}: GONE")
             elif got["sha256"] != want["sha256"]:
-                drift.append(f"{doc}/{name}: CHANGED")
+                drift.append(f"{label}/{name}: CHANGED")
+    # AND THE SAME BLIND SPOT FROM THE OTHER SIDE — fix the CLASS, not the caller. The loop
+    # above only ever iterated the CATALOGUE, so a run directory present on disk and absent
+    # from the catalogue was invisible: precisely how D01's second run went unrecorded for
+    # weeks while --verify reported VERIFIED every time.
+    catalogued_dirs = {m.get("dir", k) for k, m in old.items()}
+    # THE TEST IS THE DIRECTORY AND NOTHING ELSE. An earlier draft of this line also required
+    # the doc-id to be absent from the catalogue, which defeated the whole check: D01's second
+    # run has doc-id D01, the old catalogue HAS a D01 key, so the one run this was written to
+    # find was the one run it excluded. A guard that cannot fire on its own founding case.
+    uncatalogued = sorted(m["label"] for m in runs.values()
+                          if m["dir"] not in catalogued_dirs)
+    for label in uncatalogued:
+        drift.append(f"{label}: PRESENT ON DISK, ABSENT FROM THE CATALOGUE — re-run --write")
     print()
     print("=" * 96)
     if drift:

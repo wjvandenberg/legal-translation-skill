@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS.** Branches 3, 4, 5 and 14's `quality_check` slice delivered; branch 5 built and merge-pending. **Next: branch 6, "stop deleting"** |
+| **status** | **IN PROGRESS.** Branches 3, 4, 5 and 14's `quality_check` slice MERGED. **Branch 6's first slice is built and merge-pending** — A1 A2 A3 A6 A8 A9 F27; C16, C17 and F16 are a declared follow-on slice *(2026-09-01)*. **Next: branch 7, the container inventory** |
 | **serves** | section 3 of `CLAUDE.md` — its **step 2**, Building. *(The house word for that unit is **phase**; this project says **step**. The mapping is in that charter's §1.3 and the vocabulary is deliberately not renamed.)* |
 | **produces** | branches **3–19 plus D1–D3** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
 | **done when** | every branch in §2 is merged with its own *Done when* in §3 met, tested by its kind's method in §4, and no criterion regressed against the frozen v3 baseline |

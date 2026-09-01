@@ -59,6 +59,10 @@ def _check_self_integrity():
 _check_self_integrity()
 
 W = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+# Markup-compatibility namespace. `mc:AlternateContent` is a run child that can carry the
+# only copy of a drawing's fallback content, and it is NOT in the w: namespace -- so a
+# preserved-tag list written with W-prefixed names alone can never match it.
+MC = '{http://schemas.openxmlformats.org/markup-compatibility/2006}'
 
 # Static namespace list (safety net). Primary mechanism is
 # register_document_namespaces() — dynamically registers what's on the
@@ -133,6 +137,43 @@ def get_paragraph_text(p_elem):
 def normalize_text(t):
     """Normalize text for matching: collapse whitespace, strip."""
     return re.sub(r'\s+', ' ', t).strip()
+
+# The two characters that are whitespace to Python and STRUCTURE to Word: this script turns
+# them into <w:tab/> and <w:br/> further down.
+_BOUNDARY_SEPARATORS = ('\t', '\n')
+
+def _strip_keeping_separators(s):
+    """strip(), except a leading or trailing tab or newline SURVIVES.
+
+    FINDING F27 — ONE LINE OF CODE, THREE KINDS OF BOUNDARY STRUCTURE DESTROYED, ACROSS TWO
+    DOCUMENTS. `en` was stripped unconditionally, so any tab or newline the operator authored
+    at the START or END of the string was destroyed before the code that converts \\t and \\n
+    into <w:tab/> and <w:br/> ever ran. INTERIOR separators worked; BOUNDARY separators
+    silently vanished -- which is the worst shape a defect can take, because the feature
+    demonstrably works when you test it in the middle.
+
+    D01: a leading tab, twice. The visible consequence was a two-column signature block whose
+    rows 1 and 4 started at the left margin while rows 2 and 3 kept their leading tab (that
+    one happened to sit in its own preserved run), so the block was misaligned against the two
+    lines directly above it.
+    D10: a trailing newline on one party block and a leading newline on another.
+
+    NO GATE NOTICED, and could not: `validate_apply --strict` compares TOKENS, and a lost tab
+    or line break destroys no tokens. Both documents were caught only because the operator had
+    adopted diffing declared `en` against the applied document.xml as a habit -- a check no
+    step document asks for.
+
+    A ZWSP (U+200B) survives this untouched, as it must: it is Unicode category Cf, so
+    `isspace()` is False. That is the property the non-Latin tracked-change hybrid depends on.
+    """
+    if not s:
+        return s
+    i, j = 0, len(s)
+    while i < j and s[i].isspace() and s[i] not in _BOUNDARY_SEPARATORS:
+        i += 1
+    while j > i and s[j - 1].isspace() and s[j - 1] not in _BOUNDARY_SEPARATORS:
+        j -= 1
+    return s[i:j]
 
 def get_default_rpr_et(p_elem):
     """Get run properties from the first text-bearing run."""
@@ -774,22 +815,206 @@ def _absorb_whitespace_only_tc_wrappers(orig_p):
     for child in to_remove:
         orig_p.remove(child)
 
+_PRESERVED_RUN_CHILDREN = (
+    # --- present since rev26 ---
+    f'{W}drawing', f'{W}pict',
+    f'{W}fldChar', f'{W}instrText',
+    f'{W}lastRenderedPageBreak',
+    f'{W}tab',
+    # --- BRANCH 6, option 1, clause 1. Every one of these is a POINTER: destroy it and the
+    # thing it points at is still in the package and reachable from nothing. That asymmetry
+    # is why they were invisible -- the auxiliary part is translated, intact and perfect, so
+    # every content check passes while the footnote appears on no page.
+    f'{W}footnoteReference',   # A1. D05 1->0, D09 2->0. Five gates blind to it by
+                               # construction, then Step 11a printed "Deliver with
+                               # confidence". Nothing anywhere checked referential
+                               # integrity between document.xml and the aux parts.
+    f'{W}endnoteReference',    # the same structure with no recorded instance yet. Added
+                               # because leaving it out would be a fourth special case
+                               # waiting to become a fifth finding.
+    f'{W}commentReference',    # A2. D02 28->14, D08 13->9, all bodies still in
+                               # comments.xml. Two of D08's four lost comments were
+                               # substantive; Wouter found this unaided from the page.
+    f'{W}object',              # embedded OLE object.
+    f'{W}sym',                 # a symbol-font character. Related to A5, which is not
+                               # reproducible from the corpus at all.
+    f'{MC}AlternateContent',   # mc:, not w: -- see the MC constant above.
+)
+
+
 def _run_should_be_preserved(r):
-    """Rev26: preserve runs with page breaks, drawings, fields, etc.;
-    drop plain <w:br/> (recreated from \\n in en) and empty runs"""
+    """True if this run carries a non-text child that must survive the rebuild.
+
+    Rev26 preserved page breaks, drawings, fields and tabs and dropped everything else,
+    including plain <w:br/> (recreated from \\n in en) and genuinely empty runs.
+
+    BRANCH 6 WIDENED THE SET RATHER THAN THE PRINCIPLE. The seven-item list was not wrong
+    about what it named; it was wrong that a list of seven could be complete. Appending the
+    obvious tag closed D05, D09 and D02 and left D06 and D11 untouched -- which is why the
+    register decomposes cluster A into three mechanisms and this fix addresses all three.
+
+    NOTE WHAT THIS FUNCTION STILL CANNOT DO, because branch 7 owns it: it is a list, not one
+    explicit inventory SHARED with extraction, and it stays silent rather than failing loudly
+    on a tag nobody listed. Content controls (A16), smart tags (N1) and text in graphic
+    metadata (A19) are that branch's, not this one's.
+    """
     for child in r:
         tag = child.tag
         if tag == f'{W}br':
-            br_type = child.get(f'{W}type', '')
-            if br_type == 'page':
+            if child.get(f'{W}type', '') == 'page':
                 return True
-            # plain line break — not preserved
-        elif tag in (f'{W}drawing', f'{W}pict',
-                     f'{W}fldChar', f'{W}instrText',
-                     f'{W}lastRenderedPageBreak',
-                     f'{W}tab'):
+            # plain line break — not preserved, it is recreated from \n in en
+        elif tag in _PRESERVED_RUN_CHILDREN:
             return True
     return False
+
+
+def _split_run_non_text(r):
+    """Split a TEXT-BEARING run's children into what precedes its text and what follows it.
+
+    THIS IS MECHANISM A-ii, AND IT IS THE HALF A WHITELIST CANNOT FIX. `_run_is_text_bearing`
+    was tested before `_run_should_be_preserved`, so a run carrying text AND a protected child
+    was removed whole and the child died even though it WAS on the list. The whitelist was
+    never consulted, so widening it changes nothing here.
+
+    WHY THE SPLIT IS BY SIDE RATHER THAN BY EXACT OFFSET (Wouter's decision, 2026-09-01). The
+    English arrives as ONE unbroken string, so where inside it a tab belonged is not knowable.
+    What IS knowable is which side of the run's text the child sat on, and that is the half
+    that carries the layout:
+
+      [rPr, tab, t]        the tab PRECEDES the text. With a hanging indent the tab is the
+                           only thing pushing the line out to the indent position, so
+                           returning it in front restores the layout with no operator action.
+                           That is Wouter's D05 notices clause: `ind left=1418 hanging=709`
+                           byte-identical in source and deliverable, and the text sitting
+                           709 twips -- about 1.25 cm -- too far left because the tab died.
+
+      [rPr, t, tab, t]     the tab sat BETWEEN two text fragments. The two fragments collapse
+                           into one English string, so the tab returns after it. Imperfect --
+                           on a party grid the tab lands after both names rather than between
+                           them -- and strictly better than deletion, which is what happens
+                           today. Declared rather than hidden.
+
+    Returns (before, after) as lists of the original child elements. `rPr` is never salvaged:
+    it is run PROPERTIES, and properties are branches 15-17's problem, not this branch's.
+    """
+    before, after, seen_text = [], [], False
+    for child in r:
+        tag = child.tag
+        if tag in (f'{W}t', f'{W}delText'):
+            seen_text = True
+            continue
+        if tag == f'{W}rPr':
+            continue
+        if tag == f'{W}br' and child.get(f'{W}type', '') != 'page':
+            continue          # recreated from \n in en, exactly as before
+        if tag == f'{W}lastRenderedPageBreak':
+            # CLAUSE 3 AGAIN, AND THE INSTRUMENT FOUND IT. This tag is a CACHE, not
+            # content: Word writes it to record where it last laid the page out, and
+            # regenerates it on open. Salvaging it from a run whose text we are
+            # REPLACING carries forward a break position measured against text that no
+            # longer exists -- provably redundant, which is exactly what clause 3
+            # licenses deleting.
+            #
+            # Measured 2026-09-01 by tools/apply_corpus_diff.py, which flagged it on
+            # TEN of the thirteen frozen intermediates -- D05 alone went 1 -> 20 -- as
+            # movement no register row predicted. It stays in the structural-only
+            # whitelist, so a run we are NOT rebuilding keeps its cache untouched and
+            # existing behaviour is unchanged there.
+            continue
+        (after if seen_text else before).append(child)
+    return before, after
+
+
+def _wrap_salvaged(children, template_rpr):
+    """Wrap salvaged non-text children in fresh runs so the XML stays valid.
+
+    A <w:tab/> or a <w:footnoteReference/> is only legal inside a <w:r>. The run's OWN rPr is
+    copied where it had one -- not the paragraph template's. That distinction matters: A18
+    records that borrowing whichever run happens to carry an explicit rPr systematically
+    selects the run that DIFFERS from the paragraph default, and can make a property SPREAD
+    across a whole clause. Copying a child's own run properties cannot do that.
+    """
+    out = []
+    for child in children:
+        run = ET.Element(f'{W}r')
+        if template_rpr is not None:
+            run.append(copy.deepcopy(template_rpr))
+        run.append(copy.deepcopy(child))
+        out.append(run)
+    return out
+
+
+# CLAUSE 3 IS RESTRICTED TO THE CROSS-REFERENCE FAMILY, AND THE RESTRICTION IS THE POINT.
+# A9's evidence is REF-FIELD skeletons on D06, and "drop the skeleton when its cached result
+# is consumed" applied to EVERY field type would freeze a `PAGE`, `NUMPAGES`, `DATE`, `TIME`
+# or `SEQ` field at whatever value happened to be cached -- a regression the evidence never
+# licensed, on a defect nobody reported.
+#
+# MEASURED ACROSS THE WHOLE CORPUS BEFORE NARROWING IT (2026-09-01): the only fields carrying
+# a cached result anywhere in the eleven documents are D06's 45 REF fields. So this guard
+# changes nothing measurable today -- it exists for the document that is not in the corpus,
+# which is the difference between fixing the caller that bit you and fixing the class.
+_DELETABLE_FIELD_KEYWORDS = ('REF', 'PAGEREF', 'NOTEREF')
+_FIELD_KEYWORD_RX = re.compile(r'^\s*([A-Za-z]+)')
+
+
+def _consumed_field_runs(container):
+    """Runs of a `fldChar` field whose CACHED RESULT is text-bearing — finding A9.
+
+    CLAUSE 3, AND THE ONLY DELETION IN OPTION 1. A field is a SEQUENCE of runs, not one
+    element: `begin`, the `instrText` instruction, `separate`, the cached result, `end`.
+    Extraction folds the cached result into `text`, so the operator's English legitimately
+    contains the number; apply then consumed that run and PRESERVED the skeleton, because
+    `fldChar` and `instrText` are both whitelisted. Word and LibreOffice re-evaluate the
+    now-empty skeleton on open and print the value a SECOND time.
+
+    D06: 42 paragraphs, six of which also resurrected the literal string "Error: Reference
+    source not found". Caught only by rendering -- `validate_apply` polices MISSING tokens and
+    never EXTRA ones, the remnant scan looks for source language, `quality_check` has no
+    duplicated-cross-reference rule, and `verify_diligence` reported OVERALL PASS. And no
+    lever in paragraphs.json could fix it, because the offending runs are precisely the ones
+    apply is designed to preserve -- so the step documents' prescribed remedy ("fix the JSON
+    and re-run Step 5") could not work.
+
+    WHAT THE DELETION COSTS, stated rather than buried: the cross-reference stops being a
+    LIVE field and becomes static text, so it no longer auto-updates. That is the trade the
+    register prescribes, and it is the right way round -- a number printed twice is a defect
+    a reader sees, and a number that does not auto-update in a translated deliverable is not.
+
+    ONLY WHERE THE RESULT IS ACTUALLY CONSUMED. A field with no cached result -- a bare
+    `PAGE`, a field never evaluated -- has nothing folded into `text`, so its skeleton is the
+    only copy of the instruction and is preserved untouched. Nesting is tracked by depth, and
+    an unterminated field is preserved rather than guessed at.
+    """
+    out, current, depth, has_result, kw = set(), [], 0, False, None
+    for child in container:
+        if child.tag != f'{W}r':
+            continue
+        kinds = [c.get(f'{W}fldCharType', '') for c in child if c.tag == f'{W}fldChar']
+        if 'begin' in kinds:
+            if depth == 0:
+                current, has_result, kw = [], False, None
+            depth += 1
+            current.append(child)
+        elif depth > 0:
+            current.append(child)
+            if kw is None:
+                for c in child:
+                    if c.tag == f'{W}instrText' and c.text:
+                        m = _FIELD_KEYWORD_RX.match(c.text)
+                        if m:
+                            kw = m.group(1).upper()
+                        break
+            if 'end' in kinds:
+                depth -= 1
+                if depth == 0:
+                    if has_result and kw in _DELETABLE_FIELD_KEYWORDS:
+                        out.update(current)
+                    current, has_result, kw = [], False, None
+            elif _run_is_text_bearing(child):
+                has_result = True
+    return out
 
 def extract_header(xml_text):
     """Extract XML declaration and root element opening tag from raw XML text."""
@@ -1013,7 +1238,12 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
     for entry in entries_sorted:
         idx = entry.get('idx', 0)
         it_text = (entry.get('text') or '').strip()
-        en_text = (entry.get('en') or '').strip()
+        # F27: boundary-aware. `it_text` above is stripped normally because it is only ever
+        # used for MATCHING; `en_text` is what gets written, so its boundary tabs and
+        # newlines are structure and must survive. `en_deleted` is left on plain .strip()
+        # deliberately: F27's evidence is `en` on D01 and D10, and widening a fix past its
+        # evidence is how a branch stops being reviewable.
+        en_text = _strip_keeping_separators(entry.get('en') or '')
         en_deleted = (entry.get('en_deleted') or '').strip()
         en_runs_spec = entry.get('en_runs')
         original_runs = entry.get('runs', [])
@@ -1076,49 +1306,50 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
         else:
             segments = auto_detect_formatting(en_text, original_runs)
 
-        # walk children, classify, preserve structural runs.
-        # Text-bearing runs and hyperlinks are removed and replaced;
-        # structural runs (page breaks, drawings, fields, etc.) stay
-        # in place. See _run_should_be_preserved + 
-        children_to_remove = []
-        insertion_index = None
-        for i, child in enumerate(list(orig_p)):
-            if child.tag == f'{W}hyperlink':
-                children_to_remove.append((i, child))
-                if insertion_index is None:
-                    insertion_index = i
-            elif child.tag == f'{W}r':
-                if _run_is_text_bearing(child):
-                    children_to_remove.append((i, child))
-                    if insertion_index is None:
-                        insertion_index = i
-                elif not _run_should_be_preserved(child):
-                    # Empty run, plain <w:br/> line break, or other
-                    # non-preserved non-text content — drop. Doesn't
-                    # update insertion_index because we'd rather
-                    # insert new content at a text-bearing position
-                    # if any exists.
-                    children_to_remove.append((i, child))
+        # =====================================================================
+        # BRANCH 6 (option 1) — THE THREE CLAUSES:
+        #
+        #   1  REBUILD ONLY TEXT
+        #   2  PRESERVE EVERY NON-TEXT RUN CHILD IN ITS ORIGINAL RELATIVE POSITION
+        #   3  DELETE ONLY WHAT CAN BE PROVED REDUNDANT
+        #
+        # The slogan this replaces was "preserve by default", and it was retired
+        # for being self-contradictory: text-bearing runs MUST be removed and
+        # rebuilt, so a one-clause version breaks the pipeline. Three clauses.
+        #
+        # WHAT THE OLD CLASSIFIER GOT WRONG — four separable ways, and appending
+        # one tag to the whitelist fixes only the first of them:
+        #
+        #   A-i    a structural-ONLY run whose child was not one of seven listed
+        #          tags was read as an empty run and deleted. D05's only footnote
+        #          anchor 1->0, D09's 2->0, D02's comment anchors 28->14, D08's
+        #          13->9. In every case the auxiliary part was translated and
+        #          perfect and the POINTER was destroyed, so the content shipped
+        #          inside the package and appeared on no page -- which is exactly
+        #          why five gates reported clean and Step 11a printed "Deliver
+        #          with confidence".
+        #   A-ii   `_run_is_text_bearing` was tested FIRST, so a run carrying text
+        #          AND a protected child lost the child without the whitelist ever
+        #          being consulted. Widening the list cannot reach this.
+        #   A-iii  `w:hyperlink` was removed wholesale with its whole subtree,
+        #          including tab-only runs the whitelist WOULD have protected.
+        #          D06: hyperlinks 34->1, tab characters 80->10, a 40-entry table
+        #          of contents flattened to "1.General Provisions4" and no longer
+        #          navigable -- while tab STOPS stayed 248->248, which is why no
+        #          count-based check ever saw it.
+        #   pos    every rebuilt run was inserted at ONE index while preserved
+        #          children kept their old ones, so relative order was not
+        #          preserved even when nothing was deleted.
+        #
+        # THIS BRANCH DELIBERATELY DOES NOT FIX: any formatting property (A4, A5,
+        # A7, A10-A14, A17, A18 — branches 15-17), the container inventory shared
+        # with extraction (A16, A19, N1 — branch 7), or any gate's blindness.
+        # =====================================================================
 
-        # If no text-bearing run was found, fall back to "append at
-        # end of paragraph" (existing behaviour for the rare case
-        # where a paragraph has no text but apply was still called).
-        if insertion_index is None:
-            insertion_index = len(orig_p)
-
-        # Compute the position where new runs will be inserted, after
-        # accounting for removals that happen at lower indices.
-        removals_before_insert = sum(
-            1 for i, _ in children_to_remove if i < insertion_index)
-        final_insertion_index = insertion_index - removals_before_insert
-
-        # Now actually remove the marked children.
-        for _, child in children_to_remove:
-            orig_p.remove(child)
-
-        # Build new translated runs as a Python list (not yet attached
-        # to orig_p) so we can insert them all at the right position.
+        # Build the English runs FIRST. Clause 3 cannot decide which source tabs
+        # are redundant until it knows whether the operator authored any.
         new_runs = []
+        authored_tab = False
         for seg in segments:
             start = seg.get('start', 0)
             end = seg.get('end', len(en_text))
@@ -1135,6 +1366,7 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                         tab_run = ET.Element(f'{W}r')
                         ET.SubElement(tab_run, f'{W}tab')
                         new_runs.append(tab_run)
+                        authored_tab = True
                     elif part == '\n':
                         br_run = ET.Element(f'{W}r')
                         ET.SubElement(br_run, f'{W}br')
@@ -1146,9 +1378,108 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                 new_runs.append(make_run_et(
                     seg_text, default_rpr, bold=bold, italic=italic))
 
-        # Insert all new runs at the computed insertion position.
+        def _first_text_container(container):
+            """The container holding the paragraph's FIRST text-bearing run, in
+            document order — which may be a `w:hyperlink`, in which case the
+            English belongs INSIDE it so the link still covers the translated
+            words rather than becoming an empty wrapper beside them."""
+            for child in container:
+                if child.tag == f'{W}r' and _run_is_text_bearing(child):
+                    return container
+                if child.tag == f'{W}hyperlink':
+                    found = _first_text_container(child)
+                    if found is not None:
+                        return found
+            return None
+
+        target = _first_text_container(orig_p)
+        nested = []
+
+        def _rebuild_container(container):
+            """Clauses 1 and 2 over one run-bearing container, in place.
+
+            Returns the index at which the English belongs if the paragraph's
+            first text-bearing run lives in THIS container, else None. The child
+            list is rebuilt in document order rather than patched by index, which
+            is what makes clause 2 true by construction instead of by arithmetic.
+            """
+            kept, slot = [], None
+            # CLAUSE 3, computed per container before anything is touched: the runs of any
+            # field whose cached result we are about to consume. A9.
+            dead_field = _consumed_field_runs(container)
+            for child in list(container):
+                tag = child.tag
+                if tag == f'{W}r':
+                    if child in dead_field:
+                        # The whole skeleton goes, instruction and all. The number it held is
+                        # already inside en_text, so leaving the skeleton makes Word print it
+                        # twice. Still let the cached-result run mark the insertion point, so
+                        # a paragraph that BEGINS with a cross-reference keeps the English
+                        # where the field was rather than pushing it to the end.
+                        if (_run_is_text_bearing(child) and slot is None
+                                and container is target):
+                            slot = len(kept)
+                        continue
+                    if _run_is_text_bearing(child):
+                        rpr = child.find(f'{W}rPr')
+                        before, after = _split_run_non_text(child)
+                        if authored_tab:
+                            # CLAUSE 3 — the only deletion in this step, and it is
+                            # the one A3/D01 demands. That document's operator read
+                            # the apply source and authored literal `\t` to work
+                            # around the relocation; tab characters went 18 -> 24,
+                            # UP, because the authored tabs landed in the right
+                            # places and the source's own tabs were preserved at
+                            # the paragraph end as orphans. The layout looked
+                            # correct over a doubled tab structure, and a bare
+                            # count cannot tell a repair from an orphan.
+                            #
+                            # Wouter's decision, 2026-09-01: the AUTHORED tab wins.
+                            # Where `en` carries a tab, the operator has stated the
+                            # positions, so a source tab from a run whose text we
+                            # are replacing is provably redundant. Narrow on
+                            # purpose: it fires only when a tab was authored, and
+                            # only for runs being rebuilt.
+                            before = [c for c in before if c.tag != f'{W}tab']
+                            after = [c for c in after if c.tag != f'{W}tab']
+                        kept.extend(_wrap_salvaged(before, rpr))
+                        if slot is None and container is target:
+                            slot = len(kept)
+                        kept.extend(_wrap_salvaged(after, rpr))
+                    elif _run_should_be_preserved(child):
+                        kept.append(child)
+                    # else: an empty run or a plain <w:br/> line break — dropped,
+                    # exactly as before. The break is recreated from \n in en.
+                elif tag == f'{W}hyperlink':
+                    # A-iii: THE WRAPPER IS NEVER DELETED. Rebuild inside it.
+                    inner_slot = _rebuild_container(child)
+                    if inner_slot is not None:
+                        nested.append((child, inner_slot))
+                    kept.append(child)
+                else:
+                    # pPr, bookmarkStart/End, commentRangeStart/End, proofErr and
+                    # anything else at paragraph level: carried through untouched.
+                    kept.append(child)
+            for child in list(container):
+                container.remove(child)
+            for child in kept:
+                container.append(child)
+            return slot
+
+        para_slot = _rebuild_container(orig_p)
+
+        # Where the English goes: inside the hyperlink that held the first text,
+        # or at the first text position in the paragraph, or — for a paragraph
+        # with no text-bearing run at all — appended at the end, which is the
+        # pre-existing fallback and is kept deliberately.
+        if nested:
+            holder, at = nested[0]
+        elif para_slot is not None:
+            holder, at = orig_p, para_slot
+        else:
+            holder, at = orig_p, len(orig_p)
         for offset, new_run in enumerate(new_runs):
-            orig_p.insert(final_insertion_index + offset, new_run)
+            holder.insert(at + offset, new_run)
 
         changes += 1
 

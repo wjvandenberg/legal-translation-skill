@@ -11,9 +11,9 @@
       "sha256_now": "9fe078ab330124682f5f4d098d7f9c34219e3570bbde5b6a55e7afca1c0bbd4a"
     },
     "uk/scripts/apply_translations_textmatch.py": {
-      "changed_by": "feature/checks-can-fail",
-      "commit_subject": "Branch 5 - checks can fail: the mandatory quality check gets an exit code, a corrupt deliverable stops the run and is written to a temporary name first, omitting --paragraphs refuses instead of warning, a validator's exit 3 blocks unconditionally, the truncation guard moves above __main__, and WARN stops being indistinguishable from PASS (register rows C3 C23 C25 W3 W4 L4)",
-      "sha256_now": "f8d8511500176b9a0a56c0463c8199143fea27977a8deea6b5026920667e5aee"
+      "changed_by": "feature/branch6-stop-deleting",
+      "commit_subject": "Branch 6 - stop deleting what you do not recognise: the three clauses. Rebuild only text; preserve every non-text run child in its original relative position; delete only what can be proved redundant. Closes A1 (footnote anchors), A2 (comment anchors), A8 (hyperlink wrappers) and the destruction half of A3/A6 (tab characters). Restored to the SOURCE count on every measured document: D02 comments 14->28, D05 footnote 0->1, D06 hyperlinks 1->34 and tabs 10->80, D08 comments 12->13, D09 footnote 0->2.",
+      "sha256_now": "ffc260a2cafa13ee0b842467028ff0b008c55f3236962b69e1ddacc342570a7b"
     },
     "uk/scripts/post_process.py": {
       "changed_by": "feature/checks-can-fail",
@@ -71,9 +71,9 @@
       "sha256_now": "b6b8b7fa11665f7bc720db1892e3e33362e86db52f0b241aabb9362725547ed1"
     },
     "us/scripts/apply_translations_textmatch.py": {
-      "changed_by": "feature/checks-can-fail",
-      "commit_subject": "Branch 5 - checks can fail: the mandatory quality check gets an exit code, a corrupt deliverable stops the run and is written to a temporary name first, omitting --paragraphs refuses instead of warning, a validator's exit 3 blocks unconditionally, the truncation guard moves above __main__, and WARN stops being indistinguishable from PASS (register rows C3 C23 C25 W3 W4 L4)",
-      "sha256_now": "d58aa8c40bdd98907e2133f7e65fde53ec57dfd695bddf55ef727664813e26f4"
+      "changed_by": "feature/branch6-stop-deleting",
+      "commit_subject": "Branch 6 - stop deleting what you do not recognise: the three clauses. Rebuild only text; preserve every non-text run child in its original relative position; delete only what can be proved redundant. Closes A1 (footnote anchors), A2 (comment anchors), A8 (hyperlink wrappers) and the destruction half of A3/A6 (tab characters). Restored to the SOURCE count on every measured document: D02 comments 14->28, D05 footnote 0->1, D06 hyperlinks 1->34 and tabs 10->80, D08 comments 12->13, D09 footnote 0->2.",
+      "sha256_now": "3d0682116acabf844c185857a34484f04bbb065ea2f08ed3f2ceba2582eb93d8"
     },
     "us/scripts/post_process.py": {
       "changed_by": "feature/checks-can-fail",
