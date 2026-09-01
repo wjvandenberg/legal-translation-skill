@@ -135,8 +135,9 @@ def fixture(name, why):
 # self-contained and runnable by someone with no access to the corpus at all.
 # ---------------------------------------------------------------------------
 @fixture("anchors-and-tabs.docx",
-         "footnote anchor, comment anchor, hyperlink wrapping a tab-only run, and a run "
-         "carrying BOTH text and a tab — the four shapes branch 6 must preserve")
+         "footnote anchor, comment anchor, hyperlink wrapping a tab-only run, a run carrying "
+         "text THEN a tab, and a hanging-indent item whose tab PRECEDES its text — the five "
+         "shapes branch 6 must preserve, plus a tab STOP as the negative control")
 def _anchors(path):
     footnotes = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:footnotes {W}><w:footnote w:id="1"><w:p>{r("A note on the preceding clause.")}</w:p>
@@ -156,6 +157,37 @@ def _anchors(path):
         # A single run holding text, then a tab, then more text.
         p('<w:r><w:t xml:space="preserve">Party A</w:t><w:tab/>'
           '<w:t xml:space="preserve">Party B</w:t></w:r>') +
+        # A HANGING-INDENT LIST ITEM WHOSE TAB PRECEDES ITS TEXT. Added 2026-09-01 for
+        # branch 6: the four shapes above are all "tab after text or tab alone", and the
+        # register's clearest visible consequence of mechanism A-ii is the opposite order.
+        #
+        # It is Wouter's D05 notices clause, reproduced as STRUCTURE with invented words
+        # (CLAUDE.md 5.4 -- a fixture example must be synthetic, because anonymising a real
+        # one still leaks its shape). A marker run, then a run whose children are
+        # [rPr, tab, t]. With hanging=709 against left=1418 the tab is the ONLY thing
+        # pushing the text out to the indent, so when apply destroyed it the line rendered
+        # about 1.25 cm too far left -- while ind left/hanging and all 144 of numbering.xml's
+        # w:ind elements stayed BYTE-IDENTICAL, which is why the paragraph properties looked
+        # innocent and nothing pointed at the tab.
+        #
+        # This is the case that distinguishes "the preserved child came back" from "the
+        # preserved child came back WHERE IT WAS", and no other fixture paragraph does.
+        p(r("(a)"),
+          '<w:r><w:rPr><w:sz w:val="20"/></w:rPr><w:tab/>'
+          '<w:t xml:space="preserve">If to the first party:</w:t></w:r>',
+          ppr='<w:pPr><w:ind w:left="1418" w:hanging="709"/></w:pPr>') +
+        # A TAB THAT PRECEDES ALL THE TEXT IN ITS PARAGRAPH — the case where the true
+        # position IS recoverable, and therefore the case that keeps the placement rule
+        # honest. Added 2026-09-01 after Wouter's render review showed a misplaced tab does
+        # visible harm and the rule became "keep it only where it can be placed truly".
+        #
+        # WITHOUT THIS PARAGRAPH THE RULE COULD NOT BE TESTED, only its negative half: a
+        # suite that only ever asserts tabs are DROPPED would pass just as well against code
+        # that deleted every tab unconditionally, which is the old defect. One run, the tab
+        # before its text, no other text in the paragraph, so the tab belongs in front of the
+        # rebuilt English and must still be there afterwards.
+        p('<w:r><w:rPr><w:sz w:val="20"/></w:rPr><w:tab/>'
+          '<w:t xml:space="preserve">Indented by a leading tab.</w:t></w:r>') +
         # A tab STOP in paragraph properties, which carries the same tag name as a rendered
         # tab and must never be counted with it.
         p(r("Indented line."),
@@ -199,6 +231,127 @@ def _anchors(path):
             'TargetMode="External"/></Relationships>')
     docx(path, body, {"word/footnotes.xml": footnotes, "word/comments.xml": comments,
                       "word/_rels/document.xml.rels": rels}, ct)
+
+
+# ---------------------------------------------------------------------------
+# Branch 6 — A TABLE OF CONTENTS, because the real one cannot be looked at.
+#
+# Wouter read D06's rendered page 2 on 2026-09-01 and reported the table of contents coming
+# out "terribly, with all page numbers not outlined to the right" plus a stray indent. That
+# page is a client document: CLAUDE.md 6.5 means Claude may never view it, so the defect could
+# be measured but not SEEN from this side. This fixture reproduces the SHAPE with invented
+# words so it can be.
+#
+# The shape, from the register's own reading of D06 entry idx 21: a hyperlink containing
+# number, tab, title, tab, page number — with real tab STOPS at the indent and at the right
+# margin, which is what makes a dot leader and a right-aligned number possible at all. One
+# entry's title is deliberately long enough to reach the margin, because that is the row where
+# a stray trailing tab forces a WRAP rather than merely being invisible.
+# ---------------------------------------------------------------------------
+@fixture("toc.docx",
+         "a three-entry table of contents — number, tab, title, tab, right-aligned page "
+         "number, inside a hyperlink, with real tab stops — reproducing D06 page 2's shape "
+         "so a rendered check can SEE what a client page may not show")
+def _toc(path):
+    # Right-aligned stop at the text margin, with a dot leader: this is what a table of
+    # contents uses, and it is why the page number lands at the right edge.
+    ppr = ('<w:pPr><w:tabs>'
+           '<w:tab w:val="left" w:pos="567"/>'
+           '<w:tab w:val="right" w:leader="dot" w:pos="9070"/>'
+           '</w:tabs></w:pPr>')
+
+    def entry(num, title, page, rid):
+        return p(f'<w:hyperlink r:id="{rid}">'
+                 f'<w:r><w:t xml:space="preserve">{num}</w:t></w:r>'
+                 f'<w:r><w:tab/></w:r>'
+                 f'<w:r><w:t xml:space="preserve">{title}</w:t></w:r>'
+                 f'<w:r><w:tab/></w:r>'
+                 f'<w:r><w:t xml:space="preserve">{page}</w:t></w:r>'
+                 f'</w:hyperlink>', ppr=ppr)
+
+    body = (
+        p(r("Table of contents")) +
+        entry("1", "General provisions", "4", "rId9") +
+        # LONG ENOUGH TO REACH THE MARGIN. This is the row that shows whether a stray tab
+        # forces a wrap, which no count can see.
+        entry("21", "Project finance, security and the order of application of proceeds",
+              "15", "rId9") +
+        entry("22", "Governing law", "31", "rId9")
+    )
+    rels = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/'
+            'relationships">'
+            '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/styles" Target="styles.xml"/>'
+            '<Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/hyperlink" Target="https://example.invalid/clause" '
+            'TargetMode="External"/></Relationships>')
+    docx(path, body, {"word/_rels/document.xml.rels": rels})
+
+
+# ---------------------------------------------------------------------------
+# Branch 6, clause 3 — the ONE case in option 1 that is a DELETION rather than a
+# preservation. Added 2026-09-01, and it had to be built: anchors-and-tabs.docx carries no
+# field skeleton, and STEP-B-ANALYSIS.md section 3.7's own fixture list for branch 6 does not
+# name one either, so finding A9's only instrument was the D06 frozen intermediate.
+# ---------------------------------------------------------------------------
+@fixture("cross-reference.docx",
+         "a REF field whose cached result IS consumed — clause 3 must drop the whole "
+         "skeleton or the number prints twice — and a PAGE field with no cached result, "
+         "which must be preserved untouched: the positive and the negative in one document")
+def _crossref(path):
+    # THE POSITIVE. A field is a SEQUENCE of runs, not one element: begin, the instruction,
+    # separate, the CACHED RESULT, end. Extraction folds the cached result into `text`, so the
+    # operator's English legitimately contains the number -- and apply then deletes the
+    # cached-result run (text-bearing) while PRESERVING the skeleton (fldChar and instrText
+    # are both whitelisted). Word and LibreOffice re-evaluate the now-empty skeleton when the
+    # file is opened and print the value a second time.
+    #
+    # On D06 that was 42 paragraphs, six of which also resurrected the literal string
+    # "Error: Reference source not found". Caught ONLY by rendering: validate_apply polices
+    # MISSING tokens and never EXTRA ones, the remnant scan looks for source language, and
+    # quality_check has no duplicated-cross-reference rule. verify_diligence reported
+    # OVERALL PASS.
+    consumed = (
+        '<w:r><w:fldChar w:fldCharType="begin"/></w:r>'
+        '<w:r><w:instrText xml:space="preserve"> REF _Ref100 \\h </w:instrText></w:r>'
+        '<w:r><w:fldChar w:fldCharType="separate"/></w:r>'
+        + r("3.2") +
+        '<w:r><w:fldChar w:fldCharType="end"/></w:r>'
+    )
+    # THE NEGATIVE, and it is what stops clause 3 becoming "delete every field". This one has
+    # NO separate and NO cached result, so nothing of it is consumed into the English: the
+    # skeleton is the only copy of the instruction and must survive. A fix that drops both is
+    # indistinguishable from the correct fix if only the positive is tested.
+    unevaluated = (
+        '<w:r><w:fldChar w:fldCharType="begin"/></w:r>'
+        '<w:r><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r>'
+        '<w:r><w:fldChar w:fldCharType="end"/></w:r>'
+    )
+    # THE SECOND NEGATIVE, AND IT IS THE ONE THAT NEARLY GOT MISSED. This field DOES have a
+    # cached result, so the rule "delete the skeleton once its cached result is consumed"
+    # would delete it -- and a PAGE field frozen at whatever number happened to be cached
+    # prints the same page number on every page. A9's evidence is REF fields; every other
+    # field type must survive even when its result IS consumed, which is why clause 3 tests
+    # the instruction KEYWORD and not merely the presence of a result.
+    #
+    # Measured 2026-09-01 across the whole corpus: the only cached-result fields in the
+    # eleven documents are D06's 45 REF fields, so no corpus document can exercise this. It
+    # had to be built, exactly like branch 7's four containers.
+    cached_non_ref = (
+        '<w:r><w:fldChar w:fldCharType="begin"/></w:r>'
+        '<w:r><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r>'
+        '<w:r><w:fldChar w:fldCharType="separate"/></w:r>'
+        + r("7") +
+        '<w:r><w:fldChar w:fldCharType="end"/></w:r>'
+    )
+    body = (
+        p(r("Cross-reference to "), consumed, r(" of this agreement.")) +
+        p(r("Page "), unevaluated, r(" of the schedule.")) +
+        p(r("See page "), cached_non_ref, r(" for the notices clause.")) +
+        p(r("A clause with no field at all, as the quiet control."))
+    )
+    docx(path, body)
 
 
 # ---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS.** Branches 3, 4, 5 and 14's `quality_check` slice delivered; branch 5 built and merge-pending. **Next: branch 6, "stop deleting"** |
+| **status** | **IN PROGRESS.** Branches 3, 4, 5 and 14's `quality_check` slice MERGED. **Branch 6's first slice is built and merge-pending** — A1 A2 A3 A6 A8 A9 F27; C16, C17 and F16 are a declared follow-on slice *(2026-09-01)*. **Next: branch 7, the container inventory** |
 | **serves** | section 3 of `CLAUDE.md` — its **step 2**, Building. *(The house word for that unit is **phase**; this project says **step**. The mapping is in that charter's §1.3 and the vocabulary is deliberately not renamed.)* |
 | **produces** | branches **3–19 plus D1–D3** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
 | **done when** | every branch in §2 is merged with its own *Done when* in §3 met, tested by its kind's method in §4, and no criterion regressed against the frozen v3 baseline |
@@ -1553,6 +1553,35 @@ the way out.
 It is three clauses: **rebuild only text; preserve every non-text child in its original relative position;
 delete only what you can prove is now redundant.** The third clause is needed because one of the fixes in
 this option is a *deletion* — dropping a cross-reference skeleton once the number it held has been consumed.
+
+> **CORRECTED 2026-09-01, ON BUILDING IT: THE POSITION CLAUSE CANNOT CLOSE THE RELOCATION CASE, AND THIS
+> OPTION'S OWN "what it does NOT fix" CELL SAYS OTHERWISE.** That cell states that the relocation case needs
+> the position clause, and that this is why the clause is in the proposal. Built, it does not follow, and the
+> reason is
+> structural rather than a coding slip: **apply rebuilds a paragraph from ONE unbroken English string**, so a
+> tab that sat BETWEEN two text atoms cannot be put back between them. There is no offset in `en` saying
+> where it belonged, because `en` carries no per-run structure at all.
+>
+> **What clause 2 DOES deliver, measured on all thirteen frozen intermediates:** the tab is no longer
+> DESTROYED — every tab count returned exactly to its source value, D06 10→80 and D02 61→73 — and a
+> non-text child is placed correctly relative to the text **within a single run's own children**. Where the
+> tab's run is the paragraph's FIRST text-bearing run, that is a real fix.
+>
+> **Where it is not, the rendered page is unchanged from the broken state, and that was confirmed by
+> RENDERING rather than inferred from XML** *(`tools/render_diff.py`, built for this)*. On the synthetic
+> fixture the source reads `(a)⇥If to the first party:` and the deliverable reads `(a)If to the first party:`
+> — the tab is present in the file and stranded after the collapsed English. **That is Wouter's D05 notices
+> clause exactly**, and it is the sharpest available illustration of §2.5 item 7: *the pipeline preserves
+> form as COUNTS and FLAGS, never as EFFECTS*, so a count restored to source is not a layout restored.
+>
+> **This belongs to branches 15–17, not here, and the register already separates the two:** the apply-side
+> deletion problem is fixable in this file, and the data contract being unable to describe the formatting is
+> a different fix in a different file. **Branch 15 makes extraction emit effective formatting per RUN; only
+> then can the English be split at the boundary the tab sat on.** The current outcome is ASSERTED in
+> `tests/test_stop_deleting.py` so that branch must change it deliberately rather than silently.
+>
+> **The option's verdict does not change** — it closes 17 findings including four of the six worst, and it
+> did. What changes is one sentence about how much of the tab defect it reaches.
 
 **And stop listing containers.** Three text-bearing containers are now known to sit outside the inventory —
 content controls, smart tags, and text held in graphic metadata such as image alt text and chart titles.
