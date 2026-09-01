@@ -58,7 +58,7 @@ ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"))
 SCRIPT = "apply_translations_textmatch.py"
-REF = os.environ.get("LT_BASELINE_REF", "79a8c14")
+REF = os.environ.get("LT_BASELINE_REF", "4a1c452")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
 # Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
 # glance whether the pages in front of them belong to the run being discussed.

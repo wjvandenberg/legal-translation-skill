@@ -62,7 +62,7 @@ SCRIPT = "apply_translations_textmatch.py"
 # compared the new file against itself and reported 100% carried. 79a8c14 is the merge-base of
 # this branch with main, and uk/ and us/ are byte-identical there to e57e658, the last commit
 # that touched either tree.
-REF = os.environ.get("LT_BASELINE_REF", "79a8c14")
+REF = os.environ.get("LT_BASELINE_REF", "4a1c452")
 
 # WHICH ROW OWNS WHICH STRUCTURE — taken from FINDINGS-REGISTER.md's `docs` column, used as
 # a LABEL rather than as the gate. The documents named are the ones that were MEASURED, not

@@ -11,7 +11,7 @@
       "sha256_now": "9fe078ab330124682f5f4d098d7f9c34219e3570bbde5b6a55e7afca1c0bbd4a"
     },
     "uk/scripts/apply_translations_textmatch.py": {
-      "changed_by": "feature/branch6-stop-deleting",
+      "changed_by": "4a1c452",
       "commit_subject": "Branch 6 - stop deleting what you do not recognise: the three clauses. Rebuild only text; preserve every non-text run child in its original relative position; delete only what can be proved redundant. Closes A1 (footnote anchors), A2 (comment anchors), A8 (hyperlink wrappers) and the destruction half of A3/A6 (tab characters). Restored to the SOURCE count on every measured document: D02 comments 14->28, D05 footnote 0->1, D06 hyperlinks 1->34 and tabs 10->80, D08 comments 12->13, D09 footnote 0->2.",
       "sha256_now": "f6a3739aa4304ecb40042d9abcaf6cd6d4d5ea115f3ae797e68040c1a7765547"
     },
@@ -71,7 +71,7 @@
       "sha256_now": "b6b8b7fa11665f7bc720db1892e3e33362e86db52f0b241aabb9362725547ed1"
     },
     "us/scripts/apply_translations_textmatch.py": {
-      "changed_by": "feature/branch6-stop-deleting",
+      "changed_by": "4a1c452",
       "commit_subject": "Branch 6 - stop deleting what you do not recognise: the three clauses. Rebuild only text; preserve every non-text run child in its original relative position; delete only what can be proved redundant. Closes A1 (footnote anchors), A2 (comment anchors), A8 (hyperlink wrappers) and the destruction half of A3/A6 (tab characters). Restored to the SOURCE count on every measured document: D02 comments 14->28, D05 footnote 0->1, D06 hyperlinks 1->34 and tabs 10->80, D08 comments 12->13, D09 footnote 0->2.",
       "sha256_now": "46341b5cc93538f435080c5b17f1b47d2faa68306aad5d9a38253e0fa81cbeae"
     },
