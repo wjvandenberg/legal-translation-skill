@@ -44,6 +44,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import zipfile
 from pathlib import Path
 
@@ -59,6 +60,9 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 SCRIPT = "apply_translations_textmatch.py"
 REF = os.environ.get("LT_BASELINE_REF", "79a8c14")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
+# Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
+# glance whether the pages in front of them belong to the run being discussed.
+STAMP = time.strftime("%Y-%m-%d %H:%M:%S")
 
 SOFFICE_CANDIDATES = [
     os.environ.get("LT_SOFFICE", ""),
@@ -182,6 +186,9 @@ ap.add_argument("--doc", action="append", default=[], help="corpus doc-id (real,
 ap.add_argument("--fixture", action="append", default=[],
                 help="synthetic fixture stem (renders are kept and may be viewed)")
 ap.add_argument("--variant", default="uk", choices=("uk", "us"))
+ap.add_argument("--pages", type=int, action="append", default=[],
+                help="force these page numbers to be written even if they did not change "
+                     "— the page a reviewer wants is often the one that stopped changing")
 ap.add_argument("--keep-into-logs", action="store_true",
                 help="write the real-corpus renders into the LOGS folder for a HUMAN to "
                      "open. They are still never displayed here.")
@@ -360,6 +367,7 @@ if args.doc:
                 ok(f"{label} {arm}: converted to PDF", False,
                    (r.stderr or r.stdout or "")[-160:])
             pdfs[arm] = pdf
+        ps = None
         spdf, sr = to_pdf(SOFFICE, work / "source.docx", work)
         if not all(pdfs.values()):
             continue
@@ -398,9 +406,24 @@ if args.doc:
         # the pages that actually CHANGED, because those are the ones worth a human's time.
         if args.keep_into_logs:
             dest = LOGS / "branch6-render" / label.replace(" ", "").replace("#", "n")
+            # CLEAR FIRST. THIS WAS THE DEFECT, and Wouter hit it within the hour: the
+            # directory was reused, so PNGs from an earlier run survived beside new ones and
+            # nothing on screen said which was which. He opened D06 page 2 written at 15:52
+            # by the REGRESSION run while the current run had written pages 4-32 at 16:21 --
+            # and reasonably read the stale page as the fix's output. A stale artefact
+            # indistinguishable from a fresh one is exactly what CLAUDE.md 5.16 is about, and
+            # here the artefact was being handed to a reviewer as evidence.
+            if dest.exists():
+                shutil.rmtree(dest, ignore_errors=True)
             dest.mkdir(parents=True, exist_ok=True)
             import pymupdf
-            wanted = {pg for pg, _ in changed}
+            # AND WRITE THE PAGES A REVIEWER ASKED FOR, CHANGED OR NOT. Writing only changed
+            # pages makes ABSENCE ambiguous -- it can mean "identical in both arms" or "this
+            # document was never run" -- and the page someone wants to check is often the one
+            # that stopped changing, which is the good news. --pages makes that explicit and
+            # the manifest below removes the ambiguity either way.
+            wanted = {pg for pg, _ in changed} | {
+                p for p in args.pages if 1 <= p <= max(len(po), len(pn))}
             written = 0
             for arm, pdf in (("old", pdfs["old"]), ("new", pdfs["new"]),
                              ("source", spdf)):
@@ -430,8 +453,30 @@ if args.doc:
                 "     is back in the file but lands AFTER the text, so a hanging-indent\n"
                 "     list item still reads glued. That is branch 16's, not branch 6's.\n\n"
                 "These are renders of a real client document. They live here, outside the\n"
-                "repository, and must never be committed or pasted anywhere.\n",
+                "repository, and must never be committed or pasted anywhere.\n\n"
+                "WHAT THESE PAGES ARE, AND WHAT THEY ARE NOT. They come from apply + repack\n"
+                "ONLY -- not the eleven-step pipeline. So the definitions are NOT reordered,\n"
+                "the tidy-up pass has not run, and headers, footers, comments and footnotes\n"
+                "are still in the source language. That is deliberate: it isolates the one\n"
+                "code change under review. Do not read a missing definitions reorder, or an\n"
+                "untranslated footnote, as a defect -- neither step was run.\n",
                 encoding="utf-8")
+            # A MANIFEST, SO ABSENCE IS NEVER AMBIGUOUS. Without it, "no page 2 here" reads
+            # identically as "page 2 is unchanged" and "this document was never rendered".
+            man = [f"run written: {STAMP}",
+                   f"document: {label}",
+                   f"pages in old / new / source: {len(po)} / {len(pn)} / "
+                   f"{len(ps) if spdf is not None else 'n/a'}",
+                   f"pages whose rendering CHANGED between old and new: "
+                   f"{sorted(pg for pg, _ in changed) or 'NONE'}",
+                   f"pages forced by --pages: {sorted(set(args.pages)) or 'none'}",
+                   f"PNGs written: {written}",
+                   "",
+                   "A page number absent below is a page this run did NOT write. The",
+                   "directory was CLEARED before writing, so nothing here is from an",
+                   "earlier run.",
+                   f"written pages: {sorted(wanted) or 'NONE'}"]
+            (dest / "MANIFEST.txt").write_text("\n".join(man) + "\n", encoding="utf-8")
             print(f"       {written} PNG(s) for a HUMAN to read: "
                   f"{LOGS.name}/branch6-render/{dest.name}/  (not displayed here)")
         # NOT AN ASSERTION, AND IT USED TO BE ONE. "At least one page changed" is true of a
