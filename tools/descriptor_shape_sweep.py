@@ -63,7 +63,19 @@ def targets(argv):
 PATHS = targets(sys.argv[1:])
 missing = [n for n in CORE if not (ROOT / n).exists()] if not sys.argv[1:] else []
 print("=" * 96)
-print(f"FILES READ: {len(PATHS)}")
+# FINDING I-22, fixed 2026-09-02: THIS SAID "FILES READ" BEFORE OPENING ANYTHING.
+#
+# It was a statement of INTENT printed at the top, and the sweep then died on the first
+# undecodable file -- `read_text(encoding="utf-8")` raising UnicodeDecodeError on a `.docx`
+# byte -- after candidates had already been printed for the files ahead of it. The result read
+# as a partial success: a plausible report, a traceback, and every file behind the crash
+# silently unswept. A control that announces what it was ASKED to do rather than what it DID
+# is the fourth instance of that shape in this project (I-19's `$?`, I-20's exit 0 on a killed
+# build, C29's crash announced as an intentional block).
+#
+# So the count is now REQUESTED at the top and READ at the bottom, and every file is decoded
+# ONCE, here, with an undecodable one recorded as a DECLARED SKIP rather than an exception.
+print(f"FILES REQUESTED: {len(PATHS)}")
 for p in PATHS:
     try:
         rel = p.resolve().relative_to(ROOT)
@@ -78,6 +90,39 @@ if not PATHS:
 
 FILES = [str(p.resolve().relative_to(ROOT)) if p.resolve().is_relative_to(ROOT) else str(p)
          for p in PATHS]
+
+# DECODE ONCE, HERE, AND DECLARE WHAT COULD NOT BE READ -- finding I-22.
+#
+# This sweep is a PROSE instrument: it looks for a subject-matter qualifier sitting in front of
+# an instrument noun, and those leak in sentences, not in a compressed container. So refusing a
+# binary is CORRECT BEHAVIOUR and the scope is not the defect. What was wrong is that it
+# refused by CRASHING, mid-run, having already printed a count and some findings.
+#
+# A skip is therefore a RESULT, printed and counted -- never an exception and never silence.
+# The confidentiality control that DOES have to see inside a container is `leakage_scan.py`,
+# which reads a ZIP's members as of the same day (I-21); this one deliberately does not.
+TEXTS, SKIPPED = {}, []
+for _name in FILES:
+    try:
+        TEXTS[_name] = (ROOT / _name).read_text(encoding="utf-8")
+    except UnicodeDecodeError as _e:
+        SKIPPED.append((_name, f"not UTF-8 text ({_e.reason})"))
+    except OSError as _e:
+        SKIPPED.append((_name, f"unreadable ({_e.__class__.__name__})"))
+FILES = [f for f in FILES if f in TEXTS]
+if SKIPPED:
+    print()
+    print(f"  {len(SKIPPED)} file(s) DECLARED SKIPPED -- not prose, so this sweep cannot rule "
+          f"on them:")
+    for _n, _why in SKIPPED:
+        print(f"      SKIP  {_n}  ({_why})")
+    print("  A skip is reported, never silent. For a container's CONTENTS use "
+          "tools/leakage_scan.py,")
+    print("  which reads a ZIP's members; this sweep is a prose instrument by design.")
+if not FILES:
+    print()
+    print("VOID -- every requested file was skipped, so nothing has been established.")
+    sys.exit(2)
 
 INSTRUMENT = r"(?:agreement|contract|deed|guarantee|MOU|memorandum|novation|power of attorney|" \
              r"instrument|lease|licence|license|charter|mandate|undertaking|indenture|covenant)"
@@ -105,7 +150,7 @@ print("=" * 96)
 print("A. QUALIFIER IMMEDIATELY BEFORE AN INSTRUMENT NOUN")
 print("=" * 96)
 for name in FILES:
-    text = (ROOT / name).read_text(encoding="utf-8")
+    text = TEXTS[name]          # decoded once above; skips already declared
     out = []
     for m in re.finditer(r"([A-Za-z][\w'’-]*)\s+" + INSTRUMENT + r"\b", text, re.I):
         q = m.group(1).lower().strip("*`")
@@ -125,7 +170,7 @@ print("=" * 96)
 print("B. A LANGUAGE AND AN INSTRUMENT NOUN WITHIN A FEW WORDS — what sits between them?")
 print("=" * 96)
 for name in FILES:
-    text = (ROOT / name).read_text(encoding="utf-8")
+    text = TEXTS[name]          # decoded once above; skips already declared
     out = []
     for m in re.finditer(LANGUAGE + r"\)?\W{1,4}(?:\w+\W+){0,3}?" + INSTRUMENT + r"\b",
                          text, re.I):
@@ -143,4 +188,10 @@ print("CANDIDATE QUALIFIERS, most frequent first — judge each; none is automat
 print("=" * 96)
 for q, n in flagged.most_common(40):
     print(f"  {q:<28} {n}")
+print("=" * 96)
+# THE COUNT THAT MEANS SOMETHING, printed LAST -- finding I-22. Reaching this line is itself
+# the evidence: every file in FILES was decoded before the first section ran, so a crash can no
+# longer sit between a printed count and the work it claims to describe.
+print(f"FILES READ: {len(FILES)} of {len(PATHS)} requested"
+      + (f" · {len(SKIPPED)} DECLARED SKIP(S), listed above" if SKIPPED else ""))
 print("=" * 96)

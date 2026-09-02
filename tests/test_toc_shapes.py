@@ -26,6 +26,27 @@ widening a shipped tree belongs to whoever decides it rather than whoever notice
 decided to widen. Both now expect PLACED, and the rows say so in place rather than quietly
 reading as though they always had.
 
+AND IT GREW AGAIN TO TWENTY-SIX ON 2026-09-02, BECAUSE HE ASKED THE SAME QUESTION A SECOND
+TIME — "did you cover all types of TOCs?" — after branch 6 had closed. **Eighteen of eighteen
+agreeing could not answer that, and the reason is this file's own argument turned on itself: a
+sweep proves coverage of its POPULATION and of nothing else.** 18 of 18 over a list I wrote is
+the same kind of claim as 26 of 26 over D06's house style.
+
+**THE EIGHT NEW SHAPES FOUND FOUR SILENT IMPROVEMENTS AND TWO UNRECORDED OPEN EDGES.** Run
+against apply at `79a8c14`, the commit before branch 6 began, **all eight declined and none
+placed**; now a roman ENTRY number, a lower-case `a-3` and the five-atom shape **inside a table
+cell** all place, and an indented sub-entry keeps a leading tab the old code destroyed. And a
+page **range** `4-7` and a trailing full stop `4.` decline **by decision**, which took the
+count of open page-number edges from the one `Sch-3` that was recorded to three.
+
+**THE INDENTED SUB-ENTRY ALSO BROKE THE VERDICT TEST, which is the more useful half.** It
+declines while PRESERVING its leading tab, so its atoms are `['tab', 'text']` — and
+`DECLINED` was tested as `atoms == ['text']`, so the row read `BROKEN`, a verdict that says
+damage where the truth is a decline plus a repair. A decline means the English collapsed into
+ONE run, whatever structural runs survive beside it. The summary counters had a SECOND copy of
+that rule and disagreed with the per-row test: 14 + 10 + 1 against 26 shapes, a sum that does
+not add up and that nothing asserted. Both now read one list, and the arithmetic is asserted.
+
 AND THE WIDENING ARRIVED WITH FOUR NEGATIVES, WHICH ARE THE HALF THAT MATTERS. The page-number
 test is the only thing between the five-atom shape and any three-part tabbed line whose last
 part survives translation, so widening it spends margin. `civil` is the sharpest of the four:
@@ -221,6 +242,86 @@ CASES = [
      entry("8", "Force majeure", "22"),
      "8Force majeure22", "8Force majeure22",
      "SKIPPED", "en == text, so apply never rebuilds it -- and it was already correct"),
+
+    # -----------------------------------------------------------------------------------
+    # EIGHT SHAPES ADDED 2026-09-02, AND THEY CAME FROM THE QUESTION BEING ASKED A SECOND
+    # TIME. Wouter, on being told branch 6 was closed: "did you cover all types of TOCs?"
+    #
+    # THE FIRST EIGHTEEN SHAPES COULD NOT ANSWER THAT, and the reason is this file's own
+    # argument turned on itself: 18 of 18 agreeing is a statement about a list I wrote, not
+    # about the shape space. A sweep proves coverage of its POPULATION and nothing else --
+    # exactly as 26 of 26 on D06 proved coverage of one document's house style.
+    #
+    # So these were measured in a probe first (`temp/probe_toc_gaps.py`), then promoted here.
+    # FOUR OF THE EIGHT WERE IMPROVEMENTS BRANCH 6 MADE WITHOUT ANYONE MEASURING THEM:
+    # re-run against apply at 79a8c14, the commit before branch 6 began, ALL EIGHT declined
+    # and none placed. Three now place and one keeps an indent it used to lose.
+    # -----------------------------------------------------------------------------------
+
+    ("number and title in ONE run, then tab, then page",
+     p(f'<w:hyperlink r:id="rId9"><w:r>{t("9. General provisions")}</w:r>'
+       f'<w:r><w:tab/></w:r><w:r>{t("24")}</w:r></w:hyperlink>', ppr=PPR),
+     "9. General provisions24", "9. General provisions EN24",
+     "DECLINED", "three atoms, and the ONE tab's left side is a TRANSLATED title, so its "
+                 "position cannot be proved. Same shape as the unnumbered heading above -- "
+                 "and it is a COMMON house style, which the sweep did not say anywhere until "
+                 "this row existed"),
+
+    ("LEADING tab before the number (indented sub-entry)",
+     p(f'<w:hyperlink r:id="rId9"><w:r><w:tab/></w:r><w:r>{t("9.1")}</w:r>'
+       f'<w:r><w:tab/></w:r><w:r>{t("Scope")}</w:r><w:r><w:tab/></w:r>'
+       f'<w:r>{t("25")}</w:r></w:hyperlink>', ppr=PPR),
+     "9.1Scope25", "9.1Scope EN25",
+     "DECLINED", "SIX atoms, not five, so the rule does not reach it -- an indented "
+                 "sub-entry on a multi-level contents page is still glued. BUT IT NOW KEEPS "
+                 "ITS LEADING TAB, which branch 6 clause 2 preserves and the old code "
+                 "destroyed, so the line is indented-but-glued rather than flush-and-glued. "
+                 "That is what forced the DECLINED test below to stop meaning "
+                 "`atoms == ['text']`"),
+
+    ("page RANGE `4-7`",
+     entry("10", "Payment terms", "4-7"),
+     "10Payment terms4-7", "10Payment terms EN4-7",
+     "DECLINED", "digits + separator + digits. The prefixed alternative is one-or-two "
+                 "LETTERS plus separator plus digits, so a range matches neither. DECLINED "
+                 "BY DECISION, not by defect: a range translates to itself and would place "
+                 "if admitted"),
+
+    ("page number with a trailing full stop `4.`",
+     entry("11", "Notices", "4."),
+     "11Notices4.", "11Notices EN4.",
+     "DECLINED", "not plain digits. Also DECLINED BY DECISION -- a typed contents page can "
+                 "carry one. With `Sch-3` and the range above, that is THREE open edges, "
+                 "where CLAUDE.md section 7 recorded one until this file measured them"),
+
+    ("roman numeral as the ENTRY number",
+     entry("IV.", "Governing law", "26"),
+     "IV.Governing law26", "IV.Governing law EN26",
+     "PLACED", "the widening was about the PAGE number; an entry number only has to survive "
+               "translation, and `IV.` does. Was DECLINED before branch 6"),
+
+    ("single-letter LOWER-case prefix `a-3`",
+     entry("12", "Schedule of rates", "a-3"),
+     "12Schedule of ratesa-3", "12Schedule of rates ENa-3",
+     "PLACED", "one letter plus separator plus digits is inside the widened pattern, and the "
+               "sweep had only ever tested the UPPER-case `A-3`. Was DECLINED before branch 6"),
+
+    ("NO page number at all",
+     p(f'<w:hyperlink r:id="rId9"><w:r>{t("13")}</w:r><w:r><w:tab/></w:r>'
+       f'<w:r>{t("Confidentiality")}</w:r></w:hyperlink>', ppr=PPR),
+     "13Confidentiality", "13Confidentiality EN",
+     "DECLINED", "three atoms and the tab's RIGHT side is a translated title. Correct to "
+                 "decline, and worth having on the record so nobody reads it as a gap"),
+
+    ("the five-atom shape INSIDE A TABLE CELL",
+     '<w:tbl><w:tblPr><w:tblW w:w="9000" w:type="dxa"/></w:tblPr><w:tr>'
+     '<w:tc><w:tcPr><w:tcW w:w="9000" w:type="dxa"/></w:tcPr>'
+     + entry("14", "Dispute resolution", "27") +
+     '</w:tc></w:tr></w:tbl>',
+     "14Dispute resolution27", "14Dispute resolution EN27",
+     "PLACED", "a contents page laid out as a TABLE is a real house style, and apply is "
+               "required to recurse into table cells (.claude/rules/ooxml.md). Was DECLINED "
+               "before branch 6, so this is a silent improvement now pinned down"),
 ]
 
 TMP = Path(tempfile.mkdtemp(prefix="toc-variants-"))
@@ -287,14 +388,33 @@ src_paras = list(etree.fromstring(
 out_paras = list(etree.fromstring(out.read_bytes()).iter(f"{{{W}}}p"))
 print()
 FAIL = []
+# ONE VERDICT PER SHAPE, COMPUTED ONCE. The summary below used to re-derive its own counts with
+# a DIFFERENT definition of "declined" (`atoms == ["text"]`), and on 2026-09-02 the two
+# definitions disagreed: the indented sub-entry declined while KEEPING a preserved leading tab,
+# so the per-row test called it DECLINED and the summary counted it as neither -- 14 + 10 + 1
+# against 26 shapes, a number that does not add up and that nothing asserted. Two copies of one
+# rule is the defect; one list read twice is the fix.
+VERDICTS = []
 for i, (label, _x, _tx, _en, should, why) in enumerate(CASES):
     sa, oa = atoms(src_paras[i]), atoms(out_paras[i])
+    # A DECLINE MEANS THE ENGLISH COLLAPSED INTO ONE RUN -- it does NOT mean every tab
+    # vanished, and this test said `oa == ["text"]` until 2026-09-02.
+    #
+    # That was too narrow, and the indented sub-entry above is what exposed it: apply
+    # DECLINED it and, correctly, PRESERVED its leading tab as a whitelisted structural run,
+    # so the atoms came back `['tab', 'text']`. The old three-way test called that BROKEN --
+    # a verdict that reads as damage when the truth is a decline plus a repair.
+    #
+    # The right question is whether any tab still sits BETWEEN two pieces of text, because
+    # that is what placement means. One text atom = the English is one unbroken run = the
+    # rule declined, whatever structural runs survive around it.
     if oa == sa:
         got = "SKIPPED" if _tx == _en else "PLACED"
-    elif oa == ["text"]:
+    elif oa.count("text") == 1:
         got = "DECLINED"
     else:
         got = "BROKEN"
+    VERDICTS.append(got)
     agree = got == should
     print(("  OK   " if agree else "  XX   ")
           + f"{label:<52} {got:<9} (expected {should})")
@@ -306,10 +426,18 @@ for i, (label, _x, _tx, _en, should, why) in enumerate(CASES):
     print()
 
 print("=" * 100)
-placed = sum(1 for i, c in enumerate(CASES)
-             if atoms(out_paras[i]) == atoms(src_paras[i]) and c[2] != c[3])
-declined = sum(1 for i in range(len(CASES)) if atoms(out_paras[i]) == ["text"])
-print(f"  {len(CASES)} shapes · {placed} PLACED · {declined} DECLINED")
+placed = VERDICTS.count("PLACED")
+declined = VERDICTS.count("DECLINED")
+skipped = VERDICTS.count("SKIPPED")
+broken = VERDICTS.count("BROKEN")
+print(f"  {len(CASES)} shapes · {placed} PLACED · {declined} DECLINED · {skipped} SKIPPED"
+      + (f" · {broken} BROKEN" if broken else ""))
+# AND THE ARITHMETIC IS ASSERTED, because a summary that does not add up is exactly what hid
+# the two-definitions problem: every shape must land in one bucket and no shape in none.
+if len(VERDICTS) != len(CASES) or placed + declined + skipped + broken != len(CASES):
+    FAIL.append(f"the summary does not account for every shape: {len(VERDICTS)} verdict(s) "
+                f"and {placed}+{declined}+{skipped}+{broken} buckets against "
+                f"{len(CASES)} shapes")
 # THE POSITIVE CONTROL. Every shape here is TOC-shaped or deliberately not, and if NOTHING
 # placed then apply matched nothing, the notes did not line up, or the document did not build
 # -- all of which would leave every "DECLINED" above reading as a correct fallback.
