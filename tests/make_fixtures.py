@@ -21,6 +21,7 @@ the file.
     uv run python tests/make_fixtures.py --list
 """
 import io
+import json
 import shutil
 import sys
 import zipfile
@@ -248,10 +249,31 @@ def _anchors(path):
 # entry's title is deliberately long enough to reach the margin, because that is the row where
 # a stray trailing tab forces a WRAP rather than merely being invisible.
 # ---------------------------------------------------------------------------
+#
+# SIX ENTRIES SINCE 2026-09-02, AND THEY ARE A TRUTH TABLE RATHER THAN A LONGER LIST. The tab
+# placement rule reads two boundaries off the SOURCE paragraph -- the text before its first tab
+# and the text after its last -- and requires both to survive into `en` unchanged. Four entries
+# must therefore be PLACED and two must be DECLINED, and a fixture carrying only the placeable
+# ones cannot tell a working rule from one that fires on everything.
+#
+#   1, 21, 22   plain: number, tab, title, tab, page, each tab in its own run.
+#   23          THE REGRESSION TEST, and the reason this entry exists. Its FIRST RUN carries
+#               text on BOTH SIDES of the tab -- children [t, tab, t] -- so extraction's
+#               `runs[0]["text"]` is number+title while the tab sits after the number. An
+#               earlier formulation of the rule used exactly that fragment for its offset and
+#               would have placed the tab AFTER THE TITLE. The atom shape is identical, so no
+#               shape test catches it; only this entry does.
+#   24          DECLINE: the page digits differ between `text` and `en`, so the second
+#               boundary is not proved. Must fall back to dropping.
+#   25          DECLINE: the number is translated, so the first boundary is not proved. This is
+#               D01's outcome -- three TOC-SHAPED paragraphs that are ordinary numbered prose,
+#               where the real corpus measures 0 of 3 on every test.
+# ---------------------------------------------------------------------------
 @fixture("toc.docx",
-         "a three-entry table of contents — number, tab, title, tab, right-aligned page "
-         "number, inside a hyperlink, with real tab stops — reproducing D06 page 2's shape "
-         "so a rendered check can SEE what a client page may not show")
+         "a six-entry table of contents inside hyperlinks with real tab stops — four the "
+         "placement rule must PLACE (one with its tab inside a text-bearing run) and two it "
+         "must DECLINE — reproducing D06 page 2's shape so a rendered check can SEE what a "
+         "client page may not show. Ships its own toc.notes.json")
 def _toc(path):
     # Right-aligned stop at the text margin, with a dot leader: this is what a table of
     # contents uses, and it is why the page number lands at the right edge.
@@ -260,24 +282,36 @@ def _toc(path):
            '<w:tab w:val="right" w:leader="dot" w:pos="9070"/>'
            '</w:tabs></w:pPr>')
 
-    def entry(num, title, page, rid):
-        return p(f'<w:hyperlink r:id="{rid}">'
-                 f'<w:r><w:t xml:space="preserve">{num}</w:t></w:r>'
-                 f'<w:r><w:tab/></w:r>'
-                 f'<w:r><w:t xml:space="preserve">{title}</w:t></w:r>'
+    # (number, title, page, kind). The XML AND the notes are both generated from this, so
+    # `text` cannot disagree with the document -- it is not hand-typed anywhere.
+    entries = [
+        ("1", "General provisions", "4", "plain"),
+        # LONG ENOUGH TO REACH THE MARGIN. This is the row that shows whether a stray tab
+        # forces a wrap, which no count can see.
+        ("21", "Project finance, security and the order of application of proceeds",
+         "15", "plain"),
+        ("22", "Governing law", "31", "plain"),
+        ("23", "Interpretation and defined terms", "38", "inline-tab"),
+        ("24", "Notices and service of process", "42", "decline-digits"),
+        ("25", "Counterparts", "47", "decline-prefix"),
+    ]
+
+    def entry_xml(num, title, page, kind):
+        if kind == "inline-tab":
+            # ONE run carrying number, tab and title. Same atoms, different run boundaries.
+            head = (f'<w:r><w:t xml:space="preserve">{num}</w:t><w:tab/>'
+                    f'<w:t xml:space="preserve">{title}</w:t></w:r>')
+        else:
+            head = (f'<w:r><w:t xml:space="preserve">{num}</w:t></w:r>'
+                    f'<w:r><w:tab/></w:r>'
+                    f'<w:r><w:t xml:space="preserve">{title}</w:t></w:r>')
+        return p(f'<w:hyperlink r:id="rId9">{head}'
                  f'<w:r><w:tab/></w:r>'
                  f'<w:r><w:t xml:space="preserve">{page}</w:t></w:r>'
                  f'</w:hyperlink>', ppr=ppr)
 
-    body = (
-        p(r("Table of contents")) +
-        entry("1", "General provisions", "4", "rId9") +
-        # LONG ENOUGH TO REACH THE MARGIN. This is the row that shows whether a stray tab
-        # forces a wrap, which no count can see.
-        entry("21", "Project finance, security and the order of application of proceeds",
-              "15", "rId9") +
-        entry("22", "Governing law", "31", "rId9")
-    )
+    heading = "Table of contents"
+    body = p(r(heading)) + "".join(entry_xml(*e) for e in entries)
     rels = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
             '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/'
             'relationships">'
@@ -287,6 +321,73 @@ def _toc(path):
             '2006/relationships/hyperlink" Target="https://example.invalid/clause" '
             'TargetMode="External"/></Relationships>')
     docx(path, body, {"word/_rels/document.xml.rels": rels})
+
+    # --- THE NOTES, generated from the same data ------------------------------------------
+    # `runs` mirrors what extraction really emits, measured on D06's 26 entries: TWO
+    # fragments, never three, carrying start/end offsets into `text`. For the inline-tab
+    # entry the fragments follow the RUN boundaries instead, which is what makes it the
+    # regression test.
+    notes = [_note(0, heading, heading + " EN", [(0, len(heading))])]
+    for i, (num, title, page, kind) in enumerate(entries, start=1):
+        text = num + title + page
+        if kind == "decline-digits":
+            en = num + title + " EN" + str(int(page) + 57)
+        elif kind == "decline-prefix":
+            en = "Clause " + num + title + " EN" + page
+        else:
+            en = num + title + " EN" + page
+        if kind == "inline-tab":
+            spans = [(0, len(num) + len(title)), (len(num) + len(title), len(text))]
+        else:
+            spans = [(0, len(num)), (len(num), len(text))]
+        notes.append(_note(i, text, en, spans))
+    _write_notes(path, notes)
+
+
+def _note(idx, text, en, spans):
+    return {"idx": idx, "text": text, "en": en, "style": "Normal",
+            "runs": [{"start": s, "end": e, "text": text[s:e],
+                      "bold": False, "italic": False} for s, e in spans]}
+
+
+def _write_notes(docx_path, notes):
+    """Write `<stem>.notes.json` beside the fixture, and PROVE it agrees with the document.
+
+    A fixture's notes are its INPUT, so they belong with it rather than being invented by
+    whichever tool happens to drive it -- which is what `render_diff.py` did, synthesising
+    `en = text + " EN"` and no `runs` at all, so a rule keyed on either could not fire on a
+    fixture at all.
+
+    Written as BYTES with explicit \\n. `Path.write_text()` opens in text mode, so on Windows
+    every \\n becomes \\r\\n and an LF file silently turns CRLF with its content perfectly
+    intact -- every content check passes and only a line-endings check sees it.
+    """
+    import xml.etree.ElementTree as ET      # READING only; never used to write OOXML
+    out = docx_path.with_suffix(".notes.json")
+    payload = json.dumps(notes, ensure_ascii=False, indent=2) + "\n"
+    out.write_bytes(payload.encode("utf-8"))
+
+    # ASSERT THE ARTEFACT. The notes are generated from the same data as the XML, so they
+    # agree by construction -- but "by construction" is an argument, and this is a check.
+    # `text` must equal what apply's own get_paragraph_text() computes: w:t only, no space
+    # at a tab.
+    wns = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    with zipfile.ZipFile(docx_path) as z:
+        root = ET.fromstring(z.read("word/document.xml"))
+    actual = ["".join(t.text or "" for t in para.iter(f"{wns}t"))
+              for para in root.iter(f"{wns}p")]
+    declared = [n["text"] for n in notes]
+    if actual != declared:
+        raise AssertionError(
+            f"{out.name}: `text` disagrees with the document it describes — "
+            f"{len(actual)} paragraph(s) in the XML, {len(declared)} note(s); "
+            f"first mismatch at index "
+            f"{next((i for i, (x, y) in enumerate(zip(actual, declared)) if x != y), 'length')}")
+    for n in notes:
+        for run in n["runs"]:
+            if n["text"][run["start"]:run["end"]] != run["text"]:
+                raise AssertionError(f"{out.name}: idx {n['idx']} run offsets do not slice "
+                                     f"`text` back to the fragment they declare")
 
 
 # ---------------------------------------------------------------------------
@@ -566,6 +667,13 @@ def main():
         else:
             ok = "deliberately invalid"
         print(f"  {name:<26} {size:>7,} B  {ok}")
+        # A FIXTURE MAY SHIP ITS OWN NOTES, and if it does, say so: the notes are the input
+        # a driving tool would otherwise invent, so which one was used is not a detail.
+        side = path.with_suffix(".notes.json")
+        if side.is_file():
+            n = len(json.loads(side.read_text(encoding="utf-8")))
+            print(f"  {'':<26} + {side.name}  ({n} note(s), agreement with the document "
+                  f"asserted)")
         print(f"  {'':<26} {why}")
     # PRUNE ONLY NOW, once every replacement is on disk. A fixture that is no longer declared
     # is removed; nothing is removed before its successor exists.

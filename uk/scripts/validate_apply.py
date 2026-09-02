@@ -186,6 +186,14 @@ _STRUCTURAL_WORDS = frozenset({
 def _extract_tokens(text):
     if not text:
         return set()
+    # A TAB OR NEWLINE CONTRIBUTES NO CHARACTER ON EITHER SIDE, and this is the declared
+    # half of that rule — `_paragraph_applied_text` is the applied half, and its docstring
+    # carries the reasoning for both. Dropped rather than turned into a space, because a
+    # space cannot be symmetric: apply may PLACE a tab that the declared `en` never had
+    # (extraction emits nothing for a tab, so the operator cannot declare one), and there is
+    # then nothing on the declared side to substitute. Removing on both sides is symmetric
+    # whether the separator was authored, placed, or absent.
+    text = text.replace('\t', '').replace('\n', '').replace('\r', '')
     # pre-split sentence-boundary glue so phantom-segment-plus-
     # regular-segment joins like ``project.hereinafter`` tokenise as
     # two tokens. Symmetric on declared and applied → no false
@@ -343,29 +351,55 @@ def _collect_required_tokens_with_options(paragraph_entry, post_spacing_fix):
 def _paragraph_applied_text(p_element):
     """Concatenate all w:t and w:delText in document order (Accept+Reject union).
 
-    ``<w:tab/>`` and ``<w:br/>`` elements are treated as whitespace
-    separators when joining. The declared side (``en`` in paragraphs.json)
-    represents tabs and line-breaks as literal U+0009 / U+000A characters,
-    which the token regex ``[A-Za-z0-9][A-Za-z0-9.\\-]*[A-Za-z0-9]``
-    treats as token boundaries. Without a corresponding boundary on the
-    applied side, paragraphs containing real ``<w:tab/>`` elements (e.g.
-    signature blocks, witness rows) produce different tokenisations between
-    declared and applied: declared ``"Alpha\\tBeta"`` →
-    ``{"Alpha", "Beta"}`` via the \\t boundary, applied ``"AlphaBeta"``
-    → ``{"AlphaBeta"}`` one token, false-positive miss.
+    A ``<w:tab/>`` OR ``<w:br/>`` CONTRIBUTES NO CHARACTER, and neither does a tab
+    STOP. Both halves of that sentence are corrections, made 2026-09-02; the reasoning
+    for each is below, because the previous version's reasoning was sound for the case
+    it was written for and this is not a case of carelessness.
 
-    Inserting a single space at every ``<w:tab/>`` / ``<w:br/>`` boundary
-    when joining restores symmetric tokenisation. Symmetric on documents
-    that have no tab/br elements (the loop simply never appends extra
-    whitespace), so backward compatible.
+    IT USED TO APPEND A SPACE at every ``<w:tab/>`` / ``<w:br/>``, to keep the applied
+    side tokenising like a declared ``en`` that carries a literal U+0009: declared
+    ``"Alpha\\tBeta"`` gives ``{"Alpha", "Beta"}`` via the ``\\t`` boundary, so an
+    applied ``"AlphaBeta"`` would read as one token and report a phantom miss. That is
+    real, and it is why the space was introduced.
+
+    WHAT IT DID NOT ANTICIPATE IS APPLY *PLACING* A TAB THE DECLARED SIDE CANNOT
+    CONTAIN. Extraction emits nothing for a ``<w:tab/>`` (finding F18), so an operator
+    translating a table-of-contents entry sees and declares ``"1General provisions4"``
+    with no tab in it at all; the tab's position is recoverable only from the source,
+    which is what ``apply_translations_textmatch._toc_tab_offsets`` now does. The
+    applied text then read ``"1 General provisions EN 4"`` against a declared
+    ``"1General provisions EN4"``, and the tokens ``1general`` and ``en4`` were
+    reported MISSING although not one character was lost -- 8 phantom misses over 4
+    paragraphs, exit 1, and ``repack_docx.py`` aborting with no ``.docx`` written.
+
+    SUBSTITUTING A SPACE ON BOTH SIDES CANNOT FIX THAT, which is worth stating because
+    it is the obvious repair: the declared side has no tab to substitute, so the
+    asymmetry survives. REMOVAL is the only symmetric choice, and it is also the
+    convention the rest of the package already keeps -- extraction emits nothing for a
+    tab, and ``apply_translations_textmatch.get_paragraph_text`` inserts no space at
+    one, so a party grid deliberately matches as ``"Party AParty B"``. This function
+    was the only place in the tree that disagreed. The declared side drops ``\\t`` and
+    ``\\n`` in ``_extract_tokens`` for the same reason, so the two remain symmetric
+    whether the tab was authored, placed, or absent.
+
+    IT ALSO COUNTED TAB STOPS AS TABS, and its own claim to be "symmetric on documents
+    that have no tab/br elements" was therefore false for any paragraph with a ruler:
+    ``p_element.iter()`` reaches ``w:pPr/w:tabs/w:tab``, which declares a POSITION and
+    renders nothing. A table-of-contents entry with a left stop and a right dot-leader
+    stop gained two spaces at the head of its text. Harmless in effect -- leading
+    whitespace splits no token -- but it meant this check measured text the document
+    does not contain. ``quality_check._missing_space_issues`` excludes stops with this
+    exact test and its docstring names THIS function as the check it converged with:
+    one of the two handled the ruler and the other did not.
     """
     pieces = []
     for node in p_element.iter():
         tag = etree.QName(node).localname
         if tag in ('t', 'delText') and node.text:
             pieces.append(node.text)
-        elif tag in ('tab', 'br'):
-            pieces.append(' ')
+        # A rendered tab and a line break contribute nothing; a tab STOP is not even a
+        # rendered tab. Nothing is appended for any of the three, so the branch is kept
+        # only to document that they were considered rather than overlooked.
     return ''.join(pieces)
 
 def _normalise_paragraph_text(text):

@@ -471,6 +471,132 @@ else:
            "cached-result field happens to be a REF")
 
 # =========================================================================================
+# 5. A3, THE TABLE-OF-CONTENTS HALF — PLACEMENT, not survival. Everything above asks whether a
+#    structure came BACK; this asks whether it came back IN THE RIGHT PLACE, which is a
+#    different question and the one Wouter's render review forced. A misplaced tab is worse
+#    than a missing one: on D06 both tabs returned at the paragraph END, so the page number
+#    stayed glued to the title exactly as before AND the trailing tabs forced a line wrap.
+#
+#    THE ASSERTION IS THE SOURCE'S OWN ATOM SEQUENCE, NOT A COUNT. D02 lost 45 tabs and not
+#    one pixel moved on any of its 11 pages, so `tab_chars` cannot decide this.
+# =========================================================================================
+print("\n5. A3/TOC — a table-of-contents entry's two tabs go back where the SOURCE had them")
+print("-" * 98)
+TOC = ROOT / "tests" / "fixtures" / "toc.docx"
+TOCN = TOC.with_suffix(".notes.json")
+
+
+def atom_split(p):
+    """(pre, post) — the w:t text before the first tab atom and after the last, or None if
+    the paragraph is not TOC-shaped. The same reading the rule itself makes, so a delivered
+    paragraph can be compared against its source on the one thing that matters: WHERE."""
+    at = []
+    for el in p.iter():
+        tag = etree.QName(el).localname
+        if tag in ("t", "delText"):
+            if el.text:
+                at.append(("text", el.text))
+        elif tag == "tab":
+            parent = el.getparent()
+            if parent is None or etree.QName(parent).localname != "tabs":
+                at.append(("tab", ""))
+        elif tag == "br":
+            at.append(("br", ""))
+    if [k for k, _ in at] != ["text", "tab", "text", "tab", "text"]:
+        return None
+    return at[0][1], at[4][1]
+
+
+if not TOC.is_file() or not TOCN.is_file():
+    void("A3/TOC", f"{TOC.name} or {TOCN.name} not built — run tests/make_fixtures.py")
+else:
+    with zipfile.ZipFile(TOC) as z:
+        TSRC = z.read("word/document.xml")
+    tb = census(TSRC)
+    TPARAS = list(etree.fromstring(TSRC).iter(f"{{{W}}}p"))
+    tnotes = json.loads(TOCN.read_text(encoding="utf-8"))
+    shaped = [i for i, p in enumerate(TPARAS) if atom_split(p) is not None]
+    # POSITIVE CONTROL. Six TOC-shaped paragraphs, twelve tab characters, twelve tab STOPS as
+    # the negative control, six hyperlinks, and notes that describe THIS document. Any of
+    # these wrong and every assertion below is VOID however it reads.
+    tctl = ok(f"fixture carries the TOC shape: {len(shaped)} shaped paragraph(s), "
+              f"tab_chars {tb['tab_chars']}, tab_stops {tb['tab_stops']}, "
+              f"hyperlink {tb['hyperlink']}",
+              len(shaped) == 6 and tb["tab_chars"] == 12 and tb["tab_stops"] == 12
+              and tb["hyperlink"] == 6,
+              "expected 6 shaped, 12 tab chars, 12 stops, 6 hyperlinks")
+    tctl = ok(f"the shipped notes describe THIS document: {len(tnotes)} note(s) "
+              f"for {len(TPARAS)} paragraph(s)",
+              len(tnotes) == len(TPARAS)
+              and all(n["text"] == para_text(TPARAS[n["idx"]]) for n in tnotes),
+              "a notes file that does not match the fixture tests a different document") \
+        and tctl
+    T, rt = run_apply(TMP / "toc", TSRC, tnotes, "table-of-contents rebuild", fixture=TOC)
+    if T is None or not tctl:
+        void("A3/TOC", "the rebuild produced nothing comparable" if T is None
+             else "positive control failed")
+    else:
+        ta = census(T)
+        TOUT = list(etree.fromstring(T).iter(f"{{{W}}}p"))
+        # WHICH ENTRIES MUST BE PLACED AND WHICH MUST DECLINE — from make_fixtures' own
+        # construction, stated here so the truth table is visible rather than implied.
+        PLACE, DECLINE, PROSE = (1, 2, 3, 4), (5, 6), 0
+        placed_right = []
+        for i in PLACE:
+            src, out = atom_split(TPARAS[i]), atom_split(TOUT[i])
+            # BOTH boundaries, against the SOURCE's own text. `out is not None` alone would
+            # accept two tabs in the wrong places, which is the exact defect being fixed.
+            placed_right.append(out is not None and src is not None
+                                and out[0] == src[0] and out[1] == src[1])
+        ok(f"A3/TOC  all four placeable entries deliver the SOURCE's atom sequence, with the "
+           f"number before the first tab and the page number after the last   "
+           f"{sum(placed_right)}/4",
+           all(placed_right),
+           "an entry whose atoms are ['text'] delivered `1General provisions4` — flat, no "
+           "dot leader, no right-aligned page number. An entry with the tabs in the WRONG "
+           "places is worse: it glues the page number exactly as before AND forces a wrap")
+        # THE ENTRY THIS FIXTURE EXISTS FOR. Its first RUN carries text on both sides of the
+        # tab, so extraction's runs[0] spans the tab. A rule taking its offset from that
+        # fragment places tab 1 AFTER the title while every count and the atom sequence still
+        # look right — so this is asserted on the TEXT, separately from the three above.
+        inline = atom_split(TOUT[4])
+        ok(f"A3/TOC  the inline-tab entry places on the SOURCE's tab position, not on the "
+           f"run boundary   pre={inline[0]!r}" if inline else
+           "A3/TOC  the inline-tab entry places on the SOURCE's tab position",
+           inline is not None and inline[0] == atom_split(TPARAS[4])[0],
+           "its runs[0] is number+title, so an offset of len(runs[0]) puts the first tab "
+           "after the TITLE — same atom sequence, same tab count, wrong page")
+        # THE NEGATIVES. A rule that fires on everything passes every assertion above.
+        declined = [content_atoms(TOUT[i]) == ["text"] for i in DECLINE]
+        ok(f"A3/TOC  NEGATIVE 1: the two unprovable entries FALL BACK to dropping   "
+           f"{sum(declined)}/2",
+           all(declined),
+           "one has different page digits in `en`, one has a translated number — neither "
+           "boundary is proved, so placing a tab would be a guess. Dropping leaves the page "
+           "no worse than before, which is the whole fallback")
+        ok(f"A3/TOC  NEGATIVE 2: the heading is not TOC-shaped and gains nothing   "
+           f"{content_atoms(TOUT[PROSE])}",
+           content_atoms(TOUT[PROSE]) == ["text"],
+           "ordinary prose must never acquire a tab")
+        ok(f"A3/TOC  tab STOPS untouched (the negative control)   {tb['tab_stops']} -> "
+           f"{ta['tab_stops']}",
+           ta["tab_stops"] == tb["tab_stops"],
+           "a w:tab inside pPr/tabs is a ruler position, not a rendered tab; touching one "
+           "would move the whole column")
+        ok(f"A3/TOC  tab characters rise toward source, by exactly the placed entries   "
+           f"{tb['tab_chars']} -> {ta['tab_chars']} (expect 8 of the source's 12)",
+           ta["tab_chars"] == 8,
+           "8 = four placed entries times two. NOT 12: the two declined entries drop theirs "
+           "on purpose, so this row is PARTIAL by design and the atom assertions above are "
+           "what decide it")
+        ok(f"A3/TOC  A8 not regressed: every hyperlink survives and still covers text   "
+           f"hyperlink {tb['hyperlink']} -> {ta['hyperlink']}",
+           ta["hyperlink"] == tb["hyperlink"]
+           and all(any((t.text or "").strip() for t in h.iter(f"{{{W}}}t"))
+                   for h in etree.fromstring(T).iter(f"{{{W}}}hyperlink")),
+           "an empty hyperlink beside the words it should cover is not a navigable entry")
+
+# =========================================================================================
 print()
 print("=" * 98)
 if VOIDED:

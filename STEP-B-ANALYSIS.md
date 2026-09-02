@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS.** Branches 3, 4, 5 and 14's `quality_check` slice MERGED. **Branch 6's first slice is built and merge-pending** — A1 A2 A3 A6 A8 A9 F27; C16, C17 and F16 are a declared follow-on slice *(2026-09-01)*. **Next: branch 7, the container inventory** |
+| **status** | **IN PROGRESS.** Branches 3, 4, 5 and 14's `quality_check` slice MERGED. **Branch 6 slice 1 MERGED** `4a1c452` — A1 A2 A8 A9 F27. **Slice 2, the table-of-contents tab placement, is built and merge-pending** *(2026-09-02)* — it closes **A3's TOC and doubled-tab instances**, so A3 is **PARTIAL** and **A6 has moved to branches 15–17**; C16, C17 and F16 remain a declared follow-on slice. **Next: branch 7, the container inventory** |
 | **serves** | section 3 of `CLAUDE.md` — its **step 2**, Building. *(The house word for that unit is **phase**; this project says **step**. The mapping is in that charter's §1.3 and the vocabulary is deliberately not renamed.)* |
 | **produces** | branches **3–19 plus D1–D3** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
 | **done when** | every branch in §2 is merged with its own *Done when* in §3 met, tested by its kind's method in §4, and no criterion regressed against the frozen v3 baseline |
@@ -790,7 +790,7 @@ original relative position; delete only what you can prove is now redundant*) an
 (one explicit tested inventory shared by extraction and apply, failing loudly on anything outside it, rather
 than a fourth special case appended to a list).
 
-**Approved as the first fix branch.** It closes 17 findings including four of the six worst, changes no data
+**Approved as the first fix branch.** It closes 16 findings including four of the six worst, changes no data
 format, and is provable by byte comparison — which is why it can go first. **Its two prerequisites are
 instruments, not decisions:** branch 0 (commit both trees unmodified) and branch 1 (the harness, which is
 what makes "provable by byte comparison" true). Neither changes behaviour and neither needed a verdict.
@@ -1580,8 +1580,47 @@ this option is a *deletion* — dropping a cross-reference skeleton once the num
 > then can the English be split at the boundary the tab sat on.** The current outcome is ASSERTED in
 > `tests/test_stop_deleting.py` so that branch must change it deliberately rather than silently.
 >
-> **The option's verdict does not change** — it closes 17 findings including four of the six worst, and it
-> did. What changes is one sentence about how much of the tab defect it reaches.
+> **The option's verdict does not change** — it closes 16 findings including four of the six worst, and it
+> did. What changes is one sentence about how much of the tab defect it reaches. *(The figure read 17 until
+> 2026-09-02, when A6 left this option for branches 15–17. Re-derived from the map by
+> `tools/stepb_verify.py`, never adjusted by hand — §5.14 rule 6 of the charter: count by LISTING, never by
+> adding a delta to the figure already written down.)*
+>
+> > **CORRECTED AGAIN 2026-09-02, AND THE CORRECTION ABOVE IS TOO STRONG IN ONE PLACE.** Two of its
+> > sentences say flatly that `en` carries no offset recording where a tab belonged, and that every
+> > such tab is therefore unplaceable from a single English string. **True in general, FALSE for a
+> > table of contents.** The general
+> > argument stands: `en` carries no per-run structure, so a tab between two text atoms usually
+> > cannot be placed. **But a table-of-contents entry is the one shape where both boundaries are
+> > derivable from the SOURCE rather than from `en`'s structure** — the text before its first tab is
+> > a clause number and the text after its last is a page number, and **both translate to
+> > themselves**, so each still appears unchanged at the corresponding end of the English. Two exact
+> > string equalities, not a similarity score.
+> >
+> > **WHY IT WAS DISMISSED TWICE, AND IT IS A POPULATION ERROR OF THE KIND §5.1 OF THE CHARTER
+> > NAMES BY NAME.** The affix test was measured over **all 231 of D06's multi-fragment
+> > paragraphs**, where it scores **18%**, and that number was quoted as the reason the idea could
+> > not work — in this section and in a comment inside both published trees. Measured over **the 26
+> > table-of-contents entries**, the population the fix is for, it scores **100%**: 26/26 on the
+> > prefix, 26/26 on the trailing digits, 26/26 non-overlapping. **D01's three TOC-shaped
+> > paragraphs score 0 of 3**, so the negative control is in the corpus rather than invented. *A
+> > PORTED CHECK IS A CHECK AGAINST A NEW POPULATION.*
+> >
+> > **AND THE FIRST SPECIFICATION OF THE FIX WAS ITSELF WRONG, caught by building the fixture rather
+> > than by reading.** It took the offset from `len(runs[0]["text"])` — extraction's first fragment
+> > — and **a run may carry text on BOTH SIDES of a tab**, so on children `[t, tab, t]` that offset
+> > places the first tab **after the title**. Same atom sequence, same tab count, wrong page. The
+> > shipped rule reads the **source paragraph's own tab positions** instead; both forms were
+> > measured side by side and give identical offsets on all 26, but only one declines the
+> > `[t, tab, t]` case rather than misplacing it.
+> >
+> > **What this closes and what it does not.** Delivered 2026-09-02 on branch 6's second slice: **25
+> > of D06's 26 entries placed** (the 26th is skipped by apply, its title already English, and was
+> > already correct), tab characters **10 → 60 of the source's 80**, and **exactly one page of 36
+> > re-rendered**. **A3 is therefore PARTIAL, not closed** — D02's tables, D05's hanging-indent
+> > notices clause and D11's mid-phrase tabs are still unplaceable and still branch 16's. **A6
+> > moves to branch 16 outright**: glued bullets are a different paragraph shape and nothing here
+> > reaches them.
 
 **And stop listing containers.** Three text-bearing containers are now known to sit outside the inventory —
 content controls, smart tags, and text held in graphic metadata such as image alt text and chart titles.
@@ -1590,7 +1629,7 @@ one explicit, tested inventory, and anything outside it must fail loudly rather 
 
 | pros | cons | what it would break | what it does NOT fix |
 |---|---|---|---|
-| **17 findings, including 4 of the 6 worst content losses**, closed outright — the lost footnote, the fourteen unreachable comments, the source-language text on page one, and the untranslated auxiliary part · One file plus one flag on the repackager · **No change to any data format**, so nothing else has to move · Provable by comparing bytes on frozen intermediates, no model involved · Nothing depends on it, so it can go first · Lowest risk of any option here, and it is the only one where that is true | Cost **low**, risk **low** *(inference)* · The three clauses have to be written precisely; a loose reading of "preserve" duplicates the English · Needs a synthetic test document for the container cases, because no corpus document contains a chart or SmartArt carrying text | Nothing, if the three clauses are right · A one-clause version — "preserve everything you do not recognise" — **breaks the pipeline**, because text-bearing runs must be removed and rebuilt · It changes the delivered bytes on any document with footnotes, comments, hyperlinks or content controls, so every affected baseline has to be re-measured | **Every formatting property.** Bold, underline, highlight, character styles, sizes — untouched · **Every check.** The gates stay exactly as blind as they are · Every dictionary finding · The layout effects · Half of the tab defect: this closes the case where the tab dies inside a text-bearing run, and the *relocation* case needs the position clause, which is why the clause is in the proposal |
+| **16 findings, including 4 of the 6 worst content losses**, closed outright — the lost footnote, the fourteen unreachable comments, the source-language text on page one, and the untranslated auxiliary part · One file plus one flag on the repackager · **No change to any data format**, so nothing else has to move · Provable by comparing bytes on frozen intermediates, no model involved · Nothing depends on it, so it can go first · Lowest risk of any option here, and it is the only one where that is true | Cost **low**, risk **low** *(inference)* · The three clauses have to be written precisely; a loose reading of "preserve" duplicates the English · Needs a synthetic test document for the container cases, because no corpus document contains a chart or SmartArt carrying text | Nothing, if the three clauses are right · A one-clause version — "preserve everything you do not recognise" — **breaks the pipeline**, because text-bearing runs must be removed and rebuilt · It changes the delivered bytes on any document with footnotes, comments, hyperlinks or content controls, so every affected baseline has to be re-measured | **Every formatting property.** Bold, underline, highlight, character styles, sizes — untouched · **Every check.** The gates stay exactly as blind as they are · Every dictionary finding · The layout effects · Half of the tab defect: this closes the case where the tab dies inside a text-bearing run, and the *relocation* case needs the position clause, which is why the clause is in the proposal |
 
 ---
 
@@ -1758,7 +1797,7 @@ carried, or warn.** Neither document exhibits both today, which is why nothing h
 
 | pros | cons | what it would break | what it does NOT fix |
 |---|---|---|---|
-| Closes **20 findings, 15 of them visible defects** — the bold class in all three of its routes, the spreading-property class, the underline and size losses, the character-style losses · Deletes rather than rewords four wrong instructions, including the longest rule in the skill: **8,028 bytes, 121 lines, 16.8% of the heaviest step document, three times the size of ten other rules combined [measured]** · Makes the missing span-count check possible · Removes the reason the definitions detector has to guess at all · It is the change that makes the previously-planned formatting branch **safe**, which as scoped it was not | Cost **high**, risk **high** *(inference)* · New capability in the reading-apart step: genuinely fiddly OOXML · The writing-back step's rebuild is **replaced, not amended** · The notes-file format changes, which invalidates every worked example in the step documents and every archived intermediate — including the frozen ones the test plan depends on, so those must be regenerated · Cannot be verified without option 2 existing first | Every worked example in the step documents · Every archived intermediate, i.e. the tier-2 test fixtures · The bold-off removal and the computation **must land in one branch**, so this is the one option with a step that cannot be made smaller · A wrong cascade computation is a **new class of defect** in a pipeline that currently scores 9 on translation | **Every content loss.** Disjoint from option 1: no shared code path, no shared finding · **Cluster layout is NOT closed by this — that claim is refuted in §12.** Five of the six layout findings resolve to detect-and-disclose or are forbidden by the golden rule, not to a formatting computation · Every check · Every dictionary finding |
+| Closes **22 findings, 17 of them visible defects** *(20 and 15 until 2026-09-02, when **A6** and **A3's remainder** arrived from option 1: glued bullets, and every tab whose position cannot be proved from the source. **Both are visible — Wouter reported each from a rendered page** — so the visible count rises with the total)* — the bold class in all three of its routes, the spreading-property class, the underline and size losses, the character-style losses · Deletes rather than rewords four wrong instructions, including the longest rule in the skill: **8,028 bytes, 121 lines, 16.8% of the heaviest step document, three times the size of ten other rules combined [measured]** · Makes the missing span-count check possible · Removes the reason the definitions detector has to guess at all · It is the change that makes the previously-planned formatting branch **safe**, which as scoped it was not | Cost **high**, risk **high** *(inference)* · New capability in the reading-apart step: genuinely fiddly OOXML · The writing-back step's rebuild is **replaced, not amended** · The notes-file format changes, which invalidates every worked example in the step documents and every archived intermediate — including the frozen ones the test plan depends on, so those must be regenerated · Cannot be verified without option 2 existing first | Every worked example in the step documents · Every archived intermediate, i.e. the tier-2 test fixtures · The bold-off removal and the computation **must land in one branch**, so this is the one option with a step that cannot be made smaller · A wrong cascade computation is a **new class of defect** in a pipeline that currently scores 9 on translation | **Every content loss.** Disjoint from option 1: no shared code path, no shared finding · **Cluster layout is NOT closed by this — that claim is refuted in §12.** Five of the six layout findings resolve to detect-and-disclose or are forbidden by the golden rule, not to a formatting computation · Every check · Every dictionary finding |
 
 ---
 
@@ -2737,7 +2776,13 @@ decomposition renegotiated. Treat option 3's first branch as the probe that sett
 ## 9. Traceability appendix
 
 
-**Generated by `temp/stepb_verify.py` from `FINDINGS-REGISTER.md`, not typed.** Re-run it to reproduce these
+**Generated by `tools/stepb_verify.py` from `FINDINGS-REGISTER.md`, not typed.** *(**The path was `temp/` until
+2026-09-02 and that is not a typo but a trap that fired.** Both files exist. `temp/stepb_verify.py` is
+UNTRACKED and 74 lines behind; `tools/stepb_audit.py` loads the option and group maps by explicit path from
+the **`tools/`** copy, so an edit to the `temp/` one changes nothing any checker reads — and it reads as
+success, because the emitted table changes and the checker keeps passing on the old map until it happens to
+compare them. Caught here by check 13b when A6 was reassigned. The house rule is `…\Coding\.claude\CLAUDE.md`'s:
+**prefer a script in `tools\` over any same-named copy in `temp\`.**)* Re-run it to reproduce these
 tables. It asserts that every one of the 168 skill findings appears in exactly one consequence group and in
 at least one option, and it fails if any id does not exist or is misfiled. **This appendix is what stops the
 plain English above becoming hand-waving.**
@@ -2770,9 +2815,9 @@ plain English above becoming hand-waving.**
 
 | option | what it is | findings it closes or detects | severity mix |
 |---|---|---|---|
-| 1 | preserve-by-default in apply | A1 A2 A3 A6 A8 A9 A16 A19 C16 C17 C19 D4 F16 F27 N1 T1 T6 | CRITICAL:4 HIGH:11 MED:1 POS:1 |
+| 1 | preserve-by-default in apply | A1 A2 A3 A8 A9 A16 A19 C16 C17 C19 D4 F16 F27 N1 T1 T6 | CRITICAL:4 HIGH:10 MED:1 POS:1 |
 | 2 | check against the original | B8 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28 D2 D5 E4 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 H1 H2 H4 J1 L1 L4 L6 M1 S1 S2 S3 U1 V1 | CRITICAL:6 HIGH:23 MED:20 LOW:4 —:1 |
-| 3 | say what the formatting is | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 C13 C20 D6 F7 F13 F19 F22 L2 L3 O1 | HIGH:15 MED:4 LOW:1 |
+| 3 | say what the formatting is | A3 A4 A5 A6 A7 A10 A11 A12 A13 A14 A17 A18 C13 C20 D6 F7 F13 F19 F22 L2 L3 O1 | HIGH:17 MED:4 LOW:1 |
 | 4 | a home for document furniture | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 | CRITICAL:1 HIGH:5 MED:9 LOW:1 |
 | 5 | one authority, one way out, more than one gear | A15 C5 C7 C26 D3 D5 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28 F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 | CRITICAL:1 HIGH:16 MED:23 LOW:5 |
 | 6 | take post_process's authority away | B1 B2 B3 B4 B5 B6 B7 B8 D5 F29 T1 T6 | HIGH:5 MED:5 LOW:1 POS:1 |
@@ -2815,7 +2860,7 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 | 3 the scope rule | 5, 9 | K1 K2 K3 F35 X3 |
 | 4 the exception channel | 5 | A15 D3 D4 D5 F1 F15 F28 F30 F33 L5 **F41** — and the whole eighteen-row set named in §12 routes through here. *(F41, repair is unbounded, added 2026-08-11: §6's Option 5 assigns it here in as many words — "this gap belongs to this option because its answer is this option's answer" — but this row had never carried it. No register row was added, so no count in `CLAUDE.md` §2.3 moves.)* |
 | 5 checks can fail | 2, 8 | C3 C23 C25 W3 W4 L4 (via C3) |
-| 6 stop deleting | 1 | A1 A2 A3 A6 A8 A9 C16 C17 F16 F27 |
+| 6 stop deleting | 1 | A1 A2 A8 A9 F27 · **A3 PARTIAL** · C16 C17 F16 *(**A3 and A6 both left this row on 2026-09-02, differently, and the difference is the point.** Slice 1 closed A1 A2 A8 A9 F27; slice 2 placed 25 of D06's 26 table-of-contents entries, which closes **A3's TOC instance and D01's doubled-tab instance** and leaves D02's tables, D05's hanging-indent notices clause and D11's mid-phrase tabs unplaceable from a single English string — so **A3 stays here as PARTIAL and its remainder is branch 16's**. **A6 moved OUT to 15–17 entire:** glued bullets are a different paragraph shape and no slice of option 1 reaches them. C16, C17 and F16 remain a declared follow-on slice — boundary-whitespace and offset defects in three other functions, not deletions.)* |
 | 7 the container inventory | 1 | A16 A19 N1 C19 |
 | 8 reading-apart completeness | 2 | C28 C12 M1 |
 | 9 the change journal | 6, 2 | C15 B6 — and it unblocks branch 11 |
@@ -2824,7 +2869,7 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 | 12 declare the language | 2 | S1 S2 S3 H1 H2 H4 C9 C2 E4 |
 | 13 declared modes | 5 | H3 L5 R1 — and the runtime problem |
 | 14 check scoping | 2 | G1 G2 G3 G4 G5 G6 G7 G8 G9 **G10 G11 G12** C7 C10 F5 F10 *(G10 added 2026-08-12: `quality_check`'s missing-space rule fires across a `w:tab` element, and branch 5's exit code turned that false positive into a blocked run. Same shape as G4 — an adjacency rule that cannot see what sits between the two runs.)* *(**G11 and G12 added 2026-08-21.** G11 is `check_truncation`'s method B ignoring the `source_data` method A uses in the same function, found by the rule-5b probe's arm 3 and never added to this row. G12 is the residue branch 14's slice leaves behind, measured and deliberately unclassified.)* **THE `quality_check` SLICE IS BUILT, and it fixed FOUR rows this row does not own** — L1 (branch 11's), M1 (branch 8's), C9's input half (branch 12's) and F15 (branch 4's, reassigned to branch 14 by its own row on 2026-08-19). **That is the fourth sequencing fact executing, not a scope grab:** §2 owns the order and puts the slice immediately after branch 5, while this column owns row-level accountability. The two disagreed for four rows and the disagreement is recorded rather than resolved by editing one of them. **G9 is HALF closed** — the del/ins double-space scoping is fixed; the alpha-collision half is measured UNFIXABLE by scoping, because `en_segments` carry only `type` and `en` and the source text the rule would need is not in the file it reads. |
-| 15–17 formatting, parts 1–3 | 3 | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3 |
+| 15–17 formatting, parts 1–3 | 3 | A4 A5 **A6** A7 A10 A11 A12 A13 A14 A17 A18 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3 · **plus A3's REMAINDER** *(both arrived 2026-09-02 from branch 6's row. **A6** is glued bullets on D05 — a marker separated from its text by a destroyed tab, in a paragraph shape option 1 never reached. **A3's remainder** is every tab whose position cannot be proved from the source: D02's two tables, D05's hanging-indent notices clause, D11's mid-phrase tabs. Branch 15's per-run English is what makes those knowable; the table-of-contents case did not need it, because a clause number and a page number translate to themselves.)* |
 | 18 layout: detect and disclose | 2, 5 | D1 D2 D3 D4 D5 |
 | 19 furniture and prohibition | 4 | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 |
 | deferred: reconciliation · claim audit · coverage and manifest | 7, 9, 8 | U1 V1 C21 F34 F8 Q1 · X1 X2 X4 X5 X6 C5 C11 F12 · W1 W2 |
@@ -2899,7 +2944,7 @@ call** rather than twice.
 | **2** | **Check against the original** (option 2) | Highest total value — 54 findings, six of them worst-grade — and the only option that changes what we can find next time. Ranked second rather than first for one reason: it **detects** rather than repairs, and the deadlock finding means its discerning half cannot land before rank 3. Its instrument half (one failing input per check) belongs with the harness and should go first |
 | **3** | **One authority, one way out, more than one gear** (option 5, cheap half first) | Promoted from A3's fifth place, on a fact A3 did not have: **it is a precondition for rank 2.** Eighteen findings have no compliant repair, so a discerning check without an escape hatch stops the pipeline permanently. It also contains the cheapest fix in the project and the only sanctioned speed lever. Do the scope rule and the exception channel **before** the checks get teeth |
 | **4** | **Take the tidy-up script's authority** (option 6) | The strongest single piece of evidence in the register, and — newly — **option 2's character-exact check cannot be built until this stage declares its changes.** The journal is small and should land early even if the shape decision takes longer |
-| **5** | **Say what the formatting is** (option 3) | The biggest quality gain on the page: 20 findings, 15 visible. Ranked fifth only because it is the most expensive and the riskiest, it needs rank 2 underneath it to be believed, and its own claim on the layout group is refuted. **This is the leap.** It is fifth in *order*, not in importance |
+| **5** | **Say what the formatting is** (option 3) | The biggest quality gain on the page: 22 findings, 17 visible. Ranked fifth only because it is the most expensive and the riskiest, it needs rank 2 underneath it to be believed, and its own claim on the layout group is refuted. **This is the leap.** It is fifth in *order*, not in importance |
 | **6** | **A home for document furniture** (option 4) | The only option touching what your own review says matters, and structurally invisible to every instrument we have — which is both its argument and its problem. Ranked sixth because it needs your decision on the prohibition question first, and because its verification is a graded run plus your review rather than a script |
 | **7** | **Layout — see it and say so** (option 11) | **Added 2026-08-05; it was missing.** It carries Wouter's own named defect. Ranked below furniture because furniture's harm is *substantive* — a wrong instrument-class rendering, an arguably narrowed exclusion clause — while layout's is presentational, and one of its six findings is explicitly benign. Ranked here rather than lower because the detection half is cheap, rides on option 2's rendered comparison, and is a **precondition for the repair half either way** |
 | **8** | **Fix the claim** (option 9) | Cheap, and a product requirement for a published skill. Ranked here because most of it should be folded into ranks 1–6 as they land, leaving a small standalone slice. **But see the retraction above: an independent reader rates this higher within the static findings it could see, and the operative fact is not the rank — it is that this and rank 3 open the same files and should be one pass** |
