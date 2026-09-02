@@ -63,7 +63,7 @@ SCRIPT = "apply_translations_textmatch.py"
 # is the last commit to touch either tree. Kept in step with the same pin in
 # tools/apply_corpus_diff.py: the two tools answer the same before-and-after question, one in
 # bytes and one in pixels, and a disagreement between their baselines would be invisible.
-REF = os.environ.get("LT_BASELINE_REF", "049484e")
+REF = os.environ.get("LT_BASELINE_REF", "2a71e71")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
 # Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
 # glance whether the pages in front of them belong to the run being discussed.

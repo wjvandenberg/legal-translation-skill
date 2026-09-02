@@ -61,18 +61,20 @@ SCRIPT = "apply_translations_textmatch.py"
 # once read its "before" from HEAD, which worked only while the change was uncommitted and then
 # compared the new file against itself and reported 100% carried.
 #
-# MOVED TO 049484e 2026-09-02, the squash-merge of branch 6 slice 2 (PR #59) and the LAST
-# COMMIT THAT TOUCHED EITHER TREE -- verified by `git log -- uk us` and by `git diff 049484e
+# MOVED TO 2a71e71 2026-09-02, the squash-merge of branch 6 slice 3 (PR #60) and the LAST
+# COMMIT THAT TOUCHED EITHER TREE -- verified by `git log -- uk us` and by `git diff 2a71e71
 # -- uk us` coming back empty, not by reading the merge message. A pin left at the previous
-# baseline 4a1c452 would report slice 2's own 25 placed tabs as movement belonging to whatever
-# branch ran next, which is the failure this pin exists to prevent.
+# baseline would report the merged slice's own work as movement belonging to whatever branch
+# ran next, which is the failure this pin exists to prevent. It has moved three times in two
+# days -- 4a1c452, then 049484e, then here -- so moving it is the FIRST act after a merge,
+# not a closing tidy-up.
 #
 # AND THE PROSE ABOVE THE PIN GOES STALE TOO, WHICH IS WHY IT IS BEING REWRITTEN RATHER THAN
 # APPENDED TO: it still named 79a8c14 as "the merge-base of this branch" and e57e658 as the
 # last commit to touch either tree, both true when first written and both false by the time
 # the pin read 4a1c452. Nothing checks a comment. Re-derive both claims on the commit that
 # moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "049484e")
+REF = os.environ.get("LT_BASELINE_REF", "2a71e71")
 
 # WHICH ROW OWNS WHICH STRUCTURE — taken from FINDINGS-REGISTER.md's `docs` column, used as
 # a LABEL rather than as the gate. The documents named are the ones that were MEASURED, not
