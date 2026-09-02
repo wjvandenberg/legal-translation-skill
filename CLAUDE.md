@@ -115,7 +115,7 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, RE-DECLARED 2026-09-02: 1,106 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, RE-DECLARED 2026-09-02: 1,116 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
 > because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run, and caught this line stale twice on the day it landed.)*
@@ -924,6 +924,16 @@ the very next line.** **Probed one grep per rule: six of the eight have a twin t
 PARENT RUNNER** — and make a before/after suite exit **VOID** when the baseline turns out byte-identical to
 the working tree. **Its two measurements are `EVIDENCE-measurement.md` section 3.4.**
 
+**A SECOND RULE WITH NO TWIN, ADDED 2026-09-02 ON A MEASURED FALSE GREEN: A CLAIM THAT MEASURES ITSELF
+AGAINST `main` IS GREEN ON THE BRANCH THAT BREAKS IT AND RED ONLY AFTER THE MERGE.** Same family as *pin a
+baseline to a revision* — **the thing you measured against was not the thing under review** — but it fails
+in the opposite direction and at the opposite moment, which is why it needs saying. `audit_branches`'
+fixture count read the merged tree, so the branch adding a fixture saw the OLD denominator, passed, recorded
+the suite green and closed; the claim went red afterwards with nobody looking, and stayed red across a
+merge. **Ask of every claim whether it asserts a HISTORICAL DELIVERY or a LIVE INVENTORY** — the first may
+read `main`, the second must read the INDEX, so a number moved on a branch is caught while whoever moved it
+is still there. **And the sweep of the other claims for the same shape is not done.**
+
 **THE SIX DATED INSTANCES MOVED TO `EVIDENCE-measurement.md` SECTION 3.3 ON 2026-08-25** — six green numbers
 in one session, each reporting on something other than the thing being checked. §5.1's *run, do not read*
 rule assumes the run tells you the truth; those are the ways it does not.
@@ -1101,6 +1111,6 @@ the one irreversible act here — never publish without Wouter's explicit OK.)*
 
 **THE SINGLE NEXT ACTION: open the PR for slice 3, then C16, C17 and F16** — branch 6's declared follow-on, and NOT tabs. Per section 2 of `temp/PLAN-branch6-stop-deleting.md` they are boundary-whitespace and offset defects in **three other functions**: `distribute_text_across_elements` (C16), the tracked-change path's `en_seg` handling (C17), and the `en_runs` segment loop (F16). **Read each register row before scoping; do not infer the mechanism from the row's title.** Then **branch 7**, the container inventory (A16 A19 N1 C19), whose four fixtures already exist in `containers.docx`.
 
-**Open, none blocking.** **(1)** C16 C17 F16, then branch 7. **(2)** whether the prefix edge should move past two letters (`Sch-3` is refused today, by decision and recorded as one). **(3)** register **G12**'s 16 unclassified findings, and `stepb_verify`'s maps are **3 findings behind the register**, on which it exits 1 — pre-existing. **(4)** G9's first half, needing branch 15. **(5)** `--original` absent from Step 9's step document. **(6)** a `probe` origin class for the register. **(7)** **I-7 to I-10**, the four open A1 harness defects. **(8)** `tools/run_tests.py` collides by name with `tests/run_tests.py`. **(9)** three `tests/` suites need the system interpreter for `lxml`. **(10)** the scan list needs tightening. **(11)** the companion-file rename is due. **(12)** `us/scripts/apply_translations_textmatch.py` line 937 carries the UK spelling `behaviour` — the reconciliation's to fix.
+**Open, none blocking.** **(1)** C16 C17 F16, then branch 7. **(2)** **`audit_branches`' OTHER claims have not been swept for the shape §5.16 now names** — B1.fixtures was the one that bit, and any claim asserting a LIVE INVENTORY rather than a historical delivery has it. **(3)** whether the prefix edge should move past two letters (`Sch-3` is refused today, by decision and recorded as one). **(4)** register **G12**'s 16 unclassified findings. **(5)** G9's first half, needing branch 15. **(6)** `--original` absent from Step 9's step document. **(7)** a `probe` origin class for the register. **(8)** **I-7 to I-10**, the four open A1 harness defects. **(9)** `tools/run_tests.py` collides by name with `tests/run_tests.py`. **(10)** three `tests/` suites need the system interpreter for `lxml`. **(11)** the scan list needs tightening. **(12)** the companion-file rename is due. **(13)** `us/scripts/apply_translations_textmatch.py` line 937 carries the UK spelling `behaviour` — the reconciliation's to fix.
 
 **What a new session would get wrong.** It would trust `audit_branches`' fixture claim as a historical one: it is now the ONLY claim in that block reading the **index** rather than `main`, deliberately, and a new fixture must be **staged** before the count is right. It would point a test's apply at `tests/fixtures/` and dirty the tree. It would read `$?` after a pipe — a suite that printed FAIL came back `EXIT=0` because `tail` succeeded. It would trust a directory-level line-ending map: `uk/` and `us/` are pure LF, `CLAUDE.md` and the root `.md` are pure CRLF, `tests/`, `tools/` and `.claude/` are MIXED **per file**, so measure the file. It would run `verify_charter_continuity.py` without `LT_HOUSE_TEMPLATES` set to `…\Coding\templates`, whose check 7 then reports **VOID, not a pass**. And two red lines are **by design**: `verify_md`'s `file length` while §1.7's exemption stands, and `stepb_audit`'s check 10 at **8 unverified quotations**, which needs `LEGAL_TRANSLATION_A4`.
