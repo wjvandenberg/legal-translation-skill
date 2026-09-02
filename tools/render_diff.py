@@ -190,6 +190,10 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--doc", action="append", default=[], help="corpus doc-id (real, mechanical)")
 ap.add_argument("--fixture", action="append", default=[],
                 help="synthetic fixture stem (renders are kept and may be viewed)")
+ap.add_argument("--expect-block", action="append", default=[],
+                help="fixture stem whose NEW arm is EXPECTED to be refused by a gate. Its "
+                     "old arm still renders, so the page shows what used to ship; a run "
+                     "that produced output anyway is the FAILURE for such a fixture")
 ap.add_argument("--variant", default="uk", choices=("uk", "us"))
 ap.add_argument("--pages", type=int, action="append", default=[],
                 help="force these page numbers to be written even if they did not change "
@@ -232,6 +236,48 @@ def run_apply(scripts_dir, src_docx, notes_json, out_xml):
     return (out_xml if out_xml.is_file() else None), p
 
 
+def _gate_line(proc):
+    """The line a HUMAN needs from a refusal, not the first line of a traceback.
+
+    `stderr[0]` is `Traceback (most recent call last):` on every gate this tree has, because
+    the gates raise. Prefer the line that names the block; fall back to the LAST non-empty
+    line, which is where a RuntimeError's message lands.
+    """
+    lines = [ln.strip() for ln in ((proc.stderr or "") + (proc.stdout or "")).splitlines()
+             if ln.strip() and set(ln.strip()) - set("=-_ ")]   # a rule line is not a message
+    for ln in lines:
+        if "SKILL GATE FIRED" in ln or "BLOCK" in ln or "returned exit code" in ln:
+            return ln[:160]
+    return lines[-1][:160] if lines else "no output"
+
+
+def _repack_bypass(src_docx, doc_xml, out_docx):
+    """A .docx built by BYTE-SUBSTITUTING document.xml, used ONLY to render a blocked arm.
+
+    WHY THIS EXISTS, AND WHY IT IS NOT A WAY ROUND A GATE. Branch 6's fourth slice found that
+    the PRE-FIX code cannot be repacked at all on the whitespace fixture: clearing a
+    whitespace-only segment glues two words into one, `validate_apply --strict` compares token
+    SETS, and a merged token is a token set that no longer matches -- so repack refuses. That
+    is a real finding (the operator who follows Step 4 rule 9 is deadlocked, F41's family) and
+    it is reported as one.
+
+    But it also means the DEFECT has no page, and a fix nobody can see is a fix taken on
+    trust. So the OLD arm -- and only the old arm, of a SYNTHETIC fixture -- is assembled here
+    without the gates, purely to be looked at.
+
+    NO XML IS PARSED OR REWRITTEN: `document.xml` is copied in as BYTES, so nothing here can
+    rebind a namespace prefix (.claude/rules/ooxml.md's first rule). Every other part is
+    copied verbatim from the source. It is not a deliverable and must never be used as one.
+    """
+    payload = Path(doc_xml).read_bytes()
+    with zipfile.ZipFile(src_docx) as zin, \
+            zipfile.ZipFile(out_docx, "w", zipfile.ZIP_DEFLATED) as zout:
+        for item in zin.infolist():
+            data = payload if item.filename == "word/document.xml" else zin.read(item.filename)
+            zout.writestr(item, data)
+    return out_docx if Path(out_docx).is_file() else None
+
+
 def repack(scripts_dir, src_docx, doc_xml, out_docx, notes_json):
     env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
                PYTHONDONTWRITEBYTECODE="1")
@@ -246,6 +292,36 @@ def repack(scripts_dir, src_docx, doc_xml, out_docx, notes_json):
 # =========================================================================================
 # SYNTHETIC FIXTURES — renders KEPT, because there is no client text in them.
 # =========================================================================================
+# A PINNED-BASELINE ARM FOR FIXTURES, BUILT ONCE. Added for branch 6's fourth slice.
+#
+# WITHOUT IT A FIXTURE RENDER SHOWS `source` VERSUS `applied-with-whatever-is-in-the-tree`, so
+# the DEFECT is not on any page and the reviewer is asked to take the improvement on trust.
+# Slice 3 hit exactly this and worked around it by hand -- "rendering a third arm from the
+# pre-widening script" -- which is a step nobody can repeat and nothing records. The real
+# corpus path has had this arm since it was written; the fixture path did not, and the
+# asymmetry was invisible because only the corpus path was ever red.
+FX_OLDTREE = None
+if args.fixture:
+    _blob = subprocess.run(["git", "show", f"{REF}:{args.variant}/scripts/{SCRIPT}"],
+                           capture_output=True, cwd=ROOT)
+    if _blob.returncode != 0:
+        print(f"\n  VOID — cannot read {SCRIPT} at {REF}; no baseline arm for the fixtures.")
+        sys.exit(1)
+    _fxtmp = Path(tempfile.mkdtemp(prefix="fx-oldtree-"))
+    FX_OLDTREE = _fxtmp / "old_scripts"
+    shutil.copytree(ROOT / args.variant / "scripts", FX_OLDTREE)
+    (FX_OLDTREE / SCRIPT).write_bytes(_blob.stdout)
+    # The sentinel is a plain string at the file's end, so a copied script still passes its own
+    # integrity check -- proved rather than assumed, because failing it would exit 3 and the
+    # arm would silently not exist.
+    if b"\n# === SKILL FILE COMPLETE ===" not in (FX_OLDTREE / SCRIPT).read_bytes():
+        print("  VOID — the baseline copy has no integrity sentinel; it would exit 3.")
+        sys.exit(1)
+    _same = _blob.stdout == (ROOT / args.variant / "scripts" / SCRIPT).read_bytes()
+    print(f"  fixture baseline arm: {REF}"
+          + ("   NOTE: BYTE-IDENTICAL to the working tree, so old and new are the same code "
+             "and an all-quiet render proves nothing" if _same else ""))
+
 for stem in args.fixture:
     fx = ROOT / "tests" / "fixtures" / f"{stem}.docx"
     print(f"\n{stem}.docx  — SYNTHETIC, renders kept for inspection")
@@ -283,35 +359,138 @@ for stem in args.fixture:
     nj = outdir / "paragraphs.json"
     nj.write_text(json.dumps(notes, ensure_ascii=False), encoding="utf-8")
     shutil.copyfile(fx, outdir / "source.docx")
-    xml, _ = run_apply(ROOT / args.variant / "scripts", outdir / "source.docx", nj,
-                       outdir / "document.xml")
-    if xml is None:
-        ok(f"{stem}: apply produced document.xml", False)
-        continue
-    deliv, rp = repack(ROOT / args.variant / "scripts", outdir / "source.docx", xml,
-                       outdir / "applied.docx", nj)
-    if deliv is None:
-        ok(f"{stem}: repack produced a .docx", False,
-           (rp.stderr or rp.stdout or "")[-200:])
-        continue
+
+    # THREE ARMS: the source, the deliverable at the PINNED BASELINE, and the deliverable with
+    # the working tree. `old` is what the defect looks like on a page; without it a reviewer is
+    # asked to believe the improvement rather than see it.
+    #
+    # ONE INPUT COPY PER ARM. Apply invokes validate_translations as its final pre-apply pass
+    # and that writes `.validate-state.json` beside the NOTES file, so two arms sharing a
+    # directory would have each arm reading the other's batch state.
+    expect_block = stem in args.expect_block
+    built = {}
+    for arm, scripts_dir in (("old", FX_OLDTREE),
+                             ("new", ROOT / args.variant / "scripts")):
+        adir = outdir / arm
+        adir.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(fx, adir / "source.docx")
+        shutil.copyfile(nj, adir / "paragraphs.json")
+        xml, p_ = run_apply(scripts_dir, adir / "source.docx", adir / "paragraphs.json",
+                            adir / "document.xml")
+        if xml is None:
+            # A REFUSAL IS A RESULT FOR A FIXTURE THAT DECLARES ONE, AND A FAILURE OTHERWISE.
+            # en-runs-offsets.docx exists so a gate REFUSES it; reporting that as a broken
+            # fixture would train a reader to ignore the one arm that is working.
+            if expect_block and arm == "new":
+                ok(f"{stem}: the NEW arm is REFUSED by a gate, as this fixture declares",
+                   True)
+                print(f"       rc={p_.returncode}, and the refusal is the point: there is no "
+                      f"page to render because the run correctly did not produce one.")
+                print(f"       gate said: {_gate_line(p_)}")
+                continue
+            ok(f"{stem}: apply produced document.xml ({arm} arm)", False,
+               (p_.stderr or p_.stdout or "")[-200:])
+            continue
+        deliv, rp = repack(scripts_dir, adir / "source.docx", xml,
+                           adir / "applied.docx", adir / "paragraphs.json")
+        if deliv is None and arm == "old":
+            # THE PRE-FIX CODE FAILING ITS OWN REPACK GATE IS A RESULT, NOT A BROKEN FIXTURE.
+            # Reported as the finding it is, and then the arm is assembled without the gates
+            # so the defect still has a page. Synthetic fixture, old arm, render only.
+            print(f"       the OLD arm's repack was REFUSED by a gate — which is a FINDING, "
+                  f"not a fixture defect:")
+            print(f"         {_gate_line(rp)}")
+            print(f"       so the old arm is assembled by byte-substituting document.xml, "
+                  f"purely to be LOOKED AT. It is not a deliverable.")
+            deliv = _repack_bypass(adir / "source.docx", xml, adir / "bypassed.docx")
+            if deliv is None:
+                ok(f"{stem}: old arm assembled for rendering", False)
+                continue
+        elif deliv is None:
+            ok(f"{stem}: repack produced a .docx ({arm} arm)", False,
+               (rp.stderr or rp.stdout or "")[-200:])
+            continue
+        built[arm] = deliv
+    if expect_block and "new" in built:
+        ok(f"{stem}: declared --expect-block, yet the NEW arm produced a deliverable",
+           False, "the gate did not fire — that is the failure for this fixture")
+
     pdfs = {}
-    for name in ("source", "applied"):
-        pdf, r = to_pdf(SOFFICE, outdir / f"{name}.docx", outdir)
+    for name, docx_path in (("source", outdir / "source.docx"),
+                            ("old", built.get("old")), ("new", built.get("new"))):
+        if docx_path is None:
+            continue
+        pdf, r = to_pdf(SOFFICE, docx_path, outdir / name if name != "source" else outdir)
         if pdf is None:
-            ok(f"{stem}: {name}.docx converted to PDF", False,
-               (r.stderr or r.stdout or "")[-200:])
+            ok(f"{stem}: {name} converted to PDF", False, (r.stderr or r.stdout or "")[-200:])
+            continue
         pdfs[name] = pdf
-    if not all(pdfs.values()):
-        continue
+    import pymupdf
     for name, pdf in pdfs.items():
-        pages = page_hashes(pdf)
-        import pymupdf
         with pymupdf.open(pdf) as doc:
             for i, page in enumerate(doc):
                 page.get_pixmap(dpi=DPI).save(str(outdir / f"{name}-p{i + 1}.png"))
-        print(f"       {name}: {len(pages)} page(s) rendered -> temp/render/{stem}/")
-    sp, ap_ = page_hashes(pdfs["source"]), page_hashes(pdfs["applied"])
-    ok(f"{stem}: page count unchanged  {len(sp)} -> {len(ap_)}", len(sp) == len(ap_))
+        print(f"       {name}: {len(page_hashes(pdf))} page(s) -> temp/render/{stem}/"
+              f"{name}-p1.png ...")
+    if "old" in pdfs and "new" in pdfs:
+        po, pn = page_hashes(pdfs["old"]), page_hashes(pdfs["new"])
+        ok(f"{stem}: page count unchanged old -> new  {len(po)} -> {len(pn)}",
+           len(po) == len(pn))
+        moved = [i + 1 for i, (a, b) in enumerate(zip(po, pn)) if a != b]
+        # NOT AN ASSERTION EITHER WAY. Some fixtures must change on the page and some must
+        # not; the manifest says which pages moved and the suite owns the expectation.
+        print(f"       pages whose RENDERING changed old -> new: {moved or 'NONE'}")
+    if "source" in pdfs and "new" in pdfs:
+        ok(f"{stem}: page count unchanged source -> new  "
+           f"{len(page_hashes(pdfs['source']))} -> {len(page_hashes(pdfs['new']))}",
+           len(page_hashes(pdfs["source"])) == len(page_hashes(pdfs["new"])))
+
+    # A READ-ME PER FIXTURE, and it is written as BYTES with explicit \n. `write_text` opens
+    # in text mode, so on Windows every \n becomes \r\n -- harmless in a scratch directory,
+    # but the habit is what matters and the real-corpus block below has the same defect.
+    (outdir / "READ-ME.txt").write_bytes(("\n".join([
+        f"SYNTHETIC FIXTURE RENDER — {stem}.docx",
+        "",
+        "Every string in this document is invented. It is NOT a client document, so these",
+        "pages may be looked at, kept and pasted anywhere.",
+        "",
+        "THREE ARMS:",
+        f"  source-pN.png   the fixture itself, untranslated",
+        f"  old-pN.png      the deliverable as the code stood at {REF} — THE DEFECT",
+        "  new-pN.png       the deliverable with the working tree's code — THE FIX",
+        "",
+        "The `old` arm is the point. Without it you would be asked to believe the",
+        "improvement rather than see it, which is what happened on the previous slice.",
+        "",
+        "WHAT THIS SLICE CHANGED — C17, C16 and F16, all three about a boundary apply could",
+        "not describe and resolved silently, in the direction that destroyed something.",
+        "",
+        "  whitespace-arms.docx — the document LABELS ITS OWN ROWS, so nothing here has to",
+        "  be taken on trust. Read the labels, then the line under each:",
+        "    ARM 1 (two lines)  a one-space tracked insertion between two sentences. In",
+        "                       `old` the two sentences are GLUED together; in `new` there",
+        "                       is a space. The second of the two is the register's own",
+        "                       example, and post_process would have masked it by accident.",
+        "    NEGATIVE (one line) an explicitly empty segment. MUST look identical in both",
+        "                       arms — if it changed, the fix broke the documented device",
+        "                       that clears a run.",
+        "    ARM 2 (two lines)  the first must begin with ONE leading space in `new` and TWO",
+        "                       in `old`. The second must be IDENTICAL in both — a single",
+        "                       source space is still restored, and that repair had to",
+        "                       survive.",
+        "",
+        "  en-runs-offsets.docx — THERE IS NO `new` PAGE, AND THAT IS THE RESULT. The",
+        "  offsets point past the end of the string, and apply now REFUSES rather than",
+        "  slicing the wrong characters. Compare `old`: every character is present and the",
+        "  BOLD is on the wrong words — `8.1, as adjusted.` instead of `8.1`. That is the",
+        "  defect, and it exited 0.",
+        "",
+        "WHAT THESE PAGES ARE NOT. They come from apply + repack only, never the",
+        "eleven-step pipeline: no definitions reorder, no tidy-up pass, no post_process. So",
+        "post_process's seam repair has NOT run — which is deliberate, because it would",
+        "have masked one of the two ARM 1 lines and hidden what apply actually delivered.",
+        "",
+    ]) + "\n").encode("utf-8"))
 
 # =========================================================================================
 # REAL CORPUS — MECHANICAL ONLY. Renders are made outside the repository and DELETED.
@@ -467,59 +646,65 @@ if args.doc:
                 "                     branch 6'. It is 'before the change under review'.\n"
                 "  p<NNN>-new.png     the deliverable with the working tree's code\n"
                 "  p<NNN>-source.png  the original document, for reference\n\n"
-                "THE CHANGE UNDER REVIEW IS THE TABLE-OF-CONTENTS PAGE-NUMBER WIDENING.\n"
-                "Rewritten 2026-09-02. The text here described the PREVIOUS change and would\n"
-                "now send you looking for something that is already in -old -- the same way a\n"
-                "stale pinned-baseline comment misdirects. It is rewritten on every change to\n"
-                "what is under review, and that is not optional.\n\n"
-                "EXPECT NO CHANGE AT ALL, AND THAT IS THE RESULT, NOT A FAILED RUN.\n\n"
-                "The tab PLACEMENT itself landed in the previous slice and is already in the\n"
-                "-old arm: dot leaders and right-aligned page numbers are there in both. What\n"
-                "this change did was widen WHICH page numbers count as page numbers -- adding\n"
-                "a roman numeral (front matter, 'iv') and a prefixed one (schedules, 'A-3')\n"
-                "to the arabic digits already admitted.\n\n"
-                "NO DOCUMENT IN THE CORPUS HAS EITHER SHAPE. Only one of the eleven has a\n"
-                "table of contents at all, and its 26 entries are numbered in arabic digits\n"
-                "throughout. So the widening cannot fire on any real document here, and the\n"
-                "byte comparison across all thirteen frozen intermediates says exactly that:\n"
-                "0 moved, 13 byte-quiet. If a page in -new differs from -old, THAT IS THE\n"
-                "DEFECT -- it means the wider test fired somewhere it was not meant to.\n\n"
+                "THE CHANGE UNDER REVIEW IS WHITESPACE AT A SEGMENT BOUNDARY -- C17, C16 and\n"
+                "the F16 offset guard. Rewritten 2026-09-02, for the third slice in a row.\n"
+                "The text here described the PREVIOUS change (the table-of-contents\n"
+                "page-number widening) and would now send you looking for something already\n"
+                "in -old, the same way a stale pinned-baseline comment misdirects. It is\n"
+                "rewritten on every change to what is under review, and that is not optional.\n\n"
+                "EXPECT EXACTLY THREE PARAGRAPHS TO CHANGE, ON TWO DOCUMENTS, AND NOTHING\n"
+                "ELSE. Measured across all thirteen frozen intermediates: D02 two paragraphs\n"
+                "and D07 one, ten documents byte-identical, no unexplained movement.\n\n"
+                "C17 -- a tracked-change segment whose declared English is a single SPACE was\n"
+                "read as a request to clear the run, because the code tested the string for\n"
+                "truthiness after stripping it. Step 4 rule 9 tells the operator to mirror\n"
+                "source whitespace, so the manual instructed them into the one input the code\n"
+                "could not read. Three real instances, and in EVERY ONE the space sits at the\n"
+                "END of its paragraph -- so THERE IS NOTHING TO SEE ON THESE PAGES, and that\n"
+                "is not a failed run. A trailing space renders as nothing. The visible form\n"
+                "of this defect -- two sentences glued together mid-paragraph -- exists only\n"
+                "on the synthetic fixture, because no corpus document carries that shape.\n\n"
                 "What to look for, in order:\n"
-                "  1. -old AND -new SHOULD BE INDISTINGUISHABLE. Any difference at all is a\n"
-                "     finding, and the most likely one is a tab appearing in a three-part\n"
-                "     tabbed line that is NOT a contents entry -- a party grid, a cost table,\n"
-                "     a signature block. That is the false positive the page-number test\n"
-                "     exists to stop, and widening it spent part of that margin.\n"
-                "  2. NO WRAPPED LINE anywhere that did not wrap in -old. A tab placed at a\n"
-                "     paragraph END forced a wrap on a long row once, and a misplaced tab is\n"
-                "     worse than a missing one -- so a wrap is a DEFECT, not a nuisance.\n"
-                "  3. The table of contents should look the same as it did after the previous\n"
-                "     slice: number, gap, title, DOT LEADER, page number at the RIGHT MARGIN.\n"
-                "     It should NOT have improved. There was nothing left to improve here.\n"
-                "  4. THE KNOWN LIMITATION, UNCHANGED BY THIS SLICE. Where a tab sat between\n"
-                "     two pieces of text and the boundary CANNOT be proved -- a hanging-indent\n"
-                "     list item, a party grid, a cost table -- it is still dropped and the\n"
-                "     line still reads glued. That is branch 16's, and nothing here reaches\n"
-                "     it. A contents entry is the one shape where both boundaries ARE proved.\n\n"
-                "A FLAT LINE IS NOT AUTOMATICALLY A DEFECT, AND THIS NOTE IS HERE BECAUSE THE\n"
-                "FIRST REVIEW READ IT AS ONE. Some lines are SUPPOSED to stay flat, and the\n"
-                "synthetic fixture tests/fixtures/toc-widened.docx now labels them on the page\n"
+                "  1. -old AND -new SHOULD BE INDISTINGUISHABLE ON EVERY PAGE. All three\n"
+                "     changed paragraphs gained a trailing space, which no renderer shows.\n"
+                "     Any VISIBLE difference is therefore a finding, not the fix working.\n"
+                "  2. NO WORD GLUED TO ITS NEIGHBOUR that was separate in -old, and no new\n"
+                "     double space between words. The fix changes whitespace, so a whitespace\n"
+                "     regression is the failure mode with the shortest path from this change.\n"
+                "  3. NO WRAPPED LINE that did not wrap in -old.\n"
+                "  4. THE TABLE OF CONTENTS SHOULD BE UNTOUCHED -- number, gap, title, dot\n"
+                "     leader, page number at the right margin, exactly as the previous two\n"
+                "     slices left it. It should NOT have changed at all.\n"
+                "  5. THE KNOWN LIMITATION, AND THIS SLICE DID NOT CLOSE IT. C16 -- a double\n"
+                "     space apply CREATES -- is only PARTIALLY fixed. Two mechanisms were\n"
+                "     found and repaired, both proved on the synthetic fixture, but on the\n"
+                "     real corpus no attributable double space was removed: D07 still carries\n"
+                "     three that exceed both its source's own count and the operator's\n"
+                "     declared ones. If you see a double space between words, it was there in\n"
+                "     -old too. Check that it was.\n\n"
+                "A LINE THAT LOOKS UNCHANGED IS NOT AUTOMATICALLY A FAILED RUN, AND THIS NOTE\n"
+                "IS HERE BECAUSE THE PREVIOUS SLICE'S FIRST REVIEW READ FLAT LINES AS DAMAGE.\n"
+                "The synthetic fixtures LABEL THEIR OWN ROWS on the page\n"
                 # NOT `labels read:\\n\\n` -- a colon followed by two escapes reads as the
                 # Windows path `d:\\n\\n` to the committed-script scan, which blocked the
                 # commit. The pattern is right to be broad: narrowing it would miss a real
                 # `C:\\network\\...`, and a leaked path cannot be rotated. Reworded instead.
-                "itself so nobody has to take that on trust. The two labels are\n\n"
-                "  'The five below MUST keep a dot leader and a right-aligned page number:'\n"
-                "  'NOT contents entries. The two below MUST stay flat - and were flat before\n"
-                "   this change too:'\n\n"
-                "The two under the second label are a PARTY GRID and a contents-shaped line\n"
-                "whose last column is the word `civil`. Neither is a contents entry. The rule\n"
-                "may only put a tab back where it can PROVE the position, and its proof is\n"
-                "that the text on each side survives translation unchanged: a page number\n"
-                "does, an ordinary word does not. Admitting a trailing word would make the\n"
-                "rule fire on every three-column table in every document, guessing. `civil` is\n"
-                "in the fixture because every one of its letters is a roman numeral letter, so\n"
-                "the obvious pattern would have swallowed it.\n\n"
+                "itself so nobody has to take that on trust. For this slice the fixture is\n"
+                "tests/fixtures/whitespace-arms.docx, rendered to temp/render/, and its three\n"
+                "labels are\n\n"
+                "  'ARM 1 - C17. The two below MUST read as two sentences with a space\n"
+                "   between them. Glued together is the defect:'\n"
+                "  'NEGATIVE CONTROL. The line below MUST look the same in both arms - an\n"
+                "   explicitly empty segment goes on being cleared:'\n"
+                "  'ARM 2 - C16. The FIRST line below MUST begin with ONE leading space, not\n"
+                "   two. The SECOND MUST look identical in both arms ...'\n\n"
+                "THAT FIXTURE IS WHERE THIS CHANGE IS VISIBLE AND THESE PAGES ARE NOT. The\n"
+                "three real instances are trailing spaces at a paragraph end; the glued-\n"
+                "sentence form the register describes appears on no corpus document, which is\n"
+                "why the fixture had to be built. A second fixture, en-runs-offsets.docx,\n"
+                "carries F16 -- and the corpus CANNOT carry that one at all, because the\n"
+                "frozen intermediates are the post-compliance artefact and the offsets are\n"
+                "checked before apply runs, so a run with bad offsets never produced one.\n\n"
                 "These are renders of a real client document. They live here, outside the\n"
                 "repository, and must never be committed or pasted anywhere.\n\n"
                 "WHAT THESE PAGES ARE, AND WHAT THEY ARE NOT. They come from apply + repack\n"

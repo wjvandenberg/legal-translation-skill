@@ -185,8 +185,13 @@ GROUPS = {
  "1 loses content": """
    A1 A2 A3 A6 A8 A9 A16 A19 N1 C19 C17 C23 C28 C12 M1 B3 B8 A15 J1 C16 C13 C14 F16 F27 E4 S3 C2
    """,
+ # A20 added 2026-09-02 (branch 6, fourth slice). Apply slices the STRIPPED `en` with offsets
+ # authored against the UNSTRIPPED one, so leading whitespace shifts every declared span and
+ # the emphasis lands on the wrong words -- every character present, which is why it belongs
+ # here and not in group 1. Found BY the F16 guard firing on correct input.
  "2 looks wrong on the page": """
-   A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 O1 D1 D2 D3 D4 D5 D6 B1 B7 F7 F13 F19 F22 C20 E9 E12 R1
+   A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 A20 O1 D1 D2 D3 D4 D5 D6 B1 B7 F7 F13 F19 F22 C20 E9
+   E12 R1
    """,
  # G10 added 2026-08-12 (branch 5). THIS LIST IS THE SOURCE and §9.1's table is generated
  # from it — a hand-edit to the document alone leaves the two disagreeing, which is exactly
@@ -202,9 +207,14 @@ GROUPS = {
  "4 hard to keep correct": """
    U1 V1 V2 W1 W2 T1 T2 T3 T4 T5 T6 F21 F23 F32 F36 F37 F38 L2 L3 E1 E2 E3 E5 E6 E10 E11 E13 E14 Q1 Y1
    """,
+ # C29 added 2026-09-02 (branch 6, fourth slice). A gate crashes printing its own finding and
+ # apply announces the crash as "INTENTIONAL BLOCK ... the script is working as intended",
+ # sending the operator to read a message that was never printed. It is here rather than in
+ # group 3 because nothing claims to have WORKED -- what is wrong is the shipped account of
+ # what happened, which is F35's collision arriving from a third direction.
  "5 the manual is wrong": """
    F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40
-   E7 E8 K1 K2 K3 H3 L5 B2 B4 B5 B6 X3 X5 Y2 Y3 Y4 F41 F42
+   E7 E8 K1 K2 K3 H3 L5 B2 B4 B5 B6 X3 X5 Y2 Y3 Y4 F41 F42 C29
    """,
 }
 # -------------------------------------------- options (a row may need more than one)
@@ -227,15 +237,22 @@ OPTIONS = {
  # above says a row may need more than one, and A3 genuinely does: option 1 closed the
  # instances whose tab position is provable from the source, option 3's per-run English is
  # what makes the rest knowable. A6 is here alone.
+ # A20 added 2026-09-02 (branch 6, fourth slice). It is the `en_runs` trust problem from a
+ # third side -- C20 is a span the operator forgot to declare, C13 a range nothing checks, and
+ # A20 offsets that index a DIFFERENT STRING from the one apply slices. The fix is a decision
+ # about which string is authoritative, which is what this option is for.
  "3 say what the formatting is": """
-   A3 A4 A5 A6 A7 A10 A11 A12 A13 A14 A17 A18 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3
+   A3 A4 A5 A6 A7 A10 A11 A12 A13 A14 A17 A18 A20 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3
    """,
  "4 a home for document furniture": """
    E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33
    """,
+ # C29 added 2026-09-02: half its fix is F36's exit-code class applied to the CALLER --
+ # `_run_validator` maps every non-zero exit onto "intentional block", so a crash and a gate
+ # are indistinguishable to it. That is this option's business; the packaging half is 8's.
  "5 one authority, one way out, more than one gear": """
-   A15 C5 C7 C26 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28 F29 F30
-   F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 D3 D5
+   A15 C5 C7 C26 C29 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28
+   F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 D3 D5
    """,
  "6 take post_process's authority away": """
    B1 B2 B3 B4 B5 B6 B7 B8 F29 D5 T1 T6
@@ -243,8 +260,11 @@ OPTIONS = {
  "7 one tree instead of two": """
    U1 V1 V2 C21 F34 F8 Q1
    """,
+ # C29 added 2026-09-02: the other half of its fix is that a shipped script must write UTF-8
+ # whatever the console code page is. That is a packaging property of the whole tree, not a
+ # property of the one script that happened to print an arrow.
  "8 protect the whole package": """
-   W1 W2 W3 W4 F35 Y1 Q1
+   W1 W2 W3 W4 C29 F35 Y1 Q1
    """,
  "9 fix the claim, not only the code": """
    X1 X2 X3 X4 X5 X6 C5 C11 K1 J1 L6 F12 C10 F39 F40 F42 Y1 Y2 Y3 Y4

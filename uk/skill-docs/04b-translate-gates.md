@@ -68,7 +68,19 @@ equivalent). For each occurrence:
    the Final Acceptance clause, "Liquidated Damages" → the delay damages clause).
 2. **Replace in the `en` field only** with the correct clause number (e.g. "Clause 8.1").
    Do NOT modify the `text` field — text matching depends on it staying intact.
-3. **If the target is genuinely ambiguous**, render the error marker as
+3. **RE-DERIVE `en_runs` FOR THAT PARAGRAPH — MANDATORY, and it is the step this instruction
+   used to omit.** Replacing a 33-character error marker with a 3-character clause number
+   makes `en` 30 characters shorter, so **every `en_runs` offset after the edit now points at
+   the wrong characters** and the last span's `end` points past the end of the string. Rule 3
+   of Step 4 requires `en_runs` on every definitions paragraph, and a broken cross-reference
+   in a definition is the common case — so this is the usual situation, not an edge case.
+   Re-measure each span against the `en` you now have, so that the last span's `end` equals
+   the length of `en`.
+   **Do NOT simply pull the last offset back to the end of the string.** That repairs the tail
+   and leaves the interior mis-sliced, which puts the emphasis on the wrong words and blocks
+   Step 6. **Apply refuses an out-of-range offset rather than clamping it**, and the block
+   names the paragraph.
+4. **If the target is genuinely ambiguous**, render the error marker as
    "[cross-reference to be confirmed]" rather than carrying forward the raw error text.
 
 ### Step 4d: Lexicon compliance scan (pre-apply) — MANDATORY

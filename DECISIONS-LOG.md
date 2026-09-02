@@ -373,6 +373,55 @@ once, at the end, rather than in two disturbances. **So until then the names sta
 prose is the only thing telling a reader what each document is.** Recorded plainly because a reader
 arriving mid-project will hit this, and the answer must not be *"nobody noticed"*.
 
+## 2026-09-02 — C16's fix keeps both halves, and C16 stays PARTIAL rather than buying its closure
+
+**Two decisions at branch 6 slice 4's closing exchange, both taken after the measurement rather than
+before it, which is why they are here and not in the plan.**
+
+**FIRST: THE C16 FIX SHIPS WIDER THAN THE ONE APPROVED AT THE INPUT POINT, AND THAT WAS PUT TO WOUTER AS AN
+OVERRUN RATHER THAN PRESENTED AS COMPLIANCE.** At the input point he chose *restore at most ONE whitespace
+character* over three alternatives. Building it found a second, unpredicted mechanism: the restoration guard
+tested a segment's **own** slice edge and was blind to its neighbour, so **one** source space restored beside
+an authored one still makes two — `"Clause "` + a cleared `ins` + `" applies."` delivered
+`"Clause 12  applies."`. It needs only one source space, so it is the **commoner** shape, and *at most one*
+does not touch it: it was already restoring one.
+
+**DECIDED: keep both halves** — *at most one character, and only where the boundary has no whitespace from
+either side.* **The reasoning, which generalises past this row:** the two halves are one rule rather than a
+rule plus an extension — make the operator's input authoritative at a boundary — and the narrower version
+would have left a defect that is **visible on the rendered page in the very pull request claiming to fix
+it**. The rev42 repair the wider rule had to preserve is asserted as the fixture's own negative, so the
+widening cannot quietly become a deletion.
+
+**AND THE PROCEDURAL POINT MATTERS MORE THAN THE RULE.** The decision was implemented *before* it was
+confirmed, with the overrun flagged in the pull request, the commit message and the closing exchange, on the
+reasoning that stalling a verified branch to re-ask a question whose answer the measurement had already
+constrained costs a session and buys nothing. **That is only defensible because the flag was unmissable and
+the alternative was reversible.** It would not be defensible for anything irreversible.
+
+**SECOND: C16 STAYS PARTIAL. Its residue does NOT get a branch, and the queue is NOT reordered.** The slice
+built the delivered-versus-declared arm the row had always needed, and the arm **attributes rather than
+totals** — the source's own interior doubles and the operator's declared ones are subtracted, because
+*"apply CREATES it"* is a claim about the excess alone. Measured: **D04 delivers ONE interior double against
+12 in its own SOURCE and 0 declared**, so nothing on the row's own document is attributable to apply at all;
+**D07 keeps 3**, which the fix did not remove.
+
+**DECIDED: leave the row PARTIAL with the measurement written into it, and take branch 7 next.** Three
+reasons, in order of weight. **(1)** §5.8's rule that the queue is worked in order and a reordering is
+Wouter's decision, never a side effect — and wanting to finish a row one is already holding is exactly how
+that rule gets broken. **(2)** Paragraph-level attribution is **unbounded until the first measurement comes
+back**, so it cannot be scoped into a branch that is otherwise finished and verified. **(3)** The instrument
+now exists, so whoever picks the residue up starts from evidence rather than from this row's prose — which
+is the difference between the row as it stood this morning *("the un-catchability is the finding")* and as it
+stands tonight.
+
+**What was explicitly NOT decided: whether the residue is a defect in apply at all.** D04's delivered double
+space may be inherited from a source that carries twelve of them, in which case C16's own document never
+demonstrated the row. **That question is open and is recorded as open**, rather than being settled by the
+convenient reading.
+
+---
+
 ## The closed decisions that had their own sections
 
 # Observability — decided 2026-07-29, and closed

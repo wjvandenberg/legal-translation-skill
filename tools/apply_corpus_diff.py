@@ -37,6 +37,7 @@ import argparse
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -204,6 +205,109 @@ def para_texts(xml_bytes):
     return out
 
 
+# A RUN OF TWO OR MORE SPACES OR TABS, counted as ONE occurrence rather than as n-1 pairs, so
+# three spaces is one defect and not two. Newlines excluded: `br_plain` owns those.
+DOUBLE = re.compile(r"[^\S\r\n]{2,}")
+
+
+def para_texts_raw(xml_bytes):
+    """`para_texts` WITHOUT the trailing `.strip()`, and the difference is a whole finding.
+
+    `para_texts` strips, correctly: it exists to match a delivered paragraph against the
+    notes' `text` field, and those are stripped. But the FIRST version of the text arm below
+    reused it, and C17's three real corpus instances are every one of them the LAST segment of
+    their paragraph -- so the space the fix restores is a TRAILING space, and `.strip()`
+    deleted it before the comparison could see it. The arm reported `0 paragraph(s) changed`
+    on D02 and D07 while the census showed their `ins` and `t` counts had moved.
+
+    That is the same shape as the mislabel it was written to correct, one level down: the thing
+    measured was not the thing under review. Two readers, two purposes, two functions.
+    """
+    root = etree.fromstring(xml_bytes)
+    out = []
+    for p in root.iter(f"{{{W}}}p"):
+        pieces = []
+        for el in p.iter():
+            tag = etree.QName(el).localname
+            if tag == "t" and el.text:
+                pieces.append(el.text)
+            elif tag == "br" and el.get(f"{{{W}}}type", "") != "page":
+                pieces.append("\n")
+        out.append("".join(pieces))
+    return out
+
+
+def _doubles(texts):
+    """(interior runs, trailing-whitespace paragraphs) -- and they are NOT one number.
+
+    MEASURED, AND IT IS WHY THIS IS SPLIT: of the 13 double-space runs on D07's delivered text,
+    most sit at the very END of a paragraph, after a full stop, where nothing can render them.
+    Totalling them with the interior ones produces a figure that moves for reasons a reader
+    cannot see, and C16 is a claim about a double space BETWEEN WORDS.
+    """
+    interior = 0
+    trailing = 0
+    for t in texts:
+        for m in DOUBLE.finditer(t):
+            if m.end() < len(t):
+                interior += 1
+        if t and t[-1].isspace():
+            trailing += 1
+    return interior, trailing
+
+
+def text_delta(old_bytes, new_bytes):
+    """What the CENSUS CANNOT SEE, and this arm exists because it could not.
+
+    THE CENSUS COUNTS STRUCTURES. C16 and C17 change TEXT INSIDE AN ELEMENT THAT ALREADY
+    EXISTS -- a space restored into a `<w:t>` that was there either way -- so a fully working
+    fix produces an EMPTY census delta. Before this arm existed the summary below derived its
+    counts from that delta while printing the word "byte-quiet", so branch 6's fourth slice
+    would have reported `13 byte-quiet` on a run where two documents' bytes had changed.
+    CLAUDE.md 5.16's shape exactly: the thing measured was not the thing under review.
+
+    Indices are paragraph POSITIONS, never text -- nothing here can print a document's
+    content.
+    """
+    o, n = para_texts_raw(old_bytes), para_texts_raw(new_bytes)
+    changed = [i for i, (a, b) in enumerate(zip(o, n)) if a != b]
+    if len(o) != len(n):
+        changed.append(-1)          # -1 means the paragraph COUNT moved, which is not a text
+                                    # change at all and must not be silently averaged into one
+    return changed, _doubles(o), _doubles(n)
+
+
+def predictors(notes):
+    """How many C17 instances this document's own notes predict, and C16's DECLARED baseline.
+
+    A movement is only EXPLAINED if a row predicted it, and for C17 the prediction is
+    computable from the notes rather than read off a document list -- which is stronger,
+    because it says WHERE as well as whether.
+
+      c17       a segment whose declared `en` is non-empty and all whitespace: the exact input
+                `.strip()` truthiness could not tell from an explicit empty-string request.
+      declared  interior double-space runs the operator AUTHORED in `en`. C16 is a claim that
+                apply CREATES one, so a delivered double space the operator declared, or one
+                the SOURCE already carried, is not C16's -- measured on D07, four of its
+                delivered doubles are inherited from the source paragraph and three were
+                declared. Attribution, not a total.
+    """
+    c17 = []
+    for e in notes:
+        for s in (e.get("en_segments") or []):
+            v = s.get("en")
+            if isinstance(v, str) and v != "" and v.strip() == "":
+                c17.append(e.get("idx"))
+                break
+    declared = 0
+    for e in notes:
+        t = e.get("en") or ""
+        for m in DOUBLE.finditer(t):
+            if m.end() < len(t):
+                declared += 1
+    return c17, declared
+
+
 def corpus_dirs():
     """WHERE THE PRISTINE SOURCES LIVE — read from config, never hardcoded, never printed.
 
@@ -314,7 +418,7 @@ print(f"  corpus folder(s) reachable: {len(CORPUS)} · "
       f"{sum(len(list(d.glob('*.doc'))) for d in CORPUS)} legacy .doc (needs conversion, "
       f"not compared)")
 
-docs_done, rows, unexplained, voided = [], [], [], []
+docs_done, rows, unexplained, voided, text_rows = [], [], [], [], []
 wds = [w for w in (sorted(LOGS.rglob("wd")) + sorted(LOGS.rglob("wd-*"))) if w.is_dir()]
 seen = {}
 for wd in wds:
@@ -422,6 +526,53 @@ for wd in wds:
             verdict = (f"structural, not scored (source {sv}) — CLAUDE.md 5.6: never score "
                        "a run property from element counts")
         print(f"      {k:<20} {bv:>6} -> {av:<6} src {sv:<6} {verdict}")
+
+    # ---- THE TEXT ARM. Added for branch 6's fourth slice, because the census above is
+    # structurally incapable of seeing what C16 and C17 change. ------------------------------
+    changed, (di_old, dt_old), (di_new, dt_new) = text_delta(arms["old"][0], arms["new"][0])
+    c17_idx, c16_declared = predictors(notes)
+    # THE SOURCE'S OWN INTERIOR DOUBLES, because "apply CREATED it" is only true of a double
+    # space the source did not already have. Measured on D07: four of its delivered doubles
+    # sit in paragraphs whose SOURCE paragraph carried one, so they are INHERITED. Scoring
+    # those against apply would credit this branch with a defect it never had and, worse,
+    # would report a fix as having failed to remove something that was never its to remove.
+    with zipfile.ZipFile(src_docx) as z:
+        di_src, _ = _doubles(para_texts_raw(z.read("word/document.xml")))
+    n_moved = len([i for i in changed if i >= 0])
+    text_rows.append((label, n_moved, len(c17_idx), di_src, c16_declared,
+                      di_old, di_new, dt_old, dt_new, ident))
+    if -1 in changed:
+        unexplained.append(f"{label}/paragraph count: old and new produced different numbers "
+                           f"of paragraphs — this branch changes text, never structure count")
+    if n_moved or c17_idx or di_old != di_new or dt_old != dt_new:
+        pred = (f"{len(c17_idx)} C17 instance(s) predicted at idx {c17_idx}"
+                if c17_idx else "no C17 instance predicted")
+        print(f"      {'TEXT':<20} {n_moved:>6} paragraph(s) changed        {pred}")
+        # ATTRIBUTED, NEVER TOTALLED. Only the excess over BOTH the source's own doubles and
+        # the operator's declared ones can be attributed to apply.
+        acct = max(0, di_old - max(di_src, c16_declared))
+        acct_new = max(0, di_new - max(di_src, c16_declared))
+        print(f"      {'interior doubles':<20} {di_old:>6} -> {di_new:<6} "
+              f"src {di_src:<4} declared {c16_declared:<4} "
+              + (f"C16: {acct} attributable to apply, now {acct_new}" if acct
+                 else "none attributable to apply — inherited or declared, so not C16's"))
+        print(f"      {'trailing ws paras':<20} {dt_old:>6} -> {dt_new:<6} "
+              "(invisible on a page; counted so it cannot masquerade as an interior double)")
+        # A MOVEMENT NO ROW PREDICTS IS A DEFECT — the same rule the census arm applies, and
+        # it has to be applied here too or the text arm is a printout rather than a check.
+        if n_moved and not c17_idx and di_old == di_new:
+            unexplained.append(
+                f"{label}/TEXT: {n_moved} paragraph(s) changed text with no C17 instance in "
+                f"the notes and no change in interior double count — nothing predicts this")
+        # AND THE OPPOSITE DIRECTION, WHICH A "did anything move" CHECK CANNOT ASK: a document
+        # the notes say carries C17 whose text did NOT move means the fix did not fire where
+        # the evidence says it should. That reads as a clean run and is the more expensive
+        # failure, because it is indistinguishable from success.
+        if c17_idx and not n_moved:
+            unexplained.append(
+                f"{label}/TEXT: the notes carry {len(c17_idx)} C17 instance(s) at "
+                f"{c17_idx} and NOT ONE paragraph's text moved — the fix did not fire where "
+                f"the measurement says it must")
     rows.append((label, moved))
 
 print()
@@ -434,8 +585,32 @@ if not docs_done:
     shutil.rmtree(TMP, ignore_errors=True)
     sys.exit(1)
 moved_docs = [d for d, m in rows if m]
-print(f"  {len(docs_done)} document(s) compared · {len(moved_docs)} moved · "
-      f"{len(docs_done) - len(moved_docs)} byte-quiet")
+# THREE NUMBERS, NOT ONE, AND THE WORD "byte-quiet" NO LONGER MEANS "the census was quiet".
+#
+# THIS LINE USED TO READ `{n} moved · {m} byte-quiet` WITH BOTH DERIVED FROM THE CENSUS DELTA,
+# and that is a mislabel with teeth: the census cannot see text, so a document whose delivered
+# bytes had changed was counted and printed as byte-quiet. Branch 6's fourth slice would have
+# reported 13 byte-quiet on a run that moved two documents. A number is only as good as the
+# noun attached to it, and nothing checks a noun.
+text_moved = [t[0] for t in text_rows if t[1]]
+byte_identical = [t[0] for t in text_rows if t[9]]
+print(f"  {len(docs_done)} document(s) compared")
+print(f"      {len(moved_docs):>3} moved a counted STRUCTURE   (the census arm)")
+print(f"      {len(text_moved):>3} moved a paragraph's TEXT    (the text arm — C16, C17)")
+print(f"      {len(byte_identical):>3} byte-identical old vs new  (nothing changed at all, "
+      f"and this is the only one of the three that means that)")
+if text_rows:
+    print()
+    print(f"      {'doc':<10}{'txt moved':>10}{'C17':>5}{'int src':>9}{'int decl':>10}"
+          f"{'int old':>9}{'int new':>9}{'trail old':>11}{'trail new':>11}")
+    print("      " + "-" * 84)
+    for t in text_rows:
+        print(f"      {t[0]:<10}{t[1]:>10}{t[2]:>5}{t[3]:>9}{t[4]:>10}"
+              f"{t[5]:>9}{t[6]:>9}{t[7]:>11}{t[8]:>11}")
+    print("      " + "-" * 84)
+    print("      int = INTERIOR double-space runs, the only kind a page can show. `src` is the")
+    print("      SOURCE document's own; `decl` is what the operator authored in `en`. Only the")
+    print("      excess over both is attributable to apply, which is what C16 claims.")
 if voided:
     print(f"  {len(voided)} NOT compared — VOID, not clean:")
     for v in voided:

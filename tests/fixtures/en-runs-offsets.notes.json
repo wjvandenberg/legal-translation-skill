@@ -1,0 +1,84 @@
+[
+  {
+    "idx": 0,
+    "text": "1. Definitions",
+    "en": "1. Definitions",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 14,
+        "text": "1. Definitions",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 1,
+    "text": "\"Delivery Date\" betekent de datum genoemd in artikel Error: Reference source not found, as adjusted.",
+    "en": "\"Delivery Date\" means the date set out in Clause 8.1, as adjusted.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 100,
+        "text": "\"Delivery Date\" betekent de datum genoemd in artikel Error: Reference source not found, as adjusted.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 15,
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 15,
+        "end": 49,
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 49,
+        "end": 82,
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 82,
+        "end": 96,
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs_conforming": [
+      {
+        "start": 0,
+        "end": 15,
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 15,
+        "end": 49,
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 49,
+        "end": 52,
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 52,
+        "end": 66,
+        "bold": false,
+        "italic": false
+      }
+    ]
+  }
+]

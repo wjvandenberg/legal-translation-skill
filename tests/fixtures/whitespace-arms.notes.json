@@ -1,0 +1,204 @@
+[
+  {
+    "idx": 0,
+    "text": "Whitespace at a segment boundary",
+    "en": "Whitespace at a segment boundary",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 32,
+        "text": "Whitespace at a segment boundary",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 1,
+    "text": "ARM 1 - C17. The two below MUST read as two sentences with a space between them. Glued together is the defect:",
+    "en": "ARM 1 - C17. The two below MUST read as two sentences with a space between them. Glued together is the defect:",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 110,
+        "text": "ARM 1 - C17. The two below MUST read as two sentences with a space between them. Glued together is the defect:",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 2,
+    "text": "The services end. the notice period applies.",
+    "en": "The services end. the notice period applies.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 44,
+        "text": "The services end. the notice period applies.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_segments": [
+      {
+        "type": "regular",
+        "en": "The services end."
+      },
+      {
+        "type": "ins",
+        "en": " "
+      },
+      {
+        "type": "regular",
+        "en": "the notice period applies."
+      }
+    ],
+    "has_track_changes": true
+  },
+  {
+    "idx": 3,
+    "text": "The obligations of the providers. The Company shall pay the fee.",
+    "en": "The obligations of the providers. The Company shall pay the fee.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 64,
+        "text": "The obligations of the providers. The Company shall pay the fee.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_segments": [
+      {
+        "type": "regular",
+        "en": "The obligations of the providers."
+      },
+      {
+        "type": "ins",
+        "en": " "
+      },
+      {
+        "type": "regular",
+        "en": "The Company shall pay the fee."
+      }
+    ],
+    "has_track_changes": true
+  },
+  {
+    "idx": 4,
+    "text": "NEGATIVE CONTROL. The line below MUST look the same in both arms - an explicitly empty segment goes on being cleared:",
+    "en": "NEGATIVE CONTROL. The line below MUST look the same in both arms - an explicitly empty segment goes on being cleared:",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 117,
+        "text": "NEGATIVE CONTROL. The line below MUST look the same in both arms - an explicitly empty segment goes on being cleared:",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 5,
+    "text": "Clause twelve applies.",
+    "en": "Clause 12 applies.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 22,
+        "text": "Clause twelve applies.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_segments": [
+      {
+        "type": "regular",
+        "en": "Clause 12"
+      },
+      {
+        "type": "ins",
+        "en": ""
+      },
+      {
+        "type": "regular",
+        "en": " applies."
+      }
+    ],
+    "has_track_changes": true
+  },
+  {
+    "idx": 6,
+    "text": "ARM 2 - C16. The FIRST line below MUST begin with ONE leading space, not two. The SECOND MUST look identical in both arms - a single source space is still restored, and that repair must survive the fix:",
+    "en": "ARM 2 - C16. The FIRST line below MUST begin with ONE leading space, not two. The SECOND MUST look identical in both arms - a single source space is still restored, and that repair must survive the fix:",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 202,
+        "text": "ARM 2 - C16. The FIRST line below MUST begin with ONE leading space, not two. The SECOND MUST look identical in both arms - a single source space is still restored, and that repair must survive the fix:",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 7,
+    "text": "  The fee is payable within thirty days.",
+    "en": "The fee is payable within thirty days.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 40,
+        "text": "  The fee is payable within thirty days.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_segments": [
+      {
+        "type": "regular",
+        "en": "The fee is payable "
+      },
+      {
+        "type": "ins",
+        "en": "within thirty days."
+      }
+    ],
+    "has_track_changes": true
+  },
+  {
+    "idx": 8,
+    "text": " The term is twelve months.",
+    "en": "The term is twelve months.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 27,
+        "text": " The term is twelve months.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_segments": [
+      {
+        "type": "regular",
+        "en": "The term is "
+      },
+      {
+        "type": "ins",
+        "en": "twelve months."
+      }
+    ],
+    "has_track_changes": true
+  }
+]

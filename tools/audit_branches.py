@@ -411,8 +411,24 @@ def audit_b1():
     #      carries a roman or prefixed page number -- only one of eleven has a table of
     #      contents at all -- so a synthetic page is the ONLY render that change can ever have.
     #
-    # COUNTED BY LISTING, from `git ls-tree`, never by adding a delta to the figure above.
-    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 16)
+    # 20 SINCE 2026-09-02, the fourth slice: +4, two fixtures and their two sidecars, and BOTH
+    # had to exist for a reason the corpus cannot supply.
+    #
+    #   whitespace-arms.docx    C17's damage is a MID-paragraph glue, and the three real
+    #                           instances are every one of them a TRAILING space at a
+    #                           paragraph end -- invisible on a page, and the document the
+    #                           register row names carries none at all. So the corpus holds
+    #                           the mechanism and not the damage.
+    #   en-runs-offsets.docx    F16's shape CANNOT be in the corpus. The frozen intermediates
+    #                           are the post-compliance artefact and the offsets are gated
+    #                           BEFORE apply, so a run carrying a bad one never produced a
+    #                           frozen intermediate. Measured 0 of 13, and the zero proved.
+    #
+    # COUNTED BY LISTING, from `git ls-files`, never by adding a delta to the figure above.
+    # This claim reads the INDEX, deliberately, and is the only one in this block that does --
+    # so a fixture added on a branch must be STAGED before the number is right, and the claim
+    # goes red while whoever moved it is still here rather than after the merge.
+    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 20)
 
     hits = 0
     for nm in fx:

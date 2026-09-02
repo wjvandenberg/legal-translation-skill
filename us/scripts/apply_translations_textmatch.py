@@ -226,11 +226,42 @@ def snap_to_whitespace(pos, text, window=20):
                 return candidate
     return pos
 
-def distribute_text_across_elements(elements, text, preserve_source_boundary_whitespace=True):
+def distribute_text_across_elements(elements, text, preserve_source_boundary_whitespace=True,
+                                    prev_boundary_has_ws=False, next_boundary_has_ws=False):
     """Distribute text proportionally across w:t/w:delText elements,
     snapping boundaries to whitespace. Restores source-side leading/
     trailing whitespace on first/last elements if upstream .strip()
-    lost it"""
+    lost it.
+
+    C16 — THE RESTORATION USED TO OVERRIDE THE OPERATOR, TWO SEPARATE WAYS, and the row's
+    "there is no input-side fix" is the symptom of both. It restored the source's ENTIRE
+    whitespace run, and it tested only THIS segment's own slice edge while being blind to what
+    the adjacent segment already supplies. So:
+
+      SAME-SEGMENT.  A source run carrying two spaces came back as two spaces however the
+                     English was authored. Measured on the real function, 11 synthetic cases:
+                     source `"  alpha beta"` + authored `"alpha beta"` -> `"  alpha beta"`,
+                     and the register's own D04 method -- remove the trailing space, re-apply
+                     -- returns IDENTICAL XML, which is precisely why no edit to `en` helped.
+      CROSS-SEGMENT. A single source space restored on segment N's trailing edge, while
+                     segment N+1's authored text ALREADY begins with a space, makes two. This
+                     was NOT in the plan and was found by a fixture row built as a negative
+                     control for something else: `"Clause "` + a cleared `ins` + `" applies."`
+                     delivered `"Clause 12  applies."`. It needs only ONE source space, so it
+                     is the commoner of the two shapes, and restoring "at most one character"
+                     does not touch it -- it was already restoring one.
+
+    ONE RULE COVERS BOTH: restore AT MOST ONE character, and only where that boundary has no
+    whitespace from EITHER side. The caller knows what its neighbors carry and this function
+    cannot, so it is told: `prev_boundary_has_ws` / `next_boundary_has_ws` default to False,
+    which is exactly right for the legacy whole-paragraph callers, where there is no
+    neighboring segment to consult.
+
+    WHAT IS DELIBERATELY NOT CHANGED: the repair itself. A source edge carrying one space,
+    with an English that dropped it and no neighbor supplying it, is still restored -- that
+    is the rev42 repair the comment in the segment loop documents, and removing it would
+    re-open a four-part structural conflict to fix a double space.
+    """
     if not elements or not text:
         return
 
@@ -240,13 +271,15 @@ def distribute_text_across_elements(elements, text, preserve_source_boundary_whi
     src_leading_ws = ''
     src_trailing_ws = ''
     if preserve_source_boundary_whitespace:
-        # Only preserve spaces/tabs (not newlines) that were actually in the source.
+        # Only preserve spaces/tabs (not newlines) that were actually in the source, and only
+        # ONE character of it -- see C16 above. `[:1]` and `[-1:]` keep a TAB a tab rather than
+        # silently substituting a space for it.
         m_lead = re.match(r'^[ \t]+', first_src)
-        if m_lead:
-            src_leading_ws = m_lead.group(0)
+        if m_lead and not prev_boundary_has_ws:
+            src_leading_ws = m_lead.group(0)[:1]
         m_trail = re.search(r'[ \t]+$', last_src)
-        if m_trail:
-            src_trailing_ws = m_trail.group(0)
+        if m_trail and not next_boundary_has_ws:
+            src_trailing_ws = m_trail.group(0)[-1:]
 
     src_lengths = [len(e.text or '') for e in elements]
     total_src = sum(src_lengths)
@@ -427,10 +460,44 @@ def apply_trackchanges_inplace(orig_p, en_text, it_text,
 
         if en_types == xml_types:
             applied = False
-            for en_seg, xml_seg in zip(en_segments, merged_xml):
-                # 'en' missing/None: leave source text. '' or whitespace:
-                # clear run (coalesce-to-first-segment trick — see
-                # `skill-docs/04-translate.md` "Scrambled edits"). Else: distribute.
+            # C16's CROSS-SEGMENT HALF — WHAT EACH SEGMENT WILL CARRY, worked out BEFORE any
+            # of them is written. It has to be computed up front: once the loop starts
+            # overwriting `.text`, the source text of a later segment is gone and the
+            # authored text of an earlier one has replaced it, so neither can be consulted.
+            #
+            # `None` -> the source stays, so the source text is what the neighbor will see;
+            # `''`   -> the segment is cleared and is NOT a neighbor at all, which is why
+            #           the searches below skip over empties rather than stopping at them;
+            # else   -> the authored English, INCLUDING a whitespace-only one, which after
+            #           C17 is content rather than a clear-request.
+            effective = []
+            for _es, _xs in zip(en_segments, merged_xml):
+                _v = _es.get('en') if 'en' in _es else None
+                if _v is None:
+                    effective.append(''.join(e.text or '' for e in _xs['elements']))
+                else:
+                    effective.append(_v if isinstance(_v, str) else str(_v))
+
+            def _boundary_ws(i, back):
+                """Does the nearest non-empty neighbor already supply whitespace here?"""
+                rng = range(i - 1, -1, -1) if back else range(i + 1, len(effective))
+                for j in rng:
+                    if effective[j]:
+                        return effective[j].endswith((' ', '\t')) if back \
+                            else effective[j].startswith((' ', '\t'))
+                return False
+
+            for seg_i, (en_seg, xml_seg) in enumerate(zip(en_segments, merged_xml)):
+                # 'en' missing/None: leave source text. '': clear run (the
+                # coalesce-to-first-segment device — see
+                # `skill-docs/04-translate.md` "Scrambled edits"). Else:
+                # distribute, INCLUDING a whitespace-only `en`, which is a
+                # space and not a clear-request (C17, below). This comment
+                # used to read "'' or whitespace", attributing the whitespace
+                # behavior to a device that uses the empty string
+                # exclusively — the step document says so three times and its
+                # detection rule requires no whitespace in any cluster
+                # segment, so the two cases never overlapped.
                 if 'en' not in en_seg or en_seg.get('en') is None:
                     continue
                 # rev42: keep the operator's boundary whitespace alive into
@@ -455,12 +522,38 @@ def apply_trackchanges_inplace(orig_p, en_text, it_text,
                 # the operator left glued, validate_apply's --post-
                 # spacing-fix simulation (rev42) keeps the post-strip
                 # drift gate symmetric.
-                en_seg_stripped = (en_seg['en'] or '').strip()
+                # C17 — A SPACE IS NOT AN EMPTY-STRING REQUEST, and this line used to be
+                # `if (en_seg['en'] or '').strip():`. A segment whose `en` is `" "` strips to
+                # `""`, is falsy, and fell into the branch below commented "Explicit
+                # empty-string request". It was not a request; it was a space.
+                #
+                # AND STEP 4 RULE 9 TELLS THE OPERATOR TO CREATE EXACTLY THIS INPUT --
+                # `04-translate.md:172`, "For empty paragraphs (whitespace only), set `en` to
+                # the same whitespace" -- so the manual instructs them into the one input the
+                # code could not read.
+                #
+                # NO SHIPPED INSTRUCTION CHANGES, and that was checked rather than assumed.
+                # `04-translate.md`'s Option B states the contract in terms: `"en": ""` (key
+                # present, value empty) CLEARS; no `en` key at all PRESERVES. It says nothing
+                # about whitespace. The coalesce-to-first-segment device it describes uses the
+                # empty string exclusively -- three times over, plus a JSON skeleton showing
+                # `"en": ""` on every cleared entry -- and its own detection rule requires
+                # "no whitespace inside any segment's text", so the device and this case are
+                # disjoint by construction. Whitespace was an undocumented THIRD case that the
+                # code folded into "clear", and the comment attributing it to that device was
+                # describing a mechanism the mechanism does not have.
+                #
+                # Measured over all 13 frozen intermediates: THREE real instances (D02 idx 31
+                # and 170, D07 idx 59) and NONE on D08, the document the register row names --
+                # that row's sentence is conditional and that operator did not mirror.
                 if not xml_seg['elements']:
                     continue
-                if en_seg_stripped:
+                if en_seg['en'] != '':
                     en_seg_text = en_seg['en']
-                    distribute_text_across_elements(xml_seg['elements'], en_seg_text)
+                    distribute_text_across_elements(
+                        xml_seg['elements'], en_seg_text,
+                        prev_boundary_has_ws=_boundary_ws(seg_i, True),
+                        next_boundary_has_ws=_boundary_ws(seg_i, False))
                     # Inject ZWSP at wrapper boundaries inside cluster-
                     # merged xml_segs to defeat fix_spacing's alpha+alpha
                     # rule. Skip if edges already have non-alpha chars.
@@ -1550,6 +1643,75 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
         en_deleted = (entry.get('en_deleted') or '').strip()
         en_runs_spec = entry.get('en_runs')
         original_runs = entry.get('runs', [])
+
+        # F16 — AN AUTHORED OFFSET PAST THE END OF `en` IS REFUSED, NEVER CLAMPED.
+        #
+        # Step 4c tells the operator to replace a dead field marker in `en` and explicitly not
+        # to touch `text`. It says nothing about `en_runs`, and Step 4 rule 3 mandates
+        # `en_runs` on every definitions paragraph -- so replacing a 33-character marker with
+        # a 3-character section number shortens `en` by 30 and every authored offset after the
+        # marker is 30 too high. On D06 that was 7 of 7 affected paragraphs.
+        #
+        # PYTHON'S SLICING IS WHAT MAKES IT SILENT. `en[81:96]` on a 66-character string is
+        # not an error; it is `''`, and the segment loop's `if not seg_text: continue` then
+        # drops it without a word. Where the shifted span is still IN range it is worse than a
+        # drop: every character arrives, so no text check sees anything wrong, and the
+        # emphasis lands on the wrong words. Measured on tests/fixtures/en-runs-offsets.docx
+        # -- bold on `'8.1, as adjusted.'` instead of on `'8.1'`, apply exiting 0.
+        #
+        # CLAMPING IS NOT A VALID REPAIR: the register is explicit that it fixes the tail and
+        # not the interior, which is the bug that then blocked Step 6 (C13).
+        #
+        # IT IS CHECKED HERE, AGAINST THE RAW AUTHORED `en`, AND THE FIRST VERSION WAS WRONG
+        # ABOUT EXACTLY THIS -- caught by the corpus, not by reading. Placed in the segment
+        # loop it compared the offsets against `en_text`, which is `en` AFTER
+        # `_strip_keeping_separators` and possibly after `_insert_separators` lengthened it.
+        # So it fired on D07 -- on input that is entirely correct, where the operator authored
+        # the offsets against `en` exactly as rule 3 requires and `validate_en_runs` passed
+        # them. A gate can be right in mechanism and wrong in scope, and the test is whether a
+        # compliant way out exists (CLAUDE.md 5.9): there was none, so the SCOPE was fixed.
+        # The offsets index the string the operator wrote, so that is the string they are
+        # measured against.
+        #
+        # THIS IS NOT C13, which stays branch 11's. That row wants a range assertion in
+        # `validate_en_runs.py` -- a pre-apply gate over the detected definitions section
+        # only, overridable with `--allow-bold-loss`. Measured 2026-09-02: that file is 144
+        # lines, tests PRESENCE only, and never reads `start` or `end`. This is inside apply,
+        # covers EVERY paragraph, and refuses at the point of use.
+        _raw_en = entry.get('en') or ''
+        for _seg in (en_runs_spec or []):
+            if not isinstance(_seg, dict):
+                continue
+            _s, _e = _seg.get('start', 0), _seg.get('end', len(_raw_en))
+            if not isinstance(_s, int) or not isinstance(_e, int):
+                continue
+            if _s > len(_raw_en) or _e > len(_raw_en) or _s > _e:
+                raise RuntimeError(
+                    "SKILL GATE FIRED - INTENTIONAL BLOCK, NOT A SCRIPT ERROR.\n"
+                    f"  en_runs offset out of range on paragraph idx {entry.get('idx')}.\n"
+                    f"  A span declares start={_s}, end={_e}, but the `en` it indexes into is "
+                    f"{len(_raw_en)} characters long.\n"
+                    "\n"
+                    "  This is finding F16. Step 4c told you to replace a broken cross-"
+                    "reference in `en`\n"
+                    "  and not to touch `text`; it did not tell you to RE-DERIVE `en_runs`, "
+                    "and shortening\n"
+                    "  `en` leaves every offset after the edit pointing at the wrong "
+                    "characters.\n"
+                    "\n"
+                    "  The offsets are NOT clamped, deliberately. Clamping repairs the tail "
+                    "and leaves the\n"
+                    "  interior mis-sliced, which is the defect that then blocks Step 6 - and "
+                    "it would do so\n"
+                    "  silently, with every character present and the emphasis on the wrong "
+                    "words.\n"
+                    "\n"
+                    "  FIX: re-derive every `en_runs` span for this paragraph against the "
+                    "`en` you now have,\n"
+                    "  so the last span's `end` equals len(en), then re-run apply. Do NOT "
+                    "work around this by\n"
+                    "  deleting `en_runs` - on a definitions paragraph that loses the defined "
+                    "term's emphasis.")
 
         if not it_text or not en_text:
             skipped_empty += 1
