@@ -961,13 +961,27 @@ def _split_run_non_text(r):
 # SO A MISPLACED TAB IS WORSE THAN A MISSING ONE, measured on the page rather than argued.
 # Wouter's decision, 2026-09-01: keep a tab only where its TRUE position survives the
 # collapse; where it does not, DROP it, which is what the old code did, so the page is no
-# worse than before. A3 and A6 are therefore NOT closed by this branch and belong to branch
-# 16, where per-run English makes the position knowable.
+# worse than before. That is still the rule for every shape except one -- see
+# `_toc_tab_offsets` below, which proves the position rather than assuming it.
 #
-# AN EXACT PREFIX/SUFFIX SPLIT WAS CONSIDERED AND MEASURED FIRST, not dismissed: if a source
-# fragment is still an exact affix of `en` the boundary is proved, not guessed. It fires on
-# 4 of D06's 231 multi-fragment paragraphs and 12% corpus-wide, so it would not have fixed
-# the page in question. Recorded so nobody rediscovers it as an idea.
+# CORRECTED 2026-09-02, AND THE PARAGRAPH THAT STOOD HERE IS THE REASON THIS CORRECTION IS
+# WRITTEN OUT RATHER THAN QUIETLY DELETED. It read:
+#
+#     AN EXACT PREFIX/SUFFIX SPLIT WAS CONSIDERED AND MEASURED FIRST, not dismissed: [...]
+#     It fires on 4 of D06's 231 multi-fragment paragraphs and 12% corpus-wide, so it would
+#     not have fixed the page in question. Recorded so nobody rediscovers it as an idea.
+#
+# THE DENOMINATOR IS THE WRONG POPULATION, and the sentence therefore told the next reader
+# not to do the thing that works. Over all 231 multi-fragment paragraphs the affix test
+# scores 18%; over THE 26 TABLE-OF-CONTENTS ENTRIES -- the population the fix is for -- it
+# scores 100%, and D01's three TOC-shaped lookalikes score 0 of 3, so the rule arrives with
+# its own negative control. That is `.claude/rules/`-adjacent house doctrine stated in
+# CLAUDE.md 5.1: A PORTED CHECK IS A CHECK AGAINST A NEW POPULATION. Measure the population
+# before porting the pattern -- and a figure that agrees with the one you expected is the
+# moment to re-derive it, not to relax.
+#
+# A6 is untouched and still belongs to branch 16: it is glued bullets on D05, a different
+# paragraph shape, and nothing here reaches it.
 _POSITION_CRITICAL = (f'{W}tab', f'{W}br')
 
 
@@ -984,6 +998,158 @@ def _run_is_only_position_critical(r):
     """
     kids = [c for c in r if c.tag != f'{W}rPr']
     return bool(kids) and all(_is_position_critical(c) for c in kids)
+
+
+_TOC_ATOMS = ('text', 'tab', 'text', 'tab', 'text')
+_TRAILING_DIGITS = re.compile(r'\d+\Z')
+
+
+def _atoms_with_text(p):
+    """The paragraph's content in document order as ('text', s) | ('tab', '') | ('br', '').
+
+    TAB STOPS ARE EXCLUDED BY NOT DESCENDING INTO `pPr`. A `w:tab` inside `pPr/tabs` is a
+    ruler position carrying the same tag name as a rendered tab, and summing the two is the
+    naive iteration `.claude/rules/ooxml.md` names by example. ElementTree has no parent
+    pointers, so the subtree is skipped rather than the parent tested.
+    """
+    out = []
+
+    def walk(el):
+        for child in el:
+            tag = child.tag
+            if tag == f'{W}pPr':
+                continue
+            if tag in (f'{W}t', f'{W}delText'):
+                if child.text:
+                    out.append(('text', child.text))
+            elif tag == f'{W}tab':
+                out.append(('tab', ''))
+            elif tag == f'{W}br':
+                out.append(('br', ''))
+            else:
+                walk(child)
+
+    walk(p)
+    return out
+
+
+def _is_toc_shaped(orig_p):
+    """True if the SOURCE paragraph is number / tab / title / tab / page number."""
+    return tuple(k for k, _ in _atoms_with_text(orig_p)) == _TOC_ATOMS
+
+
+def _lead_trim(s):
+    """Drop exactly the LEADING whitespace `_strip_keeping_separators` would drop."""
+    i = 0
+    while i < len(s) and s[i].isspace() and s[i] not in _BOUNDARY_SEPARATORS:
+        i += 1
+    return s[i:]
+
+
+def _trail_trim(s):
+    """Drop exactly the TRAILING whitespace `_strip_keeping_separators` would drop."""
+    j = len(s)
+    while j > 0 and s[j - 1].isspace() and s[j - 1] not in _BOUNDARY_SEPARATORS:
+        j -= 1
+    return s[:j]
+
+
+def _toc_tab_offsets(orig_p, en_text):
+    """Where a table-of-contents entry's two tabs belong in `en_text`, or None.
+
+    THE ONE PARAGRAPH SHAPE WHERE A BETWEEN-TEXT TAB'S POSITION IS PROVED RATHER THAN GUESSED,
+    and the exception to the rule stated above it that such a tab must be dropped. It exists
+    because Wouter read D06's rendered page 2 and said the table of contents was still wrong:
+    every entry delivered as `1General provisions4` -- flat, no dot leader, no right-aligned
+    page number -- because apply rebuilds a paragraph from ONE unbroken English string and
+    both tabs sat between text atoms.
+
+    Both boundaries are read off the SOURCE paragraph rather than off `en`:
+
+        pre  = the source's text BEFORE its first tab   -- the clause number
+        post = the source's text AFTER  its last tab    -- the page number
+
+    and the rule fires only where BOTH still appear, unchanged, at the corresponding ends of
+    the English. CLAUSE NUMBERS AND PAGE NUMBERS TRANSLATE TO THEMSELVES, which is why this
+    is two exact string equalities and not a similarity score. Measured on D06's 26 entries:
+    26/26 on the prefix, 26/26 on the trailing digits, 26/26 non-overlapping; and 0/3 on
+    D01's three TOC-shaped paragraphs, which are ordinary numbered prose -- so the negative
+    control is in the corpus, not invented.
+
+    WHY THE OFFSET IS NOT `len(runs[0]["text"])`, which is what the first specification said.
+    A RUN MAY CARRY TEXT ON BOTH SIDES OF A TAB: children `[t, tab, t]` make `runs[0]` span
+    the tab, so that offset places the first tab AFTER THE TITLE while the atom sequence and
+    the tab count both still look correct. Same population, same 26/26, wrong page. Reading
+    the source's own tab positions cannot make that mistake, and the two forms were measured
+    side by side before this one was adopted: identical offsets on all 26.
+
+    WHERE ANY CONDITION FAILS, RETURN None AND THE CALLER DROPS THE TAB -- the pre-existing
+    behaviour, so an entry this cannot prove is no worse off than before. A rule that fires on
+    everything would pass every assertion about the entries it gets right, so the decline is
+    counted and printed beside the results (CLAUDE.md 5.9: a language-dependent check must
+    announce what it is doing rather than degrade to a confident wrong answer).
+
+    NOT APPLIED ON THE TRACKED-CHANGE PATH, deliberately: that path is a different rebuild in
+    `apply_trackchanges_inplace`, and widening a fix past the evidence it was measured on is
+    how a branch stops being reviewable.
+    """
+    atoms = _atoms_with_text(orig_p)
+    if tuple(k for k, _ in atoms) != _TOC_ATOMS:
+        return None
+    # TRIMMED ON THE OUTER EDGES ONLY, AND THIS IS A CORRECTION MADE 2026-09-02 ON MEASURING
+    # TWELVE TOC SHAPES RATHER THAN ONE. `en_text` has been through
+    # `_strip_keeping_separators`, so the paragraph's outermost whitespace is already gone from
+    # it -- while `pre` and `post` come from the SOURCE and still carry theirs. Comparing them
+    # untrimmed made the rule fail on a page-number run written `"5 "` or a number run written
+    # `" 5"`, which is ordinary authoring and says nothing about whether the boundary is
+    # provable. D06 has none of it (0 of 26 entries differ under the two strips), so THE CORPUS
+    # COULD NOT HAVE SHOWN THIS -- it is one document's house style, and a synthetic sweep is
+    # the only instrument that reaches the question. INNER edges are NOT trimmed: whitespace
+    # next to the tab is interior to `en_text` and is part of the boundary.
+    pre, post = _lead_trim(atoms[0][1]), _trail_trim(atoms[4][1])
+    # A PAGE NUMBER, NOT MERELY A TRAILING RUN. Without this, any three-part tabbed line whose
+    # last part happened to survive translation would qualify -- a party grid, a cost table.
+    # Deliberately EXCLUDES a roman numeral (front matter) and a prefixed number such as
+    # `A-3` (schedules), both of which also translate to themselves and are therefore
+    # placeable in principle; widening to them is a decision, not an oversight, and it is
+    # recorded as one in `tests/test_toc_shapes.py`.
+    if not _TRAILING_DIGITS.match(post.strip()):
+        return None
+    if not pre or not en_text.startswith(pre) or not en_text.endswith(post):
+        return None
+    a, b = len(pre), len(en_text) - len(post)
+    # NON-OVERLAPPING, OR THE TWO TABS WOULD CROSS. Cheap to test and impossible to see later.
+    return (a, b) if a < b else None
+
+
+def _insert_separators(en_text, segments, offsets):
+    """Put a literal tab at each offset in `en_text`, and move `segments` with it.
+
+    NOTHING NEW EMITS ANYTHING. The segment loop already converts a `\\t` in `en` into a
+    `<w:tab/>` -- that is the device F31(a) records the D01 operator finding by reading this
+    file -- so placing a tab is inserting the character the loop already understands.
+
+    THE OFFSET MAP IS THE ONE PIECE OF ARITHMETIC HERE: a boundary at `pos` moves to
+    `pos + count(o <= pos)`, applied to BOTH `start` and `end`. That puts each inserted tab
+    inside the segment on its LEFT and leaves the list contiguous and non-overlapping, so no
+    tab lands in a gap between segments -- which would emit nothing at all, since the loop
+    only ever slices what a segment covers. `segments` may BE the entry's own `en_runs`, so
+    every dict is copied rather than mutated.
+    """
+    n = len(en_text)
+    for o in sorted(offsets, reverse=True):
+        en_text = en_text[:o] + '\t' + en_text[o:]
+
+    def moved(pos):
+        return pos + sum(1 for o in offsets if o <= pos)
+
+    out = []
+    for seg in segments:
+        moved_seg = dict(seg)
+        moved_seg['start'] = moved(seg.get('start', 0))
+        moved_seg['end'] = moved(seg.get('end', n))
+        out.append(moved_seg)
+    return en_text, out
 
 
 def _text_span(container):
@@ -1307,6 +1473,10 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
     not_found = 0
     skipped_same = 0
     skipped_empty = 0
+    # A3/TOC. Counted so the placement rule ANNOUNCES itself: a decline is the fallback, and
+    # a fallback nobody can see is indistinguishable from a rule that never ran.
+    toc_placed = 0
+    toc_declined = 0
 
     # Sort entries by idx to process in order (helps with duplicate disambiguation)
     entries_sorted = sorted(translations, key=lambda e: e.get('idx', 0))
@@ -1381,6 +1551,20 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                 segments = en_runs_spec
         else:
             segments = auto_detect_formatting(en_text, original_runs)
+
+        # A3, THE TABLE-OF-CONTENTS HALF — A PLACEMENT RULE, NOT A PRESERVATION ONE.
+        #
+        # Everything in the block below asks whether a structure comes BACK. This asks
+        # whether it comes back IN THE RIGHT PLACE, and it is the only place in this file
+        # where a between-text tab is put back at all. `_toc_tab_offsets` proves both
+        # boundaries against the source or returns None, in which case nothing happens here
+        # and clause 2's limit drops the tab exactly as before.
+        toc_at = _toc_tab_offsets(orig_p, en_text)
+        if toc_at is not None:
+            en_text, segments = _insert_separators(en_text, segments, toc_at)
+            toc_placed += 1
+        elif _is_toc_shaped(orig_p):
+            toc_declined += 1
 
         # =====================================================================
         # BRANCH 6 (option 1) — THE THREE CLAUSES:
@@ -1604,6 +1788,12 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
     print(f"  Skipped (same text): {skipped_same}")
     print(f"  Skipped (empty): {skipped_empty}")
     print(f"  Total changes applied: {changes}")
+    # CLAUDE.md 5.9 — a language-dependent rule announces what it did. A DECLINE IS THE
+    # INTERESTING NUMBER: it means a paragraph looked like a table-of-contents entry and the
+    # rule could not prove where its tabs belonged, so it dropped them rather than guess.
+    if toc_placed or toc_declined:
+        print(f"  TOC tab placement: {toc_placed} placed, {toc_declined} declined "
+              f"(a decline drops the tabs, as before)")
 
     # Serialize
     buf = io.BytesIO()

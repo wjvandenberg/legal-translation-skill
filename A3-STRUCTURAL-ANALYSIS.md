@@ -337,7 +337,14 @@ runs nest inside wrappers, wrappers nest inside content controls, and references
 that carry meaning. **The contract needs inverting: preserve by default, rebuild only what you can
 account for.**
 
-**What it closes:** A1, A2, A3, A6, A8, A9, A16, N1, C19, C17, C16, F27, F16.
+**What it closes:** A1, A2, A8, A9, A16, N1, C19, C17, C16, F27, F16 — **and A3 only PARTIALLY.**
+*(Corrected 2026-09-02, on building it. **A6 was never reachable by this option at all** and has moved to
+branches 15–17: glued bullets are a different paragraph shape. **A3 divides:** the instances whose tab
+position is provable from the source closed on branch 6's two slices — D06's table of contents and D01's
+doubled tabs — and D02's tables, D05's hanging-indent notices clause and D11's mid-phrase tabs did not,
+because their boundaries cannot be recovered from one unbroken English string. Those need branch 15's
+per-run English. **This cell claimed a clean thirteen and the truth is eleven, one partial and one moved**,
+which is the closure-claim direction §2.5 item 6 of the charter is about.)*
 **Cost:** one file (plus a repack flag). No schema change. Byte-comparable on synthetic fixtures.
 **Risk:** low, and it is the only candidate where that is true.
 **Does NOT close:** anything in A-format.

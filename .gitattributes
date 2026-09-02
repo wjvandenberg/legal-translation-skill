@@ -32,6 +32,15 @@ uk/**   -text
 us/**   -text
 tests/fixtures/**  -text -diff
 
+# AND ONE EXCEPTION, ADDED 2026-09-02 WHEN THE FIRST *TEXT* FILE ARRIVED IN THAT DIRECTORY.
+# The `-diff` above was written when `tests/fixtures/` held nothing but ZIP containers, where
+# refusing to diff is simply correct. A fixture may now ship its OWN NOTES beside it -- the
+# `paragraphs.json` a driving tool would otherwise invent -- and that file is the fixture's
+# INPUT: a reviewer who cannot read it cannot review what the test asserts. So restore `diff`
+# and KEEP `-text`, because the reason the blanket rule exists is unchanged: these bytes must
+# never be retranslated on checkout, on any platform.
+tests/fixtures/*.notes.json  -text diff
+
 # Word documents and packaged skills are ZIP containers: binary, never diffed, never merged.
 *.docx  binary
 *.doc   binary

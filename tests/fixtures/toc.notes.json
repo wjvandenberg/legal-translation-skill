@@ -1,0 +1,149 @@
+[
+  {
+    "idx": 0,
+    "text": "Table of contents",
+    "en": "Table of contents EN",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 17,
+        "text": "Table of contents",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 1,
+    "text": "1General provisions4",
+    "en": "1General provisions EN4",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 1,
+        "text": "1",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 1,
+        "end": 20,
+        "text": "General provisions4",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 2,
+    "text": "21Project finance, security and the order of application of proceeds15",
+    "en": "21Project finance, security and the order of application of proceeds EN15",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 2,
+        "text": "21",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 2,
+        "end": 70,
+        "text": "Project finance, security and the order of application of proceeds15",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 3,
+    "text": "22Governing law31",
+    "en": "22Governing law EN31",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 2,
+        "text": "22",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 2,
+        "end": 17,
+        "text": "Governing law31",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 4,
+    "text": "23Interpretation and defined terms38",
+    "en": "23Interpretation and defined terms EN38",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 34,
+        "text": "23Interpretation and defined terms",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 34,
+        "end": 36,
+        "text": "38",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 5,
+    "text": "24Notices and service of process42",
+    "en": "24Notices and service of process EN99",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 2,
+        "text": "24",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 2,
+        "end": 34,
+        "text": "Notices and service of process42",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 6,
+    "text": "25Counterparts47",
+    "en": "Clause 25Counterparts EN47",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 2,
+        "text": "25",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 2,
+        "end": 16,
+        "text": "Counterparts47",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  }
+]

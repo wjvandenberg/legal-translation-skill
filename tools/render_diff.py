@@ -254,9 +254,27 @@ for stem in args.fixture:
     outdir.mkdir(parents=True)
     with zipfile.ZipFile(fx) as z:
         src_xml = z.read("word/document.xml")
-    root = etree.fromstring(src_xml)
-    notes = [{"idx": i, "text": t, "en": (t + " EN") if t else t, "style": "Normal"}
-             for i, t in enumerate(para_texts(src_xml))]
+    # A FIXTURE MAY SHIP ITS OWN NOTES, AND WHERE IT DOES THEY WIN.
+    #
+    # The synthesised notes below are `en = text + " EN"` with NO `runs` array, which is fine
+    # for a fixture testing whether a structure SURVIVES and useless for one testing where a
+    # structure is PLACED: any rule keyed on `runs`, or on the English keeping the source's
+    # trailing digits, cannot fire on them at all. Measured 2026-09-02 on toc.docx, where
+    # `en` ended in " EN" rather than a page number, so the placement rule declined every
+    # entry and the render showed a flat page that looked like the unfixed defect.
+    #
+    # A fixture's notes are its INPUT. Shipping them beside it means the suite and this tool
+    # drive the fixture with the SAME input -- so what is asserted mechanically is what gets
+    # looked at, rather than two different documents wearing one name.
+    side = fx.with_suffix(".notes.json")
+    if side.is_file():
+        notes = json.loads(side.read_text(encoding="utf-8"))
+        print(f"       notes: {side.name} (shipped with the fixture, {len(notes)} entries)")
+    else:
+        notes = [{"idx": i, "text": t, "en": (t + " EN") if t else t, "style": "Normal"}
+                 for i, t in enumerate(para_texts(src_xml))]
+        print(f"       notes: SYNTHESISED, {len(notes)} entries — en = text + \" EN\", no "
+              f"`runs`. A placement rule cannot be tested on these.")
     nj = outdir / "paragraphs.json"
     nj.write_text(json.dumps(notes, ensure_ascii=False), encoding="utf-8")
     shutil.copyfile(fx, outdir / "source.docx")
@@ -438,20 +456,31 @@ if args.doc:
                         written += 1
             (dest / "READ-ME.txt").write_text(
                 "Branch 6 rendered comparison. One PNG per CHANGED page, three arms:\n"
-                "  p<NNN>-old.png     the deliverable as the code stood at the pinned\n"
-                "                     baseline, i.e. WITHOUT branch 6\n"
-                "  p<NNN>-new.png     the deliverable WITH branch 6\n"
+                f"  p<NNN>-old.png     the deliverable as the code stood at {REF}, the\n"
+                "                     PINNED BASELINE. Read that literally: the baseline\n"
+                "                     moves as each slice merges, so -old is NOT 'before\n"
+                "                     branch 6'. It is 'before the change under review'.\n"
+                "  p<NNN>-new.png     the deliverable with the working tree's code\n"
                 "  p<NNN>-source.png  the original document, for reference\n\n"
+                "THE CHANGE UNDER REVIEW IS THE TABLE-OF-CONTENTS TAB PLACEMENT.\n\n"
                 "What to look for, in order:\n"
-                "  1. footnote and comment markers PRESENT in -new where they were absent\n"
-                "     in -old, with the footnote text at the foot of its page\n"
-                "  2. table-of-contents entries: the dot leader and the right-aligned page\n"
-                "     number should be back, and each entry should be a working link\n"
-                "  3. cross-references should appear ONCE in -new. In -old some appear\n"
-                "     twice, and six carry 'Error: Reference source not found'\n"
-                "  4. THE KNOWN LIMITATION: where a tab sat between two pieces of text, it\n"
-                "     is back in the file but lands AFTER the text, so a hanging-indent\n"
-                "     list item still reads glued. That is branch 16's, not branch 6's.\n\n"
+                "  1. TABLE OF CONTENTS -- this is the one that matters. Every entry should\n"
+                "     now read as number, gap, title, DOT LEADER, page number at the RIGHT\n"
+                "     MARGIN. In -old the entries read '1General provisions4', flat. 25 of\n"
+                "     the 26 entries were rebuilt and placed; the 26th is the one apply\n"
+                "     SKIPS because its title is already English, and it looked correct in\n"
+                "     -old too, so it is not evidence either way.\n"
+                "  2. NO WRAPPED LINE. A long title whose text reaches the margin must still\n"
+                "     occupy ONE line. A tab placed at the paragraph END forced a wrap on\n"
+                "     exactly such a row last time, and a misplaced tab is worse than a\n"
+                "     missing one -- so a wrap here is a DEFECT, not a cosmetic nuisance.\n"
+                "  3. Each entry should still be a working link, and each cross-reference\n"
+                "     should appear ONCE.\n"
+                "  4. THE KNOWN LIMITATION, NARROWED. Where a tab sat between two pieces of\n"
+                "     text and the boundary CANNOT be proved -- a hanging-indent list item,\n"
+                "     a party grid, a cost table -- it is still dropped and the line still\n"
+                "     reads glued. That is branch 16's. A table-of-contents entry is the one\n"
+                "     shape where both boundaries ARE proved, which is why only it is fixed.\n\n"
                 "These are renders of a real client document. They live here, outside the\n"
                 "repository, and must never be committed or pasted anywhere.\n\n"
                 "WHAT THESE PAGES ARE, AND WHAT THEY ARE NOT. They come from apply + repack\n"

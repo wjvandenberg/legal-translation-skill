@@ -209,16 +209,26 @@ GROUPS = {
 }
 # -------------------------------------------- options (a row may need more than one)
 OPTIONS = {
+ # A6 LEFT THIS OPTION ON 2026-09-02 and A3 gained a SECOND owner below. Branch 6's two
+ # slices closed A1 A2 A8 A9 F27 and placed 25 of D06's 26 table-of-contents entries, which
+ # closes A3's TOC and doubled-tab instances. It reaches NEITHER A6's glued bullets (a
+ # different paragraph shape, no boundary that translates to itself) NOR A3's remainder --
+ # D02's tables, D05's hanging indent, D11's mid-phrase tabs -- whose positions cannot be
+ # recovered from one unbroken English string. Those are option 3's per-run English.
  "1 preserve-by-default in apply": """
-   A1 A2 A3 A6 A8 A9 A16 A19 N1 C16 C17 C19 F16 F27 D4 T1 T6
+   A1 A2 A3 A8 A9 A16 A19 N1 C16 C17 C19 F16 F27 D4 T1 T6
    """,
  # G10 added 2026-08-12 (branch 5) — see the note on group 3 above.
  "2 check against the original": """
    C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28
    G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
    """,
+ # A3 AND A6 BOTH ARRIVED HERE 2026-09-02. A3 is deliberately in TWO options -- the header
+ # above says a row may need more than one, and A3 genuinely does: option 1 closed the
+ # instances whose tab position is provable from the source, option 3's per-run English is
+ # what makes the rest knowable. A6 is here alone.
  "3 say what the formatting is": """
-   A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3
+   A3 A4 A5 A6 A7 A10 A11 A12 A13 A14 A17 A18 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3
    """,
  "4 a home for document furniture": """
    E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33
