@@ -59,10 +59,20 @@ SCRIPT = "apply_translations_textmatch.py"
 
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. CLAUDE.md 5.16: a before-and-after check
 # once read its "before" from HEAD, which worked only while the change was uncommitted and then
-# compared the new file against itself and reported 100% carried. 79a8c14 is the merge-base of
-# this branch with main, and uk/ and us/ are byte-identical there to e57e658, the last commit
-# that touched either tree.
-REF = os.environ.get("LT_BASELINE_REF", "4a1c452")
+# compared the new file against itself and reported 100% carried.
+#
+# MOVED TO 049484e 2026-09-02, the squash-merge of branch 6 slice 2 (PR #59) and the LAST
+# COMMIT THAT TOUCHED EITHER TREE -- verified by `git log -- uk us` and by `git diff 049484e
+# -- uk us` coming back empty, not by reading the merge message. A pin left at the previous
+# baseline 4a1c452 would report slice 2's own 25 placed tabs as movement belonging to whatever
+# branch ran next, which is the failure this pin exists to prevent.
+#
+# AND THE PROSE ABOVE THE PIN GOES STALE TOO, WHICH IS WHY IT IS BEING REWRITTEN RATHER THAN
+# APPENDED TO: it still named 79a8c14 as "the merge-base of this branch" and e57e658 as the
+# last commit to touch either tree, both true when first written and both false by the time
+# the pin read 4a1c452. Nothing checks a comment. Re-derive both claims on the commit that
+# moves the pin.
+REF = os.environ.get("LT_BASELINE_REF", "049484e")
 
 # WHICH ROW OWNS WHICH STRUCTURE — taken from FINDINGS-REGISTER.md's `docs` column, used as
 # a LABEL rather than as the gate. The documents named are the ones that were MEASURED, not

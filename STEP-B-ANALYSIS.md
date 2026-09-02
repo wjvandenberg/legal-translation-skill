@@ -1614,6 +1614,36 @@ this option is a *deletion* — dropping a cross-reference skeleton once the num
 > > measured side by side and give identical offsets on all 26, but only one declines the
 > > `[t, tab, t]` case rather than misplacing it.
 > >
+> > > **AND A THIRD CORRECTION, SAME DAY, ON THE ONE SENTENCE BELOW THAT DESCRIBED A CHOICE AS
+> > > IF IT WERE A LIMIT.** The paragraph below records the rule as reaching page numbers
+> > > written in **arabic digits**. That was never a property of the shape — it was the
+> > > narrowest test that closed D06, and the corpus could not argue with it because **D06's
+> > > 26 entries are arabic throughout and no other document has a table of contents at all**.
+> > > The twelve-shape sweep surfaced two further forms that also translate to themselves — a
+> > > **roman numeral** (front matter) and a **prefixed** number such as `A-3` (schedules) —
+> > > and declined them explicitly, as a decision to be taken rather than a defect to be
+> > > fixed. **Put to Wouter 2026-09-02 and taken the other way: both are now placed.**
+> > >
+> > > **THE INTERESTING PART IS WHAT THE WIDENING COSTS, BECAUSE IT IS NOT NOTHING.** The
+> > > page-number test is the only thing between the five-atom shape and any three-part tabbed
+> > > line whose last part survives translation — a party grid, a cost table, a signature
+> > > block. Widening it SPENDS that margin, so it had to be bought back by being stricter
+> > > inside each alternative rather than looser across them. **The trap is that the obvious
+> > > roman pattern, the character class `[ivxlcdm]+`, matches the English word `civil`** —
+> > > and `dill`, `lid` and `mill` — so the shipped rule is a **well-formedness** test plus a
+> > > uniform-case requirement. Four negative shapes were added to hold that line, and one
+> > > residue is declared rather than hidden: `mix` is M + IX and *is* a well-formed numeral.
+> > >
+> > > **AND THE PROOF IS THE ABSENCE OF MOVEMENT, WHICH INVERTS THE PREVIOUS TWO SLICES.**
+> > > Those had to move a delivered byte and explain every movement. This one must move
+> > > **none**: no corpus document carries either form, so all thirteen frozen intermediates
+> > > are the positive control. Measured **13 compared · 0 moved · 13 byte-quiet** against a
+> > > baseline pinned at `049484e`, with the harness's self-comparison note absent, so it was
+> > > a genuine before-and-after and not a file compared with itself. **The only render this
+> > > change can ever have is synthetic** — `tests/fixtures/toc-widened.docx`, built for the
+> > > purpose, because a count of 18 of 18 is not a page. §5.7's third entry is the general
+> > > form of that limit.
+> >
 > > **What this closes and what it does not.** Delivered 2026-09-02 on branch 6's second slice: **25
 > > of D06's 26 entries placed** (the 26th is skipped by apply, its title already English, and was
 > > already correct), tab characters **10 → 60 of the source's 80**, and **exactly one page of 36

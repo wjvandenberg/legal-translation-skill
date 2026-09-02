@@ -82,6 +82,25 @@ venv/
 temp/probe-5b-documents/
 
 # ─────────────────────────────────────────────────────────────────────────────
+# RUN STATE THAT APPLY DROPS INTO WHATEVER DIRECTORY IT IS POINTED AT. Added 2026-09-02,
+# after a real instance reached the index.
+#
+# `apply_translations_textmatch.py` invokes `validate_translations.py` as its final pre-apply
+# pass, and that writes `<workdir>/.validate-state.json` — the batch-cap audit trail — where
+# workdir is wherever the NOTES file lives. Hand apply a notes path inside `tests/fixtures/`
+# and a state file appears in the committed fixture directory: the working tree goes dirty on
+# what the caller thought was a read-only check, `git switch` then refuses, `git bisect`
+# breaks, and the next `git add -A` commits run state into a PUBLIC repository.
+#
+# THIS IS THE GUARD FOR CALLER N+1, NOT THE FIX. The fix is that a test copies its inputs to
+# a temp directory before running apply, which `render_diff.py` and `test_stop_deleting.py`
+# always did and `test_toc_shapes.py` did not — that caller is corrected in the same commit.
+# One line here costs nothing and covers the callers that do not exist yet (§5.1, fix the
+# CLASS not the caller). BY PATH, never `*.json`: the fixtures ship their own notes sidecars
+# and a blanket rule would silently stop committing them (§2.6, 2026-07-29).
+tests/fixtures/.validate-state.json
+
+# ─────────────────────────────────────────────────────────────────────────────
 # OS and editor
 # ─────────────────────────────────────────────────────────────────────────────
 Thumbs.db

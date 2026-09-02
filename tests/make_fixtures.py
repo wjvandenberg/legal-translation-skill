@@ -396,6 +396,75 @@ def _write_notes(docx_path, notes):
 # field skeleton, and STEP-B-ANALYSIS.md section 3.7's own fixture list for branch 6 does not
 # name one either, so finding A9's only instrument was the D06 frozen intermediate.
 # ---------------------------------------------------------------------------
+@fixture("toc-widened.docx",
+         "the three page-number forms the placement rule admits after the 2026-09-02 "
+         "widening — arabic, roman (both cases, and compound) and prefixed A-3 — beside the "
+         "TWO it must still refuse. Built so the widening can be SEEN on a page: no corpus "
+         "document carries a roman or prefixed page number, so this is the only render there "
+         "can ever be. Ships its own toc-widened.notes.json")
+def _toc_widened(path):
+    """A contents page exercising every branch of `_is_page_number`, placed beside its traps.
+
+    WHY A SECOND TOC FIXTURE RATHER THAN SIX MORE ROWS IN `toc.docx`. That one is the
+    instrument `tests/test_stop_deleting.py` section 5 counts against -- four placeable, two
+    declining, twelve tab characters, twelve tab stops, six hyperlinks. Adding rows would move
+    every one of those numbers and force an edit to a suite this branch must not touch. A new
+    fixture costs two committed files and breaks nothing.
+
+    AND THE LAST TWO ENTRIES ARE THE POINT OF IT. A fixture carrying only the shapes a rule
+    places cannot tell a working rule from one that fires on everything -- the same argument
+    that put two declining entries in `toc.docx`. Here they are sharper, because the widening
+    is what spends the margin: `Signature` is an ordinary word in the page-number position on
+    a line that is not a contents entry at all, and `civil` is the word every letter of which
+    is a roman letter. Both must render FLAT while the five above them render with a leader.
+    """
+    ppr = ('<w:pPr><w:tabs>'
+           '<w:tab w:val="left" w:pos="567"/>'
+           '<w:tab w:val="right" w:leader="dot" w:pos="9070"/>'
+           '</w:tabs></w:pPr>')
+
+    # (number, title, page, must-place). The XML AND the notes are generated from this, so
+    # `text` cannot disagree with the document -- it is not hand-typed anywhere.
+    entries = [
+        ("1", "General provisions", "4", True),            # arabic: unchanged by the widening
+        ("2", "Preface", "iv", True),                       # roman, lower
+        ("3", "Foreword", "IV", True),                      # roman, upper
+        ("4", "Table of defined terms", "xii", True),       # roman, compound
+        ("A.1", "Schedule of works", "A-3", True),          # prefixed
+        ("Party", "Registered office", "Signature", False),  # the false positive
+        ("5", "Jurisdiction", "civil", False),              # the character-class trap
+    ]
+
+    def entry_xml(num, title, page, _place):
+        return p(f'<w:hyperlink r:id="rId9">'
+                 f'<w:r><w:t xml:space="preserve">{num}</w:t></w:r>'
+                 f'<w:r><w:tab/></w:r>'
+                 f'<w:r><w:t xml:space="preserve">{title}</w:t></w:r>'
+                 f'<w:r><w:tab/></w:r>'
+                 f'<w:r><w:t xml:space="preserve">{page}</w:t></w:r>'
+                 f'</w:hyperlink>', ppr=ppr)
+
+    heading = "Contents"
+    body = p(r(heading)) + "".join(entry_xml(*e) for e in entries)
+    rels = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/'
+            'relationships">'
+            '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/styles" Target="styles.xml"/>'
+            '<Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/hyperlink" Target="https://example.invalid/clause" '
+            'TargetMode="External"/></Relationships>')
+    docx(path, body, {"word/_rels/document.xml.rels": rels})
+
+    notes = [_note(0, heading, heading + " EN", [(0, len(heading))])]
+    for i, (num, title, page, _place) in enumerate(entries, start=1):
+        text = num + title + page
+        en = num + title + " EN" + page
+        spans = [(0, len(num)), (len(num), len(text))]
+        notes.append(_note(i, text, en, spans))
+    _write_notes(path, notes)
+
+
 @fixture("cross-reference.docx",
          "a REF field whose cached result IS consumed — clause 3 must drop the whole "
          "skeleton or the number prints twice — and a PAGE field with no cached result, "

@@ -1,0 +1,171 @@
+[
+  {
+    "idx": 0,
+    "text": "Contents",
+    "en": "Contents EN",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 8,
+        "text": "Contents",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 1,
+    "text": "1General provisions4",
+    "en": "1General provisions EN4",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 1,
+        "text": "1",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 1,
+        "end": 20,
+        "text": "General provisions4",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 2,
+    "text": "2Prefaceiv",
+    "en": "2Preface ENiv",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 1,
+        "text": "2",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 1,
+        "end": 10,
+        "text": "Prefaceiv",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 3,
+    "text": "3ForewordIV",
+    "en": "3Foreword ENIV",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 1,
+        "text": "3",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 1,
+        "end": 11,
+        "text": "ForewordIV",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 4,
+    "text": "4Table of defined termsxii",
+    "en": "4Table of defined terms ENxii",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 1,
+        "text": "4",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 1,
+        "end": 26,
+        "text": "Table of defined termsxii",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 5,
+    "text": "A.1Schedule of worksA-3",
+    "en": "A.1Schedule of works ENA-3",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 3,
+        "text": "A.1",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 3,
+        "end": 23,
+        "text": "Schedule of worksA-3",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 6,
+    "text": "PartyRegistered officeSignature",
+    "en": "PartyRegistered office ENSignature",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 5,
+        "text": "Party",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 5,
+        "end": 31,
+        "text": "Registered officeSignature",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 7,
+    "text": "5Jurisdictioncivil",
+    "en": "5Jurisdiction ENcivil",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 1,
+        "text": "5",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 1,
+        "end": 18,
+        "text": "Jurisdictioncivil",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  }
+]
