@@ -58,12 +58,23 @@ ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"))
 SCRIPT = "apply_translations_textmatch.py"
-# PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.16. Moved to 049484e on
-# 2026-09-02, the squash-merge of branch 6 slice 2 (PR #59), which `git log -- uk us` confirms
-# is the last commit to touch either tree. Kept in step with the same pin in
-# tools/apply_corpus_diff.py: the two tools answer the same before-and-after question, one in
-# bytes and one in pixels, and a disagreement between their baselines would be invisible.
-REF = os.environ.get("LT_BASELINE_REF", "2a71e71")
+# PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.16.
+#
+# MOVED TO d3c7f19 on 2026-09-02: the squash-merge of branch 6 slice 4 (PR #62) and the last
+# commit to touch either tree, verified by `git log --oneline -1 -- uk us` returning it and by
+# `git diff d3c7f19 -- uk us` coming back empty -- not by reading the merge message.
+#
+# AND THE COMMENT ABOVE THIS LINE WAS ITSELF STALE WHEN THIS EDIT WAS MADE, which is the whole
+# argument for rewriting it rather than appending to it: it read "Moved to 049484e" while the
+# pin one line below said 2a71e71. Both were true once. NOTHING CHECKS A COMMENT, so a stale
+# one is indistinguishable from a current one and costs a reader their bearings at exactly the
+# moment they are trying to establish what "-old" means. Re-derive both claims on the commit
+# that moves the pin.
+#
+# Kept in step with the same pin in tools/apply_corpus_diff.py: the two tools answer the same
+# before-and-after question, one in bytes and one in pixels, and a disagreement between their
+# baselines would be invisible in either one's output.
+REF = os.environ.get("LT_BASELINE_REF", "d3c7f19")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
 # Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
 # glance whether the pages in front of them belong to the run being discussed.
