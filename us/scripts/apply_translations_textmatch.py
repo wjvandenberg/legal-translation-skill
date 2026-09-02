@@ -1001,7 +1001,59 @@ def _run_is_only_position_critical(r):
 
 
 _TOC_ATOMS = ('text', 'tab', 'text', 'tab', 'text')
-_TRAILING_DIGITS = re.compile(r'\d+\Z')
+
+# WHAT COUNTS AS A PAGE NUMBER -- three alternatives. The second and third were WIDENED IN ON
+# 2026-09-02, on Wouter's decision, replacing a test that admitted arabic digits alone.
+#
+# THE DIGIT TEST WAS NEVER DECORATION. It is the only thing standing between the five-atom
+# shape and any three-part tabbed line whose last part happens to survive translation -- a
+# party grid, a cost table, a signature block. Widening it SPENDS part of that margin, so the
+# widening has to buy the margin back by being stricter inside each alternative rather than
+# looser across them. That is the whole design of what follows.
+#
+# THE TRAP, AND IT IS WHY THE ROMAN PATTERN IS THE LONG ONE. The obvious test is the character
+# class `[ivxlcdm]+`. IT MATCHES THE ENGLISH WORD `civil` -- c, i, v, i, l are every one of
+# them roman letters -- and `dill`, `lid` and `mill` besides. A character class is not a
+# roman-numeral test; a WELL-FORMEDNESS test is, and it refuses `civil` because `IL` is not a
+# legal pair. Uniform case is required on top of that and is tested in Python, because an
+# inline `(?i:)` cannot say "all one case" and `Iv` is a page number in no house style.
+#
+# ONE RESIDUE, STATED RATHER THAN HIDDEN: `mix` is M + IX = 1009 and IS a well-formed roman
+# numeral, so no roman test can refuse it without also refusing real numerals. It would have
+# to arrive as the last atom of a TOC-shaped paragraph and survive translation unchanged.
+#
+# THE SEPARATORS ARE BUILT WITH chr() RATHER THAN TYPED. A literal en dash in a source line is
+# invisible in review, indistinguishable from a hyphen at a glance, and one keystroke from
+# silently becoming one -- and that failure would be a page number that stops being placed on
+# documents nobody re-measures. The non-breaking hyphen is in the set because WORD INSERTS IT
+# ITSELF, which is exactly the one a hand-typed class would miss.
+#
+# Every vector, admitted and refused, is proved in `temp/probe_page_number.py`; the twelve
+# document-level shapes are `tests/test_toc_shapes.py`.
+_PAGE_SEPARATORS = '-.' + chr(0x2010) + chr(0x2011) + chr(0x2013)
+_PAGE_ARABIC = re.compile(r'\d+\Z')
+_PAGE_ROMAN = re.compile(
+    r'(?i:(?=[mdclxvi])m{0,3}(?:cm|cd|d?c{0,3})(?:xc|xl|l?x{0,3})(?:ix|iv|v?i{0,3}))\Z')
+_PAGE_PREFIXED = re.compile('[A-Za-z]{1,2}[' + re.escape(_PAGE_SEPARATORS) + r']\d+\Z')
+
+
+def _is_page_number(s):
+    """True if `s` is a page number a table of contents could carry.
+
+        arabic    4, 12, 147      the shape the placement rule was first measured on
+        roman     iv, IV, xii     front matter -- upper or lower case, never mixed
+        prefixed  A-3, B-12, A.3  schedules and annexes: one or two letters, a separator,
+                                  then digits
+
+    ALL THREE TRANSLATE TO THEMSELVES, and that is the only property `_toc_tab_offsets` needs
+    of a page number. Nothing here is about what the number MEANS; it is about whether the
+    same characters can be relied on to appear, unchanged, at the end of the English.
+    """
+    if _PAGE_ARABIC.match(s):
+        return True
+    if _PAGE_ROMAN.match(s):
+        return s == s.lower() or s == s.upper()
+    return bool(_PAGE_PREFIXED.match(s))
 
 
 def _atoms_with_text(p):
@@ -1109,11 +1161,16 @@ def _toc_tab_offsets(orig_p, en_text):
     pre, post = _lead_trim(atoms[0][1]), _trail_trim(atoms[4][1])
     # A PAGE NUMBER, NOT MERELY A TRAILING RUN. Without this, any three-part tabbed line whose
     # last part happened to survive translation would qualify -- a party grid, a cost table.
-    # Deliberately EXCLUDES a roman numeral (front matter) and a prefixed number such as
-    # `A-3` (schedules), both of which also translate to themselves and are therefore
+    #
+    # WIDENED 2026-09-02, AND THE SENTENCE THAT STOOD HERE RECORDED THE OPPOSITE DECISION. It
+    # read: "Deliberately EXCLUDES a roman numeral (front matter) and a prefixed number such
+    # as `A-3` (schedules), both of which also translate to themselves and are therefore
     # placeable in principle; widening to them is a decision, not an oversight, and it is
-    # recorded as one in `tests/test_toc_shapes.py`.
-    if not _TRAILING_DIGITS.match(post.strip()):
+    # recorded as one in `tests/test_toc_shapes.py`." IT WAS A DECISION, it was put to Wouter
+    # with the twelve-shape sweep that raised it, and he took it the other way. Kept rather
+    # than deleted, because the next reader is owed the fact that the narrower rule was
+    # chosen once on purpose. `_is_page_number` above holds the three forms and their traps.
+    if not _is_page_number(post.strip()):
         return None
     if not pre or not en_text.startswith(pre) or not en_text.endswith(post):
         return None

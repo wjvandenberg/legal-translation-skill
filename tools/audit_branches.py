@@ -373,18 +373,55 @@ def audit_b1():
           (g is not None, mn is not None, g is not None and mn is not None and g < mn),
           (True, True, True))
 
-    fx = [l for l in git("ls-tree", "-r", ref, "--name-only", "tests/fixtures").splitlines() if l]
+    # READ FROM THE INDEX, NOT FROM `ref` -- AND THIS ONE CLAIM DIFFERS FROM EVERY OTHER IN
+    # THIS BLOCK ON PURPOSE, 2026-09-02. Its neighbours ask what branch 1 DELIVERED, which is
+    # a historical question `main` answers correctly. This one asks how many synthetic
+    # fixtures the project HAS, which is a live inventory -- and reading `main` made it lag by
+    # exactly one merge.
+    #
+    # THE FAILURE THAT SHAPE PRODUCES IS THE WORST KIND: GREEN ON THE BRANCH THAT BREAKS IT,
+    # RED AFTERWARDS WHEN NOBODY IS LOOKING. `toc.notes.json` was added on 2026-09-02 while
+    # this expected 13; on the branch `main` still held 13 files, so the claim passed and the
+    # session recorded the suite green -- and the moment it merged, the count became 14 and
+    # the claim went red with the branch already closed. Reading the INDEX means a fixture
+    # added on a branch is counted on that branch, which is when the number can still be
+    # fixed by whoever moved it.
+    #
+    # `git ls-files` reads the INDEX, so a new fixture counts once it is STAGED. That is
+    # CLAUDE.md 5.16 point 5 working as intended rather than a limitation: stage first, then
+    # scan, then record -- a scan whose denominator silently excludes an untracked file is
+    # the same defect from the other end.
+    fx = [l for l in git("ls-files", "tests/fixtures").splitlines() if l]
     # 11 UNTIL 2026-09-01, and the audit caught the correction rather than my remembering it.
     # Branch 6 built two fixtures it could not do without: cross-reference.docx, because no
     # existing fixture carried a field skeleton and STEP-B section 3.7's own list for branch 6
     # omits one, so finding A9 had no synthetic instrument at all; and toc.docx, because a
     # table of contents is CLIENT TEXT on the one document that has one, so the defect Wouter
     # reported on D06 page 2 could be measured but never SEEN from this side.
-    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 13)
+    #
+    # 16 SINCE 2026-09-02, AND THE JUMP IS THREE FILES FOR TWO REASONS -- worth separating,
+    # because one of them is a slip this claim caught after the fact rather than at the time.
+    #
+    #   +1 INHERITED AND ALREADY RED. `toc.notes.json` landed with the notes-sidecar change on
+    #      2026-09-02 and this number was left at 13, so the claim went red on that commit and
+    #      the session that made it recorded the suite as green. It counts FILES, not fixture
+    #      DEFINITIONS, and a sidecar is a file -- which is the right behaviour and was simply
+    #      not thought about. Fixed here rather than put on a list.
+    #   +2 toc-widened.docx AND ITS SIDECAR, for the page-number widening. No corpus document
+    #      carries a roman or prefixed page number -- only one of eleven has a table of
+    #      contents at all -- so a synthetic page is the ONLY render that change can ever have.
+    #
+    # COUNTED BY LISTING, from `git ls-tree`, never by adding a delta to the figure above.
+    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 16)
 
     hits = 0
     for nm in fx:
-        data = git("show", f"{ref}:{nm}", binary=True)
+        # `:path` IS THE INDEX BLOB, and it has to match where `fx` came from. Reading
+        # `{ref}:{nm}` while the list comes from the index would throw on the first fixture
+        # added by the branch under review -- and, worse, would scan the OLD content of any
+        # fixture the branch had changed, reporting a confidentiality pass on bytes nobody is
+        # about to commit.
+        data = git("show", f":{nm}", binary=True)
         try:
             z = zipfile.ZipFile(io.BytesIO(data))
             text = b"".join(z.read(x) for x in z.namelist()).decode("utf-8", "replace")
