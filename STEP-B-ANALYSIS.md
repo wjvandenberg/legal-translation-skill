@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS.** Branches 3, 4, 5 and 14's `quality_check` slice MERGED. **Branch 6 slice 1 MERGED** `4a1c452` — A1 A2 A8 A9 F27. **Slice 2, the table-of-contents tab placement, is built and merge-pending** *(2026-09-02)* — it closes **A3's TOC and doubled-tab instances**, so A3 is **PARTIAL** and **A6 has moved to branches 15–17**; C16, C17 and F16 remain a declared follow-on slice. **Next: branch 7, the container inventory** |
+| **status** | **IN PROGRESS.** Branches 3, 4, 5 and 14's `quality_check` slice MERGED. **Branch 6 slice 1 MERGED** `4a1c452` — A1 A2 A8 A9 F27. **Slices 2 and 3 MERGED** `049484e` and `2a71e71` *(2026-09-02)* — the table-of-contents tab placement and then the page-number widening, which together close **A3's TOC and doubled-tab instances**, so A3 is **PARTIAL** and **A6 has moved to branches 15–17**. **Slice 4, the last, is built and merge-pending** *(2026-09-02)*: **C17 and F16 CLOSED, C16 PARTIAL** — two mechanisms found and fixed, and the corpus instance shown to be neither. Two new register rows came out of it, **A20** and **C29**, and neither belongs to branch 6. **Next: branch 7, the container inventory** |
 | **serves** | section 3 of `CLAUDE.md` — its **step 2**, Building. *(The house word for that unit is **phase**; this project says **step**. The mapping is in that charter's §1.3 and the vocabulary is deliberately not renamed.)* |
 | **produces** | branches **3–19 plus D1–D3** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
 | **done when** | every branch in §2 is merged with its own *Done when* in §3 met, tested by its kind's method in §4, and no criterion regressed against the frozen v3 baseline |
@@ -1286,7 +1286,7 @@ is a class that has already cost real content, not a hypothesis. And a delivered
 integrity test prints a warning and exits successfully, leaving a possibly-unopenable document at the
 delivery path.
 
-### 5.2 Things that make the document look wrong on the page — 27 findings
+### 5.2 Things that make the document look wrong on the page — 28 findings
 
 **Emphasis reaches a word three different ways and the pipeline understands one of them.** A word can be
 bold because its own run says so, because a *character style* says so, or because a *paragraph style* says
@@ -1408,7 +1408,7 @@ third lost, it lost to defects the first run had noticed and repaired outside th
 **So the conclusion is an argument for fixing the defects, not for a rule about batching** — fix them and
 batch position stops mattering, because there is nothing left to rescue.
 
-### 5.5 Places where the manual is simply wrong — 43 findings, and it is now the largest
+### 5.5 Places where the manual is simply wrong — 44 findings, and it is now the largest
 
 **Three mandatory requirements cannot be met at all.** One requires a check to report zero issues while two
 other mandatory rules forbid both available ways to get there. One requires the operator to verify that no
@@ -1827,7 +1827,7 @@ carried, or warn.** Neither document exhibits both today, which is why nothing h
 
 | pros | cons | what it would break | what it does NOT fix |
 |---|---|---|---|
-| Closes **22 findings, 17 of them visible defects** *(20 and 15 until 2026-09-02, when **A6** and **A3's remainder** arrived from option 1: glued bullets, and every tab whose position cannot be proved from the source. **Both are visible — Wouter reported each from a rendered page** — so the visible count rises with the total)* — the bold class in all three of its routes, the spreading-property class, the underline and size losses, the character-style losses · Deletes rather than rewords four wrong instructions, including the longest rule in the skill: **8,028 bytes, 121 lines, 16.8% of the heaviest step document, three times the size of ten other rules combined [measured]** · Makes the missing span-count check possible · Removes the reason the definitions detector has to guess at all · It is the change that makes the previously-planned formatting branch **safe**, which as scoped it was not | Cost **high**, risk **high** *(inference)* · New capability in the reading-apart step: genuinely fiddly OOXML · The writing-back step's rebuild is **replaced, not amended** · The notes-file format changes, which invalidates every worked example in the step documents and every archived intermediate — including the frozen ones the test plan depends on, so those must be regenerated · Cannot be verified without option 2 existing first | Every worked example in the step documents · Every archived intermediate, i.e. the tier-2 test fixtures · The bold-off removal and the computation **must land in one branch**, so this is the one option with a step that cannot be made smaller · A wrong cascade computation is a **new class of defect** in a pipeline that currently scores 9 on translation | **Every content loss.** Disjoint from option 1: no shared code path, no shared finding · **Cluster layout is NOT closed by this — that claim is refuted in §12.** Five of the six layout findings resolve to detect-and-disclose or are forbidden by the golden rule, not to a formatting computation · Every check · Every dictionary finding |
+| Closes **23 findings, 17 of them visible defects** *(20 and 15 until 2026-09-02, when **A6** and **A3's remainder** arrived from option 1, and **A20** later the same day from branch 6's fourth slice — offsets that index a different string from the one apply slices, which is the `en_runs` trust problem from a third side: glued bullets, and every tab whose position cannot be proved from the source. **Both are visible — Wouter reported each from a rendered page** — so the visible count rises with the total)* — the bold class in all three of its routes, the spreading-property class, the underline and size losses, the character-style losses · Deletes rather than rewords four wrong instructions, including the longest rule in the skill: **8,028 bytes, 121 lines, 16.8% of the heaviest step document, three times the size of ten other rules combined [measured]** · Makes the missing span-count check possible · Removes the reason the definitions detector has to guess at all · It is the change that makes the previously-planned formatting branch **safe**, which as scoped it was not | Cost **high**, risk **high** *(inference)* · New capability in the reading-apart step: genuinely fiddly OOXML · The writing-back step's rebuild is **replaced, not amended** · The notes-file format changes, which invalidates every worked example in the step documents and every archived intermediate — including the frozen ones the test plan depends on, so those must be regenerated · Cannot be verified without option 2 existing first | Every worked example in the step documents · Every archived intermediate, i.e. the tier-2 test fixtures · The bold-off removal and the computation **must land in one branch**, so this is the one option with a step that cannot be made smaller · A wrong cascade computation is a **new class of defect** in a pipeline that currently scores 9 on translation | **Every content loss.** Disjoint from option 1: no shared code path, no shared finding · **Cluster layout is NOT closed by this — that claim is refuted in §12.** Five of the six layout findings resolve to detect-and-disclose or are forbidden by the golden rule, not to a formatting computation · Every check · Every dictionary finding |
 
 ---
 
@@ -1944,7 +1944,7 @@ the convention statements and cheaper.
 > stated number of failed repairs the operator stops, records, and uses the channel. **Without the bound the
 > channel is optional; with it, the channel is the only legitimate way the loop can end.**
 
-**Five separable gaps that between them own 45 findings**, and they are the cheapest per finding and the
+**Five separable gaps that between them own 46 findings**, and they are the cheapest per finding and the
 largest single group. *(Corrected 2026-08-05 from 50: six batch-behaviour findings were wrongly filed here —
 two moved to options 1 and 6, four are closed by no option at all. See §9.2.)*
 
@@ -2020,7 +2020,7 @@ because that text protects users.
 
 **(v) THE PROBE THIS WHOLE OPTION RESTS ON, AND NOBODY HAS RUN IT.** The comparison calls it **"the central
 empirical question about this artefact"**: *does the prose reach the agent under pressure?* Twelve runs
-observed compliance; **none was a controlled comparison.** **This option is 45 findings whose fix is to write
+observed compliance; **none was a controlled comparison.** **This option is 46 findings whose fix is to write
 better instructions — so its entire premise is untested.** The probe is cheap and already designed: **the
 same document twice, step-file reads enforced versus suppressed, comparing defect counts.** **Prescription — and CORRECTED 2026-08-05 when Wouter asked how and when it would run.** The first version
 said *run it before the expensive half of this option is built*, which **over-claimed: this probe does not
@@ -2050,7 +2050,7 @@ auto-invoked validators a condition for proceeding, the count is stated five dif
 
 | pros | cons | what it would break | what it does NOT fix |
 |---|---|---|---|
-| **45 findings, the largest group, and most are one-line edits** · Contains the cheapest fix in the project — one paragraph stating that a check can be wrong in scope, that the remedy is to fix the check and never to bypass it, and never to alter a faithful translation to satisfy it · **It is now a precondition for option 2**, not merely parallel to it: 14 findings have no compliant repair, so making the checks discerning without an escape hatch deadlocks the pipeline · The declared-mode half is **the only speed lever that costs no quality** — it skips steps that have nothing to do, rather than reading less or checking less · Touches no code for most of its findings | Cost **low per finding, high for the four structural parts** *(inference)* · **The danger is doing the cheap half and calling the group closed** while the three impossible requirements remain impossible · "One-line edit" means low code risk, not low judgement: someone has to decide what the rule *is* · **The exception channel is the highest-risk documentation change in the whole plan.** Written loosely it is a licence to bypass checks, which is the one thing the discipline forbids — and an independent reader called the current absolutism *"mature"*, so the fix must **add the scope rule**, never soften the anti-drift text | If the exception channel is written badly it breaks the discipline that holds the whole skill together · The declared modes must be **declared by the operator, never inferred** — the language detection is measured unreliable, so an inferred mode would be a new silent-failure class · Renumbering the steps would invalidate every step id in the existing forensic logs, which is why that part should be the cheap version first: fix the hole and the inconsistent letters without renumbering | **All code.** No content loss, no formatting, no layout, no check mechanism · It does not make the impossible requirements possible — it makes them *escapable and disclosed*, which is a different thing and must be described as such |
+| **46 findings, the largest group, and most are one-line edits** · Contains the cheapest fix in the project — one paragraph stating that a check can be wrong in scope, that the remedy is to fix the check and never to bypass it, and never to alter a faithful translation to satisfy it · **It is now a precondition for option 2**, not merely parallel to it: 14 findings have no compliant repair, so making the checks discerning without an escape hatch deadlocks the pipeline · The declared-mode half is **the only speed lever that costs no quality** — it skips steps that have nothing to do, rather than reading less or checking less · Touches no code for most of its findings | Cost **low per finding, high for the four structural parts** *(inference)* · **The danger is doing the cheap half and calling the group closed** while the three impossible requirements remain impossible · "One-line edit" means low code risk, not low judgement: someone has to decide what the rule *is* · **The exception channel is the highest-risk documentation change in the whole plan.** Written loosely it is a licence to bypass checks, which is the one thing the discipline forbids — and an independent reader called the current absolutism *"mature"*, so the fix must **add the scope rule**, never soften the anti-drift text | If the exception channel is written badly it breaks the discipline that holds the whole skill together · The declared modes must be **declared by the operator, never inferred** — the language detection is measured unreliable, so an inferred mode would be a new silent-failure class · Renumbering the steps would invalidate every step id in the existing forensic logs, which is why that part should be the cheap version first: fix the hole and the inconsistent letters without renumbering | **All code.** No content loss, no formatting, no layout, no check mechanism · It does not make the impossible requirements possible — it makes them *escapable and disclosed*, which is a different thing and must be described as such |
 
 ---
 
@@ -2682,12 +2682,16 @@ rewriting stage at all. By construction that addresses options 1, 2, 3 and 6.
 **What it would not touch, and this is the decisive part of the arithmetic.** It does nothing for the
 furniture and dictionary work (content, not architecture), nothing for the instruction substrate (the
 instructions still have to be written, and they are 50 findings), nothing for the two-tree problem, nothing
-for truncation, and nothing for the false claims. **On the measured numbers a rebuild addresses at most 94 of
-the 168 findings and leaves 74 exactly where they are** *(re-derived 2026-08-06 from the option map that
-generates §9's appendix: the union of what options 1, 2, 3 and 6 close is **94**. This parenthetical
-previously read "92, not the 99 first written" — a figure from before the register's last two rows landed,
-sitting two words from the correct 94 in the same sentence. Caught by re-measuring rather than by reading;
-`temp/rebuild_arithmetic.py` re-derives it)* — and the 50-finding instruction group is
+for truncation, and nothing for the false claims. **On the measured numbers a rebuild addresses at most 98 of
+the 173 findings and leaves 75 exactly where they are** *(re-derived 2026-09-02 from the option map in
+`tools/stepb_verify.py`, which is what generates §9's appendix: the union of what options 1, 2, 3 and 6
+close is **98**. It read "94 of the 168 … leaves 74" until then, and that figure had already gone stale
+before branch 6's fourth slice touched it — the slice added only A20 to the union, and the union had moved
+by four. **DO NOT re-derive this from `temp/rebuild_arithmetic.py`: it carries its own COPY of the option
+map and that copy has drifted** — it reports option 3 at 20 and option 5 at 45 where the real map says 23
+and 46. A second copy of a generated map is a stale answer waiting to be quoted, which is the defect this
+parenthetical has now had twice; the earlier version read "92, not the 99 first written", a figure sitting
+two words from the correct one in the same sentence. Both were caught by re-measuring, neither by reading)* — and the 50-finding instruction group is
 the largest single group in the register.
 
 **What it would break, and one of these is structural rather than practical.** Every worked example in the
@@ -2822,12 +2826,12 @@ plain English above becoming hand-waving.**
 | # | consequence group | findings | severity mix |
 |---|---|---|---|
 | 1 | loses content | A1 A2 A3 A6 A8 A9 A15 A16 A19 B3 B8 C2 C12 C13 C14 C16 C17 C19 C23 C28 E4 F16 F27 J1 M1 N1 S3 | CRITICAL:6 HIGH:16 MED:4 LOW:1 |
-| 2 | looks wrong on the page | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 B1 B7 C20 D1 D2 D3 D4 D5 D6 E9 E12 F7 F13 F19 F22 O1 R1 | HIGH:16 MED:9 LOW:2 |
+| 2 | looks wrong on the page | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 A20 B1 B7 C20 D1 D2 D3 D4 D5 D6 E9 E12 F7 F13 F19 F22 O1 R1 | HIGH:16 MED:10 LOW:2 |
 | 3 | says it worked when it did not | C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 H1 H2 H4 L1 L4 L6 S1 S2 W3 W4 X1 X2 X4 X6 | CRITICAL:4 HIGH:21 MED:15 LOW:3 —:1 |
 | 4 | hard to keep correct | E1 E2 E3 E5 E6 E10 E11 E13 E14 F21 F23 F32 F36 F37 F38 L2 L3 Q1 T1 T2 T3 T4 T5 T6 U1 V1 V2 W1 W2 Y1 | CRITICAL:1 HIGH:8 MED:16 LOW:3 POS:2 |
-| 5 | the manual is wrong | B2 B4 B5 B6 E7 E8 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40 F41 F42 H3 K1 K2 K3 L5 X3 X5 Y2 Y3 Y4 | HIGH:17 MED:20 LOW:6 |
+| 5 | the manual is wrong | B2 B4 B5 B6 C29 E7 E8 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40 F41 F42 H3 K1 K2 K3 L5 X3 X5 Y2 Y3 Y4 | HIGH:18 MED:20 LOW:6 |
 
-**27 + 27 + 44 + 30 + 43 = 171 ✓**
+**27 + 28 + 44 + 30 + 44 = 173 ✓**
 
 > **THIS LINE WAS STALE BY TWO, AND IT HAD BEEN FOR SOME TIME.** *(Corrected 2026-08-21 on
 > branch 14.)* It read **27 + 27 + 41 + 30 + 43 = 168** while the table directly above it
@@ -2847,12 +2851,12 @@ plain English above becoming hand-waving.**
 |---|---|---|---|
 | 1 | preserve-by-default in apply | A1 A2 A3 A8 A9 A16 A19 C16 C17 C19 D4 F16 F27 N1 T1 T6 | CRITICAL:4 HIGH:10 MED:1 POS:1 |
 | 2 | check against the original | B8 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28 D2 D5 E4 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 H1 H2 H4 J1 L1 L4 L6 M1 S1 S2 S3 U1 V1 | CRITICAL:6 HIGH:23 MED:20 LOW:4 —:1 |
-| 3 | say what the formatting is | A3 A4 A5 A6 A7 A10 A11 A12 A13 A14 A17 A18 C13 C20 D6 F7 F13 F19 F22 L2 L3 O1 | HIGH:17 MED:4 LOW:1 |
+| 3 | say what the formatting is | A3 A4 A5 A6 A7 A10 A11 A12 A13 A14 A17 A18 A20 C13 C20 D6 F7 F13 F19 F22 L2 L3 O1 | HIGH:17 MED:5 LOW:1 |
 | 4 | a home for document furniture | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 | CRITICAL:1 HIGH:5 MED:9 LOW:1 |
-| 5 | one authority, one way out, more than one gear | A15 C5 C7 C26 D3 D5 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28 F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 | CRITICAL:1 HIGH:16 MED:23 LOW:5 |
+| 5 | one authority, one way out, more than one gear | A15 C5 C7 C26 C29 D3 D5 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28 F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 | CRITICAL:1 HIGH:17 MED:23 LOW:5 |
 | 6 | take post_process's authority away | B1 B2 B3 B4 B5 B6 B7 B8 D5 F29 T1 T6 | HIGH:5 MED:5 LOW:1 POS:1 |
 | 7 | one tree instead of two | C21 F8 F34 Q1 U1 V1 V2 | MED:5 LOW:2 |
-| 8 | protect the whole package | F35 Q1 W1 W2 W3 W4 Y1 | HIGH:5 MED:1 LOW:1 |
+| 8 | protect the whole package | C29 F35 Q1 W1 W2 W3 W4 Y1 | HIGH:6 MED:1 LOW:1 |
 | 9 | fix the claim, not only the code | C5 C10 C11 F12 F39 F40 F42 J1 K1 L6 X1 X2 X3 X4 X5 X6 Y1 Y2 Y3 Y4 | CRITICAL:2 HIGH:7 MED:9 LOW:2 |
 | 11 | layout: see it and say so | D1 D2 D3 D4 D5 D6 | HIGH:3 MED:2 LOW:1 |
 
@@ -2890,7 +2894,7 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 | 3 the scope rule | 5, 9 | K1 K2 K3 F35 X3 |
 | 4 the exception channel | 5 | A15 D3 D4 D5 F1 F15 F28 F30 F33 L5 **F41** — and the whole eighteen-row set named in §12 routes through here. *(F41, repair is unbounded, added 2026-08-11: §6's Option 5 assigns it here in as many words — "this gap belongs to this option because its answer is this option's answer" — but this row had never carried it. No register row was added, so no count in `CLAUDE.md` §2.3 moves.)* |
 | 5 checks can fail | 2, 8 | C3 C23 C25 W3 W4 L4 (via C3) |
-| 6 stop deleting | 1 | A1 A2 A8 A9 F27 · **A3 PARTIAL** · C16 C17 F16 *(**A3 and A6 both left this row on 2026-09-02, differently, and the difference is the point.** Slice 1 closed A1 A2 A8 A9 F27; slice 2 placed 25 of D06's 26 table-of-contents entries, which closes **A3's TOC instance and D01's doubled-tab instance** and leaves D02's tables, D05's hanging-indent notices clause and D11's mid-phrase tabs unplaceable from a single English string — so **A3 stays here as PARTIAL and its remainder is branch 16's**. **A6 moved OUT to 15–17 entire:** glued bullets are a different paragraph shape and no slice of option 1 reaches them. C16, C17 and F16 remain a declared follow-on slice — boundary-whitespace and offset defects in three other functions, not deletions.)* |
+| 6 stop deleting | 1 | A1 A2 A8 A9 F27 · **A3 PARTIAL** · C16 C17 F16 *(**A3 and A6 both left this row on 2026-09-02, differently, and the difference is the point.** Slice 1 closed A1 A2 A8 A9 F27; slice 2 placed 25 of D06's 26 table-of-contents entries, which closes **A3's TOC instance and D01's doubled-tab instance** and leaves D02's tables, D05's hanging-indent notices clause and D11's mid-phrase tabs unplaceable from a single English string — so **A3 stays here as PARTIAL and its remainder is branch 16's**. **A6 moved OUT to 15–17 entire:** glued bullets are a different paragraph shape and no slice of option 1 reaches them. C16, C17 and F16 were a declared follow-on slice — boundary-whitespace and offset defects in three other functions, not deletions — and **the fourth slice, 2026-09-02, CLOSED C17 and F16 and left C16 PARTIAL.** **C17: three real instances measured over all 13 frozen intermediates and ZERO on D08, the document its row names**, all three the LAST segment of their paragraph — so the damage is a lost TRAILING space and the glued form the row describes carries on no corpus document at all. **F16: zero instances, and the corpus CANNOT hold one** — the frozen intermediates are the post-compliance artefact and the offsets are gated before apply, so both rows needed synthetic fixtures for two different reasons. **C16 is PARTIAL because two mechanisms were found and fixed and the corpus instance is neither**: D04 delivers one interior double space against 12 in its own source and 0 declared, so nothing there is attributable to apply by the new delivered-versus-declared arm, and D07 keeps 3 attributable ones. **Two new rows came out of the slice — A20 and C29 — and neither is branch 6's**, so this row does not gain them.)* |
 | 7 the container inventory | 1 | A16 A19 N1 C19 |
 | 8 reading-apart completeness | 2 | C28 C12 M1 |
 | 9 the change journal | 6, 2 | C15 B6 — and it unblocks branch 11 |
@@ -2974,7 +2978,7 @@ call** rather than twice.
 | **2** | **Check against the original** (option 2) | Highest total value — 54 findings, six of them worst-grade — and the only option that changes what we can find next time. Ranked second rather than first for one reason: it **detects** rather than repairs, and the deadlock finding means its discerning half cannot land before rank 3. Its instrument half (one failing input per check) belongs with the harness and should go first |
 | **3** | **One authority, one way out, more than one gear** (option 5, cheap half first) | Promoted from A3's fifth place, on a fact A3 did not have: **it is a precondition for rank 2.** Eighteen findings have no compliant repair, so a discerning check without an escape hatch stops the pipeline permanently. It also contains the cheapest fix in the project and the only sanctioned speed lever. Do the scope rule and the exception channel **before** the checks get teeth |
 | **4** | **Take the tidy-up script's authority** (option 6) | The strongest single piece of evidence in the register, and — newly — **option 2's character-exact check cannot be built until this stage declares its changes.** The journal is small and should land early even if the shape decision takes longer |
-| **5** | **Say what the formatting is** (option 3) | The biggest quality gain on the page: 22 findings, 17 visible. Ranked fifth only because it is the most expensive and the riskiest, it needs rank 2 underneath it to be believed, and its own claim on the layout group is refuted. **This is the leap.** It is fifth in *order*, not in importance |
+| **5** | **Say what the formatting is** (option 3) | The biggest quality gain on the page: 23 findings, 17 visible. Ranked fifth only because it is the most expensive and the riskiest, it needs rank 2 underneath it to be believed, and its own claim on the layout group is refuted. **This is the leap.** It is fifth in *order*, not in importance |
 | **6** | **A home for document furniture** (option 4) | The only option touching what your own review says matters, and structurally invisible to every instrument we have — which is both its argument and its problem. Ranked sixth because it needs your decision on the prohibition question first, and because its verification is a graded run plus your review rather than a script |
 | **7** | **Layout — see it and say so** (option 11) | **Added 2026-08-05; it was missing.** It carries Wouter's own named defect. Ranked below furniture because furniture's harm is *substantive* — a wrong instrument-class rendering, an arguably narrowed exclusion clause — while layout's is presentational, and one of its six findings is explicitly benign. Ranked here rather than lower because the detection half is cheap, rides on option 2's rendered comparison, and is a **precondition for the repair half either way** |
 | **8** | **Fix the claim** (option 9) | Cheap, and a product requirement for a published skill. Ranked here because most of it should be folded into ranks 1–6 as they land, leaving a small standalone slice. **But see the retraction above: an independent reader rates this higher within the static findings it could see, and the operative fact is not the rank — it is that this and rank 3 open the same files and should be one pass** |

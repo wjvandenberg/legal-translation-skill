@@ -698,6 +698,226 @@ def _empty(path):
     docx(path, "")
 
 
+# ---------------------------------------------------------------------------
+# Branch 6, FOURTH SLICE — C17 and C16. Whitespace at a segment boundary.
+#
+# WHY THESE ARE SYNTHETIC WHEN THE CORPUS DOES CARRY C17. Measured 2026-09-02 over all 13
+# frozen intermediates: C17 fires exactly THREE times (D02 idx 31 and 170, D07 idx 59) and in
+# every one of the three the whitespace-only segment is the LAST segment of its paragraph --
+# so nothing follows it to be glued to, and the damage is a lost TRAILING space, which no page
+# can show. The register's visible damage is the D08 MID-PARAGRAPH shape, and D08 does not
+# carry it: that row's sentence is conditional (*"mirroring them WOULD HAVE rendered"*) and
+# that operator did not mirror.
+#
+# So the corpus proves the mechanism FIRES and cannot prove the glue is PREVENTED. This is the
+# third distinct route to the same remedy: the contents shapes because the corpus does not
+# CONTAIN the shape, F16 because it CANNOT, and this because it contains the mechanism but not
+# the damage.
+# ---------------------------------------------------------------------------
+@fixture("whitespace-arms.docx",
+         "a whitespace-only en_segment mid-paragraph, which apply CLEARS -- gluing two "
+         "sentences -- beside the explicitly-empty segment that must go on clearing, and a "
+         "source run whose DOUBLE trailing space apply restores over the operator's text. "
+         "C17 and C16, with their negative controls. Ships its own whitespace-arms.notes.json")
+def _whitespace_arms(path):
+    """Three rows that must change, one that must not, each labelled on the page.
+
+    THE LABELS ARE NOT DECORATION. Shown slice 3's render, Wouter read two deliberately-flat
+    lines as damage -- a fair reading, because nothing on the page said they were refusals. A
+    reviewer should not need the author standing beside the picture. Labels are ordinary
+    paragraphs with `en == text`, so apply's skip-same-text branch leaves them alone and they
+    render identically in every arm.
+
+    EVERY SEGMENT USES `w:t`, NEVER `w:delText`, AND THAT IS DELIBERATE: `_write_notes` proves
+    `text` against the document by walking `w:t`, so a `w:del` row would make the fixture's own
+    self-check disagree with the fixture. The mechanism under test is the same either way --
+    `distribute_text_across_elements` is reached from both.
+    """
+    def ins(t):
+        return ('<w:ins w:id="1" w:author="A" w:date="2020-01-01T00:00:00Z">'
+                f'<w:r><w:t xml:space="preserve">{t}</w:t></w:r></w:ins>')
+
+    heading = "Whitespace at a segment boundary"
+    L1 = ("ARM 1 - C17. The two below MUST read as two sentences with a space between "
+          "them. Glued together is the defect:")
+    L2 = ("NEGATIVE CONTROL. The line below MUST look the same in both arms - an "
+          "explicitly empty segment goes on being cleared:")
+    L3 = ("ARM 2 - C16. The FIRST line below MUST begin with ONE leading space, not two. "
+          "The SECOND MUST look identical in both arms - a single source space is still "
+          "restored, and that repair must survive the fix:")
+
+    # (label, [(segment type, source text, declared en)]) -- the XML and the notes are both
+    # generated from this, so `text` is not hand-typed anywhere and cannot disagree.
+    rows = [
+        # C17, seam NOTHING DOWNSTREAM REPAIRS. post_process.fix_spacing has seven seam rules
+        # and `'.' + lower` is not one of them, so this glue reaches the page.
+        [("regular", "The services end.", "The services end."),
+         ("ins", " ", " "),
+         ("regular", "the notice period applies.", "the notice period applies.")],
+        # C17, THE REGISTER'S OWN SHAPE, and it is here to be honest about the row rather than
+        # to flatter it: `'.' + upper` IS a fix_spacing rule, so this seam would have been
+        # repaired downstream by accident. A defect that depends on a later step to mask it is
+        # still a defect -- C15 records what that repair costs when it fires -- but the row's
+        # own example is the weaker of the two and the fixture says so.
+        [("regular", "The obligations of the providers.", "The obligations of the providers."),
+         ("ins", " ", " "),
+         ("regular", "The Company shall pay the fee.", "The Company shall pay the fee.")],
+        # THE NEGATIVE, AND WITHOUT IT THE FIX IS JUST A DISABLED BRANCH. `"en": ""` is the
+        # documented coalesce-to-first-segment device -- 04-translate.md Option B states the
+        # contract in terms: `"en": ""` CLEARS, no `en` key PRESERVES. It says nothing about
+        # whitespace, which is the undocumented third case the code folds into "clear".
+        [("regular", "Clause ", "Clause 12"),
+         ("ins", "twelve", ""),
+         ("regular", " applies.", " applies.")],
+        # C16, AND ITS SHAPE IS NARROWER THAN THE PLAN ASSUMED -- measured, first run.
+        #
+        # The restoration guard tests THE SEGMENT'S OWN slice edge (`not
+        # slice_text.startswith((' ', '\t'))`), never its NEIGHBOUR's. So restoration cannot
+        # be provoked at a boundary where the operator authored the space on the other side --
+        # and if they authored it on NEITHER side the declared segments concatenate glued, and
+        # `validate_segment_shapes` blocks the run before apply is reached. That gate is RIGHT:
+        # the first version of this fixture declared `"The fee is payable" | "within thirty
+        # days."` and was correctly refused.
+        #
+        # WHAT IS LEFT IS THE PARAGRAPH'S LEADING EDGE, where there is no neighbour to glue
+        # to and nothing for the shape gate to see. That is the shape the fix addresses, and
+        # the residue is DECLARED rather than hidden: a double space arising ACROSS two
+        # segments -- authored space on one side, restored space on the other -- is a
+        # different shape, is not fixed here, and cannot be, because the per-segment call has
+        # no view of its neighbour.
+        [("regular", "  The fee is payable ", "The fee is payable "),
+         ("ins", "within thirty days.", "within thirty days.")],
+        # THE C16 NEGATIVE, and it is the half that proves the fix is not just a deletion.
+        # A source edge carrying ONE space must go on being restored: that is the rev42 repair
+        # the comment at apply's `:436-457` documents, and "restore at most one character"
+        # must leave it exactly as it was.
+        [("regular", " The term is ", "The term is "),
+         ("ins", "twelve months.", "twelve months.")],
+    ]
+
+    parts = [p(r(heading)), p(r(L1))]
+    for i, row in enumerate(rows):
+        if i == 2:
+            parts.append(p(r(L2)))
+        if i == 3:
+            parts.append(p(r(L3)))
+        parts.append(p(*[r(src) if kind == "regular" else ins(src)
+                         for kind, src, _ in row]))
+    docx(path, "".join(parts))
+
+    # PARAGRAPH INDICES, WHICH THE SUITE ASSERTS RATHER THAN A COUNT: 0 heading, 1 label,
+    # 2-3 the C17 rows, 4 label, 5 the C17 negative, 6 label, 7 the C16 row, 8 the C16
+    # negative.
+    notes = [_note(0, heading, heading, [(0, len(heading))])]
+    for lab in (L1,):
+        notes.append(_note(len(notes), lab, lab, [(0, len(lab))]))
+    for i, row in enumerate(rows):
+        if i == 2:
+            notes.append(_note(len(notes), L2, L2, [(0, len(L2))]))
+        if i == 3:
+            notes.append(_note(len(notes), L3, L3, [(0, len(L3))]))
+        text = "".join(src for _, src, _ in row)
+        en = "".join(en_ for _, _, en_ in row)
+        n = _note(len(notes), text, en, [(0, len(text))])
+        # `en_segments` is what puts apply on the segment-aware path; `has_track_changes` only
+        # gates the TC-only pre-apply validators, and it is set so they RUN rather than being
+        # quietly skipped on a fixture built to exercise that path.
+        n["en_segments"] = [{"type": kind, "en": en_} for kind, _, en_ in row]
+        n["has_track_changes"] = True
+        notes.append(n)
+    _write_notes(path, notes)
+
+
+# ---------------------------------------------------------------------------
+# Branch 6, FOURTH SLICE — F16. AND THIS ONE THE CORPUS CANNOT CARRY AT ALL.
+#
+# Measured 2026-09-02: ZERO instances across all 13 frozen intermediates, and the zero is
+# PROVED rather than believed -- 729 entries carry `en_runs`, the keys are exactly
+# start/end/bold/italic, the last run's `end` lands on `len(en)` 729 times out of 729 and on
+# `len(text)` 0 times, a planted needle fired and a conforming input stayed quiet.
+#
+# THE REASON IS §5.8 RULE 2 VERBATIM. The frozen intermediates are the POST-COMPLIANCE
+# artefact and `validate_en_runs.py` is a PRE-APPLY gate, so a run whose offsets pointed past
+# the end of `en` could never have produced a frozen intermediate at all. The evidence base is
+# clean BECAUSE the gate worked, and F16 describes what happens to an operator mid-run, which
+# no post-run artefact records. A zero read as "already fixed" would be the whole defect.
+#
+# SEPARATE FROM whitespace-arms.docx BECAUSE A FIRING GUARD ABORTS APPLY FOR THE WHOLE
+# DOCUMENT. Putting this row in that file would take the other three arms' render down with it,
+# and a fixture that cannot be rendered is not a fixture anyone looks at.
+# ---------------------------------------------------------------------------
+@fixture("en-runs-offsets.docx",
+         "a definitions paragraph whose en_runs offsets were authored against the LONGER "
+         "pre-Step-4c `en` -- so the last span's `end` points past the end of the string apply "
+         "actually slices. Python clamps silently, so the emphasis lands on the wrong words "
+         "and nothing reports it. Ships its own en-runs-offsets.notes.json")
+def _en_runs_offsets(path):
+    """The one shape the corpus is structurally incapable of holding.
+
+    THE DAMAGE IS MIS-SLICING, NOT TRUNCATION, and that distinction is why the offsets are
+    built by arithmetic here rather than typed. A span that merely overshoots the END is
+    harmless -- `en[x:huge]` clamps to `en[x:]` and the tail still comes out right. The damage
+    needs the marker to sit in the MIDDLE, so every span after it is shifted by the length the
+    edit removed and slices characters that belong to its neighbour.
+    """
+    # Step 4c's dead field marker, verbatim from the step document's own example.
+    marker = "Error: Reference source not found"
+    term = '"Delivery Date"'
+    mid = " means the date set out in Clause "
+    tail = ", as adjusted."
+
+    # The SOURCE still carries the broken field, which is what Step 4c tells the operator to
+    # scan `text` for. Invented, and deliberately not any real language's legal phrasing.
+    text = f'{term} betekent de datum genoemd in artikel {marker}{tail}'
+    # What the operator authored BEFORE Step 4c, and what the offsets were measured against.
+    en_pre = f"{term}{mid}{marker}{tail}"
+    # What Step 4c leaves behind: the marker replaced, `text` untouched, `en_runs` NOT re-derived.
+    en_post = f"{term}{mid}8.1{tail}"
+
+    # Authored against `en_pre`: bold term, plain lead-in, bold clause reference, plain tail.
+    # A plausible authoring choice, and the third span is the one that goes out of range.
+    a = len(term)
+    b = a + len(mid)
+    c = b + len(marker)
+    en_runs = [
+        {"start": 0, "end": a, "bold": True, "italic": False},
+        {"start": a, "end": b, "bold": False, "italic": False},
+        {"start": b, "end": c, "bold": True, "italic": False},
+        {"start": c, "end": len(en_pre), "bold": False, "italic": False},
+    ]
+    assert en_runs[-1]["end"] > len(en_post), (
+        "the fixture must be OUT OF RANGE against the post-edit `en`, or it tests nothing")
+    assert en_runs[2]["start"] < len(en_post), (
+        "span 3 must START in range, or the damage is a harmless clamp at the tail rather "
+        "than the mis-slicing this fixture is for")
+
+    # THE SAME SPANS, RE-DERIVED AGAINST THE POST-EDIT STRING -- the control the F16 arm is
+    # useless without, because a guard that raises on every paragraph satisfies "it refused
+    # the bad input" perfectly. It ships HERE rather than being reconstructed in the suite so
+    # the arithmetic lives in one place: a second copy in the test would be free to drift
+    # from the fixture it claims to be a corrected version of. Apply ignores the extra key.
+    c_ok = b + len("8.1")
+    en_runs_ok = [
+        {"start": 0, "end": a, "bold": True, "italic": False},
+        {"start": a, "end": b, "bold": False, "italic": False},
+        {"start": b, "end": c_ok, "bold": True, "italic": False},
+        {"start": c_ok, "end": len(en_post), "bold": False, "italic": False},
+    ]
+    assert en_runs_ok[-1]["end"] == len(en_post), "the control must be exactly in range"
+    assert [s["end"] - s["start"] for s in en_runs_ok] == [
+        len(term), len(mid), len("8.1"), len(tail)], (
+        "the control's spans must tile `en_post` as the operator meant them to")
+
+    heading = "1. Definitions"
+    docx(path, p(r(heading)) + p(r(text)))
+    notes = [_note(0, heading, heading, [(0, len(heading))])]
+    n = _note(1, text, en_post, [(0, len(text))])
+    n["en_runs"] = en_runs
+    n["en_runs_conforming"] = en_runs_ok
+    notes.append(n)
+    _write_notes(path, notes)
+
+
 @fixture("not-a-zip.docx",
          "a file with a .docx name that is not a ZIP — the delivered-document integrity "
          "test must FAIL on this, and today a failed integrity test exits 0")

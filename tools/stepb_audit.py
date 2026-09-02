@@ -238,6 +238,31 @@ for f, ph, ctx in xref:
 # stated, rather than by quietly tightening the pattern until the number comes out right.
 DESCRIBES_NOT_MEMBER = {"F41"}
 own = [x for x in own if x[0] not in DESCRIBES_NOT_MEMBER]
+
+# CLOSED DEADLOCKS LEAVE THE LIVE SET, AND THE EXCLUSION IS POLICED RATHER THAN ASSERTED.
+#
+# C17 JOINED THIS SET ON 2026-09-02 AND LEFT IT THE SAME DAY, both by measurement. Branch 6's
+# fourth slice measured that the mid-paragraph form was never a silent defect at all: Step 4
+# rule 9 instructs the operator to mirror source whitespace, apply then cleared it, and
+# `validate_apply --strict` REFUSED the result at repack because gluing two words merges token
+# types -- so the manual walked them into a block with no legal way out, which is exactly this
+# set's shape. The row now says so, which is why the pattern started matching it.
+#
+# But this count is about deadlocks an operator can still WALK INTO, and that one is fixed. So
+# a row is excluded only while its own text declares a closure, and the check FAILS if the
+# declaration is absent -- an exclusion that stops being true un-excludes itself instead of
+# quietly holding the number down. That is the difference between this and narrowing the
+# pattern, which the note above rules out.
+CLOSED_DEADLOCK = {"C17"}
+for _f in sorted(CLOSED_DEADLOCK):
+    if _f not in rows:
+        fail("3c", f"{_f} is declared a closed deadlock but is not a register row")
+    elif not re.search(r"\bCLOSED\b", rows[_f]["text"]):
+        fail("3c", f"{_f} is excluded from the deadlock count as CLOSED, and its row does "
+                   f"not say so — the exclusion is no longer true")
+    else:
+        print(f"  excluded as CLOSED        : {_f} (its row declares the closure)")
+own = [x for x in own if x[0] not in CLOSED_DEADLOCK]
 loops = sorted({i for i in re.findall(r"\b(F\d+)\b", reg)
                 if i in rows and re.search(r"closed loop", rows[i]["text"], re.I)
                 and i not in DESCRIBES_NOT_MEMBER})
