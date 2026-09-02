@@ -501,6 +501,25 @@ if args.doc:
                 "     list item, a party grid, a cost table -- it is still dropped and the\n"
                 "     line still reads glued. That is branch 16's, and nothing here reaches\n"
                 "     it. A contents entry is the one shape where both boundaries ARE proved.\n\n"
+                "A FLAT LINE IS NOT AUTOMATICALLY A DEFECT, AND THIS NOTE IS HERE BECAUSE THE\n"
+                "FIRST REVIEW READ IT AS ONE. Some lines are SUPPOSED to stay flat, and the\n"
+                "synthetic fixture tests/fixtures/toc-widened.docx now labels them on the page\n"
+                # NOT `labels read:\\n\\n` -- a colon followed by two escapes reads as the
+                # Windows path `d:\\n\\n` to the committed-script scan, which blocked the
+                # commit. The pattern is right to be broad: narrowing it would miss a real
+                # `C:\\network\\...`, and a leaked path cannot be rotated. Reworded instead.
+                "itself so nobody has to take that on trust. The two labels are\n\n"
+                "  'The five below MUST keep a dot leader and a right-aligned page number:'\n"
+                "  'NOT contents entries. The two below MUST stay flat - and were flat before\n"
+                "   this change too:'\n\n"
+                "The two under the second label are a PARTY GRID and a contents-shaped line\n"
+                "whose last column is the word `civil`. Neither is a contents entry. The rule\n"
+                "may only put a tab back where it can PROVE the position, and its proof is\n"
+                "that the text on each side survives translation unchanged: a page number\n"
+                "does, an ordinary word does not. Admitting a trailing word would make the\n"
+                "rule fire on every three-column table in every document, guessing. `civil` is\n"
+                "in the fixture because every one of its letters is a roman numeral letter, so\n"
+                "the obvious pattern would have swallowed it.\n\n"
                 "These are renders of a real client document. They live here, outside the\n"
                 "repository, and must never be committed or pasted anywhere.\n\n"
                 "WHAT THESE PAGES ARE, AND WHAT THEY ARE NOT. They come from apply + repack\n"

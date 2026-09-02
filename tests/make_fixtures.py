@@ -444,8 +444,23 @@ def _toc_widened(path):
                  f'<w:r><w:t xml:space="preserve">{page}</w:t></w:r>'
                  f'</w:hyperlink>', ppr=ppr)
 
+    # THE PAGE MUST EXPLAIN ITSELF, and this is here because it did not. Shown the first
+    # render, Wouter read the two flat lines at the bottom as damage the change had done --
+    # a fair reading, because nothing on the page said they were deliberate refusals. A
+    # reviewer should not need the author standing beside the picture. The labels are
+    # ordinary paragraphs with NO tab stops, and `en == text` so apply skips them: they
+    # render identically in every arm and cannot be mistaken for entries.
     heading = "Contents"
-    body = p(r(heading)) + "".join(entry_xml(*e) for e in entries)
+    labels = {
+        1: "The five below MUST keep a dot leader and a right-aligned page number:",
+        7: "NOT contents entries. The two below MUST stay flat - and were flat before "
+           "this change too:",
+    }
+    parts = [p(r(heading)), p(r(labels[1]))]
+    parts += [entry_xml(*e) for e in entries[:5]]
+    parts.append(p(r(labels[7])))
+    parts += [entry_xml(*e) for e in entries[5:]]
+    body = "".join(parts)
     rels = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
             '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/'
             'relationships">'
@@ -456,12 +471,20 @@ def _toc_widened(path):
             'TargetMode="External"/></Relationships>')
     docx(path, body, {"word/_rels/document.xml.rels": rels})
 
+    # THE NOTES ARE GENERATED FROM THE SAME DATA IN THE SAME ORDER, so `text` cannot disagree
+    # with the document. Paragraph indices: 0 heading, 1 label, 2-6 entries, 7 label,
+    # 8-9 entries -- and `tests/test_toc_shapes.py` asserts that shape rather than a count.
     notes = [_note(0, heading, heading + " EN", [(0, len(heading))])]
-    for i, (num, title, page, _place) in enumerate(entries, start=1):
+    notes.append(_note(1, labels[1], labels[1], [(0, len(labels[1]))]))
+    idx = 2
+    for i, (num, title, page, _place) in enumerate(entries):
+        if i == 5:
+            notes.append(_note(idx, labels[7], labels[7], [(0, len(labels[7]))]))
+            idx += 1
         text = num + title + page
         en = num + title + " EN" + page
-        spans = [(0, len(num)), (len(num), len(text))]
-        notes.append(_note(i, text, en, spans))
+        notes.append(_note(idx, text, en, [(0, len(num)), (len(num), len(text))]))
+        idx += 1
     _write_notes(path, notes)
 
 

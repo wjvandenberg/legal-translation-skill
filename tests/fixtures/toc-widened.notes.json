@@ -16,6 +16,21 @@
   },
   {
     "idx": 1,
+    "text": "The five below MUST keep a dot leader and a right-aligned page number:",
+    "en": "The five below MUST keep a dot leader and a right-aligned page number:",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 70,
+        "text": "The five below MUST keep a dot leader and a right-aligned page number:",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 2,
     "text": "1General provisions4",
     "en": "1General provisions EN4",
     "style": "Normal",
@@ -37,7 +52,7 @@
     ]
   },
   {
-    "idx": 2,
+    "idx": 3,
     "text": "2Prefaceiv",
     "en": "2Preface ENiv",
     "style": "Normal",
@@ -59,7 +74,7 @@
     ]
   },
   {
-    "idx": 3,
+    "idx": 4,
     "text": "3ForewordIV",
     "en": "3Foreword ENIV",
     "style": "Normal",
@@ -81,7 +96,7 @@
     ]
   },
   {
-    "idx": 4,
+    "idx": 5,
     "text": "4Table of defined termsxii",
     "en": "4Table of defined terms ENxii",
     "style": "Normal",
@@ -103,7 +118,7 @@
     ]
   },
   {
-    "idx": 5,
+    "idx": 6,
     "text": "A.1Schedule of worksA-3",
     "en": "A.1Schedule of works ENA-3",
     "style": "Normal",
@@ -125,7 +140,22 @@
     ]
   },
   {
-    "idx": 6,
+    "idx": 7,
+    "text": "NOT contents entries. The two below MUST stay flat - and were flat before this change too:",
+    "en": "NOT contents entries. The two below MUST stay flat - and were flat before this change too:",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 90,
+        "text": "NOT contents entries. The two below MUST stay flat - and were flat before this change too:",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 8,
     "text": "PartyRegistered officeSignature",
     "en": "PartyRegistered office ENSignature",
     "style": "Normal",
@@ -147,7 +177,7 @@
     ]
   },
   {
-    "idx": 7,
+    "idx": 9,
     "text": "5Jurisdictioncivil",
     "en": "5Jurisdiction ENcivil",
     "style": "Normal",

@@ -363,20 +363,34 @@ else:
         fx_src = list(etree.fromstring(
             zipfile.ZipFile(FX).read("word/document.xml")).iter(f"{{{W}}}p"))
         fx_new = list(etree.fromstring(fx_out.read_bytes()).iter(f"{{{W}}}p"))
-        # Paragraph 0 is the heading; entries 1-5 must PLACE, 6 and 7 must DECLINE. Written
-        # as the SHAPE each must end in, never as a count -- a count of 5 is satisfied by
-        # placing the wrong five.
-        want = [None] + ["PLACED"] * 5 + ["DECLINED"] * 2
+        # BY INDEX, AND THE INDICES ARE THE POINT. The fixture carries two LABEL paragraphs
+        # so the rendered page explains itself: 0 heading, 1 label, 2-6 the five entries that
+        # must PLACE, 7 label, 8-9 the two traps that must DECLINE. Written as the shape each
+        # must end in, never as a count -- a count of 5 is satisfied by placing the wrong five.
+        want = {2: "PLACED", 3: "PLACED", 4: "PLACED", 5: "PLACED", 6: "PLACED",
+                8: "DECLINED", 9: "DECLINED"}
+        # POSITIVE CONTROL ON THE FIXTURE ITSELF: if it is not the ten-paragraph document
+        # those indices describe, every verdict below is read off the wrong paragraph and
+        # would still print OK or XX as though it meant something.
+        #
+        # THE EXPECTED COUNT IS A NAME, NOT A LITERAL IN THE MESSAGE, and that is a repair
+        # rather than a style choice. Proving this control could fire meant flipping the
+        # comparison to 11 and re-running -- and it failed with "has 10 paragraphs, expected
+        # 10", because the message hardcoded the number the comparison no longer used. A
+        # failure that reports two equal numbers and fails anyway sends the reader hunting a
+        # phantom. Caught by running the negative, never by reading the line.
+        WANT_PARAS = 10
+        if len(fx_src) != WANT_PARAS:
+            FAIL.append(f"toc-widened.docx has {len(fx_src)} paragraphs, expected "
+                        f"{WANT_PARAS} — the indices below would read the wrong lines")
         got = []
-        for i, w in enumerate(want):
-            if w is None:
-                continue
+        for i in sorted(want):
             g = ("PLACED" if atoms(fx_new[i]) == atoms(fx_src[i])
                  else "DECLINED" if atoms(fx_new[i]) == ["text"] else "BROKEN")
             got.append(g)
-            if g != w:
-                FAIL.append(f"toc-widened.docx entry {i}: expected {w}, got {g}")
-        agree = got == ["PLACED"] * 5 + ["DECLINED"] * 2
+            if g != want[i]:
+                FAIL.append(f"toc-widened.docx entry {i}: expected {want[i]}, got {g}")
+        agree = got == ["PLACED"] * 5 + ["DECLINED"] * 2 and len(fx_src) == 10
         print(("  OK   " if agree else "  XX   ")
               + "the RENDERED fixture toc-widened.docx: entries 1-5 place (arabic, roman "
                 "lower, roman upper, roman compound, prefixed) and 6-7 decline")
