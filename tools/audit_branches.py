@@ -374,7 +374,13 @@ def audit_b1():
           (True, True, True))
 
     fx = [l for l in git("ls-tree", "-r", ref, "--name-only", "tests/fixtures").splitlines() if l]
-    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 11)
+    # 11 UNTIL 2026-09-01, and the audit caught the correction rather than my remembering it.
+    # Branch 6 built two fixtures it could not do without: cross-reference.docx, because no
+    # existing fixture carried a field skeleton and STEP-B section 3.7's own list for branch 6
+    # omits one, so finding A9 had no synthetic instrument at all; and toc.docx, because a
+    # table of contents is CLIENT TEXT on the one document that has one, so the defect Wouter
+    # reported on D06 page 2 could be measured but never SEEN from this side.
+    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 13)
 
     hits = 0
     for nm in fx:
