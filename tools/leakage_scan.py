@@ -28,6 +28,7 @@ import hashlib
 import os
 import re
 import sys
+import zipfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 # The list lives OUTSIDE this repository and always will -- a .gitignore entry is one mistake
@@ -63,12 +64,8 @@ def load_patterns():
     return pats, path, bad
 
 
-def scan(path, pats, show):
-    hits = []
-    try:
-        lines = open(path, encoding="utf-8", errors="replace").read().splitlines()
-    except Exception as e:
-        return None, "unreadable (%r)" % e
+def _scan_lines(lines, pats, show, hits, where=""):
+    """Match every pattern against every line, appending to `hits`. `where` names the member."""
     for n, line in enumerate(lines, 1):
         for i, (src, rx) in enumerate(pats):
             m = rx.search(line)
@@ -76,11 +73,55 @@ def scan(path, pats, show):
                 token = m.group(0)
                 hits.append({
                     "line": n,
+                    "member": where,
                     "pattern_index": i,
                     "matched_sha": hashlib.sha256(token.encode()).hexdigest()[:10],
                     "matched": token if show else None,
                 })
-    return hits, None
+
+
+def scan(path, pats, show):
+    """Scan a file. IF IT IS A ZIP CONTAINER, SCAN ITS MEMBERS INSTEAD OF ITS BYTES.
+
+    FINDING I-21, fixed 2026-09-02. This function read the file's bytes, and a `.docx` is a ZIP
+    whose XML parts are DEFLATE-compressed -- so it reported CLEAN on a document containing any
+    number of real names, and the blindness was invisible to anyone reasoning from the
+    filename. **Measured both ways with a live pattern planted and never printed
+    (`temp/probe_leak_docx.py`): NOT detected in a real DEFLATE document and reported clean;
+    DETECTED, exit 1, in a byte-identical STORED ZIP.** So the limit was COMPRESSION, not the
+    extension, which is why widening a filename check would not have fixed it.
+
+    THE FIX IS THE CLASS, NOT THE EXTENSION. It tests whether the file IS a ZIP rather than
+    whether it is named `.docx`, so `.xlsx`, `.pptx`, `.zip` and the project's own `.skill`
+    archive -- which is the DELIVERABLE -- are all covered by the same three lines. A byte
+    scanner is blind to every container; a member scanner is blind to none of them.
+
+    A member that is itself unreadable is REPORTED, never skipped in silence: the whole point
+    of the finding is that a control must say what it could not reach.
+    """
+    hits = []
+    if zipfile.is_zipfile(path):
+        try:
+            with zipfile.ZipFile(path) as z:
+                names = z.namelist()
+                for name in names:
+                    try:
+                        raw = z.read(name)
+                    except Exception as e:
+                        hits.append({"line": 0, "member": name, "pattern_index": -1,
+                                     "matched_sha": "UNREADABLE", "matched": repr(e)})
+                        continue
+                    _scan_lines(raw.decode("utf-8", errors="replace").splitlines(),
+                                pats, show, hits, where=name)
+        except Exception as e:
+            return None, "container unreadable (%r)" % e, 0
+        return hits, None, len(names)
+    try:
+        lines = open(path, encoding="utf-8", errors="replace").read().splitlines()
+    except Exception as e:
+        return None, "unreadable (%r)" % e, 0
+    _scan_lines(lines, pats, show, hits)
+    return hits, None, 0
 
 
 def main():
@@ -105,22 +146,33 @@ def main():
     P("")
 
     total = 0
+    containers = 0
     for t in targets:
-        hits, err = scan(t, pats, show)
+        hits, err, members = scan(t, pats, show)
         if err:
             P("  %-46s %s" % (os.path.basename(t), err))
             continue
+        # SAY WHEN A CONTAINER WAS OPENED, because that is the whole of finding I-21: the same
+        # word "clean" used to cover a file whose contents had never been read. A reader must
+        # be able to tell the two apart from the output alone.
+        tag = " (%d member(s) read)" % members if members else ""
+        if members:
+            containers += 1
         if not hits:
-            P("  %-46s clean" % os.path.basename(t))
+            P("  %-46s clean%s" % (os.path.basename(t), tag))
             continue
         total += len(hits)
-        P("  %-46s %d HIT(S)" % (os.path.basename(t), len(hits)))
+        P("  %-46s %d HIT(S)%s" % (os.path.basename(t), len(hits), tag))
         for h in hits:
-            if show:
-                P("     line %-6d pattern #%-3d  %r" % (h["line"], h["pattern_index"], h["matched"]))
+            loc = ("%s:%d" % (h.get("member"), h["line"])) if h.get("member") else \
+                  ("line %d" % h["line"])
+            if h["pattern_index"] < 0:
+                P("     %-28s UNREADABLE MEMBER -- not scanned: %s" % (loc, h["matched"]))
+            elif show:
+                P("     %-28s pattern #%-3d  %r" % (loc, h["pattern_index"], h["matched"]))
             else:
-                P("     line %-6d pattern #%-3d  sha=%s  (text withheld; --show to reveal)"
-                  % (h["line"], h["pattern_index"], h["matched_sha"]))
+                P("     %-28s pattern #%-3d  sha=%s  (text withheld; --show to reveal)"
+                  % (loc, h["pattern_index"], h["matched_sha"]))
 
     P("")
     P("=" * 74)
