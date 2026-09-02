@@ -1038,6 +1038,22 @@ def _is_toc_shaped(orig_p):
     return tuple(k for k, _ in _atoms_with_text(orig_p)) == _TOC_ATOMS
 
 
+def _lead_trim(s):
+    """Drop exactly the LEADING whitespace `_strip_keeping_separators` would drop."""
+    i = 0
+    while i < len(s) and s[i].isspace() and s[i] not in _BOUNDARY_SEPARATORS:
+        i += 1
+    return s[i:]
+
+
+def _trail_trim(s):
+    """Drop exactly the TRAILING whitespace `_strip_keeping_separators` would drop."""
+    j = len(s)
+    while j > 0 and s[j - 1].isspace() and s[j - 1] not in _BOUNDARY_SEPARATORS:
+        j -= 1
+    return s[:j]
+
+
 def _toc_tab_offsets(orig_p, en_text):
     """Where a table-of-contents entry's two tabs belong in `en_text`, or None.
 
@@ -1080,9 +1096,23 @@ def _toc_tab_offsets(orig_p, en_text):
     atoms = _atoms_with_text(orig_p)
     if tuple(k for k, _ in atoms) != _TOC_ATOMS:
         return None
-    pre, post = atoms[0][1], atoms[4][1]
+    # TRIMMED ON THE OUTER EDGES ONLY, AND THIS IS A CORRECTION MADE 2026-09-02 ON MEASURING
+    # TWELVE TOC SHAPES RATHER THAN ONE. `en_text` has been through
+    # `_strip_keeping_separators`, so the paragraph's outermost whitespace is already gone from
+    # it -- while `pre` and `post` come from the SOURCE and still carry theirs. Comparing them
+    # untrimmed made the rule fail on a page-number run written `"5 "` or a number run written
+    # `" 5"`, which is ordinary authoring and says nothing about whether the boundary is
+    # provable. D06 has none of it (0 of 26 entries differ under the two strips), so THE CORPUS
+    # COULD NOT HAVE SHOWN THIS -- it is one document's house style, and a synthetic sweep is
+    # the only instrument that reaches the question. INNER edges are NOT trimmed: whitespace
+    # next to the tab is interior to `en_text` and is part of the boundary.
+    pre, post = _lead_trim(atoms[0][1]), _trail_trim(atoms[4][1])
     # A PAGE NUMBER, NOT MERELY A TRAILING RUN. Without this, any three-part tabbed line whose
     # last part happened to survive translation would qualify -- a party grid, a cost table.
+    # Deliberately EXCLUDES a roman numeral (front matter) and a prefixed number such as
+    # `A-3` (schedules), both of which also translate to themselves and are therefore
+    # placeable in principle; widening to them is a decision, not an oversight, and it is
+    # recorded as one in `tests/test_toc_shapes.py`.
     if not _TRAILING_DIGITS.match(post.strip()):
         return None
     if not pre or not en_text.startswith(pre) or not en_text.endswith(post):

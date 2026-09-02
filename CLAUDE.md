@@ -115,17 +115,20 @@ CLAUDE.md` reports each of them with a per-section breakdown showing where the w
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, RE-DECLARED 2026-09-01: 1,090 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, RE-DECLARED 2026-09-02: 1,105 lines against a cap of 350.** *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
 > because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run, and caught this line stale twice on the day it landed.)*
 > **Reason, REWRITTEN 2026-08-25 BECAUSE THE OLD TRIGGER FIRED.** It read *"the reduction that brings this
 > file under 350 is under way; trigger: that reduction completing"* — and **the reduction has now completed**
-> *(phases 3a, 3b, 3c and 12)*, leaving the file **740 over**. So the honest reason is no longer *"content
+> *(phases 3a, 3b, 3c and 12)*, leaving the file **755 over**. So the honest reason is no longer *"content
 > with a named destination"*: it is that **every subsection the reduction was SCOPED to touch has been
-> touched**, and the weight that remains sits in **§2 (149), §3 (137) and §6 (143) — 429 lines no phase was
-> ever scoped to reach.** *(§6 gained 3 lines on 2026-09-01, when a stale internal-reference count in §6.4
-> became a relationship — §5.14 rule 3. Re-derived by listing, from the checker.)* **NEW TRIGGER: a phase scoped to §2, §3 and §6.** Until one exists this number
+> touched**, and the weight that remains sits in **§2 (149), §3 (137) and §6 (147) — 433 lines no phase was
+> ever scoped to reach.** *(§6 has gained 7 lines across two days for the same reason both times: a stale
+> COUNT being turned into something that cannot go stale. 3 on 2026-09-01, when §6.4's internal-reference
+> figure became a relationship; 4 on 2026-09-02, when its `tools/` **36** and `tests/` **14** were dated,
+> both having since moved. §5.14 rule 3, and the cost of applying it is lines. Re-derived by listing, from
+> the checker.)* **NEW TRIGGER: a phase scoped to §2, §3 and §6.** Until one exists this number
 > will not move, and **a trigger that has fired is worse than no trigger**, which is why it was replaced
 > rather than re-dated. **Over the cap means RELOCATE, never delete**, and every relocation leaves a
 > one-line pointer.
@@ -736,9 +739,15 @@ subject matter.
   on UK**, the default, so a failure is unambiguously a pipeline defect rather than a variant defect; **US
   goes to terminologically rich but technically straightforward documents**, so variant divergence is what
   gets tested.
-- **Two things the corpus cannot reach, so they need synthetic fixtures:** there are **no `Symbol` or
-  `Wingdings` runs anywhere**, so the Greek-glyph defect cannot be reproduced from a real document; and
-  content controls, smart tags, images with alt text and charts with titles appear in none of the eleven.
+- **THREE things the corpus cannot reach, so they need synthetic fixtures:** there are **no `Symbol` or
+  `Wingdings` runs anywhere**, so the Greek-glyph defect cannot be reproduced from a real document;
+  content controls, smart tags, images with alt text and charts with titles appear in none of the eleven;
+  and — **added 2026-09-02 — only ONE document has a TABLE OF CONTENTS at all.** So any measurement of
+  TOC handling is a measurement of **D06's house style**, and 26 of 26 on that document says nothing
+  about a roman-numeral page number, an unnumbered entry, or a page-number run carrying a stray space.
+  **A synthetic sweep found two real defects the corpus was structurally blind to** on its first run;
+  `tests/test_toc_shapes.py` owns that population and the reasoning. **The general lesson is §5.1's:** a
+  figure of 100% over one document is not a figure of 100%.
 
 ### 5.8 How a change is actually tested
 **MOVED TO `.claude/skills/frozen-intermediate-test/SKILL.md` ON 2026-08-24** — the
@@ -986,9 +995,13 @@ Chosen over two independent repos and over a shared-core + generated-variant bui
 **THE DIRECTORY DIAGRAM WAS CUT ON 2026-08-24 — a layout is derivable by listing the folder, and this
 one had drifted FOUR measured ways:** it said the repository had *"no `.git` in it"* · it showed a
 `README.md` and a `LICENSE` inside **each tree, neither of which exists** · it said `tools/` held **29**
-scripts against a real **36** · and `tests/` **nine** `test_*.py` against a real **14**. *(Its own
+scripts and `tests/` **nine** `test_*.py`, **against a real 36 and 14 AS MEASURED THAT DAY**. *(Its own
 footnote recorded the same counts going stale once before, corrected then by listing rather than by
-adding to the figure already there — which is the house rule that now governs every count in this file.)*
+adding to the figure already there — which is the house rule that now governs every count in this file.
+**Both of those "real" figures have since moved** — `precommit_gate` reported 41 tools on 2026-09-02, and
+that day's branch added a fifteenth test — which is the argument for the dating rather than a defect in
+it: the numbers are EVIDENCE OF THE DRIFT ON A DATE, not a live inventory, and `precommit_gate` prints
+the live one on every run. §5.14 rule 3 — prefer a relationship to a number.)*
 
 > **FOUR SCRIPTS MAY NEVER BE COMMITTED, and this stays because forgetting it is irreversible.** Counted
 > by listing them, not by adding one to a figure: `confidentiality_sweep.py`, `corpus_descriptor_scan.py`,
@@ -1073,6 +1086,8 @@ the one irreversible act here — never publish without Wouter's explicit OK.)*
 
 **Produced: `feature/branch6-toc-placement`, 14 files, not merged.** A table-of-contents entry's two tabs go back where the SOURCE had them, so an entry that delivered as `1General provisions4` now delivers with its dot leader and a right-aligned page number. **25 of D06's 26 entries placed, 0 declined** *(the 26th is skipped by apply — its title is already English — and was already correct)*. Corpus: **13 documents compared, 1 moved, 12 byte-quiet**, and the one that moved is the only one with a table of contents. `tab_chars` **10 → 60** of the source's 80; `r` +100 and `t` +50 — all three divide exactly by 25 entries. **One page of 36 re-rendered: page 2, at 7.79% of pixels.**
 
+**AND THE COVERAGE QUESTION WAS ASKED AND IS ANSWERED, having first been answered wrongly by omission.** Wouter asked whether the fix reaches ALL table-of-contents types or only the one the defect surfaced from. **The corpus cannot answer it: D06 is the only document with a table of contents at all**, so 26 of 26 is one house style — now §5.7's THIRD thing the corpus cannot reach. `tests/test_toc_shapes.py` runs **12 shapes through real apply** and **found two defects on its first run**: a page-number run written `"5 "` and a number run written `" 5"` both declined, because the source-side boundaries were compared untrimmed against an already-stripped `en_text`. Fixed, and the corpus re-run is **byte-for-byte identical**, so the widening reached nothing it should not. **7 PLACED · 4 DECLINED · 12 of 12 expectations met.** Reached: numbered, sub-numbered `1.2.3`, with or without a hyperlink, a literal dot leader, and a page number inside a **PAGEREF field's cached result**. Declined by necessity: an unnumbered entry (three atoms) and a doubled tab (six).
+
 **THREE THINGS NEED A DECISION BEFORE MERGE, and only the first is not routine.**
 
 **(1) A SHIPPED GATE WAS CORRECTED, because it BLOCKED the fix rather than merely disagreeing with it.** `validate_apply --strict` reported 8 missing tokens over 4 paragraphs although not one character was lost, so `repack_docx.py` aborted with no `.docx` written — **a repaired table of contents could not have been DELIVERED by anyone.** Two defects, both now on register row **G10**, whose sibling `quality_check` had already got the second one right while documenting itself as converged with that very function. §5.9 says fix the gate, never bypass it, and this is that rule's first firing. **Proved with a three-arm negative input:** untouched PASSES, a word deleted inside a placed-tab paragraph still FAILS, a word deleted in a tabless paragraph still FAILS. **And the invariant the fix rests on is measured — the applied text equals the declared `en` character for character on 7 of 7 fixture paragraphs.**
@@ -1085,6 +1100,6 @@ the one irreversible act here — never publish without Wouter's explicit OK.)*
 
 **THE SINGLE NEXT ACTION: open the pull request, then the render review and the merge decision.** After that, in order: **C16, C17 and F16**, this branch's declared follow-on slice; then **branch 7**, the container inventory (A16 A19 N1 C19), whose four fixtures already exist in `containers.docx`.
 
-**Open, none blocking.** **(1)** C16 C17 F16. **(2)** whether G10's second instance deserves its own register id — recorded on G10 so no count moved. **(3)** register **G12**'s 16 unclassified findings, and `stepb_verify`'s maps are **3 findings behind the register**, on which it exits 1 — pre-existing, and it means the appendix is emitted from a map that is not current. **(4)** G9's first half, needing branch 15. **(5)** `--original` absent from Step 9's step document. **(6)** a `probe` origin class for the register. **(7)** **I-7 to I-10**, the four open A1 harness defects. **(8)** `tools/run_tests.py` collides by name with `tests/run_tests.py`. **(9)** three `tests/` suites need the system interpreter for `lxml`. **(10)** the scan list needs tightening. **(11)** the companion-file rename is due. **(12)** `us/scripts/apply_translations_textmatch.py` line 937 carries the UK spelling `behaviour` — a real parity instance, left standing because it is the reconciliation's to fix and a positive control refused to let it be fixed silently.
+**Open, none blocking.** **(1)** C16 C17 F16. **(2)** **whether to widen the page-number test to a ROMAN NUMERAL (front matter) and a PREFIXED number such as `A-3` (schedules)** — both translate to themselves, so both are placeable in principle; they are declined **by decision, not by defect**, and `tests/test_toc_shapes.py` asserts the current contract so a widening must be deliberate. **(3)** whether G10's second instance deserves its own register id — recorded on G10 so no count moved. **(3)** register **G12**'s 16 unclassified findings, and `stepb_verify`'s maps are **3 findings behind the register**, on which it exits 1 — pre-existing, and it means the appendix is emitted from a map that is not current. **(4)** G9's first half, needing branch 15. **(5)** `--original` absent from Step 9's step document. **(6)** a `probe` origin class for the register. **(7)** **I-7 to I-10**, the four open A1 harness defects. **(8)** `tools/run_tests.py` collides by name with `tests/run_tests.py`. **(9)** three `tests/` suites need the system interpreter for `lxml`. **(10)** the scan list needs tightening. **(11)** the companion-file rename is due. **(12)** `us/scripts/apply_translations_textmatch.py` line 937 carries the UK spelling `behaviour` — a real parity instance, left standing because it is the reconciliation's to fix and a positive control refused to let it be fixed silently.
 
 **What a new session would get wrong.** It would edit **`temp/stepb_verify.py`**, because section 9 of the plan named that path as the generator — while `stepb_audit` loads the map from the **`tools/`** copy, which is tracked and 74 lines ahead, so the edit changes nothing any checker reads **and reads as success**. That pointer is corrected; the house rule is *prefer a script in `tools\` over any same-named copy in `temp\`*. It would read `$?` after a pipe: a suite that printed FAIL came back `EXIT=0` here because `tail` succeeded. It would trust a directory-level line-ending map — `uk/` and `us/` are pure LF, `CLAUDE.md` is pure CRLF, and `tests/`, `tools/` and `.claude/` are MIXED **per file**, so measure the file. It would run `verify_charter_continuity.py` without `LT_HOUSE_TEMPLATES` set to `…\Coding\templates`, whose check 7 then reports **VOID, not a pass**. And two red lines are **by design**: `verify_md`'s `file length` while §1.7's exemption stands, and `stepb_audit`'s check 10 at **8 unverified quotations**, which needs `LEGAL_TRANSLATION_A4`.
