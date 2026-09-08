@@ -473,28 +473,43 @@ for stem in args.fixture:
         "The `old` arm is the point. Without it you would be asked to believe the",
         "improvement rather than see it, which is what happened on the previous slice.",
         "",
-        "WHAT THIS SLICE CHANGED — C17, C16 and F16, all three about a boundary apply could",
-        "not describe and resolved silently, in the direction that destroyed something.",
+        # THIS BLOCK IS REWRITTEN ON EVERY SLICE, NEVER APPENDED TO, AND IT HAS NOW HAD TO BE
+        # ON EACH OF THE LAST FOUR. Nothing checks it. Left describing the previous change it
+        # sends a reviewer hunting for something that is already in the `old` arm, and a
+        # reviewer who cannot find what the text promises reads a correct page as a defect --
+        # which happened on the table-of-contents slice, where two deliberate refusals were
+        # read as damage because nothing on the page said they were deliberate.
+        "WHAT THIS BRANCH CHANGED — A16 and N1, the container inventory. Extraction always",
+        "descended into a container and folded its text into the paragraph; apply rebuilt",
+        "only the runs it recognised. So the container's text stayed in the SOURCE LANGUAGE",
+        "on the delivered page, and every gate reported the document clean, because the",
+        "English was in the package and merely unreachable.",
         "",
-        "  whitespace-arms.docx — the document LABELS ITS OWN ROWS, so nothing here has to",
-        "  be taken on trust. Read the labels, then the line under each:",
-        "    ARM 1 (two lines)  a one-space tracked insertion between two sentences. In",
-        "                       `old` the two sentences are GLUED together; in `new` there",
-        "                       is a space. The second of the two is the register's own",
-        "                       example, and post_process would have masked it by accident.",
-        "    NEGATIVE (one line) an explicitly empty segment. MUST look identical in both",
-        "                       arms — if it changed, the fix broke the documented device",
-        "                       that clears a run.",
-        "    ARM 2 (two lines)  the first must begin with ONE leading space in `new` and TWO",
-        "                       in `old`. The second must be IDENTICAL in both — a single",
-        "                       source space is still restored, and that repair had to",
-        "                       survive.",
+        "  containers.docx — the document LABELS ITS OWN ROWS, so nothing here has to be",
+        "  taken on trust. Read each label, then the line under it. Twenty rows:",
+        "    the CONTROL rows      must look IDENTICAL in `old` and `new`. Two of them are a",
+        "                          BLOCK content control, which was always correct, and they",
+        "                          are the real corpus's own positive control — 5 of the sdt",
+        "                          document's 10 take exactly that shape.",
+        "    the sdt and smartTag  in `old` the source-language fragment stands beside the",
+        "    rows                  English, often BEFORE it. In `new` there is one English",
+        "                          sentence and the fragment is gone.",
+        "    smarttag-trailing     in `new` the annotation wrapper is GONE. That is the",
+        "                          decided outcome, not damage: a smart tag over text that no",
+        "                          longer exists is provably redundant. A content control is",
+        "                          KEPT even when empty, because it renders.",
+        "    ruby-in-run           looks the SAME in both arms and is still wrong in both.",
+        "                          apply destroys the ruby annotation, and putting it back",
+        "                          needs the per-run English branch 15 emits. Pinned, not",
+        "                          fixed — see tests/test_container_inventory.py.",
+        "    fldsimple-ref         the clause number appears TWICE in both arms. A9's",
+        "                          duplication in the one field form clause 3 cannot see.",
+        "                          Also pinned.",
         "",
-        "  en-runs-offsets.docx — THERE IS NO `new` PAGE, AND THAT IS THE RESULT. The",
-        "  offsets point past the end of the string, and apply now REFUSES rather than",
-        "  slicing the wrong characters. Compare `old`: every character is present and the",
-        "  BOLD is on the wrong words — `8.1, as adjusted.` instead of `8.1`. That is the",
-        "  defect, and it exited 0.",
+        "  THE ALT TEXT AND THE CHART TITLE DO NOT SHOW ON ANY PAGE, and that is A19 rather",
+        "  than a rendering problem: alt text is an attribute a screen reader speaks, and the",
+        "  chart title lives in its own part. Slice 3 owns them; apply must leave both alone,",
+        "  which the suite asserts in both directions.",
         "",
         "WHAT THESE PAGES ARE NOT. They come from apply + repack only, never the",
         "eleven-step pipeline: no definitions reorder, no tidy-up pass, no post_process. So",
@@ -650,49 +665,52 @@ if args.doc:
                             str(dest / f"p{i + 1:03d}-{arm}.png"))
                         written += 1
             (dest / "READ-ME.txt").write_text(
-                "Branch 6 rendered comparison. One PNG per CHANGED page, three arms:\n"
+                "Branch 7 rendered comparison. One PNG per CHANGED page, three arms:\n"
                 f"  p<NNN>-old.png     the deliverable as the code stood at {REF}, the\n"
                 "                     PINNED BASELINE. Read that literally: the baseline\n"
                 "                     moves as each slice merges, so -old is NOT 'before\n"
                 "                     branch 6'. It is 'before the change under review'.\n"
                 "  p<NNN>-new.png     the deliverable with the working tree's code\n"
                 "  p<NNN>-source.png  the original document, for reference\n\n"
-                "THE CHANGE UNDER REVIEW IS WHITESPACE AT A SEGMENT BOUNDARY -- C17, C16 and\n"
-                "the F16 offset guard. Rewritten 2026-09-02, for the third slice in a row.\n"
-                "The text here described the PREVIOUS change (the table-of-contents\n"
-                "page-number widening) and would now send you looking for something already\n"
-                "in -old, the same way a stale pinned-baseline comment misdirects. It is\n"
-                "rewritten on every change to what is under review, and that is not optional.\n\n"
-                "EXPECT EXACTLY THREE PARAGRAPHS TO CHANGE, ON TWO DOCUMENTS, AND NOTHING\n"
-                "ELSE. Measured across all thirteen frozen intermediates: D02 two paragraphs\n"
-                "and D07 one, ten documents byte-identical, no unexplained movement.\n\n"
-                "C17 -- a tracked-change segment whose declared English is a single SPACE was\n"
-                "read as a request to clear the run, because the code tested the string for\n"
-                "truthiness after stripping it. Step 4 rule 9 tells the operator to mirror\n"
-                "source whitespace, so the manual instructed them into the one input the code\n"
-                "could not read. Three real instances, and in EVERY ONE the space sits at the\n"
-                "END of its paragraph -- so THERE IS NOTHING TO SEE ON THESE PAGES, and that\n"
-                "is not a failed run. A trailing space renders as nothing. The visible form\n"
-                "of this defect -- two sentences glued together mid-paragraph -- exists only\n"
-                "on the synthetic fixture, because no corpus document carries that shape.\n\n"
+                "THE CHANGE UNDER REVIEW IS THE CONTAINER INVENTORY -- A16 and N1. Rewritten\n"
+                "2026-09-08, for the FOURTH change in a row. The text here described the\n"
+                "PREVIOUS change (whitespace at a segment boundary) and would now send you\n"
+                "looking for something already in -old, the same way a stale pinned-baseline\n"
+                "comment misdirects. NOTHING CHECKS THIS TEXT. It is rewritten on every\n"
+                "change to what is under review, and that is not optional.\n\n"
+                "WHAT THE DEFECT IS. Extraction has always descended into a content control\n"
+                "or a smart tag and folded its text into the paragraph, so the operator\n"
+                "translated a whole sentence. Apply then rebuilt only the runs it recognised\n"
+                "-- so the container's own words stayed in the SOURCE LANGUAGE on the\n"
+                "delivered page, often BEFORE the English rather than after it. Every gate\n"
+                "reported the document clean, because the English was in the package and\n"
+                "merely unreachable. The asymmetry was the defect, not either half.\n\n"
+                "EXPECT ONE PARAGRAPH TO CHANGE, ON TWO DOCUMENTS -- one document and its\n"
+                "batch arm -- AND NOTHING ELSE. That is a smaller number than the register\n"
+                "row suggests and it is the row being right: of the three paragraphs holding\n"
+                "an inline content control, TWO have `en == text`, so apply skips them and\n"
+                "their untranslated placeholder is correct. Only the third is rebuilt. The\n"
+                "row said so; it was checked against the notes rather than the XML.\n\n"
                 "What to look for, in order:\n"
-                "  1. -old AND -new SHOULD BE INDISTINGUISHABLE ON EVERY PAGE. All three\n"
-                "     changed paragraphs gained a trailing space, which no renderer shows.\n"
-                "     Any VISIBLE difference is therefore a finding, not the fix working.\n"
-                "  2. NO WORD GLUED TO ITS NEIGHBOUR that was separate in -old, and no new\n"
-                "     double space between words. The fix changes whitespace, so a whitespace\n"
-                "     regression is the failure mode with the shortest path from this change.\n"
-                "  3. NO WRAPPED LINE that did not wrap in -old.\n"
-                "  4. THE TABLE OF CONTENTS SHOULD BE UNTOUCHED -- number, gap, title, dot\n"
-                "     leader, page number at the right margin, exactly as the previous two\n"
-                "     slices left it. It should NOT have changed at all.\n"
-                "  5. THE KNOWN LIMITATION, AND THIS SLICE DID NOT CLOSE IT. C16 -- a double\n"
-                "     space apply CREATES -- is only PARTIALLY fixed. Two mechanisms were\n"
-                "     found and repaired, both proved on the synthetic fixture, but on the\n"
-                "     real corpus no attributable double space was removed: D07 still carries\n"
-                "     three that exceed both its source's own count and the operator's\n"
-                "     declared ones. If you see a double space between words, it was there in\n"
-                "     -old too. Check that it was.\n\n"
+                "  1. ON THE CHANGED PAGE, a source-language fragment that stood beside the\n"
+                "     English in -old is GONE in -new, and the English reads as one sentence.\n"
+                "     This one IS visible, unlike the previous slice's trailing spaces.\n"
+                "  2. THE CONTROL ITSELF MUST STILL BE THERE. An emptied content control is\n"
+                "     KEPT deliberately -- it renders, and it may be locked or data-bound.\n"
+                "     Only a pure annotation wrapper is dropped once empty.\n"
+                "  3. NO WORD GLUED TO ITS NEIGHBOUR that was separate in -old, and no new\n"
+                "     double space. Collapsing a container's text into the English block is\n"
+                "     a join, so a join defect is the shortest path from this change.\n"
+                "  4. NO WRAPPED LINE that did not wrap in -old.\n"
+                "  5. THE TABLE OF CONTENTS SHOULD BE UNTOUCHED -- number, gap, title, dot\n"
+                "     leader, page number at the right margin, exactly as branch 6 left it.\n"
+                "     A hyperlink is a container too and was ALREADY handled, so its text\n"
+                "     must not move; if the contents changed at all, that is a finding.\n"
+                "  6. THE KNOWN LIMITATIONS, NEITHER CLOSED HERE. A ruby annotation is still\n"
+                "     destroyed (it needs branch 15's per-run English), and a w:fldSimple\n"
+                "     still prints its cached number twice. Both are pinned in\n"
+                "     tests/test_container_inventory.py so a later branch has to change them\n"
+                "     deliberately. Neither appears on any corpus document.\n\n"
                 "A LINE THAT LOOKS UNCHANGED IS NOT AUTOMATICALLY A FAILED RUN, AND THIS NOTE\n"
                 "IS HERE BECAUSE THE PREVIOUS SLICE'S FIRST REVIEW READ FLAT LINES AS DAMAGE.\n"
                 "The synthetic fixtures LABEL THEIR OWN ROWS on the page\n"
@@ -700,22 +718,19 @@ if args.doc:
                 # Windows path `d:\\n\\n` to the committed-script scan, which blocked the
                 # commit. The pattern is right to be broad: narrowing it would miss a real
                 # `C:\\network\\...`, and a leaked path cannot be rotated. Reworded instead.
-                "itself so nobody has to take that on trust. For this slice the fixture is\n"
-                "tests/fixtures/whitespace-arms.docx, rendered to temp/render/, and its three\n"
-                "labels are\n\n"
-                "  'ARM 1 - C17. The two below MUST read as two sentences with a space\n"
-                "   between them. Glued together is the defect:'\n"
-                "  'NEGATIVE CONTROL. The line below MUST look the same in both arms - an\n"
-                "   explicitly empty segment goes on being cleared:'\n"
-                "  'ARM 2 - C16. The FIRST line below MUST begin with ONE leading space, not\n"
-                "   two. The SECOND MUST look identical in both arms ...'\n\n"
-                "THAT FIXTURE IS WHERE THIS CHANGE IS VISIBLE AND THESE PAGES ARE NOT. The\n"
-                "three real instances are trailing spaces at a paragraph end; the glued-\n"
-                "sentence form the register describes appears on no corpus document, which is\n"
-                "why the fixture had to be built. A second fixture, en-runs-offsets.docx,\n"
-                "carries F16 -- and the corpus CANNOT carry that one at all, because the\n"
-                "frozen intermediates are the post-compliance artefact and the offsets are\n"
-                "checked before apply runs, so a run with bad offsets never produced one.\n\n"
+                "itself so nobody has to take that on trust. For this branch the fixture is\n"
+                "tests/fixtures/containers.docx, rendered to temp/render/, and it carries\n"
+                "TWENTY labelled rows -- among them a BLOCK content control marked as a\n"
+                "control that must look identical in both arms, an annotation wrapper that\n"
+                "is deliberately dropped, and the two pinned shapes that are wrong in both\n"
+                "arms on purpose.\n\n"
+                "THE FIXTURE COVERS ELEVEN CONTAINER SHAPES AND THE CORPUS CARRIES TWO. Only\n"
+                "a content control and a smart tag appear on any real document -- 5 inline\n"
+                "controls on one document and exactly ONE smart tag on another -- so\n"
+                "w:customXml, w:dir, w:bdo, w:ruby and w:fldSimple have no corpus instance at\n"
+                "all and the fixture is their only instrument. That is not a gap in the\n"
+                "corpus; those shapes cannot be reproduced from a real document however many\n"
+                "you have, which is why they had to be built.\n\n"
                 "These are renders of a real client document. They live here, outside the\n"
                 "repository, and must never be committed or pasted anywhere.\n\n"
                 "WHAT THESE PAGES ARE, AND WHAT THEY ARE NOT. They come from apply + repack\n"

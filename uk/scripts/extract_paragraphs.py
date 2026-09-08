@@ -119,6 +119,39 @@ def get_color(rpr):
     c = rpr.find(f'{{{W}}}color')
     return c.get(f'{{{W}}}val') if c is not None else None
 
+# =========================================================================================
+# THE CONTAINER INVENTORY — BRANCH 7's READING HALF.
+#
+# Option 1's rule: "the reading and the writing halves must share one explicit, tested
+# inventory, and anything outside it must fail loudly rather than ship silently." These four
+# tuples are BYTE-FOR-BYTE the ones in apply_translations_textmatch.py, and
+# tests/test_container_inventory.py asserts the two copies are identical -- so a widening on
+# one side that is forgotten on the other fails a check instead of shipping. They are stated
+# twice rather than imported because the 2026-08-05 decision rules out a shared library
+# between the scripts, and a skill must run in whatever sandbox its host gives it.
+#
+# THE READING HALF WAS NEVER THE BROKEN ONE, AND THE INVENTORY IS HERE ANYWAY. `p.iter(w:r)`
+# below is fully recursive, so extraction has always descended into every container and
+# folded its text into the paragraph's `text` field -- which is exactly why the operator
+# translates that text and then cannot see where it went. The asymmetry WAS the defect:
+# extraction read the container, apply did not write it. Stating the inventory on this side
+# too is what makes the two halves comparable rather than merely both correct today.
+_CONTAINER_RECURSE = ('hyperlink', 'sdt', 'smartTag', 'customXml', 'dir', 'bdo')
+_CONTAINER_DECLINED = ('fldSimple',)
+_CONTAINER_TC = ('ins', 'del', 'moveFrom', 'moveTo')
+_PARA_CHILD_INERT = (
+    'pPr', 'r', 'bookmarkStart', 'bookmarkEnd', 'commentRangeStart', 'commentRangeEnd',
+    'proofErr', 'permStart', 'permEnd', 'subDoc', 'oMath', 'oMathPara', 'AlternateContent',
+    'customXmlInsRangeStart', 'customXmlInsRangeEnd', 'customXmlDelRangeStart',
+    'customXmlDelRangeEnd', 'customXmlMoveFromRangeStart', 'customXmlMoveFromRangeEnd',
+    'customXmlMoveToRangeStart', 'customXmlMoveToRangeEnd',
+    'moveFromRangeStart', 'moveFromRangeEnd', 'moveToRangeStart', 'moveToRangeEnd',
+    'sdtPr', 'sdtEndPr', 'smartTagPr', 'fldSimplePr', 'rPr',
+)
+_CONTAINER_KNOWN = (_CONTAINER_RECURSE + _CONTAINER_DECLINED + _CONTAINER_TC
+                    + _PARA_CHILD_INERT)
+
+
 def extract_paragraphs(input_path, output_json):
     # Accept either .docx (ZIP) or raw .xml path
     if input_path.lower().endswith('.docx'):
@@ -460,6 +493,42 @@ def extract_paragraphs(input_path, output_json):
 
     non_empty = sum(1 for p in paragraphs if p["text"].strip())
     print(f"Extracted {len(paragraphs)} paragraphs ({non_empty} non-empty) to {output_json}")
+
+    # THE CONTAINER INVENTORY, SAID OUT LOUD. Branch 7. Extraction has always folded a
+    # container's text into the paragraph's `text`, silently -- so the operator translated a
+    # sentence without being told that part of it lives somewhere apply might not reach. A
+    # count here costs one line and is the difference between an inventory that is explicit
+    # and one that merely exists in the source.
+    #
+    # AN UNLISTED CONTAINER IS REPORTED HERE AND REFUSED AT APPLY, NOT REFUSED HERE. Reading
+    # is recursive, so nothing is stranded at this step; the stranding happens when the
+    # English goes back. Blocking extraction would stop the run before the operator had
+    # anything to look at, which is a worse place to fail.
+    seen, unlisted = {}, {}
+    for p_el in root.iter(f'{{{W}}}p'):
+        for child in p_el:
+            name = child.tag.rsplit('}', 1)[-1]
+            if name in ('pPr', 'r'):
+                continue
+            has_text = any(
+                t.text and t.text.strip()
+                for rr in child.iter(f'{{{W}}}r') for t in rr.iter(f'{{{W}}}t'))
+            if not has_text:
+                continue
+            (seen if name in _CONTAINER_KNOWN else unlisted)[name] = \
+                (seen if name in _CONTAINER_KNOWN else unlisted).get(name, 0) + 1
+    if seen:
+        print("  CONTAINERS carrying text, folded into the paragraphs above: "
+              + ", ".join(f"<w:{k}> {v}" for k, v in sorted(seen.items())))
+    if unlisted:
+        print("  CONTAINER NOT IN THE INVENTORY, and it carries text: "
+              + ", ".join(f"<w:{k}> {v}" for k, v in sorted(unlisted.items())))
+        print("    apply_translations_textmatch.py will REFUSE this document rather than "
+              "leave that text in the source language on a delivered page. Add the element "
+              "to _CONTAINER_RECURSE in BOTH scripts, with a fixture that reproduces the "
+              "stranding first.")
+    if not seen and not unlisted:
+        print("  CONTAINERS carrying text: none — the inventory had nothing to reach")
 
     # Highlight consecutive-same-type TC clusters so the translator sees
     # them BEFORE burning cycles on the translation pass. Each entry lists

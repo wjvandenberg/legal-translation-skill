@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 6's ACCEPTANCE INSTRUMENT — what apply does DIFFERENTLY, on the real corpus.
+"""THE ACCEPTANCE INSTRUMENT FOR EVERY FIX BRANCH — what apply does DIFFERENTLY, on the real corpus.
 
-THIS BRANCH'S ACCEPTANCE CONDITION IS THE OPPOSITE OF EVERY BRANCH BEFORE IT. Branches 0-5
-and branch 14's slice each proved that no delivered byte moved. Branch 6 is the first fix
-branch that CHANGES a delivered document, so "nothing moved" would mean it had failed. The
-condition is instead:
+THE ACCEPTANCE CONDITION OF A FIX BRANCH IS THE OPPOSITE OF EVERY BRANCH BEFORE BRANCH 6.
+Branches 0-5 and branch 14's slice each proved that no delivered byte moved. Branch 6 was the
+first fix branch that CHANGES a delivered document, so "nothing moved" would mean it had
+failed, and branch 7 is the same. The condition is instead:
 
     THE BYTES MUST MOVE, AND EVERY MOVEMENT MUST BE EXPLAINED BY A REGISTER ROW.
     Anything that moves which no row predicted is a DEFECT until shown otherwise.
@@ -80,6 +80,38 @@ SCRIPT = "apply_translations_textmatch.py"
 # COMMENT. Re-derive both claims on the commit that moves the pin.
 REF = os.environ.get("LT_BASELINE_REF", "d3c7f19")
 
+# WHICH DIRECTIONAL CHECK BELONGS TO WHICH MERGED FIX — added 2026-09-08, on a measured false
+# alarm that would have recurred for ever.
+#
+# A "DID THE FIX FIRE?" CHECK IS MEANINGLESS ONCE ITS FIX IS IN THE PINNED BASELINE, AND IT
+# DOES NOT GO QUIET — IT FAILS. The C17 arm asks whether a document whose notes carry a
+# whitespace-only segment had its text move between the two arms. That is the right question
+# while C17's fix is under review. The moment branch 6 slice 4 merged and the pin moved to it,
+# BOTH arms carry the fix, so nothing can move and the check reports two defects on every run:
+# "the fix did not fire where the measurement says it must", on D02 and D07, for ever, with
+# nobody able to act on it.
+#
+# Same family as CLAUDE.md 5.16's second rule -- ask of every claim whether it asserts a
+# HISTORICAL DELIVERY or a LIVE INVENTORY -- and it is the third member of that family found
+# in this one file. `git merge-base --is-ancestor` settles it exactly: if the fix's commit is
+# an ancestor of the baseline, the baseline already has it and the question is answered, not
+# open. Forgetting to add a row here produces a LOUD false defect rather than a silent pass,
+# which is the right way round.
+FIX_LANDED = {
+    "C17": "d3c7f19",      # branch 6 slice 4
+}
+
+
+def fix_in_baseline(key):
+    """True if the named fix is already an ancestor of the baseline, so its directional
+    check can no longer be asked. Unknown key -> False: the fix is not merged yet."""
+    sha = FIX_LANDED.get(key)
+    if not sha:
+        return False
+    r = subprocess.run(["git", "merge-base", "--is-ancestor", sha, REF],
+                       capture_output=True, cwd=ROOT)
+    return r.returncode == 0
+
 # WHICH ROW OWNS WHICH STRUCTURE — taken from FINDINGS-REGISTER.md's `docs` column, used as
 # a LABEL rather than as the gate. The documents named are the ones that were MEASURED, not
 # the extent of the mechanism: A3's whitelist bug is in one branch of one classifier and
@@ -140,7 +172,19 @@ DELETE = ("fldChar", "instrText")
 # device on its RENDERED EFFECT, never on its element count -- so the verdict for this key
 # points at tools/render_diff.py rather than pretending a number settles it.
 PARTIAL = ("tab_chars",)
-HOLD = ("tab_stops", "sdt", "smartTag", "lastRenderedPageBreak")
+# sdt AND smartTag LEFT 'HOLD' ON 2026-09-08, ON BRANCH 7, AND THE MOVE IS DELIBERATE. They
+# sat there labelled "the containers another branch owns" — and branch 7 is that branch. But
+# they do NOT belong in RESTORE either, and getting that wrong would have made this harness
+# report the fix as having done nothing: the fix removes the source-language TEXT from inside
+# a container and leaves the container itself exactly where it was, so the COUNT is expected
+# to hold at the same time as the contents change.
+#
+# THIS IS THE THIRD BRANCH RUNNING WHERE THE ACCEPTANCE INSTRUMENT COULD NOT EXPRESS THE
+# CONDITION UNTIL IT WAS EXTENDED. The census counts structures; C16 and C17 changed text
+# inside an element that already existed, and so does this. A class whose verdict is "must
+# not move" would have been satisfied by a fix that did nothing at all.
+CONTAINED = ("sdt", "smartTag")
+HOLD = ("tab_stops", "lastRenderedPageBreak")
 REPORT = ("r", "p", "t", "delText", "ins", "del", "trailing_tabs", "br_plain")
 
 ap = argparse.ArgumentParser()
@@ -150,7 +194,7 @@ ap.add_argument("--ref", default=REF, help="baseline commit to compare against")
 args = ap.parse_args()
 
 print("=" * 100)
-print(f"BRANCH 6 — APPLY, BEFORE AND AFTER, ON THE FROZEN INTERMEDIATES  ({args.variant})")
+print(f"APPLY, BEFORE AND AFTER, ON THE FROZEN INTERMEDIATES  ({args.variant})")
 print("=" * 100)
 
 if not LOGS.exists():
@@ -278,6 +322,79 @@ def text_delta(old_bytes, new_bytes):
         changed.append(-1)          # -1 means the paragraph COUNT moved, which is not a text
                                     # change at all and must not be silently averaged into one
     return changed, _doubles(o), _doubles(n)
+
+
+# THE CONTAINERS THIS BRANCH NEWLY REACHES, and the two exclusions are the whole reason this
+# is a separate tuple from the shipped inventory. Deliberately NOT imported from the shipped
+# script either: this tool must be able to report on a tree whose inventory has changed, and
+# tests/test_container_inventory.py is what asserts the shipped copies agree with each other.
+#
+#   w:hyperlink  EXCLUDED, and leaving it in produced a MEASURED FALSE ALARM on the first
+#                acceptance run. Branch 6 already made apply recurse into it, so a
+#                hyperlink's text is translated and its stranded-fragment count CANNOT fall.
+#                On the table-of-contents document that is 34 predicted containers and 53
+#                fragments stable in both arms, which the "did the fix fire?" check read as
+#                "A16/N1's fix did not fire here" -- a defect report on a document where
+#                there was never anything to fix. An instrument that predicts a change it
+#                has no reason to expect reports its own scope error as a finding.
+#   w:fldSimple  EXCLUDED because it is PINNED. Its cached result is deliberately still
+#                duplicated -- A9's defect in the one field form clause 3 cannot see -- so
+#                counting it would make every document carrying one look unfixed for ever.
+_CONTAINERS = ("sdt", "smartTag", "customXml", "dir", "bdo")
+
+
+def container_source_text(xml_bytes, src_texts):
+    """How many `w:t` INSIDE a container still carry text the SOURCE document had.
+
+    THE CENSUS CANNOT ASK THIS, AND NEITHER CAN THE TEXT ARM. The census counts elements, and
+    branch 7 changes neither the number of containers nor the number of w:t. The text arm
+    compares a paragraph's whole text old against new, which does see the change — but it
+    cannot say WHERE, and "some text moved" is not the same claim as "the source-language
+    fragment that was stranded inside a content control is gone".
+
+    THE ABSOLUTE NUMBER IS NOT THE MEASUREMENT; THE DELTA IS. A fragment inside a container
+    can legitimately stay in the source language -- a defined term, a party name the operator
+    chose not to translate, or a paragraph where `en == text` so apply skipped it entirely
+    (11 such entries on the sdt document's own notes). Those are in both arms, so they cancel.
+    Same attribution principle as C16's interior doubles: only the excess is anybody's fault.
+    """
+    root = etree.fromstring(xml_bytes)
+    n = 0
+    for p in root.iter(f"{{{W}}}p"):
+        for child in p:
+            if etree.QName(child).localname not in _CONTAINERS:
+                continue
+            for t in child.iter(f"{{{W}}}t"):
+                if (t.text or "").strip() and (t.text or "").strip() in src_texts:
+                    n += 1
+    return n
+
+
+def container_predictor(src_xml_bytes):
+    """How many text-carrying INLINE containers the SOURCE document holds — computed, never
+    read off a document list.
+
+    Stronger than naming D03 and D05, for the reason the C17 predictor gives: it says WHERE
+    as well as whether, and it keeps working on a document nobody has measured. A16's row
+    names one document and one batch arm; the mechanism is in one branch of one classifier
+    and applies to every document, so a container fixed on a document nobody measured is the
+    row's evidence widening rather than an unexplained movement.
+
+    Block containers are excluded, and that is the row's own measurement: 5 of the sdt
+    document's 10 w:sdt wrap a whole paragraph, whose runs are direct children of their own
+    w:p, so apply always rebuilt them correctly. They are the positive control, not the
+    defect.
+    """
+    root = etree.fromstring(src_xml_bytes)
+    hits = []
+    for i, p in enumerate(root.iter(f"{{{W}}}p")):
+        for child in p:
+            if etree.QName(child).localname not in _CONTAINERS:
+                continue
+            if any((t.text or "").strip() for t in child.iter(f"{{{W}}}t")):
+                hits.append(i)
+                break
+    return hits
 
 
 def predictors(notes):
@@ -421,7 +538,7 @@ print(f"  corpus folder(s) reachable: {len(CORPUS)} · "
       f"{sum(len(list(d.glob('*.doc'))) for d in CORPUS)} legacy .doc (needs conversion, "
       f"not compared)")
 
-docs_done, rows, unexplained, voided, text_rows = [], [], [], [], []
+docs_done, rows, unexplained, voided, text_rows, container_rows = [], [], [], [], [], []
 wds = [w for w in (sorted(LOGS.rglob("wd")) + sorted(LOGS.rglob("wd-*"))) if w.is_dir()]
 seen = {}
 for wd in wds:
@@ -512,6 +629,14 @@ for wd in wds:
             else:
                 verdict = "MORE field structure than before — DEFECT until shown otherwise"
                 unexplained.append(f"{label}/{k}: {bv} -> {av}, source {sv} ({verdict})")
+        elif k in CONTAINED:
+            # THE COUNT MUST HOLD AND THE CONTENTS MUST CHANGE. Branch 7 empties a container
+            # of its source-language text; it never adds or removes one. So a moved COUNT is
+            # a defect here exactly as it was under HOLD, and the contents are scored by the
+            # CONTAINER arm below rather than by this number.
+            verdict = ("COUNT MUST NOT MOVE — the fix empties a container, it never adds or "
+                       "removes one; contents are the CONTAINER arm's")
+            unexplained.append(f"{label}/{k}: {bv} -> {av}, source {sv} ({verdict})")
         elif k in HOLD:
             verdict = "MUST NOT MOVE — defect until shown otherwise"
             unexplained.append(f"{label}/{k}: {bv} -> {av}, source {sv} ({verdict})")
@@ -540,8 +665,43 @@ for wd in wds:
     # those against apply would credit this branch with a defect it never had and, worse,
     # would report a fix as having failed to remove something that was never its to remove.
     with zipfile.ZipFile(src_docx) as z:
-        di_src, _ = _doubles(para_texts_raw(z.read("word/document.xml")))
+        _src_doc_xml = z.read("word/document.xml")
+    di_src, _ = _doubles(para_texts_raw(_src_doc_xml))
     n_moved = len([i for i in changed if i >= 0])
+
+    # ---- THE CONTAINER ARM. Branch 7. --------------------------------------------------
+    _src_texts = {t.strip() for t in
+                  (x.text for x in etree.fromstring(_src_doc_xml).iter(f"{{{W}}}t"))
+                  if t and t.strip()}
+    cs_old = container_source_text(arms["old"][0], _src_texts)
+    cs_new = container_source_text(arms["new"][0], _src_texts)
+    cont_pred = container_predictor(_src_doc_xml)
+    container_rows.append((label, len(cont_pred), cs_old, cs_new, ident))
+    if cont_pred or cs_old or cs_new:
+        print(f"      {'CONTAINER':<20} {cs_old:>6} -> {cs_new:<6} "
+              f"source-language w:t inside a container; "
+              f"{len(cont_pred)} text-carrying inline container(s) in the source"
+              + (f" at idx {cont_pred[:8]}" if cont_pred else ""))
+        if cs_new > cs_old:
+            unexplained.append(
+                f"{label}/CONTAINER: {cs_old} -> {cs_new} source-language fragments inside a "
+                f"container — this branch only ever removes them, so a RISE is a defect")
+        # AND THE OPPOSITE DIRECTION, WHICH "did anything move" CANNOT ASK. A document whose
+        # SOURCE carries a text-carrying inline container, and whose stranded fragments did
+        # NOT fall, means the fix did not fire where the measurement says it must — which
+        # reads exactly like a clean run.
+        #
+        # `not SAME` GUARDS IT, AND THAT GUARD IS A DEFECT THIS RUN FOUND IN THIS FILE. On a
+        # self-comparison old and new ARE the same code, so nothing can move and this check
+        # was GUARANTEED to fire: the before-branch-7 baseline run printed the note saying an
+        # all-quiet result proves nothing and then reported 2 MOVEMENTS NO REGISTER ROW
+        # PREDICTS, from the C17 arm below, for exactly that reason. A harness that reports
+        # two defects whenever it is asked to prove it reports none is not usable as evidence.
+        if cont_pred and cs_new >= cs_old and not SAME:
+            unexplained.append(
+                f"{label}/CONTAINER: the source carries {len(cont_pred)} text-carrying "
+                f"inline container(s) at idx {cont_pred[:8]} and the stranded fragment count "
+                f"did not fall ({cs_old} -> {cs_new}) — A16/N1's fix did not fire here")
     text_rows.append((label, n_moved, len(c17_idx), di_src, c16_declared,
                       di_old, di_new, dt_old, dt_new, ident))
     if -1 in changed:
@@ -563,19 +723,38 @@ for wd in wds:
               "(invisible on a page; counted so it cannot masquerade as an interior double)")
         # A MOVEMENT NO ROW PREDICTS IS A DEFECT — the same rule the census arm applies, and
         # it has to be applied here too or the text arm is a printout rather than a check.
-        if n_moved and not c17_idx and di_old == di_new:
+        # AND THE PREDICTOR HAS TO KNOW ABOUT THE BRANCH THAT IS RUNNING, which the first
+        # acceptance run of branch 7 proved by flagging the fix's own two documents. The text
+        # arm was written for C16 and C17, so a paragraph whose text changed because a
+        # stranded container fragment was FREED matched no predictor and was reported as
+        # "nothing predicts this". It was predicted -- by the arm three lines below this one.
+        # A per-branch arm added beside an older one has to be wired into the verdict too,
+        # or every branch's acceptance run reports its own work as unexplained.
+        if n_moved and not c17_idx and di_old == di_new and cs_new >= cs_old:
             unexplained.append(
                 f"{label}/TEXT: {n_moved} paragraph(s) changed text with no C17 instance in "
-                f"the notes and no change in interior double count — nothing predicts this")
+                f"the notes, no change in interior double count and no container fragment "
+                f"freed — nothing predicts this")
         # AND THE OPPOSITE DIRECTION, WHICH A "did anything move" CHECK CANNOT ASK: a document
         # the notes say carries C17 whose text did NOT move means the fix did not fire where
         # the evidence says it should. That reads as a clean run and is the more expensive
         # failure, because it is indistinguishable from success.
-        if c17_idx and not n_moved:
+        # `not SAME` ADDED 2026-09-08, ON A MEASURED FALSE POSITIVE IN THIS VERY FILE. With
+        # old and new the same code nothing CAN move, so this check fired on both C17
+        # documents every time the harness was asked to demonstrate that it reports no
+        # movement when there is none — the run printed its own NOTE saying an all-quiet
+        # result proves nothing, and then two lines of "MOVEMENTS NO REGISTER ROW PREDICTS".
+        # Two guaranteed defects, reading exactly like real ones. Same family as every other
+        # entry in CLAUDE.md 5.16: the thing measured was not the thing under review.
+        if c17_idx and not n_moved and not SAME and not fix_in_baseline("C17"):
             unexplained.append(
                 f"{label}/TEXT: the notes carry {len(c17_idx)} C17 instance(s) at "
                 f"{c17_idx} and NOT ONE paragraph's text moved — the fix did not fire where "
                 f"the measurement says it must")
+        elif c17_idx and not n_moved:
+            print(f"      {'':<20} {'':>6} C17's fix is in the baseline "
+                  f"({FIX_LANDED['C17']}), so both arms carry it and no movement is "
+                  f"possible — the check is ANSWERED, not open")
     rows.append((label, moved))
 
 print()
@@ -597,11 +776,17 @@ moved_docs = [d for d, m in rows if m]
 # noun attached to it, and nothing checks a noun.
 text_moved = [t[0] for t in text_rows if t[1]]
 byte_identical = [t[0] for t in text_rows if t[9]]
+# FOUR NUMBERS NOW, because the third arm answers a question the first two structurally
+# cannot. Branch 7 changes neither an element count nor, on most documents, a paragraph's
+# whole text — it removes a source-language fragment from inside a container. Counting the
+# fragments is the only arm that can say it happened.
+cont_freed = [c[0] for c in container_rows if c[3] < c[2]]
 print(f"  {len(docs_done)} document(s) compared")
 print(f"      {len(moved_docs):>3} moved a counted STRUCTURE   (the census arm)")
 print(f"      {len(text_moved):>3} moved a paragraph's TEXT    (the text arm — C16, C17)")
+print(f"      {len(cont_freed):>3} freed a stranded fragment  (the container arm — A16, N1)")
 print(f"      {len(byte_identical):>3} byte-identical old vs new  (nothing changed at all, "
-      f"and this is the only one of the three that means that)")
+      f"and this is the only one of the four that means that)")
 if text_rows:
     print()
     print(f"      {'doc':<10}{'txt moved':>10}{'C17':>5}{'int src':>9}{'int decl':>10}"
@@ -614,6 +799,21 @@ if text_rows:
     print("      int = INTERIOR double-space runs, the only kind a page can show. `src` is the")
     print("      SOURCE document's own; `decl` is what the operator authored in `en`. Only the")
     print("      excess over both is attributable to apply, which is what C16 claims.")
+if container_rows:
+    print()
+    print(f"      {'doc':<10}{'inline containers':>19}{'stranded old':>14}"
+          f"{'stranded new':>14}{'freed':>7}")
+    print("      " + "-" * 64)
+    for c in container_rows:
+        print(f"      {c[0]:<10}{c[1]:>19}{c[2]:>14}{c[3]:>14}{c[2] - c[3]:>7}")
+    print("      " + "-" * 64)
+    print("      `inline containers` counts TEXT-CARRYING containers inside a w:p in the")
+    print("      SOURCE — the prediction, computed rather than read off a document list. A")
+    print("      BLOCK container is excluded and is the positive control: 5 of the sdt")
+    print("      document's 10 wrap a whole paragraph and were always rebuilt correctly.")
+    print("      `stranded` counts delivered w:t inside a container whose text the source")
+    print("      also had. The ABSOLUTE number includes fragments that legitimately stay in")
+    print("      the source language, so only the DELTA is attributable to this branch.")
 if voided:
     print(f"  {len(voided)} NOT compared — VOID, not clean:")
     for v in voided:

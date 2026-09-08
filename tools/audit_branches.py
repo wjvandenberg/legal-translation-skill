@@ -424,11 +424,20 @@ def audit_b1():
     #                           BEFORE apply, so a run carrying a bad one never produced a
     #                           frozen intermediate. Measured 0 of 13, and the zero proved.
     #
+    # 21 SINCE 2026-09-08, branch 7's first slice: +1, containers.notes.json. The fixture
+    # itself already existed and was REBUILT rather than added -- from four shapes taken from
+    # four register-row TITLES to twenty measured through the real apply. Its sdt shape was
+    # the BLOCK form, which that row says in terms is untouched and correct; A16's defect is
+    # the INLINE one, so the fixture built from the titles carried the one shape the row calls
+    # fine. It gains a notes sidecar for the same reason the other four have one: a fixture's
+    # notes are its INPUT and belong beside it, not invented by whichever tool drives it.
+    #
     # COUNTED BY LISTING, from `git ls-files`, never by adding a delta to the figure above.
     # This claim reads the INDEX, deliberately, and is the only one in this block that does --
     # so a fixture added on a branch must be STAGED before the number is right, and the claim
-    # goes red while whoever moved it is still here rather than after the merge.
-    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 20)
+    # goes red while whoever moved it is still here rather than after the merge. IT DID
+    # EXACTLY THAT ON THIS BRANCH, which is the second time that design has paid.
+    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 21)
 
     hits = 0
     for nm in fx:
