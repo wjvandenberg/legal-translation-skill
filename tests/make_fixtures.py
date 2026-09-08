@@ -27,7 +27,20 @@ import sys
 import zipfile
 from pathlib import Path
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+# REASSIGNING sys.stdout AT IMPORT TIME BREAKS EVERY IMPORTER THAT HAS ALREADY WRAPPED IT,
+# and the way it breaks is not obvious from the error. Both wrappers share one underlying
+# buffer; assigning a second one drops the first one's last reference, so it is garbage
+# collected and CLOSES THE SHARED BUFFER on the way out. The surviving wrapper then raises
+# `ValueError: I/O operation on closed file` at whatever line happens to print next -- which
+# was line 208 of tests/test_container_inventory.py, nowhere near the cause.
+#
+# Four test modules and nineteen tools wrap stdout at module level, so this is a collision
+# waiting for the next importer rather than one file's problem. `reconfigure` mutates the
+# existing object in place instead of replacing it, and it is done only when this file is
+# RUN, because an imported module has no business owning its importer's stdout.
+# Found 2026-09-08 on branch 7, the first module to import this one and wrap stdout too.
+if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "tests" / "fixtures"
 
@@ -81,9 +94,112 @@ PNG = bytes.fromhex(
 #     test method is byte comparison.
 #
 # Found on 2026-08-06 by a verification pass, not by the suite itself. Fixed by stamping every
-# member with the ZIP epoch (1980-01-01, the earliest a ZIP can express) so a build is a pure
-# function of its input.
+# member with the ZIP epoch (1980-01-01, the earliest a ZIP can express).
+#
+# AND THE CLAIM THAT USED TO END THIS COMMENT WAS TOO STRONG. It read "so a build is a pure
+# function of its input", and it is not: it is a pure function of its input AND OF THE
+# INTERPRETER'S zlib. Measured 2026-09-08 (register I-25), after running this file with bare
+# `python` instead of `uv run python` — the house rule, broken once:
+#
+#     bare python 3.14.3   zlib 1.3.1.zlib-ng
+#     uv   python 3.12.12  zlib 1.3.1
+#
+# Two DEFLATE implementations, identical input, DIFFERENT COMPRESSED BYTES — and ALL SIXTEEN
+# fixtures came back modified at once. Nothing caught it: this file exits 0, every fixture is
+# a valid ZIP, every content check passes, and the smoke suite's byte-identity assertion
+# compares two runs of the SAME interpreter, so it cannot see this at all.
+#
+# WHY IT MATTERS RATHER THAN BEING A CURIOSITY: a sixteen-file phantom diff committed by
+# accident makes `git bisect` step through a commit where every fixture's bytes moved for no
+# reason, which is the one tool the whole test method exists to enable. ALWAYS `uv run`.
+#
+# The available class fix is ZIP_STORED, whose bytes no compressor can vary — DECLARED AND
+# NOT TAKEN here: it would rewrite all sixteen fixtures in a branch about containers, and a
+# stored .docx is less like a real one, which is DEFLATE. It belongs to whoever wants it.
 FIXED_TIME = (1980, 1, 1, 0, 0, 0)
+
+
+def _assert_pointers(path):
+    """EVERY POINTER IN A FIXTURE MUST HAVE A TARGET. Register I-17, as a check.
+
+    I-17 was a fixture LibreOffice refused outright -- "source file could not be loaded" --
+    because its body referenced an `r:id` with no Relationship and shipped auxiliary parts
+    nothing pointed at. It was fixed by hand on that one fixture in 2026-08-21, and **it came
+    straight back on the next fixture to carry a pointer** (containers.docx, 2026-09-08),
+    because nothing checked. A patch on the caller that bit you leaves callers 2..N carrying
+    the defect, and you learn which only when the next one surfaces as a new bug.
+
+    So this is the guard inside the shared thing, and it covers the fixtures that do not
+    exist yet. Two assertions, and they are precisely I-17's two causes:
+
+      1  every `r:id` referenced anywhere in a WML part resolves to a Relationship Id in that
+         part's own `_rels`;
+      2  every footnote, endnote and comment reference id exists in the corresponding part.
+
+    IT IS PURE ZIP AND XML, so it runs on every build in milliseconds. Loading each fixture
+    in LibreOffice would be the stronger test and is far too slow for a build loop -- but the
+    two causes above are what actually made a renderer refuse a file here, twice.
+
+    Deliberately NOT asserted: that every part is referenced. `docx()` writes an unreferenced
+    `word/styles.xml` into every fixture and every renderer accepts it, so that arm would
+    fail on all sixteen and be switched off within a day.
+    """
+    import xml.etree.ElementTree as ET      # READING only; never used to write OOXML
+    R_NS = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
+    wns = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    problems = []
+    with zipfile.ZipFile(path) as z:
+        names = set(z.namelist())
+        for part in sorted(n for n in names
+                           if n.startswith("word/") and n.endswith(".xml")
+                           and "/_rels/" not in n):
+            try:
+                root = ET.fromstring(z.read(part))
+            except ET.ParseError as exc:
+                problems.append(f"{part} is not well-formed XML: {exc}")
+                continue
+            base = part.rsplit("/", 1)
+            rels_name = f"{base[0]}/_rels/{base[1]}.rels"
+            have = set()
+            if rels_name in names:
+                try:
+                    for rel in ET.fromstring(z.read(rels_name)):
+                        rid = rel.get("Id")
+                        if rid:
+                            have.add(rid)
+                except ET.ParseError as exc:
+                    problems.append(f"{rels_name} is not well-formed XML: {exc}")
+            wanted = set()
+            for el in root.iter():
+                for attr, val in el.attrib.items():
+                    if attr.startswith(R_NS) and attr.endswith("}id") and val:
+                        wanted.add(val)
+            for rid in sorted(wanted - have):
+                problems.append(
+                    f"{part} references r:id={rid} and {rels_name} does not declare it — "
+                    f"a consumer rejects the whole package for this (register I-17)")
+            # 2. A note or comment reference must have a body to point at.
+            for tag, ppart, idtag in (("footnoteReference", "word/footnotes.xml", "footnote"),
+                                      ("endnoteReference", "word/endnotes.xml", "endnote"),
+                                      ("commentReference", "word/comments.xml", "comment")):
+                refs = {el.get(f"{wns}id") for el in root.iter(f"{wns}{tag}")}
+                refs.discard(None)
+                if not refs:
+                    continue
+                if ppart not in names:
+                    problems.append(
+                        f"{part} has {len(refs)} <w:{tag}> and there is no {ppart} at all — "
+                        f"this is what made LibreOffice refuse a fixture outright (I-17)")
+                    continue
+                bodies = {el.get(f"{wns}id")
+                          for el in ET.fromstring(z.read(ppart)).iter(f"{wns}{idtag}")}
+                for missing in sorted(refs - bodies):
+                    problems.append(
+                        f"{part} references {idtag} id={missing} and {ppart} has no such "
+                        f"<w:{idtag}>")
+    if problems:
+        raise AssertionError(f"{path.name}: pointer(s) with no target —\n    "
+                             + "\n    ".join(problems))
 
 
 def _member(name):
@@ -350,6 +466,71 @@ def _note(idx, text, en, spans):
                       "bold": False, "italic": False} for s, e in spans]}
 
 
+def _notes_from_document(path):
+    """Build one note per w:p BY READING THE DOCUMENT BACK, not from the shape table.
+
+    The notes and the XML would otherwise be two descriptions of one thing, and every
+    fixture-versus-notes defect this project has had came from exactly that. Reading the
+    document back makes the XML the single source: `text` is what apply's own
+    get_paragraph_text() computes, and `runs` are the real w:r fragments with real offsets,
+    so the note is what extract_paragraphs.py would have produced.
+
+    A BLOCK CONTAINER'S INNER PARAGRAPH IS A PARAGRAPH. `root.iter(w:p)` reaches it, so it
+    gets its own note, in document order -- which is exactly why the block shapes are the
+    positive controls: from apply's side they are ordinary paragraphs.
+
+    Two properties are ASSERTED rather than trusted:
+      1  every shape label has an `en`, so adding a shape and forgetting its English fails
+         the build instead of producing a note that makes apply skip the paragraph;
+      2  NO `en` reproduces any source `w:t` verbatim, which is the property that lets a
+         test call a delivered w:t equal to a source w:t a remnant.
+    """
+    import xml.etree.ElementTree as ET      # READING only; never used to write OOXML
+    wns = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    missing = [lbl for lbl, _, _, _ in CONTAINER_SHAPES if lbl not in CONTAINER_EN]
+    if missing:
+        raise AssertionError("CONTAINER_EN has no English for: " + ", ".join(missing))
+    with zipfile.ZipFile(path) as z:
+        root = ET.fromstring(z.read("word/document.xml"))
+    paras = list(root.iter(f"{wns}p"))
+    # ONE SHAPE MAY CONTRIBUTE MORE THAN ONE PARAGRAPH (a block container wraps one), so the
+    # shapes are walked in step with the paragraphs rather than zipped one-to-one.
+    order = []
+    for lbl, _, _, xml in CONTAINER_SHAPES:
+        order += [lbl] * xml.count("<w:p>")
+    if len(order) != len(paras):
+        raise AssertionError(
+            f"containers.docx: {len(paras)} paragraph(s) in the XML but the shape table "
+            f"accounts for {len(order)} — a shape's own XML and its paragraph count "
+            f"disagree, so every note below would describe the wrong row")
+    src_texts = set()
+    for para in paras:
+        for t in para.iter(f"{wns}t"):
+            if (t.text or "").strip():
+                src_texts.add(t.text.strip())
+    notes = []
+    for idx, (para, lbl) in enumerate(zip(paras, order)):
+        text = "".join(t.text or "" for t in para.iter(f"{wns}t"))
+        en = CONTAINER_EN[lbl]
+        clash = sorted(s for s in src_texts if s and s in en)
+        if clash:
+            raise AssertionError(
+                f"containers.docx idx {idx} ({lbl}): its `en` contains the source fragment "
+                f"{clash[0]!r} verbatim. The suite tells English from source by comparing "
+                f"whole w:t strings, so this would read as a remnant that is not one.")
+        spans, pos = [], 0
+        for run in para.iter(f"{wns}r"):
+            frag = "".join(t.text or "" for t in run.iter(f"{wns}t"))
+            if not frag:
+                continue
+            spans.append((pos, pos + len(frag)))
+            pos += len(frag)
+        if not spans:
+            spans = [(0, len(text))]
+        notes.append(_note(idx, text, en, spans))
+    return notes
+
+
 def _write_notes(docx_path, notes):
     """Write `<stem>.notes.json` beside the fixture, and PROVE it agrees with the document.
 
@@ -551,32 +732,256 @@ def _crossref(path):
 # Branch 7 — the container inventory. NONE of these four is reproducible from any corpus
 # document, which is the entire reason they exist.
 # ---------------------------------------------------------------------------
+_SDTPR = '<w:sdtPr><w:id w:val="{n}"/><w:alias w:val="Field {n}"/></w:sdtPr>'
+
+
+def _sdt(n, inner):
+    return "<w:sdt>" + _SDTPR.format(n=n) + "<w:sdtContent>" + inner + "</w:sdtContent></w:sdt>"
+
+
+# THE SHAPES, AND THE FIRST FOUR ARE NOT THE ONES THIS FIXTURE USED TO CARRY. Measured
+# 2026-09-08 through the real apply, every expectation written down first
+# (temp/probe_container_gaps.py, 20 shapes): the fixture's original `w:sdt` wrapped a whole
+# PARAGRAPH, and that shape is CORRECT today -- the inner paragraph's runs are direct
+# children of their own w:p, so apply rebuilds them normally. A16's measured defect is the
+# INLINE MIXED case, and the fixture built from the row's TITLE carried the one shape the row
+# says is fine. So the block forms stay, as the POSITIVE CONTROLS they always were, and the
+# inline forms are added.
+#
+# `label` is the assertion key.
+#
+# THE SECOND FIELD IS A DATED MEASUREMENT, NOT A LIVE CLAIM, and that distinction is the
+# whole reason it can sit here safely. It records what apply did to this shape ON 2026-09-08,
+# BEFORE branch 7 -- measured by temp/probe_container_gaps.py over 20 shapes with every
+# expectation written down first. `True` means the shape's container text was stranded or its
+# structure destroyed; `False` means it was already correct.
+#
+# It is NOT what the suite asserts. A suite must assert the TARGET state or the fix turns it
+# red: tests/test_container_inventory.py asserts CLEAN for every shape except the two it
+# PINS, and it owns that list. A dated fact does not go stale; a behavioural expectation
+# written as though it were permanent does.
+CONTAINER_SHAPES = [
+    ("sdt-inline-mixed", True,
+     "A16's CORPUS SHAPE: an inline content control beside ordinary runs. 5 such sdt in 3 "
+     "paragraphs on one corpus document, every one of them mixed",
+     p(r("This deed is dated "), _sdt(1, r("[=datum]")), r(" between the parties."))),
+    ("sdt-inline-alone", True,
+     "an inline content control as the paragraph's ONLY content -- so the source's first "
+     "text is inside it and the English is placed after it",
+     p(_sdt(2, r("The whole recital sits in a control.")))),
+    ("sdt-inline-anchor", True,
+     "an inline control holding a FOOTNOTE ANCHOR beside its text. The anchor must survive "
+     "the container being emptied -- a pointer works from anywhere in the paragraph",
+     p(r("Subject to "),
+       _sdt(3, '<w:r><w:t xml:space="preserve">the annexe</w:t>'
+                '<w:footnoteReference w:id="2"/></w:r>'),
+       r(" as amended from time to time."))),
+    ("sdt-inline-tab", True,
+     "an inline control holding a TAB beside its text -- a position-critical child inside a "
+     "container, which clause 2's limit governs",
+     p(r("Left column"),
+       _sdt(4, '<w:r><w:tab/><w:t xml:space="preserve">right column</w:t></w:r>'))),
+    ("sdt-block-para", False,
+     "POSITIVE CONTROL. A BLOCK content control wrapping a whole paragraph -- what this "
+     "fixture carried alone until 2026-09-08, and it is CORRECT today. It must not move",
+     _sdt(5, p(r("The Supplier shall deliver the goods.")))),
+    ("sdt-block-row", False,
+     "POSITIVE CONTROL. A BLOCK content control inside a table row -- 5 of the corpus "
+     "document's 10 sdt take exactly this shape, and all 5 are correct",
+     '<w:tbl><w:tr>' + _sdt(6, '<w:tc><w:tcPr/>' + p(r("A cell in a controlled row."))
+                            + '</w:tc>') + '</w:tr></w:tbl>'),
+    ("smarttag-mixed", True,
+     "N1's CORPUS SHAPE: a smart tag beside ordinary runs. EXACTLY ONE instance in the "
+     "corpus, on one document, and the source's first text sits inside it",
+     p('<w:smartTag w:element="place">' + r("Rotterdam") + "</w:smartTag>",
+       r(" is the agreed place of delivery."))),
+    ("smarttag-nested", True,
+     "a smart tag INSIDE a smart tag -- the schema allows it, so the recursion has to "
+     "terminate rather than assume one level",
+     p('<w:smartTag w:element="country"><w:smartTag w:element="city">'
+       + r("Delft") + "</w:smartTag></w:smartTag>",
+       r(" and the surrounding province."))),
+    ("smarttag-trailing", True,
+     "a smart tag whose text is NOT the paragraph's first -- so after the collapse the "
+     "wrapper receives no English and is genuinely empty. THIS IS THE ONLY SHAPE THAT "
+     "EXERCISES THE DROP HALF of the emptied-wrapper decision; without it that branch is a "
+     "line of code no test reaches, and every other container shape either keeps its wrapper "
+     "or is the insertion target",
+     p(r("Delivery shall be made at "),
+       '<w:smartTag w:element="place">' + r("Eindhoven") + "</w:smartTag>",
+       r(" before the long stop date."))),
+    ("customxml-mixed", True,
+     "w:customXml -- the third container of the same schema group, NAMED IN NO REGISTER ROW "
+     "and stranding text identically. Zero corpus instances",
+     p('<w:customXml w:element="PartyName">' + r("Acme Holdings") + "</w:customXml>",
+       r(" shall pay the fee within thirty days."))),
+    ("dir-mixed", True,
+     "w:dir -- a bidirectional embedding container. NAMED IN NO ROW. Zero corpus instances",
+     p('<w:dir w:val="rtl">' + r("embedded phrase") + "</w:dir>",
+       r(" inside a left-to-right clause."))),
+    ("bdo-mixed", True,
+     "w:bdo -- a bidirectional override container. NAMED IN NO ROW. Zero corpus instances",
+     p('<w:bdo w:val="ltr">' + r("overridden phrase") + "</w:bdo>",
+       r(" inside the same clause."))),
+    ("ruby-in-run", True,
+     "w:ruby INSIDE a run, and this one is WORSE than a remnant: measured, apply destroys "
+     "ruby, rubyBase and rt outright, 1->0 each, while extraction has already glued the "
+     "phonetic reading to its base in `text`. Zero corpus instances -- and the corpus has a "
+     "Japanese document. ASSERTED AS THE CURRENT OUTCOME so a later branch must change it "
+     "deliberately rather than silently",
+     p(r("The defined term "),
+       '<w:r><w:ruby><w:rubyPr/><w:rt><w:r><w:t>yomi</w:t></w:r></w:rt>'
+       '<w:rubyBase><w:r><w:t>kanji</w:t></w:r></w:rubyBase></w:ruby></w:r>',
+       r(" is set out below."))),
+    # A22's SHAPE IS DELIBERATELY NOT HERE, and the reason is a measurement rather than an
+    # omission. A `w:fldSimple` whose cached result is consumed leaves the field rendering
+    # its number immediately after the English block, so the delivered text reads
+    # `...instrument.4.2` -- and gluing two atoms MERGES TOKEN TYPES, so
+    # `validate_apply --strict` REFUSES THE REPACK. That makes A22 a DEADLOCK rather than a
+    # cosmetic duplication, which is a sharper statement of its severity than any pin -- and
+    # it also means a fixture carrying that shape can never be repacked, so all nineteen
+    # other shapes would lose their page.
+    #
+    # BYPASSING THE GATE FOR THE NEW ARM IS NOT AN OPTION. render_diff does byte-substitute a
+    # refused OLD arm, legitimately, because that arm is a picture of a defect and not a
+    # deliverable. The NEW arm is what the working tree produces, and CLAUDE.md 5.9 is
+    # explicit: never work around a gate.
+    #
+    # So A22 keeps its register row and the 20-shape probe as its evidence, and the fixture
+    # is DECLARED as owed by whichever branch fixes it -- which must then decide clause 3's
+    # keyword question first. tests/test_container_inventory.py names the gap rather than
+    # leaving it silent.
+    ("ins-mixed", False,
+     "NEGATIVE CONTROL. A tracked insertion beside an ordinary run. 220 w:ins and 108 w:del "
+     "across 6 corpus documents all take the TRACKED-CHANGE FAST PATH, which was measured "
+     "CLEAN -- so an inventory must NOT claim this family and double-handle it",
+     p('<w:ins w:id="9" w:author="Reviewer" w:date="2020-01-01T00:00:00Z">'
+       + r("an inserted phrase") + "</w:ins>",
+       r(" and an existing phrase."))),
+    ("subdoc", False,
+     "NEGATIVE CONTROL. w:subDoc carries no text of its own, so there is nothing to strand "
+     "and nothing to empty. A gate that fires here would be firing on correct input",
+     p(r("Incorporated by reference: "), '<w:subDoc r:id="rId8"/>')),
+    ("hyperlink-mixed", False,
+     "POSITIVE CONTROL. The one container apply ALREADY recurses into, so this row proves "
+     "the inventory did not break what worked",
+     p('<w:hyperlink r:id="rId9">' + r("the linked words") + "</w:hyperlink>",
+       r(" and the unlinked words."))),
+    ("alt-text", False,
+     "A19. An inline image whose translatable text is an ATTRIBUTE -- wp:docPr/@descr for "
+     "alt text and @title beside it. Measured across both trees: docPr, SmartArt, "
+     "w:drawing, a:graphic, c:title and wp:inline appear in ZERO files, so there is no rule "
+     "and no check. And the corpus has 14 drawings carrying @name only, never @descr, so "
+     "there is no real-document instance either",
+     p(r("The approval sequence is shown here: "),
+       '<w:r><w:drawing><wp:inline><wp:docPr id="1" name="Diagram"'
+       ' descr="Flow chart showing the approval sequence"'
+       ' title="Approval flow"/>'
+       '<a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/'
+       'picture"/></a:graphic></wp:inline></w:drawing></w:r>')),
+    ("chart-title", False,
+     "A19's second surface: a chart title and an AXIS title, in their own part, reachable "
+     "only through the relationship. Detected and reported, never translated -- there is no "
+     "corpus instance to verify a translation against",
+     p(r("The figures are set out in the chart below."))),
+    ("plain", False,
+     "THE QUIET CONTROL. No container at all. If this row ever moves, the inventory has "
+     "reached a paragraph it has no business in",
+     p(r("This clause contains no container of any kind."))),
+]
+
+
+# THE ENGLISH, one entry per shape label. It sits beside the table rather than inside it only
+# because the rows are already long -- and `_notes_from_document` ASSERTS both properties the
+# suite depends on: that every label has an entry, and that no `en` reproduces any source
+# `w:t` VERBATIM. The second is what lets a test say "a delivered w:t equal to a source w:t is
+# a remnant" without a sentinel, and a sentinel is exactly what failed in the probe: the
+# tracked-change path distributes ONE English string across several w:t, so only the first
+# fragment carried the marker and all-English output read as source language.
+#
+# Two lists that must agree will disagree, and the one that loses is silent -- unless
+# something asserts. This is that assertion's other half.
+CONTAINER_EN = {
+    "sdt-inline-mixed": "This deed bears the date shown and is made between the signatories.",
+    "sdt-inline-alone": "An entire recital held within a single control.",
+    "sdt-inline-anchor": "Governed by the appendix, as varied from time to time.",
+    "sdt-inline-tab": "First heading\tsecond heading",
+    "sdt-block-para": "CONTROL — must not move. The vendor will hand over the items.",
+    "sdt-block-row": "CONTROL — must not move. One box inside a governed line.",
+    "smarttag-mixed": "The stated point of hand-over lies in the port city named.",
+    "smarttag-nested": "A university town, together with its wider region.",
+    "smarttag-trailing": "Hand-over occurs at the southern city ahead of the final cut-off.",
+    "customxml-mixed": "The named undertaking will settle the charge inside one month.",
+    "dir-mixed": "A nested wording within an otherwise ordinary provision.",
+    "bdo-mixed": "A reversed wording within the very same provision.",
+    "ruby-in-run": "The specified expression appears immediately underneath.",
+    "ins-mixed": "CONTROL — a marked addition plus wording that was already present.",
+    "subdoc": "CONTROL — brought in by cross-reference: ",
+    "hyperlink-mixed": "CONTROL — the words carrying the link, and those without one.",
+    "alt-text": "The sequence for sign-off appears in the picture here: ",
+    "chart-title": "The numbers appear in the graph shown underneath.",
+    "plain": "CONTROL — this provision holds no wrapper whatsoever.",
+}
+
+
 @fixture("containers.docx",
-         "content control, smart tag, image with alt text, chart with a title — four "
-         "containers holding translatable text, NONE reproducible from the corpus")
+         "the container inventory — 19 shapes: 11 that strand source-language text or "
+         "destroy a structure, 6 controls, plus A19's alt text and chart title. NOT ONE is "
+         "reproducible from the corpus")
 def _containers(path):
-    body = (
-        # A content control (structured document tag) wrapping a paragraph.
-        '<w:sdt><w:sdtPr><w:alias w:val="Party name"/></w:sdtPr><w:sdtContent>' +
-        p(r("The Supplier shall deliver the goods.")) +
-        '</w:sdtContent></w:sdt>' +
-        # A smart tag wrapping a run.
-        p('<w:smartTag w:element="place">' + r("Rotterdam") + '</w:smartTag>',
-          r(" is the place of delivery.")) +
-        # An inline image whose alt text is translatable and lives in graphic metadata.
-        p('<w:r><w:drawing><wp:inline><wp:docPr id="1" name="Diagram"'
-          ' descr="Flow chart showing the approval sequence"/>'
-          '<a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"/>'
-          '</a:graphic></wp:inline></w:drawing></w:r>') +
-        # A chart title, in its own part, reachable only through the relationship.
-        p(r("The figures are set out in the chart below."))
-    )
+    body = "".join(s[3] for s in CONTAINER_SHAPES)
     chart = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
              '<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"'
              ' xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><c:chart>'
              '<c:title><c:tx><c:rich><a:p><a:r><a:t>Deliveries by quarter</a:t></a:r>'
-             '</a:p></c:rich></c:tx></c:title></c:chart></c:chartSpace>')
-    docx(path, body, {"word/charts/chart1.xml": chart, "word/media/image1.png": PNG})
+             '</a:p></c:rich></c:tx></c:title>'
+             '<c:plotArea><c:valAx><c:title><c:tx><c:rich><a:p><a:r>'
+             '<a:t>Tonnes delivered</a:t></a:r></a:p></c:rich></c:tx></c:title>'
+             '</c:valAx></c:plotArea></c:chart></c:chartSpace>')
+    # THE FOOTNOTES PART AND THE RELATIONSHIPS, AND THIS IS REGISTER I-17 REINTRODUCED.
+    # Built without them, LibreOffice refused the whole package -- "source file could not be
+    # loaded" -- and the shape that did it was the content control holding a
+    # `w:footnoteReference w:id="2"` pointing at a footnotes part that did not exist.
+    # I-17 is the SAME DEFECT on anchors-and-tabs.docx, found on branch 14, and that
+    # fixture's own comment says it in terms: a hyperlink `r:id` referring to a relationship
+    # that does not exist "is enough for a consumer to reject the package". Nothing checked
+    # it, so it came straight back on the next fixture to carry a pointer.
+    #
+    # AND THE IRONY IS AGAIN THE LESSON: the fixture was unreadable for exactly cluster A's
+    # reason -- the content was in the container and the POINTER was not. `_assert_pointers`
+    # below is the class fix, so the next fixture cannot repeat it.
+    footnotes = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+                 f'<w:footnotes {W}><w:footnote w:id="2"><w:p>'
+                 + r("A note attached to the controlled span.")
+                 + '</w:p></w:footnote></w:footnotes>')
+    ct = ('<Override PartName="/word/footnotes.xml" ContentType="application/vnd.'
+          'openxmlformats-officedocument.wordprocessingml.footnotes+xml"/>\n')
+    rels = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/'
+            'relationships">'
+            '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/styles" Target="styles.xml"/>'
+            '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/footnotes" Target="footnotes.xml"/>'
+            # example.invalid is reserved by RFC 2606, so nothing here can resolve to a real
+            # host if a renderer ever follows it.
+            '<Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/hyperlink" Target="https://example.invalid/schedule-2" '
+            'TargetMode="External"/>'
+            # The subdocument the body references. It carries no text of its own and exists
+            # only so the `r:id` resolves.
+            '<Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/subDocument" Target="https://example.invalid/annexe" '
+            'TargetMode="External"/>'
+            '<Relationship Id="rId10" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/chart" Target="charts/chart1.xml"/>'
+            '<Relationship Id="rId11" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/image" Target="media/image1.png"/>'
+            '</Relationships>')
+    docx(path, body, {"word/charts/chart1.xml": chart, "word/media/image1.png": PNG,
+                      "word/footnotes.xml": footnotes,
+                      "word/_rels/document.xml.rels": rels}, ct)
+    _write_notes(path, _notes_from_document(path))
 
 
 @fixture("symbol-font.docx",
@@ -974,6 +1379,10 @@ def main():
                 with zipfile.ZipFile(path) as z:
                     bad = z.testzip()
                 ok = "valid ZIP" if bad is None else f"CORRUPT at {bad}"
+                # A VALID ZIP IS NOT A LOADABLE DOCUMENT, which is the whole of register
+                # I-17. Every fixture gets the pointer check, so the guard covers the ones
+                # that do not exist yet rather than the one that bit us.
+                _assert_pointers(path)
             except zipfile.BadZipFile:
                 ok = "NOT A ZIP — unexpected"
         else:

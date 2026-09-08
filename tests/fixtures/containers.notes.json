@@ -1,0 +1,413 @@
+[
+  {
+    "idx": 0,
+    "text": "This deed is dated [=datum] between the parties.",
+    "en": "This deed bears the date shown and is made between the signatories.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 19,
+        "text": "This deed is dated ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 19,
+        "end": 27,
+        "text": "[=datum]",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 27,
+        "end": 48,
+        "text": " between the parties.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 1,
+    "text": "The whole recital sits in a control.",
+    "en": "An entire recital held within a single control.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 36,
+        "text": "The whole recital sits in a control.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 2,
+    "text": "Subject to the annexe as amended from time to time.",
+    "en": "Governed by the appendix, as varied from time to time.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 11,
+        "text": "Subject to ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 11,
+        "end": 21,
+        "text": "the annexe",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 21,
+        "end": 51,
+        "text": " as amended from time to time.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 3,
+    "text": "Left columnright column",
+    "en": "First heading\tsecond heading",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 11,
+        "text": "Left column",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 11,
+        "end": 23,
+        "text": "right column",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 4,
+    "text": "The Supplier shall deliver the goods.",
+    "en": "CONTROL — must not move. The vendor will hand over the items.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 37,
+        "text": "The Supplier shall deliver the goods.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 5,
+    "text": "A cell in a controlled row.",
+    "en": "CONTROL — must not move. One box inside a governed line.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 27,
+        "text": "A cell in a controlled row.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 6,
+    "text": "Rotterdam is the agreed place of delivery.",
+    "en": "The stated point of hand-over lies in the port city named.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 9,
+        "text": "Rotterdam",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 9,
+        "end": 42,
+        "text": " is the agreed place of delivery.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 7,
+    "text": "Delft and the surrounding province.",
+    "en": "A university town, together with its wider region.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 5,
+        "text": "Delft",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 5,
+        "end": 35,
+        "text": " and the surrounding province.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 8,
+    "text": "Delivery shall be made at Eindhoven before the long stop date.",
+    "en": "Hand-over occurs at the southern city ahead of the final cut-off.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 26,
+        "text": "Delivery shall be made at ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 26,
+        "end": 35,
+        "text": "Eindhoven",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 35,
+        "end": 62,
+        "text": " before the long stop date.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 9,
+    "text": "Acme Holdings shall pay the fee within thirty days.",
+    "en": "The named undertaking will settle the charge inside one month.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 13,
+        "text": "Acme Holdings",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 13,
+        "end": 51,
+        "text": " shall pay the fee within thirty days.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 10,
+    "text": "embedded phrase inside a left-to-right clause.",
+    "en": "A nested wording within an otherwise ordinary provision.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 15,
+        "text": "embedded phrase",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 15,
+        "end": 46,
+        "text": " inside a left-to-right clause.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 11,
+    "text": "overridden phrase inside the same clause.",
+    "en": "A reversed wording within the very same provision.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 17,
+        "text": "overridden phrase",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 17,
+        "end": 41,
+        "text": " inside the same clause.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 12,
+    "text": "The defined term yomikanji is set out below.",
+    "en": "The specified expression appears immediately underneath.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 17,
+        "text": "The defined term ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 17,
+        "end": 26,
+        "text": "yomikanji",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 26,
+        "end": 30,
+        "text": " is ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 30,
+        "end": 35,
+        "text": "set o",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 35,
+        "end": 53,
+        "text": "ut below.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 13,
+    "text": "an inserted phrase and an existing phrase.",
+    "en": "CONTROL — a marked addition plus wording that was already present.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 18,
+        "text": "an inserted phrase",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 18,
+        "end": 42,
+        "text": " and an existing phrase.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 14,
+    "text": "Incorporated by reference: ",
+    "en": "CONTROL — brought in by cross-reference: ",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 27,
+        "text": "Incorporated by reference: ",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 15,
+    "text": "the linked words and the unlinked words.",
+    "en": "CONTROL — the words carrying the link, and those without one.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 16,
+        "text": "the linked words",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 16,
+        "end": 40,
+        "text": " and the unlinked words.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 16,
+    "text": "The approval sequence is shown here: ",
+    "en": "The sequence for sign-off appears in the picture here: ",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 37,
+        "text": "The approval sequence is shown here: ",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 17,
+    "text": "The figures are set out in the chart below.",
+    "en": "The numbers appear in the graph shown underneath.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 43,
+        "text": "The figures are set out in the chart below.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 18,
+    "text": "This clause contains no container of any kind.",
+    "en": "CONTROL — this provision holds no wrapper whatsoever.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 46,
+        "text": "This clause contains no container of any kind.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  }
+]

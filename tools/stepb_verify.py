@@ -189,9 +189,21 @@ GROUPS = {
  # authored against the UNSTRIPPED one, so leading whitespace shifts every declared span and
  # the emphasis lands on the wrong words -- every character present, which is why it belongs
  # here and not in group 1. Found BY the F16 guard firing on correct input.
+ # A21 AND A22 added 2026-09-08 (branch 7), both for the same reason: every character is
+ # present and the PAGE is wrong.
+ #   A21  a ruby annotation is destroyed and its READING SURVIVES, glued to its base in the
+ #        paragraph's text -- so nothing is lost and the page reads `yomikanji` as flat
+ #        characters where a reading should sit above a base.
+ #   A22  a w:fldSimple's cached result is consumed into the English AND still rendered by
+ #        the field, so the clause number prints TWICE.
+ # AND A22's GROUP DELIBERATELY DIVERGES FROM A9's, WHICH IS THE SAME DEFECT IN THE OTHER
+ # FIELD FORM AND SITS IN GROUP 1. Duplication is not loss, so group 2 is the honest
+ # consequence; A9's placement is arguable and is not this branch's to move. The divergence
+ # is recorded rather than resolved by quietly following the older row -- if A9 is ever
+ # re-grouped, these two should move together.
  "2 looks wrong on the page": """
-   A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 A20 O1 D1 D2 D3 D4 D5 D6 B1 B7 F7 F13 F19 F22 C20 E9
-   E12 R1
+   A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 A20 A21 A22 O1 D1 D2 D3 D4 D5 D6 B1 B7 F7 F13 F19
+   F22 C20 E9 E12 R1
    """,
  # G10 added 2026-08-12 (branch 5). THIS LIST IS THE SOURCE and §9.1's table is generated
  # from it — a hand-edit to the document alone leaves the two disagreeing, which is exactly
@@ -225,8 +237,19 @@ OPTIONS = {
  # different paragraph shape, no boundary that translates to itself) NOR A3's remainder --
  # D02's tables, D05's hanging indent, D11's mid-phrase tabs -- whose positions cannot be
  # recovered from one unbroken English string. Those are option 3's per-run English.
+ # A21 AND A22 ADDED 2026-09-08 (branch 7, the container inventory), and NEITHER IS BRANCH
+ # 7's to fix. Both came out of the 20-shape sweep that measured the container class properly
+ # for the first time, and both are PINNED in tests/test_container_inventory.py -- the
+ # current outcome asserted, so a later branch has to change it deliberately rather than
+ # silently.
+ #   A21  a w:ruby annotation is DESTROYED, ruby/rubyBase/rt 1->0. Putting it back needs
+ #        per-run English, which is option 3's, so it is here for its CAUSE and there for
+ #        its fix -- the same double assignment A3 carries.
+ #   A22  a w:fldSimple whose cached result is consumed prints the number TWICE. It is A9's
+ #        defect in the one field form clause 3 cannot see, so it belongs to this option
+ #        beside A9.
  "1 preserve-by-default in apply": """
-   A1 A2 A3 A8 A9 A16 A19 N1 C16 C17 C19 F16 F27 D4 T1 T6
+   A1 A2 A3 A8 A9 A16 A19 N1 A21 A22 C16 C17 C19 F16 F27 D4 T1 T6
    """,
  # G10 added 2026-08-12 (branch 5) — see the note on group 3 above.
  "2 check against the original": """
@@ -241,8 +264,12 @@ OPTIONS = {
  # third side -- C20 is a span the operator forgot to declare, C13 a range nothing checks, and
  # A20 offsets that index a DIFFERENT STRING from the one apply slices. The fix is a decision
  # about which string is authoritative, which is what this option is for.
+ # A21 added 2026-09-08 (branch 7) alongside its option-1 entry, for the same reason A3 sits
+ # in both: option 1 is where the destruction happens, and option 3's per-run English is the
+ # only thing that could put a ruby annotation back. A single unbroken `en` string carries no
+ # boundary saying which characters were the reading and which the base.
  "3 say what the formatting is": """
-   A3 A4 A5 A6 A7 A10 A11 A12 A13 A14 A17 A18 A20 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3
+   A3 A4 A5 A6 A7 A10 A11 A12 A13 A14 A17 A18 A20 A21 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3
    """,
  "4 a home for document furniture": """
    E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33

@@ -1302,16 +1302,160 @@ def _insert_separators(en_text, segments, offsets):
     return en_text, out
 
 
+# =========================================================================================
+# THE CONTAINER INVENTORY — BRANCH 7, option 1's second half.
+#
+# "The reading and the writing halves must share one explicit, tested inventory, and anything
+# outside it must fail loudly rather than ship silently." Three instances were known when
+# that rule replaced a list of special cases; measured on 2026-09-08 through this very
+# script, over 20 shapes with every expectation written down first, THE CLASS IS TWELVE:
+# every one of `sdt`, `smartTag`, `customXml`, `dir` and `bdo` stranded its text, and
+# `w:ruby` was destroyed outright.
+#
+# THE INVENTORY IS "SHARED" BY BEING STATED IN BOTH SCRIPTS AND CHECKED, because the
+# 2026-08-05 decision rules out a shared library. extract_paragraphs.py carries the identical
+# tuple and tests/test_container_inventory.py asserts the two copies are equal, so a widening
+# on one side that is forgotten on the other fails a check rather than shipping.
+#
+# WHY EACH GROUP IS WHERE IT IS:
+#
+#   RECURSE   these hold runs and their text belongs to the paragraph, so the rebuild must go
+#             inside them. `w:hyperlink` was already handled (A-iii, branch 6); the other
+#             five were not, and all five failed identically.
+#   DECLINED  `w:fldSimple` holds runs too, and it is deliberately NOT rebuilt. Extraction
+#             folds its cached result into `text`, so the English carries the number AND the
+#             field renders it again -- A9's DUPLICATION in the one form clause 3 cannot see,
+#             because that clause reads the fldChar/instrText skeleton and this is a different
+#             element. Clause 3 was narrowed to the REF family on a corpus measurement and
+#             widening it here would reopen that, so this is a declared row and a pinned test,
+#             not a silent omission.
+#   TC        the tracked-change fast path claims any paragraph holding one of these
+#             (has_track_changes uses `.//`), and it was measured CLEAN on them -- it
+#             distributes the English across their w:t rather than rebuilding. An inventory
+#             that also claimed them would double-handle 220 w:ins and 108 w:del across six
+#             corpus documents.
+#   INERT     legitimate children of w:p that carry no translatable text of their own.
+#
+# THE MEASURED POPULATION, and it is why the refusal below is safe. Across all 52
+# WordprocessingML parts of 10 of the 11 corpus documents -- the eleventh is a legacy binary
+# .doc and was not opened, so this is a denominator of 10 -- the COMPLETE set of non-run
+# children of `w:p` is: pPr, ins, del, proofErr, commentRangeStart, commentRangeEnd,
+# bookmarkStart, bookmarkEnd, sdt, smartTag. Exactly three carry text: ins 188, sdt 6,
+# smartTag 1. THERE IS NO MATH ANYWHERE, which is the shape that would otherwise make the
+# refusal fire on input the operator cannot change -- m:oMath is in EG_PContent and can hold
+# runs. It is listed as INERT rather than left unknown so that a document carrying one gets a
+# named decline instead of a block.
+_CONTAINER_RECURSE = ('hyperlink', 'sdt', 'smartTag', 'customXml', 'dir', 'bdo')
+_CONTAINER_DECLINED = ('fldSimple',)
+_CONTAINER_TC = ('ins', 'del', 'moveFrom', 'moveTo')
+_PARA_CHILD_INERT = (
+    'pPr', 'r', 'bookmarkStart', 'bookmarkEnd', 'commentRangeStart', 'commentRangeEnd',
+    'proofErr', 'permStart', 'permEnd', 'subDoc', 'oMath', 'oMathPara', 'AlternateContent',
+    'customXmlInsRangeStart', 'customXmlInsRangeEnd', 'customXmlDelRangeStart',
+    'customXmlDelRangeEnd', 'customXmlMoveFromRangeStart', 'customXmlMoveFromRangeEnd',
+    'customXmlMoveToRangeStart', 'customXmlMoveToRangeEnd',
+    'moveFromRangeStart', 'moveFromRangeEnd', 'moveToRangeStart', 'moveToRangeEnd',
+    'sdtPr', 'sdtEndPr', 'smartTagPr', 'fldSimplePr', 'rPr',
+)
+_CONTAINER_KNOWN = (_CONTAINER_RECURSE + _CONTAINER_DECLINED + _CONTAINER_TC
+                    + _PARA_CHILD_INERT)
+
+
+def _local(tag):
+    """The local name of an lxml tag, namespace discarded."""
+    return tag.rsplit('}', 1)[-1] if isinstance(tag, str) else ''
+
+
+def _run_hosts(child):
+    """The element(s) inside `child` whose OWN children are runs, or () if it is not a
+    container we recurse into.
+
+    `w:sdt` is the one that is not itself the host: its runs live under `w:sdtContent`, with
+    `w:sdtPr` and `w:sdtEndPr` as siblings. Every other listed container holds its runs
+    directly. Returning a tuple rather than one element keeps the caller from having to know
+    which is which.
+    """
+    name = _local(child.tag)
+    if name not in _CONTAINER_RECURSE:
+        return ()
+    if name == 'sdt':
+        return tuple(g for g in child if _local(g.tag) == 'sdtContent')
+    return (child,)
+
+
+def _holds_text_bearing_run(el):
+    """True if `el` contains a w:r carrying text. Recursive: nesting is legal."""
+    for r in el.iter(f'{W}r'):
+        if _run_is_text_bearing(r):
+            return True
+    return False
+
+
+def _refuse_unlisted_containers(orig_p, idx):
+    """FAIL LOUDLY on a container nothing has listed, and ONLY where text would be stranded.
+
+    Option 1's rule in as many words: anything outside the inventory must fail loudly rather
+    than ship silently. The scope is the whole point, and CLAUDE.md 5.9 is why -- a gate can
+    be right in mechanism and wrong in scope, and the test is whether a COMPLIANT WAY OUT
+    exists. The source is the client's own document, so the operator cannot delete an element
+    to satisfy a checker. Therefore:
+
+      * an unlisted element carrying NO text-bearing run is left alone. There is nothing to
+        strand, and refusing would be refusing correct input -- which is exactly what branch
+        6's first offset guard did before its scope was fixed.
+      * an unlisted element that DOES carry text gets a block, because the alternative is the
+        failure this branch exists to end: source-language text on a delivered page, past
+        every gate. The sanctioned exit is branch 4's exception channel, and the message says
+        so rather than leaving the operator to improvise.
+    """
+    unlisted = []
+    for child in orig_p:
+        if _local(child.tag) in _CONTAINER_KNOWN:
+            continue
+        if _holds_text_bearing_run(child):
+            unlisted.append(_local(child.tag))
+    if not unlisted:
+        return
+    names = ', '.join(f'<w:{n}>' for n in sorted(set(unlisted)))
+    raise RuntimeError(
+        "SKILL GATE FIRED - INTENTIONAL BLOCK, NOT A SCRIPT ERROR.\n"
+        f"  Paragraph idx {idx} holds {names}, which is not in the container inventory,\n"
+        "  and it carries text. Putting the English back rebuilds only the runs this script\n"
+        "  knows how to reach, so that text would stay in the SOURCE LANGUAGE on the\n"
+        "  delivered page - and every existing gate would report the document clean,\n"
+        "  because the text is present in the package and merely unreachable.\n"
+        "\n"
+        "  This is finding A16/N1's class. Three text-bearing containers were known when the\n"
+        "  rule 'stop listing containers' was written; the measured class is twelve.\n"
+        "\n"
+        "  DO NOT work around this by deleting the element from the source: the source is the\n"
+        "  client's document and it is evidence.\n"
+        "\n"
+        "  FIX: add the element to _CONTAINER_RECURSE in this script AND to the identical\n"
+        "  tuple in extract_paragraphs.py, with a synthetic fixture that reproduces the\n"
+        "  stranding first - or, if it must ship now, use the sanctioned exception channel\n"
+        "  (rule 5a/5b) and disclose the untranslated span in the delivery notes.")
+
+
 def _text_span(container):
-    """(first, last) child index of this container's text-bearing runs, or (None, None).
+    """(first, last) child index of this container's text-bearing children, or (None, None).
 
     All of a container's text collapses into ONE rebuilt block at the first of these, so these
     two indices are what decide whether a positional child can still be put on the correct
     side of the text.
+
+    BRANCH 7 WIDENED THIS FROM `w:r` TO "a run OR a listed container holding a run", and the
+    reason is clause 2's limit rather than the remnant. A tab sitting before an inline content
+    control used to count as being before the paragraph's first text, because the control's
+    text was invisible here -- so the tab was kept at a position the collapsed English no
+    longer justifies. The span has to see all the text the rebuild is about to move.
     """
     first = last = None
     for i, child in enumerate(container):
-        if child.tag == f'{W}r' and _run_is_text_bearing(child):
+        texty = (child.tag == f'{W}r' and _run_is_text_bearing(child))
+        if not texty and _run_hosts(child):
+            texty = _holds_text_bearing_run(child)
+        if texty:
             if first is None:
                 first = i
             last = i
@@ -1859,17 +2003,32 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
 
         def _first_text_container(container):
             """The container holding the paragraph's FIRST text-bearing run, in
-            document order — which may be a `w:hyperlink`, in which case the
-            English belongs INSIDE it so the link still covers the translated
-            words rather than becoming an empty wrapper beside them."""
+            document order — which may be a `w:hyperlink` or any other listed
+            container, in which case the English belongs INSIDE it so the link
+            still covers the translated words, or the control still holds its
+            own content, rather than becoming an empty wrapper beside them.
+
+            BRANCH 7: THIS IS THE SECOND CONSEQUENCE OF THE CONTAINER GAP, AND
+            IT IS NOT THE REMNANT. Until now this looked at direct-child `w:r`
+            and at `w:hyperlink` alone, so text inside any other container was
+            invisible here — and where the container held the paragraph's FIRST
+            text, the English was placed AFTER it. The delivered paragraph's
+            reading order was wrong before anything was deleted. Measured on 6
+            of the 20 swept shapes.
+            """
             for child in container:
                 if child.tag == f'{W}r' and _run_is_text_bearing(child):
                     return container
-                if child.tag == f'{W}hyperlink':
-                    found = _first_text_container(child)
+                for host in _run_hosts(child):
+                    found = _first_text_container(host)
                     if found is not None:
                         return found
             return None
+
+        # FAIL LOUDLY BEFORE ANYTHING IS TOUCHED, never half-way through a rebuild. A refusal
+        # raised mid-edit leaves the paragraph partly rebuilt in a tree the caller then
+        # writes out on the next paragraph's success.
+        _refuse_unlisted_containers(orig_p, idx)
 
         target = _first_text_container(orig_p)
         nested = []
@@ -1967,11 +2126,54 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                         kept.append(child)
                     # else: an empty run or a plain <w:br/> line break — dropped,
                     # exactly as before. The break is recreated from \n in en.
-                elif tag == f'{W}hyperlink':
-                    # A-iii: THE WRAPPER IS NEVER DELETED. Rebuild inside it.
-                    inner_slot = _rebuild_container(child)
-                    if inner_slot is not None:
-                        nested.append((child, inner_slot))
+                elif _run_hosts(child):
+                    # A-iii FOR w:hyperlink, AND A16/N1 FOR THE OTHER FIVE: THE WRAPPER IS
+                    # NEVER DELETED WHILE IT STILL HOLDS ANYTHING. Rebuild inside it, so its
+                    # source text is removed with the rest of the paragraph's rather than
+                    # surviving beside the English.
+                    #
+                    # NESTING IS LEGAL AND HAPPENS: a smart tag inside a smart tag, or a
+                    # control inside a hyperlink. `_run_hosts` returns the host to descend
+                    # into, so the recursion terminates on the tree rather than assuming one
+                    # level.
+                    # WHETHER THE ENGLISH IS COMING HERE IS ASKED OF `target`, NOT OF THE
+                    # RETURN VALUE, AND NESTING IS WHY. `_rebuild_container` returns a slot
+                    # only for the container that IS the target, so on a smart tag inside a
+                    # smart tag the outer one learned nothing and was dropped — taking the
+                    # inner target with it, and the English was inserted into an element no
+                    # longer in the tree. Found by the nested shape, which exists in the
+                    # fixture precisely because the schema allows it.
+                    holds_english = target is not None and (
+                        target is child or any(x is target for x in child.iter()))
+                    for host in _run_hosts(child):
+                        inner_slot = _rebuild_container(host)
+                        if inner_slot is not None:
+                            nested.append((host, inner_slot))
+                    # WOUTER'S DECISION, 2026-09-08: KEEP AN EMPTIED w:sdt, DROP AN EMPTIED
+                    # ANNOTATION. A content control RENDERS -- it may be locked, data-bound,
+                    # a date picker or a checkbox -- so removing it is a structural edit to
+                    # the client's document, which A16's own row records as unsanctioned.
+                    # A smart tag, a customXml element, a w:dir or a w:bdo is a pure
+                    # annotation over text that no longer exists, so once empty it is
+                    # provably redundant, which is clause 3's own test and the only warrant
+                    # this branch has to delete anything.
+                    #
+                    # AND `holds_english` IS THE HALF THE FIRST VERSION LEFT OUT, CAUGHT BY
+                    # THE hyperlink CONTROL RATHER THAN BY READING. The English is inserted
+                    # AFTER the whole rebuild returns, so at this moment the container that
+                    # is about to RECEIVE it looks exactly like one that has been emptied and
+                    # abandoned -- and dropping it left the English being inserted into an
+                    # element no longer in the tree, so nothing reached the page at all. Six
+                    # shapes went SKIPPED, `w:hyperlink` among them, which had worked since
+                    # branch 6. A control that only ever passes is not a control.
+                    # EMPTY MEANS "no run and no paragraph left inside it", which is the
+                    # thing that decides whether Word has anything to render. An annotation
+                    # still holding a preserved tab-only run is NOT empty and is kept.
+                    now_empty = (not any(True for _ in child.iter(f'{W}r'))
+                                 and not any(True for _ in child.iter(f'{W}p')))
+                    if (not holds_english and now_empty
+                            and _local(child.tag) != 'sdt'):
+                        continue
                     kept.append(child)
                 else:
                     # pPr, bookmarkStart/End, commentRangeStart/End, proofErr and
