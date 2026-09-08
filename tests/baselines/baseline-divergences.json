@@ -3,7 +3,7 @@
   "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
   "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
   "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
-  "count": 28,
+  "count": 30,
   "divergences": {
     "uk/SKILL.md": {
       "changed_by": "feature/checks-can-fail",
@@ -11,9 +11,14 @@
       "sha256_now": "9fe078ab330124682f5f4d098d7f9c34219e3570bbde5b6a55e7afca1c0bbd4a"
     },
     "uk/scripts/apply_translations_textmatch.py": {
-      "changed_by": "4a1c452",
-      "commit_subject": "Branch 6 - stop deleting what you do not recognise: the three clauses. Rebuild only text; preserve every non-text run child in its original relative position; delete only what can be proved redundant. Closes A1 (footnote anchors), A2 (comment anchors), A8 (hyperlink wrappers) and the destruction half of A3/A6 (tab characters). Restored to the SOURCE count on every measured document: D02 comments 14->28, D05 footnote 0->1, D06 hyperlinks 1->34 and tabs 10->80, D08 comments 12->13, D09 footnote 0->2.",
-      "sha256_now": "f6a3739aa4304ecb40042d9abcaf6cd6d4d5ea115f3ae797e68040c1a7765547"
+      "changed_by": "544f908",
+      "commit_subject": "Branch 7 slice 1 — the container class is twelve, not three, and the fixture built from the row titles carried the shape the row calls correct (#65)",
+      "sha256_now": "1b9a3e7afe7cc01933b42740cd1717829a593b4b9bf8307173fe0a0a16ce0cb4"
+    },
+    "uk/scripts/extract_paragraphs.py": {
+      "changed_by": "544f908",
+      "commit_subject": "Branch 7 slice 1 — the container class is twelve, not three, and the fixture built from the row titles carried the shape the row calls correct (#65)",
+      "sha256_now": "0361484a5445883d7064320067d2aac8fda6b1a0efd69a85fd79b0e2041ea787"
     },
     "uk/scripts/post_process.py": {
       "changed_by": "feature/checks-can-fail",
@@ -30,10 +35,20 @@
       "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
       "sha256_now": "1d024f5bca314332bf47b09462f7b1e712d1a4c20e110f7a05c86b2cc3e43dbb"
     },
+    "uk/scripts/translate_headers_footers.py": {
+      "changed_by": "feature/check-scoping-quality-check",
+      "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
+      "sha256_now": "e82513a21d09a7269fc09adafed2012f1df3ff8834e13285ea72ba1b3d9392ba"
+    },
     "uk/scripts/validate_apply.py": {
-      "changed_by": "bca3881",
-      "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
-      "sha256_now": "654c6a8c1c31b846256b9dc380f18828d6519309944dfdb8a5cd641e1fc24550"
+      "changed_by": "049484e",
+      "commit_subject": "Branch 6 slice 2 — a table of contents can be repaired, and the gate that would have refused to deliver it (#59)",
+      "sha256_now": "746b7c60eb835f5ecb384ccda38ed21faca927d2544832cd2716c8053b408de1"
+    },
+    "uk/scripts/validate_segment_shapes.py": {
+      "changed_by": "feature/check-scoping-quality-check",
+      "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
+      "sha256_now": "d36afd7da2d703dde74202bcc293335fe31d0317d2ab4aca2d19f4fd787597e2"
     },
     "uk/scripts/verify_diligence.py": {
       "changed_by": "feature/checks-can-fail",
@@ -41,9 +56,9 @@
       "sha256_now": "b5bbddac8c4c6d83a04157cefe756bb6309356987ff48756893bab981af79175"
     },
     "uk/skill-docs/04b-translate-gates.md": {
-      "changed_by": "feature/exception-channel",
-      "commit_subject": "Branch 4 - the exception channel: the sanctioned way out when a check is right and no compliant repair exists, and the five-attempt bound on every repair loop (register rows F41 and the eighteen-row deadlock set)",
-      "sha256_now": "722a05dd220cbf84f4c058a71d1bf0fa00f6f2f3e052728042546a92f7657eba"
+      "changed_by": "d3c7f19",
+      "commit_subject": "Branch 6 slice 4 — a space is not an empty string, and two of the three rows did not mean what their titles said (#62)",
+      "sha256_now": "4f301418363b6d592da21fdcb4b5d482f8c2ef6834bc2b6bdeabb2c7abbc3bf0"
     },
     "uk/skill-docs/05-apply.md": {
       "changed_by": "feature/scope-rule",
@@ -71,9 +86,14 @@
       "sha256_now": "b6b8b7fa11665f7bc720db1892e3e33362e86db52f0b241aabb9362725547ed1"
     },
     "us/scripts/apply_translations_textmatch.py": {
-      "changed_by": "4a1c452",
-      "commit_subject": "Branch 6 - stop deleting what you do not recognise: the three clauses. Rebuild only text; preserve every non-text run child in its original relative position; delete only what can be proved redundant. Closes A1 (footnote anchors), A2 (comment anchors), A8 (hyperlink wrappers) and the destruction half of A3/A6 (tab characters). Restored to the SOURCE count on every measured document: D02 comments 14->28, D05 footnote 0->1, D06 hyperlinks 1->34 and tabs 10->80, D08 comments 12->13, D09 footnote 0->2.",
-      "sha256_now": "46341b5cc93538f435080c5b17f1b47d2faa68306aad5d9a38253e0fa81cbeae"
+      "changed_by": "544f908",
+      "commit_subject": "Branch 7 slice 1 — the container class is twelve, not three, and the fixture built from the row titles carried the shape the row calls correct (#65)",
+      "sha256_now": "43d93bd3fe021f2b05af92c4b690f69e3206e8ddfe783f9ebd9492a9f91eaf40"
+    },
+    "us/scripts/extract_paragraphs.py": {
+      "changed_by": "544f908",
+      "commit_subject": "Branch 7 slice 1 — the container class is twelve, not three, and the fixture built from the row titles carried the shape the row calls correct (#65)",
+      "sha256_now": "32bda407a5d27f51829f0adada261ceb1da93289e0546dc09b83f5185408289c"
     },
     "us/scripts/post_process.py": {
       "changed_by": "feature/checks-can-fail",
@@ -90,10 +110,20 @@
       "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
       "sha256_now": "1d024f5bca314332bf47b09462f7b1e712d1a4c20e110f7a05c86b2cc3e43dbb"
     },
+    "us/scripts/translate_headers_footers.py": {
+      "changed_by": "feature/check-scoping-quality-check",
+      "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
+      "sha256_now": "7dc907d06d5d9eed95038d9cc7ce20eccfedb4d034ee7c7e25b11a8eb48810c9"
+    },
     "us/scripts/validate_apply.py": {
-      "changed_by": "bca3881",
-      "commit_subject": "Confidentiality: replace real-document material in both published trees (#4)",
-      "sha256_now": "e403a619ed2e3e3345debff13baae03eced9cf60a5fac563abb9124cc0defbbf"
+      "changed_by": "049484e",
+      "commit_subject": "Branch 6 slice 2 — a table of contents can be repaired, and the gate that would have refused to deliver it (#59)",
+      "sha256_now": "c82048537b187e46859695901c806c234849ba753ffd6978d67b91a4da09b5ec"
+    },
+    "us/scripts/validate_segment_shapes.py": {
+      "changed_by": "feature/check-scoping-quality-check",
+      "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
+      "sha256_now": "14167da617e929d80bbe294a51ebd4673379662e258c45d61edf6d470104a770"
     },
     "us/scripts/verify_diligence.py": {
       "changed_by": "feature/checks-can-fail",
@@ -101,9 +131,9 @@
       "sha256_now": "1ef1eb2ced2bc24ee1aa8932c3e510a0d05335a9493d322d0ea8904344e4eec7"
     },
     "us/skill-docs/04b-translate-gates.md": {
-      "changed_by": "feature/exception-channel",
-      "commit_subject": "Branch 4 - the exception channel: the sanctioned way out when a check is right and no compliant repair exists, and the five-attempt bound on every repair loop (register rows F41 and the eighteen-row deadlock set)",
-      "sha256_now": "c9c16f5af9a9037a49b3df35233cae7e402a0e848e5e77d6017e257bc56974a8"
+      "changed_by": "d3c7f19",
+      "commit_subject": "Branch 6 slice 4 — a space is not an empty string, and two of the three rows did not mean what their titles said (#62)",
+      "sha256_now": "f5d34644df58de0c1ab0c3ea87dd33368abb3aa2f0405ab79aaa953399c33aba"
     },
     "us/skill-docs/05-apply.md": {
       "changed_by": "feature/scope-rule",
@@ -124,26 +154,6 @@
       "changed_by": "feature/checks-can-fail",
       "commit_subject": "Branch 5 - checks can fail: the mandatory quality check gets an exit code, a corrupt deliverable stops the run and is written to a temporary name first, omitting --paragraphs refuses instead of warning, a validator's exit 3 blocks unconditionally, the truncation guard moves above __main__, and WARN stops being indistinguishable from PASS (register rows C3 C23 C25 W3 W4 L4)",
       "sha256_now": "092d0e4cd5368fba056b8679f25e243efaa2189b60e4250c8b46094c5b90f29a"
-    },
-    "uk/scripts/validate_segment_shapes.py": {
-      "changed_by": "feature/check-scoping-quality-check",
-      "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-      "sha256_now": "d36afd7da2d703dde74202bcc293335fe31d0317d2ab4aca2d19f4fd787597e2"
-    },
-    "uk/scripts/translate_headers_footers.py": {
-      "changed_by": "feature/check-scoping-quality-check",
-      "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-      "sha256_now": "e82513a21d09a7269fc09adafed2012f1df3ff8834e13285ea72ba1b3d9392ba"
-    },
-    "us/scripts/validate_segment_shapes.py": {
-      "changed_by": "feature/check-scoping-quality-check",
-      "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-      "sha256_now": "14167da617e929d80bbe294a51ebd4673379662e258c45d61edf6d470104a770"
-    },
-    "us/scripts/translate_headers_footers.py": {
-      "changed_by": "feature/check-scoping-quality-check",
-      "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-      "sha256_now": "7dc907d06d5d9eed95038d9cc7ce20eccfedb4d034ee7c7e25b11a8eb48810c9"
     }
   }
 }

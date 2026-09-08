@@ -62,23 +62,23 @@ SCRIPT = "apply_translations_textmatch.py"
 # once read its "before" from HEAD, which worked only while the change was uncommitted and then
 # compared the new file against itself and reported 100% carried.
 #
-# MOVED TO d3c7f19 2026-09-02, the squash-merge of branch 6 slice 4 (PR #62) and the LAST
-# COMMIT THAT TOUCHED EITHER TREE -- verified by `git log --oneline -1 -- uk us` returning it
-# and by `git diff d3c7f19 -- uk us` coming back empty, not by reading the merge message. A pin
-# left at the previous baseline would report the merged slice's own work as movement belonging
-# to whatever branch ran next, which is the failure this pin exists to prevent.
+# MOVED TO 544f908 ON 2026-09-08, the squash-merge of branch 7 slice 1 (PR #65) and the LAST
+# COMMIT THAT TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE:
+# `git log --oneline -1 -- uk us` returns it, and `git diff 544f908 -- uk us` comes back
+# empty. A pin left at the previous baseline reports the merged slice's own work as movement
+# belonging to whatever branch runs next, and the branch that inherits it cannot tell.
 #
-# IT HAS NOW MOVED FOUR TIMES IN THREE DAYS -- 4a1c452, 049484e, 2a71e71, here -- and that
-# cadence IS the argument for the rule: moving it is the FIRST act after a merge, never a
-# closing tidy-up.
+# IT HAS NOW MOVED FIVE TIMES IN FOUR DAYS -- 4a1c452, 049484e, 2a71e71, d3c7f19, here -- and
+# that cadence IS the argument for the rule rather than a complaint about it: moving it is the
+# FIRST act after a merge, never a closing tidy-up.
 #
-# AND THE PROSE ABOVE THE PIN GOES STALE TOO, WHICH IS WHY IT IS REWRITTEN RATHER THAN APPENDED
-# TO. This has now happened twice and been caught twice. The first time it still named 79a8c14
-# as "the merge-base of this branch". The second time -- found on this very commit -- the same
-# comment block in tools/render_diff.py read "Moved to 049484e" while its pin one line below
-# said 2a71e71, so the two disagreed with each other inside five lines. NOTHING CHECKS A
+# AND THE PROSE ABOVE THE PIN GOES STALE AS READILY AS THE PIN, WHICH IS WHY THIS BLOCK IS
+# REWRITTEN EACH TIME RATHER THAN APPENDED TO. It has gone stale twice and been caught twice:
+# once still naming 79a8c14 as "the merge-base of this branch", and once with the same block
+# in tools/render_diff.py reading "Moved to 049484e" while its pin one line below said
+# 2a71e71 -- two claims disagreeing inside five lines, both true once. NOTHING CHECKS A
 # COMMENT. Re-derive both claims on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "d3c7f19")
+REF = os.environ.get("LT_BASELINE_REF", "544f908")
 
 # WHICH DIRECTIONAL CHECK BELONGS TO WHICH MERGED FIX — added 2026-09-08, on a measured false
 # alarm that would have recurred for ever.
@@ -99,6 +99,12 @@ REF = os.environ.get("LT_BASELINE_REF", "d3c7f19")
 # which is the right way round.
 FIX_LANDED = {
     "C17": "d3c7f19",      # branch 6 slice 4
+    # A16/N1 added the moment slice 1 merged, 2026-09-08, and adding it HERE is the whole
+    # point of the table: the container arm's "the fix did not fire" check is now in the
+    # baseline exactly as C17's was, so leaving this row out would make it the next
+    # guaranteed false defect -- register I-24, for the second time, on the branch that
+    # filed it.
+    "CONTAINER": "544f908",   # branch 7 slice 1
 }
 
 
@@ -697,7 +703,8 @@ for wd in wds:
         # all-quiet result proves nothing and then reported 2 MOVEMENTS NO REGISTER ROW
         # PREDICTS, from the C17 arm below, for exactly that reason. A harness that reports
         # two defects whenever it is asked to prove it reports none is not usable as evidence.
-        if cont_pred and cs_new >= cs_old and not SAME:
+        if (cont_pred and cs_new >= cs_old and not SAME
+                and not fix_in_baseline("CONTAINER")):
             unexplained.append(
                 f"{label}/CONTAINER: the source carries {len(cont_pred)} text-carrying "
                 f"inline container(s) at idx {cont_pred[:8]} and the stranded fragment count "
