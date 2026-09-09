@@ -1,4 +1,71 @@
 {
+  "tests": {
+    "suites": [
+      {
+        "name": "the project's own suite",
+        "command": "uv run python tests/run_tests.py"
+      }
+    ],
+    "selftest_globs": ["tools/*.py"],
+    "entry_points": [
+      {"command": "uv run python tools/verify_md.py CLAUDE.md"},
+      {"command": "uv run python tools/verify_code.py"},
+      {"command": "uv run python tools/check_checkers.py"},
+      {"command": "uv run python tools/verify_expected.py"},
+      {"command": "uv run python tools/verify_charter_continuity.py"},
+      {"command": "uv run python tools/xdoc_signs.py"},
+      {"command": "uv run python tools/cycle_evidence.py status"}
+    ],
+    "entry_points_exempt": {
+      "run_tests.py": "this IS the runner - an entry point invoking it would recurse. STRUCTURAL AND PERMANENT: no flag could change it.",
+      "house_common.py": "a shared library. Its __main__ IS its selftest, so there is no second entry point to exercise. STRUCTURAL AND PERMANENT.",
+      "verify_confidential.py": "its real entry point needs VERIFY_FORBIDDEN_LIST pointing at a file that lives OUTSIDE this repository and may never enter it - the scanner ships, the list never does. Run bare it exits 2, CANNOT CERTIFY, which is correct behaviour and not a start failure, but it makes this arm assert nothing. It is run deliberately, with the environment variable set, at the sessions that need a confidentiality verdict.",
+      "verify_deliverable.py": "there is no packaged artefact in the tree to point it at. tools/package.py and tools/publish.py DO NOT EXIST - checked by listing - and building them is step 4's work, not step 2's. It exits 2 when it cannot run, and a VOID run asserts nothing about starting. TRIGGER THAT ENDS THIS EXEMPTION: the first .skill archive built by a committed script.",
+      "trace_instructions.py": "it runs as an InstructionsLoaded HOOK and reads its own log back, so its real entry point is a session start rather than a command. Invoking it here would either report on a log this run did not produce or write one, and its log is gitignored because it carries absolute paths."
+    },
+    "timeout_seconds": 900,
+    "stop_on_first_failure": false
+  },
+  "_comments_tests": {
+    "entry_points": "SEVEN REAL ENTRY POINTS, ADDED 2026-09-09 BECAUSE THE RUNNER RAISED A JUDGE SAYING THERE WERE NONE: '12 suite(s) run, 0 entry point(s) exercised - all 12 are --selftest only, and a --selftest is not the tool.' A selftest proves a checker's own logic; it does not prove the checker STARTS against this project's real tree and config. FINDINGS ARE IGNORED ON THIS ARM - only a failure to start fails - which is why verify_md and verify_code belong here despite both being red by design.",
+    "entry_points_exempt": "FIVE, each with the reason the runner itself refuses to accept blank. Two are STRUCTURAL AND PERMANENT (the runner cannot invoke itself; a shared library has no second entry point). Three are conditional and carry a trigger or the condition that would change them. Counted by LISTING: 7 exercised plus 5 exempt is the 12 the selftest globs discover.",
+    "suites": "The project's own suite is named here so ONE command runs everything - it was previously invisible to the installed runner, which discovered only tools/*.py selftests. The two are still reported separately in the campaign record, because they test different things and only one of them can fail because of the propagation."
+  },
+  "expected": {
+    "runs": [
+      {
+        "name": "charter",
+        "command": ["uv", "run", "python", "tools/verify_md.py", "--report-json", "CLAUDE.md"],
+        "tolerated": {
+          "verify_md.py::CLAUDE.md::file length": "BY DESIGN while section 1.7's over-cap exemption stands. The charter is 1233 lines against a cap of 500, and section 1.7 declares that in three parts - the number from the checker, the reason, and a TRIGGER stated as an event rather than a date. NEVER silence it by setting the cap to 0, which reports 'exempt' and measures nothing. THIS ROW IS EXPECTED TO BE RETIRED, not to stand. ITS TRIGGER IS SUB-STEP 12 OF PLAN-5-propagation.md, THE CHARTER REDUCTION - and the trigger recorded here until 2026-09-09 (6) was WRONG on measurement: it named 'relocating section 5's dated evidence', and only 30 of that section's 548 lines carry a date at all. Daily Digest measured the same hypothesis at 13 of 197 and discarded it. The reduction comes from DESTINATIONS rather than from stripping narrative - CLAUDE-TEMPLATE.md carries a per-subsection TIER TABLE, a per-block destination notation (22 blocks marked route 0, 7 marked .claude/rules/), an ARCHETYPE DEFAULTS table and Round 0.5's procedure, and MEASURED, no charter in this house carries a single one of those markers and only new_charter.py reads them. The cap stays 500, uniform, no project-specific exception (Wouter)."
+        }
+      },
+      {
+        "name": "code",
+        "command": ["uv", "run", "python", "tools/verify_code.py", "--report-json"],
+        "tolerated": {
+          "verify_code.py::::commit author identity": "PRE-EXISTING AND DEFERRED BY WOUTER, 2026-09-09, with the full scope in front of him and both alternatives declined by name. Read the figure from the checker and never from a handoff. The remedy is a history rewrite - irreversible, re-SHAing every commit across every ref, breaking branch 7's comparison pins and the commit references inside tests/baselines/ - and the house gate 'rewrite BEFORE a repository goes public, never after' CANNOT BE MET HERE AT ALL, the remote having been public since 2026-08-07. TRIGGER: the next force-push-class history operation on this repository, whatever prompts it, the identities riding in that one pass rather than earning one of their own. Section 3 of CLAUDE.md carries the decision and DECISIONS-LOG.md 2026-09-09 the reasoning.",
+          "verify_code.py::::gitignore covers": "PRE-EXISTING, MEASURED IDENTICAL AT HEAD AND IN THE WORKING TREE, and NOT scoped by anyone. It was one of the four standing reds captured in the propagation baseline at 038a153, so it is a fact recorded rather than inherited. IT IS TOLERATED HERE TO MAKE IT VISIBLE, NOT TO EXCUSE IT: an undeclared red is one a session learns to scroll past, and a declared one that stops failing is reported as DECL-STALE. TRIGGER: the first session that scopes it.",
+          "verify_code.py::::negative tests exist": "PRE-EXISTING, and the same shape as the row above - captured in the 038a153 baseline, measured identical at HEAD and in the working tree, nobody has scoped it. Note that this project does have negative tests and takes them seriously: section 5.4 makes a mandatory negative input part of the test method, and two of them once passed while failing to make their own violation. What the checker looks for is its own convention, which this project's suite does not follow. TRIGGER: the first session that either adopts the convention or forks the check with a reason."
+        }
+      }
+    ]
+  },
+  "_comments_expected": {
+    "runs": "TWO RUNS, NOT FOUR, AND THE GAP IS THE POINT. This project has FOUR standing reds - verify_md's 'file length', verify_code's three rows, stepb_audit's check 10, and claudemd_disposal's 37-carried-nowhere. ONLY TWO CAN BE DECLARED HERE, because verify_expected reads ROWS and not prose, so a command must carry --report-json, and stepb_audit.py and claudemd_disposal.py are this project's OWN tools and have no such flag. Recorded as a declared limit rather than left as an unexplained absence: a reader comparing 'four standing reds' against two runs here would otherwise conclude something had been forgotten. TRIGGER THAT CLOSES IT: --report-json added to either project tool, at which point its red belongs here too. WHAT THIS BUYS THAT PROSE DID NOT: the second arm, 'every declaration still fails'. A toleration that stops being needed is reported as DECL-STALE, so an exemption cannot quietly outlive the defect it was written for - which is exactly what happened to the 350-line cap, retired and still sitting in this file for days."
+  },
+  "checkers": {
+    "declared_absent": {
+      "verify_refs.py": "ITS NEEDLE DOES NOT FIT THIS CORPUS, AND THAT WAS MEASURED THREE WAYS RATHER THAN ASSUMED. It treats any quoted string of three or more words as a citation that must resolve to a heading. This project is 308 sub-lexicon and reference files whose CONTENT IS QUOTED TERMINOLOGY - run over the full 365-document universe, 14 of its 22 failure lines are lexicon terms and prose fragments ('long lease / ground lease / emphyteusis', 'imputato', a table row), false by construction. AND THE GENUINELY UNRESOLVABLE ONES ARE UNRESOLVABLE BY DESIGN: FINDINGS-REGISTER.md quotes headings from the blind desk review's 2,222-line report, which section 5.6 keeps PERMANENTLY OUTSIDE the repository, so a checker whose universe is the repository can never resolve them and no wider file list will help. Narrowing the universe does not rescue it either: run over the 27 root-and-step documents it reports 9 failures, of which two resolve correctly into references/ that the narrower universe excluded - so both scopes are wrong in opposite directions. TRIGGER THAT ENDS THIS DECLARATION: the day a committed document cites another committed document by quoting its heading title as a CONVENTION rather than incidentally, at which point there is a population to resolve and this row starts being wrong.",
+      "verify_crossdoc.py": "RUN, AND IT REPORTED 'VOID: nothing was declared for this project' AT 0 EXAMINED on all three arms - and here that is STRUCTURAL rather than an omission. This charter's own section 5.8 rule 4 forbids restating what another document owns and requires every document to have undivided ownership of its facts, so a mirrored claim is designed out rather than merely absent. The one genuine two-document claim class is UK/US VARIANT PARITY, and it is already covered whole-tree by tools/parity_check.py, which compares all 198 files per tree line by line - strictly stronger than one declared string, and of two controls doing one job the house removes the weaker. TRIGGER THAT ENDS THIS DECLARATION: the claims pass of step 2, which fixes the published feature list that section 2.1 says lives in README.md and in BOTH SKILL.md files - 'a feature claim changes in three places or in none' is a mirrored claim in the checker's exact sense, and it is planned work rather than a hypothetical.",
+      "auto_mode.py": "THIS PROJECT RUNS NO UNATTENDED CHAIN, and its charter says so in terms: section 3.2 requires every branch to get explore and plan with Wouter, a pull request, a presented review and his approval before merge, and states that AUTONOMY NEVER MEANS SELF-MERGING. Note the thing that makes this reason worth writing out rather than leaving as 'not needed': the project's own SUBJECT is an autonomous translation run - eleven documents translated and graded without mid-run questions - and that is a run of the DELIVERABLE, an entirely different thing from an unattended CODING session. Confusing the two is the mistake this sentence exists to prevent.",
+      "auto_mode_guard.py": "THE GUARD IMPORTS THE COUNTER, so it cannot start without auto_mode.py - the two are declared as a PAIR, because one without the other is a hook that exits 2, and exit 2 is the hook contract's REFUSE code, which would block every tool call in the session. AND THERE IS A SECOND REASON SPECIFIC TO THIS REPOSITORY: a PreToolUse hook is already live here - tools/hooks/evidence_guard.py, which blocks a name-emitting command aimed at an evidence folder - and it is a confidentiality control whose failure is unrecoverable. Adding a second guard to that chain is a change to a live control, not an installation."
+    }
+  },
+  "_comments_checkers": {
+    "declared_absent": "FOUR OF THE THIRTEEN TRACKED SCRIPTS. The other NINE are installed in tools/ - seven upgraded and two newly added, counted by LISTING them rather than by subtracting. EVERY REASON HERE IS CITED TO A RUN OF THE INSTRUMENT INSIDE THIS PROJECT, never to the blueprint's 'why' column, which has twice recommended declaring a checker that then found real things. WHY A REASON IS REQUIRED AT ALL: check_checkers.py v13+ REFUSES a blank one and the file stays MISSING, because an empty entry is not a quieter declaration - it is a decision nobody made, and afterwards it reads exactly like one somebody took. AND IT IS CHECKED IN BOTH DIRECTIONS: a declaration for a file this project turns out to HAVE fails as DECL-STALE, so this list cannot quietly outlive its facts. THE TWO NEW INSTALLS ARE THE ARGUMENT FOR RUNNING BEFORE DECLARING: verify_confidential.py is the instrument that found 22 dirty commit messages no record in this project or the campaign carried, a population no content scan can reach; and verify_expected.py turns four standing reds carried in prose into a checked artefact.",
+    "gitattributes": "DECLARED ALREADY SATISFIED, WITH THE FILE AS THE EVIDENCE rather than the blueprint's why column. The propagation blueprint asks for a .gitattributes carrying '* -text' to be installed in the same step as the checker copy. This repository already has one, with a stronger rationale than the house rule's: it declares '* -text' plus explicit rules for both variant trees and the fixtures, and its own comment records that Git for Windows shipped core.autocrlf=true when this repository was created. A declaration written before the thing has been looked at is a guess; this one was read first."
+  },
   "md": {
     "files": [
       "CLAUDE.md"
@@ -27,6 +94,12 @@
       "CLAUDE.md": 500
     },
     "section_caps": {
+      "1": 127,
+      "2": 153,
+      "3": 162,
+      "4": 37,
+      "5": 548,
+      "6": 166,
       "7": 35
     },
     "report_section_sizes": true,
@@ -38,7 +111,7 @@
   "_comments_md": {
     "why_this_file_exists": "Until 2026-08-24 this repository had NO verify.config.json at all, so 'file length' and 'section length' both reported N/A and every reduction was being made toward a number nothing measured. Written at sub-step 1.0 of phase 3a, with the class confirmed by Wouter.",
     "max_lines": "CLAUDE.md is size class L, and the cap is 500 - RAISED FROM 350 ON 2026-09-09 (4) BY WOUTER, because 350 is the RETIRED number and 500 is the live gate. The class no longer carries a line cap at all: it decides which relocation ROUTES exist, and 500 is the same for M and L. WHY 500 RATHER THAN A NUMBER THIS FILE COULD MEET: measured across all 22 archetype-and-class emits, 200 was met by 0 charters and 350 by 6, while 500 is met by 20 - and a cap nothing can meet is declared-exempt every time, which makes it not a control. THIS CHARTER STILL FAILS THE ROW, and that is DECLARED in section 1.7 with a reason and a trigger rather than silenced - deliberately WITHOUT restating the figure here, because this comment carried '1,191 against 500' for a day after the charter itself had moved on, and two statements of one measurement means one of them is stale. Section 1.7 is the only place the number is written, and tools/verify_charter_continuity.py compares it against the measurement on every run. It is a MAP rather than one number so that a later step can give another document its own declared cap without changing this one. A file matching no glob reports N/A, which is honest: a README and an evidence document have no size class. AND THE NUMBER IS STATED IN THREE PLACES, WHICH IS A DEFECT THIS CHANGE HAD TO PAY FOR: here, in section 1.7's prose, and as DECLARED_CAP in tools/verify_charter_continuity.py. Only this one is the gate; the other two must be moved in the same commit or the continuity check trades one red for another.",
-    "section_caps": "Section 7 is the handoff. It is replaced every session, so it is the section that bloats fastest, and 35 is the number in CLAUDE-TEMPLATE.md and in templates/verify.config.json. EVIDENCE-lt-charter-reduction.md says 60 in two places; the template wins where the two disagree, so 35 is what is enforced here.",
+    "section_caps": "Section 7 is the handoff. It is replaced every session, so it is the section that bloats fastest, and 35 is the number in CLAUDE-TEMPLATE.md and in templates/verify.config.json. EVIDENCE-lt-charter-reduction.md says 60 in two places; the template wins where the two disagree, so 35 is what is enforced here. AND THE OTHER SIX ARRIVED 2026-09-09 AT MEASURED SIZE, WITH NO SLACK: 127 / 153 / 162 / 37 / 548 / 166, taken from verify_md v25's own SECTION SIZES block with the working directory inside this project, never typed from a record. THE POINT OF NO SLACK IS THAT EVERY ADDITION IS PAID FOR IN-SECTION - the file cap is 733 over and nobody has ever acted on it, while 'section 5 is 3 over' is a decision somebody takes. A table ROW IS ONE LINE however long it is, so extending a row is free and adding one is not. THE RECORDED FIGURE FOR SECTION 1 WAS 133 AND IS WRONG: the recorded row does not sum to its own stated total of 1233, because 133 was section 1's size BEFORE the mapping. Trusting it would have given this section six lines of unearned slack - and section 1 is where subsection 1.7 declares the file's own length, so slack there is the most expensive kind. AND SECTION 5's 548 IS PROVISIONAL, A CEILING RATHER THAN APPROVAL: it is the measured size today and it is the right cap today, but sub-step 12 of PLAN-5-propagation.md, THE CHARTER REDUCTION, is expected to bring it down, and a cap set at a measured size records that size as sanctioned unless something says otherwise. This is that something. Setting it here is NOT a ratchet against shrinking - a cap only ever refuses growth - but the next session must read 548 as the number to beat rather than as the number agreed.",
     "forbidden_phrases_file": "DELIBERATELY EMPTY. This project's scan lists live OUTSIDE the repository and are read by tools/leakage_scan.py and tools/publication_check.py, which are the controls that own confidentiality here. Declaring a path that is not found would report VOID, and wiring a second reader of those lists is section 5.6 work, not a checker setting.",
     "size_scope": "Only CLAUDE.md. Every OTHER markdown file at the root - the analysis documents, the EVIDENCE- documents, README.md - is evidence or plan content rather than a charter, so it has no size class; a file matching no glob reports N/A, which is honest. Deliberately stated WITHOUT a count: this comment said 'the six analysis documents' until 2026-08-24, when phase 3c added two EVIDENCE- files and made it wrong. And uk/ and us/ contain SKILL.md, never a CLAUDE.md, so nothing in a shipped tree is in scope."
   }

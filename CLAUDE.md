@@ -97,11 +97,11 @@ stale in silence whenever one moved. **The headings are the contents;** §1.3 an
 
 ### 1.7 The size class, and the cap this charter is held to
 
-**SIZE CLASS: L — cap 500 lines. §7 alone: 35 lines.** L rather than M because this project has run far past
-eight sessions, which is the observable test rather than a judgement about how big it feels. Both caps are
-**enforced, not aspirational**: they live in `verify.config.json`, and `verify_md.py` reports each of them
-with a per-section breakdown showing where the weight sits. **Until 2026-08-24 there was no config here at
-all, so both checks reported N/A on a 1,666-line file** — a cap nothing measures is not a cap.
+**SIZE CLASS: L — cap 500 lines; ALL SEVEN SECTIONS CAPPED at measured size since 2026-09-09, §7 at 35.** L
+rather than M because this project has run far past eight sessions, the observable test rather than a judgement
+about how big it feels. Every cap is **enforced, not aspirational**: they live in `verify.config.json`, and
+`verify_md.py` reports each with a per-section breakdown showing where the weight sits. **Until 2026-08-24
+there was no config here at all, so both reported N/A on a 1,666-line file** — a cap nothing measures is not a cap.
 **AND CHECK THE COPY YOU RUN:** the `charter structure` row arrived in **v25**, so an older local
 `tools/verify_md.py` reports on this section's shape **by omitting the row** — and a missing row reads
 exactly like a passed one.
