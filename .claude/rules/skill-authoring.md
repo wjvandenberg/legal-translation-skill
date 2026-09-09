@@ -6,14 +6,14 @@ paths:
 
 # Skill-authoring conventions
 
-**Relocated from `CLAUDE.md` §5.11 on 2026-08-24, phase 3b step 6 — FIVE of its seven rules.**
+**Relocated from `CLAUDE.md` §5.7 on 2026-08-24, phase 3b step 6 — FIVE of its seven rules.**
 **Two did NOT come**, and the reason is the whole test: *no changelog inside the archive* and *no
 confidential data or real-document examples* are **irreversible if forgotten** — each publishes client
 names into a distributed archive, and a commit cannot be un-published. **Those two stay in the charter
 under route 1.** The five below are reversible, so they live here.
 
 **Each of these keeps an unconditional twin in the charter**, checked before the move: the anti-drift
-rule in §2.5 item 5, the no-renumbering rule in §6.3, the telemetry prohibition in §2.6 and §3.5.
+rule in §2.4 item 5, the no-renumbering rule in §6.3, the telemetry prohibition in §2.5 and §3.2.
 **So this file is the DETAIL, and the charter still carries the rule.**
 - **Anti-drift safeguards are load-bearing.** The layered defences — mandatory step-file reads, the five
   hard rules, auto-invoked gates, per-batch validation with the batch-cap state file, gate semantics,

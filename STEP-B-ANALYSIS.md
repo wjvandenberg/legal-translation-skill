@@ -1571,7 +1571,7 @@ this option is a *deletion* — dropping a cross-reference skeleton once the num
 > RENDERING rather than inferred from XML** *(`tools/render_diff.py`, built for this)*. On the synthetic
 > fixture the source reads `(a)⇥If to the first party:` and the deliverable reads `(a)If to the first party:`
 > — the tab is present in the file and stranded after the collapsed English. **That is Wouter's D05 notices
-> clause exactly**, and it is the sharpest available illustration of §2.5 item 7: *the pipeline preserves
+> clause exactly**, and it is the sharpest available illustration of §2.4 item 7: *the pipeline preserves
 > form as COUNTS and FLAGS, never as EFFECTS*, so a count restored to source is not a layout restored.
 >
 > **This belongs to branches 15–17, not here, and the register already separates the two:** the apply-side
@@ -1584,7 +1584,7 @@ this option is a *deletion* — dropping a cross-reference skeleton once the num
 > did. What changes is one sentence about how much of the tab defect it reaches. *(The figure read 17 until
 > 2026-09-02, when A6 left this option for branches 15–17, and 16 until 2026-09-08, when branch 7 measured
 > the container class at twelve rather than three and A21 and A22 joined this option. Re-derived from the
-> map by `tools/stepb_verify.py`, never adjusted by hand — §5.14 rule 6 of the charter: count by LISTING,
+> map by `tools/stepb_verify.py`, never adjusted by hand — section 5.8 rule 6 of the charter: count by LISTING,
 > never by adding a delta to the figure already written down. **And note the direction: the option closes
 > MORE findings than it did, because measuring the class properly ADDED two rows that nothing had
 > filed.**)*
@@ -1644,7 +1644,7 @@ this option is a *deletion* — dropping a cross-reference skeleton once the num
 > > > baseline pinned at `049484e`, with the harness's self-comparison note absent, so it was
 > > > a genuine before-and-after and not a file compared with itself. **The only render this
 > > > change can ever have is synthetic** — `tests/fixtures/toc-widened.docx`, built for the
-> > > purpose, because a count of 18 of 18 is not a page. §5.7's third entry is the general
+> > > purpose, because a count of 18 of 18 is not a page. Section 5.5 of the charter's third entry is the general
 > > > form of that limit.
 > >
 > > **What this closes and what it does not.** Delivered 2026-09-02 on branch 6's second slice: **25

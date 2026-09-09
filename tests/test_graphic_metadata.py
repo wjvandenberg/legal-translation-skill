@@ -134,7 +134,7 @@ def ok(label, cond, detail=""):
 
 
 def void(label, why):
-    """A check that could not establish anything is VOID, never a pass. CLAUDE.md 5.16."""
+    """A check that could not establish anything is VOID, never a pass. CLAUDE.md 5.3."""
     VOIDED.append(f"{label}: {why}")
     print(f"  ??   {label}   VOID — {why}")
 
@@ -213,7 +213,7 @@ ok("no `en` string reproduces its source verbatim — so a delivered value equal
 # ARM 2 — THE REPORT. A19's row says the gap is that NOTHING ACKNOWLEDGES IT.
 #
 # This is the half that covers the surfaces no route reaches. A block would be wrong here:
-# CLAUDE.md 5.9's test is whether a COMPLIANT WAY OUT exists, and for a body @descr or a
+# CLAUDE.md 5.7's test is whether a COMPLIANT WAY OUT exists, and for a body @descr or a
 # chart title there is none inside this pipeline -- the operator cannot edit the client's
 # document to satisfy a checker. So the remedy is loudness, not refusal.
 # =========================================================================================

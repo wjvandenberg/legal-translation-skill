@@ -141,11 +141,19 @@ DECLARATIONS = [
 
 # --------------------------------------------------------------------------- check 5 data
 # (section, the phrase that says what was cut and where it went)
+# MOVED 2026-09-09 (5): 5.10 AND 5.11 BOTH BECAME 5.7. Sections 2, 3, 5 and 6 were mapped onto
+# CLAUDE-TEMPLATE.md's subsection counts, which closed all four structural excesses by re-parenting
+# -- the two pointer stubs are now unnumbered `####` blocks of section 5.7, "The artefact — domain
+# rules and deliverable conventions". BOTH ROWS NAME 5.7 ON PURPOSE and that is not a duplicate:
+# check 5 asks whether the section BODY carries the phrase, and 5.7's body carries both.
+# THIS ROW IS THE STALE-DATA HALF OF THE RENAME AND IT FAILED LOUDLY, WHICH IS THE CHEAP DIRECTION:
+# `section 5.10 is missing entirely` is exactly what a pointer's return path disappearing looks
+# like, so the check earned its place rather than needing an exemption.
 POINTERS = [
     ("1.6", "CUT 2026-08-24"),
     ("6.2", "CUT 2026-08-24"),
-    ("5.10", ".claude/rules/ooxml.md"),
-    ("5.11", ".claude/rules/skill-authoring.md"),
+    ("5.7", ".claude/rules/ooxml.md"),
+    ("5.7", ".claude/rules/skill-authoring.md"),
 ]
 
 # --------------------------------------------------------------------------- check 6 data
@@ -201,7 +209,7 @@ LEDGER = [
 #
 # THE FIRST VERSION OF THIS CHECK FORBADE PRESENCE, AND THAT IS THE WRONG READING. It fired on
 # `skill-authoring.md`, which carries the run-report rule -- correctly, because step 6a moved it there
-# AND left an unconditional twin in section 5.4. Belt and braces is not the failure; being behind the
+# AND left an unconditional twin in section 5.6. Belt and braces is not the failure; being behind the
 # glob and NOWHERE ELSE is. So the test is SOLE presence, and an over-strict check that condemns
 # correct work is the same defect as a lax one that waves through bad work.
 NEVER_ONLY_PATH_SCOPED = [
@@ -442,7 +450,7 @@ def run(charter_path="CLAUDE.md", root=None):
     # separate case-sensitivity bugs in this ledger in one day, each reporting a rule that is
     # plainly present as GONE: 'no changelog' against "No changelog...", 'A comment ships' against
     # "A COMMENT SHIPS...". A rule gets SHOUTED when it is rewritten to be more prominent, which
-    # is exactly when a case-sensitive needle breaks. That is §5.12's sixth point: never a needle
+    # is exactly when a case-sensitive needle breaks. That is §5.3's sixth point: never a needle
     # that a rewrap or a capital can defeat.
     def needle_norm(t):
         return re.sub(r"\s+", " ", re.sub(r"[*`]", "", t)).lower()

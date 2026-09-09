@@ -68,7 +68,7 @@ if rc != 0 or not out.strip():
 # reported MOVED AGAIN the moment they were. Nothing in the output said which tree it had
 # looked at, so the first PASS was indistinguishable from the second.
 #
-# CLAUDE.md 5.16's second rule, from the other side: a claim asserting a HISTORICAL DELIVERY
+# CLAUDE.md 5.3's second rule, from the other side: a claim asserting a HISTORICAL DELIVERY
 # may read the index; the reader has to be told that is what it did.
 _dirty, _rcd = git("diff", "--name-only", "--", "uk", "us")
 _unstaged = sorted(x for x in _dirty.decode("utf-8", "replace").split("\n") if x.strip())

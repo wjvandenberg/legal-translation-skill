@@ -99,7 +99,7 @@ def ok(label, cond, detail=""):
 
 
 def void(label, why):
-    """A check that could not establish anything is VOID, never a pass. CLAUDE.md 5.16."""
+    """A check that could not establish anything is VOID, never a pass. CLAUDE.md 5.3."""
     VOIDED.append(f"{label}: {why}")
     print(f"  ??   {label}   VOID — {why}")
 
@@ -185,7 +185,7 @@ def run_apply(work, source_xml, notes, label, fixture=None, expect_block=False):
     if expect_block:
         return (out.read_bytes() if out.exists() else None), res
     # ASSERT THE ARTEFACT, NOT THE EXIT CODE. A run that skipped every paragraph, matched
-    # nothing, or died after printing its summary all exit 0. CLAUDE.md 5.16.
+    # nothing, or died after printing its summary all exit 0. CLAUDE.md 5.3.
     if not out.exists():
         print(f"\n  {label}: apply wrote no output (rc={res.returncode}).")
         print("  " + (res.stderr or res.stdout or "").strip()[-1200:])
@@ -224,7 +224,7 @@ print("=" * 106)
 
 # =========================================================================================
 # 0. THE POSITIVE CONTROL. Plant nothing, but PROVE the fixture carries every needle. An
-#    assertion that a count went 0 -> 0 is the clean-looking zero CLAUDE.md 5.16 rule 6 is
+#    assertion that a count went 0 -> 0 is the clean-looking zero CLAUDE.md 5.3 rule 6 is
 #    about, and it is indistinguishable from a real pass.
 # =========================================================================================
 # =========================================================================================
@@ -432,7 +432,7 @@ PINNED = {
 #
 #   A fixture carrying that shape therefore cannot be repacked at all, so every other shape
 #   in it loses its rendered page -- and bypassing the gate for the NEW arm is exactly what
-#   CLAUDE.md 5.9 forbids. render_diff byte-substitutes a refused OLD arm legitimately,
+#   CLAUDE.md 5.7 forbids. render_diff byte-substitutes a refused OLD arm legitimately,
 #   because that arm is a picture of a defect rather than a deliverable.
 #
 # So A22's evidence is its register row plus temp/probe_container_gaps.py's 20-shape run, and
@@ -621,7 +621,7 @@ ok("the drawing itself survives",
 # 7. THE LOUD REFUSAL. An unlisted container carrying text must stop the run rather than
 #    ship silently -- option 1's rule in as many words.
 #
-#    AND THE NEGATIVE IS THE HALF THAT MATTERS, because section 5.9's test is whether a
+#    AND THE NEGATIVE IS THE HALF THAT MATTERS, because section 5.7's test is whether a
 #    compliant way out exists: the refusal must NOT fire on an unlisted element carrying no
 #    text, nor on any of the ten non-run children of w:p the corpus actually contains.
 # =========================================================================================

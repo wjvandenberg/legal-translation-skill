@@ -50,7 +50,7 @@ BEFORE_BYTES = {p: p.read_bytes() for p in PLANT_TARGETS}
 # FROM THE WORKING TREE at import, so the orphaned plant had become the new baseline. The test
 # faithfully restored the file to its contaminated state and certified it unchanged.
 #
-# THAT IS §5.16 RULE 4 IN A TEST THAT WRITES TO A PUBLISHED TREE: a baseline pinned to "the
+# THAT IS §5.3 RULE 4 IN A TEST THAT WRITES TO A PUBLISHED TREE: a baseline pinned to "the
 # current file" instead of to a revision, where the vacuous case is indistinguishable from the
 # passing case. Here the cost is not a wrong number — it is a line of invented prose shipping
 # inside a public skill, and only `git status` at the very end of the session caught it.
@@ -180,7 +180,7 @@ check("with nothing planted, the gate is not blocked by section 7",
 check("the gate's own exit is 0 on the unmodified tree", rc3 == 0, f"exit {rc3}")
 
 # THE OTHER DIRECTION OF THE FILENAME-SHAPE NARROWING, and it is required rather than nice:
-# §5.4 says every pattern must be tested against the string it was written for, in the same
+# §5.6 says every pattern must be tested against the string it was written for, in the same
 # commit. The plant above proves the class still catches a filename carrying proper nouns.
 # These prove it no longer fires on prose that merely names the extension — which is what the
 # unnarrowed pattern did to branch 5's own added lines (" the .docx", " a partial .docx"),
@@ -235,6 +235,6 @@ for n, c in results:
 print()
 print("  WHAT THIS DOES NOT PROVE: that a leak of a shape none of these patterns describes")
 print("  would be caught. The list-free shape sweep and human judgement remain the answer")
-print("  to that, exactly as CLAUDE.md 5.4 says — the probes are a floor, not a ceiling.")
+print("  to that, exactly as CLAUDE.md 5.6 says — the probes are a floor, not a ceiling.")
 print("=" * 92)
 sys.exit(0 if ok == len(results) else 1)

@@ -1,6 +1,6 @@
 # EVIDENCE-confidentiality.md — how the confidentiality controls were built, and what they caught
 
-**This document owns the DATED EVIDENCE behind §5.4 of `CLAUDE.md`. It does not own a single rule.**
+**This document owns the DATED EVIDENCE behind §5.6 of `CLAUDE.md`. It does not own a single rule.**
 Every rule stayed in the charter, deliberately and under route 1: a confidentiality rule that is absent
 when it is needed means a publication that cannot be undone, and this document is read on entry to a
 confidentiality question rather than every session. **Where this document and the charter appear to
@@ -12,7 +12,7 @@ disagree, THE CHARTER WINS** — and the disagreement is a defect to fix here, n
 > controls that were run over it before its first commit are recorded in section 6 below, with what they
 > read, because a clean report from a control that could not reach the file is not a pass.
 
-**Created 2026-08-24, phase 3c step 9 of the charter reduction.** It receives ~170 lines from §5.4, which
+**Created 2026-08-24, phase 3c step 9 of the charter reduction.** It receives ~170 lines from §5.6, which
 was **202 lines — the largest single block in the charter**, and the reason the whole reduction was
 ordered cheapest-first.
 
@@ -20,7 +20,7 @@ ordered cheapest-first.
 
 ## 1 — The naming rule's measurement: why a name scan is structurally blind
 
-**The rule is §5.4's and stays there:** name a test document by its instrument class and its language and
+**The rule is §5.6's and stays there:** name a test document by its instrument class and its language and
 by nothing else. This is the measurement that made it a rule *(Wouter, 2026-08-06)*.
 
 **The 93-pattern scan reported 0 hits on every one of the subject-matter qualifiers this project had been
@@ -46,11 +46,11 @@ answer:** a blocking probe in `tools/publication_check.py`, and `tools/descripto
 real corpus filenames carrying counterparty and personal names INTO THE CONVERSATION.** Nothing was
 committed and nothing could be: **the leak never touched a file.**
 
-**Every control this project has reads committed content.** §6.5 of the charter already says session
+**Every control this project has reads committed content.** §6.4 of the charter already says session
 metadata is reachable by neither the scanners nor the location rule — so there is **no after-the-fact
 remedy at all**, and it cannot be un-said.
 
-**THE RULE EXISTED AND WAS BROKEN ANYWAY.** §6.5's *"any glob over an evidence folder must be explicit
+**THE RULE EXISTED AND WAS BROKEN ANYWAY.** §6.4's *"any glob over an evidence folder must be explicit
 about which files it expects"* had been read that same morning. **That is §5.1's argument restated: prose
 is not a control.**
 
@@ -82,7 +82,7 @@ someone creates that file.** Same shape as the scan list: the scanner ships, the
 
 ## 3 — The three controls, and the suppressor that hid a real finding
 
-**The rule — run all three on every committable file before any commit — is §5.4's.** This is what each
+**The rule — run all three on every committable file before any commit — is §5.6's.** This is what each
 one cost to get right.
 
 ### 3.1 The name-and-term scan, and why it is not sufficient alone
@@ -122,7 +122,7 @@ classes: 14 files read, 3 blocking findings, exit 1; probe removed, 13 files and
 
 ### 3.5 Two list-maintenance rules, both learned the hard way
 
-*(The rules stay in §5.4. These are the incidents.)* A bank-name pattern written with a literal space
+*(The rules stay in §5.6. These are the incidents.)* A bank-name pattern written with a literal space
 **silently failed against a document containing a doubled space** — and **a missed name is invisible: the
 scan simply reports clean.** And in Python, a word-boundary pattern written in a non-raw string literal
 becomes BACKSPACE + the word + BACKSPACE and **will never match** — which is why every pattern must be
@@ -132,7 +132,7 @@ tested against the string it was written for, in the same commit.
 
 ## 4 — Which files may never be committed: the 90-script measurement
 
-**The deciding rule is §5.4's** — not *"is this a script?"* but ***"does this file hold one real string per
+**The deciding rule is §5.6's** — not *"is this a script?"* but ***"does this file hold one real string per
 pattern?"*** — which is why a scanner is publishable and the list it reads never is.
 
 **Re-measured across all 90 scripts on 2026-08-06** (`temp/script_committability.py`, which runs the same
@@ -152,7 +152,7 @@ string.** The 21 fall into four kinds, and **only the first was on the old list:
 > they failed is worth more than the fix: **each had quoted a real string inside an explanatory COMMENT.**
 > The publication check's own comment quoted the home-relative path it exists to block, and the list-free
 > descriptor sweep illustrated itself with two real qualifiers. **A COMMENT SHIPS. AN EXAMPLE IN A
-> DOCSTRING IS PUBLISHED PROSE.** Invent the examples. *(That rule stays in §5.4.)*
+> DOCSTRING IS PUBLISHED PROSE.** Invent the examples. *(That rule stays in §5.6.)*
 
 > **AND ONE FILE IS WITHHELD BY JUDGEMENT RATHER THAN BY PROBE.** *(Wouter, 2026-08-06: "I don't want
 > confidentiality review to be committed.")* `temp/confidentiality_review.py` is clean on every probe, and
@@ -238,12 +238,12 @@ lesson it carried is already in §5 of the charter, sourced and dated.
 **This project has no credentials at all** — the skill authenticates against nothing — so that rule is
 preventative and **the live risk is client names and document content.** *(The standing rules —
 `.gitignore` prevents accident and is not a security control; a leaked client name cannot be rotated;
-making a repo public exposes the whole history — are all §5.4's and stay there.)*
+making a repo public exposes the whole history — are all §5.6's and stay there.)*
 
 **History *can* be rewritten, but it needs a force-push, which our own branch protection blocks, and after
 a repo has been public it is no longer a remedy** — forks and scrapers may already hold the content.
 
-> **A SUPERSEDED OBSERVATION, KEPT BECAUSE IT WOULD MISLEAD IF IT STAYED IN THE CHARTER.** §5.4 carried,
+> **A SUPERSEDED OBSERVATION, KEPT BECAUSE IT WOULD MISLEAD IF IT STAYED IN THE CHARTER.** §5.6 carried,
 > until 2026-08-24, a block headed *"THE GOOD NEWS: THERE IS NO HISTORY TO SCAN — nothing has ever been
 > committed."* **That was true before `git init` on 2026-08-06 and has been false ever since.** The
 > repository exists, it has been PUBLIC since 2026-08-07, and its whole history is served. A session
@@ -268,5 +268,5 @@ what each control READ is recorded, not merely its verdict.**
 **Nothing in this document names a client, a counterparty, a person, a subject-matter qualifier, a corpus
 filename, an email address or an absolute path.** Where a real string was the *source* of a lesson, **the
 lesson is here and the string is not** — *"two real people's names taken from real source documents"*,
-*"named outside law firms"*, *"the operative commercial terms"*. That is §5.4's rule applied to the
-document about §5.4, which is the only way it could have been written.
+*"named outside law firms"*, *"the operative commercial terms"*. That is §5.6's rule applied to the
+document about §5.6, which is the only way it could have been written.

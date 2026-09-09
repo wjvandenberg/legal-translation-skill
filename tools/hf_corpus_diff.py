@@ -82,7 +82,7 @@ PINNED = (SCRIPT, "extract_paragraphs.py")
 # both arms carry the new code, the VOID guard below fires correctly, and this tool reports
 # `VOID -- every pinned script is BYTE-IDENTICAL` on EVERY RUN, for ever, until the
 # translator next changes. A check that can only report VOID is not a check, and a
-# permanently-red row in the sweep is one people learn to scroll past -- CLAUDE.md 5.16's
+# permanently-red row in the sweep is one people learn to scroll past -- CLAUDE.md 5.3's
 # fourth rule, from the other side.
 #
 # SO IT FOLLOWS tests/test_no_delivered_byte_moves.py's PRECEDENT rather than
@@ -218,7 +218,7 @@ for name in PINNED:
     print(f"  pinned into the old arm: {name}")
 
 # A COMPARISON OF A FILE WITH ITSELF IS TRIVIALLY IDENTICAL, WHICH IS EXACTLY THE RESULT A
-# "nothing moved" READING WANTS. CLAUDE.md 5.16's rule with no house twin.
+# "nothing moved" READING WANTS. CLAUDE.md 5.3's rule with no house twin.
 if len(identical) == len(PINNED):
     print(f"  VOID — every pinned script is BYTE-IDENTICAL to {args.ref}, so arm 1 is the")
     print("  same code against itself. That is not a clean run; it is no run. Point")

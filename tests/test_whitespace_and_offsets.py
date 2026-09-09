@@ -24,7 +24,7 @@ that no page can show; the visible mid-paragraph shape is D08's, and D08 does no
 C16 has one recorded instance and its delivered side needs the corpus tool, not this file.
 F16 CANNOT appear in the corpus at all -- the frozen intermediates are the post-compliance
 artefact and `validate_en_runs.py` is a pre-apply gate, so a run with out-of-range offsets
-could never have produced one. Three routes, one remedy, and CLAUDE.md 5.7's rule throughout:
+could never have produced one. Three routes, one remedy, and CLAUDE.md 5.5's rule throughout:
 a figure measured on one document is a figure about one document.
 
 OWNERSHIP, SO NEITHER INSTRUMENT DUPLICATES THE OTHER. This file owns the SHAPES.

@@ -344,7 +344,7 @@ position is provable from the source closed on branch 6's two slices — D06's t
 doubled tabs — and D02's tables, D05's hanging-indent notices clause and D11's mid-phrase tabs did not,
 because their boundaries cannot be recovered from one unbroken English string. Those need branch 15's
 per-run English. **This cell claimed a clean thirteen and the truth is eleven, one partial and one moved**,
-which is the closure-claim direction §2.5 item 6 of the charter is about.)*
+which is the closure-claim direction §2.4 item 6 of the charter is about.)*
 **Cost:** one file (plus a repack flag). No schema change. Byte-comparable on synthetic fixtures.
 **Risk:** low, and it is the only candidate where that is true.
 **Does NOT close:** anything in A-format.

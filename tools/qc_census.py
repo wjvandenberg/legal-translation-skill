@@ -8,7 +8,7 @@ that decides whether branch 5 is safe to merge ahead of branch 14. CLAUDE.md pub
 rate has never been derived.
 
 RE-MEASURED, NOT READ. The findings are recreated by running `quality_check` against each recorded
-deliverable, not lifted from the narrative logs -- CLAUDE.md 5.12 rule 1, and 5.6's warning that
+deliverable, not lifted from the narrative logs -- CLAUDE.md 5.3 rule 1, and 5.6's warning that
 the narratives under-report counts (14/12/11 against a real 18/16/11).
 
 HOW L1's SHARE IS ESTABLISHED WITHOUT JUDGEMENT, and this is the heart of it. `check_truncation`
@@ -36,7 +36,7 @@ git and asserts both directions per rule.
 
 OUTPUT POLICY. Prints rule-class names, counts, and corpus doc-ids. NEVER a finding's text, a
 paragraph's text, a filename or a path -- every finding string embeds 50-70 characters of the
-client document, which is exactly what CLAUDE.md 6.5 says cannot be un-said once it reaches a
+client document, which is exactly what CLAUDE.md 6.4 says cannot be un-said once it reaches a
 transcript. There is no verbose flag.
 
 Location from LEGAL_TRANSLATION_LOGS, so nothing about this machine is baked in.
@@ -83,7 +83,7 @@ def para_texts(xml_path):
     after the first empty paragraph was off by one, and the census claimed 13 method-A
     candidates on two documents where quality_check itself reported zero. That disagreement is
     what exposed it. `check_truncation` does `list(root.iter(w:p))`, so this does exactly the
-    same thing and inherits its ordering rather than reimplementing it. CLAUDE.md 5.10's rule
+    same thing and inherits its ordering rather than reimplementing it. CLAUDE.md 5.7's rule
     — prefer lxml for structural work — applies to our instruments too, not only to the skill.
     """
     from lxml import etree
@@ -118,7 +118,7 @@ rows, class_totals, l1_split = [], Counter(), Counter()
 # English. They were also the three non-zero runs, so the headline number was mostly my own
 # invocation. `--language` is passed for the same reason: omitting it leaves C9's unreliable
 # auto-detection to guess, and a language-dependent check does not degrade to nothing, it
-# degrades to a confident wrong answer (CLAUDE.md 5.9).
+# degrades to a confident wrong answer (CLAUDE.md 5.7).
 VARIANT = {"D04": "us", "D05": "us", "D07": "us"}          # 5.7: the rest are UK
 LANGUAGE = {"D01": "hungarian", "D02": "dutch", "D03": "norwegian", "D03B": "norwegian",
             "D04": "spanish", "D05": "italian", "D06": "italian", "D07": "english",
@@ -273,7 +273,7 @@ if live:
 # compare the anomaly count on both sides.
 #
 # Containers are identified BY INDEX, never by name. A corpus filename carries counterparty
-# and personal names and this output goes into a transcript, which CLAUDE.md 5.4 says no
+# and personal names and this output goes into a transcript, which CLAUDE.md 5.6 says no
 # scanner in this project can reach afterwards.
 print("\n  IS THE NUMBERING INHERITED? (M1) — containers numbered, never named")
 sys.path.insert(0, str(ROOT / "uk" / "scripts"))

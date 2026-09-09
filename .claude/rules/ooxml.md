@@ -8,7 +8,7 @@ paths:
 
 # OOXML hard rules — every one confirmed in production
 
-**Relocated from `CLAUDE.md` §5.10 on 2026-08-24, phase 3b step 6.** They matter only when touching
+**Relocated from `CLAUDE.md` §5.7 on 2026-08-24, phase 3b step 6.** They matter only when touching
 OOXML-handling code, and **forgetting one produces a file Word rejects — unpleasant but REVERSIBLE**,
 which is what makes them route 4 rather than route 1.
 

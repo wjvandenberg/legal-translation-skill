@@ -80,7 +80,7 @@ for wd in sorted(LOGS.rglob("wd")) + sorted(LOGS.rglob("wd-*")):
         # THE LABEL IS THE DOC-ID PLUS AN ORDINAL, AND NEVER THE DIRECTORY NAME. A run
         # directory can sit under a batch folder whose name is not committable, and this
         # label is PRINTED — so it carries a file's place in the corpus and nothing else,
-        # which is the same licence tools/evidence_ls.py operates under. CLAUDE.md 5.4.
+        # which is the same licence tools/evidence_ls.py operates under. CLAUDE.md 5.6.
         label = doc if seen_docs[doc] == 1 else f"{doc} #{seen_docs[doc]}"
         runs[rel] = {"doc": doc, "label": label, "dir": rel, "files": files}
 

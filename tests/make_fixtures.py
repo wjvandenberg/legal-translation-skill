@@ -279,7 +279,7 @@ def _anchors(path):
         # register's clearest visible consequence of mechanism A-ii is the opposite order.
         #
         # It is Wouter's D05 notices clause, reproduced as STRUCTURE with invented words
-        # (CLAUDE.md 5.4 -- a fixture example must be synthetic, because anonymising a real
+        # (CLAUDE.md 5.6 -- a fixture example must be synthetic, because anonymising a real
         # one still leaks its shape). A marker run, then a run whose children are
         # [rPr, tab, t]. With hanging=709 against left=1418 the tab is the ONLY thing
         # pushing the text out to the indent, so when apply destroyed it the line rendered
@@ -355,7 +355,7 @@ def _anchors(path):
 #
 # Wouter read D06's rendered page 2 on 2026-09-01 and reported the table of contents coming
 # out "terribly, with all page numbers not outlined to the right" plus a stray indent. That
-# page is a client document: CLAUDE.md 6.5 means Claude may never view it, so the defect could
+# page is a client document: CLAUDE.md 6.4 means Claude may never view it, so the defect could
 # be measured but not SEEN from this side. This fixture reproduces the SHAPE with invented
 # words so it can be.
 #
@@ -854,7 +854,7 @@ CONTAINER_SHAPES = [
     #
     # BYPASSING THE GATE FOR THE NEW ARM IS NOT AN OPTION. render_diff does byte-substitute a
     # refused OLD arm, legitimately, because that arm is a picture of a defect and not a
-    # deliverable. The NEW arm is what the working tree produces, and CLAUDE.md 5.9 is
+    # deliverable. The NEW arm is what the working tree produces, and CLAUDE.md 5.7 is
     # explicit: never work around a gate.
     #
     # So A22 keeps its register row and the 20-shape probe as its evidence, and the fixture
@@ -1277,7 +1277,7 @@ def _graphic_metadata(path):
            # It was copied out of Step 8b.2's own worked example, and `leakage_scan.py`
            # caught it on pattern #46 with the SAME sha as that step document's
            # long-standing, already-judged hit. Inheriting a judgement is not the test:
-           # CLAUDE.md 5.4 requires every fixture string to be INVENTED FOR THE PURPOSE,
+           # CLAUDE.md 5.6 requires every fixture string to be INVENTED FOR THE PURPOSE,
            # and a code lifted from elsewhere is not. Replaced rather than argued about --
            # the scan list's false-positive rate is 5.4's one open item, and adding to it
            # is the wrong direction.
@@ -1579,7 +1579,7 @@ def _whitespace_arms(path):
 # start/end/bold/italic, the last run's `end` lands on `len(en)` 729 times out of 729 and on
 # `len(text)` 0 times, a planted needle fired and a conforming input stayed quiet.
 #
-# THE REASON IS §5.8 RULE 2 VERBATIM. The frozen intermediates are the POST-COMPLIANCE
+# THE REASON IS §5.4 RULE 2 VERBATIM. The frozen intermediates are the POST-COMPLIANCE
 # artefact and `validate_en_runs.py` is a PRE-APPLY gate, so a run whose offsets pointed past
 # the end of `en` could never have produced a frozen intermediate at all. The evidence base is
 # clean BECAUSE the gate worked, and F16 describes what happens to an operator mid-run, which

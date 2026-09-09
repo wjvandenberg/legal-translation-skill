@@ -1,6 +1,6 @@
 ---
 name: frozen-intermediate-test
-description: How a change to this pipeline is actually tested - freeze the translated intermediate from an existing run so the whole mechanical half becomes a deterministic function, plus the two fixture tiers, the blind spot the trick does not announce, and the mandatory negative inputs. Use when planning or running a branch's TEST stage, building a fixture, deciding whether a change needs a graded run, or making git bisect possible. Relocated from CLAUDE.md 5.8 under route 3 on 2026-08-24.
+description: How a change to this pipeline is actually tested - freeze the translated intermediate from an existing run so the whole mechanical half becomes a deterministic function, plus the two fixture tiers, the blind spot the trick does not announce, and the mandatory negative inputs. Use when planning or running a branch's TEST stage, building a fixture, deciding whether a change needs a graded run, or making git bisect possible. Relocated from CLAUDE.md 5.4 under route 3 on 2026-08-24.
 ---
 
 # How a change is actually tested
@@ -20,7 +20,7 @@ reorder, auxiliary parts, repackage — becomes a deterministic function.** Run 
 bytes. **Seconds, repeatable, no model, no Cowork.** The frozen intermediates already exist from the July
 runs; `tools/freeze_intermediates.py` is the instrument.
 
-**This is what makes `git bisect` possible**, which is the standing method for a regression *(section 2.6
+**This is what makes `git bisect` possible**, which is the standing method for a regression *(section 2.5
 of `CLAUDE.md`, 2026-07-29)*. Bisect needs a cheap deterministic pass/fail test, and *"translate a
 document and grade it"* is neither.
 
@@ -73,5 +73,5 @@ discipline in the name of tidying up** — it is what makes bisect work.
   and is invalidated by it. A foreground suite once caught a fixture mid-write and died with
   `BadZipFile`, which reads exactly like a corrupt document rather than a race.
 
-*(Both are section 5.16's rule 5 and stay in the charter unconditionally; they are repeated here because
+*(Both are section 5.3's rule 5 and stay in the charter unconditionally; they are repeated here because
 this is the page somebody reads while about to run a suite.)*

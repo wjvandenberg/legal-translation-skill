@@ -91,7 +91,7 @@ def ok(label, cond, detail=""):
 
 
 def void(label, why):
-    """A check that could not establish anything is VOID, never a pass. CLAUDE.md 5.16."""
+    """A check that could not establish anything is VOID, never a pass. CLAUDE.md 5.3."""
     VOIDED.append(f"{label}: {why}")
     print(f"  ??   {label}   VOID — {why}")
 

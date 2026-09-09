@@ -89,7 +89,7 @@ def run(script, *args, tree="uk"):
 # ======================================================================================
 # Minimal synthetic .docx and document.xml builders. EVERY FIXTURE IS INVENTED: no text
 # here derives from any real document, and none may -- anonymising one still leaks its
-# clause structure (CLAUDE.md §5.4).
+# clause structure (CLAUDE.md §5.6).
 # ======================================================================================
 NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
 CT = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
@@ -392,7 +392,7 @@ head("6. THE WARN CONTRACT — verify_diligence NO LONGER REPORTS WARN AS PASS")
 # .validate-state.json, so Steps 4/4b and 5 reported FAIL and the OVERALL verdict was FAIL.
 # The assertion "the induced condition really is a WARN" then PASSED, because it searched
 # the output for the substring "WARN", which appears in the Step 9 line of a FAILing report.
-# That is §5.12 rule 6 -- never a two-word needle -- committed in this branch's own test.
+# That is §5.3 rule 6 -- never a two-word needle -- committed in this branch's own test.
 # It now asserts the report's OWN verdict line.
 #
 # The condition used instead is a state file with no history entries, which

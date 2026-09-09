@@ -8,7 +8,7 @@ defects surfaced from?"
 THE ANSWER CANNOT COME FROM THE CORPUS, AND THAT IS WHY THIS FILE EXISTS. D06 is the only one
 of eleven documents with a table of contents at all, so every real measurement this project
 has -- 26 of 26 on three separate tests -- is a measurement of ONE DOCUMENT'S HOUSE STYLE.
-CLAUDE.md 5.7 names this case exactly: what the corpus cannot reach needs synthetic fixtures.
+CLAUDE.md 5.5 names this case exactly: what the corpus cannot reach needs synthetic fixtures.
 A rule measured at 100% on one document is not a rule measured at 100%.
 
 IT FOUND TWO DEFECTS ON ITS FIRST RUN, both invisible to the corpus. A page-number run written

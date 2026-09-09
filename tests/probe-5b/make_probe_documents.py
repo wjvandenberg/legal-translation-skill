@@ -38,7 +38,7 @@ answers the gate and arm 2 becomes unnecessary. Cost in the bad case: one run.
 
 EVERY WORD IN THESE DOCUMENTS IS INVENTED. No text, party, figure or clause derives from any
 real document, and none may -- anonymising one still leaks its shape and clause structure
-(CLAUDE.md §5.4). The source language is Dutch because a sub-lexicon exists for it, so the
+(CLAUDE.md §5.6). The source language is Dutch because a sub-lexicon exists for it, so the
 translation itself is unremarkable and the deadlock is the only thing under test.
 
     uv run python tests/probe-5b/make_probe_documents.py
@@ -53,7 +53,7 @@ from make_fixtures import docx, p, r                                          # 
 
 # GENERATED INTO temp/, NOT BESIDE THIS SCRIPT, and the reason is a control rather than tidiness.
 # The pre-commit gate and the charter claims check both refuse to see a Word document anywhere
-# outside `temp/` and `tests/fixtures/` — a filesystem check, not a git one, because §5.4 says a
+# outside `temp/` and `tests/fixtures/` — a filesystem check, not a git one, because §5.6 says a
 # .gitignore entry is not a security control and a gitignored client document is still a client
 # document sitting in the repo. Writing here keeps that control at exactly one allowlisted
 # directory instead of two; every allowlisted directory is a hole in it.

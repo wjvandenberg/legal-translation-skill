@@ -2,7 +2,7 @@
 """BRANCH 14 — PROVE THE DELIVERED DOCUMENT DOES NOT MOVE.
 
 The branch's claim is that it changes what the checks REPORT and nothing a reader of the
-delivered document could see. §5.3 requires a rendered page-by-page comparison of both
+delivered document could see. §5.2 requires a rendered page-by-page comparison of both
 documents; a byte-identical deliverable is strictly stronger evidence than rendering two
 files that are the same file, so this is the proof that discharges it — and a proof, not
 an assertion, because "no behaviour change" has been claimed wrongly in this project

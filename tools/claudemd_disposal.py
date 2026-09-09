@@ -351,7 +351,7 @@ DROPPED = [
  ("the 2026-08-04 handoff",
   "§7 carries one handoff by rule; its non-status content is disposed of above"),
  ("the eight-row 'files and locations' table",
-  "replaced by §1.3 (the document set) and §6.5 (what never enters the repo), which "
+  "replaced by §1.3 (the document set) and §6.4 (what never enters the repo), which "
   "between them name every location without the absolute paths the old table carried"),
 ]
 

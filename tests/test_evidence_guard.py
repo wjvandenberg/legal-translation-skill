@@ -94,7 +94,7 @@ print("=" * 92)
 MUST_ALLOW = [
     ("gate_replay.py, which READS those logs and prints counts only",
      "uv run python tools/gate_replay.py"),
-    ("the register validator CLAUDE.md 5.12 prescribes by path",
+    ("the register validator CLAUDE.md 5.3 prescribes by path",
      "uv run python ../legal-translation-private/tools/audit_register.py"),
     ("the sanctioned lister itself — it must not block its own alternative",
      "uv run python tools/evidence_ls.py ../legal-translation-logs/A1"),

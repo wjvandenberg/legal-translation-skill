@@ -26,7 +26,7 @@ comparison that established nothing has not passed.
     uv run --with lxml python tests/test_check_scoping.py
     LT_BASELINE_REF=<ref> uv run --with lxml python tests/test_check_scoping.py
 
-All test content is INVENTED. No client text, no corpus material -- CLAUDE.md 5.4.
+All test content is INVENTED. No client text, no corpus material -- CLAUDE.md 5.6.
 """
 import importlib.util
 import json

@@ -4,7 +4,7 @@
 WHY THIS EXISTS. On 2026-08-11 a session ran `ls` and `find` over the sibling logs folder to
 work out how it was laid out, and the output printed real corpus filenames carrying
 counterparty and personal names straight into the conversation transcript. Nothing was
-committed and no scanner could ever have caught it: CLAUDE.md 6.5 says session metadata is
+committed and no scanner could ever have caught it: CLAUDE.md 6.4 says session metadata is
 reachable by neither the scanners nor the location rule, so there is no after-the-fact
 control at all. Prevention is the only control, and 6.5's rule -- "any glob over an evidence
 folder must be explicit about which files it expects" -- had been read that same morning and
@@ -17,7 +17,7 @@ believes, which is the failure mode already diagnosed in the skill's own validat
 
 WHAT IT PRINTS: counts, extensions, size buckets, depth, and corpus doc-ids (D01..D11), which
 name a FILE's place in the corpus and never the instrument or the parties -- the same
-distinction CLAUDE.md 5.4 already draws for the technical character of a file.
+distinction CLAUDE.md 5.6 already draws for the technical character of a file.
 
 WHAT IT NEVER PRINTS: a filename, a stem, a directory name below the root you gave it, or any
 file content. There is no --show, no --verbose and no --names. Adding one would defeat the

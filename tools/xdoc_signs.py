@@ -45,16 +45,16 @@ DECLARED_BENIGN = [
      "'§5 here' -- the word 'here' is the disambiguator, and FINDINGS-REGISTER.md has no "
      "numbered sections at all"),
     ("rests on **D03 alone**",
-     "§5.7 is this charter's test corpus; A3 is cited on the same line as 'section 11' in words"),
+     "§5.5 is this charter's test corpus; A3 is cited on the same line as 'section 11' in words"),
     ("all eleven structural questions settled",
      "§6.1 is this charter's own answer table -- and this is the cell that said §6.2 until "
      "step 8 read it"),
     ("turned out to be classes rather than defects",
-     "§2.5 is this charter's evidence section"),
+     "§2.4 is this charter's evidence section"),
     ("**Step 1** is the git history",
      "§6.4 is this charter's repository section"),
     ("This file rewritten to seven sections",
-     "§5.4 is this charter's confidentiality section"),
+     "§5.6 is this charter's confidentiality section"),
     # REMOVED 2026-08-25 BY PHASE 12, and the tool is what noticed. The declared line lived in
     # §5.1's Explore row; that row now carries only what THIS project adds, because "never work
     # from a précis" is the auto-loaded house file's rule and was counted 2 -> 1. The sign went
@@ -65,11 +65,25 @@ DECLARED_BENIGN = [
     # saying what an evidence document received FROM this charter, so the sign names the SOURCE
     # section here, not a section of the document being described.
     ("the dated evidence behind",
-     "§5.4 names the charter section this evidence document was split OUT of — the source, not a "
+     "§5.6 names the charter section this evidence document was split OUT of — the source, not a "
      "section of `EVIDENCE-confidentiality.md`, which has numbered sections of its own"),
     ("the twelve-row test-corpus listing",
-     "§5.7 and §5.6 name the two charter sections this document received content from; its own "
-     "sections are cited elsewhere in words as 'section 1' and 'section 3'"),
+     "BOTH signs now read §5.5 and that is not a typo: the test corpus and the measuring "
+     "instruments were separate subsections until 2026-09-09 and are now two `####` blocks of "
+     "one, so the row names the same charter section twice. Its own sections are cited "
+     "elsewhere in words as 'section 1' and 'section 3'"),
+    # ADDED 2026-09-09 BY THE SECTION MAPPING, AND THE TOOL IS WHAT NOTICED. Section 6.5 was
+    # WRITTEN this session -- the template's 6.5 was the one subsection this charter had never
+    # had -- and its table names each rule file beside the charter subsection it was relocated
+    # FROM. That is a filename and a sign on one line, which is exactly the candidate shape, and
+    # it went from 0 undeclared to 2 on the commit that added the table.
+    ("the ten OOXML hard rules, every one a production incident",
+     "§5.7 is THIS charter's artefact subsection, which carries the pointer stub the rule file "
+     "was relocated OUT of — the sign names the source, not a section of `ooxml.md`, which has "
+     "ZERO numbered headings (measured, not assumed)"),
+    ("of the seven skill-authoring conventions",
+     "§5.7 is the same charter subsection, for the same reason: `skill-authoring.md` carries "
+     "FIVE of its rules and likewise has ZERO numbered headings"),
 ]
 
 

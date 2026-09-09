@@ -276,7 +276,7 @@ head("7. THE PUBLISHED TREES — ADDED LINES ONLY, AGAINST THE BASELINE")
 # more. A confidentiality gate blind to the two directories that actually ship is the wrong
 # blind spot to keep.
 #
-# It was left blind for a real reason, recorded in CLAUDE.md 5.4(b): scanning a WHOLE tree
+# It was left blind for a real reason, recorded in CLAUDE.md 5.6(b): scanning a WHOLE tree
 # returns 46 hits per tree, overwhelmingly ordinary Dutch, Polish, Hungarian, Finnish, French
 # and German legal vocabulary matching short patterns. A reviewer facing 46 known-benign hits
 # starts skimming, which is the exact failure this project diagnoses in the skill's own
@@ -366,11 +366,11 @@ else:
                     # its own legend ("bare .docx extension mentions, no filenames") — but
                     # section 7 BLOCKS, so the same class stopped the gate.
                     #
-                    # What the class exists to catch is a real corpus filename, and §5.4 says
+                    # What the class exists to catch is a real corpus filename, and §5.6 says
                     # what makes those dangerous: "the test corpus filenames alone carry
                     # counterparty names". A counterparty name is a proper noun, so the stem
                     # must contain a capital. Vectors for both directions live in
-                    # tests/test_gate_tree_scan.py and run in this same commit, per §5.4's
+                    # tests/test_gate_tree_scan.py and run in this same commit, per §5.6's
                     # rule that a pattern is tested against the string it was written for.
                     #
                     # THE CAPITAL MUST BE IN THE TOKEN THAT ABUTS THE EXTENSION, not merely
