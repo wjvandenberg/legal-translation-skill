@@ -61,18 +61,19 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 SCRIPT = "apply_translations_textmatch.py"
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.16.
 #
-# MOVED TO 010c34f ON 2026-09-09: the squash-merge of branch 7 slice 3 (PR #69), which CLOSED
-# branch 7, and the last commit to touch either tree. DERIVED, NOT READ OFF THE MERGE MESSAGE
-# -- `git log --oneline -1 -- uk us` returns it and `git diff 010c34f -- uk us` comes back
+# MOVED TO 015c8b6 ON 2026-09-09: the squash-merge of the no-.pyc-in-a-shipped-tree slice
+# (PR #71) and the last commit to touch either tree. DERIVED, NOT READ OFF THE MERGE MESSAGE
+# -- `git log --oneline -1 -- uk us` returns it and `git diff 015c8b6 -- uk us` comes back
 # empty.
 #
 # AND THIS TOOL ALREADY SAYS SO WHEN IT BITES: the fixture path prints "BYTE-IDENTICAL to the
 # working tree, so old and new are the same code and an all-quiet render proves nothing"
-# whenever the swapped script matches the pin. That line fired on slices 2 AND 3 for a
-# legitimate reason -- neither changed the apply script this tool swaps -- so a stale pin
-# would have produced the same honest-looking notice for an illegitimate one.
+# whenever the swapped script matches the pin. That line fired on branch 7's slices 2 AND 3
+# for a legitimate reason -- neither changed the apply script this tool swaps -- so a stale
+# pin would have produced the same honest-looking notice for an illegitimate one. The .pyc
+# slice is the first in four to touch apply, so at this pin the notice should be ABSENT again.
 #
-# THE PIN HAS NOW MOVED SEVEN TIMES IN FIVE DAYS, and this comment block has gone stale twice
+# THE PIN HAS NOW MOVED EIGHT TIMES IN FIVE DAYS, and this comment block has gone stale twice
 # and been caught twice -- which is the whole argument for rewriting it rather than appending
 # to it. Once it read "Moved to 049484e" while the pin one line below said 2a71e71: both true
 # once, disagreeing inside five lines. NOTHING CHECKS A COMMENT, so a stale one is
@@ -89,7 +90,7 @@ SCRIPT = "apply_translations_textmatch.py"
 # tool proves a kind-less scaffold entry is still a paragraph entry, a question that only
 # exists against a tree predating the `kind` key, so moving its pin makes it VOID for ever.
 # `git grep -F <old sha>` enumerates the carriers; a phrase naming a COUNT does not.
-REF = os.environ.get("LT_BASELINE_REF", "010c34f")
+REF = os.environ.get("LT_BASELINE_REF", "015c8b6")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
 # Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
 # glance whether the pages in front of them belong to the run being discussed.
