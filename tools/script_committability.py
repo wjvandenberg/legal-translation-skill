@@ -65,8 +65,18 @@ if DESC is None or NAMES is None:
 PROBES = [
     ("corpus subject-matter descriptor", "(?i)" + "|".join(DESC)),
     ("a name or term from the 93-pattern list", "(?i)" + "|".join(NAMES)),
+    # THE DRIVE-LETTER ARM CARRIES A WORD-BOUNDARY GUARD, AND IT IS NOT COSMETIC (2026-09-09).
+    # Without `(?<!\w)` the arm reads the `s:` of a Python string containing `paths:\n` as a
+    # drive path -- letter, colon, backslash, word characters -- so ANY selftest fixture holding
+    # a YAML-ish escaped string trips it. Measured across tools/ and temp/ before the change:
+    # 29 hits, of which 28 survive the guard and exactly 1 was this false positive. A real path
+    # is preceded by a quote, a space or a line start, never by a word character, so the guard
+    # cannot hide one. TEST VECTORS, both arms, in tests/test_committability_probe.py.
+    # WHY IT WAS FIXED RATHER THAN WORKED AROUND: section 5.7 -- a gate can be wrong in SCOPE,
+    # and the remedy is to fix the gate, never to bypass it and never to contort the input.
+    # It blocked a commit of the house trace_instructions.py, whose fixture strings are correct.
     ("absolute or home path",
-     r"[A-Za-z]:\\[\w\-.]+(?:\\[\w\-. ]+)+|~[\\/][\w\-.]+(?:[\\/][\w\-. ]+)+"),
+     r"(?<!\w)[A-Za-z]:\\[\w\-.]+(?:\\[\w\-. ]+)+|~[\\/][\w\-.]+(?:[\\/][\w\-. ]+)+"),
     ("container path", r"(?<![\w.])/(?:home|mnt)/[\w\-./]+"),
     ("money amount", r"(?:EUR|USD|GBP|PLN|HUF|NOK|£|€)\s?[\d][\d,. ]{2,}"),
     ("capacity figure", r"\d[\d,. ]*\s?(?:MW|kW|GW|MWh|kWh)\b"),

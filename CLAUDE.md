@@ -592,11 +592,9 @@ controls and the publication check run.**
 #### "IT EXITED 0" IS NOT "IT DID THE WORK" — and this section is here because §7 gets replaced
 
 **THE VERIFICATION-HYGIENE RULES ARE IN `…\Coding\.claude\CLAUDE.md`, WHICH AUTO-LOADS HERE, AND ARE NOT
-RESTATED** *(phase 12, 2026-08-25)* — assert the artefact, not the exit code · a long runner writes a
-**sentinel FILE** as its last act · never run two suites concurrently · pin a comparison baseline to a
-**revision**, never to a branch name or `HEAD` · a control that opened no files is **VOID, never CLEAN** ·
-and, from the user-global file, **`$?` is reset by a pipe or a command substitution, so capture `rc=$?` on
-the very next line.** **Probed one grep per rule: six of the eight have a twin there.**
+RESTATED** *(phase 12, 2026-08-25)* — assert the artefact not the exit code · a sentinel FILE · never two
+suites at once · pin a baseline to a REVISION · a control that opened no files is VOID · `rc=$?` on the very
+next line. **Probed one grep per rule: six of the eight have a twin there.**
 
 **THE ONE RULE WITH NO TWIN, so it stays: RUN THIS PROJECT'S SUITES AS TOP-LEVEL COMMANDS, NEVER FROM A
 PARENT RUNNER** — and make a before/after suite exit **VOID** when the baseline turns out byte-identical to
@@ -638,26 +636,31 @@ fixed on an earlier branch sat in the new count, so 34 predicted and 53 stable f
 not fire" on a document where there was never anything to fix.)*
 
 **THE SIX DATED INSTANCES MOVED TO `EVIDENCE-measurement.md` SECTION 3.3 ON 2026-08-25** — six green numbers
-in one session, each reporting on something other than the thing being checked. §5.1's *run, do not read*
-rule assumes the run tells you the truth; those are the ways it does not.
+in one session, each reporting on something other than the thing being checked.
 
----
+#### The checker roster — what this project keeps, and why it dropped the rest
+
+**9 INSTALLED · 4 DECLARED ABSENT · 13 TRACKED, `0 needing a decision` THROUGH A FRESH CLONE** *(2026-09-09,
+never on this machine — a local `core.autocrlf` does not travel)*. **The four reasons live in
+`verify.config.json` where the checker reads them and refuses a blank one.** Three things it cannot hold:
+
+| | |
+|---|---|
+| **the 13 are not the whole population** | `install_hooks.py` **is not the house script of that name and never was** — it installs THIS project's hooks from `tools/hooks/`, and its own header declares the collision so a byte comparison stops there rather than turning into a repair. **`0 needing a decision` is true of the thirteen and silent about anything outside them** — the accepted cost of a tracked list, not a defect in it. *(`trace_instructions.py` was four versions behind and CRLF against the house LF, unreported for the same reason; brought to house v5 on 2026-09-09.)* |
+| **33 scripts are PROJECT-SPECIFIC, and this is the declaration** | *Prefer the standard scripts* permits one only where a house checker genuinely cannot do the job. These are OOXML, the corpus, the register, leakage and descriptors, UK/US parity, and the Step-B audit family — **domains no house checker addresses at all** |
+| **one is a deliberate TWIN of a house checker** | `xref_check.py` does the house `verify_refs` checker's job — *every quoted cross-reference must resolve to a heading that exists* — and is the **strongest** reason that checker is declared absent rather than merely unsuited: **the local one is green where the house one misfires**, this corpus being 308 files whose content IS quoted terminology. *(Named without its `.py`, deliberately: `claudemd_claims` check 6 fails on any script this charter names that exists nowhere in the tree, and a DECLARED-ABSENT checker is exactly that — it caught this row on its first run.)* |
 
 #### The audit gate — for any analysis deliverable
 **MOVED TO `.claude/skills/audit-gate/SKILL.md` ON 2026-08-24** — the seven-point method, the standing
 instruments with their commands, `STEP-B-ANALYSIS.md`'s six suites, and the four scripts deliberately left
-in `temp/`. **Route 3: a procedure followed start to finish.** The skill also carries **corrected paths**:
-`md_tables.py`, `publication_check.py` and `audit_register.py` are all in `tools/` now, and this block had
-all three wrong. **The register validator every other section points here for is
-`uv run python tools/audit_register.py`.**
+in `temp/`. **Route 3: a procedure followed start to finish. The register validator every other section
+points here for is `uv run python tools/audit_register.py`.**
 
 **What stays is the TRIGGER, not the method.** **Wouter's standing requirement:** *"triple check, do a deep
 audit and verify your summary. This summary is the basis of the changes, and I REALLY don't want it to
-contain errors or omissions."* **It has found real errors EVERY time it has been asked for, and not one
-would have been caught by re-reading** — so **RE-MEASURE, DO NOT RE-READ**, and **an audit that reports
-NOTHING found is evidence it was too shallow, not that the work was clean.** **Invoke the skill; do not
-improvise the method** — the seven points exist because seven different kinds of error got through without
-them.
+contain errors or omissions."* **It has found real errors EVERY time it has been asked for**, and **an audit
+that reports NOTHING found is evidence it was too shallow, not that the work was clean.** **Invoke the
+skill; do not improvise** — the seven points exist because seven kinds of error got through without them.
 
 #### Never-regress — the rule, and how it becomes enforceable
 
@@ -685,16 +688,13 @@ the case for a scripted mechanical gate as the primary instrument and against an
 ### 5.4 TEST — proving nothing else broke
 
 #### How a change is actually tested
-**MOVED TO `.claude/skills/frozen-intermediate-test/SKILL.md` ON 2026-08-24** — the
-freeze-the-intermediate trick and why it is deterministic, the two fixture tiers, the mandatory negative
-inputs, and the two ways a green suite means nothing. **Route 3: a test method somebody follows start to
-finish.** **Section 4 of `STEP-B-ANALYSIS.md` still owns the method per branch kind**; the skill is the
-principle behind it.
+**MOVED TO `.claude/skills/frozen-intermediate-test/SKILL.md` ON 2026-08-24** — the freeze-the-intermediate
+trick, the two fixture tiers, the mandatory negative inputs, and the two ways a green suite means nothing.
+**Route 3. Section 4 of `STEP-B-ANALYSIS.md` still owns the method per branch kind.**
 
 **Three things stay, because each binds OUTSIDE a test run.**
 
-1. **The synthetic fixtures in `tests/fixtures/` are committable and the frozen intermediates NEVER
-   are** — that is a location rule and §5.6 and §6.4 own it. This is the pointer, not the rule.
+1. **Synthetic fixtures in `tests/fixtures/` are committable and frozen intermediates NEVER are** — a location rule §5.6 and §6.4 own; this is the pointer.
 2. **A FROZEN-INTERMEDIATE RESULT IS EVIDENCE ABOUT THE MECHANICAL HALF ONLY.** It is the
    *post-compliance* artefact, so it cannot reproduce a gate that was satisfied while the run was
    happening — measured 2026-08-21, `validate_segment_shapes` finding 0 over 81 tracked-change
