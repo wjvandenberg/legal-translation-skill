@@ -593,6 +593,27 @@ def extract_paragraphs(input_path, output_json):
                         'comment', label='word/comments.xml')
                     if cm_summary['substantive']:
                         summaries.append(cm_summary)
+                # Glossary — register C19, added 2026-09-09.
+                #
+                # THIS IS THE ROUTE IN, AND ITS ABSENCE IS HALF THE DEFECT. C19's row frames
+                # the gap as the repackager's; measured, extraction never read the part
+                # either, so an operator was never told there was anything to translate. On
+                # the batch arm the part shipped byte-identical and untranslated and neither
+                # the forensic log nor the narrative mentioned the glossary once — which is
+                # what "no route in" looks like from the operator's side.
+                #
+                # FULL ZIP PATH, NEVER A BASENAME: 'word/glossary/document.xml' and
+                # 'word/document.xml' share the basename 'document.xml', and a listing keyed
+                # on basenames once made a whole glossary directory disappear and produced a
+                # written "C19 did not recur" that re-measuring refuted.
+                if 'word/glossary/document.xml' in names:
+                    gl_summary = _summarise_aux_xml(
+                        zf.read('word/glossary/document.xml').decode(
+                            'utf-8', errors='replace'),
+                        'glossary building block',
+                        label='word/glossary/document.xml')
+                    if gl_summary['substantive']:
+                        summaries.append(gl_summary)
                 if summaries:
                     print()
                     print('=' * 60)
@@ -610,13 +631,32 @@ def extract_paragraphs(input_path, output_json):
                             print(f"    ... {len(s['substantive']) - 10} "
                                   f"more (suppressed)")
                     print()
-                    print('Translate these in Step 8c (comments) and '
-                          'Step 8d (footnotes/endnotes) before Step 9 '
+                    print('Translate these in Step 8c (comments), '
+                          'Step 8d (footnotes/endnotes) and '
+                          'Step 8e (glossary) before Step 9 '
                           '(quality check).')
                     print('Pass the corresponding --comments / '
-                          '--footnotes / --endnotes flag to '
+                          '--footnotes / --endnotes / --glossary flag to '
                           'repack_docx.py in Step 10 so the '
                           'translated copies are bundled.')
+                    if any(s['kind'].startswith('glossary') for s in summaries):
+                        # SAID HERE BECAUSE THIS IS WHERE THE OPERATOR IS LOOKING. The
+                        # glossary is the one auxiliary part whose flag is not optional:
+                        # repack REFUSES without it rather than warning, because a warning
+                        # is the control that already failed on this part.
+                        print()
+                        print('  NOTE — the glossary is the one auxiliary part whose '
+                              'flag is MANDATORY. repack_docx.py REFUSES to bundle a '
+                              'document whose')
+                        print('  original carries a text-bearing '
+                              'word/glossary/document.xml unless --glossary is passed. '
+                              'A glossary building block')
+                        print('  supplies the placeholder text a content control '
+                              'DISPLAYS while it is empty, so leaving it untranslated '
+                              'can put the source')
+                        print('  language on the page. If you read it and judge that it '
+                              'needs no translation, pass the original part to the same '
+                              'flag.')
         except (zipfile.BadZipFile, OSError):
             # Source not a zip — skip the aux summary.
             pass
@@ -633,6 +673,13 @@ def _summarise_aux_xml(raw_xml, kind, label):
 
     For comments: any ``<w:comment>`` with at least one ``<w:t>`` of
     non-whitespace text.
+
+    For glossary building blocks: any ``<w:docPart>`` with at least one
+    ``<w:t>`` of non-whitespace text. Its identifier is the docPart NAME
+    rather than a numeric id, because that is what the body references —
+    measured on the one corpus carrier, 10 of 10 docPart names appear
+    verbatim in ``word/document.xml``, addressed by
+    ``<w:placeholder><w:docPart w:val="..."/></w:placeholder>``. Register C19.
     """
     import re as _re
     # regex compilation moved up; var renamed pattern_re to
@@ -641,6 +688,13 @@ def _summarise_aux_xml(raw_xml, kind, label):
     if kind in ('footnote', 'endnote'):
         pattern_re = _re.compile(
             r'<w:(?:footnote|endnote)\b([^>]*)>(.*?)</w:(?:footnote|endnote)>',
+            _re.DOTALL)
+    elif kind.startswith('glossary'):
+        # The whole <w:docPart> ... </w:docPart>, non-greedily. `w:docPartPr` and
+        # `w:docPartBody` are children and neither matches `<w:docPart\b` — the `\b`
+        # is what stops it, so it must not be dropped.
+        pattern_re = _re.compile(
+            r'<w:docPart\b([^>]*)>(.*?)</w:docPart>',
             _re.DOTALL)
     else:
         pattern_re = _re.compile(
@@ -655,8 +709,16 @@ def _summarise_aux_xml(raw_xml, kind, label):
                 r'w:type="(separator|continuationSeparator)"', attrs)
             if type_match:
                 continue
-        id_match = _re.search(r'w:id="([^"]+)"', attrs)
-        entry_id = id_match.group(1) if id_match else '?'
+        if kind.startswith('glossary'):
+            # A docPart's identity is its NAME, and the name lives in a CHILD element
+            # (w:docPartPr/w:name/@w:val), not in the opening tag's attributes — so the
+            # w:id search below finds nothing here and would report every entry as '?'.
+            name_match = _re.search(
+                r'<w:docPartPr>.*?<w:name w:val="([^"]*)"', body, _re.DOTALL)
+            entry_id = name_match.group(1) if name_match else '?'
+        else:
+            id_match = _re.search(r'w:id="([^"]+)"', attrs)
+            entry_id = id_match.group(1) if id_match else '?'
         # Concatenate all <w:t> contents
         text_parts = _re.findall(r'<w:t[^>]*>([^<]*)</w:t>', body)
         text = ''.join(text_parts).strip()

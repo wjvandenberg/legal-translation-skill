@@ -466,8 +466,18 @@ def _note(idx, text, en, spans):
                       "bold": False, "italic": False} for s, e in spans]}
 
 
-def _notes_from_document(path):
+def _notes_from_document(path, shapes, en_map):
     """Build one note per w:p BY READING THE DOCUMENT BACK, not from the shape table.
+
+    PARAMETERISED ON 2026-09-09, branch 7 slice 2, and the alternative was worse. It read
+    CONTAINER_SHAPES and CONTAINER_EN as module globals, so the glossary fixture needed either
+    a second copy of this reader or a hardcoded reference to the wrong tables. A second copy is
+    exactly the defect slice 1 filed twice -- two definitions of one rule in one file will
+    disagree, and the one that loses is silent. There is deliberately NO DEFAULT for either
+    argument: a default is a hidden second place for a caller to be wrong.
+
+    THE OTHER FIXTURES' NOTES MUST NOT MOVE, and that is asserted rather than hoped for --
+    `make_fixtures.py` is run and every other fixture's bytes are compared before and after.
 
     The notes and the XML would otherwise be two descriptions of one thing, and every
     fixture-versus-notes defect this project has had came from exactly that. Reading the
@@ -487,20 +497,20 @@ def _notes_from_document(path):
     """
     import xml.etree.ElementTree as ET      # READING only; never used to write OOXML
     wns = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
-    missing = [lbl for lbl, _, _, _ in CONTAINER_SHAPES if lbl not in CONTAINER_EN]
+    missing = [lbl for lbl, _, _, _ in shapes if lbl not in en_map]
     if missing:
-        raise AssertionError("CONTAINER_EN has no English for: " + ", ".join(missing))
+        raise AssertionError(f"{path.name}: no English for: " + ", ".join(missing))
     with zipfile.ZipFile(path) as z:
         root = ET.fromstring(z.read("word/document.xml"))
     paras = list(root.iter(f"{wns}p"))
     # ONE SHAPE MAY CONTRIBUTE MORE THAN ONE PARAGRAPH (a block container wraps one), so the
     # shapes are walked in step with the paragraphs rather than zipped one-to-one.
     order = []
-    for lbl, _, _, xml in CONTAINER_SHAPES:
+    for lbl, _, _, xml in shapes:
         order += [lbl] * xml.count("<w:p>")
     if len(order) != len(paras):
         raise AssertionError(
-            f"containers.docx: {len(paras)} paragraph(s) in the XML but the shape table "
+            f"{path.name}: {len(paras)} paragraph(s) in the XML but the shape table "
             f"accounts for {len(order)} — a shape's own XML and its paragraph count "
             f"disagree, so every note below would describe the wrong row")
     src_texts = set()
@@ -511,11 +521,11 @@ def _notes_from_document(path):
     notes = []
     for idx, (para, lbl) in enumerate(zip(paras, order)):
         text = "".join(t.text or "" for t in para.iter(f"{wns}t"))
-        en = CONTAINER_EN[lbl]
+        en = en_map[lbl]
         clash = sorted(s for s in src_texts if s and s in en)
         if clash:
             raise AssertionError(
-                f"containers.docx idx {idx} ({lbl}): its `en` contains the source fragment "
+                f"{path.name} idx {idx} ({lbl}): its `en` contains the source fragment "
                 f"{clash[0]!r} verbatim. The suite tells English from source by comparing "
                 f"whole w:t strings, so this would read as a remnant that is not one.")
         spans, pos = [], 0
@@ -981,7 +991,143 @@ def _containers(path):
     docx(path, body, {"word/charts/chart1.xml": chart, "word/media/image1.png": PNG,
                       "word/footnotes.xml": footnotes,
                       "word/_rels/document.xml.rels": rels}, ct)
-    _write_notes(path, _notes_from_document(path))
+    _write_notes(path, _notes_from_document(path, CONTAINER_SHAPES, CONTAINER_EN))
+
+
+# ---------------------------------------------------------------------------
+# Branch 7 slice 2 — C19, word/glossary/document.xml.
+#
+# WHY THIS FIXTURE CARRIES A SHAPE THE ROW DOES NOT NAME. C19 says the delivered document.xml
+# "still referenced its docPart for the cover-page date control", which reads as
+# `w:docPartObj` / `w:docPartGallery` inside `w:sdtPr` -- and that is what
+# temp/probe_glossary_c19.py built. Measured on the one corpus carrier
+# (temp/probe_glossary_reference_site.py): docPartObj 0, docPartGallery 0, and instead
+# `docPart` 10, `placeholder` 20, `w:sdt` 10, with 10 of 10 glossary docPart names appearing
+# VERBATIM in document.xml.
+#
+# So the real mechanism is <w:placeholder><w:docPart w:val="..."/></w:placeholder>: the
+# GREYED-OUT PROMPT TEXT Word shows while a content control is EMPTY, fetched from the
+# glossary at render time. The row is right that the body addresses the glossary and wrong
+# about how, and the effect it describes is slightly worse than stated -- ten controls, each
+# able to display source-language prompt text, from a part no check in either tree reads.
+#
+# THIS IS THE SECOND TIME ON THIS BRANCH that a fixture built from a register row's own words
+# carried the wrong shape; slice 1's carried the `w:sdt` BLOCK form, which A16 calls correct.
+# Hence the rule this fixture is built under: take the shape from the MEASUREMENT.
+#
+# The corpus names its docParts with 32-character GUIDs. The names here are readable instead,
+# because the reference is an exact string match either way -- measured, 10 of 10 -- so the
+# name format is immaterial to the mechanism and a GUID would only make the assertions
+# unreadable. One name is GUID-SHAPED anyway, so the shape is represented too.
+# ---------------------------------------------------------------------------
+GLOSSARY_DATE_PART = "0f3c7ad14e6b48c9b2e5a71d9c40be82"     # GUID-shaped, as the corpus is
+GLOSSARY_PARTY_PART = "LT-Partij-Aanduiding"                # readable, same mechanism
+
+# The docPart bodies. INVENTED Dutch, deliberately bland: these are the placeholder prompts a
+# reader sees in an empty control. Kept SHORT because the corpus's are short -- 10 strings,
+# 38 characters in total, the longest 7 -- and a fixture whose payload is an essay would test
+# a different thing.
+GLOSSARY_PROMPTS = {
+    GLOSSARY_DATE_PART: "Datum invullen",
+    GLOSSARY_PARTY_PART: "Naam van de partij",
+}
+
+
+def _glossary_part(prompts):
+    """A w:glossaryDocument holding one placeholder building block per prompt.
+
+    `prompts` maps docPart name -> body text. An EMPTY dict produces a structurally valid
+    glossary part carrying no translatable text at all, which is the conforming input for the
+    refusal: Word writes such a part for AutoText, and a gate that fired on it would fire on
+    input nobody can change. That is Wouter's decision 2 of 2026-09-08 applied one part
+    outward -- "an unlisted element carrying no text is left alone".
+    """
+    parts = []
+    for name, body in prompts.items():
+        parts.append(
+            "<w:docPart><w:docPartPr>"
+            f'<w:name w:val="{name}"/>'
+            '<w:category><w:name w:val="Algemeen"/>'
+            '<w:gallery w:val="placeholder"/></w:category>'
+            "<w:types><w:type w:val=\"bbPlcHdr\"/></w:types>"
+            "</w:docPartPr><w:docPartBody>"
+            + p(r(body)) +
+            "</w:docPartBody></w:docPart>")
+    return ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            f"<w:glossaryDocument {W}><w:docParts>"
+            + "".join(parts) +
+            "</w:docParts></w:glossaryDocument>")
+
+
+def _sdt_placeholder(n, part_name, inner):
+    """An inline content control whose PLACEHOLDER points at a glossary docPart by name.
+
+    This is the measured corpus shape. Note `w:showingPlcHdr`: it says the control is
+    currently DISPLAYING its placeholder, which is when the glossary's source-language text
+    is what appears on the page.
+    """
+    return ("<w:sdt><w:sdtPr>"
+            f'<w:id w:val="{n}"/>'
+            f'<w:placeholder><w:docPart w:val="{part_name}"/></w:placeholder>'
+            "<w:showingPlcHdr/>"
+            "</w:sdtPr><w:sdtContent>" + inner + "</w:sdtContent></w:sdt>")
+
+
+GLOSSARY_SHAPES = [
+    ("gloss-date-control", True,
+     "THE CORPUS SHAPE. An inline content control whose placeholder names a glossary "
+     "docPart, beside ordinary runs. While the control is empty Word renders the glossary's "
+     "source-language prompt on the page, and no check in either tree reads that part",
+     p(r("Deze overeenkomst is gedateerd "),
+       _sdt_placeholder(1, GLOSSARY_DATE_PART, r("[datum]")),
+       r(" en treedt in werking bij ondertekening."))),
+    ("gloss-party-control", True,
+     "a second control naming a DIFFERENT docPart, so the part carries more than one "
+     "translatable string and a fix that reaches only the first is caught",
+     p(r("De wederpartij is "),
+       _sdt_placeholder(2, GLOSSARY_PARTY_PART, r("[partij]")),
+       r(" te dezer zake."))),
+    ("gloss-plain", False,
+     "POSITIVE CONTROL. An ordinary paragraph with no control and no glossary reference. It "
+     "must translate exactly as it does today",
+     p(r("De partijen zijn het volgende overeengekomen."))),
+]
+
+GLOSSARY_EN = {
+    "gloss-date-control": "This agreement bears the date shown and takes effect on signing.",
+    "gloss-party-control": "The counterparty is the entity identified for this matter.",
+    "gloss-plain": "CONTROL — the parties have reached the following accord.",
+}
+
+# THE RELATIONSHIP AND THE CONTENT-TYPE OVERRIDE, and both are load-bearing: a glossary part
+# with neither is a part no consumer can find, and register I-17's family is a fixture a
+# renderer refuses outright. `_assert_pointers` cannot catch this one -- it deliberately does
+# NOT assert that every part is referenced, because docx() writes an unreferenced styles.xml
+# into every fixture -- so the proof is the LibreOffice render, which is run.
+GLOSSARY_CT = ('<Override PartName="/word/glossary/document.xml" ContentType="application/'
+               'vnd.openxmlformats-officedocument.wordprocessingml.document.glossary+xml"/>\n')
+GLOSSARY_RELS = (
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/'
+    'relationships/styles" Target="styles.xml"/>'
+    '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/'
+    'relationships/glossaryDocument" Target="glossary/document.xml"/>'
+    '</Relationships>')
+
+
+@fixture("glossary.docx",
+         "C19 — a live word/glossary/document.xml whose placeholder building blocks are "
+         "named by controls in the body. 1 of 10 reachable corpus documents carries the "
+         "part; NONE carries the docPartObj shape the row describes, so the mechanism is "
+         "synthetic even though the part is not")
+def _glossary(path):
+    body = "".join(s[3] for s in GLOSSARY_SHAPES)
+    docx(path, body,
+         {"word/glossary/document.xml": _glossary_part(GLOSSARY_PROMPTS),
+          "word/_rels/document.xml.rels": GLOSSARY_RELS},
+         GLOSSARY_CT)
+    _write_notes(path, _notes_from_document(path, GLOSSARY_SHAPES, GLOSSARY_EN))
 
 
 @fixture("symbol-font.docx",

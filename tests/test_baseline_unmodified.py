@@ -58,6 +58,30 @@ if rc != 0 or not out.strip():
     print("  SKIPPED — nothing staged or committed under uk/ or us/ yet.")
     sys.exit(0)
 
+# SAY WHICH TREE WAS READ, because a PASS over the INDEX looks exactly like a PASS over the
+# working tree and this suite can only ever mean the first.
+#
+# It reads `git ls-files` and `git cat-file`, so an UNSTAGED edit is invisible to it. That is
+# correct for the question it asks — "are the COMMITTED trees byte-identical to the published
+# archives?" — and it is a trap for the session running it. Measured on branch 7 slice 2:
+# eight tree files edited, this suite green, because nothing had been staged; the same eight
+# reported MOVED AGAIN the moment they were. Nothing in the output said which tree it had
+# looked at, so the first PASS was indistinguishable from the second.
+#
+# CLAUDE.md 5.16's second rule, from the other side: a claim asserting a HISTORICAL DELIVERY
+# may read the index; the reader has to be told that is what it did.
+_dirty, _rcd = git("diff", "--name-only", "--", "uk", "us")
+_unstaged = sorted(x for x in _dirty.decode("utf-8", "replace").split("\n") if x.strip())
+print(f"  read from: the GIT INDEX (staged + committed), not the working tree")
+if _unstaged:
+    print(f"  NOTE — {len(_unstaged)} tree file(s) have UNSTAGED edits, which this suite "
+          f"CANNOT see:")
+    for _u in _unstaged[:10]:
+        print(f"      {_u}")
+    if len(_unstaged) > 10:
+        print(f"      ... {len(_unstaged) - 10} more")
+    print("  A pass below says nothing about those. `git add` them and re-run.")
+
 blobs = {}
 for line in out.decode("utf-8", "replace").splitlines():
     meta, path = line.split("\t", 1)

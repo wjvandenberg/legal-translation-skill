@@ -40,6 +40,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -290,12 +291,55 @@ def _repack_bypass(src_docx, doc_xml, out_docx):
     return out_docx if Path(out_docx).is_file() else None
 
 
+_GLOSSARY_PART = "word/glossary/document.xml"
+_GLOSSARY_TEXT_RE = re.compile(
+    r"<w:(?:t|delText)(?:\s[^>]*)?>([^<]*)</w:(?:t|delText)>")
+
+
+def _glossary_passthrough(src_docx, workdir):
+    """['--glossary', <path>] when the source carries a text-bearing glossary part, else [].
+
+    ADDED FOR BRANCH 7 SLICE 2, and without it this tool simply FAILS on any document that
+    has one: repack now REFUSES when the original carries a text-bearing
+    word/glossary/document.xml and --glossary is absent (register C19). A renderer that dies
+    on a new fixture is the shape "fix the class, not the caller" warns about — so the
+    pass-through lives here, in the one place both arms go through, rather than being
+    remembered at each call site.
+
+    IT PASSES THE ORIGINAL PART, UNCHANGED, AND THAT IS DELIBERATE. That is repack's second
+    compliant route — the operator who has read the part and judged it needs no translation
+    records the decision by passing it. This tool renders; it does not translate, and
+    inventing a translation here would put text on a page that no pipeline produced.
+
+    THE CONSEQUENCE FOR WHAT THE RENDER SHOWS IS STATED IN THE READ-ME rather than left to be
+    inferred: measured 2026-09-09 with a positive control firing
+    (temp/probe_glossary_visible.py), LibreOffice renders NO glossary placeholder text at
+    all — a translated and an untranslated glossary produce byte-identical page text. So this
+    part of C19 has no page in this renderer, and a three-arm visual diff of it would be
+    false coverage. Its proof is the byte comparison in tests/test_glossary_route.py.
+    """
+    try:
+        with zipfile.ZipFile(src_docx) as z:
+            if _GLOSSARY_PART not in z.namelist():
+                return []
+            raw = z.read(_GLOSSARY_PART)
+    except Exception:                                   # noqa: BLE001
+        return []
+    text = raw.decode("utf-8", errors="ignore")
+    if not any(t.strip() for t in _GLOSSARY_TEXT_RE.findall(text)):
+        return []                                       # empty part: repack does not refuse
+    out = Path(workdir) / "glossary-passthrough.xml"
+    out.write_bytes(raw)
+    return ["--glossary", str(out)]
+
+
 def repack(scripts_dir, src_docx, doc_xml, out_docx, notes_json):
     env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
                PYTHONDONTWRITEBYTECODE="1")
     p = subprocess.run(
         ["uv", "run", "--with", "lxml", "python", str(scripts_dir / "repack_docx.py"),
-         str(src_docx), str(doc_xml), str(out_docx), "--paragraphs", str(notes_json)],
+         str(src_docx), str(doc_xml), str(out_docx), "--paragraphs", str(notes_json)]
+        + _glossary_passthrough(src_docx, out_docx.parent),
         capture_output=True, text=True, encoding="utf-8", errors="replace",
         cwd=str(ROOT), env=env, timeout=900)
     return (out_docx if out_docx.is_file() else None), p
@@ -480,11 +524,46 @@ for stem in args.fixture:
         # reviewer who cannot find what the text promises reads a correct page as a defect --
         # which happened on the table-of-contents slice, where two deliberate refusals were
         # read as damage because nothing on the page said they were deliberate.
-        "WHAT THIS BRANCH CHANGED — A16 and N1, the container inventory. Extraction always",
-        "descended into a container and folded its text into the paragraph; apply rebuilt",
-        "only the runs it recognised. So the container's text stayed in the SOURCE LANGUAGE",
-        "on the delivered page, and every gate reported the document clean, because the",
-        "English was in the package and merely unreachable.",
+        "WHAT THIS BRANCH CHANGED — C19, the glossary part's route in and route out. It",
+        "changes repack_docx.py and extract_paragraphs.py; it does NOT touch apply. So on",
+        "these pages the `old` and `new` arms are the SAME APPLY CODE, and an all-quiet",
+        "render is the expected result rather than evidence of anything. The line above",
+        "about the baseline arm says so too when it fires.",
+        "",
+        "AND THIS PART OF C19 HAS NO PAGE IN THIS RENDERER, WHICH IS MEASURED, NOT ASSUMED.",
+        "A glossary building block is PLACEHOLDER text that Word fetches when a content",
+        "control is empty. Measured 2026-09-09 with a positive control firing",
+        "(temp/probe_glossary_visible.py): LibreOffice renders none of it, and a translated",
+        "and an untranslated glossary give byte-IDENTICAL page text. So do not hunt these",
+        "pages for the glossary — it is not on them, in either arm, and that absence is a",
+        "fact about LibreOffice rather than about the deliverable. It is also very close to",
+        "why the defect survived: the part is invisible to almost everything that looks.",
+        "",
+        "  WHAT THE PAGES DO SHOW, and it is worth checking: the body is translated, the",
+        "  content controls still stand, and THE PACKAGE LOADS AT ALL. That last one is not",
+        "  a formality — a glossary part needs both its relationship and its content-type",
+        "  override, and a fixture missing a pointer made LibreOffice refuse a whole package",
+        "  twice before (register I-17). A rendered page is the proof that it does not here.",
+        "",
+        "  glossary.docx — three rows, and the document labels them:",
+        "    gloss-date-control    an inline control whose PLACEHOLDER names a glossary",
+        "                          docPart. The measured corpus shape — and note the row's",
+        "                          register text names docPartObj, which the corpus does",
+        "                          NOT use. The fixture follows the measurement.",
+        "    gloss-party-control   a second control naming a DIFFERENT docPart, so a fix",
+        "                          reaching only the first would be caught.",
+        "    gloss-plain           CONTROL. No control, no glossary reference. Must look",
+        "                          identical in both arms.",
+        "",
+        "  THE PROOF OF THIS SLICE IS NOT VISUAL. It is tests/test_glossary_route.py: the",
+        "  part comes back byte-identical to the translated one when --glossary is passed,",
+        "  repack REFUSES when it is absent and the original carries text, and it does NOT",
+        "  refuse on an empty glossary or on none. 38 checks, both variants.",
+        "",
+        "PREVIOUS SLICE, FOR ORIENTATION ONLY — A16 and N1, the container inventory: a",
+        "container's text stayed in the SOURCE LANGUAGE on the delivered page while every",
+        "gate reported the document clean. That is now in the pinned baseline, so it is no",
+        "longer visible as a difference here. Render containers.docx to see it.",
         "",
         "  containers.docx — the document LABELS ITS OWN ROWS, so nothing here has to be",
         "  taken on trust. Read each label, then the line under it. Twenty rows:",

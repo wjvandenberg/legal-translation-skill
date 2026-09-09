@@ -2,7 +2,8 @@
 
 Uses Python's zipfile to copy the original ZIP structure byte-for-byte,
 replacing only word/document.xml (and optionally word/numbering.xml,
-word/settings.xml, word/headerN.xml, word/footerN.xml). This avoids
+word/settings.xml, word/headerN.xml, word/footerN.xml, word/comments.xml,
+word/footnotes.xml, word/endnotes.xml, word/glossary/document.xml). This avoids
 the case-sensitivity and directory-entry issues that arise when using
 shell unzip + zip, which can produce files that Word on Windows refuses
 to open.
@@ -21,8 +22,10 @@ Exit codes:
   0 — the .docx was written to the delivery path
   1 — a gate blocked; NOTHING was written to the delivery path. Either a
       mandatory pre-bundle validator failed, or --paragraphs was not supplied
-      so one could not run, or the finished archive failed its own ZIP
-      integrity or case-conflict check and was deleted.
+      so one could not run, or the ORIGINAL carries a text-bearing
+      word/glossary/document.xml and --glossary was not supplied, or the
+      finished archive failed its own ZIP integrity or case-conflict check
+      and was deleted.
   3 — script-integrity check failed (re-install the skill)
 
 The archive is built under `<output>.docx.tmp` and moved into place only after
@@ -80,6 +83,52 @@ except Exception:  # pragma: no cover — the agreement control is best-effort.
     _guess_lang = None
 
 _TAG_STRIP_RE = re.compile(r'<[^>]+>')
+
+# THE GLOSSARY PART, BY ITS FULL ZIP PATH AND NEVER BY A BASENAME. Register C19.
+#
+# `word/glossary/document.xml` and `word/document.xml` share the basename `document.xml`, so
+# any inventory keyed on basenames collapses the two and a whole glossary directory vanishes
+# from the listing. That is not hypothetical: it produced a written "C19 did not recur" that
+# re-measuring on full paths refuted, finding six `word/glossary/` entries and the part
+# untranslated. Every comparison below matches the full path.
+#
+# `<w:t(?:\s[^>]*)?>` and NOT `<w:t[^>]*>`: the loose form also matches `<w:tcPr>`, `<w:tbl>`
+# and `<w:tab/>`. `w:delText` is included because a docPart may carry tracked changes.
+_GLOSSARY_PART = 'word/glossary/document.xml'
+_GLOSSARY_TEXT_RE = re.compile(
+    r'<w:(?:t|delText)(?:\s[^>]*)?>([^<]*)</w:(?:t|delText)>')
+
+
+def _glossary_text_in(orig_docx):
+    """The ORIGINAL's glossary prompts: every non-whitespace <w:t>/<w:delText> string.
+
+    Returns [] when the document carries no glossary part at all — which is 9 of the 10
+    reachable corpus documents.
+
+    WHY TEXT-BEARING AND NOT MERELY PRESENT. Word writes an empty glossary part for AutoText,
+    and nothing in it can be translated, so a gate keyed on PRESENCE would fire on input
+    nobody can change. That is Wouter's decision of 2026-09-08 applied one part outward — "an
+    unlisted element carrying no text is left alone … a gate firing there would fire on
+    correct input, which is what branch 6's first offset guard did".
+
+    AND IT RAISES RATHER THAN RETURNING [] WHEN THE PART CANNOT BE READ. A gate that answers
+    "nothing to see" when it could not look is CLAUDE.md 5.16's VOID reported as CLEAN, and
+    this one guards a part that has already shipped untranslated twice.
+    """
+    try:
+        with zipfile.ZipFile(orig_docx) as zin:
+            if _GLOSSARY_PART not in zin.namelist():
+                return []
+            raw = zin.read(_GLOSSARY_PART).decode('utf-8', errors='ignore')
+    except Exception as exc:
+        raise RuntimeError(
+            "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. The original .docx "
+            f"could not be read to check for {_GLOSSARY_PART}: {exc}. Repack aborted; no "
+            ".docx written. This check is not skippable on failure: a glossary part has "
+            "shipped untranslated twice, and a gate that reports 'nothing to see' when it "
+            "could not look is worse than one that stops."
+        ) from exc
+    return [t for t in _GLOSSARY_TEXT_RE.findall(raw) if t.strip()]
 
 
 def _original_body_text(orig_docx):
@@ -187,11 +236,16 @@ def repack(orig_docx, translated_doc_xml, output_docx,
            translated_numbering_xml=None, headers_footers_dir=None,
            translated_comments_xml=None,
            translated_footnotes_xml=None, translated_endnotes_xml=None,
+           translated_glossary_xml=None,
            clean_track_revisions=True,
            paragraphs_json=None):
     """Copy orig_docx to output_docx, replacing word/document.xml and any
     optionally-supplied auxiliary XML parts (numbering, headers/footers,
-    comments, footnotes, endnotes).
+    comments, footnotes, endnotes, glossary).
+
+    THE GLOSSARY IS THE ONE THAT BLOCKS WHEN ITS FLAG IS MISSING, and it is the only
+    auxiliary part whose check reads the ORIGINAL rather than the workdir. See the gate
+    below for why the trigger and the severity both differ from the other four.
 
     CRITICAL: every auxiliary XML passed in MUST have been produced by a
     namespace-safe translator (translate_comments.py, translate_headers_footers.py,
@@ -265,6 +319,47 @@ def repack(orig_docx, translated_doc_xml, output_docx,
             "silently ships token drift introduced after apply by "
             "post_process / strip_noop / reorder_definitions, which is the "
             "entire reason this pre-bundle re-check exists."
+        )
+
+    # --- THE GLOSSARY GATE — register C19 -------------------------------
+    #
+    # NOTE THE TRIGGER, BECAUSE IT IS NOT THE ONE THE OTHER AUXILIARY CHECKS USE. The warning
+    # block further down fires on a file in the WORKDIR that looks translated: the operator
+    # did the work and lost the flag, so the evidence is sitting in their own directory and a
+    # warning has something to point at. THIS ONE FIRES ON THE ORIGINAL CARRYING THE PART,
+    # because for the glossary nobody has done any work and nothing anywhere says so — on the
+    # batch arm of C19's document, neither the forensic log nor the run narrative mentioned
+    # the glossary once. There is no second signal to fall back on.
+    #
+    # AND IT BLOCKS RATHER THAN WARNS, WHICH IS A DELIBERATE DIFFERENCE FROM THOSE FOUR.
+    # Measured 2026-09-09 (temp/probe_repack_refusal_shape.py, both positive controls
+    # firing): numbering, comments, footnotes and endnotes each print a WARNING and BUNDLE
+    # ANYWAY at exit 0. So "the pattern repack already uses" is a warn-and-bundle, and a
+    # warning is precisely the control that failed here — the part shipped byte-identical and
+    # untranslated with nothing objecting. Wouter was shown that measurement and confirmed
+    # the block. The shape copied is the --paragraphs gate immediately above.
+    #
+    # THE COMPLIANT WAY OUT EXISTS AND IS ALWAYS AVAILABLE (CLAUDE.md 5.9): pass --glossary.
+    # Either the part translated per Step 8e, or — if the operator judges it needs no
+    # translation — the original part unchanged. The second route is not a bypass: it makes
+    # the decision explicit and recorded, and the post-repack remnant scan now reads the
+    # delivered part, so a wrong judgement is still reported.
+    _glossary_prompts = _glossary_text_in(orig_docx)
+    if _glossary_prompts and not translated_glossary_xml:
+        raise RuntimeError(
+            "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. The ORIGINAL .docx "
+            f"carries {_GLOSSARY_PART} holding {len(_glossary_prompts)} translatable "
+            "string(s), and --glossary was not supplied. Repack aborted; no .docx written.\n"
+            "  Every part this script is not explicitly given is copied BYTE-FOR-BYTE from "
+            "the original, so bundling now would ship that part in the source language.\n"
+            "  It is not dormant metadata: a glossary docPart supplies the placeholder text "
+            "a content control DISPLAYS while it is empty, so the source language can appear "
+            "on the page — and no remnant check in this skill used to read the part at all.\n"
+            "  Translate it per Step 8e and pass --glossary "
+            "<workdir>/final/word/glossary-document.xml. If you have read it and judged that "
+            "it needs no translation, pass the ORIGINAL part to the same flag: that is a "
+            "recorded decision rather than a silent default, and the post-repack scan will "
+            "still report any source-language text left in it. Do NOT work around this gate."
         )
 
     with open(translated_doc_xml, 'rb') as f:
@@ -345,6 +440,11 @@ def repack(orig_docx, translated_doc_xml, output_docx,
         ('word/comments.xml', translated_comments_xml),
         ('word/footnotes.xml', translated_footnotes_xml),
         ('word/endnotes.xml', translated_endnotes_xml),
+        # THE FULL PATH IS THE KEY, and that is what makes this safe to add here. The write
+        # loop below compares `norm_filename` against 'word/document.xml' FIRST; a glossary
+        # part keyed by basename would have been captured by that branch and overwritten with
+        # the translated BODY. Matching on the full path, the two never collide. Register C19.
+        (_GLOSSARY_PART, translated_glossary_xml),
     ]:
         if src_path and os.path.exists(src_path):
             with open(src_path, 'rb') as f:
@@ -655,6 +755,17 @@ def repack(orig_docx, translated_doc_xml, output_docx,
                     'word/comments.xml',
                     'word/footnotes.xml',
                     'word/endnotes.xml',
+                    # ADDED 2026-09-09, register C19 — and this is the arm that would have
+                    # caught the recurrence. The part had shipped byte-identical and
+                    # untranslated on a batch run, and the row records that it went "past
+                    # five separate remnant checks, none of which look at the glossary at
+                    # all". This is one of the five.
+                    #
+                    # IT MUST BE THE FULL PATH. `base` below is os.path.basename(part_name),
+                    # which for this part is 'document.xml' — so a basename-keyed membership
+                    # test would either miss it or match the body. The set is keyed on
+                    # part_name, which is the full path, and that is why this one line works.
+                    _GLOSSARY_PART,
                 }
                 for part_name in xml_parts:
                     # Include headerN.xml, footerN.xml, and the fixed list above.
@@ -732,6 +843,15 @@ if __name__ == '__main__':
     parser.add_argument('--endnotes', default=None,
                         help='Translated word/endnotes.xml '
                              '(produced via the regex-only approach — NOT ElementTree)')
+    parser.add_argument('--glossary', default=None,
+                        help='Translated word/glossary/document.xml, holding the '
+                             'placeholder building blocks a content control DISPLAYS while '
+                             'it is empty (Step 8e; regex-only — NOT ElementTree). The '
+                             'repack REFUSES when the ORIGINAL carries a text-bearing '
+                             'glossary part and this flag is absent, because every part not '
+                             'named here is copied byte-for-byte from the original and the '
+                             'part would ship in the source language. To keep it as it is, '
+                             'pass the original part: an explicit decision, not a bypass.')
     parser.add_argument('--no-clean-track-revisions', action='store_true',
                         help='Do not remove trackRevisions from settings.xml')
     parser.add_argument('--paragraphs', default=None,
@@ -748,6 +868,7 @@ if __name__ == '__main__':
            translated_comments_xml=args.comments,
            translated_footnotes_xml=args.footnotes,
            translated_endnotes_xml=args.endnotes,
+           translated_glossary_xml=args.glossary,
            clean_track_revisions=not args.no_clean_track_revisions,
            paragraphs_json=args.paragraphs)
 
