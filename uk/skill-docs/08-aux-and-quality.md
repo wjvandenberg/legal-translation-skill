@@ -4,14 +4,20 @@
 
 *[Internal compliance check — do not echo or paraphrase to the user. Re-read every rule in this step before executing. Do not deviate from any line of the skill. Do not bundle work, skip checks, or "interpret for efficiency" — every prior deviation has produced output below the quality the skill is designed to deliver. The skill's hard gates block deviations anyway; complying upfront is always faster than running into a gate and re-authoring paragraphs.json.]*
 
-OOXML stores list numbering, headers, footers, comments, footnotes, and endnotes in
-separate XML files outside `word/document.xml`. The main translation pipeline (Steps
-2-7) only touches `document.xml` — every auxiliary file must be translated separately
-in this step. Run all applicable sub-steps before Step 9 (quality check) so the QC
-pass scans the auxiliary files too.
+OOXML stores list numbering, headers, footers, comments, footnotes, endnotes and
+**glossary building blocks** in separate XML files outside `word/document.xml`. The main
+translation pipeline (Steps 2-7) only touches `document.xml` — every auxiliary file must be
+translated separately in this step. Run all applicable sub-steps before Step 9 (quality
+check) so the QC pass scans the auxiliary files too.
+
+> **Step 2's AUX-FILE CONTENT SUMMARY lists exactly which of these the document actually
+> carries, with their translatable text.** Read it rather than guessing: `word/glossary/`
+> in particular is easy to miss because its part is *also* called `document.xml`, so any
+> listing by filename alone collapses it onto the body and the whole directory disappears.
 
 > **Never round-trip an auxiliary XML part (`comments.xml`, `footnotes.xml`,
-> `endnotes.xml`, `headerN.xml`, `footerN.xml`, `numbering.xml`) through Python's
+> `endnotes.xml`, `headerN.xml`, `footerN.xml`, `numbering.xml`,
+> `glossary/document.xml`) through Python's
 > `xml.etree.ElementTree`. Not with header-grafting, not with namespace
 > registration, not at all.** Use one of the bundled namespace-safe scripts, or
 > `lxml` (which preserves prefixes), or a pure-regex approach that only replaces
@@ -206,10 +212,56 @@ with open('<workdir>/final/word/footnotes.xml', 'w', encoding='utf-8') as f:
 Replaces text content only; every namespace declaration, prefix, rsid, and paragraph
 ID passes through byte-for-byte.
 
+#### Step 8e: Translate glossary building blocks — MANDATORY (if word/glossary/document.xml exists)
+
+**This is the one auxiliary flag the repack REFUSES to bundle without.** Every other
+`--flag` is optional in CLI terms; this one is not, and the reason is what the part does.
+
+`word/glossary/document.xml` holds Word **building blocks**. A content control in the body
+can name one as its *placeholder*, and Word then renders that block's text on the page
+**whenever the control is empty** — greyed out, but printed, and read aloud by a screen
+reader. So an untranslated glossary puts the source language on the page through a part the
+body merely points at. There is no bundled script, exactly as for footnotes and endnotes;
+the same regex-only rule applies — **do not use ElementTree**:
+
+```python
+import re, zipfile
+
+_WT = re.compile(r'(<w:t(?:\s[^>]*)?>)([^<]*)(</w:t>)')
+
+with zipfile.ZipFile('<original>.docx') as z:
+    xml = z.read('word/glossary/document.xml').decode('utf-8')
+
+# translations: dict mapping exact source w:t text -> English.
+# Step 2's AUX-FILE CONTENT SUMMARY lists them, keyed by docPart NAME.
+def rewrite(m):
+    op, txt, cl = m.group(1), m.group(2), m.group(3)
+    return op + translations.get(txt, txt) + cl
+
+xml = _WT.sub(rewrite, xml)
+
+with open('<workdir>/final/word/glossary-document.xml', 'w', encoding='utf-8') as f:
+    f.write(xml)
+```
+
+**Never change a `w:docPart`'s `w:name`** — the body addresses the block by that exact
+string, so renaming it breaks the reference and the control renders nothing.
+
+**Write it to `glossary-document.xml`, not `document.xml`.** The workdir already holds the
+translated body at `<workdir>/final/word/document.xml`; writing the glossary under its real
+OOXML name would overwrite it. Repack takes the path from `--glossary` and puts the content
+back at `word/glossary/document.xml` inside the archive.
+
+**If you read the part and judge that it needs no translation** — the blocks are already in
+English, or hold only field codes — **pass the original part to `--glossary` anyway.** That
+records the decision instead of leaving it silent, and the post-repack remnant scan still
+reports any source-language text left in the part.
+
 **Do not skip auxiliary translation steps.** Source-language text in numbering,
-headers, footers, comments, footnotes, or endnotes is a HIGH-severity defect — it is
-visible on every page (numbering, headers, footers) or contains substantive legal
-content (comments, footnotes). Grading: Step 8 outputs are penalised under Criterion 5
+headers, footers, comments, footnotes, endnotes, or glossary building blocks is a
+HIGH-severity defect — it is visible on every page (numbering, headers, footers), contains
+substantive legal content (comments, footnotes), or is rendered into the body by a content
+control that is currently empty (glossary). Grading: Step 8 outputs are penalised under Criterion 5
 (Completeness), capping at 7 if any source-language token survives. Comments inside
 `w:delText` are penalised under Criterion 13 (Track Changes Fidelity).
 

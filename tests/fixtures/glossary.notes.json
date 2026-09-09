@@ -1,0 +1,75 @@
+[
+  {
+    "idx": 0,
+    "text": "Deze overeenkomst is gedateerd [datum] en treedt in werking bij ondertekening.",
+    "en": "This agreement bears the date shown and takes effect on signing.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 31,
+        "text": "Deze overeenkomst is gedateerd ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 31,
+        "end": 38,
+        "text": "[datum]",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 38,
+        "end": 78,
+        "text": " en treedt in werking bij ondertekening.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 1,
+    "text": "De wederpartij is [partij] te dezer zake.",
+    "en": "The counterparty is the entity identified for this matter.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 18,
+        "text": "De wederpartij is ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 18,
+        "end": 26,
+        "text": "[partij]",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 26,
+        "end": 41,
+        "text": " te dezer zake.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 2,
+    "text": "De partijen zijn het volgende overeengekomen.",
+    "en": "CONTROL — the parties have reached the following accord.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 45,
+        "text": "De partijen zijn het volgende overeengekomen.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  }
+]

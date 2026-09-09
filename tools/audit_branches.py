@@ -432,12 +432,21 @@ def audit_b1():
     # fine. It gains a notes sidecar for the same reason the other four have one: a fixture's
     # notes are its INPUT and belong beside it, not invented by whichever tool drives it.
     #
+    # 23 SINCE 2026-09-09, branch 7's second slice: +2, glossary.docx and its
+    # glossary.notes.json. C19's part had no route in and no route out, and NEITHER is
+    # reproducible from the corpus in the shape that matters -- 1 of 10 reachable documents
+    # carries a glossary part at all, and the mechanism its register row describes
+    # (`docPartObj`) is carried by NONE of them, the real one being `w:placeholder/w:docPart`.
+    # So the fixture follows the measurement rather than the row, which is the same lesson
+    # slice 1 filed one paragraph above, arriving a second time on the same branch.
+    #
     # COUNTED BY LISTING, from `git ls-files`, never by adding a delta to the figure above.
     # This claim reads the INDEX, deliberately, and is the only one in this block that does --
     # so a fixture added on a branch must be STAGED before the number is right, and the claim
-    # goes red while whoever moved it is still here rather than after the merge. IT DID
-    # EXACTLY THAT ON THIS BRANCH, which is the second time that design has paid.
-    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 21)
+    # goes red while whoever moved it is still here rather than after the merge. IT HAS NOW
+    # DONE EXACTLY THAT ON TWO CONSECUTIVE SLICES, which is the third time that design has
+    # paid. Re-derived 23 against a claimed 21, on this branch, with the fixtures staged.
+    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 23)
 
     hits = 0
     for nm in fx:

@@ -111,7 +111,8 @@ python <skill-path>/scripts/repack_docx.py \
   --headers-footers-dir <workdir>/final \
   --comments <workdir>/final/word/comments.xml \
   --footnotes <workdir>/final/word/footnotes.xml \
-  --endnotes <workdir>/final/word/endnotes.xml
+  --endnotes <workdir>/final/word/endnotes.xml \
+  --glossary <workdir>/final/word/glossary-document.xml
 ```
 
 `--paragraphs` is **REQUIRED**: it enables the auto-run pre-bundle
@@ -126,15 +127,28 @@ lines called the flag only "strongly recommended", so a reader could not tell wh
 the gate was required. Omitting one optional-looking flag removed a mandatory check
 and printed a warning nobody had to act on.
 
-Every flag after the first three positional arguments **except `--paragraphs`** is
-optional in CLI terms — include each only if the corresponding step produced a
-translated file:
+**TWO of the flags are not optional, and the second one is conditional rather than
+always-on.** The rest are optional in CLI terms — include each only if the corresponding
+step produced a translated file:
 
-- `--paragraphs` — **REQUIRED**; the repack refuses to bundle without it
+- `--paragraphs` — **ALWAYS REQUIRED**; the repack refuses to bundle without it
+- `--glossary` — **REQUIRED WHENEVER THE ORIGINAL CARRIES A TEXT-BEARING
+  `word/glossary/document.xml`**; the repack refuses in that case and writes no `.docx`.
+  Step 8e produces the file. If the part needs no translation, pass the original part —
+  see Step 8e
 - `--numbering` — if Step 8a produced translated `numbering.xml`
 - `--headers-footers-dir` — if Step 8b produced translated `headerN.xml` / `footerN.xml` files
 - `--comments` — if Step 8c produced translated `comments.xml`
 - `--footnotes`, `--endnotes` — if Step 8d produced translated footnotes/endnotes
+
+> **Why the glossary blocks where the other four only warn, which is a real difference in
+> this script.** For `numbering`, `comments`, `footnotes` and `endnotes` the repack checks
+> the **workdir**: a translated file sitting there with its flag missing means the work was
+> done and the flag forgotten, so a warning has something to point at. The glossary check
+> reads **the original**, because nothing in the workdir would exist — the part has no
+> translation step anyone knew to run. Warning was the control that failed: the part has
+> shipped byte-identical and untranslated, with neither the run log nor the delivery note
+> mentioning it. The way out is always available: pass `--glossary`.
 
 The script also automatically:
 - Removes `<w:trackRevisions>` from `word/settings.xml` (disabling track changes mode)
