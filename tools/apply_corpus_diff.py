@@ -62,15 +62,22 @@ SCRIPT = "apply_translations_textmatch.py"
 # once read its "before" from HEAD, which worked only while the change was uncommitted and then
 # compared the new file against itself and reported 100% carried.
 #
-# MOVED TO 544f908 ON 2026-09-08, the squash-merge of branch 7 slice 1 (PR #65) and the LAST
+# MOVED TO ae48f6d ON 2026-09-09, the squash-merge of branch 7 slice 2 (PR #67) and the LAST
 # COMMIT THAT TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE:
-# `git log --oneline -1 -- uk us` returns it, and `git diff 544f908 -- uk us` comes back
+# `git log --oneline -1 -- uk us` returns it, and `git diff ae48f6d -- uk us` comes back
 # empty. A pin left at the previous baseline reports the merged slice's own work as movement
 # belonging to whatever branch runs next, and the branch that inherits it cannot tell.
 #
-# IT HAS NOW MOVED FIVE TIMES IN FOUR DAYS -- 4a1c452, 049484e, 2a71e71, d3c7f19, here -- and
-# that cadence IS the argument for the rule rather than a complaint about it: moving it is the
-# FIRST act after a merge, never a closing tidy-up.
+# IT HAS NOW MOVED SIX TIMES IN FIVE DAYS -- 4a1c452, 049484e, 2a71e71, d3c7f19, 544f908,
+# here -- and that cadence IS the argument for the rule rather than a complaint about it:
+# moving it is the FIRST act after a merge, never a closing tidy-up.
+#
+# AND SLICE 2 IS THE CASE WHERE FORGETTING IT WOULD HAVE BEEN HARDEST TO SEE. That slice
+# changed repack and extraction and NOT apply, so this tool's own arms were byte-identical by
+# design and it reported 13 of 13 unchanged. A stale pin would have gone on reporting exactly
+# that -- a correct-looking all-quiet run -- while the baseline it compares against silently
+# lacked eight tree files' worth of change. The reading that catches a stale pin is the one
+# that MOVES, and this slice produced none.
 #
 # AND THE PROSE ABOVE THE PIN GOES STALE AS READILY AS THE PIN, WHICH IS WHY THIS BLOCK IS
 # REWRITTEN EACH TIME RATHER THAN APPENDED TO. It has gone stale twice and been caught twice:
@@ -78,7 +85,7 @@ SCRIPT = "apply_translations_textmatch.py"
 # in tools/render_diff.py reading "Moved to 049484e" while its pin one line below said
 # 2a71e71 -- two claims disagreeing inside five lines, both true once. NOTHING CHECKS A
 # COMMENT. Re-derive both claims on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "544f908")
+REF = os.environ.get("LT_BASELINE_REF", "ae48f6d")
 
 # WHICH DIRECTIONAL CHECK BELONGS TO WHICH MERGED FIX — added 2026-09-08, on a measured false
 # alarm that would have recurred for ever.
