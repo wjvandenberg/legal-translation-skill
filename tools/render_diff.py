@@ -61,17 +61,18 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 SCRIPT = "apply_translations_textmatch.py"
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.16.
 #
-# MOVED TO ae48f6d ON 2026-09-09: the squash-merge of branch 7 slice 2 (PR #67) and the last
-# commit to touch either tree. DERIVED, NOT READ OFF THE MERGE MESSAGE --
-# `git log --oneline -1 -- uk us` returns it and `git diff ae48f6d -- uk us` comes back empty.
+# MOVED TO 010c34f ON 2026-09-09: the squash-merge of branch 7 slice 3 (PR #69), which CLOSED
+# branch 7, and the last commit to touch either tree. DERIVED, NOT READ OFF THE MERGE MESSAGE
+# -- `git log --oneline -1 -- uk us` returns it and `git diff 010c34f -- uk us` comes back
+# empty.
 #
 # AND THIS TOOL ALREADY SAYS SO WHEN IT BITES: the fixture path prints "BYTE-IDENTICAL to the
 # working tree, so old and new are the same code and an all-quiet render proves nothing"
-# whenever the swapped script matches the pin. That line fired on slice 2 for a legitimate
-# reason -- the slice changed repack and extraction, not the apply script this tool swaps --
-# so a stale pin would have produced the same honest-looking notice for an illegitimate one.
+# whenever the swapped script matches the pin. That line fired on slices 2 AND 3 for a
+# legitimate reason -- neither changed the apply script this tool swaps -- so a stale pin
+# would have produced the same honest-looking notice for an illegitimate one.
 #
-# THE PIN HAS NOW MOVED SIX TIMES IN FIVE DAYS, and this comment block has gone stale twice
+# THE PIN HAS NOW MOVED SEVEN TIMES IN FIVE DAYS, and this comment block has gone stale twice
 # and been caught twice -- which is the whole argument for rewriting it rather than appending
 # to it. Once it read "Moved to 049484e" while the pin one line below said 2a71e71: both true
 # once, disagreeing inside five lines. NOTHING CHECKS A COMMENT, so a stale one is
@@ -82,7 +83,13 @@ SCRIPT = "apply_translations_textmatch.py"
 # Kept in step with the same pin in tools/apply_corpus_diff.py: the two tools answer the same
 # before-and-after question, one in bytes and one in pixels, and a disagreement between their
 # baselines would be invisible in either one's output.
-REF = os.environ.get("LT_BASELINE_REF", "ae48f6d")
+#
+# THREE TOOLS CARRY A PIN SINCE 2026-09-09, NOT TWO, AND tools/hf_corpus_diff.py's IS FIXED
+# RATHER THAN MOVING -- deliberately, and measured. Do not "keep all three in step": that
+# tool proves a kind-less scaffold entry is still a paragraph entry, a question that only
+# exists against a tree predating the `kind` key, so moving its pin makes it VOID for ever.
+# `git grep -F <old sha>` enumerates the carriers; a phrase naming a COUNT does not.
+REF = os.environ.get("LT_BASELINE_REF", "010c34f")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
 # Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
 # glance whether the pages in front of them belong to the run being discussed.

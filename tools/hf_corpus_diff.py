@@ -68,9 +68,33 @@ SCRIPT = "translate_headers_footers.py"
 # Both are pinned here, and this comment is the reason.
 PINNED = (SCRIPT, "extract_paragraphs.py")
 
-# MOVED TO ae48f6d ON 2026-09-09: the squash-merge of branch 7 slice 2 (PR #67) and the last
-# commit to touch either tree. Derived, never read off a merge message --
-# `git log --oneline -1 -- uk us` returns it and `git diff ae48f6d -- uk us` comes back empty.
+# A FIXED PIN, NOT A MOVING ONE, AND THAT IS THE OPPOSITE OF apply_corpus_diff.py's RULE --
+# decided on a measurement at branch 7's close, 2026-09-09.
+#
+# ae48f6d is the squash-merge of branch 7 slice 2: THE LAST COMMIT BEFORE THE `kind` KEY
+# EXISTED. That is the whole point. What arm 1 proves is that a scaffold entry with NO `kind`
+# key is still treated as a paragraph entry -- and every one of the 10 frozen header/footer
+# scaffolds predates that key, so if it ever stopped holding, real documents would silently
+# stop having their headers and footers translated while the fixture suite went on passing.
+#
+# THAT QUESTION ONLY EXISTS AGAINST A TREE THAT PREDATES THE KEY. Measured before deciding:
+# with the pin moved to 010c34f (branch 7 slice 3's merge, the normal thing to do at a close)
+# both arms carry the new code, the VOID guard below fires correctly, and this tool reports
+# `VOID -- every pinned script is BYTE-IDENTICAL` on EVERY RUN, for ever, until the
+# translator next changes. A check that can only report VOID is not a check, and a
+# permanently-red row in the sweep is one people learn to scroll past -- CLAUDE.md 5.16's
+# fourth rule, from the other side.
+#
+# SO IT FOLLOWS tests/test_no_delivered_byte_moves.py's PRECEDENT rather than
+# apply_corpus_diff.py's: that suite, test_check_scoping.py and
+# test_check_scoping_properties.py all pin to a FIXED pre-change revision (2178cce) for the
+# same reason. Three suites already do this; this is the fourth.
+#
+# WHEN TO MOVE IT, AND IT IS NOT AT A CLOSE. Move it only when a future branch LEGITIMATELY
+# changes what this script writes for real header/footer paragraphs -- at which point arm 1
+# goes red, which is correct, and whoever moved the bytes records why and re-pins here in the
+# same commit. Until then it stays where it is, and a close that mechanically "moves both
+# pins" must leave this one alone.
 REF = os.environ.get("LT_BASELINE_REF", "ae48f6d")
 
 ap = argparse.ArgumentParser()

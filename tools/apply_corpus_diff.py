@@ -62,22 +62,32 @@ SCRIPT = "apply_translations_textmatch.py"
 # once read its "before" from HEAD, which worked only while the change was uncommitted and then
 # compared the new file against itself and reported 100% carried.
 #
-# MOVED TO ae48f6d ON 2026-09-09, the squash-merge of branch 7 slice 2 (PR #67) and the LAST
-# COMMIT THAT TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE:
-# `git log --oneline -1 -- uk us` returns it, and `git diff ae48f6d -- uk us` comes back
-# empty. A pin left at the previous baseline reports the merged slice's own work as movement
-# belonging to whatever branch runs next, and the branch that inherits it cannot tell.
+# MOVED TO 010c34f ON 2026-09-09, the squash-merge of branch 7 slice 3 (PR #69), which CLOSED
+# branch 7, and the LAST COMMIT THAT TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE
+# MESSAGE: `git log --oneline -1 -- uk us` returns it, and `git diff 010c34f -- uk us` comes
+# back empty. A pin left at the previous baseline reports the merged slice's own work as
+# movement belonging to whatever branch runs next, and the branch that inherits it cannot
+# tell.
 #
-# IT HAS NOW MOVED SIX TIMES IN FIVE DAYS -- 4a1c452, 049484e, 2a71e71, d3c7f19, 544f908,
-# here -- and that cadence IS the argument for the rule rather than a complaint about it:
-# moving it is the FIRST act after a merge, never a closing tidy-up.
+# IT HAS NOW MOVED SEVEN TIMES IN FIVE DAYS -- 4a1c452, 049484e, 2a71e71, d3c7f19, 544f908,
+# ae48f6d, here -- and that cadence IS the argument for the rule rather than a complaint
+# about it: moving it is the FIRST act after a merge, never a closing tidy-up.
 #
-# AND SLICE 2 IS THE CASE WHERE FORGETTING IT WOULD HAVE BEEN HARDEST TO SEE. That slice
-# changed repack and extraction and NOT apply, so this tool's own arms were byte-identical by
-# design and it reported 13 of 13 unchanged. A stale pin would have gone on reporting exactly
-# that -- a correct-looking all-quiet run -- while the baseline it compares against silently
-# lacked eight tree files' worth of change. The reading that catches a stale pin is the one
-# that MOVES, and this slice produced none.
+# AND THE HABIT ITSELF WENT STALE THIS SESSION, WHICH IS THE MORE USEFUL LESSON THAN THE
+# CADENCE. Every close for five days moved "BOTH pins". Slice 3 added a THIRD tool carrying
+# one -- tools/hf_corpus_diff.py -- so "both" was already wrong on the commit that introduced
+# it, and a phrase that names a COUNT is wrong the moment the thing it counts changes.
+# `git grep -F <old sha>` enumerates the carriers and is the only reading that cannot go
+# stale. It found three, and one of them then turned out to need a FIXED pin rather than this
+# moving one -- see hf_corpus_diff.py's own block for the measurement.
+#
+# AND SLICE 2 REMAINS THE CASE WHERE FORGETTING WOULD HAVE BEEN HARDEST TO SEE, and slice 3
+# is a second of the same kind. Both changed scripts this tool does not drive -- repack and
+# extraction, then the header/footer translator and extraction -- so its two arms were
+# byte-identical BY DESIGN and it reported 13 of 13 unchanged. A stale pin would have gone on
+# reporting exactly that, a correct-looking all-quiet run, over a baseline silently lacking
+# the merged slice's change. The reading that catches a stale pin is the one that MOVES, and
+# neither slice produced one.
 #
 # AND THE PROSE ABOVE THE PIN GOES STALE AS READILY AS THE PIN, WHICH IS WHY THIS BLOCK IS
 # REWRITTEN EACH TIME RATHER THAN APPENDED TO. It has gone stale twice and been caught twice:
@@ -85,7 +95,7 @@ SCRIPT = "apply_translations_textmatch.py"
 # in tools/render_diff.py reading "Moved to 049484e" while its pin one line below said
 # 2a71e71 -- two claims disagreeing inside five lines, both true once. NOTHING CHECKS A
 # COMMENT. Re-derive both claims on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "ae48f6d")
+REF = os.environ.get("LT_BASELINE_REF", "010c34f")
 
 # WHICH DIRECTIONAL CHECK BELONGS TO WHICH MERGED FIX — added 2026-09-08, on a measured false
 # alarm that would have recurred for ever.
