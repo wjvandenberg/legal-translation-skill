@@ -97,14 +97,19 @@ stale in silence whenever one moved. **The headings are the contents;** §1.3 an
 
 ### 1.7 The size class, and the cap this charter is held to
 
-**SIZE CLASS: L — cap 350 lines. §7 alone: 35 lines.** L rather than M because this project has run far past
+**SIZE CLASS: L — cap 500 lines. §7 alone: 35 lines.** L rather than M because this project has run far past
 eight sessions, which is the observable test rather than a judgement about how big it feels. Both caps are
 **enforced, not aspirational**: they live in `verify.config.json`, and `uv run python tools/verify_md.py
 CLAUDE.md` reports each of them with a per-section breakdown showing where the weight sits. **Until
 2026-08-24 there was no config here at all, so both checks reported N/A on a 1,666-line file** — a cap
 nothing measures is not a cap.
 
-> **OVER-CAP EXEMPTION, RE-DECLARED 2026-09-09: 1,191 lines against a cap of 350.** *(Taken from the checker on
+> **OVER-CAP EXEMPTION, RE-DECLARED 2026-09-09 (4): 1,197 lines against a cap of 500.** *(The CAP moved, not the
+> file — 350 was the RETIRED number and Wouter set the live 500 on 2026-09-09 (4). **The row still FAILS**, and
+> raising a cap does not discharge an exemption: it only makes the number the exemption is measured against the
+> true one. **AND THE CAP IS STATED IN THREE PLACES, ONLY ONE OF WHICH IS THE GATE** — `verify.config.json`,
+> this sentence, and `DECLARED_CAP` in `tools/verify_charter_continuity.py`. They moved in one commit; a later
+> change that moves one of them alone trades this red for a different one.)* *(Taken from the checker on
 > the commit that declares it, never typed from memory. §7 is UNDER its 35 — a relationship, not a number,
 > because a number here is a second thing to go stale. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run, and caught this line stale twice on the day it landed, and
@@ -919,7 +924,8 @@ rescued from §7 during the 2026-08-24 reduction — which is what "replaced, no
 forgotten.)*
 
 **1. THIS CHARTER'S CAP IS MEASURED, AND §1.7 IS THE ONLY PLACE IT STATES ITS OWN LENGTH.** Class **L,
-350**, §7 at **35**; both live in `verify.config.json`. **`file length` FAILS on every run by design while
+500** *(raised from the retired 350 by Wouter, 2026-09-09 (4))*, §7 at **35**; both live in
+`verify.config.json`. **`file length` FAILS on every run by design while
 §1.7's exemption stands** — not a regression, and **never silence it by setting the cap to 0**, which
 reports *exempt* and measures nothing. **A declaration is prose, so no ordinary checker can see it going
 stale:** `tools/verify_charter_continuity.py` compares that sentence against the measurement, and it caught
