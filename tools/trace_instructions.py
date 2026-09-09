@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """trace_instructions.py - what instruction files actually loaded, and when.
-CHECKER VERSION 1 (2026-08-21)
+CHECKER VERSION 6 (2026-09-09)
 
 TWO FAILURE MODES, BOTH SILENT, WHICH IS WHY THIS EXISTS. A rule scoped to a file glob is
 supposed to load only when a matching file is read. It can fail in two directions and neither
@@ -22,13 +22,51 @@ repeatable cannot be a gate.
 
     # .claude/settings.local.json - the PERSONAL layer, never committed: a hook committed
     # into a repo that gets copied elsewhere installs itself silently in other projects.
+    #
+    # THE PATH MUST BE ABSOLUTE, AND A RELATIVE ONE FAILS SILENTLY HERE. A hook command
+    # resolves against the SESSION's working directory, not the project root, so
+    # "tools/trace_instructions.py" writes no log whenever a session starts anywhere else -
+    # and the only symptom is this script's own VOID message, which looks exactly like a
+    # hook that has simply not fired yet. An absolute path belongs in this layer anyway,
+    # because it is the gitignored one: the path names a user, and a committed hook path
+    # that names a user fails a confidentiality scan.
     { "hooks": { "InstructionsLoaded": [ { "hooks": [ { "type": "command",
-        "command": "uv run python tools/trace_instructions.py --hook" } ] } ] } }
+        "command": "uv run python <ABSOLUTE-PATH-TO-PROJECT>/tools/trace_instructions.py --hook" } ] } ] } }
+    # ^ WRITTEN AS A BRACKETED PLACEHOLDER, NOT AS A DRIVE LETTER, AND THE PARAGRAPH ABOVE IS
+    # WHY (v6, 2026-09-09). This docstring states that a committed path naming a user fails a
+    # confidentiality scan, and then carried a drive-letter example -- a placeholder with no
+    # real name in it, but the SHAPE such a scan matches on. A scan cannot tell a placeholder
+    # from a real path and must not try, so it blocked a real project's commit on this file.
+    # The script demonstrated the hazard it documents.
+    #
+    # AND THE FIRST ATTEMPT AT THIS COMMENT REINTRODUCED IT, by quoting the old example in
+    # order to explain it -- the gate fired again, on the fix. Describe a forbidden pattern;
+    # never reproduce it. The house already says a report must print a phrase's POSITION and
+    # never its text; the same applies to a comment, and nothing had written that down.
 
     uv run python tools/trace_instructions.py             # the latest session
     uv run python tools/trace_instructions.py --all       # every session
     uv run python tools/trace_instructions.py --rule ooxml
+    uv run python tools/trace_instructions.py --audit     # STATIC: read the frontmatter
     uv run python tools/trace_instructions.py --selftest
+
+TWO ARMS, AND THEY ANSWER DIFFERENT HALVES BECAUSE ONE HALF IS UNOBSERVABLE. The log arm
+sees a rule that ALWAYS loads - the file really does appear at session start. It can NEVER
+see a rule that NEVER loads, because "no match in this session" and "nobody read a matching
+file" are the same observation, and no amount of logging separates them. So --audit reads
+the frontmatter instead. Neither arm is a lesser version of the other; the runtime one
+cannot answer the second question at any length of run.
+
+--audit IS NOT IN THE JUDGED GATE, and deliberately, for the reason this whole script is
+outside check_checkers' TRACKED list: it exits 2 - VOID - in any project that has no
+path-scoped rules at all, which is most of them. A gate that is VOID by default is a gate
+somebody switches off. It is an instrument a person runs, and it prints how many files it
+examined so a small clean run cannot be mistaken for a clean one.
+
+IT READS WHAT IS ON DISK, INCLUDING GITIGNORED SCRATCH - honest, not a defect, and the same
+property every checker in this house has. A tree holding generated sample projects will
+report dozens of files; the COUNT is printed for exactly that reason. Judge the run by the
+findings, never by the denominator.
 
 THE LOG IS GITIGNORED, AND THAT IS NOT TIDINESS. Every entry carries absolute paths, so it
 names a user and a directory layout. It defaults into temp/, which the house .gitignore
@@ -39,9 +77,10 @@ subprocess spawned around every instruction load, where an ImportError is not a 
 someone reads: it is a hook that fails on every event. A diagnostic that can break the tool
 it is diagnosing gets switched off, and then there is no diagnostic.
 
-FOUR WAYS THE READER HAS BEEN WRONG, every one printing a confident false verdict. They are
-kept here because each was bought with real time, and because a reader that can print a false
-verdict will print one again:
+THE WAYS THE READER HAS BEEN WRONG - no count in this heading, deliberately, because a
+heading that states one goes stale the next time the list grows. Every one printed a
+confident false verdict. They are kept because each was bought with real time, and because a
+reader that can print a false verdict will print one again:
   1. It asked only "was there a second match?" and printed SURVIVED when there was not - but
      a compact emits load_reason 'compact' listing what it PUT BACK, and absence from that
      list is itself the measurement.
@@ -51,6 +90,11 @@ verdict will print one again:
      compact 2 then reads as never-fired, and a conclusive run gets reported INCONCLUSIVE.
   4. Its fallback branch printed the strongest verdict - gone for the rest of the session -
      for a session in which the rule had never fired at all, which measures nothing.
+  5. Bug 2 again, at the one caller the fix missed. verdict() and reinjections() were both
+     moved to full-path matching; the EVENT LISTING kept printing Path(...).name, so the
+     three instruction files that load at every session start - user, house and project, all
+     called CLAUDE.md - rendered as three identical rows. Fix the CLASS, not the caller: two
+     of three callers is how the same defect comes back wearing different clothes.
 Every branch is proved BOTH ways by --selftest.
 
 THE ONE THING THIS CANNOT SEE, said out loud rather than guessed at. It records LOADS, not
@@ -61,8 +105,11 @@ names that ambiguity instead of resolving it in whichever direction is more inte
 from __future__ import annotations
 
 import argparse
+import contextlib
+import io
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -132,17 +179,55 @@ def _compact_bursts(events):
     return [bursts[k] for k in order]
 
 
+def canon(fp: str) -> str:
+    """The IDENTITY of a logged path. TWO SPELLINGS OF ONE FILE ARE ONE FILE.
+
+    MEASURED, NOT TIDINESS. On Windows a directory reached through TEMP can be the 8.3 SHORT
+    name while the same file reached another way is the long one, so ONE file is logged
+    TWICE - and everything here that keyed on the raw string then counted it twice, listed it
+    as two rows, and could not see a re-injection that crossed the two spellings. Measured on
+    a real headless session: the user-global instructions appeared as
+    ...\\<short>\\.claude\\CLAUDE.md and ...\\<long>\\.claude\\CLAUDE.md, and os.path.samefile
+    says they are one directory.
+
+    SAME CLASS AS v3, ONE STEP FURTHER, AND THAT IS WHY IT IS A CLASS FIX RATHER THAN A
+    PATCH. v3 stopped printing basenames because three DISTINCT files called CLAUDE.md
+    rendered as three identical rows. This is the same confusion from the other side: ONE
+    file rendering as two distinct rows. Both come from letting a report LABEL serve as an
+    IDENTITY, which this house's verification-hygiene rule 8 already names - fix it at the
+    boundary, once, rather than at each site that compares.
+
+    DISPLAY STAYS RAW. The log records what the session actually said, and rewriting that in
+    the listing would hide the very duplication this exists to reconcile.
+
+    Falls back to the string it was given: a path that no longer exists still has an
+    identity, and a log is read long after the session that wrote it.
+    """
+    if not fp:
+        return ""
+    try:
+        return os.path.normcase(str(Path(fp).resolve()))
+    except (OSError, ValueError):
+        return os.path.normcase(fp)
+
+
+def logged_path(record) -> str:
+    """The raw logged path of one event, for display."""
+    return str(record["payload"].get("file_path", ""))
+
+
 def scoped_rules(events):
     """Every distinct file that ever loaded by glob match, newest last.
 
     Discovering these from the log is what makes the instrument general: the earlier version
     hardcoded one probe filename, so it could only ever judge the rule it was written for.
     """
-    out = []
+    out, seen = [], set()
     for r in events:
         if r["payload"].get("load_reason") == MATCH:
-            fp = str(r["payload"].get("file_path", ""))
-            if fp and fp not in out:
+            fp = logged_path(r)
+            if fp and canon(fp) not in seen:
+                seen.add(canon(fp))
                 out.append(fp)
     return out
 
@@ -162,7 +247,7 @@ def verdict(events, rule):
     """
     matches = [(i, r) for i, r in enumerate(events)
                if r["payload"].get("load_reason") == MATCH
-               and str(r["payload"].get("file_path", "")) == rule]
+               and canon(logged_path(r)) == canon(rule)]
     bursts = _compact_bursts(events)
 
     if not bursts:
@@ -176,8 +261,13 @@ def verdict(events, rule):
 
     last = bursts[-1]
     last_idx = last[-1][0]
-    back = sorted({str(r["payload"].get("file_path", "")) for _, r in last})
-    scoped_back = rule in back                       # exact membership, never substring
+    # DEDUPED BY IDENTITY, DISPLAYED AS LOGGED. Without canon() one file put back under two
+    # spellings inflates "put N file(s) back" and reads as a busier compact than happened.
+    _by_id: dict[str, str] = {}
+    for _, r in last:
+        _by_id.setdefault(canon(logged_path(r)), logged_path(r))
+    back = sorted(_by_id.values())
+    scoped_back = canon(rule) in _by_id              # exact identity, never substring
     before = [m for m in matches if m[0] < last_idx]
     after = [m for m in matches if m[0] > last_idx]
 
@@ -221,7 +311,7 @@ def always_loaded(events, rule):
     nothing was saved. It looks exactly like a working relocation from every other angle.
     """
     return [r for r in events
-            if str(r["payload"].get("file_path", "")) == rule
+            if canon(logged_path(r)) == canon(rule)
             and r["payload"].get("load_reason") in (START, COMPACT)]
 
 
@@ -233,11 +323,151 @@ def reinjections(events):
     """
     seen, out = {}, []
     for r in events:
-        fp = str(r["payload"].get("file_path", ""))
-        if fp in seen and r["at"] != seen[fp]:
-            out.append((fp, seen[fp], r["at"]))
-        seen.setdefault(fp, r["at"])
+        fp, key = logged_path(r), canon(logged_path(r))
+        # BY IDENTITY, NOT BY SPELLING. A file put back under the 8.3 short name after
+        # loading under the long one IS a re-injection, and keying on the raw string made
+        # exactly that case invisible - the quietest direction for this check to fail in.
+        if key in seen and r["at"] != seen[key][1]:
+            out.append((fp, seen[key][1], r["at"]))
+        seen.setdefault(key, (fp, r["at"]))
     return out
+
+
+# -------------------------------------------------------------------------- static audit
+#
+# WHY A STATIC ARM EXISTS AT ALL, AND WHY IT IS NOT A SECOND-BEST VERSION OF THE LOG. The
+# reader above records LOADS, never READS. So of route 4's two silent failures it can see
+# exactly one:
+#
+#   * ALWAYS LOADS - a rules file with no paths: block loads at launch. The log SEES this,
+#     and always_loaded() reports it, because the file really does appear at session start.
+#   * NEVER LOADS - a rule whose glob only ever matches CLAUDE.md never fires. The log
+#     CANNOT see it, now or ever: "no match" is indistinguishable from "nobody read a
+#     matching file". The reader is right to call that VOID, and VOID is where it stops.
+#
+# The second one is therefore undetectable at runtime BY CONSTRUCTION, and it is the more
+# expensive of the two: the block left the charter and loads nowhere. Only reading the
+# frontmatter answers it. Added 2026-09-01 on that reasoning, before the checkers travel to
+# projects that use route 4 - afterwards would need a second propagation pass.
+
+# Probe paths, and the SECOND LIST IS THE FALSE-POSITIVE GUARD. A glob like "*.md" matches
+# CLAUDE.md and also every other markdown file, so it fires on ordinary reads and is NOT the
+# defect. Only a rule that matches the charter and NOTHING ELSE never fires.
+CHARTER_PROBES = ("CLAUDE.md", "sub/CLAUDE.md", "a/b/CLAUDE.md")
+OTHER_PROBES = ("notes.md", "tools/x.py", "tests/test_x.py", "uk/a.txt", "src/main.js",
+                "docs/guide.md", "data/x.csv")
+
+
+def _glob_to_re(glob: str):
+    """A glob as a regex. '**' spans separators, '*' and '?' do not.
+
+    HAND-ROLLED BECAUSE fnmatch IS WRONG FOR THIS. fnmatch's '*' matches '/' too, so
+    "CLAUDE.md" and "**/CLAUDE.md" would score identically against every probe and the
+    charter-only test would report nothing. A matcher that cannot tell two globs apart is
+    the silent zero this whole file exists to catch, so it is built explicitly and proved
+    in --selftest rather than borrowed.
+    """
+    out, i = [], 0
+    while i < len(glob):
+        c = glob[i]
+        if c == "*":
+            if glob[i:i + 3] == "**/":                # '**/' may also match NOTHING, so
+                out.append("(?:.*/)?")                # tools/** covers tools/x directly
+                i += 3
+                continue
+            if glob[i:i + 2] == "**":
+                out.append(".*")
+                i += 2
+                continue
+            out.append("[^/]*")
+        elif c == "?":
+            out.append("[^/]")
+        else:
+            out.append(re.escape(c))
+        i += 1
+    return re.compile("^" + "".join(out) + "$")
+
+
+def glob_matches(glob: str, path: str) -> bool:
+    return bool(_glob_to_re(glob).match(path))
+
+
+def read_rule_frontmatter(text: str):
+    """(has_frontmatter, globs) for one rules file.
+
+    FRONTMATTER IS LINE 1 OR IT IS NOT FRONTMATTER. A paths: block further down - inside a
+    fenced example, or under a heading explaining the notation - is prose, and a file whose
+    only paths: block sits there loads at launch exactly as if it had none. That is a
+    recorded house hazard, so the position is asserted rather than searched for.
+    """
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return False, []
+    globs, in_paths = [], False
+    for line in lines[1:]:
+        if line.strip() == "---":
+            break
+        if re.match(r"^\s*paths\s*:", line):
+            in_paths = True
+            continue
+        if in_paths:
+            m = re.match(r"""^\s*-\s*["']?([^"'\s]+)["']?\s*$""", line)
+            if m:
+                globs.append(m.group(1))
+                continue
+            if line.strip() and not line.startswith((" ", "\t")):
+                in_paths = False            # a new top-level key ended the list
+    return True, globs
+
+
+def audit_rule(text: str) -> str:
+    """One status per rules file, so every wrong answer is its own string.
+
+    Pure, so --selftest drives it directly rather than through a directory of fixtures.
+    """
+    has_fm, globs = read_rule_frontmatter(text)
+    if not has_fm:
+        return "NO FRONTMATTER"                       # loads at launch - the lines moved
+    if not globs:                                     # and nothing was saved
+        return "NO PATHS"
+    hits_charter = any(glob_matches(g, p) for g in globs for p in CHARTER_PROBES)
+    hits_other = any(glob_matches(g, p) for g in globs for p in OTHER_PROBES)
+    if hits_charter and not hits_other:
+        return "CHARTER ONLY"                         # never fires - the expensive one
+    return "SCOPED"
+
+
+def audit(root: Path) -> int:
+    """Read every .claude/rules/*.md under root and judge its frontmatter."""
+    files = sorted(root.rglob(".claude/rules/*.md"))
+    print(f"STATIC AUDIT of route 4 under {root}\n")
+    if not files:
+        print("VOID: no .claude/rules/*.md found, so nothing was judged. That is NOT a")
+        print("  pass - a project with no path-scoped rules and a project whose rules")
+        print("  directory is somewhere else look identical from here.")
+        return 2
+    bad = 0
+    for f in files:
+        try:
+            status = audit_rule(f.read_text(encoding="utf-8", errors="replace"))
+        except OSError as e:
+            status = f"UNREADABLE ({type(e).__name__})"
+        flag = "OK  " if status == "SCOPED" else "!   "
+        if status != "SCOPED":
+            bad += 1
+        print(f"  {flag} {status:<16} {f}")
+        if status == "NO FRONTMATTER":
+            print("       no '---' on line 1, so it LOADS AT LAUNCH at charter priority -")
+            print("       the lines moved out and nothing was saved. A paths: block lower")
+            print("       down is prose, not frontmatter.")
+        elif status == "NO PATHS":
+            print("       frontmatter with no paths: globs - same effect as none at all.")
+        elif status == "CHARTER ONLY":
+            print("       every glob matches the charter and NOTHING else, so this rule")
+            print("       NEVER FIRES. The log cannot see this one: 'never loaded' and")
+            print("       'nobody read a matching file' are the same observation.")
+    print(f"\n{len(files)} rules file(s) examined, {bad} finding(s)")
+    return 1 if bad else 0
 
 
 # -------------------------------------------------------------------------- reporting
@@ -282,11 +512,18 @@ def report(log: Path, want_all: bool, only_rule) -> int:
             p = r["payload"]
             extra = ""
             if p.get("load_reason") == MATCH:
-                extra = (f"   <- triggered by "
-                         f"{Path(str(p.get('trigger_file_path', '?'))).name}")
+                # The TRIGGER in full too. Which directory the matching file sat in is the
+                # whole question route 4 asks - a glob meant for uk/ that is in fact firing
+                # on us/ is the failure this instrument exists to expose, and two files
+                # called thing.py in different trees are identical once you print the name.
+                extra = f"   <- triggered by {p.get('trigger_file_path', '?')}"
+            # NAME **AND** FULL PATH, the same pair the compact and re-injection listings
+            # print. The name alone cannot separate the three CLAUDE.md files that load at
+            # every session start, which is the one comparison this report exists to make.
+            fp = str(p.get("file_path", "?"))
             print(f"  {r['at'][11:19]}  {p.get('memory_type', '?'):<8} "
                   f"{p.get('load_reason', '?'):<16} "
-                  f"{Path(str(p.get('file_path', '?'))).name}{extra}")
+                  f"{Path(fp).name:<22} {fp}{extra}")
         print()
 
         # --rule FILTERS the discovered rules; it never becomes the match key itself, so the
@@ -402,6 +639,72 @@ def selftest() -> int:
     real[1]["at"] = "2026-08-19T09:00:00+00:00"
     check("same path twice IS a reload", len(reinjections(real)) == 1, len(reinjections(real)))
 
+    # ONE FILE UNDER TWO SPELLINGS IS ONE FILE - v5, and it is the v3 confusion from the
+    # other side. Measured on a real headless session: the user-global instructions were
+    # logged under the Windows 8.3 SHORT path AND under the long one, and every raw-string
+    # comparison here read them as two separate files - so a re-injection that crossed the
+    # two spellings was invisible, which is the quietest direction for this check to fail in.
+    # THE 8.3 FORM CANNOT BE PLANTED PORTABLY, so this exercises the same normalisation
+    # (resolve + normcase) through a redundant path component, and DECLARES that substitution
+    # rather than implying the exact case was reproduced.
+    _d = Path(tempfile.mkdtemp(prefix="trace_instructions_selftest_"))
+    (_d / "sub").mkdir()
+    (_d / "CLAUDE.md").write_bytes(b"x")
+    (_d / "sub" / "CLAUDE.md").write_bytes(b"y")
+
+    def _pair(p0, p1):
+        evs = [_ev(START, "CLAUDE.md"), _ev(COMPACT, "CLAUDE.md", "c1")]
+        evs[0]["payload"]["file_path"] = str(p0)
+        evs[1]["payload"]["file_path"] = str(p1)
+        evs[1]["at"] = "2026-08-19T09:00:00+00:00"
+        return evs
+
+    spelt = _pair(_d / "CLAUDE.md", _d / "sub" / ".." / "CLAUDE.md")
+    check("two spellings of ONE path IS a reload", len(reinjections(spelt)) == 1,
+          len(reinjections(spelt)))
+    # ...and the arm that stops the fix from being a blanket 'everything is one file'.
+    twofiles = _pair(_d / "CLAUDE.md", _d / "sub" / "CLAUDE.md")
+    check("...and two REAL files are still two", reinjections(twofiles) == [],
+          len(reinjections(twofiles)))
+    shutil.rmtree(_d, ignore_errors=True)
+
+    # THE EVENT LISTING MUST DISTINGUISH FILES THAT SHARE A BASENAME - bug 2 above, one level
+    # out. verdict() and reinjections() were both moved to full-path matching and the LISTING
+    # was left printing Path(...).name, so the class fix stopped at two of three callers. It
+    # is not a hypothetical shape: a project under a house-rules layer loads a USER, a HOUSE
+    # and a PROJECT instruction file at session start and all three are called CLAUDE.md, so
+    # the listing rendered them as three identical rows - indistinguishable from one file
+    # loaded three times, which is the very thing this instrument exists to tell apart.
+    TRIO = ["C:\\user\\CLAUDE.md", "C:\\house\\CLAUDE.md", "C:\\proj\\CLAUDE.md"]
+    trio = [_ev(START, "CLAUDE.md") for _ in TRIO]
+    for _r, _fp in zip(trio, TRIO):
+        _r["payload"]["file_path"] = _fp
+    # The same claim for the TRIGGER path: a glob firing on us/ when it was written for uk/
+    # is route 4's whole failure mode, and both trigger files are called thing.py.
+    TRIGGER = "C:\\x\\us\\thing.py"
+    trio = trio + [_ev(MATCH, "r.md", "m", trigger_file_path=TRIGGER)]
+    tmp2 = Path(tempfile.mkdtemp(prefix="trace_instructions_selftest_"))
+    try:
+        _f = tmp2 / "l.log"
+        _f.write_text("".join(json.dumps(r) + "\n" for r in trio), encoding="utf-8")
+        _buf = io.StringIO()
+        with contextlib.redirect_stdout(_buf):
+            report(_f, False, None)
+        out = _buf.getvalue()
+        listing = [ln for ln in out.splitlines() if START in ln]
+        check("3 files sharing a basename -> 3 DISTINCT lines", len(set(listing)) == 3,
+              f"{len(set(listing))} distinct of {len(listing)} rows")
+        check("...and each full path is printed", all(fp in out for fp in TRIO),
+              f"{sum(fp in out for fp in TRIO)} of 3")
+        check("the TRIGGER path prints in full too", TRIGGER in out,
+              "present" if TRIGGER in out else "name only")
+        # The negative arm: without it the two checks above would also pass on a listing that
+        # printed the whole log verbatim, or on any output containing the strings by accident.
+        check("a path NOT in the events is not printed", "C:\\nowhere\\CLAUDE.md" not in out,
+              "absent")
+    finally:
+        shutil.rmtree(tmp2, ignore_errors=True)
+
     # the always-loaded detector, proved BOTH ways
     check("a rule that only glob-matches is scoped", always_loaded(BOOT + HIT, SCOPED) == [],
           len(always_loaded(BOOT + HIT, SCOPED)))
@@ -414,6 +717,74 @@ def selftest() -> int:
     check("scoped_rules finds the matched file only", found == [SCOPED], found)
     check("scoped_rules finds none when nothing matched", scoped_rules(BOOT) == [],
           scoped_rules(BOOT))
+
+    # ---- THE STATIC ARM. The glob matcher goes first, because every judgement below rests
+    # on it and a matcher that cannot tell "CLAUDE.md" from "**/CLAUDE.md" would make the
+    # charter-only test report nothing at all while every row still printed.
+    for g, path, want in (("CLAUDE.md", "CLAUDE.md", True),
+                          ("CLAUDE.md", "sub/CLAUDE.md", False),      # '*' must not span '/'
+                          ("**/CLAUDE.md", "sub/CLAUDE.md", True),
+                          ("**/CLAUDE.md", "CLAUDE.md", True),        # '**/' may match empty
+                          ("*.md", "notes.md", True),
+                          ("*.md", "docs/guide.md", False),
+                          ("tools/**", "tools/x.py", True),
+                          ("tools/**", "tests/x.py", False),
+                          ("tests/**/*.py", "tests/a/b/x.py", True),
+                          ("tests/**/*.py", "tests/x.txt", False)):
+        got = glob_matches(g, path)
+        check(f"glob {g!r} vs {path!r}", got == want, got)
+
+    FM = "---\npaths:\n  - \"tools/**\"\n---\n\n# A rule\n"
+    for label, text, want in (
+        # the mode the LOG can also see
+        ("no '---' on line 1 -> NO FRONTMATTER", "# A rule\n\npaths:\n  - \"tools/**\"\n",
+         "NO FRONTMATTER"),
+        ("frontmatter with no globs -> NO PATHS", "---\npaths:\n---\n\n# A rule\n",
+         "NO PATHS"),
+        ("no paths: key at all -> NO PATHS", "---\ntitle: x\n---\n\n# A rule\n", "NO PATHS"),
+        # THE MODE THE LOG CAN NEVER SEE, in both shapes it arrives in
+        ("scoped to CLAUDE.md -> CHARTER ONLY",
+         "---\npaths:\n  - \"CLAUDE.md\"\n---\n", "CHARTER ONLY"),
+        ("scoped to **/CLAUDE.md -> CHARTER ONLY",
+         "---\npaths:\n  - \"CLAUDE.md\"\n  - \"**/CLAUDE.md\"\n---\n", "CHARTER ONLY"),
+        # THE FALSE-POSITIVE GUARD, and it is the arm that makes the two above mean
+        # something: '*.md' matches CLAUDE.md and fires on every other markdown read, so it
+        # is NOT the defect. Without this, flagging anything that touches the charter would
+        # pass all the cases above and condemn a perfectly good glob.
+        ("'*.md' also fires elsewhere -> SCOPED",
+         "---\npaths:\n  - \"*.md\"\n---\n", "SCOPED"),
+        ("a charter glob BESIDE a real one -> SCOPED",
+         "---\npaths:\n  - \"CLAUDE.md\"\n  - \"tools/**\"\n---\n", "SCOPED"),
+        ("an ordinary scoped rule -> SCOPED", FM, "SCOPED"),
+        # the recorded hazard: a paths: block inside a fenced example is PROSE
+        ("paths: only inside a fence -> NO FRONTMATTER",
+         "# A rule\n\n```yaml\npaths:\n  - \"tools/**\"\n```\n", "NO FRONTMATTER"),
+    ):
+        got = audit_rule(text)
+        check(label, got == want, got)
+
+    # the audit's exit codes, and an EMPTY tree is VOID rather than clean
+    tmp3 = Path(tempfile.mkdtemp(prefix="trace_instructions_selftest_"))
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            rc = audit(tmp3)
+        check("no rules file anywhere is VOID", rc == 2, f"rc={rc}")
+        rules = tmp3 / "p" / ".claude" / "rules"
+        rules.mkdir(parents=True)
+        (rules / "good.md").write_bytes(FM.encode("utf-8"))
+        with contextlib.redirect_stdout(io.StringIO()):
+            rc = audit(tmp3)
+        check("a well-scoped rule audits clean", rc == 0, f"rc={rc}")
+        (rules / "bad.md").write_bytes(b"---\npaths:\n  - \"CLAUDE.md\"\n---\n")
+        with contextlib.redirect_stdout(io.StringIO()) as buf3:
+            rc = audit(tmp3)
+        out3 = buf3.getvalue()
+        check("a charter-only rule is a FINDING", rc == 1, f"rc={rc}")
+        check("...and the report names the file", "bad.md" in out3, "named")
+        check("...and does not condemn the good one",
+              out3.count("CHARTER ONLY") == 1, out3.count("CHARTER ONLY"))
+    finally:
+        shutil.rmtree(tmp3, ignore_errors=True)
 
     # a missing log is VOID (exit 2), which is not the same fact as a clean run
     rc = report(Path("no") / "such" / "file.log", False, None)
@@ -454,12 +825,19 @@ def main(argv=None) -> int:
     p.add_argument("--all", action="store_true", help="every session, not just the latest")
     p.add_argument("--rule", default=None,
                    help="judge only rules whose path contains this substring")
+    p.add_argument("--audit", nargs="?", const=".", default=None, metavar="DIR",
+                   help="STATIC pass over .claude/rules/ frontmatter (default: here). It "
+                        "answers the one failure the log can NEVER see: a rule whose glob "
+                        "only matches CLAUDE.md never fires, and 'never loaded' is "
+                        "indistinguishable from 'nobody read a matching file'")
     p.add_argument("--selftest", action="store_true")
     args = p.parse_args(argv)
     if args.selftest:
         return selftest()
     if args.hook:
         return hook(Path(args.log))
+    if args.audit is not None:
+        return audit(Path(args.audit))
     return report(Path(args.log), args.all, args.rule)
 
 

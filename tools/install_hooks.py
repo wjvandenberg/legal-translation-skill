@@ -1,6 +1,18 @@
 # -*- coding: utf-8 -*-
 """INSTALL THE GIT HOOKS, and check they actually bite.
 
+NOT THE HOUSE SCRIPT OF THE SAME NAME, AND NOT A FORK OF IT (declared 2026-09-09). The house
+`standard-scripts/install_hooks.py` installs the HOUSE hooks -- the `pre-push` accident guard
+and the AUTO MODE guard. This one installs THIS project's hooks from `tools/hooks/`: the
+pre-commit confidentiality gate and the cycle gate. They share a name and nothing else, so a
+byte comparison against the shared folder reports a difference that is not drift.
+
+WHY THAT MATTERS RATHER THAN BEING A CURIOSITY. `check_checkers.py` tracks THIRTEEN scripts
+and this is not one of them, so its `0 needing a decision` is true of the thirteen and silent
+about this file. Anyone diffing `tools/` against `standard-scripts/` will find two mismatches
+-- this and nothing else, since `trace_instructions.py` was brought to house v5 on the same
+day -- and both of them should stop at this paragraph rather than turn into a repair.
+
 Hooks live in `.git/hooks/`, which is not tracked, so they do not travel with a clone. That
 makes them easy to believe in and easy to not have. This installer copies them from
 `tools/hooks/` and then VERIFIES each one is present and executable, because an
