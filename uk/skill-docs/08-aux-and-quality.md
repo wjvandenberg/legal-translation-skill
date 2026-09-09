@@ -139,6 +139,54 @@ Recognised placeholder types include `<<PAGE>>`, `<<NUMPAGES>>`, `<<SECTIONPAGES
 `<<REF>>`, `<<PAGEREF>>`. If you see a `<<...>>` token in `text`, copy it
 into `en` exactly — never expand, translate, or reorder its internal letters.
 
+**8b.2b — Graphic metadata: picture alt text — MANDATORY (if the Step 2 report lists any).**
+
+Some translatable text is not in a paragraph at all. It sits in an **XML attribute** on a
+picture:
+
+- `wp:docPr/@descr` and `wp:docPr/@title` — the **alt text** and title of a DrawingML image.
+- `v:shape/@alt` (also `v:image`, `v:rect`, `v:group`) — the same thing on a **VML** picture,
+  which is the older form Word still writes.
+
+**Alt text is what a screen reader speaks aloud.** Leaving it in the source language is an
+accessibility defect as well as a translation gap, so it is translated rather than merely
+reported. Step 2's `GRAPHIC METADATA SUMMARY` lists every surface in the document.
+
+`--extract` puts each header/footer surface into the scaffold as its own entry:
+
+```json
+{
+  "idx": 7,
+  "source": "word/header1.xml",
+  "kind": "graphic_metadata",
+  "surface": "wp:docPr/@descr",
+  "text": "<source-language alt text>",
+  "en": null
+}
+```
+
+Fill `en` exactly as for a paragraph — same lexicons, same judgment, same
+preserve-verbatim rule (`en == text`, or `null`, leaves the attribute untouched). `--apply`
+writes your English into that attribute and nothing else: the picture, its `@id` and its
+`@name` are left alone. **`@name` is not translated** — Word assigns it (`Picture 1`,
+`Afbeelding 1`) and it is not prose.
+
+**Entries are matched by their source VALUE, never by position.** If two pictures in one part
+carry the same alt text, both are updated, which is the right answer. If a value has changed
+since `--extract`, the entry is reported as **NOT APPLIED** rather than written somewhere
+approximate — re-run `--extract` in that case.
+
+**WHAT THIS STEP CANNOT REACH, and it is a known gap rather than a pass.** Step 8b writes
+header and footer parts only, so the Step 2 report marks these **`NO ROUTE — REPORTED
+ONLY`**:
+
+- alt text on a picture in the **document body**,
+- **chart** titles and axis titles (`word/charts/*.xml`),
+- **SmartArt / diagram** text (`word/diagrams/*.xml`).
+
+Record them in the run report. **Do not edit the source document to work around it** — the
+source is the client's document, and editing it to satisfy this pipeline is not a repair.
+
 **8b.3 — Apply.**
 
 ```bash
