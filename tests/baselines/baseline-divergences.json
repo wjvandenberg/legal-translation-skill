@@ -11,9 +11,9 @@
    "sha256_now": "9fe078ab330124682f5f4d098d7f9c34219e3570bbde5b6a55e7afca1c0bbd4a"
   },
   "uk/scripts/apply_translations_textmatch.py": {
-   "changed_by": "544f908",
-   "commit_subject": "Branch 7 slice 1 — the container class is twelve, not three, and the fixture built from the row titles carried the shape the row calls correct (#65)",
-   "sha256_now": "1b9a3e7afe7cc01933b42740cd1717829a593b4b9bf8307173fe0a0a16ce0cb4"
+   "changed_by": "feature/no-bytecode-in-shipped-tree",
+   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
+   "sha256_now": "86a4a6b0f422be5f526a32b6485873f4b359c5089ae361ac150544789d60b160"
   },
   "uk/scripts/extract_paragraphs.py": {
    "changed_by": "feature/branch7-slice3-a19",
@@ -26,14 +26,14 @@
    "sha256_now": "cea9606606a17f0c779e62fb1acaf79e34583700267021f63b8931db04153173"
   },
   "uk/scripts/quality_check.py": {
-   "changed_by": "feature/check-scoping-quality-check",
-   "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-   "sha256_now": "e03ea24a8145cf01d3c811a949249cab85e1d06f5b056187fe04e0f572c28736"
+   "changed_by": "feature/no-bytecode-in-shipped-tree",
+   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
+   "sha256_now": "efbb157c8dcad6d7d80f8d9e4e41e76b6b8790d7c802a3a63cd523878e1b51f0"
   },
   "uk/scripts/repack_docx.py": {
-   "changed_by": "feature/branch7-glossary-route",
-   "commit_subject": "Branch 7 slice 2 — C19: the glossary part gets a route in and a route out, and the refusal pattern the decision named turned out to be a warning",
-   "sha256_now": "dbab306e6b59f35103484afaba3de8bf1506878e4e7239be562971f261c072aa"
+   "changed_by": "feature/no-bytecode-in-shipped-tree",
+   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
+   "sha256_now": "06806fe38f50ec91f5b1d657763c767213e5d5dc789bb95acc45b29f69f76993"
   },
   "uk/scripts/translate_headers_footers.py": {
    "changed_by": "feature/branch7-slice3-a19",
@@ -41,9 +41,9 @@
    "sha256_now": "b2430a50710643006d30aa2af68fbe834fb759e10d125972297bdc0b3f2dc8e8"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "049484e",
-   "commit_subject": "Branch 6 slice 2 — a table of contents can be repaired, and the gate that would have refused to deliver it (#59)",
-   "sha256_now": "746b7c60eb835f5ecb384ccda38ed21faca927d2544832cd2716c8053b408de1"
+   "changed_by": "feature/no-bytecode-in-shipped-tree",
+   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
+   "sha256_now": "e505abd621e2cbba15e705dc69f6fa50f8b8c97d805714c1eaec161478286952"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -86,9 +86,9 @@
    "sha256_now": "b6b8b7fa11665f7bc720db1892e3e33362e86db52f0b241aabb9362725547ed1"
   },
   "us/scripts/apply_translations_textmatch.py": {
-   "changed_by": "544f908",
-   "commit_subject": "Branch 7 slice 1 — the container class is twelve, not three, and the fixture built from the row titles carried the shape the row calls correct (#65)",
-   "sha256_now": "43d93bd3fe021f2b05af92c4b690f69e3206e8ddfe783f9ebd9492a9f91eaf40"
+   "changed_by": "feature/no-bytecode-in-shipped-tree",
+   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
+   "sha256_now": "14554470c1a83606449b63a4994dad34191a1fcf198763ef6f96d2bc8e5b2f5b"
   },
   "us/scripts/extract_paragraphs.py": {
    "changed_by": "feature/branch7-slice3-a19",
@@ -101,14 +101,14 @@
    "sha256_now": "488689839482f454a5ff6bbe02ac854ed87b655a10bcd8bb8885e0dde50f24a1"
   },
   "us/scripts/quality_check.py": {
-   "changed_by": "feature/check-scoping-quality-check",
-   "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-   "sha256_now": "97ea321e81b22567de8cb9f91c3cd5b48530aead263949ccff9b29a02084ba25"
+   "changed_by": "feature/no-bytecode-in-shipped-tree",
+   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
+   "sha256_now": "359524280ee216a947502a3a00ac571a1639fa63e7672b73d5d776080e2a2b9f"
   },
   "us/scripts/repack_docx.py": {
-   "changed_by": "feature/branch7-glossary-route",
-   "commit_subject": "Branch 7 slice 2 — C19: the glossary part gets a route in and a route out, and the refusal pattern the decision named turned out to be a warning",
-   "sha256_now": "dbab306e6b59f35103484afaba3de8bf1506878e4e7239be562971f261c072aa"
+   "changed_by": "feature/no-bytecode-in-shipped-tree",
+   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
+   "sha256_now": "06806fe38f50ec91f5b1d657763c767213e5d5dc789bb95acc45b29f69f76993"
   },
   "us/scripts/translate_headers_footers.py": {
    "changed_by": "feature/branch7-slice3-a19",
@@ -116,9 +116,9 @@
    "sha256_now": "3240155eff68d9f4d1a21f53f6966a121cd9adca68d7221b1a06eadb284a8ce4"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "049484e",
-   "commit_subject": "Branch 6 slice 2 — a table of contents can be repaired, and the gate that would have refused to deliver it (#59)",
-   "sha256_now": "c82048537b187e46859695901c806c234849ba753ffd6978d67b91a4da09b5ec"
+   "changed_by": "feature/no-bytecode-in-shipped-tree",
+   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
+   "sha256_now": "858180500d8341acf957c649c199530d89399f08aa2a24b6bae796b4e558691b"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",

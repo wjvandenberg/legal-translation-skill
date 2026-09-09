@@ -68,6 +68,16 @@ _check_self_integrity()
 
 # Make scripts/ importable so we can reach source_language_markers when
 # repack_docx.py is invoked from an arbitrary working directory.
+# NO .pyc INSIDE A SHIPPED TREE. Python writes bytecode beside the module it imported,
+# so the sibling import below would put `scripts/__pycache__/` into the operator's
+# INSTALLED skill -- and the release packager zips this tree. The guard must precede the
+# import: set afterwards it has already missed its moment. Register I-18's family, found
+# on branch 7 slice 3 when a fifth script gained a sibling import and
+# tools/precommit_gate.py check 6 caught the .pyc on that very commit. Four other
+# scripts had been doing it unguarded for months, which is why the check that guards
+# this is tests/test_no_bytecode_in_tree.py -- it DISCOVERS the importers by reading the
+# tree, so caller N+1 is covered without anybody adding a row.
+sys.dont_write_bytecode = True
 _SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)

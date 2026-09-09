@@ -763,3 +763,71 @@ produced an inventory of the register rows.
    text from `customXml` on open, so a correct `document.xml` edit may be undone on the page. It needs
    Word in the loop, which no current instrument has. **Neither blocks a branch; both are now owed a
    measurement rather than left as prose.**
+
+## 2026-09-09 — branch 7's close: four scope decisions at the open, four at the close
+
+**All four opening decisions came before any code**, which is the point worth recording: three of
+them would have changed what slice 3 built, and one of them decided whether it could be believed.
+
+**THE FOUR AT THE OPENING INPUT POINT.**
+
+1. **A19's alt-text route goes in HEADER AND FOOTER PARTS ONLY, and every other surface is
+   REPORTED.** The measurement is the argument: all 14 of the corpus's graphics are in headers and
+   footers and **none is in the body**, `translate_headers_footers.py` already has the extract-apply
+   round trip, and `repack --headers-footers-dir` already bundles what it writes. A body route would
+   need a new script in both trees, a new repack flag, and would collide with apply's own
+   `document.xml` output — for a surface no corpus document carries. **The residue is not hidden:**
+   §5.9's compliant-exit test says a body drawing, a chart title and SmartArt text cannot be
+   refused, because the source is the client's own document and the operator may not edit it to
+   satisfy a checker. So they are reported, loudly, which is the honest form of *fail loudly rather
+   than ship silently* where a gate would fire on input nobody can change.
+2. **The header/footer CORPUS ARM is in scope, and it is not about A19.** `apply_corpus_diff` drives
+   apply and cannot see this slice at all, so before `tools/hf_corpus_diff.py` existed **nothing in
+   this repository measured the header/footer translator against a real document.** What it actually
+   guards is the **scaffold SHAPE**: slice 3 adds a `kind` key, all 10 frozen scaffolds predate it,
+   and if a `kind`-less entry ever stopped being treated as a paragraph entry then every real
+   document would silently stop having its headers and footers translated **while the fixture suite
+   went on passing**, because a freshly extracted fixture scaffold has the key.
+3. **The corpus's inability to reach measurement (a) is §5.7's THIRD reason, NOT a fifth.** The
+   corpus does hold the shape — one inline `sdt` in a footer — and nothing removed it; the paragraph
+   is simply never rebuilt, because the operator left that scaffold entry's `en` null. So the
+   mechanism is the **artefact's** rather than the shape's, and it is *holds the mechanism but not
+   the damage*. **Naming the mechanism in the row buys the same understanding without adding a
+   fifth category to a charter already over its cap** — and slice 2 nearly added a fifth for a
+   similar case and did not. *A category that merely happens to fit is a claim waiting to go stale.*
+4. **PR #68 merges first, so slice 3 branches off a main that already carries the pin moves.**
+   Stacking it would have put slice 3 on `close/branch7-slice2`, and §5.2's stacked-branch rule has
+   already cost this project a pull request.
+
+**AND THE FOUR AT THE CLOSE, after the measurement rather than before it.**
+
+5. **`hf_corpus_diff.py`'s PIN IS FIXED, NOT MOVING — the opposite of `apply_corpus_diff`'s rule,
+   and decided on a measurement.** With its pin moved to slice 3's merge in the ordinary way, both
+   arms carry the new code, its VOID guard fires correctly, and it reports **VOID on every run for
+   ever** until the translator next changes. The question it asks only exists against a tree that
+   predates the `kind` key. **A check that can only report VOID is not a check**, and a
+   permanently-red row is one people learn to scroll past. It follows
+   `test_no_delivered_byte_moves.py`'s precedent instead — that suite and two others already pin to
+   a fixed pre-change revision. **When to move it is written into the file, and it is not at a
+   close.**
+6. **THE `.pyc` CLASS GETS ITS OWN SLICE, BEFORE BRANCH 8, IN THE SAME SESSION** *(Wouter)*. Slice
+   3's new import can leave a `.pyc` inside a **shipped** tree, and `precommit_gate` check 6 caught
+   one on the very commit that added it. Four other tree scripts import a sibling the same way and
+   none guarded. **It was deliberately not fixed inside slice 3:** a line added to
+   `apply_translations_textmatch.py` would have changed what `apply_corpus_diff` was comparing,
+   mid-slice, in a slice about graphic metadata. Done alone, the same change becomes a **proof**
+   instead of a confound — apply genuinely differs from the pin, the self-comparison notice is
+   absent, and 13 of 13 frozen intermediates come back byte-identical, which is §5.8 rule 3's
+   *proved byte-for-byte, or not claimed*. **And the fix is a check that DISCOVERS the importers by
+   reading the tree rather than a patch on the four that exist**, so caller N+1 is covered without
+   anybody adding a row.
+7. **REGISTER F43 IS FILED AT CANDIDATE STRENGTH AND INVESTIGATED WITH BRANCH 8** *(Wouter)*. The
+   frozen header/footer scaffolds went partly or wholly unfilled on the three workdirs that match a
+   corpus document, and an unfilled entry means apply left that paragraph alone — so if those are
+   delivered runs, header and footer text shipped in the source language. **It is not established,
+   and the reason is the denominator:** the other 7 of 10 match no document and hold 0–1 entries,
+   so some of the thirteen are stubs or arms, and *a fill rate over a population of unknown
+   provenance is not a fill rate.* Filing it now and investigating later keeps it from dying with
+   the session without spending a session on it; it rides in branch 8's prompt.
+8. **THE SESSION COST IS 44%, READ BY WOUTER.** Claude cannot see the figure and may never estimate
+   it. Recorded, never obeyed: the session ended because its planned work ran out.
