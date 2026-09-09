@@ -708,3 +708,58 @@ conversation.
 but it makes a *silent* 5b impossible, which turns an undisclosed exception from invisible into a detectable
 defect. Independent of the probe; ordering it first would make the probe's result mechanical rather than a
 judgement about the operator's prose.
+
+## 2026-09-08 — branch 7's seven scope decisions, and the two taken at the close
+
+**All seven were put before any code was written**, which is the point worth recording: the container
+inventory's *width* is not a coding detail, and a plan that named only the register rows would have
+produced an inventory of the register rows.
+
+**THE SIX TAKEN AT THE OPENING INPUT POINT.**
+
+1. **All five containers of the schema group** — `sdt`, `smartTag`, `customXml`, `dir`, `bdo` — **rather
+   than the two with register rows.** The measurement is the argument: a 20-shape sweep through the real
+   apply found all five stranding text identically, and it is one code change rather than five. *Fix the
+   class, not the caller.* `w:ruby` and `w:fldSimple` are different mechanisms and got rows instead.
+2. **"Fail loudly" means BLOCK, but only where an unlisted container CARRIES TEXT.** §5.9's test is
+   whether a compliant way out exists, and the source is the client's own document, so the operator
+   cannot delete an element to satisfy a checker. An unlisted element carrying no text is left alone —
+   `w:subDoc` measured CLEAN, and a gate firing there would fire on correct input, which is what branch
+   6's first offset guard did. **The measured population makes this safe:** across all 52 WML parts of 10
+   of the 11 documents, the complete set of non-run children of `w:p` is ten elements and exactly three
+   carry text. There is no math anywhere — the one shape that would otherwise refuse input nobody can
+   change — and it is listed as inert so a document carrying one gets a named decline.
+3. **KEEP an emptied content control; DROP an emptied annotation wrapper.** A `w:sdt` renders, and may be
+   locked, data-bound, a date picker or a checkbox — so removing it is a structural edit to the client's
+   document, which A16's own row records as unsanctioned. A smart tag, a `w:customXml`, a `w:dir` or a
+   `w:bdo` is a pure annotation over text that no longer exists, so once empty it is *provably redundant*,
+   which is clause 3's own test and the only warrant this branch has to delete anything.
+4. **A19: report every graphic surface AND TRANSLATE THE ALT TEXT.** Wider than the recommendation, which
+   was report-only, and the reason is the one the recommendation missed: **a `@descr` is what a screen
+   reader speaks**, so leaving it in the source language is an accessibility defect as well as a
+   translation gap. Chart and diagram text stay detected-only, having no corpus instance to verify a
+   translation against — and neither has the alt text, so that must be said rather than implied.
+5. **C19: the `--glossary` flag PLUS repack's own refusal pattern**, which it already applies to
+   numbering, comments, footnotes and endnotes. This is the script's existing convention rather than a new
+   mechanism. *(Note the trigger differs from those five: theirs fire on a workdir file looking translated;
+   this must fire on the ORIGINAL carrying the part.)*
+6. **Three slices**, one per script and one per acceptance condition.
+
+**AND THE TWO TAKEN AT THE CLOSE, after the measurement rather than before it.**
+
+7. **A22 GETS A ROW NOW AND NO BRANCH YET, and the queue is not reordered.** Measured on this branch, A22
+   is not a cosmetic duplication but a **DEADLOCK**: the field's cached result glues to the English,
+   gluing merges token types, and `validate_apply --strict` refuses the repack with no compliant repair —
+   F41's family, exactly as C17 turned out to be. **It is nonetheless not scheduled**, and the reason is
+   that fixing it means reopening clause 3's keyword narrowing, which was itself set on a corpus
+   measurement: *"drop the skeleton when its cached result is consumed"* applied to every field type would
+   freeze a `PAGE` field at whatever number happened to be cached. **Zero corpus instances**, so nothing
+   ships wrong today. That reopening deserves its own exploration rather than a decision taken in passing.
+8. **BOTH READ-BUT-NOT-RUN MEASUREMENTS ARE SCHEDULED.** *(a)* The **header/footer `sdt` surface** — 5
+   across 4 corpus documents, where `translate_headers_footers.py` appears to strand nothing because it
+   writes into the first `w:t` and clears the rest. **That is a reading, and this project's record on
+   readings is poor** — the same session refuted A16's row from structure and was wrong. *(b)* The
+   **`w:dataBinding` question** — 2 corpus documents carry a bound control, and Word can repopulate its
+   text from `customXml` on open, so a correct `document.xml` edit may be undone on the page. It needs
+   Word in the loop, which no current instrument has. **Neither blocks a branch; both are now owed a
+   measurement rather than left as prose.**
