@@ -27,6 +27,17 @@ re-tested. If you need these twice in one session, re-open this file deliberatel
 - **Never match `<w:t>` as `<w:t[^>]*>`** — that also matches `<w:tcPr>`, `<w:tbl>` and `<w:tab/>`. Use
   `<w:t(?:\s[^>]*)?>`.
 
+- **AND THE SAME HAZARD ONE LEVEL UP, WHERE lxml MAKES IT LOOK SAFE: A LOCALNAME IS NOT AN IDENTITY.**
+  Matching `etree.QName(el).localname == 't'` feels like the careful, prefix-agnostic thing to do — a
+  prefix is the document's choice, so localname-matching is right for an element whose name is
+  *unambiguous*. But **`t` is one of the most reused names in OOXML**: `w:t` is a text run, `a:t` a
+  DrawingML text run, `dgm:t` a SmartArt node's text. Measured on branch 7 slice 3: a graphic-metadata
+  report written that way counted a chart part as **four** surfaces instead of two and labelled every one
+  of them **both** `c:title` and `dgm:t`, because `a:t` sits *inside* a `c:title`. **Match the full
+  `{namespace}localname` wherever the localname is shared** — and the tell that you are in that case is
+  that you cannot say which namespace you meant without checking. *(Caught by running the report and
+  reading its output; the code read perfectly.)*
+
 - **`<w:b w:val="0"/>` means bold OFF.** Any bold check must read `w:val` and treat `0|false|off` as
   not-bold. The same applies to `w:i`, `w:strike` and `w:u`.
 

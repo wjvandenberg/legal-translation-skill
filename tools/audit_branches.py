@@ -440,13 +440,31 @@ def audit_b1():
     # So the fixture follows the measurement rather than the row, which is the same lesson
     # slice 1 filed one paragraph above, arriving a second time on the same branch.
     #
+    # 24 SINCE 2026-09-09, branch 7's THIRD slice: +1, graphic-metadata.docx, and NO sidecar.
+    # A19's surfaces are attributes and whole parts rather than paragraphs, so the fixture
+    # needs no body notes at all; its header/footer scaffold is EXTRACTED and filled inside
+    # tests/test_graphic_metadata.py, which is test_no_delivered_byte_moves.py's own
+    # precedent and keeps the English visible in the test source.
+    #
+    #   graphic-metadata.docx   The corpus carries 14 graphics across 3 documents and NOT ONE
+    #                           attribute of prose on any of them -- @descr 0, @title 0,
+    #                           v:shape/@alt 0, and 0 in both shipped trees over 396 files
+    #                           with a control firing. So there is no real-document instance
+    #                           of translatable graphic metadata IN ANY FORM, and this
+    #                           fixture is the only place A19 can be exercised. It is a NEW
+    #                           fixture rather than an extension of headers-footers.docx
+    #                           because test_no_delivered_byte_moves.py depends on that
+    #                           fixture's BYTES, and its arm 2 -- the written auxiliary XML
+    #                           being byte-identical old-vs-new -- is this slice's best free
+    #                           regression signal precisely BECAUSE it carries no graphic.
+    #
     # COUNTED BY LISTING, from `git ls-files`, never by adding a delta to the figure above.
     # This claim reads the INDEX, deliberately, and is the only one in this block that does --
     # so a fixture added on a branch must be STAGED before the number is right, and the claim
     # goes red while whoever moved it is still here rather than after the merge. IT HAS NOW
-    # DONE EXACTLY THAT ON TWO CONSECUTIVE SLICES, which is the third time that design has
-    # paid. Re-derived 23 against a claimed 21, on this branch, with the fixtures staged.
-    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 23)
+    # DONE EXACTLY THAT ON THREE CONSECUTIVE SLICES, which is the fourth time that design has
+    # paid. Re-derived 24 against a claimed 23, on this branch, with the fixture staged.
+    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 24)
 
     hits = 0
     for nm in fx:

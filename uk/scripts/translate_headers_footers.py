@@ -37,6 +37,16 @@ MODE 2 — Apply (recommended, second half of the round-trip):
     w:b, w:i, etc.). Entries with `en == null` or `en == ""` are left
     verbatim.
 
+    GRAPHIC METADATA (register A19). An entry with "kind":
+    "graphic_metadata" is a picture's alt text, which lives in an XML
+    ATTRIBUTE and so is reached by no paragraph loop -- and a `@descr`
+    is what a screen reader speaks. Those entries are matched by their
+    source VALUE, never by an index, and only the attribute is written:
+    the element, its @id and its @name are left alone, @name being what
+    Word assigns rather than prose. An entry with NO "kind" key is a
+    paragraph entry, which is what every scaffold written before
+    2026-09-09 looks like.
+
 MODE 3 — Legacy dictionary lookup (fallback):
     python translate_headers_footers.py <original.docx> <output_dir> --language <lang>
 
@@ -87,6 +97,50 @@ _check_self_integrity()
 
 
 W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+
+# ──────────────────────────────────────────────────────────────────────
+# GRAPHIC METADATA — register A19. ONE INVENTORY, READ BY BOTH HALVES.
+#
+# A19's own remedy is that "extraction and apply must share an explicit, tested inventory",
+# so the surface list is NOT restated here: it is imported from extract_paragraphs.py, which
+# reports it in Step 2. Two lists that must agree will disagree, and the one that loses is
+# silent — which is the defect this branch exists to stop repeating.
+#
+# THE FALLBACK IS THE HOUSE PATTERN, copied from validate_apply.py's import of post_process:
+# a partial install must degrade to a NAMED refusal, never to a silent skip. If the inventory
+# cannot be imported, the graphic-metadata surfaces are simply not offered — and --extract
+# SAYS SO, because a scaffold that quietly stops offering them looks exactly like a document
+# that has none.
+# ──────────────────────────────────────────────────────────────────────
+# AND THE IMPORT MUST NOT LEAVE A .pyc INSIDE THE SHIPPED TREE. Python writes bytecode beside
+# the module it imported, so importing a sibling script puts `scripts/__pycache__/` into the
+# operator's installed skill -- and the release packager zips this tree. `precommit_gate.py`
+# check 6 caught exactly that on the commit that added this import; register I-18 is the same
+# defect arriving from a test harness rather than from the skill itself.
+#
+# THE GUARD GOES HERE, NEXT TO THE IMPORT, RATHER THAN IN WHATEVER CALLS THIS SCRIPT, because
+# a caller that has to remember an environment variable is a caller that will not. This one
+# line covers the callers that do not exist yet.
+#
+# FOUR OTHER SCRIPTS IN THIS TREE IMPORT A SIBLING THE SAME WAY AND NONE OF THEM GUARDS --
+# apply_translations_textmatch.py, quality_check.py, repack_docx.py, validate_apply.py. That
+# is a class rather than an instance and it is NOT fixed here: a line added to apply would
+# change what tools/apply_corpus_diff.py is comparing, mid-slice, in a slice about graphic
+# metadata. Reported for its own decision instead of patched in passing.
+sys.dont_write_bytecode = True
+_SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+if _SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPTS_DIR)
+try:
+    from extract_paragraphs import (                                    # noqa: E402
+        _GRAPHIC_ATTR_SURFACES, graphic_metadata_surfaces)
+    _GRAPHICS_AVAILABLE = True
+except ImportError:
+    _GRAPHIC_ATTR_SURFACES = ()
+    _GRAPHICS_AVAILABLE = False
+
+    def graphic_metadata_surfaces(zf):                    # type: ignore[no-redef]
+        return []
 
 # ──────────────────────────────────────────────────────────────────────
 # Legacy dictionary-lookup maps (Mode 3 only).
@@ -761,11 +815,36 @@ def extract_to_scaffold(docx_path, out_json):
                     entry['fields'] = fa_fields
                 entries.append(entry)
                 global_idx += 1
+        # GRAPHIC METADATA — register A19, added 2026-09-09. Alt text on a picture in a
+        # header or footer is translatable prose that lives in an ATTRIBUTE, so no paragraph
+        # loop can ever reach it. A `@descr` is what a screen reader speaks.
+        #
+        # KEPT OUT OF THE PARAGRAPH LOOP DELIBERATELY. These entries are keyed by their own
+        # source VALUE, not by a paragraph index, because an attribute has no `p_idx` — and
+        # index-based application is the one thing this pipeline may never reintroduce (577
+        # JSON entries against 564 XML paragraphs once corrupted a whole document that way).
+        n_graphic = 0
+        for surface in graphic_metadata_surfaces(zf):
+            if surface['route'] != 'step8b':
+                # Reported by extract_paragraphs.py's Step 2 summary, and NOT offered here:
+                # this script writes header and footer parts only, so offering a body or
+                # chart surface would promise a route that does not exist.
+                continue
+            entries.append({
+                'idx': global_idx,
+                'source': surface['part'],
+                'kind': 'graphic_metadata',
+                'surface': surface['surface'],
+                'text': surface['text'],
+                'en': None,
+            })
+            global_idx += 1
+            n_graphic += 1
     os.makedirs(os.path.dirname(os.path.abspath(out_json)), exist_ok=True)
     with open(out_json, 'w', encoding='utf-8') as f:
         json.dump(entries, f, ensure_ascii=False, indent=1)
     print(
-        f'Extracted {len(entries)} non-empty paragraph(s) from '
+        f'Extracted {len(entries) - n_graphic} non-empty paragraph(s) from '
         f'{len(hf_names)} header/footer file(s) to {out_json}.'
     )
     print(
@@ -773,6 +852,26 @@ def extract_to_scaffold(docx_path, out_json):
         'same way you fill body paragraphs.json. Entries left at null '
         '(or with en == text) are preserved verbatim by --apply.'
     )
+    # SAY THE NUMBER EVEN WHEN IT IS ZERO WHERE THE INVENTORY IS MISSING. A scaffold that
+    # has silently stopped offering graphic metadata is indistinguishable from a document
+    # that carries none, and the second is the common case — so the two are told apart here
+    # rather than left to the operator to notice.
+    if not _GRAPHICS_AVAILABLE:
+        print(
+            'WARNING — the graphic-metadata inventory could not be imported from '
+            'extract_paragraphs.py, so NO alt text was offered for translation. This '
+            'is a partial install, not a document with no pictures. Re-install the '
+            'skill and re-run --extract. Register A19.'
+        )
+    elif n_graphic:
+        print(
+            f'Plus {n_graphic} GRAPHIC METADATA surface(s) — alt text held in an XML '
+            f'attribute, which no paragraph carries. They have "kind": '
+            f'"graphic_metadata" and are keyed by their source value, not by a '
+            f'paragraph index. Fill "en" exactly as for a paragraph; a `@descr` is '
+            f'what a screen reader speaks, so leaving it in the source language is an '
+            f'accessibility defect as well as a translation gap. Register A19.'
+        )
     return True
 
 # ──────────────────────────────────────────────────────────────────────
@@ -813,6 +912,42 @@ def _apply_paragraph_text(p_elem, en_text):
         t.text = ''
     return True
 
+def _apply_graphic_metadata(tree, graphic_map):
+    """Write the English into each matched graphic-metadata ATTRIBUTE. Register A19.
+
+    `graphic_map` is {(surface_label, source_value): english}. MATCHED BY VALUE, NOT BY
+    INDEX -- the same principle as the body's text-matching, and for the same reason: one
+    real document produced 577 JSON entries for 564 XML paragraphs, and index-matching
+    corrupted the lot. Where two pictures in one part carry the SAME alt text, both are
+    updated, which is the correct result rather than a compromise.
+
+    ONLY THE ATTRIBUTE CHANGES. The element, its `@id`, its `@name` and every child are left
+    exactly as they were: `@name` is what Word assigns ("Picture 1") and is not prose, so
+    translating it would be a change to the client's document with nothing to gain.
+
+    Returns the number of ATTRIBUTES written, which is what the caller compares against the
+    number of entries it was given.
+    """
+    # surface label -> (element localname, attribute name), from the ONE shared inventory.
+    wanted = {}
+    for el_name, attr, surface in _GRAPHIC_ATTR_SURFACES:
+        wanted[surface] = (el_name, attr)
+    written = 0
+    for el in tree.iter():
+        tag = el.tag
+        if not isinstance(tag, str):
+            continue
+        ln = tag.rsplit('}', 1)[-1]
+        for (surface, src_value), en in graphic_map.items():
+            spec = wanted.get(surface)
+            if spec is None or spec[0] != ln:
+                continue
+            attr = spec[1]
+            if el.get(attr) == src_value:
+                el.set(attr, en)
+                written += 1
+    return written
+
 def apply_from_scaffold(docx_path, scaffold_json, output_dir):
     """Read a filled-in scaffold JSON and write translated header/footer XMLs.
 
@@ -849,6 +984,10 @@ def apply_from_scaffold(docx_path, scaffold_json, output_dir):
     # nobody filled in. Conflating the two is register F15.
     verbatim_counts = {}
     unfilled_counts = {}
+    # Graphic-metadata attributes, counted SEPARATELY from paragraph replacements.
+    # Folding them into `changes` would make the headline number stop meaning "paragraphs",
+    # and a count whose unit quietly changed is a count the next session re-derives wrongly.
+    graphic_counts = {}
     with zipfile.ZipFile(docx_path, 'r') as zf:
         available = set(zf.namelist())
         for source, file_entries in by_source.items():
@@ -858,6 +997,10 @@ def apply_from_scaffold(docx_path, scaffold_json, output_dir):
 
             # Map p_idx -> (en_text, fields_list_or_None) for non-trivial entries.
             apply_map = {}
+            # GRAPHIC METADATA — register A19. Keyed by (surface, source value), never by an
+            # index: an attribute has no p_idx, and index-based application is the one thing
+            # this pipeline may never reintroduce.
+            graphic_map = {}
             for e in file_entries:
                 en = e.get('en')
                 if en is None:
@@ -878,6 +1021,15 @@ def apply_from_scaffold(docx_path, scaffold_json, output_dir):
                     # clean exit being to write something the same manual forbids.
                     verbatim_counts[source] = verbatim_counts.get(source, 0) + 1
                     continue
+                # AN ENTRY WITH NO `kind` KEY IS A PARAGRAPH ENTRY, AND THAT DEFAULT IS
+                # LOAD-BEARING RATHER THAN TIDY. Every header/footer scaffold written before
+                # 2026-09-09 has no `kind` at all -- measured, 10 of them in the frozen
+                # intermediates -- so a stricter test here would silently stop translating
+                # the headers and footers of every real document, while a freshly-extracted
+                # fixture scaffold (which HAS the key) went on passing.
+                if e.get('kind') == 'graphic_metadata':
+                    graphic_map[(e.get('surface'), e.get('text'))] = en_str
+                    continue
                 apply_map[e['p_idx']] = (en_str, e.get('fields'))
 
             data = zf.read(source)
@@ -895,6 +1047,17 @@ def apply_from_scaffold(docx_path, scaffold_json, output_dir):
                     else:
                         if _apply_paragraph_text(p, en_text):
                             changes += 1
+            if graphic_map:
+                g = _apply_graphic_metadata(tree, graphic_map)
+                graphic_counts[source] = graphic_counts.get(source, 0) + g
+                # UNPLACED ENTRIES ARE NAMED, NEVER SWALLOWED. An `en` the operator wrote
+                # that reaches no attribute is work thrown away, and it looks exactly like
+                # work that was never asked for.
+                if g < len(graphic_map):
+                    print(f'WARNING: {source}: {len(graphic_map) - g} graphic-metadata '
+                          f'entry/entries did not match any attribute in the document and '
+                          f'were NOT applied. The source value may have changed since '
+                          f'--extract; re-run --extract. Register A19.')
 
             out_path = os.path.join(output_dir, source)
             os.makedirs(os.path.dirname(out_path), exist_ok=True)
@@ -915,10 +1078,21 @@ def apply_from_scaffold(docx_path, scaffold_json, output_dir):
     )
     for src in written:
         print(f'  {src}: {changed_counts[src]} paragraph(s) replaced'
+              + (f', {graphic_counts[src]} graphic-metadata attribute(s)'
+                 if graphic_counts.get(src) else '')
               + (f', {verbatim_counts[src]} preserved verbatim'
                  if verbatim_counts.get(src) else '')
               + (f', {unfilled_counts[src]} NOT FILLED IN'
                  if unfilled_counts.get(src) else ''))
+    total_graphic = sum(graphic_counts.values())
+    if total_graphic:
+        print(
+            f'  {total_graphic} graphic-metadata attribute(s) translated (register A19) — '
+            'alt text\n  held in an XML attribute, which no paragraph carries. A `@descr` '
+            'is what a screen\n  reader speaks. Counted apart from paragraphs on purpose: '
+            'the headline number above\n  means paragraphs and must go on meaning only '
+            'that.'
+        )
     if total_verbatim:
         print(
             f'  {total_verbatim} entry/entries were preserved verbatim (en == text). '
@@ -933,13 +1107,19 @@ def apply_from_scaffold(docx_path, scaffold_json, output_dir):
     # REFUSE ONLY WHEN NOTHING WAS DEALT WITH AT ALL. An entry preserved verbatim was
     # dealt with; an entry with en == null or "" was not. The old condition summed the
     # two and so reported a correctly-completed step as an unfilled scaffold.
-    if total_changes == 0 and total_verbatim == 0:
+    #
+    # A TRANSLATED ATTRIBUTE COUNTS AS WORK DONE — register A19, 2026-09-09. A document
+    # whose only translatable header/footer content is a picture's alt text would otherwise
+    # have every paragraph preserved verbatim, every attribute correctly translated, and
+    # still be reported as an unfilled scaffold. That is F15's exact shape one surface over,
+    # and it is fixed here rather than discovered later.
+    if total_changes == 0 and total_verbatim == 0 and total_graphic == 0:
         print(
-            'NOTE: no paragraphs were replaced and none was preserved verbatim — every '
-            'scaffold\n      entry had en == null or en == "". Verify the scaffold is '
-            'filled in.'
+            'NOTE: no paragraphs were replaced, none was preserved verbatim and no '
+            'graphic\n      metadata was translated — every scaffold entry had en == null '
+            'or en == "".\n      Verify the scaffold is filled in.'
         )
-    return (total_changes + total_verbatim) > 0
+    return (total_changes + total_verbatim + total_graphic) > 0
 
 # ──────────────────────────────────────────────────────────────────────
 # MODE 3 — Legacy dictionary-lookup translation.

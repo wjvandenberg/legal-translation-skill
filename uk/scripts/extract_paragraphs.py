@@ -657,9 +657,188 @@ def extract_paragraphs(input_path, output_json):
                         print('  language on the page. If you read it and judge that it '
                               'needs no translation, pass the original part to the same '
                               'flag.')
+                # GRAPHIC METADATA — register A19, added 2026-09-09.
+                #
+                # A SEPARATE SUMMARY, NOT A ROW IN THE ONE ABOVE, and the reason is that the
+                # aux summary's promise is "you MUST translate this". Two of these five
+                # surfaces CANNOT be translated by this pipeline at all, so filing them
+                # under that heading would issue an instruction with no compliant way to
+                # obey it — which is the shape CLAUDE.md 5.9 forbids in a gate and is no
+                # better in a report.
+                _print_graphic_metadata_summary(zf)
         except (zipfile.BadZipFile, OSError):
             # Source not a zip — skip the aux summary.
             pass
+
+# ──────────────────────────────────────────────────────────────────────
+# GRAPHIC METADATA — register A19.
+#
+# Translatable text that is held in an ATTRIBUTE, or in a part no paragraph reaches. Nothing
+# else in this pipeline reports it, and until 2026-09-09 nothing acknowledged the gap either:
+# measured across both shipped trees, 396 files with a control needle firing, `docPr`,
+# `SmartArt`, `w:drawing`, `a:graphic`, `c:title`, `wp:inline` and `diagrams` were ALL ZERO.
+#
+# WHY ALT TEXT IS NOT COSMETIC. A `@descr` is what a screen reader speaks. Leaving it in the
+# source language is an accessibility defect as well as a translation gap — which is why the
+# scope went wider than report-only.
+#
+# TWO ROUTES, AND THE REPORT NAMES WHICHEVER APPLIES:
+#   header/footer parts — TRANSLATED, in Step 8b, through translate_headers_footers.py's
+#                         existing --extract / --apply round-trip, which repack already
+#                         bundles via --headers-footers-dir.
+#   everything else     — REPORTED ONLY. There is no route, and a report is the honest form
+#                         of "fails loudly rather than shipping silently" where a refusal
+#                         would have no compliant exit: the source is the client's own
+#                         document and the operator cannot edit it to satisfy a checker.
+# ──────────────────────────────────────────────────────────────────────
+
+# (element localname, attribute name, the surface's name in the report). Matched on the
+# LOCALNAME so a document that binds `wp:`/`pic:`/`v:` to a different prefix still matches —
+# a prefix is a document's choice, never an identity.
+_GRAPHIC_ATTR_SURFACES = (
+    ('docPr', 'descr', 'wp:docPr/@descr'),
+    ('docPr', 'title', 'wp:docPr/@title'),
+    ('cNvPr', 'descr', 'pic:cNvPr/@descr'),
+    ('cNvPr', 'title', 'pic:cNvPr/@title'),
+    # VML. VML is a THIRD of the real graphic population — 5 of the corpus's 14 graphics are
+    # `w:pict` — and A19's row does not mention it at all.
+    ('shape', 'alt', 'v:shape/@alt'),
+    ('image', 'alt', 'v:image/@alt'),
+    ('rect', 'alt', 'v:rect/@alt'),
+    ('group', 'alt', 'v:group/@alt'),
+)
+
+# THE TWO PART-LEVEL SURFACES ARE MATCHED BY NAMESPACE, NOT BY LOCALNAME, AND THAT IS A
+# MEASURED CORRECTION RATHER THAN A PRECAUTION. Written first as `localname in ('title','t')`
+# it reported the chart part as FOUR surfaces instead of two and labelled each of them BOTH
+# `c:title` AND `dgm:t` — because `a:t`, the DrawingML text run inside a chart title, has the
+# localname `t` as well. The diagram part doubled the same way. `w:t` would have joined them
+# on any part holding one.
+#
+# So: localname-matching is right for the ATTRIBUTE surfaces above, whose element names are
+# unambiguous, and WRONG here, where `t` is one of the most reused names in OOXML. Caught by
+# running the report and reading its output, not by reading the code — CLAUDE.md 5.1.
+_CHART_NS = 'http://schemas.openxmlformats.org/drawingml/2006/chart'
+_DIAGRAM_NS = 'http://schemas.openxmlformats.org/drawingml/2006/diagram'
+_PART_TEXT_SURFACES = (
+    (f'{{{_CHART_NS}}}title', 'c:title'),
+    (f'{{{_DIAGRAM_NS}}}t', 'dgm:t'),
+)
+
+def _localname(el):
+    tag = el.tag
+    if not isinstance(tag, str):
+        return ''
+    return tag.rsplit('}', 1)[-1]
+
+def _graphic_metadata_route(part_name):
+    """'step8b' where a translation route exists, 'none' where it does not.
+
+    The basename decides, and it is taken from the FULL ZIP PATH deliberately: a listing
+    keyed on basenames once made a whole glossary directory disappear, because
+    'word/glossary/document.xml' and 'word/document.xml' share one (register C19).
+    """
+    base = part_name.rsplit('/', 1)[-1]
+    if base.startswith('header') or base.startswith('footer'):
+        return 'step8b'
+    return 'none'
+
+def graphic_metadata_surfaces(zf):
+    """Every graphic surface holding non-whitespace text, in document order, per part.
+
+    Returns a list of dicts: part, surface, text, route. SHARED WITH
+    translate_headers_footers.py, which offers the 'step8b' ones for translation — one
+    inventory read by both halves, which is branch 7's whole rule. A second list would be a
+    second thing to go stale, and the one that lost would be silent.
+    """
+    found = []
+    for name in sorted(zf.namelist()):
+        if not name.startswith('word/') or not name.endswith('.xml'):
+            continue
+        try:
+            root = etree.fromstring(zf.read(name))
+        except (etree.XMLSyntaxError, KeyError, OSError):
+            # A part that cannot be parsed is REPORTED as unreadable rather than skipped:
+            # a scan whose denominator can shrink in silence is not a scan.
+            found.append({'part': name, 'surface': '(unreadable)', 'text': '',
+                          'route': 'none'})
+            continue
+        route = _graphic_metadata_route(name)
+        for el in root.iter():
+            ln = _localname(el)
+            for want_el, attr, surface in _GRAPHIC_ATTR_SURFACES:
+                if ln != want_el:
+                    continue
+                val = el.get(attr)
+                if val and val.strip():
+                    found.append({'part': name, 'surface': surface,
+                                  'text': val, 'route': route})
+            # Chart and axis titles, and SmartArt node text. Both live in their own part,
+            # reachable only through a relationship, and both are DETECTED-ONLY: there is no
+            # corpus instance to verify a translation against, so nothing here claims one.
+            for want_tag, surface in _PART_TEXT_SURFACES:
+                if el.tag != want_tag:
+                    continue
+                # The visible words are in the DrawingML runs underneath, `a:t`. Gathering
+                # them by localname is safe HERE, inside a known container.
+                txt = ''.join(t.text or '' for t in el.iter()
+                              if _localname(t) == 't' and t.text)
+                if txt.strip():
+                    found.append({'part': name, 'surface': surface,
+                                  'text': txt, 'route': 'none'})
+    return found
+
+def _print_graphic_metadata_summary(zf):
+    """Print the graphic-metadata report, or nothing at all when there is nothing to say.
+
+    A report that fires on every document is not a report. Every fixture and every corpus
+    document with no graphic must print NOTHING here.
+    """
+    surfaces = graphic_metadata_surfaces(zf)
+    if not surfaces:
+        return
+    by_part = {}
+    for s in surfaces:
+        by_part.setdefault(s['part'], []).append(s)
+    print()
+    print('=' * 60)
+    print('GRAPHIC METADATA SUMMARY (Step 2) — register A19')
+    print('=' * 60)
+    print('This document holds translatable text in GRAPHIC METADATA — an XML '
+          'ATTRIBUTE, or a')
+    print('part no paragraph reaches. NOTHING ELSE in this pipeline reports it, '
+          'so it is easy')
+    print('to deliver a document whose every paragraph is English and whose '
+          'pictures are not.')
+    print()
+    for part in sorted(by_part):
+        items = by_part[part]
+        route = items[0]['route']
+        banner = ('TRANSLATE IN STEP 8b'
+                  if route == 'step8b' else 'NO ROUTE — REPORTED ONLY')
+        print(f"  {part} — {len(items)} surface(s), {banner}:")
+        for s in items:
+            print(f"    {s['surface']}: {s['text'][:200]!r}")
+    print()
+    print('  A `@descr` is what a SCREEN READER speaks, so source-language alt '
+          'text is an')
+    print('  accessibility defect as well as a translation gap.')
+    print()
+    print('  TRANSLATE IN STEP 8b — the sub-step is Step 8b.2b. Header and footer '
+          'surfaces')
+    print('  ride the same --extract / --apply round-trip as header and footer '
+          'paragraphs,')
+    print('  and repack bundles them')
+    print('  through --headers-footers-dir. They appear in headers_footers.json '
+          'with')
+    print('  "kind": "graphic_metadata". Fill `en` exactly as you would for a '
+          'paragraph.')
+    print()
+    print('  NO ROUTE — REPORTED ONLY: this pipeline cannot translate a body '
+          'drawing, a chart')
+    print('  title or SmartArt text. That is a KNOWN GAP, not a pass. Report it '
+          'in the run')
+    print('  report and do NOT edit the source document to work around it.')
 
 def _summarise_aux_xml(raw_xml, kind, label):
     """Parse an OOXML aux-file string and return a dict

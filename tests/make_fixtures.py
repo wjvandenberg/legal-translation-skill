@@ -1130,6 +1130,198 @@ def _glossary(path):
     _write_notes(path, _notes_from_document(path, GLOSSARY_SHAPES, GLOSSARY_EN))
 
 
+# ---------------------------------------------------------------------------
+# Branch 7 slice 3 — A19, TRANSLATABLE TEXT HELD IN GRAPHIC METADATA.
+#
+# WHY EVERY SHAPE HERE IS SYNTHETIC, AND WHY THAT IS A MEASUREMENT RATHER THAN AN EXCUSE.
+# Re-derived 2026-09-09 over 10 of the 11 corpus documents (the eleventh is a legacy binary
+# .doc and was not opened, so every figure is over 10 of 11):
+#
+#     w:drawing   9   -- 6 in headers, 3 in footers, ZERO in the body
+#     w:pict      5   -- 2 in headers, 3 in footers, ZERO in the body
+#     @descr      0     @title  0     v:shape/@alt  0     @name  15
+#
+# So the corpus carries 14 graphics across 3 documents and **not one attribute of prose on
+# any of them**. `@name` is what Word assigns ("Picture 1"), which is not translatable text.
+# There is no chart and no SmartArt anywhere. A19 is therefore FIXTURE-ONLY EVIDENCE, and it
+# is DECLARED here and in the register exactly as N1 was -- because a fixture result reported
+# beside a quiet corpus run reads as corpus evidence, and that is the whole risk.
+#
+# THE `v:shape/@alt` SURFACE IS NOT IN THE ROW AND IS INCLUDED ANYWAY. The row names
+# `wp:docPr/@descr`, chart titles and SmartArt. It does not mention VML alt text -- yet 5 of
+# the corpus's 14 graphics are `w:pict`, which is the VML form, so on the real population it
+# is a THIRD of the surface. Measured 0 across both trees like the rest.
+#
+# WHY THIS IS A NEW FIXTURE AND NOT AN EXTENSION OF headers-footers.docx. That fixture is
+# depended on byte-wise by tests/test_no_delivered_byte_moves.py -- pinned to 2178cce -- whose
+# arm 2 asserts translate_headers_footers.py writes byte-identical auxiliary XML. It carries
+# NO graphic, so that arm is this slice's free regression signal and must stay untouched: if
+# it moves, the scaffold change has a defect. tests/negative_inputs.py needs it too.
+# ---------------------------------------------------------------------------
+
+# VML. The corpus's 5 w:pict all use it, and it carries alt text on an attribute of its own.
+V = 'xmlns:v="urn:schemas-microsoft-com:vml"'
+
+# A19's shapes, as (label, why, xml). Unlike CONTAINER_SHAPES these are not all body
+# paragraphs -- the surface is spread across parts, which is the finding -- so the table
+# records WHICH PART each shape lives in and whether a translation route exists for it.
+GRAPHIC_SHAPES = [
+    ("hdr-drawing-descr", "header1", True,
+     "THE FIX. A DrawingML image in a HEADER whose alt text and title are ATTRIBUTES of "
+     "wp:docPr. 6 of the corpus's 9 w:drawing are in headers, so this is the realistic "
+     "carrier -- and a @descr is what a screen reader speaks, which is why decision 4 went "
+     "wider than report-only"),
+    ("hdr-sdt-inline", "header1", False,
+     "OWED MEASUREMENT (a), Wouter 2026-09-09. An inline w:sdt beside ordinary runs in a "
+     "HEADER paragraph. translate_headers_footers.py APPEARS to strand nothing because "
+     "_iter_own_runs yields an inline container's runs and apply writes into the first w:t. "
+     "THAT WAS A READING. The corpus cannot settle it: its one inline header/footer sdt sits "
+     "in a footer whose scaffold entry has `en` null, so apply never rebuilds that paragraph "
+     "-- 0 rebuilt header/footer paragraphs anywhere hold one. So it is proved HERE, by "
+     "running it"),
+    ("ftr-vml-alt", "footer1", True,
+     "THE FIX, second surface. VML alt text on v:shape/@alt in a FOOTER. 3 of the corpus's "
+     "5 w:pict are in footers. Not named in A19's row at all, and a third of the real "
+     "graphic population"),
+    ("ftr-sdt-databinding", "footer1", False,
+     "OWED MEASUREMENT (b), Wouter 2026-09-09. A content control BOUND to customXml. "
+     "Measured: 3 such elements across 2 corpus documents, ALL IN FOOTERS -- so the question "
+     "lands on the very script this slice edits, which is sharper than the decision log "
+     "says. Word can repopulate a bound control's text from the customXml part when the "
+     "document is opened, so a correct XML edit may be undone on the page. PINNED at the "
+     "current outcome; settling it needs Word in the loop, which no instrument here has"),
+    ("body-drawing-descr", "document", False,
+     "REPORT ONLY, AND THE HONEST RESIDUE. A body drawing carrying alt text. The corpus has "
+     "ZERO body graphics, and the translation route is Step 8b's, which reaches header and "
+     "footer parts only -- so this surface is REPORTED and not translated. The branch's own "
+     "rule is that anything outside the inventory fails loudly rather than shipping "
+     "silently, and a report is that loudness where a block would have no compliant exit"),
+    ("hdr-plain", "header1", False,
+     "THE QUIET CONTROL. A header paragraph with text and no graphic of any kind. If the "
+     "report ever names this, it has reached something it has no business in -- and if the "
+     "translated header XML moves for this paragraph, the scaffold change broke Step 8b"),
+]
+
+# The two surfaces that live in their own PART, reachable by part path rather than by any
+# element in the body. Detected and reported, never translated: decision 4 leaves chart and
+# diagram text detected-only, there being no corpus instance to verify a translation against.
+GRAPHIC_CHART = (
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+    '<c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"'
+    ' xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><c:chart>'
+    '<c:title><c:tx><c:rich><a:p><a:r><a:t>Leveringen per kwartaal</a:t></a:r>'
+    '</a:p></c:rich></c:tx></c:title>'
+    '<c:plotArea><c:valAx><c:title><c:tx><c:rich><a:p><a:r>'
+    '<a:t>Geleverde tonnage</a:t></a:r></a:p></c:rich></c:tx></c:title>'
+    '</c:valAx></c:plotArea></c:chart></c:chartSpace>')
+
+GRAPHIC_DIAGRAM = (
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+    '<dgm:dataModel xmlns:dgm="http://schemas.openxmlformats.org/drawingml/2006/diagram"'
+    ' xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><dgm:ptLst>'
+    '<dgm:pt modelId="1"><dgm:t><a:p><a:r><a:t>Goedkeuring door de raad</a:t></a:r>'
+    '</a:p></dgm:t></dgm:pt>'
+    '<dgm:pt modelId="2"><dgm:t><a:p><a:r><a:t>Ondertekening</a:t></a:r></a:p></dgm:t>'
+    '</dgm:pt></dgm:ptLst></dgm:dataModel>')
+
+
+@fixture("graphic-metadata.docx",
+         "A19 — six shapes across four parts plus a chart and a SmartArt part: alt text on "
+         "wp:docPr/@descr and @title in a header, VML v:shape/@alt in a footer, a body "
+         "drawing that is REPORTED and not translated, the two owed measurements (an inline "
+         "header sdt, and a footer control bound to customXml), and a plain header paragraph "
+         "as the quiet control. The corpus carries 14 graphics and NOT ONE attribute of prose")
+def _graphic_metadata(path):
+    # A DrawingML inline image. No a:blip and no r:embed on purpose: a relationship would
+    # have to resolve in this part's own _rels (register I-17, now guarded by
+    # _assert_pointers), and nothing here tests image bytes -- the finding is the ATTRIBUTE.
+    def drawing(el_id, name, descr, title):
+        return ('<w:r><w:drawing><wp:inline>'
+                f'<wp:docPr id="{el_id}" name="{name}" descr="{descr}" title="{title}"/>'
+                '<a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/'
+                'drawingml/2006/picture"/></a:graphic>'
+                '</wp:inline></w:drawing></w:r>')
+
+    hdr = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+           f'<w:hdr {W} {R} {WP}>'
+           # 1. hdr-drawing-descr — the fix.
+           + p(r("Bijlage bij de overeenkomst: "),
+               drawing("1", "Afbeelding 1",
+                       "Stroomschema van de goedkeuringsprocedure",
+                       "Goedkeuringsschema"))
+           # 2. hdr-sdt-inline — owed measurement (a). An sdt with NO w:p of its own, beside
+           #    ordinary runs. This is A16's mixed shape, in a header instead of the body.
+           + '<w:p>' + r("Versie ")
+           + '<w:sdt><w:sdtPr><w:alias w:val="Versienummer"/></w:sdtPr>'
+           + '<w:sdtContent>' + r("DRAFT 1") + '</w:sdtContent></w:sdt>'
+           + r(" van dit document.") + '</w:p>'
+           # 6. hdr-plain — the quiet control.
+           + p(r("Vertrouwelijk stuk."))
+           + '</w:hdr>')
+
+    ftr = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+           f'<w:ftr {W} {R} {V}>'
+           # 3. ftr-vml-alt — the fix, second surface. VML carries its alt text on @alt.
+           + p(r("Watermerk: "),
+               '<w:r><w:pict>'
+               '<v:shape id="_x0000_s1026" alt="Watermerk met het woord CONCEPT"'
+               ' style="width:120pt;height:40pt"><v:fill color="#cccccc"/></v:shape>'
+               '</w:pict></w:r>')
+           # 4. ftr-sdt-databinding — owed measurement (b). A BLOCK control (its own w:p),
+           #    bound to a customXml part. The binding is the point, not the shape.
+           + '<w:sdt><w:sdtPr><w:alias w:val="Kenmerk"/>'
+           + '<w:dataBinding w:prefixMappings="xmlns:ns0=&apos;urn:example:ref&apos;"'
+           + ' w:xpath="/ns0:ref[1]/ns0:kenmerk[1]" w:storeItemID="{00000000-0000-0000-0000-'
+           + '000000000001}"/></w:sdtPr>'
+           # THE REFERENCE CODE IS INVENTED, AND THE FIRST VERSION OF THIS LINE WAS NOT.
+           # It was copied out of Step 8b.2's own worked example, and `leakage_scan.py`
+           # caught it on pattern #46 with the SAME sha as that step document's
+           # long-standing, already-judged hit. Inheriting a judgement is not the test:
+           # CLAUDE.md 5.4 requires every fixture string to be INVENTED FOR THE PURPOSE,
+           # and a code lifted from elsewhere is not. Replaced rather than argued about --
+           # the scan list's false-positive rate is 5.4's one open item, and adding to it
+           # is the wrong direction.
+           + '<w:sdtContent>' + p(r("Kenmerk: ZZ-0000-00")) + '</w:sdtContent></w:sdt>'
+           + '</w:ftr>')
+
+    # 5. body-drawing-descr — reported, never translated. The route is Step 8b's and Step 8b
+    #    reaches header and footer parts only.
+    body = (p(r("De goedkeuringsvolgorde is hieronder weergegeven: "),
+              drawing("2", "Afbeelding 2",
+                      "Organigram van de betrokken partijen",
+                      "Organigram"))
+            + p(r("The body text of the instrument.")))
+
+    rels = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/'
+            'relationships">'
+            '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/styles" Target="styles.xml"/>'
+            '<Relationship Id="rId10" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/header" Target="header1.xml"/>'
+            '<Relationship Id="rId11" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/footer" Target="footer1.xml"/>'
+            '<Relationship Id="rId12" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/chart" Target="charts/chart1.xml"/>'
+            '<Relationship Id="rId13" Type="http://schemas.openxmlformats.org/officeDocument/'
+            '2006/relationships/diagramData" Target="diagrams/data1.xml"/>'
+            '</Relationships>')
+
+    ct = ('<Override PartName="/word/header1.xml" ContentType="application/vnd.'
+          'openxmlformats-officedocument.wordprocessingml.header+xml"/>\n'
+          '<Override PartName="/word/footer1.xml" ContentType="application/vnd.'
+          'openxmlformats-officedocument.wordprocessingml.footer+xml"/>\n'
+          '<Override PartName="/word/charts/chart1.xml" ContentType="application/vnd.'
+          'openxmlformats-officedocument.drawingml.chart+xml"/>\n'
+          '<Override PartName="/word/diagrams/data1.xml" ContentType="application/vnd.'
+          'openxmlformats-officedocument.drawingml.diagramData+xml"/>\n')
+
+    docx(path, body, {"word/header1.xml": hdr, "word/footer1.xml": ftr,
+                      "word/charts/chart1.xml": GRAPHIC_CHART,
+                      "word/diagrams/data1.xml": GRAPHIC_DIAGRAM,
+                      "word/_rels/document.xml.rels": rels}, ct)
+
+
 @fixture("symbol-font.docx",
          "runs in Symbol and Wingdings. The corpus has NO such run anywhere, so the "
          "Greek-glyph defect cannot be reproduced from a real document at all")

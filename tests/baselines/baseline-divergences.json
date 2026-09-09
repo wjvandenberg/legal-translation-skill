@@ -16,9 +16,9 @@
    "sha256_now": "1b9a3e7afe7cc01933b42740cd1717829a593b4b9bf8307173fe0a0a16ce0cb4"
   },
   "uk/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/branch7-glossary-route",
-   "commit_subject": "Branch 7 slice 2 — C19: the glossary part gets a route in and a route out, and the refusal pattern the decision named turned out to be a warning",
-   "sha256_now": "59c7144930a9c89796f7a92d9ee1b63327c45d5c7aa03030a649daf48750c44e"
+   "changed_by": "feature/branch7-slice3-a19",
+   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
+   "sha256_now": "91f49df10cb0a69a04f806433720cc3fc0df6ff687d151ce285045d137104583"
   },
   "uk/scripts/post_process.py": {
    "changed_by": "feature/checks-can-fail",
@@ -36,9 +36,9 @@
    "sha256_now": "dbab306e6b59f35103484afaba3de8bf1506878e4e7239be562971f261c072aa"
   },
   "uk/scripts/translate_headers_footers.py": {
-   "changed_by": "feature/check-scoping-quality-check",
-   "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-   "sha256_now": "e82513a21d09a7269fc09adafed2012f1df3ff8834e13285ea72ba1b3d9392ba"
+   "changed_by": "feature/branch7-slice3-a19",
+   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
+   "sha256_now": "b2430a50710643006d30aa2af68fbe834fb759e10d125972297bdc0b3f2dc8e8"
   },
   "uk/scripts/validate_apply.py": {
    "changed_by": "049484e",
@@ -71,9 +71,9 @@
    "sha256_now": "aa6c0cfa899652812b30644144ac237f7eb46fff330051a8f55bdec0b2a76199"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch7-glossary-route",
-   "commit_subject": "Branch 7 slice 2 — C19: the glossary part gets a route in and a route out, and the refusal pattern the decision named turned out to be a warning",
-   "sha256_now": "609e77262dd6cb19d093c48fab88ed0e603337ad6e5cfa704b655eb1ecd0d950"
+   "changed_by": "feature/branch7-slice3-a19",
+   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
+   "sha256_now": "e888a814a3331965de35a08c54ca19a8ccf2aa2a4f6de137edafe189df6baf0c"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/branch7-glossary-route",
@@ -91,9 +91,9 @@
    "sha256_now": "43d93bd3fe021f2b05af92c4b690f69e3206e8ddfe783f9ebd9492a9f91eaf40"
   },
   "us/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/branch7-glossary-route",
-   "commit_subject": "Branch 7 slice 2 — C19: the glossary part gets a route in and a route out, and the refusal pattern the decision named turned out to be a warning",
-   "sha256_now": "6db781a73fd6673e2c3d5f69cddfcdd1fd379d7a38996655010b999246707bd9"
+   "changed_by": "feature/branch7-slice3-a19",
+   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
+   "sha256_now": "0df16cb99fbc01cb25bbdbf2c52dfa7449869a9c0fd542248987e8f995909b74"
   },
   "us/scripts/post_process.py": {
    "changed_by": "feature/checks-can-fail",
@@ -111,9 +111,9 @@
    "sha256_now": "dbab306e6b59f35103484afaba3de8bf1506878e4e7239be562971f261c072aa"
   },
   "us/scripts/translate_headers_footers.py": {
-   "changed_by": "feature/check-scoping-quality-check",
-   "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-   "sha256_now": "7dc907d06d5d9eed95038d9cc7ce20eccfedb4d034ee7c7e25b11a8eb48810c9"
+   "changed_by": "feature/branch7-slice3-a19",
+   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
+   "sha256_now": "3240155eff68d9f4d1a21f53f6966a121cd9adca68d7221b1a06eadb284a8ce4"
   },
   "us/scripts/validate_apply.py": {
    "changed_by": "049484e",
@@ -146,9 +146,9 @@
    "sha256_now": "698e89485a008023f0d166e65e5ca325c1ea799ed5f09896947c4eac7419c41a"
   },
   "us/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch7-glossary-route",
-   "commit_subject": "Branch 7 slice 2 — C19: the glossary part gets a route in and a route out, and the refusal pattern the decision named turned out to be a warning",
-   "sha256_now": "55780dac871131c7c38ce00c33a875df3e993b067366295691c0046e3dad99b6"
+   "changed_by": "feature/branch7-slice3-a19",
+   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
+   "sha256_now": "ce0966159057375e5171dd8415ca84923b697803527ee417ade0126830656ac3"
   },
   "us/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/branch7-glossary-route",
