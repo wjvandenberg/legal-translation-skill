@@ -47,8 +47,17 @@ SHAPES = [
     ("titled personal name",
      r"\b(?:Mr|Ms|Mrs|Dr|Prof|Sig|Sig\.ra|Sr|Sra|Herr|Frau|Dhr|Mevr)\.?\s+[A-Z][a-z]+"),
     ("email address", r"[\w.\-]+@[\w.\-]+\.\w{2,}"),
+    # ONE OR TWO BACKSLASHES, AND A WORD-BOUNDARY GUARD -- both added 2026-09-09, and here they
+    # BLOCK rather than merely note. The one-backslash form could not see a path written inside
+    # a non-raw Python literal, where every separator is doubled; the guard stops the arm
+    # reading the `s:` of a string containing `paths:` plus an escaped newline as a drive path.
+    # WHY BLOCKING IS FREE HERE AND IS NOT IN tools/: measured across BOTH shipped trees, 198
+    # files each, this arm finds ZERO under the old pattern AND ZERO under the new one. There
+    # is nothing to disrupt, and an absolute path in the DELIVERABLE is a defect by definition
+    # -- so the same widening that reports for judgement in tools/ refuses outright in here.
     ("absolute or home path",
-     r"[A-Za-z]:\\[\w\-.]+(?:\\[\w\-. ]+)+|~[\\/][\w\-.]+(?:[\\/][\w\-. ]+)+"),
+     r"(?<!\w)[A-Za-z]:\\{1,2}[\w\-.]+(?:\\{1,2}[\w\-. ]+)+"
+     r"|~[\\/][\w\-.]+(?:[\\/][\w\-. ]+)+"),
     # NARROWED after its first run. The original required only a capitalised sequence ending
     # in LLP/LLC, which fired three times on ordinary lexicon rows explaining what a US LLC
     # is -- a control with a visible false positive is one a reviewer starts skimming, which
