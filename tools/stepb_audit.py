@@ -328,7 +328,7 @@ else: ok(f"consequence groups sum to {TOTAL}")
 # AND EACH GROUP'S OWN HEADING, not only the sum. ADDED 2026-08-18, because the sum passing is
 # not the same as the parts being right: G10 moved group 3 from 41 to 42 on 2026-08-11 and
 # `### 5.3 ... — 41 findings` shipped unchanged, while this check reported the groups summing
-# correctly. That is the "N of M" bookkeeping class CLAUDE.md 5.12 says clusters here and that
+# correctly. That is the "N of M" bookkeeping class CLAUDE.md 5.3 says clusters here and that
 # prose review does not see -- and it slipped past in one of our own audit tools.
 for num in sorted(gsizes, key=int):
     m = re.search(rf"^### 5\.{num} .*?(\d+) findings", LIVE, re.M)

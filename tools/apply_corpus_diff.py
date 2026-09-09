@@ -58,7 +58,7 @@ W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"))
 SCRIPT = "apply_translations_textmatch.py"
 
-# PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. CLAUDE.md 5.16: a before-and-after check
+# PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. CLAUDE.md 5.3: a before-and-after check
 # once read its "before" from HEAD, which worked only while the change was uncommitted and then
 # compared the new file against itself and reported 100% carried.
 #
@@ -109,7 +109,7 @@ REF = os.environ.get("LT_BASELINE_REF", "015c8b6")
 # "the fix did not fire where the measurement says it must", on D02 and D07, for ever, with
 # nobody able to act on it.
 #
-# Same family as CLAUDE.md 5.16's second rule -- ask of every claim whether it asserts a
+# Same family as CLAUDE.md 5.3's second rule -- ask of every claim whether it asserts a
 # HISTORICAL DELIVERY or a LIVE INVENTORY -- and it is the third member of that family found
 # in this one file. `git merge-base --is-ancestor` settles it exactly: if the fix's commit is
 # an ancestor of the baseline, the baseline already has it and the question is answered, not
@@ -156,7 +156,7 @@ ROW = {
 
 # THREE CLASSES, AND THE DISTINCTION IS WHAT MAKES THIS TOOL READABLE. The first version
 # flagged every moved key against a document list and produced 25 "unexplained" movements, of
-# which 20 were a run count rising -- which CLAUDE.md 5.6's first measurement rule says must
+# which 20 were a run count rising -- which CLAUDE.md 5.5's first measurement rule says must
 # never be scored at all: "Never score ANY run property from element counts -- translation
 # consolidates runs, so nearly every count falls even when nothing is lost."
 #
@@ -192,7 +192,7 @@ DELETE = ("fldChar", "instrText")
 #
 # THE COUNT IS NOT THE CRITERION AND THIS IS THE MEASUREMENT THAT PROVES IT: D02 went 61 -> 16
 # tab characters, 45 fewer than the OLD code kept, and NOT ONE PIXEL moved on any of its 11
-# pages. A stranded tab advances into empty space. CLAUDE.md 2.5 item 7 -- judge a layout
+# pages. A stranded tab advances into empty space. CLAUDE.md 2.4 item 7 -- judge a layout
 # device on its RENDERED EFFECT, never on its element count -- so the verdict for this key
 # points at tools/render_diff.py rather than pretending a number settles it.
 PARTIAL = ("tab_chars",)
@@ -335,7 +335,7 @@ def text_delta(old_bytes, new_bytes):
     fix produces an EMPTY census delta. Before this arm existed the summary below derived its
     counts from that delta while printing the word "byte-quiet", so branch 6's fourth slice
     would have reported `13 byte-quiet` on a run where two documents' bytes had changed.
-    CLAUDE.md 5.16's shape exactly: the thing measured was not the thing under review.
+    CLAUDE.md 5.3's shape exactly: the thing measured was not the thing under review.
 
     Indices are paragraph POSITIONS, never text -- nothing here can print a document's
     content.
@@ -455,7 +455,7 @@ def predictors(notes):
 def corpus_dirs():
     """WHERE THE PRISTINE SOURCES LIVE — read from config, never hardcoded, never printed.
 
-    The run directories under the logs folder hold DELIVERABLES; CLAUDE.md 6.5 puts the
+    The run directories under the logs folder hold DELIVERABLES; CLAUDE.md 6.4 puts the
     11-document corpus in a separate sibling folder whose NAME is not committable. Measured
     2026-09-01: matching only inside the run directories reached 3 of 13 frozen intermediates,
     and the ten it missed include BOTH documents for A2 -- the fourteen unreachable comment
@@ -463,7 +463,7 @@ def corpus_dirs():
     folder name is read from gitignored .claude/evidence-dirs.local (plus LT_CORPUS_DIR) and
     used without ever being echoed.
 
-    IN A FRESH CLONE THAT FILE DOES NOT EXIST, exactly as CLAUDE.md 5.4 says of the evidence
+    IN A FRESH CLONE THAT FILE DOES NOT EXIST, exactly as CLAUDE.md 5.6 says of the evidence
     guard. The real arm is then unavailable and this tool says so rather than reporting a
     smaller clean run.
     """
@@ -675,7 +675,7 @@ for wd in wds:
             verdict = (f"+{av - bv} tab(s) preserved-but-after-the-text (source {sv}) — "
                        "the DECLARED branch-16 deferral, not a loss")
         else:
-            verdict = (f"structural, not scored (source {sv}) — CLAUDE.md 5.6: never score "
+            verdict = (f"structural, not scored (source {sv}) — CLAUDE.md 5.5: never score "
                        "a run property from element counts")
         print(f"      {k:<20} {bv:>6} -> {av:<6} src {sv:<6} {verdict}")
 
@@ -770,7 +770,7 @@ for wd in wds:
         # movement when there is none — the run printed its own NOTE saying an all-quiet
         # result proves nothing, and then two lines of "MOVEMENTS NO REGISTER ROW PREDICTS".
         # Two guaranteed defects, reading exactly like real ones. Same family as every other
-        # entry in CLAUDE.md 5.16: the thing measured was not the thing under review.
+        # entry in CLAUDE.md 5.3: the thing measured was not the thing under review.
         if c17_idx and not n_moved and not SAME and not fix_in_baseline("C17"):
             unexplained.append(
                 f"{label}/TEXT: the notes carry {len(c17_idx)} C17 instance(s) at "

@@ -5,9 +5,9 @@
 > content-preserving** (`temp/split_decisions_log.py`).
 >
 > **What this file is for.** It stops settled questions being re-litigated, and it records the *reasoning*
-> behind decisions whose *effect* now lives in the charter. **`CLAUDE.md` §2.6 carries the short list of
+> behind decisions whose *effect* now lives in the charter. **`CLAUDE.md` §2.5 carries the short list of
 > decisions that still bind; this file carries the argument behind each one.** Where the two disagree about
-> what was decided, read the dated entry here — it is the contemporaneous record — then correct §2.6.
+> what was decided, read the dated entry here — it is the contemporaneous record — then correct §2.5.
 >
 > **Nothing here is a live question.** Every entry is closed. Two entries are recorded as *pre-registered
 > controls relaxed after the result was seen*, and they are labelled as such rather than tidied away.
@@ -53,7 +53,7 @@ actually wrong. Arm 1's operator said so directly — it began composing a 5b bl
 too early. **5b did its work by not being used.** *(2)* **Its product is the disclosure, not the escape.**
 The register records operators improvising out of closed loops; the rule that a known defect may never ship
 unspoken is load-bearing however rarely the channel fires. *(3)* **"Near-unreachable" describes the TEST,
-not the rule.** Two of §5.5's three impossible requirements — **F30** and **F33** — remain genuine dead
+not the rule.** Two of section 5.5 of `STEP-B-ANALYSIS.md`'s three impossible requirements — **F30** and **F33** — remain genuine dead
 ends; they simply do not run through a script that returns an exit code, so branch 5 cannot block on them
 and this gate could never have reached them.
 
@@ -68,25 +68,25 @@ tested against the then installed skill!! Analyse and present solutions, then ve
 
 **It is NOT a third variant, and that is what keeps 2026-07-27 intact rather than overturning it.** That
 entry rules out a third **client-internal** variant — a third *published English* tree. Checked in this
-file before deciding, not reasoned from `CLAUDE.md` §2.6's summary of it, because §1.5 says a claim that
+file before deciding, not reasoned from `CLAUDE.md` §2.5's summary of it, because §1.5 says a claim that
 matters gets read at source. **This is the same tree with logging turned up: a CONFIG OVERLAY, decided
 against a third tree.** The reason is measured — 176 of 198 files already diverge between two trees
 *(2026-08-18)*, so a third triples the reconciliation and adds a tree that must never be published to a
-repository whose whole discipline is *what you see is what ships*. **Same shape as §5.4's rule that the
+repository whose whole discipline is *what you see is what ships*. **Same shape as §5.6's rule that the
 scanner ships and the name list never does: the CAPABILITY ships, the VERBOSITY does not.**
 
 **Sequencing, and Wouter was explicit: the overlay is built only after the UK and US skills are published
 for external users.** But the **LOG FORMAT is designed before publication**, with D3's manifest work, and
-that is not a hedge — §5.6 records that the forensic log and the shipped run report *"is the same
+that is not a hedge — §5.5 records that the forensic log and the shipped run report *"is the same
 artefact, so designing the log format well gives the shipped report for free."* Design them apart and the
 project owns two formats and a reconciliation. **So: one format, two verbosity tiers — the shipped
-metadata-only report (§5.11, opt-in, already decided 2026-07-29) and Wouter's verbose local tier.**
+metadata-only report (§5.7, opt-in, already decided 2026-07-29) and Wouter's verbose local tier.**
 
 **The monthly job tests against the then-installed skill, and that is the sharpest part of the idea rather
 than a detail.** It is not log-reading: it replays the recorded failures against the skill **as it stands
-that month** and reports which still reproduce. The machinery exists — §5.8's frozen-intermediate trick
+that month** and reports which still reproduce. The machinery exists — §5.4's frozen-intermediate trick
 makes the mechanical half a deterministic function, so a replay is seconds and needs no model. **That
-turns production use into a regression suite that grows itself**, which is the never-regress rule (§5.5)
+turns production use into a regression suite that grows itself**, which is the never-regress rule (§5.3)
 fed by real documents instead of by twelve July runs.
 
 **PORTABLE, REPRODUCIBLE AND OBSERVABLE FROM THE START, because it moves to the cloud later.** Wouter:
@@ -97,18 +97,18 @@ no hard-coded local paths — every location by environment variable, the patter
 names; and it exits non-zero on VOID rather than reporting a clean run over an empty set.
 
 **AND THE CONSTRAINT THAT GOVERNS THE WHOLE DESIGN: A VERBOSE LOG OF A REAL TRANSLATION CONTAINS CLIENT
-TEXT.** §6.5 already records that the A1 forensic logs quote real client text and are the most
+TEXT.** §6.4 already records that the A1 forensic logs quote real client text and are the most
 content-rich artefacts this project has produced; a verbose production log is the same class. Four
 consequences, decided now rather than discovered later: the logs live in a **sibling folder, never the
 repo**; the **evidence guard must know that folder** or a monthly job running `ls` over it prints
-counterparty names into a transcript, which is the one leak class no scanner here can reach (§5.4); only
+counterparty names into a transcript, which is the one leak class no scanner here can reach (§5.6); only
 **sanitised conclusions** enter the register, as with Wouter's review feedback; and the register needs a
 **new origin class for production evidence** — the same gap the 5b probe hit when the validator rejected
 `probe-5b` as unknown vocabulary, so it is one change serving both.
 
 **What is NOT decided and is deliberately left open:** the log's field list, whether the monthly job is a
 scheduled session or a cron-driven script, and what "presents changes to me" looks like as an artefact.
-Those are Step B-style exploration, and §3.4's rule applies — *anything still short gets explored in the
+Those are Step B-style exploration, and §3.2's step-4 rule applies — *anything still short gets explored in the
 Step B style, not patched straight to code.*
 
 **2026-07-27** — The third, client-internal skill variant is **out of scope**; two variants only.
@@ -407,7 +407,7 @@ totals** — the source's own interior doubles and the operator's declared ones 
 **D07 keeps 3**, which the fix did not remove.
 
 **DECIDED: leave the row PARTIAL with the measurement written into it, and take branch 7 next.** Three
-reasons, in order of weight. **(1)** §5.8's rule that the queue is worked in order and a reordering is
+reasons, in order of weight. **(1)** the auto-loading house file's rule that the queue is worked in order and a reordering is
 Wouter's decision, never a side effect — and wanting to finish a row one is already holding is exactly how
 that rule gets broken. **(2)** Paragraph-level attribution is **unbounded until the first measurement comes
 back**, so it cannot be scoped into a branch that is otherwise finished and verified. **(3)** The instrument
@@ -510,7 +510,7 @@ than edits:
 
 1. **`OPUS-5-MIGRATION.md` and this file were split out**, on the same principle Wouter set for the Opus 5
    work: a self-contained workstream, and a dated historical record, are both easier to keep true outside a
-   charter than inside one. **A new standing rule follows** and is in `CLAUDE.md` §5.13: anything
+   charter than inside one. **A new standing rule follows** and is in `CLAUDE.md` §5.4: anything
    substantial being added to the charter is placed in §2–§6 by subject, and if it is extensive, **ask
    whether it belongs in its own document before writing it in.**
 2. **The build plan is no longer restated in the charter.** `STEP-B-ANALYSIS.md` §2 owns the order, §3 the
@@ -532,7 +532,7 @@ charter: *"Would like you to mention only: Agreement (Norwegian), Power of Attor
 names/types of the agreements themselves. This should also be in other documents and be a rule in terms of
 confidentiality."*
 
-**THE RULE, now `CLAUDE.md` §5.4: instrument class plus language, and nothing else.** Never what the
+**THE RULE, now `CLAUDE.md` §5.6: instrument class plus language, and nothing else.** Never what the
 instrument is *about*. The reasoning is the same one that produced the two-control requirement in July:
 **subject matter plus a language plus a date range identifies a real instrument more sharply than a name
 does**, to anyone who knows the market — **and the 93-pattern scan is structurally blind to it**, reporting
@@ -612,7 +612,7 @@ needs would have spent real effort on a new risk surface, and every lesson it ca
 charter's §5, sourced and dated. **The archive keeps it, outside the repository, where it already was.**
 
 **Applied to the plan the same day:** branch 0 no longer archives it, `docs/history/` is gone from the
-layout, the skill-authoring convention no longer points at it, and the archived revisions are named in §6.5
+layout, the skill-authoring convention no longer points at it, and the archived revisions are named in §6.4
 as a never-committable location in their own right. **A decision that changes the plan and not only a file
 has to change every place the plan is written down** — which is the failure mode the charter overhaul existed
 to fix, applied to itself within the hour.
@@ -699,7 +699,7 @@ to read it in.
 lines only, because scanning whole trees returns 46 known-benign hits per tree and a reviewer facing those
 starts skimming. Measured: branch 4's eight files give 6 hits, its 102 added lines give 0. *(ii)* An
 **evidence-folder guard** runs before a shell command executes, because the one leak class this project
-cannot scan for is the transcript — §6.5 says session metadata is reachable by neither the scanners nor the
+cannot scan for is the transcript — §6.4 says session metadata is reachable by neither the scanners nor the
 location rule, and a session proved it by globbing a log folder and printing real corpus filenames into the
 conversation.
 
@@ -721,7 +721,7 @@ produced an inventory of the register rows.
    than the two with register rows.** The measurement is the argument: a 20-shape sweep through the real
    apply found all five stranding text identically, and it is one code change rather than five. *Fix the
    class, not the caller.* `w:ruby` and `w:fldSimple` are different mechanisms and got rows instead.
-2. **"Fail loudly" means BLOCK, but only where an unlisted container CARRIES TEXT.** §5.9's test is
+2. **"Fail loudly" means BLOCK, but only where an unlisted container CARRIES TEXT.** §5.7's test is
    whether a compliant way out exists, and the source is the client's own document, so the operator
    cannot delete an element to satisfy a checker. An unlisted element carrying no text is left alone —
    `w:subDoc` measured CLEAN, and a gate firing there would fire on correct input, which is what branch
@@ -777,7 +777,7 @@ them would have changed what slice 3 built, and one of them decided whether it c
    round trip, and `repack --headers-footers-dir` already bundles what it writes. A body route would
    need a new script in both trees, a new repack flag, and would collide with apply's own
    `document.xml` output — for a surface no corpus document carries. **The residue is not hidden:**
-   §5.9's compliant-exit test says a body drawing, a chart title and SmartArt text cannot be
+   §5.7's compliant-exit test says a body drawing, a chart title and SmartArt text cannot be
    refused, because the source is the client's own document and the operator may not edit it to
    satisfy a checker. So they are reported, loudly, which is the honest form of *fail loudly rather
    than ship silently* where a gate would fire on input nobody can change.
@@ -788,7 +788,7 @@ them would have changed what slice 3 built, and one of them decided whether it c
    and if a `kind`-less entry ever stopped being treated as a paragraph entry then every real
    document would silently stop having its headers and footers translated **while the fixture suite
    went on passing**, because a freshly extracted fixture scaffold has the key.
-3. **The corpus's inability to reach measurement (a) is §5.7's THIRD reason, NOT a fifth.** The
+3. **The corpus's inability to reach measurement (a) is §5.5's THIRD reason, NOT a fifth.** The
    corpus does hold the shape — one inline `sdt` in a footer — and nothing removed it; the paragraph
    is simply never rebuilt, because the operator left that scaffold entry's `en` null. So the
    mechanism is the **artefact's** rather than the shape's, and it is *holds the mechanism but not
@@ -817,7 +817,7 @@ them would have changed what slice 3 built, and one of them decided whether it c
    `apply_translations_textmatch.py` would have changed what `apply_corpus_diff` was comparing,
    mid-slice, in a slice about graphic metadata. Done alone, the same change becomes a **proof**
    instead of a confound — apply genuinely differs from the pin, the self-comparison notice is
-   absent, and 13 of 13 frozen intermediates come back byte-identical, which is §5.8 rule 3's
+   absent, and 13 of 13 frozen intermediates come back byte-identical, which is §5.4 rule 3's
    *proved byte-for-byte, or not claimed*. **And the fix is a check that DISCOVERS the importers by
    reading the tree rather than a patch on the four that exist**, so caller N+1 is covered without
    anybody adding a row.

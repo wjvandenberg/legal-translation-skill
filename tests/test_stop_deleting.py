@@ -86,7 +86,7 @@ def ok(label, cond, detail=""):
 
 
 def void(label, why):
-    """A check that could not establish anything is VOID, never a pass. CLAUDE.md 5.16."""
+    """A check that could not establish anything is VOID, never a pass. CLAUDE.md 5.3."""
     VOIDED.append(f"{label}: {why}")
     print(f"  ??   {label}   VOID — {why}")
 
@@ -125,7 +125,7 @@ def run_apply(work, source_xml, notes, label, fixture=None):
         capture_output=True, text=True, encoding="utf-8", errors="replace",
         cwd=str(ROOT), env=env, timeout=600)
     # ASSERT THE ARTEFACT, NOT THE EXIT CODE. A run that skipped every paragraph, matched
-    # nothing or died after printing its summary all exit 0. CLAUDE.md 5.16.
+    # nothing or died after printing its summary all exit 0. CLAUDE.md 5.3.
     if not out.exists():
         print(f"\n  {label}: apply wrote no output (rc={r.returncode}).")
         print("  " + (r.stderr or r.stdout or "").strip()[-1200:])
@@ -154,7 +154,7 @@ print("=" * 98)
 
 # =========================================================================================
 # 0. THE POSITIVE CONTROL. Plant nothing, but PROVE the fixture carries each needle: an
-#    assertion that a count went 0 -> 0 is the clean-looking zero CLAUDE.md 5.16 rule 6 is
+#    assertion that a count went 0 -> 0 is the clean-looking zero CLAUDE.md 5.3 rule 6 is
 #    about, and it is indistinguishable from a real pass.
 # =========================================================================================
 print("\n0. THE FIXTURE ACTUALLY CARRIES THE NEEDLES  (else every assertion below is VOID)")
@@ -300,7 +300,7 @@ else:
 #
 # THAT IS CLUSTER A's OTHER HALF, NOT A BUG IN THIS BRANCH: the apply-side deletion problem
 # is fixable here, and the DATA CONTRACT being unable to describe the formatting is branches
-# 15-17's (CLAUDE.md 2.5 item 7 -- "two fixes, two files, and neither closes the other's
+# 15-17's (CLAUDE.md 2.4 item 7 -- "two fixes, two files, and neither closes the other's
 # rows"). Branch 15 makes extraction emit effective formatting per RUN; only then can the
 # English be split at the boundary the tab sat on.
 #

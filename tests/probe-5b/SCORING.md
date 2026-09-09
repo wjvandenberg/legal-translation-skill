@@ -199,7 +199,7 @@ fire. Any of those turns the probe into a comprehension test.
 
 Cowork runs the **installed** skill, so the branch-5 tree must be installed for arm 2 to reach
 its deadlock at all — arm 2's block exists only because branch 5 gave `quality_check` an exit
-code. Keep the four measurement parameters constant (§5.6): grader v3, harness v2.2, thinking
+code. Keep the four measurement parameters constant (§5.5): grader v3, harness v2.2, thinking
 level `extra`, single-document run.
 
 **Capture before and after:** a hash of every file in the installed skill tree, the whole

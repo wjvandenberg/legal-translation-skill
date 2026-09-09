@@ -388,7 +388,7 @@ def audit_b1():
     # fixed by whoever moved it.
     #
     # `git ls-files` reads the INDEX, so a new fixture counts once it is STAGED. That is
-    # CLAUDE.md 5.16 point 5 working as intended rather than a limitation: stage first, then
+    # CLAUDE.md 5.3 point 5 working as intended rather than a limitation: stage first, then
     # scan, then record -- a scan whose denominator silently excludes an untracked file is
     # the same defect from the other end.
     fx = [l for l in git("ls-files", "tests/fixtures").splitlines() if l]

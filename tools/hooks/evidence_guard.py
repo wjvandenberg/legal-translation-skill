@@ -11,7 +11,7 @@ the leak never touched a file.
 
 WHY A HOOK AND NOT A RULE. Every other confidentiality control in this project reads
 COMMITTED CONTENT -- leakage_scan, publication_check, descriptor_shape_sweep, the pre-commit
-gate. This leak reached the TRANSCRIPT, and CLAUDE.md 6.5 states plainly that session
+gate. This leak reached the TRANSCRIPT, and CLAUDE.md 6.4 states plainly that session
 metadata is reachable by neither the scanners nor the location rule. There is no
 after-the-fact control, so the control has to run BEFORE the command does. And the written
 rule already existed -- 6.5's "any glob over an evidence folder must be explicit about which
@@ -25,7 +25,7 @@ same thing through inline `-c` code.
 WHAT IT DELIBERATELY ALLOWS, because the hazard is OUTPUT, not access:
   * `uv run python tools/gate_replay.py`         — reads those logs, prints counts only
   * `uv run python ../legal-translation-private/tools/audit_register.py`
-                                                  — prescribed by CLAUDE.md 5.12 itself
+                                                  — prescribed by CLAUDE.md 5.3 itself
   * `uv run python tools/evidence_ls.py <path>`  — the sanctioned way to see a folder's shape
 A block with no alternative gets worked around, and then you have a control nobody believes.
 
@@ -120,7 +120,7 @@ def main():
             "",
             "Those filenames carry counterparty and personal names. This output would go",
             "into the conversation transcript, which no scanner in this project can reach",
-            "(CLAUDE.md 6.5) and which cannot be un-said. Reading the folder is fine;",
+            "(CLAUDE.md 6.4) and which cannot be un-said. Reading the folder is fine;",
             "PRINTING WHAT IS IN IT is not.",
             "",
             "Do this instead:",
@@ -130,7 +130,7 @@ def main():
             "tools/gate_replay.py, which reads these logs and prints counts only.",
             "",
             "If you genuinely need one specific file, name it explicitly rather than",
-            "globbing: CLAUDE.md 6.5 — 'any glob over an evidence folder must be explicit",
+            "globbing: CLAUDE.md 6.4 — 'any glob over an evidence folder must be explicit",
             "about which files it expects.'",
         ]),
         file=sys.stderr)

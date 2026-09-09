@@ -408,7 +408,7 @@ FS = [
      (ROOT / "README.md").exists()),
     # STILL A LIVE RULE, not a leftover: docs/history/ was decided against on 2026-08-06 and
     # the recovered changelog stays outside the repository.
-    ("no `docs/` — §5.4(c)", not (ROOT / "docs").exists()),
+    ("no `docs/` — §5.6(c)", not (ROOT / "docs").exists()),
     ("no rev*_smoke.py anywhere", not list(ROOT.rglob("rev*_smoke.py"))),
 ]
 for label, truth in FS:
@@ -425,7 +425,7 @@ if present("the project folder contains `CLAUDE.md`, `FINDINGS-REGISTER.md`, "
 # scratch and is reported separately rather than silently excused.
 #
 # UPDATED 2026-08-06: `tests/fixtures/` is now a SANCTIONED home for document-shaped files.
-# §5.8 makes synthetic fixtures committable by design -- they are what runs on every change
+# §5.4 makes synthetic fixtures committable by design -- they are what runs on every change
 # and what `git bisect` uses -- and the pre-commit gate already encodes the same rule from
 # the other side, blocking any Word document OUTSIDE that folder. This check predated the
 # folder existing and fired on all eleven the moment branch 1 was merged.
@@ -490,8 +490,11 @@ named = set(re.findall(r"`(?:[A-Za-z0-9_.\-]+[\\/])*([a-z0-9_]+\.py)`", CMD))
 # strict (anything NOT listed is still an unexplained absence) while recording why these two
 # are allowed to be absent. Delete an entry the moment its script lands.
 PLANNED = {
-    "package.py": "§6.6 — builds one .skill archive per variant, at release time",
-    "publish.py": "§6.6 — copies each tree into its public repo, at release time",
+    # §6.6 became §6.4's `#### Publishing from the monorepo` when section 6 was mapped onto the
+    # template's five subsections, 2026-09-09. A sign that resolves onto a real but WRONG section
+    # passes silently, which is why these moved with the heading rather than after it.
+    "package.py": "§6.4 — builds one .skill archive per variant, at release time",
+    "publish.py": "§6.4 — copies each tree into its public repo, at release time",
 }
 absent = {n for n in named
           if n not in scripts_on_disk and n not in skill_scripts}
@@ -805,7 +808,9 @@ for old_name, new_no, needle in [
     got = row.group(1).strip() if row else "<<missing>>"
     (ok if needle in got else lambda m: fail("15", m))(
         f"{old_name} -> plan branch {new_no} ({got!r})")
-# and the three sequencing facts §3.3 summarises must be the plan's three
+# and the three sequencing facts §3.2 summarises must be the plan's three -- the comment said
+# §3.3 and had been wrong since before the 2026-09-09 mapping: the facts have always sat in the
+# step-2 block. The CHECK is phrase-keyed and was never affected, which is why nothing caught it.
 if present("Three sequencing facts are absolute") or present("Three sequencing facts, not preferences"):
     ok("the sequencing facts are carried")
 elif "Three sequencing facts" in SB:

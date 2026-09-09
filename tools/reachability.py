@@ -296,7 +296,7 @@ def analyse(tree):
     return findings, read_count, blocking_steps, len(pipe), rule_homes, coverage
 
 
-# The needle is a PHRASE, not two words. §5.12 rule 6: eleven checks in this project have
+# The needle is a PHRASE, not two words. §5.3 rule 6: eleven checks in this project have
 # passed for the wrong reason, and every one used a needle short enough to appear by
 # accident. "in scope" alone matches ordinary prose about scoping; this cannot.
 # Case-insensitive, because the rule is written as a heading ("A check can be wrong IN
@@ -367,7 +367,7 @@ POINTER = re.compile(r"\b(?:see|described in|set out in|per|under)\b[^.]{0,80}\b
 # (language metadata). Sourced from the build plan so the list is auditable rather than
 # a set of words somebody thought of.
 # EVERY PATTERN CARRIES THE REAL STATEMENT IT WAS WRITTEN FOR, and the self-test below
-# asserts it still matches. §5.4 learned this on the leakage scan: a pattern that silently
+# asserts it still matches. §5.6 learned this on the leakage scan: a pattern that silently
 # stops matching reports CLEAN, and a missed hit is invisible. The first version of this
 # table matched NOTHING across 177 files -- four conventions that are all demonstrably in
 # the tree -- and printed that as a result. Test vectors are why that cannot recur.

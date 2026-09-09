@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""THE RENDERED PAGE COMPARISON — CLAUDE.md 5.3's gate, made runnable.
+"""THE RENDERED PAGE COMPARISON — CLAUDE.md 5.2's gate, made runnable.
 
 Section 5.3 makes a "rendered PDF visual diff against the source, page by page, BOTH
 documents" a condition of done for every branch, and 2.5 item 4 calls the rendered diff the
 PRIMARY instrument rather than a final check. No tool existed for it. This is that tool.
 
 ONE CONSTRAINT SHAPES THE WHOLE DESIGN, AND IT IS A CONFIDENTIALITY CONSTRAINT RATHER THAN A
-TECHNICAL ONE. A rendered page of a corpus document is client text as an image. CLAUDE.md 6.5
+TECHNICAL ONE. A rendered page of a corpus document is client text as an image. CLAUDE.md 6.4
 says session metadata is reachable by neither the scanners nor the location rule, so there is
 no after-the-fact remedy and it cannot be un-said. THEREFORE CLAUDE MAY NEVER LOOK AT A
 RENDER OF A REAL DOCUMENT. The gate splits in two:
@@ -59,7 +59,7 @@ ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"))
 SCRIPT = "apply_translations_textmatch.py"
-# PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.16.
+# PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.3.
 #
 # MOVED TO 015c8b6 ON 2026-09-09: the squash-merge of the no-.pyc-in-a-shipped-tree slice
 # (PR #71) and the last commit to touch either tree. DERIVED, NOT READ OFF THE MERGE MESSAGE
@@ -232,7 +232,7 @@ args = ap.parse_args()
 
 SOFFICE = find_soffice()
 print("=" * 98)
-print("RENDERED PAGE COMPARISON — CLAUDE.md 5.3")
+print("RENDERED PAGE COMPARISON — CLAUDE.md 5.2")
 print("=" * 98)
 if not SOFFICE:
     print("  VOID — LibreOffice not found. Set LT_SOFFICE. Nothing rendered, nothing proved.")
@@ -729,7 +729,7 @@ if args.doc:
 
         # THE HALF THIS TOOL CANNOT DO. Section 5.3 wants a page-by-page READ, and Claude may
         # not perform it on a real document — so hand the pages to someone who may. They go
-        # into the LOGS folder, which is where CLAUDE.md 6.5 already puts renders, and only
+        # into the LOGS folder, which is where CLAUDE.md 6.4 already puts renders, and only
         # the pages that actually CHANGED, because those are the ones worth a human's time.
         if args.keep_into_logs:
             dest = LOGS / "branch6-render" / label.replace(" ", "").replace("#", "n")
@@ -738,7 +738,7 @@ if args.doc:
             # nothing on screen said which was which. He opened D06 page 2 written at 15:52
             # by the REGRESSION run while the current run had written pages 4-32 at 16:21 --
             # and reasonably read the stale page as the fix's output. A stale artefact
-            # indistinguishable from a fresh one is exactly what CLAUDE.md 5.16 is about, and
+            # indistinguishable from a fresh one is exactly what CLAUDE.md 5.3 is about, and
             # here the artefact was being handed to a reviewer as evidence.
             if dest.exists():
                 shutil.rmtree(dest, ignore_errors=True)
@@ -863,7 +863,7 @@ if args.doc:
         # run. On 2026-09-01 D02 lost 45 stranded tabs and had 14 comment anchors restored,
         # and NOT ONE PIXEL moved on any of its 11 pages — because a stranded tab advances
         # into empty space and a comment anchor is not printed at all. The count said 45
-        # destroyed; the page said nothing happened. CLAUDE.md 2.5 item 7: judge a layout
+        # destroyed; the page said nothing happened. CLAUDE.md 2.4 item 7: judge a layout
         # device on its RENDERED EFFECT, never on its element count.
         if not changed:
             print("       0 pages re-rendered — every change on this document is "

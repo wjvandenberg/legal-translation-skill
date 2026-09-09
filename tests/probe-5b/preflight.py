@@ -7,7 +7,7 @@ affordable here -- the expensive half of a run is the translation, so this hand-
 intermediate instead of translating it and drives the mechanical half directly.
 
 THIS FILE IS COMMITTED ON PURPOSE. The first version lived in temp/, which is gitignored, and
-CLAUDE.md §5.12 records what that costs: every fix to a tool in temp/ dies with the session
+CLAUDE.md §5.3 records what that costs: every fix to a tool in temp/ dies with the session
 that made it. The rig is not yet confirmed, so the next session needs the instrument that says
 so, not a sentence claiming it.
 

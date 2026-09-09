@@ -1,6 +1,6 @@
 ---
 name: audit-gate
-description: The seven-point audit method for any analysis deliverable in this project, plus the standing instruments to run after editing a committable document and the four scripts deliberately left in temp/. Use when auditing or verifying a summary, report, register edit or plan document, when a numeric claim needs re-deriving, or when asked to triple-check work that other changes will be based on. Relocated from CLAUDE.md 5.12 under route 3 on 2026-08-24.
+description: The seven-point audit method for any analysis deliverable in this project, plus the standing instruments to run after editing a committable document and the four scripts deliberately left in temp/. Use when auditing or verifying a summary, report, register edit or plan document, when a numeric claim needs re-deriving, or when asked to triple-check work that other changes will be based on. Relocated from CLAUDE.md 5.3 under route 3 on 2026-08-24.
 ---
 
 # The audit gate — for any analysis deliverable
@@ -50,7 +50,7 @@ should be treated as evidence the audit was too shallow, not that the work was c
 ## The standing instruments — and their paths MOVED
 
 > **THE THREE COMMANDS BELOW USED TO NAME `temp/`. ALL THREE INSTRUMENTS NOW LIVE IN `tools/`** — checked
-> by listing, 2026-08-24, and the charter's 5.12 had been carrying the old paths since the promotion.
+> by listing, 2026-08-24, and the charter's 5.3 had been carrying the old paths since the promotion.
 > `temp/` is gitignored, so a path there is a command that works only on the machine that wrote it.
 
 Run these after editing any of the committable documents:
@@ -120,7 +120,7 @@ session that made it. **A promotion that quietly drops things is worse than none
 are named:**
 
 - **`temp/audit_session_stepb.py` — BLOCKED ON CONFIDENTIALITY, and it stays in `temp/` permanently.** It
-  holds **two corpus subject-matter descriptors**, precisely the class section 5.4 of `CLAUDE.md` says the
+  holds **two corpus subject-matter descriptors**, precisely the class section 5.6 of `CLAUDE.md` says the
   93-pattern name scan is structurally blind to. It is the file a `§`-resolver fix was made in, so **that
   fix does not survive** — the honest cost of the block, recorded rather than worked around.
   ***This one is also listed unconditionally in `CLAUDE.md` 6.4's never-commit list, because forgetting it
@@ -132,5 +132,5 @@ are named:**
 
 **Committing a broken tool into a public repository implies coverage that does not exist**, which is the
 same objection this project raises against a check nobody believes. The `temp/` originals are left in
-place untouched — *never delete files you didn't create*, section 5.15 — and are superseded by the
+place untouched — *never delete files you didn't create*, section 5.8 — and are superseded by the
 `tools/` copies.

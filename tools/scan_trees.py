@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""SCAN THE TWO PUBLISHED TREES -- charter §5.4(a), the step that must be READ.
+"""SCAN THE TWO PUBLISHED TREES -- charter §5.6(a), the step that must be READ.
 
 The trees are already public, so this is cleanup rather than containment. But committing
 them unexamined would be the project asserting a check it had not made.
@@ -52,7 +52,7 @@ SHAPES = [
     # NARROWED after its first run. The original required only a capitalised sequence ending
     # in LLP/LLC, which fired three times on ordinary lexicon rows explaining what a US LLC
     # is -- a control with a visible false positive is one a reviewer starts skimming, which
-    # is the failure mode §5.4(b) already names. A firm name needs a partner-name shape or an
+    # is the failure mode §5.6(b) already names. A firm name needs a partner-name shape or an
     # explicit firm suffix, not a company-form abbreviation appearing in a definition.
     ("law-firm name shape",
      r"\b[A-Z][a-z]{2,}(?:\s+[A-Z][a-z]{2,}){0,2}\s+(?:&|and)\s+[A-Z][a-z]{2,}\s+"

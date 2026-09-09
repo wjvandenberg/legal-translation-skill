@@ -1,8 +1,8 @@
 # EVIDENCE-measurement.md — the corpus, and what measurement and verification cost to get right
 
 **This document owns three things and no rules:** the **eleven-document test corpus as a listing** *(from
-section 5.7 of `CLAUDE.md`)*, the **dated cost stories behind the measurement rules** *(from section 5.6)*,
-and the **dated instances behind the verification-hygiene rules** *(from section 5.16, added 2026-08-25)*.
+section 5.5 of `CLAUDE.md`)*, the **dated cost stories behind the measurement rules** *(from section 5.5)*,
+and the **dated instances behind the verification-hygiene rules** *(from section 5.3, added 2026-08-25)*.
 Every rule stayed in the charter or is carried by the auto-loaded house file. **Where this document and the
 charter appear to disagree, THE CHARTER WINS.**
 
@@ -26,7 +26,7 @@ per subsection.
 
 ## 1 — The test corpus: eleven real client documents, outside the repo tree, permanently
 
-**Referred to by instrument class and language only, per section 5.4 of `CLAUDE.md`** — never by filename, because **the
+**Referred to by instrument class and language only, per section 5.6 of `CLAUDE.md`** — never by filename, because **the
 filenames alone carry counterparty names**, and never by subject matter. The doc-id → real-document mapping
 lives in the private sibling folder, as it always has.
 
@@ -51,7 +51,7 @@ to terminologically rich but technically straightforward documents**, so variant
 tested. **US: D04, D05, D07. UK: the other eight**, including both hard paths.
 
 **Two things the corpus cannot reach, so they need synthetic fixtures** *(the requirement itself stays in
-section 5.7 of `CLAUDE.md`)*: there are **no `Symbol` or `Wingdings` runs anywhere**, so the Greek-glyph defect cannot be
+section 5.5 of `CLAUDE.md`)*: there are **no `Symbol` or `Wingdings` runs anywhere**, so the Greek-glyph defect cannot be
 reproduced from a real document; and content controls, smart tags, images with alt text and charts with
 titles appear in **none of the eleven**.
 
@@ -67,7 +67,7 @@ titles appear in **none of the eleven**.
 > compared across runs.** Recorded because 16 against 17 reads as a discrepancy and is not one.
 
 **Dated backups of the grader are in the private folder — it is deliberately not in Git, so those are the
-only revert path.** *(The freeze rule and the four instruments to hold constant belong to section 5.6 of
+only revert path.** *(The freeze rule and the four instruments to hold constant belong to section 5.5 of
 `CLAUDE.md` and stay there.)*
 
 ---
@@ -85,7 +85,7 @@ one did.)*
 so the count can rise as well as fall for reasons that have nothing to do with the formatting.
 
 **This produced a false positive on seven consecutive documents** before the rule was written. Hence
-section 5.6 of `CLAUDE.md`: *never score ANY run property from element counts — compare the affected TEXT,
+section 5.5 of `CLAUDE.md`: *never score ANY run property from element counts — compare the affected TEXT,
 then render.*
 
 ### 3.2 Taking a count from the narrative instead of the log analyser
@@ -98,7 +98,7 @@ and **one document's non-zero exits were reported as 4 against a real 7.**
 
 ### 3.3 Six green numbers in one session, each reporting on something other than the thing being checked
 
-**Moved here from section 5.16 of `CLAUDE.md` on 2026-08-25, phase 12.** The rules those instances bought
+**Moved here from section 5.3 of `CLAUDE.md` on 2026-08-25, phase 12.** The rules those instances bought
 are the **auto-loaded house verification hygiene**, and the one with no house twin stayed in the charter.
 **This table is what they cost**, all on 2026-08-21.
 
@@ -113,7 +113,7 @@ are the **auto-loaded house verification hygiene**, and the one with no house tw
 
 ### 3.4 Why this project's suites run as top-level commands — the two measurements behind the rule
 
-**The rule itself stays in section 5.16 of `CLAUDE.md`: it has no house twin, and this document owns no
+**The rule itself stays in section 5.3 of `CLAUDE.md`: it has no house twin, and this document owns no
 rule.** These are the two measurements it rests on.
 
 - **`tests/make_fixtures.py` run as a captured child was measured to KILL ITS PARENT**, which is how a
@@ -161,5 +161,5 @@ this is the document that describes real client documents.
 
 **Every cell of the corpus table describes the file.** No sub-lexicon · legacy binary `.doc` · non-Latin
 script · table count · bold-run count · paragraph count · batch position · tracked-change load ·
-highlight count. **None of it says what any instrument is about**, which is the whole test section 5.4 of
+highlight count. **None of it says what any instrument is about**, which is the whole test section 5.6 of
 `CLAUDE.md` sets.

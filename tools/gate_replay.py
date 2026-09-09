@@ -58,7 +58,7 @@ LOGS = Path(os.environ.get("LEGAL_TRANSLATION_LOGS",
 
 # The five artefact kinds that are actually LOGS. Everything else under A1 is the skill tree
 # copied into a run workspace, or the source/deliverable itself. Being explicit about which
-# files we expect is CLAUDE.md 6.5's rule, and defect (1) above is what it protects against.
+# files we expect is CLAUDE.md 6.4's rule, and defect (1) above is what it protects against.
 # DELIVERY-NOTES belongs here too, and its absence was a defect this scoping introduced: the
 # first version of the fix narrowed to the four narrative kinds, and the delivery-notes arm
 # silently went from 1 artefact to 0 -- a check reporting on an empty set, which CLAUDE.md
@@ -101,7 +101,7 @@ SPEC_ITEMS = [
 # the private analyse_log.py, which defines a re-run as an invocation of a step beyond its
 # first: max(invocation) - 1, summed over steps. This tool reaches the same records by a
 # different parser, so it must reproduce those numbers exactly or one of the two is wrong --
-# CLAUDE.md 5.12 rule 1. It is ASSERTED, not printed as a curiosity, because a silent drift
+# CLAUDE.md 5.3 rule 1. It is ASSERTED, not printed as a curiosity, because a silent drift
 # would quietly invalidate the bound derived below.
 #
 # SELECTING THE GRADED LOG. There are 14 forensic logs for 12 graded runs: one document has a

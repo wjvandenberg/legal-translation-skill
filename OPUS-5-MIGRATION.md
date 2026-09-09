@@ -99,7 +99,7 @@ parameter is high. Recommend against unless the arms in §6 produce a reason.
    been bitten twice by a moving ruler.
 4. **Then, and only then, the arms** (§6) and **the reconciliation's re-grade**, which folds in here rather
    than being paid for separately.
-5. **Then Wouter reviews all 11 himself — INPUT POINT 2.** The protocol is `CLAUDE.md` §5.12; it is the
+5. **Then Wouter reviews all 11 himself — INPUT POINT 2.** The protocol is `CLAUDE.md` §5.4; it is the
    review that already ran once, unchanged.
 
 **The host is still open on purpose.** Decide on evidence when the run is scheduled. Cowork is attractive as

@@ -11,7 +11,7 @@ whether adding it softened anything it was forbidden to soften.
 
 Branch 4 should add its cases here rather than start a parallel file.
 
-WHY EVERY NEEDLE IS A PHRASE. §5.12 rule 6: eleven checks in this project have passed for
+WHY EVERY NEEDLE IS A PHRASE. §5.3 rule 6: eleven checks in this project have passed for
 the wrong reason and every one used a needle short enough to occur by accident. "in scope"
 matches ordinary prose about scoping; the phrases below cannot appear unless the rule is
 actually carried.
