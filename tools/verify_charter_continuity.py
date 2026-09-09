@@ -116,7 +116,12 @@ DECLARED_TOUCHES = []
 HEADINGS_ADDED_SINCE_BASELINE = ["1.7"]
 
 SECTION_7_CAP = 35
-DECLARED_CAP = 350
+# RAISED FROM 350 TO 500 ON 2026-09-09 (4) BY WOUTER: 350 is the RETIRED cap and 500 is the
+# live gate, the same number for M and L.  IT MUST EQUAL verify.config.json's max_lines for
+# CLAUDE.md -- this constant, that config key and section 1.7's prose are THREE statements of
+# ONE number, and only the config one is the gate.  Check 3 fails when the charter's declared
+# cap disagrees with this constant, so moving either alone trades one red for another.
+DECLARED_CAP = 500
 
 # --------------------------------------------------------------------------- check 3 data
 # A DECLARATION is a sentence in which the charter states ITS OWN length. Each pattern below has a
