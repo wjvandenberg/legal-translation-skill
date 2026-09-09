@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""verify_deliverable.py - the packaged-artefact checker.  CHECKER VERSION 3 (2026-08-20)
+"""verify_deliverable.py - the packaged-artefact checker.  CHECKER VERSION 9 (2026-09-01)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
-line for each version in ...\\Coding\\TEMPLATE-CHANGELOG.md and re-copy.
+line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
 
 For the thing a user actually installs or opens: a .skill / .zip package, a Word or
 Excel add-in manifest, a generated .docx / .xlsx, or a variant tree about to be
@@ -13,14 +13,43 @@ the code is correct.
     uv run python tools/verify_deliverable.py --selftest    # prove every check can FAIL
     uv run python tools/verify_deliverable.py --write-config
 
-WHAT IT CATCHES
-  * an archive that is corrupt, or that a user's unzip will silently truncate
-  * dev-only files that leaked into a shipped tree (__pycache__, .git, a changelog)
-  * a required file that is missing, or a file count that quietly changed
-  * a file large enough to hit an install-truncation limit
-  * archive entries with absolute paths or '..' traversal
-  * a manifest that is malformed, missing a required element, or still points at localhost
-  * two variant trees that have drifted apart
+THE SCOPE, WRITTEN DOWN, BECAUSE A GATE THAT DOES NOT STATE ITS OWN BOUNDARY HAS A SILENT ONE.
+It replaced a "WHAT IT CATCHES" list that said the first third of this and stopped: two
+lists of what one gate does is how the two come to disagree, and the half that was missing
+is the half a reader cannot infer.
+
+  CHECKED HERE     an archive that is corrupt, or that a user's unzip will silently
+                   truncate · entries with absolute paths, a drive letter, or '..'
+                   traversal · names that collide case-insensitively, which breaks
+                   extraction on Windows · required and forbidden members · a file count
+                   that quietly changed · a member over max_member_bytes · a manifest that
+                   is malformed, missing a required element, or still points at localhost ·
+                   an Office file that is not a zip or is missing a required OOXML part ·
+                   two variant trees whose FILE LISTINGS have drifted, compared in BOTH
+                   directions · variant trees whose same-named files are DIFFERENT PROGRAMS,
+                   compared as parsed ASTs so reflowing and recommenting are not findings ·
+                   and a file declared in variant_must_differ that is BYTE-IDENTICAL across
+                   trees, which means nobody localised it.
+  ALLOWED, NAMED   files named in variant_ignore differing freely between trees (README,
+                   LICENSE) · at most 5 differences printed per direction per tree pair -
+                   a declared truncation of the LIST only: the denominator stays whole, so
+                   the count never shrinks with the output.
+  NOT CHECKED      whether the deliverable WORKS. Nothing here installs it, opens it or
+                   runs it; every check is STRUCTURAL, and a package that satisfies all of
+                   them can still fail on a user's machine · the CONTENT of any shipped
+                   file, so a .docx carrying every required part and the wrong text passes
+                   · a variant defect that is IDENTICALLY WRONG in both trees and that
+                   NOTHING DECLARED - the within-tree arm is driven by variant_must_differ,
+                   so a file nobody listed there is still invisible to every comparison
+                   between trees. B4 made the class checkable; it cannot make it automatic,
+                   because only a person knows which files carry jurisdiction · a
+                   non-Python program, which cannot be parsed here and so falls back to
+                   being compared by name only · signatures, checksums,
+                   notarisation, provenance · a manifest that is well-formed and
+                   semantically wrong.
+  HANDED OVER      a member that is ITSELF an archive. Nothing here recurses, so an inner
+                   package has had none of the checks above run over it. Reported as
+                   JUDGE - the checker can see that it is there and cannot see inside it.
 
 xml.etree is used to READ manifests only. Never use it to WRITE OOXML - it rebinds
 namespace prefixes on serialisation and Word rejects the file.
@@ -30,9 +59,16 @@ EXIT CODES.  0 = every check passed or was a declared N/A.  1 = at least one che
 failed" are different facts and a caller that cannot tell them apart cannot react to
 either correctly. A FAIL outranks a VOID, because a concrete defect outranks an
 unestablished one; both are non-zero, so any gate wired to "non-zero blocks" is unchanged.
+
+AND A FIFTH VERDICT THAT CHANGES NO EXIT CODE: JUDGE, for the nested archive above. It is
+not a defect - shipping a package inside a package is a legitimate thing to do - so failing
+on it would be wrong. It is also not nothing: the inner artefact has been checked by
+nobody. A person decides, and sees it in the report, in the OVERALL line and in a
+JUDGE-CLAIMS mark that run_tests.py reads.
 """
 from __future__ import annotations
 
+import ast
 import itertools
 import re
 import shutil
@@ -46,8 +82,9 @@ from xml.etree import ElementTree
 # cannot start. check_checkers.py tracks it, so a project that copied one and not the other
 # gets a reported finding rather than an import error at the worst possible moment.
 from house_common import (                                       # noqa: E402
-    FAIL, NA, PASS, RC_COULD_NOT_RUN, VOID, Case, Report,
-    load_section, report_pairing, run_cases, selftest_config, write_section,
+    FAIL, JUDGE, NA, PASS, RC_COULD_NOT_RUN, VOID, Case, Report,
+    finish, load_section, report_pairing, run_cases, selftest_config,
+    wants_report_json, write_section,
 )
 
 DEFAULT_CONFIG = {
@@ -64,6 +101,8 @@ DEFAULT_CONFIG = {
     "office_files": [],
     "variant_trees": [],
     "variant_ignore": ["README.md", "LICENSE"],
+    "variant_ast_suffixes": [".py"],
+    "variant_must_differ": [],
 }
 
 CONFIG_COMMENT = {
@@ -78,6 +117,8 @@ CONFIG_COMMENT = {
     "office_files": "Generated .docx/.xlsx/.pptx to structurally validate.",
     "variant_trees": "Two or more directories that must stay in step, e.g. ['uk','us'].",
     "variant_ignore": "Filenames allowed to differ or exist in only one variant tree.",
+    "variant_ast_suffixes": "Suffixes compared as PARSED PROGRAMS, not filenames. Only .py can be parsed here.",
+    "variant_must_differ": "Paths that MUST differ between trees - the localised ones. Byte-identical means never localised, and a CROSS-tree diff passes that as clean.",
 }
 
 OFFICE_REQUIRED_PARTS = {
@@ -89,6 +130,14 @@ OFFICE_REQUIRED_PARTS = {
 
 # ---------------------------------------------------------------------------- checks
 
+# Suffixes that make a member a deliverable in its own right. OOXML files are deliberately
+# absent even though a .docx IS a zip: check_office_files already opens those and looks for
+# the parts that matter, so listing them here would hand a person a question that another
+# check has already answered - and a JUDGE row full of answered questions gets ignored,
+# taking the unanswered ones with it.
+NESTED_SUFFIXES = {".zip", ".tar", ".gz", ".tgz", ".bz2", ".xz", ".7z", ".rar", ".skill"}
+
+
 def check_archives(rep, root, cfg):
     archives = [root / a for a in cfg["archives"]]
     present = [a for a in archives if a.exists()]
@@ -96,9 +145,12 @@ def check_archives(rep, root, cfg):
     if not archives:
         rep.record("archive integrity", 0, [], na_reason="no archives declared")
         rep.record("archive contents", 0, [], na_reason="no archives declared")
+        # DECLARED HERE TOO, and not left out. A check that simply vanishes on one path
+        # through the function reads, on the report, exactly like a check that passed.
+        rep.record("nested archives", 0, [], na_reason="no archives declared")
         return
 
-    integrity, contents = list(missing), []
+    integrity, contents, nested = list(missing), [], []
     members_seen = 0
     for a in present:
         try:
@@ -113,6 +165,16 @@ def check_archives(rep, root, cfg):
                 for n in names:
                     if n.startswith("/") or ".." in Path(n).parts or re.match(r"^[A-Za-z]:", n):
                         contents.append(f"{a.name}: unsafe entry path {n!r}")
+
+                # A MEMBER THAT IS ITSELF AN ARCHIVE. Every check in this function stops at
+                # the outer zip - it does not recurse - so an inner archive is a whole
+                # deliverable nothing here has examined: not its integrity, not its unsafe
+                # paths, not its forbidden members. The checker can see that it is there
+                # and cannot see inside it, which is the definition of a JUDGE and the
+                # reason "nested archives" sat in the NOT CHECKED list until version 5.
+                nested += [f"{a.name}: contains {n} - an archive inside an archive, and "
+                           f"NOTHING here looked inside it"
+                           for n in names if Path(n).suffix.lower() in NESTED_SUFFIXES]
 
                 # case-insensitive collisions break extraction on Windows
                 lowered = [n.lower() for n in names]
@@ -151,6 +213,11 @@ def check_archives(rep, root, cfg):
     rep.record("archive integrity", len(archives), integrity)
     rep.record("archive contents", members_seen, contents,
                na_reason=None if members_seen else "archives opened but contained no members")
+    rep.record("nested archives", members_seen, nested,
+               na_reason=None if members_seen else "archives opened but contained no members",
+               judge_reason="an inner archive is a deliverable of its own that no check "
+                            "here has opened. Extract it and run this checker on it, or "
+                            "write down why it does not need one.")
 
 
 def check_manifests(rep, root, cfg):
@@ -240,14 +307,59 @@ def check_variants(rep, root, cfg):
     rep.record("variant trees in step", total, problems,
                na_reason=None if total else "variant trees exist but contain no files")
 
+    # ---- ARM 2: PARSED PROGRAMS, not filenames.
+    # The listing above is satisfied by a matching NAME. Two trees can carry the same
+    # filename holding different programs and it reports clean, which is change-list B4.
+    # ast.dump without attributes drops line numbers and formatting, so reflowing a file
+    # is not a finding and changing what it DOES is.
+    suffixes = tuple(cfg["variant_ast_suffixes"])
+    ast_problems, compared = [], 0
+    if live and suffixes:
+        shared = set(listing(live[0]))
+        for t in live[1:]:
+            shared &= set(listing(t))
+        for rel in sorted(r for r in shared if r.endswith(suffixes)):
+            shapes = {}
+            for t in live:
+                try:
+                    shapes[t.name] = ast.dump(ast.parse((t / rel).read_text(encoding="utf-8")))
+                except (SyntaxError, UnicodeDecodeError, OSError) as e:
+                    ast_problems.append(f"{t.name}/{rel}: cannot be parsed, so it cannot be "
+                                        f"compared - {type(e).__name__}")
+            if len(shapes) > 1 and len(set(shapes.values())) > 1:
+                differing = sorted(shapes)
+                ast_problems.append(f"{rel}: same filename, DIFFERENT program in "
+                                    f"{' vs '.join(differing)}")
+            compared += len(shapes)
+    rep.record("variant programs in step", compared, ast_problems,
+               na_reason=None if compared else
+               "no shared parseable files in the variant trees to compare as programs")
+
+    # ---- ARM 3: THE WITHIN-TREE ARM, and it exists because arm 1 is STRUCTURALLY blind.
+    # A cross-tree comparison's success criterion IS identity, so a file that was supposed
+    # to be localised and never was - byte-identical in every tree - passes arms 1 and 2 as
+    # PERFECTLY clean. That is the defect "identically wrong in both trees": US users given
+    # UK rules, invisible to every comparison BETWEEN the trees. So it is asserted per
+    # declared file instead: these must differ, and if they do not, nobody localised them.
+    must = list(cfg["variant_must_differ"])
+    same_problems, examined = [], 0
+    for rel in must:
+        present = [t for t in live if (t / rel).is_file()]
+        if len(present) < 2:
+            same_problems.append(f"{rel}: declared must-differ but present in "
+                                 f"{len(present)} of {len(live)} tree(s) - nothing to compare")
+            continue
+        examined += len(present)
+        blobs = {t.name: (t / rel).read_bytes() for t in present}
+        if len(set(blobs.values())) == 1:
+            same_problems.append(f"{rel}: BYTE-IDENTICAL across {', '.join(sorted(blobs))} "
+                                 f"- declared must-differ, so it was never localised")
+    rep.record("variant files that must differ", examined, same_problems,
+               na_reason=None if must else
+               "variant_must_differ is empty - nothing is declared as needing to be localised")
+
 
 # -------------------------------------------------------------------------- selftest
-
-def _make_zip(path, members):
-    with zipfile.ZipFile(path, "w") as z:
-        for name, data in members.items():
-            z.writestr(name, data)
-
 
 def probe(fn, idx=0):
     """Run one check over a built (cfg, dir) and give back the status it recorded."""
@@ -304,6 +416,35 @@ def _mk(tmp, name, members):
 
 CLEAN = {"SKILL.md": "x", "scripts/a.py": "y"}
 
+#: The same program, written two ways. Reflowed, recommented, an extra blank line, and a
+#: different amount of space after `return`. ast.dump without attributes sees ONE program,
+#: which is what makes the AST arm a comparison of programs rather than of bytes.
+_PROG_A = "def rate():\n    return 1\n"
+_PROG_A_REFLOWED = "# localised for this jurisdiction\n\ndef rate():\n\n    return  1\n"
+_PROG_B = "def rate():\n    return 2\n"
+
+
+def _var_trees(tmp, *trees):
+    """Fresh, UNIQUELY-NAMED variant trees, and the naming is not cosmetic.
+
+    The older `trees()` helper reuses uk/ and us/, which is safe only while every case
+    touching them wants the same contents. These arms deliberately put DIFFERENT bytes
+    behind the SAME filenames, so sharing directories would make one case rewrite the
+    fixture another has already built - the same hazard _unique() exists for, and it
+    surfaces as an intermittent CRASHED row rather than as a defect in the checker.
+    """
+    stamp = next(_FIXTURE_SEQ)
+    names = []
+    for i, files in enumerate(trees):
+        d = tmp / f"vt{stamp}_{i}"
+        d.mkdir(parents=True, exist_ok=True)
+        for rel, data in files.items():
+            p = d / rel
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(data, encoding="utf-8")
+        names.append(d.name)
+    return names
+
 
 def cases(tmp):
     """The case table. EVERY ROW IS PROVED BOTH WAYS unless it says why it cannot be.
@@ -314,9 +455,12 @@ def cases(tmp):
     base = dict(DEFAULT_CONFIG)
     arch = probe(check_archives, idx=1)          # row 1 is 'archive contents'
     integ = probe(check_archives, idx=0)         # row 0 is 'archive integrity'
+    nest = probe(check_archives, idx=2)          # row 2 is 'nested archives'
     man = probe(check_manifests)
     off = probe(check_office)
-    var = probe(check_variants)
+    var = probe(check_variants)                  # row 0 - the listing comparison
+    prog = probe(check_variants, idx=1)          # row 1 - parsed programs (B4-a)
+    same = probe(check_variants, idx=2)          # row 2 - the within-tree arm (B4-b)
 
     def trees(tmp, extra):
         for v in ("uk", "us"):
@@ -345,6 +489,15 @@ def cases(tmp):
         Case("path traversal in archive", arch,
              lambda t: (dict(base, archives=[_mk(t, "evil.zip", {"../escape.txt": "x"})]), t),
              lambda t: (dict(base, archives=[_mk(t, "good.zip", CLEAN)]), t)),
+        # THE JUDGE CASE. Note what the good arm is NOT: it is not an empty package, it is
+        # a package with ordinary members. An inner .zip is handed over; a .md and a .py are
+        # not. Had the good arm been the empty case, the check could have been made to pass
+        # by firing whenever an archive has any member at all.
+        Case("nested archive needs a person", nest,
+             lambda t: (dict(base, archives=[_mk(t, "outer.zip",
+                                                 {"SKILL.md": "x", "inner.zip": "PK\x03\x04"})]), t),
+             lambda t: (dict(base, archives=[_mk(t, "flat.zip", CLEAN)]), t),
+             want=JUDGE),
         Case("corrupt archive", integ,
              lambda t: (dict(base, archives=[_file(t, "corrupt.zip", b"not a zip")]), t),
              lambda t: (dict(base, archives=[_mk(t, "good.zip", CLEAN)]), t)),
@@ -360,6 +513,35 @@ def cases(tmp):
         Case("variant drift (us has extra)", var,
              lambda t: (dict(base, variant_trees=["uk", "us"]), trees(t, True)),
              lambda t: (dict(base, variant_trees=["uk", "us"]), trees(t, False))),
+        # B4-a. The GOOD arm is the point: same program, reflowed and recommented. A
+        # byte-compare would fail it, so passing it is what proves this compares PROGRAMS.
+        Case("same filename, different program", prog,
+             lambda t: (lambda v: (dict(base, variant_trees=v), t))(
+                 _var_trees(t, {"shared.md": "a", "rate.py": _PROG_A},
+                               {"shared.md": "a", "rate.py": _PROG_B})),
+             lambda t: (lambda v: (dict(base, variant_trees=v), t))(
+                 _var_trees(t, {"shared.md": "a", "rate.py": _PROG_A},
+                               {"shared.md": "a", "rate.py": _PROG_A_REFLOWED}))),
+        # B4-b. THE SYMMETRIC DEFECT. Both trees carry the same bytes behind a file that
+        # was supposed to be localised, so every comparison BETWEEN trees calls it clean.
+        Case("must-differ file never localised", same,
+             lambda t: (lambda v: (dict(base, variant_trees=v, variant_must_differ=["rate.py"]), t))(
+                 _var_trees(t, {"shared.md": "a", "rate.py": _PROG_A},
+                               {"shared.md": "a", "rate.py": _PROG_A})),
+             lambda t: (lambda v: (dict(base, variant_trees=v, variant_must_differ=["rate.py"]), t))(
+                 _var_trees(t, {"shared.md": "a", "rate.py": _PROG_A},
+                               {"shared.md": "a", "rate.py": _PROG_B}))),
+        # THE TWO "NOTHING HAPPENED" STATES, PROVED DISTINCT. Declaring a file that is not
+        # there is VOID - the check could not run, and A2's rule that a declared-but-
+        # unreadable LIST is VOID applies just as well to a declared-but-absent FILE.
+        # Declaring nothing at all is N/A. Neither is allowed to read as clean, and
+        # collapsing them into one verdict is how "we checked" comes to mean "we didn't".
+        Case("must-differ file declared but absent", same,
+             lambda t: (lambda v: (dict(base, variant_trees=v, variant_must_differ=["absent.py"]), t))(
+                 _var_trees(t, {"shared.md": "a"}, {"shared.md": "a"})),
+             lambda t: (lambda v: (dict(base, variant_trees=v, variant_must_differ=[]), t))(
+                 _var_trees(t, {"shared.md": "a"}, {"shared.md": "a"})),
+             want=VOID, good_want=NA),
         Case("variant drift (reversed order)", var,
              lambda t: (dict(base, variant_trees=["us", "uk"]), trees(t, True)),
              lambda t: (dict(base, variant_trees=["us", "uk"]), trees(t, False)),
@@ -371,6 +553,40 @@ def cases(tmp):
     ]
 
 
+def _assert_symmetric_defect(tmp) -> bool:
+    """B4's ACCEPTANCE CONDITION, and a case row cannot state it.
+
+    The condition is not "the new arm fires". It is that the new arm fires on a fixture the
+    CROSS-TREE comparison passes as clean - because if the old arms caught it too, the new
+    one is redundant and the whole change is decoration. A Case row reads one check's
+    verdict; this reads THREE off ONE input and asserts they disagree in the one direction
+    that matters.
+
+    ONE FIXTURE, THREE VERDICTS: two trees, identical filenames, byte-identical contents,
+    and rate.py declared as needing localisation. Arms 1 and 2 are structurally incapable
+    of seeing it, because their success criterion IS identity.
+    """
+    print()
+    names = _var_trees(tmp, {"shared.md": "a", "rate.py": _PROG_A},
+                            {"shared.md": "a", "rate.py": _PROG_A})
+    cfg = dict(DEFAULT_CONFIG, variant_trees=names, variant_must_differ=["rate.py"])
+    rep = Report()
+    check_variants(rep, tmp, cfg)
+    listing, programs, must = rep.statuses()[0], rep.statuses()[1], rep.statuses()[2]
+
+    good = listing == PASS and programs == PASS and must == FAIL
+    print(f"  {'OK  ' if good else 'MISS'} the SYMMETRIC defect, one fixture, three arms")
+    print(f"         listings across trees   -> {listing}"
+          f"   {'(blind: the names match)' if listing == PASS else '(UNEXPECTED)'}")
+    print(f"         programs across trees   -> {programs}"
+          f"   {'(blind: the bytes match)' if programs == PASS else '(UNEXPECTED)'}")
+    print(f"         must-differ, within-tree-> {must}"
+          f"   {'(CAUGHT it)' if must == FAIL else '(MISSED IT - the arm is not built right)'}")
+    if good:
+        print("         a cross-tree comparison passes this as clean; that is why arm 3 exists.")
+    return good
+
+
 def selftest() -> int:
     print("SELFTEST - each check must fire on a bad input AND stay quiet on a good one")
     print()
@@ -379,6 +595,7 @@ def selftest() -> int:
         ok, paired, unpaired = run_cases(cases(tmp), tmp, width=38)
         report_pairing(paired, unpaired)
         ok &= selftest_config(tmp, "deliverable", "archives", load_config, width=38)
+        ok &= _assert_symmetric_defect(tmp)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print()
@@ -406,16 +623,35 @@ def main(argv):
     check_office(rep, root, cfg)
     check_variants(rep, root, cfg)
 
-    print(rep.render(name_width=32))
-    na = sum(1 for _, s, _, _ in rep.rows if s == NA)
+    # --report-json suppresses the prose and emits the rows instead, so something other than
+    # a person can judge this run. Every print below is guarded rather than the function
+    # being split: the exit-code logic is the part a wrapper must agree with, and duplicating
+    # it into a second path is how the two would come to disagree.
+    quiet = wants_report_json(argv[1:])
+    if not quiet:
+        print(rep.render(name_width=32))
+    # rep.statuses(), NEVER an unpack of rep.rows. This line unpacked FOUR values from a
+    # 5-tuple and crashed the whole run with a traceback - every time, not intermittently -
+    # and nothing reported it, because run_tests.py runs only --selftest and a checker's
+    # main() is exercised by no suite at all. The row layout belongs to house_common; a
+    # caller that reaches into it breaks whenever that layout gains a field.
+    na = sum(1 for s in rep.statuses() if s == NA)
     if na == len(rep.rows):
-        print("\nVOID: nothing was declared for this project. Either configure it, or "
-              "record in CLAUDE.md why no deliverable check applies.")
-        return 2
+        if not quiet:
+            print("\nVOID: nothing was declared for this project. Either configure it, or "
+                  "record in CLAUDE.md why no deliverable check applies.")
+        # 2, NOT rep.exit_code - every row is a declared N/A, so the report alone says PASS.
+        # This is exactly why finish() is PASSED the code rather than deriving it.
+        return finish(rep, "verify_deliverable.py", 2, quiet)
     rc = rep.exit_code
-    print(f"\n{len(rep.rows)} checks, {na} declared not applicable")
-    print("OVERALL: " + {0: "PASS", 1: "FAIL", 2: "VOID - a check could not run"}[rc])
-    return rc
+    if not quiet:
+        print(f"\n{len(rep.rows)} checks, {na} declared not applicable")
+        # rep.verdict(), not the third private copy of it - see the note in verify_code.py.
+        print("OVERALL: " + rep.verdict())
+        mark = rep.judge_line()
+        if mark:
+            print(mark)
+    return finish(rep, "verify_deliverable.py", rc, quiet)
 
 
 if __name__ == "__main__":

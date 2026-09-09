@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""verify_code.py - the code checker.  CHECKER VERSION 5 (2026-08-24)
+"""verify_code.py - the code checker.  CHECKER VERSION 10 (2026-09-02)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
-line for each version in ...\\Coding\\TEMPLATE-CHANGELOG.md and re-copy.
+line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
 
 Runs the project's own tests, then checks the things a test suite never notices:
 leaked build artefacts, secrets about to be committed, debug leftovers, missing
@@ -24,11 +24,51 @@ TWO RULES BUILT INTO THIS FILE, both learned expensively:
     --selftest against a string it is meant to catch AND one it must ignore. An untested
     pattern that never matches is indistinguishable from a clean result.
 
+THE SCOPE, WRITTEN DOWN, BECAUSE A GATE THAT DOES NOT STATE ITS OWN BOUNDARY HAS A SILENT ONE.
+
+  CHECKED HERE     the configured test command's EXIT CODE · a shipped tree carrying
+                   dev-only files · secrets matching one of nine NAMED SHAPES, across
+                   source, config, .env and .md · declared paths absent from .gitignore ·
+                   debug leftovers by pattern, per line · a test file that asserts only
+                   success · files over max_file_bytes · every commit's AUTHOR and
+                   COMMITTER email against author_allow, across --all refs · byte
+                   baselines, for a change claimed non-behavioural.
+  ALLOWED, NAMED   the checkers' own pattern literals - scan_exclude_globs holds
+                   verify_*.py, because otherwise every secret pattern matches itself and
+                   the report is entirely false positives · debug statements under
+                   debug_allow_globs (test files, loggers) · commits reachable from
+                   author_allow_before, counted in the check's NAME so an accepted
+                   exposure stays visible on a PASS and the decision can be re-opened.
+  HANDED OVER      long, mixed, high-entropy tokens matching none of the nine shapes -
+                   reported as JUDGE, by POSITION and never by value. See below.
+  NOT CHECKED      whether the test command really RAN. Its exit code is what is read,
+                   never the artefact, so a suite that collected nothing exits 0 and
+                   passes here · whether the tests are GOOD: one negative marker anywhere
+                   in a file passes the whole file, so this counts files with NONE and
+                   never a ratio - AND THE MARKERS ARE A PROXY FOR AN IDIOM, so a project
+                   whose negative arm is spelled in some way not on the list is reported
+                   one-sided when it is not · whether a high-entropy candidate IS a secret, which is
+                   the JUDGE row and a person's call · a hexadecimal token at exactly a
+                   digest length, excluded by name as a hash · secrets in git HISTORY - the
+                   scan reads the WORKING TREE, and the author check is the only thing here
+                   that reads history at all, only for the email · style, types,
+                   dependencies, licences, known vulnerabilities, runtime behaviour ·
+                   anything outside source_globs or under exclude_dirs.
+
 EXIT CODES.  0 = every check passed or was a declared N/A.  1 = at least one check FAILED.
 2 = at least one check COULD NOT RUN (VOID) and none failed. "It could not run" and "it
 failed" are different facts and a caller that cannot tell them apart cannot react to
 either correctly. A FAIL outranks a VOID, because a concrete defect outranks an
 unestablished one; both are non-zero, so any gate wired to "non-zero blocks" is unchanged.
+
+AND A FIFTH VERDICT THAT CHANGES NO EXIT CODE: JUDGE. "Secrets by ENTROPY, so a token in no
+recognised shape is invisible" stood in the NOT CHECKED list above until CHECKER VERSION 7,
+and it was not closable by adding a tenth pattern - the defining property of a leaked
+credential is that nobody knows what it will look like. Entropy finds those candidates and
+cannot tell one from a test fixture or a minified blob, so wiring it to FAIL would fail on
+honest code and get the whole secret scan switched off. It is handed to a person instead:
+visible in the report, in the OVERALL line and in a JUDGE-CLAIMS mark run_tests.py reads,
+and it blocks nothing.
 """
 from __future__ import annotations
 
@@ -45,8 +85,9 @@ from pathlib import Path
 # cannot start. check_checkers.py tracks it, so a project that copied one and not the other
 # gets a reported finding rather than an import error at the worst possible moment.
 from house_common import (                                       # noqa: E402
-    FAIL, NA, PASS, VOID, Case, Report,
-    load_section, report_pairing, run_cases, selftest_config, write_section,
+    FAIL, JUDGE, NA, PASS, VOID, Case, Report,
+    finish, load_section, report_pairing, run_cases, selftest_config,
+    wants_report_json, write_section,
 )
 
 # --------------------------------------------------------------------------- config
@@ -61,16 +102,29 @@ DEFAULT_CONFIG = {
     "forbidden_in_ship": ["__pycache__", ".pyc", ".DS_Store", ".env", "node_modules",
                           ".git", "CHANGELOG.md"],
     "must_be_gitignored": ["temp/", ".env", "secrets.json", "*.local"],
-    "scan_exclude_globs": ["**/verify_md.py", "**/verify_code.py", "**/verify_deliverable.py"],
+    "scan_exclude_globs": ["**/verify_md.py", "**/verify_code.py", "**/verify_deliverable.py",
+                           "**/verify_confidential.py"],
     "check_secrets": True,
+    "judge_high_entropy": True,
     "check_debug_leftovers": True,
     "debug_patterns": ["console\\.log\\(", "debugger;", "breakpoint\\(\\)",
                        "pdb\\.set_trace\\(", "print\\(['\\\"]DEBUG"],
     "debug_allow_globs": ["**/test_*.py", "**/*.test.js", "**/tests/**", "**/logger*"],
     "check_negative_tests": True,
     "test_globs": ["**/test_*.py", "**/*_test.py", "**/*.test.js", "**/*.spec.ts"],
-    "negative_test_markers": ["raises", "assertRaises", "toThrow", "must_fail",
-                              "expect_fail", "should_fail", "_fails", "rejects"],
+    # MATCHED CASE-INSENSITIVELY, AND THE SPACE FORMS ARE HERE FOR THE SAME REASON: a marker
+    # list is meant to recognise an IDIOM, and this one recognised a SPELLING. It matched
+    # `must_fail` and missed `must fail`, and it knew every exception-assertion framework
+    # while knowing nothing about the assert-the-finding shape that drives a real checker and
+    # requires its verdict to be FAIL - which is what house_common.Case does, so every
+    # project copying that harness was affected. Measured: a genuinely two-sided suite,
+    # with a plant-the-defect arm and a scope arm, was reported as "only asserts success".
+    # `raises(` rather than `raises`, because case-folding a bare `raises` would turn a
+    # Google-style docstring's `Raises:` header into evidence of a negative test - a FALSE
+    # PASS, which is the dangerous direction, where the miss above was merely noisy.
+    "negative_test_markers": ["raises(", "assertRaises", "toThrow", "must_fail", "must fail",
+                              "expect_fail", "should_fail", "_fails", "rejects",
+                              "want=fail", "want=void", "good_want"],
     "max_file_bytes": 2_000_000,
     "byte_baselines": [],
     "check_commit_authors": True,
@@ -86,6 +140,7 @@ CONFIG_COMMENT = {
     "test_command": "The project's test command, e.g. 'uv run python -m pytest -q' or 'npm test'. Empty = VOID.",
     "source_globs": "What counts as source for the scans below.",
     "scan_exclude_globs": "Files the secret/debug scans skip. The checkers themselves are listed BY NAME, not by wildcard, so your own file is never skipped silently. Excluded files are counted in the output.",
+    "judge_high_entropy": "Hand over long, mixed, high-entropy tokens that match none of the nine named secret shapes. Reported as JUDGE, never FAIL, and the value is never printed: entropy says a token LOOKS like a credential, which a script cannot turn into knowing that it is. A JUDGE does not affect the exit code. Set false only if this project's content is legitimately full of such tokens - and write down where that was decided.",
     "ship_paths": "Directories that get packaged and sent to a user. Empty = do not check.",
     "forbidden_in_ship": "Names/extensions that must never appear under ship_paths.",
     "must_be_gitignored": "Paths that must be matched by .gitignore. Prevents accidental commits.",
@@ -180,7 +235,7 @@ def check_tests(rep, root, cfg, fast):
                    na_reason="no test_command configured - DECLARE why, or set one")
         return
     try:
-        r = subprocess.run(cmd, shell=True, cwd=root, capture_output=True, text=True,
+        r = subprocess.run(cmd, shell=True, cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace",
                            timeout=cfg["test_timeout_seconds"])
     except subprocess.TimeoutExpired:
         rep.record("test command", 1, [f"timed out after {cfg['test_timeout_seconds']}s: {cmd}"])
@@ -239,6 +294,88 @@ def check_secrets(rep, root, cfg):
     rep.record(name, len(files), problems)
 
 
+# -------------------------------------------- the secret this scanner cannot recognise
+
+# A run of characters long enough and mixed enough to be a credential. The class stops at
+# '/' and '.' on purpose, so a long path or a dotted identifier breaks into short pieces
+# instead of arriving as one suspicious token.
+TOKEN_RE = re.compile(r"[A-Za-z0-9+=_-]{32,}")
+HEX_RE = re.compile(r"(?i)\A[0-9a-f]+\Z")
+HASH_LENGTHS = (32, 40, 56, 64, 96, 128)     # md5, sha1, sha224, sha256, sha384, sha512
+ENTROPY_BITS = 4.0
+
+
+def shannon_bits(s: str) -> float:
+    """Bits per character of the string's own character distribution."""
+    import math
+    n = len(s)
+    counts = {}
+    for ch in s:
+        counts[ch] = counts.get(ch, 0) + 1
+    return -sum((c / n) * math.log2(c / n) for c in counts.values())
+
+
+def high_entropy_candidates(text):
+    """Long, mixed, high-entropy tokens that match NO named shape - by POSITION, never value.
+
+    THE GAP THIS FILLS IS ONE THIS FILE ALREADY DECLARED. Its scope block says secrets are
+    caught "by nine NAMED SHAPES" and that a token "in no recognised shape is invisible".
+    That blind spot is not closable by adding a tenth shape: the whole point of a leaked
+    credential is that nobody knows what it will look like.
+
+    AND IT CANNOT BE A FAIL, WHICH IS WHY IT WAITED FOR A SEVERITY. Entropy is a heuristic
+    about appearance, not about meaning. It cannot tell a leaked key from a test fixture, a
+    minified blob, a base64 icon or a licence code. A check like that wired to FAIL fails on
+    honest code, gets disabled within a week, and takes the nine real patterns with it. As a
+    JUDGE it costs a reader a few seconds and never blocks.
+
+    THE VALUE IS NEVER PRINTED, for the same reason check_forbidden prints a position: a
+    scanner that echoes a candidate secret into a terminal, a CI log or a pasted report has
+    published it by a route no scanner can clean up afterwards. If this is a real key, the
+    report itself must not be the thing that leaks it.
+
+    WHAT IS DELIBERATELY EXCLUDED, so the row stays readable: a token whose whole content is
+    hexadecimal at exactly a digest length. Those are hashes and object ids - this project's
+    own byte_baselines are full of them - and a row nobody can finish reading is a row
+    nobody reads.
+    """
+    out = []
+    for i, line in enumerate(text.splitlines(), 1):
+        if scan_secrets(line):
+            continue        # already a FAIL from check_secrets; reporting it twice helps nobody
+        for tok in TOKEN_RE.findall(line):
+            if HEX_RE.match(tok) and len(tok) in HASH_LENGTHS:
+                continue
+            has_digit = any(c.isdigit() for c in tok)
+            has_alpha = any(c.isalpha() for c in tok)
+            bits = shannon_bits(tok)
+            if has_digit and has_alpha and bits >= ENTROPY_BITS:
+                out.append(f"line {i}: a {len(tok)}-character token at "
+                           f"{bits:.1f} bits/char, matching no named shape "
+                           f"(value withheld deliberately)")
+    return out
+
+
+def check_entropy(rep, root, cfg):
+    if not cfg["judge_high_entropy"]:
+        rep.record("high-entropy candidates", 0, [],
+                   na_reason="judge_high_entropy is false (disabled)")
+        return
+    files = list(iter_files(root, cfg["source_globs"] + ["**/*.json", "**/*.yaml", "**/*.yml",
+                                                        "**/*.env*"],
+                           cfg["exclude_dirs"]))
+    files, skipped = apply_exclusions(files, root, cfg.get("scan_exclude_globs", []))
+    problems = []
+    for p in files:
+        for hit in high_entropy_candidates(read_text(p)):
+            problems.append(f"{p.relative_to(root)} - {hit}")
+    name = "high-entropy candidates" + (f" ({skipped} excluded)" if skipped else "")
+    rep.record(name, len(files), problems,
+               judge_reason="a script can see that these LOOK like credentials and cannot "
+                            "know whether they are. Open each one and decide; nothing here "
+                            "will fail while you do not.")
+
+
 def check_gitignore(rep, root, cfg):
     wanted = cfg["must_be_gitignored"]
     gi = root / ".gitignore"
@@ -281,10 +418,12 @@ def check_negative_tests(rep, root, cfg):
         rep.record("negative tests exist", 0, [], na_reason="disabled in config")
         return
     files = list(iter_files(root, cfg["test_globs"], cfg["exclude_dirs"]))
-    markers = cfg["negative_test_markers"]
+    # CASE-FOLDED ON BOTH SIDES. See the note beside the default list: matching case-sensitively
+    # made this check test how a project spells its intent rather than whether it has one.
+    markers = [m.lower() for m in cfg["negative_test_markers"]]
     problems = []
     for p in files:
-        text = read_text(p)
+        text = read_text(p).lower()
         if not any(m in text for m in markers):
             problems.append(f"{p.relative_to(root)} - only asserts success; no test proves a failure")
     rep.record("negative tests exist", len(files), problems,
@@ -332,7 +471,7 @@ def check_commit_authors(rep, root, cfg):
         return
     try:
         r = subprocess.run(["git", "log", "--all", "--format=%h%x1f%ae%x1f%ce"],
-                           cwd=root, capture_output=True, text=True, timeout=120)
+                           cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120)
     except (OSError, subprocess.SubprocessError) as exc:
         rep.record(name, 0, [f"git could not be run: {exc.__class__.__name__}"])
         return
@@ -352,7 +491,7 @@ def check_commit_authors(rep, root, cfg):
     boundary = (cfg.get("author_allow_before") or "").strip()
     if boundary:
         b = subprocess.run(["git", "rev-list", boundary],
-                           cwd=root, capture_output=True, text=True)
+                           cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace")
         if b.returncode != 0:
             rep.record(name, 0, [
                 f"author_allow_before does not resolve to a commit: {boundary!r}",
@@ -450,7 +589,7 @@ def gitrepo(sub, emails, cfg):
         d = tmp / sub
         shutil.rmtree(d, ignore_errors=True)
         d.mkdir(parents=True)
-        q = lambda *a: subprocess.run(list(a), cwd=d, capture_output=True, text=True)
+        q = lambda *a: subprocess.run(list(a), cwd=d, capture_output=True, text=True, encoding="utf-8", errors="replace")
         q("git", "init", "-q")
         for i, email in enumerate(emails):
             (d / f"f{i}.txt").write_text(f"{i}\n", encoding="utf-8")
@@ -474,7 +613,7 @@ def gitrepo_boundary(sub, emails, cfg, boundary_index):
         d = tmp / sub
         shutil.rmtree(d, ignore_errors=True)
         d.mkdir(parents=True)
-        q = lambda *a: subprocess.run(list(a), cwd=d, capture_output=True, text=True)
+        q = lambda *a: subprocess.run(list(a), cwd=d, capture_output=True, text=True, encoding="utf-8", errors="replace")
         q("git", "init", "-q")
         shas = []
         for i, email in enumerate(emails):
@@ -512,6 +651,23 @@ def cases(cfg):
         Case("planted secret", runs(check_secrets),
              tree("sec_bad", {"leak.py": 'api_key = "abcd1234efgh5678ijkl"\n'}, cfg),
              tree("sec_good", {"clean.py": 'api_key = os.environ["API_KEY"]\n'}, cfg)),
+        # THE JUDGE CASE. The bad arm's token matches none of the nine shapes - no
+        # 'api_key =' beside it, no sk- or ghp_ prefix - so check_secrets is blind to it and
+        # only entropy sees it at all. The good arm is the half that keeps this honest: an
+        # ordinary long identifier is exactly as long, and must NOT be handed over, or every
+        # file in this house would carry a standing question nobody can ever close.
+        Case("high-entropy token needs a person", runs(check_entropy),
+             tree("ent_bad", {"cfg.py": 'VALUE = "xQ7fL2mZ9pR4tK8wB6nY3vC5jH1sD0gA7eU2"\n'}, cfg),
+             tree("ent_good", {"cfg.py": "MAXIMUM_RETRY_ATTEMPTS_BEFORE_GIVING_UP = 3\n"}, cfg),
+             want=JUDGE),
+        # AND THE HASH ARM, because this project's own byte_baselines are full of them: a
+        # 64-character hex digest is high-entropy by construction and is not a candidate.
+        # Without this the row would be unreadable in any repo that pins a baseline, and an
+        # unreadable row is one nobody finishes - which is how a real hit gets missed.
+        Case("a sha256 digest is not a candidate", runs(check_entropy),
+             tree("ent_bad2", {"cfg.py": 'K = "aB3xQ9zL7mN2pR8tK4wY6vC1jH5sD0gF"\n'}, cfg),
+             tree("ent_hash", {"cfg.py": 'EXPECT = "' + "a3f" * 21 + 'b"\n'}, cfg),
+             want=JUDGE),
         Case("planted debug statement", runs(check_debug),
              tree("dbg_bad", {"app.js": "console.log('x');\n"}, cfg),
              tree("dbg_good", {"app.js": "export const x = 1;\n"}, cfg)),
@@ -523,6 +679,19 @@ def cases(cfg):
              tree("neg_good", {"test_thing.py": "def test_bad():\n"
                                                 "    with pytest.raises(ValueError):\n"
                                                 "        boom()\n"}, cfg)),
+        # THE SHAPE THIS CHECK USED TO MISS, and it is the shape this house's own suites take:
+        # no exception is asserted at all - a real checker is driven and its VERDICT is
+        # required to be FAIL. The bad arm is the same suite with its negative half removed,
+        # so the pair shows the marker recognises the idiom and not merely the file.
+        Case("a negative arm asserting a FAIL verdict", runs(check_negative_tests),
+             tree("neg_v_bad", {"test_shape.py": 'Case("x", probe, bad, good)\n'}, cfg),
+             tree("neg_v_good", {"test_shape.py": 'Case("x", probe, bad, good, want=FAIL,\n'
+                                                  '     good_want=PASS)\n'}, cfg)),
+        # AND THE SPELLING ARM. `must_fail` was matched and `must FAIL` was not, which is the
+        # whole of what was wrong: one project's underscore against another's space and case.
+        Case("a negative arm stated as prose", runs(check_negative_tests),
+             tree("neg_p_bad", {"test_prose.py": '"""A bare run must pass."""\n'}, cfg),
+             tree("neg_p_good", {"test_prose.py": '"""A bare run must FAIL here."""\n'}, cfg)),
         Case("bytecode in shipped tree", runs(check_ship_clean),
              tree("ship_bad", {"dist/__pycache__/x.pyc": ""}, ship),
              tree("ship_good", {"dist/app.py": "x = 1\n"}, ship)),
@@ -627,6 +796,7 @@ def main(argv):
     check_tests(rep, root, cfg, fast)
     check_ship_clean(rep, root, cfg)
     check_secrets(rep, root, cfg)
+    check_entropy(rep, root, cfg)
     check_gitignore(rep, root, cfg)
     check_debug(rep, root, cfg)
     check_negative_tests(rep, root, cfg)
@@ -634,12 +804,22 @@ def main(argv):
     check_commit_authors(rep, root, cfg)
     check_byte_baselines(rep, root, cfg)
 
-    print(rep.render())
+    quiet = wants_report_json(argv[1:])
     na = rep.count_of(NA)
     rc = rep.exit_code
-    print(f"\n{len(rep.rows)} checks, {na} declared not applicable")
-    print("OVERALL: " + {0: "PASS", 1: "FAIL", 2: "VOID - a check could not run"}[rc])
-    return rc
+    if not quiet:
+        print(rep.render())
+        print(f"\n{len(rep.rows)} checks, {na} declared not applicable")
+        # rep.verdict(), not a private copy of it. All THREE checkers held their own
+        # {0: "PASS", 1: "FAIL", 2: "VOID} table until CHECKER VERSION 7, and all three
+        # would have gone on printing a bare PASS over a run that handed claims to a
+        # person. The module exists to end exactly that, and it had been re-created one
+        # line at a time.
+        print("OVERALL: " + rep.verdict())
+        mark = rep.judge_line()
+        if mark:
+            print(mark)
+    return finish(rep, "verify_code.py", rc, quiet)
 
 
 if __name__ == "__main__":

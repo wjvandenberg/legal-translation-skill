@@ -478,7 +478,12 @@ for f in G3:
     if not re.search(r"CLEAN|PASS|passed|exit|gate|check|validator|report|false positive|warn|audit|"
                      r"cannot fail|blind|no gate", rows[f]["text"], re.I):
         suspects.append(("3 says it worked", f, "no assurance vocabulary in the row"))
-for s in suspects:
+# SORTED, AND THE SORT IS THE WHOLE FIX (2026-09-09). The three loops above iterate SETS, and
+# Python randomises string hashing per process -- so two runs over an unchanged tree returned the
+# same 16,366 bytes with these rows in a DIFFERENT ORDER. A naive before-and-after content diff
+# therefore called this tool CHANGED on every run, and a real change would have been
+# indistinguishable from the noise. Measured by running it twice against an unchanged tree.
+for s in sorted(suspects):
     print(f"  [judge] {s[0]:<18} {s[1]:<5} {s[2]}")
 if not suspects: print("  (no group violates its own vocabulary test)")
 # specific pairs worth a human eye, chosen because the row's stated FIX names other rows

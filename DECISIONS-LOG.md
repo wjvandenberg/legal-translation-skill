@@ -831,3 +831,54 @@ them would have changed what slice 3 built, and one of them decided whether it c
    the session without spending a session on it; it rides in branch 8's prompt.
 8. **THE SESSION COST IS 44%, READ BY WOUTER.** Claude cannot see the figure and may never estimate
    it. Recorded, never obeyed: the session ended because its planned work ran out.
+
+## 2026-09-09 — the commit MESSAGES carrying a forbidden phrase: DEFERRED, and DECIDED
+
+**§3 carries the decision and its trigger in two lines. This is the reasoning behind it, and the
+population, which §3 must never restate.** *(Owed since the decision was taken and written here on
+2026-09-09, because a pointer to a dated entry that does not exist is worse than no pointer.)*
+
+**THE POPULATION, MEASURED WITHOUT PRINTING ANY PHRASE OR ANY MESSAGE TEXT.** `verify_confidential.py`
+v4 was run over five populations with `VERIFY_FORBIDDEN_LIST` set and its selftest passed first, so the
+instrument was proved before its verdict was read. **List fingerprint `e76c67eb55c1`, 8 phrases checked,
+the positive control FIRED** — so the run is a verdict and not a VOID.
+
+- **THE TREE IS CLEAN AND THE MESSAGES ARE NOT.** 517 of 517 tracked files PASS; **802 history blobs from
+  every ref PASS**; **22 of 117 commit messages FAIL.**
+- **132 (commit, phrase) findings across those 22, with 6 of the 8 needles in every one of them** — because
+  **every hit sits on exactly ONE trailer-shaped line per commit** (`Key: value`, the shape git itself
+  recognises). One occurrence trips six needles at once.
+- **ALL 22 ARE REACHABLE FROM `main` AND ALL 22 ARE ON A REMOTE**, so they are **already served by a public
+  repository**. That is the half a clean tree cannot answer, and it is what decides this.
+- **CONTENT IS CLEAN ACROSS ALL HISTORY**, so the defect is confined to message metadata — **the one
+  population no content scan reaches**, which is why no record in this project had ever mentioned it.
+
+**THE DECISION: IT STAYS DEFERRED — *decided*, not merely un-acted-on.** *(Wouter, with the full scope in
+front of him.)* **The distinction is the point:** an undecided finding invites re-litigation every time a
+session rediscovers it, and a decided one does not.
+
+**HIS REASONING, AND THE STRONGER HALF IS THE GATE RATHER THAN THE COST.** Removing them is a **history
+rewrite** — irreversible, one message-callback pass, but re-SHAing every commit across every ref, breaking
+branch 7's comparison **pins** *(which are commit SHAs)* and the commit references inside `tests/baselines/`.
+**And the house gate — *rewrite BEFORE a repository goes public, never after* — CANNOT BE MET HERE AT ALL**,
+the remote having been public since 2026-08-07 with two public siblings. **So what a rewrite buys has shrunk
+from *prevents exposure* to *stops future copies***, and that is a much weaker thing to pay an irreversible
+operation for. *A rewrite would not un-serve what has already been served.*
+
+**BOTH ALTERNATIVES WERE PUT AND BOTH WERE DECLINED BY NAME, recorded so they are not re-proposed as new:**
+
+1. **Rewriting the messages alone, now.** Declined: it pays the whole blast radius for the smaller half of
+   the problem, and the author-identity population would still be waiting.
+2. **Bundling them into the deferred author-identity pass.** Declined *as a thing to do now*, but **it
+   remains the natural home when the trigger comes** — one blast radius paid once rather than twice, which
+   is the house rule's own shape: *one pass covering both addresses.*
+
+**THE TRIGGER IS AN EVENT AND NOT A DATE: the next force-push-class history operation on this repository,
+whatever prompts it.** The messages ride in that pass rather than earning one of their own. **A date passes
+and nothing happens; an event is something a session can recognise.**
+
+**AND ONE THING THIS ENTRY EXISTS TO FIX.** Until it was written, the decision lived **only in the house
+tooling repository's campaign record** — a file nothing in this project reads. The auto-loading house file
+says in terms that what to do about a history already carrying the wrong address belongs to **this project's
+own §3, with its trigger**. *A rule that lives in exactly one place, and that place is not where the work
+happens, is the shape this whole propagation exists to remove.*
