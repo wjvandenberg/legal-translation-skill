@@ -115,6 +115,46 @@ DECLARED_TOUCHES = []
 # Headings that did not exist at the baseline and are allowed to now.
 HEADINGS_ADDED_SINCE_BASELINE = ["1.7"]
 
+# A NUMBER THAT LEFT THE ##/### SEQUENCE, AND WHY -- added 2026-09-09 (5), and the alarm that
+# produced it was RIGHT rather than noisy.
+#
+# Mapping sections 2, 3, 5 and 6 onto CLAUDE-TEMPLATE.md's subsection counts closes an excess by
+# RE-PARENTING: a subsection that maps into another becomes an UNNUMBERED `####` child of it, which
+# is the device the template itself uses 29 times. THE HEADING SURVIVES; only its NUMBER goes -- and
+# it has to go, because `verify_md` counts any heading whose text starts with a number, at any
+# level, so demoting without renumbering changes nothing the checker can see.
+#
+# WHY THIS IS A DECLARATION AND NOT AN EXEMPTION, and it is the whole point. Check 2 used to ask
+# "is the NUMBER still there?". A demotion answers no while nothing is lost, and a DELETION answers
+# no in exactly the same way -- so the old arm could not tell them apart, and silencing it would
+# have lost the only guard against a heading actually going. The arm now asks the better question:
+# **is the RETURN PATH still there?** For every declared row it looks up that heading's TEXT in the
+# baseline and requires it still to be findable as a heading somewhere in the charter today. An
+# undeclared loss fails; a declared loss whose text has GONE fails as a real deletion; and a row
+# for a number that is back fails as stale. The reason is prose and carries no assertion -- it is
+# there so a reader learns why, which is what a blank reason cannot do.
+HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE = {
+    "2.6": "renumbered to 2.5 — section 2's 2.4 pointer stub was demoted, so 2.5 and 2.6 each "
+           "moved down one to keep the numbers gapless",
+    "3.3": "demoted to an unnumbered `####` under the new 3.2, 'The steps in detail'",
+    "3.4": "demoted to an unnumbered `####` under the new 3.2 — its irreversible line, "
+           "never publish without Wouter's explicit OK, survives verbatim",
+    "3.5": "demoted to an unnumbered `####` under the new 3.2, NOTION block included",
+    "3.6": "demoted to an unnumbered `####` under the new 3.2 — it is ORDER, which section 3 owns",
+    "5.9": "demoted into 5.7, 'The artefact — domain rules and deliverable conventions'",
+    "5.10": "demoted into 5.7; `tools/verify_charter_continuity.py`'s own POINTERS row moved with "
+            "it, and check 5 is what caught that it had not",
+    "5.11": "demoted into 5.7, beside the OOXML stub it belongs with",
+    "5.12": "demoted into 5.3, 'VERIFY — proving this change did what it claimed'",
+    "5.13": "demoted into 5.4, 'TEST — proving nothing else broke'",
+    "5.14": "demoted into 5.8, 'Working with this charter, and the session'",
+    "5.15": "demoted into 5.8, beside 'Adding to this file'",
+    "5.16": "demoted into 5.3 — its own heading explains that it lives in section 5 because "
+            "section 7 gets replaced, and that is still true one level down",
+    "6.6": "demoted into 6.4; the charter's section 6 now matches the template's five, having "
+           "gained the 6.5 it had never had",
+}
+
 SECTION_7_CAP = 35
 # RAISED FROM 350 TO 500 ON 2026-09-09 (4) BY WOUTER: 350 is the RETIRED cap and 500 is the
 # live gate, the same number for M and L.  IT MUST EQUAL verify.config.json's max_lines for
@@ -375,23 +415,74 @@ def run(charter_path="CLAUDE.md", root=None):
                          f"not this phase's to touch")
 
     # ------------------------------------------------------------------ 2
-    head(2, "NO HEADING LOST, NO RENUMBER — headings are what every pointer resolves against")
+    head(2, "NO RETURN PATH LOST — headings are what every pointer resolves against")
     hd = lambda t: [n for _, n in re.findall(r"^(#{2,3}) (\d+(?:\.\d+)?)[. ]", t, re.M)]
+    # ANY level, because a demoted heading is still a return path. `####` counts here and does
+    # NOT count in the sequence above, and that difference is the whole repair.
+    titles = lambda t: {n: x.strip() for _, n, x in
+                        re.findall(r"^(#{2,6}) (\d+(?:\.\d+)?)[. ] *(.*)$", t, re.M)}
+    # THE LEADING NUMBER IS STRIPPED ON BOTH SIDES, and the first version of this arm did not:
+    # it compared a baseline title against a CURRENT heading that still carried its number, so
+    # `2.6 Decisions that still bind` -> `2.5 Decisions that still bind` reported the text as GONE.
+    # A RENUMBER would have read as a DELETION on every run. The arm fired for the right reason
+    # SHAPE and on the wrong data, which is the cheap direction and why it was built with a
+    # planted control below.
+    any_heading_text = lambda t: {re.sub(r"^\d+(?:\.\d+)?[. ] *", "", x).strip()
+                                  for x in re.findall(r"^#{2,6} +(.*?) *$", t, re.M)}
     was_h, now_h = hd(base), hd(charter)
+    was_titles, now_texts = titles(base), any_heading_text(charter)
     lost = [n for n in was_h if n not in now_h]
     gained = [n for n in now_h if n not in was_h]
-    if lost:
-        bad("2", f"heading(s) LOST: {lost}")
-    else:
-        ok(f"all {len(was_h)} baseline headings still present")
+
+    # ARM 1 -- every number that left the sequence is DECLARED, and its heading TEXT survives.
+    undeclared = [n for n in lost if n not in HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE]
+    if undeclared:
+        bad("2", f"number(s) left the ##/### sequence UNDECLARED: {undeclared}. Declare each in "
+                 f"HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE with the reason, or put it back")
+    deleted = [n for n in lost
+               if n in HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE
+               and was_titles.get(n) and was_titles[n] not in now_texts]
+    if deleted:
+        for n in deleted:
+            bad("2", f"section {n} is declared as demoted or renumbered, but its heading text "
+                     f"{was_titles[n]!r} is GONE from the charter at every level. That is a "
+                     f"DELETED heading — the return path a relocated rule resolves against")
+    if lost and not undeclared and not deleted:
+        ok(f"{len(lost)} number(s) left the sequence, all declared, and every heading TEXT still "
+           f"present at some level — demoted or renumbered, none deleted")
+    elif not lost:
+        ok(f"all {len(was_h)} baseline headings still carry their baseline number")
+
+    # ARM 2 -- a stale declaration fails, exactly as a stale toleration does elsewhere here.
+    stale_rows = [n for n in HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE if n in now_h]
+    if stale_rows:
+        bad("2", f"declared as having left the sequence, but present again: {stale_rows} — stale")
+    elif HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE:
+        ok(f"no declaration outlived its fact ({len(HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE)} "
+           f"row(s) checked)")
+
     if gained == HEADINGS_ADDED_SINCE_BASELINE:
-        ok(f"headings added: {gained} — as declared, so no renumber")
+        ok(f"headings added: {gained} — as declared")
     else:
         bad("2", f"headings added: {gained}; declared {HEADINGS_ADDED_SINCE_BASELINE}")
-    if was_h == [n for n in now_h if n not in HEADINGS_ADDED_SINCE_BASELINE]:
-        ok("heading ORDER unchanged — nothing was resequenced")
+
+    # ARM 3 -- ASCENDING, which is what the retired arm was standing in for.
+    # IT USED TO ASSERT THE SEQUENCE WAS *IDENTICAL* to the baseline's, reported as "heading order
+    # changed". THAT AROSE FROM A MISREADING OF ITS OWN SUBJECT, measured 2026-09-09 (5): both
+    # sequences are contiguous 1..n per section, so `5.1 … 5.8` looks the same whatever content
+    # sits at each number. The arm could therefore only ever fire when a COUNT changed -- which is
+    # `verify_md`'s `charter structure` row's job, against the template, and `heading numbering`'s
+    # for gaps. It was a count check wearing an order check's name, and two checks failing on one
+    # fact is how a reader learns to stop reading one of them.
+    # WHAT IT CANNOT DO, STATED SO NOBODY LOOKS FOR IT HERE: no number-based arm can see content
+    # RESEQUENCED inside a section. Only a person reading the survivors can.
+    ints = [tuple(int(p) for p in n.split(".")) for n in now_h]
+    if ints == sorted(ints):
+        ok(f"heading order ASCENDING across all {len(now_h)} numbered headings — no section or "
+           f"subsection is out of sequence")
     else:
-        bad("2", "heading order changed")
+        first = next(i for i in range(1, len(ints)) if ints[i] < ints[i - 1])
+        bad("2", f"heading order is NOT ascending: {now_h[first]} follows {now_h[first - 1]}")
 
     # ------------------------------------------------------------------ 3
     head(3, "THE DECLARED SIZE — every sentence stating this file's own length, against the measurement")
