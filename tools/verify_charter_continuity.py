@@ -594,9 +594,13 @@ def run(charter_path="CLAUDE.md", root=None):
               "uv run python tools/verify_charter_continuity.py")
         bad("7", "check 7 could not be completed — an unreadable source is not a pass")
     else:
-        ev = Path(house) / "EVIDENCE-lt-charter-reduction.md"
+        # The evidence document moved to evidence/ in the templates layout convention
+        # (2026-09-08); prefer that location, fall back to the old root path.
+        ev = Path(house) / "evidence" / "EVIDENCE-lt-charter-reduction.md"
         if not ev.exists():
-            bad("7", f"{ev.name} not found under LT_HOUSE_TEMPLATES")
+            ev = Path(house) / "EVIDENCE-lt-charter-reduction.md"
+        if not ev.exists():
+            bad("7", f"{ev.name} not found under LT_HOUSE_TEMPLATES (root or evidence/)")
         else:
             text = ev.read_text(encoding="utf-8")
             targets = [int(m) for m in
