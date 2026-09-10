@@ -350,8 +350,18 @@ else:
                     VOID.append("tree descriptor scan (list not found)")
                 # (c) the forbidden classes the publication check applies to prose
                 CLASSES = [
+                    # ONE OR TWO BACKSLASHES plus a word-boundary guard, 2026-09-09, for the
+                    # reasons in scan_trees.py: the one-backslash form is blind to a path
+                    # inside a non-raw Python literal, and without the guard the arm reads a
+                    # string containing `paths:` plus an escaped newline as a drive path.
+                    # This arm judges ADDED LINES IN THE SHIPPED TREES, measured at zero
+                    # either side, so widening it costs nothing and an absolute path here is
+                    # a defect by definition. THREE COPIES OF THIS PROBE EXIST -- here,
+                    # scan_trees.py and script_committability.py -- and until today all three
+                    # DIFFERED, so the answer depended on which arm ran.
                     ("absolute or home path",
-                     r"[A-Za-z]:[\\/][\w\-.]+(?:[\\/][\w\-. ]+)+|~[\\/][\w\-.]+"),
+                     r"(?<!\w)[A-Za-z]:(?:\\{1,2}|/)[\w\-.]+(?:(?:\\{1,2}|/)[\w\-. ]+)+"
+                     r"|~[\\/][\w\-.]+"),
                     ("container path", r"(?<![\w.])/(?:home|mnt)/[\w\-./]+"),
                     ("money or currency", r"(?:EUR|USD|GBP|€|\$|£)\s?[\d.,]{4,}"),
                     ("capacity figure", r"\b\d[\d.,]*\s?(?:MW|kW|GW|MWh|kWh|MVA)\b"),

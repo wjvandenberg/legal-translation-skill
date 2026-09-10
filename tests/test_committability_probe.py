@@ -61,18 +61,30 @@ MUST_NOT_FIRE = [
 ]
 
 
-# A DECLARED, MEASURED GAP -- REPORTED, NOT ASSERTED, AND RAISED TO WOUTER RATHER THAN
-# QUIETLY CLOSED. The drive arm requires ONE backslash after the colon, so a path written in a
-# NON-raw Python literal -- where every separator is doubled -- is not matched. That predates
-# the 2026-09-09 word-boundary guard and is unaffected by it: the original pattern misses it
-# too, verified by running both. It is NOT fixed here because widening a confidentiality
-# pattern is a decision about a control, not a cleanup, and section 5.6 requires a test vector
-# per pattern in the same commit as the pattern. Listing it as MUST_FIRE would fail the suite
-# and invite somebody to weaken the test instead; leaving it out entirely would make an
-# unexamined hole indistinguishable from an examined one. So it is a printed observation.
-KNOWN_GAP = [
-    ('a doubled-backslash path, as a non-raw literal writes it',
-     'run = "C:' + chr(92) * 2 + 'Invented' + chr(92) * 2 + 'Folder"'),
+# THE DOUBLED-SEPARATOR ARM -- the hole the single-backslash probe could not see, closed
+# 2026-09-09 as its own probe. A path written inside a NON-raw Python literal has every
+# separator doubled, and the arm above requires exactly one.
+#
+# IT IS A SEPARATE PROBE RATHER THAN A WIDER FIRST ONE, AND THAT IS THE WHOLE DESIGN: measured
+# before it was adopted, widening the FIRST arm turns 12 committable files red, and none of the
+# 17 new hits across tools/, tests/ and temp/ carries a forbidden phrase -- checked against the
+# list with a positive control firing. So this one REPORTS for judgement in tools/ and BLOCKS
+# in the shipped trees, where the same widening finds zero files and any absolute path is a
+# defect by definition.
+DOUBLED_LABEL = "absolute or home path, doubled-separator form"
+BS2 = chr(92) * 2
+
+DOUBLED_MUST_FIRE = [
+    ('a drive path as a non-raw literal writes it',
+     'run = "C:' + BS2 + 'Invented' + BS2 + 'Folder"'),
+    ('the same, deeper', '"D:' + BS2 + 'Invented' + BS2 + 'Folder' + BS2 + 'thing.py"'),
+]
+
+DOUBLED_MUST_NOT_FIRE = [
+    # The single-separator forms belong to the OTHER arm; this one must not double-report them.
+    ('a single-separator drive path', r'C:\Invented\Folder'),
+    ('a YAML fixture string, doubled', '"---' + BS2 + 'npaths:' + BS2 + 'n"'),
+    ('ordinary prose', 'The rule says: never bypass a gate.'),
 ]
 
 
@@ -108,9 +120,31 @@ def main() -> int:
         print("\n    VOID  tools/trace_instructions.py absent -- this arm proved nothing")
         ok = False
 
-    print("\n  DECLARED GAP -- reported, never asserted, and open for Wouter")
-    for label, vector in KNOWN_GAP:
-        print(f"    {'still missed' if not pat.search(vector) else 'NOW CAUGHT'}  {label}")
+    # ---- the doubled-separator arm, its own probe ----
+    dbl = re.compile(probe_pattern(DOUBLED_LABEL))
+    print(f"\n  THE DOUBLED-SEPARATOR ARM ({len(dbl.pattern)} chars, also from the AST)")
+    for label, vector in DOUBLED_MUST_FIRE:
+        hit = bool(dbl.search(vector))
+        ok &= hit
+        print(f"    {'OK  ' if hit else 'MISS'} fires on {label}")
+    for label, vector in DOUBLED_MUST_NOT_FIRE:
+        quiet = not dbl.search(vector)
+        ok &= quiet
+        print(f"    {'OK  ' if quiet else 'MISS'} quiet on {label}")
+
+    # THE ARM THAT PROVES THE TIER, NOT JUST THE PATTERN. A probe that blocks would undo the
+    # measurement this design rests on, so the tier is asserted rather than trusted.
+    src = (ROOT / "tools" / "script_committability.py").read_text(encoding="utf-8")
+    tiered = re.search(r"NOTE_ONLY\s*=\s*\{([^}]*)\}", src)
+    in_tier = bool(tiered and DOUBLED_LABEL in tiered.group(1))
+    ok &= in_tier
+    print(f"    {'OK  ' if in_tier else 'MISS'} it is in NOTE_ONLY, so it reports and never blocks")
+
+    # And the twin: the shipped-tree scanner must carry the doubled form as a BLOCKING arm.
+    trees = (ROOT / "tools" / "scan_trees.py").read_text(encoding="utf-8")
+    blocks = r"\\{1,2}" in trees
+    ok &= blocks
+    print(f"    {'OK  ' if blocks else 'MISS'} scan_trees.py carries the doubled form, blocking")
 
     print("\n" + "=" * 92)
     print("PASS -- the probe still catches a path and no longer catches an escape sequence."
