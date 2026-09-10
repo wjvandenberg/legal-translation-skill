@@ -16,25 +16,18 @@ Cowork, before Claude Code, without version control or an up-front structural pl
 
 ### 1.1 How to talk to me — read this before answering anything
 
-Wouter is not a professional developer; his background is legal and contract review. **Explain things in
-plain, layman's terms by default, and teach the technical vocabulary along the way.** When you first use a
-term like *OOXML, run, glyph, ZWSP, monorepo, variant build, fixture, smoke test, squash-merge, progressive
-disclosure, token budget*, define it in one plain sentence. Assume the concept is new unless he has used it
-himself. Favour analogies over jargon. It is fine to be technical *after* the term has been introduced once.
-
-**Number your questions.** Whenever you ask more than one, present them as a **numbered list (1, 2, 3…)**,
-never bullets, so he can answer by number and refer back.
+**In the user-global `.claude/CLAUDE.md`, which loads in every project, and not restated** — plain layman's
+terms by default, define each term on first use, number your questions. The jargon this project defines on
+first use:
+*OOXML, run, glyph, ZWSP, monorepo, variant build, fixture, smoke test, squash-merge, progressive
+disclosure, token budget.*
 
 ### 1.2 What this file is, and what it is not
 
-**It is the charter:** what the project is, what is left to do, how the work gets done, where everything
-lives, and where the project stands today. **It is public from commit one** — every edit to it is an edit to
-a document strangers will read.
-
-**It is not the evidence, not the build plan and not the history.** Those are three other files, and this
-one points at them rather than summarising them. That division is deliberate: the last time this file
-carried a summary of the evidence, a session reasoned from the summary instead of the evidence and reached a
-wrong conclusion.
+**It is the charter** — what the project is, what is left, how the work gets done, where things live, where
+it stands. **It is public from commit one.** **It is not the evidence, the build plan or the history:** those
+are other files, and this one points at them rather than summarising them, because a session once reasoned
+from a summary of the evidence and reached a wrong conclusion.
 
 ### 1.3 The document set — what to read for what
 
@@ -76,26 +69,21 @@ plan and the register is large risk for no gain, and this mapping buys the same 
 
 ### 1.5 Two rules about reading, both bought with real time
 
-- **NEVER WORK FROM A PRÉCIS — including this file's.** A session once predicted which defects the blind
-  review had found uniquely, reasoning from this file's summary of the register rather than from the
-  register; one search settled it and the prediction was wrong. Step B then broke the same rule against the
-  blind review's report, and reading the report properly produced **six items nothing else carried**. If a
-  claim matters, open the file it came from.
-- **RE-MEASURE, DO NOT RE-READ.** Every audit this project has run has found real errors, and none of them
-  would have been caught by reading more carefully. See §5.3.
-- **AND A THIRD, ADDED 2026-09-08: A CLAIM CAN BE REFUTED FOR THE WRONG REASON, AND THAT COSTS MORE THAN
-  BELIEVING IT.** *Read the row, not its title* was obeyed on A16 — and the row's sentence about `en == text`
-  making apply skip two paragraphs was then **refuted from the XML shape alone**, written into a plan, and
-  found on measurement to be **exactly right in count and in mechanism.** **A claim about BEHAVIOUR is
-  measured where the behaviour happens** — here, in the notes the operator authored, not in the document's
-  structure. The tell is a refutation reached from a different KIND of evidence than the claim was made from.
+**Never work from a précis, and re-measure do not re-read, are in the user-global `.claude/CLAUDE.md`, not
+restated** *(§5.3 has the cost stories)*. **A third, project-specific, added 2026-09-08: a claim can be refuted for the
+WRONG REASON, which costs more than believing it.** A behavioural claim about A16 was refuted from the XML
+shape alone and turned out exactly right on measurement — **a claim about behaviour is measured where the
+behaviour happens** (the operator's notes), not in the document's structure. The tell is a refutation reached
+from a different KIND of evidence than the claim was made from.
 
 ### 1.6 Contents
 
-**CUT 2026-08-24 AND MUST NOT COME BACK** — a table of the seven headings, derivable by reading them and
-stale in silence whenever one moved. **The headings are the contents;** §1.3 and §1.4 own the navigation.
+**CUT 2026-08-24 and must not come back** — a table of headings is derivable and goes stale in silence.
+§1.3 and §1.4 own the navigation.
 
 ### 1.7 The size class, and the cap this charter is held to
+
+**ARCHETYPE: Analysis + rebuild of an existing artefact** — the closest of the template's eleven, and the one row that is ● on every optional column, so this charter carries those blocks rather than dropping any; the reduction moves them to destinations instead.
 
 **SIZE CLASS: L — cap 500 lines; ALL SEVEN SECTIONS CAPPED at measured size since 2026-09-09, §7 at 35.** L
 rather than M because this project has run far past eight sessions, the observable test rather than a judgement
@@ -106,36 +94,22 @@ there was no config here at all, so both reported N/A on a 1,666-line file** —
 `tools/verify_md.py` reports on this section's shape **by omitting the row** — and a missing row reads
 exactly like a passed one.
 
-> **OVER-CAP EXEMPTION, RE-DERIVED 2026-09-10: 1,241 lines against a cap of 500.** *(Taken from the
-> checker on the commit that declares it, never typed from memory, and re-derived **LAST**, because editing
-> this subsection moves the very number it declares. `tools/verify_charter_continuity.py` compares this
-> figure against the measurement on every run and has caught this line stale three times in one day, which
-> is the whole reason the check exists. **§7 is UNDER its 35** — a relationship rather than a number,
-> because a number here is a second thing to go stale.)*
+> **OVER-CAP, RE-DERIVED 2026-09-10: 815 lines against a cap of 500.** *(Taken from the checker, re-derived
+> LAST because editing this subsection moves the number it declares; `tools/verify_charter_continuity.py`
+> compares it against the measurement every run. §7 is UNDER its 35.)* **The cap is stated in three places
+> and only `verify.config.json`'s `max_lines` gates** — this sentence and `DECLARED_CAP` in
+> `verify_charter_continuity.py` must move with it.
 >
-> **THE CAP IS STATED IN THREE PLACES AND ONLY ONE OF THEM IS THE GATE** — `verify.config.json`'s
-> `max_lines`, this sentence, and `DECLARED_CAP` in `tools/verify_charter_continuity.py`. **Moving one alone
-> trades this red for a different one.** *(And raising a cap does not discharge an exemption: the live 500
-> replaced a retired 350 on 2026-09-09 (4) and the row still FAILS. It only made the number the exemption is
-> measured against the true one.)*
->
-> **REASON, REWRITTEN 2026-09-09 (5) BECAUSE THE OLD TRIGGER FIRED — the third rewrite for that reason,
-> which argues for the rule rather than for any wording.** It read *"a phase scoped to §2, §3 and §6"*, and
-> that phase has run: **all four structural excesses are CLOSED** — §2 six subsections mapped onto five, §3
-> six onto two, §5 sixteen onto eight, and §6 onto five **plus the one it was MISSING** — so
-> `charter structure` passes at 7 examined. **AND MAPPING IS NOT REDUCTION, WHICH IS THE FINDING WORTH MORE
-> THAN THE PASS: the file GREW.** Re-parenting sixteen subsections into eight costs a group heading each,
-> and §6 turned out **under**-mapped rather than over-grown, so a subsection had to be *written*. *A session
-> named "map and reduce" delivered the map and made the number worse; saying so is cheaper than a reader
-> discovering it.*
->
-> **NEW TRIGGER — an event and not a date: a phase scoped to relocating §5's DATED EVIDENCE into
-> `EVIDENCE-measurement.md` and `EVIDENCE-confidentiality.md`**, which already own that class and are
-> uncapped by design. §5 is the largest section by a factor of three, and its weight is dated instrument
-> stories rather than rules — which is route 2, with the destinations already on disk. **Until such a phase
-> exists this number will not move**, and **a trigger that has fired is worse than no trigger**, which is
-> why it is replaced rather than re-dated. **Over the cap means RELOCATE, never delete**, and every
-> relocation leaves a one-line pointer.
+> **THE CHARTER REDUCTION (2026-09-10) took it from 1,241 to 815 using every route** — route 0 (the
+> auto-loading house file), route 2 (`EVIDENCE-measurement.md`, `EVIDENCE-a3-structure.md`,
+> `DECISIONS-LOG.md`), route 3 (the three skills), route 4 (`.claude/rules/instruments.md`, new) — and
+> trimmed all narration to its rule. **It cannot reach 500 without dropping load-bearing rules or relocating
+> §5.6 (confidentiality, route 1, irreversible if forgotten), both forbidden.** A freshly generated charter
+> for this archetype — *Analysis + rebuild*, ● on every optional column — is itself 563 against a 500 cap, so
+> 500 is below this archetype's generative floor, and this mature instance legitimately carries more (a
+> confidentiality section built from real incidents, five verification lessons, the instrument state). **The
+> cap-versus-floor is Wouter's decision, recorded at the sub-step's close.** Over the cap means RELOCATE,
+> never delete, and every relocation left a one-line pointer.
 
 ---
 
@@ -143,25 +117,19 @@ exactly like a passed one.
 
 ### 2.1 What the skill is, and who needs it
 
-**`README.md` OWNS THE DESCRIPTION — who has the problem, what machine translation gets wrong, the
-eleven-step pipeline, the golden rule, and the published feature list.** Checked line by line on 2026-08-24
-before the 44 lines that used to sit here were cut: it carries every one, in prose written for a public
-reader rather than for us. **It is the published feature list, so keep it true** — and both `SKILL.md` files
-repeat it, so a feature claim changes in three places or in none.
-
-**What does NOT come from `README.md`, and so stays:**
+**`README.md` owns the description** — the problem, what machine translation gets wrong, the eleven-step
+pipeline, the golden rule and the published feature list *(repeated in both `SKILL.md` files, so a feature
+claim changes in three places or in none — keep it true)*. **What does NOT come from README, and so stays:**
 
 - **The driving use case is the author's own in-house energy practice** — cross-border wind and energy work,
-  sources in Dutch, Italian, Spanish, Norwegian, Finnish, Polish, Hungarian and Japanese. The README
-  generalises this deliberately; the charter is where the specific reason lives.
-- **Two of the published claims have measured evidence and six do not.** *"Others translate very well too"*
-  rests on **D03 alone** *(§5.5)*; *"minutes, not seconds"* on the ACTIVE column of the 12-run table in `EVIDENCE-a3-structure.md` section 11. **The other
-  six are read more generously than they deserve — §2.4 point 6.** Fixing the claim is part of the build.
-- **DISTRIBUTION: THIS IS A PUBLIC SKILL.** GitHub and lawve.ai. Structure, examples and packaging are all
-  written on the assumption that **strangers will read every file.** §5.6 — a hard constraint, not polish.
-- **A reverse skill (English → each of the 11 languages) is OUT OF SCOPE** for this project and these
-  repositories. **If a lexicon can be made direction-neutral at no cost that is a free option — but do not
-  design for it, do not add scope for it, and do not compromise this skill's quality for it.**
+  sources in eight languages. README generalises this; the charter holds the specific reason.
+- **Two published claims have measured evidence, six do not:** *"others translate very well too"* rests on
+  D03 alone *(§5.5)*, *"minutes, not seconds"* on the 12-run table in section 11 of `EVIDENCE-a3-structure.md`; the
+  other six are read more generously than they deserve *(§2.4)*. Fixing the claim is part of the build.
+- **This is a PUBLIC skill** (GitHub, lawve.ai) — structure, examples and packaging assume strangers read
+  every file *(§5.6, a hard constraint)*.
+- **A reverse skill (English → each language) is OUT OF SCOPE** — a free lexicon option if direction-neutral
+  at no cost, but do not design or add scope for it, and never compromise quality for it.
 
 ### 2.2 What this project is — the four goals
 
@@ -183,44 +151,18 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 
 ### 2.3 What has been done
 
-**Do not re-open any of it.** **Compressed 2026-08-24 from a nine-row account of what each strand PRODUCED
-to the document that owns it** — nine restatements, all nine documents still on disk.
+**Do not re-open any of it.** **Eight strands, each with an owner** *(§1.3 says what each document holds)*:
+Step 0's choices in `DECISIONS-LOG.md` · A1+A2's twelve runs in the logs folder, results in
+section 11 of `EVIDENCE-a3-structure.md` · Wouter's blind review, **INPUT POINT 1, CLOSED 2026-07-31**, in the register
+under origin `WvdB` · A3 its own document, answers §6.1 · A4 its 2,222-line report in the sealed directory ·
+the A3↔A4 comparison produced register cluster X *(§2.4)* · Step B is `PLAN-2-step-b.md` · Step 1 is the git
+history and §6.4, **the repository PUBLIC, protection live.**
 
-**Eight strands, each with an owner** — §1.3 says what each document holds, so it is not repeated:
-**Step 0**'s choices are in `DECISIONS-LOG.md` by date · **A1 + A2**'s twelve runs are the logs folder, and
-their results are section 11 of `EVIDENCE-a3-structure.md` · **Wouter's blind review** is **INPUT POINT 1, CLOSED 2026-07-31**, triaged
-into the register under origin `WvdB` · **A3** is its own document, its eleven answers §6.1 · **A4** is its
-2,222-line report in the sealed directory named in the private `context.md` · **the A3↔A4 comparison**
-produced register **cluster X**, and §2.4 item 6 says why it was a new class · **Step B** is
-`PLAN-2-step-b.md` · **Step 1** is the git history and §6.4 — **the repository is PUBLIC, protection live.**
-
-**THE EVIDENCE-BASE COUNTS ARE NO LONGER TYPED HERE.** The validator §5.3 already requires prints all of
-them — expect `PASS, 0 failures, 0 warnings` — and **§1.5 records the one time a session reasoned from this
-file's summary of the register instead of the register and was wrong.** What the validator does NOT print,
-and so stays:
-
-> **The instrument rows are two populations and the distinction is what makes the "open" count
-> readable.** I-1 to I-11 are defects in the **A1 harness and review tooling** — instruments outside the
-> repository that were used to *produce* the evidence. **I-12 onward are defects in the repository's own
-> committed checks and fixtures** — the ones that now guard the build. **The skill-finding counts are
-> untouched by any of them**, because none is a defect in the skill.
->
-> **FOUR ARE OPEN — AND THE SHORTHAND THIS BLOCK USED TO OFFER STAYS WITHDRAWN, WHICH IS THE POINT**
-> *(2026-09-02)*. It read: *"the four that are open are now exactly the four that threaten Step C — I-7 to
-> I-10, all in the A1 harness. Everything in the second population is closed. So 'four open' and 'four
-> Step C risks' are the same set, and a session can quote either without qualifying it."* **Both sentences
-> went false and then true again inside ONE DAY.** Branch 6's close filed **I-21 and I-22, the first open
-> rows the second population has ever had** — two confidentiality controls reporting on a file class they
-> could not read — and the next branch fixed both, so the identity holds once more. **It is deliberately
-> NOT reinstated. An equality between two sets that merely happens to hold is a claim waiting to go
-> stale, and this one broke and healed within a day: that is evidence it is volatile, not evidence it is
-> safe.** Quote the count from `audit_register.py`, which prints `instrument=22(18f/4o)` on every run, and
-> name the population you mean.
-
-#### What was produced, and which documents matter from here
-
-**MERGED INTO §1.3 ON 2026-08-24 — it was a SECOND document set, and one of the two was redundant**, and
-demoted from a subsection of its own on 2026-09-09 when section 2 was mapped onto the template's five.
+**The evidence-base counts are not typed here** — the §5.3 validator prints them (`PASS, 0 failures`), and
+§1.5 records the one time a session reasoned from a summary of the register and was wrong. **Quote the
+instrument count from `audit_register.py`** *(`instrument=22(18f/4o)`)* **and name the population:** I-1 to
+I-11 are defects in the A1 harness and review tooling, I-12 onward in the repository's own committed checks;
+the skill-finding counts are untouched by either, none being a defect in the skill.
 
 ### 2.4 What the evidence says — the seven things a new session must know
 
@@ -259,19 +201,12 @@ its element count.** *(2)* **What looked like one cluster is two independent fai
 back *deletes* structure it should keep, and the data contract is *unable to describe* the formatting.
 **Two fixes, two files, and neither closes the other's rows.**
 
-**AND EVERY ONE OF THE FOUR DEFECTS WOUTER NAMED AT THE OUTSET TURNED OUT TO BE A CLASS, NOT A DEFECT** —
-bold reaches a run three ways and the pipeline handles one · the signature block has four mechanisms
-co-acting · tracked changes are on six of eleven corpus documents · truncation detection never left the
-scripts folder. **The register holds each with its measurement** *(the table that sat here was cut
-2026-08-24 — checked first: character style, paragraph style, the 694 switched-off runs, the leading tabs and
-the unsplittable table are all register rows already)*. **Two further classes the project did not know it
-had — document furniture, and the run-written baseline that is blind at conversion, extraction and
-post-apply — are scoped as workstreams in `PLAN-2-step-b.md`.**
-
-**THE 12-RUN PERFORMANCE TABLE AND THE SIX CONCLUSIONS MOVED TO SECTION 11 OF
-`EVIDENCE-a3-structure.md` ON 2026-08-24** — byte-identical, and that document now declares it owns the
-A2 baselines *(§1.3)*. They are the never-regress comparison, read when a claim is disputed rather than
-every session, and A3 already derives the runtime formula from these same runs.
+**Each of the four defects Wouter named at the outset turned out to be a CLASS, not a defect** — bold reaches
+a run three ways, the signature block has four mechanisms, tracked changes are on six of eleven documents,
+truncation detection never left the scripts folder; the register holds each with its measurement, and two
+further classes (document furniture, the conversion/extraction/post-apply-blind baseline) are workstreams in
+`PLAN-2-step-b.md`. **The 12-run performance table and the six conclusions are in `EVIDENCE-a3-structure.md`
+section 11** — the never-regress comparison, read when a claim is disputed.
 
 ### 2.5 Decisions that still bind
 
@@ -302,12 +237,10 @@ settled — if you are about to re-open one of these, read the dated entry first
 
 **Everything that has been done is in §2.3 and is not repeated here.** This section is future work only.
 
-> **DEFERRED, WITH ITS TRIGGER — the commit messages that carry a forbidden phrase** *(Wouter, 2026-09-09)*.
-> The house gate *rewrite BEFORE a repository goes public* is **unmeetable here**, so a rewrite now buys
-> *stops future copies* rather than *prevents exposure*. **TRIGGER — an event, not a date: the next
-> force-push-class history operation on this repository, whatever prompts it**, the messages riding in that
-> one pass rather than earning one of their own. **`DECISIONS-LOG.md`, 2026-09-09, owns the population, the
-> measurement and why both alternatives were declined**, and is not summarised back to here.
+> **DEFERRED, WITH ITS TRIGGER — the commit messages carrying a forbidden phrase** *(Wouter, 2026-09-09)*.
+> The gate *rewrite BEFORE a repo goes public* is unmeetable here, so a rewrite now buys *stops future
+> copies*, not *prevents exposure*. **Trigger: the next force-push-class history operation**, the messages
+> riding in it. `DECISIONS-LOG.md`, 2026-09-09 owns the population and why both alternatives were declined.
 
 ### 3.1 The five steps
 
@@ -321,173 +254,87 @@ settled — if you are about to re-open one of these, read the dated entry first
 | **4** | **Revisit, then publish** — **Step D** consolidates everything learned, *then* repackaging and publication | **NOT STARTED** | step 3 |
 | **5** | **The private run-logging tier, and the monthly analysis of what it records** — Wouter's own instrumented use of the published skill, plus a scheduled job that replays what went wrong against the skill as it then stands. **A config overlay, never a third variant, and never published** | **NOT STARTED.** Approved 2026-08-20; the log FORMAT is designed earlier, at D3, because it is the same artefact as the shipped run report | step 4 — **the overlay is built only after the UK and US skills are published for external users** |
 
-> **THIS ROW STOOD STALE FOR SEVEN DAYS AND THE STALENESS RAN IN THE EXPENSIVE DIRECTION** *(caught
-> 2026-09-09, at a session open, by deriving the board from this table and the git log rather than
-> from the handoff)*. It read *"SLICE 4, THE LAST, IS BUILT AND NOT MERGED"* with a `blocked on` cell
-> naming *"slice 4's merge: Wouter's approval"* — while `d3c7f19` had merged on **2026-09-02** and
-> `04b7b39` closed the branch the same day. **So the table told the next session that the project was
-> waiting on its owner for something already done a week earlier**, and it did not mention branch 7 at
-> all. §5.8 rule 6 and the closing rule already require re-reading every status claim a session made
-> false; **what this cost proves is that the claim to re-read is the one in §3, not only the one in
-> §7** — §7 was replaced correctly on each of those days, and the row it points into was not.
+> **A status row here stood stale for seven days, in the expensive direction** *(2026-09-09)* — it named a
+> merge as pending that had happened a week earlier. **The status claim to re-read at a session's open is the
+> one in §3, not only the one in §7.**
 
 
 
-**Steps 1 and 2 share one branch numbering, and this is worth being clear about because two schemes used to
-exist.** Section 2 of `PLAN-2-step-b.md` numbers all the work 0–19 plus D1–D3. **Step 1 was branches 0, 1 and
-2 of that sequence. Step 2 is branches 3–19 plus the deferred items.** The old charter names map onto it
-exactly: `feature/baseline-and-inventory` is branch 0, `feature/test-harness` is branch 1, and
-`feature/variant-parity-and-reconcile` split in two — the check is branch 2 and the reconciliation is D1.
-
-> **Step 1 has no section of its own any more, and that is deliberate** *(Wouter, 2026-08-07)*. **This
-> section is future work; a finished step described here is a step the next session will start planning
-> again.** What it did is in **§2.3**, with the row of this table as its status. The 44 lines that used to
-> sit here — the pre-`git init` order, the three branch briefs, the exit gate — were all discharged, and the
-> two rules among them that still bind live in §5.6 rather than in a plan.
+**Steps 1 and 2 share one branch numbering:** `PLAN-2-step-b.md` numbers the work 0–19 plus D1–D3, step 1
+being branches 0–2 and step 2 branches 3–19 plus the deferred items. **Step 1 has no section of its own** —
+this section is future work, and what step 1 did is in §2.3.
 
 ### 3.2 The steps in detail — step 2 is the live one
 
-**Step 1 is closed and has no block here** *(§3.1's blockquote says why)*. **The four blocks below carry
-what each remaining step OWNS and what it waits on, and nothing about its scope** — every one of them names
-the document that owns that.
+**`PLAN-2-step-b.md` is the leading document for step 2** — its section 2 is the order, section 3 the brief
+per option (what to build, what it must NOT do, what counts as done), section 4 the test method. This section
+does not restate any of it, and must never start to. Every branch runs Explore → Plan → Code → Verify →
+Test → Commit under §5.1–§5.2.
 
-#### Step 2 — Building
-
-> **`PLAN-2-step-b.md` IS THE LEADING DOCUMENT FOR THIS ENTIRE STEP. Read it and follow it.** **Its
-> section 2** is the order — twenty branches plus three deferred items, each with its dependency and its
-> gate. **Its section 3** is the brief per option: **what to build, what it must NOT do, and what counts as
-> done.** **Its section 4** is the test method by branch kind. **Read those three, in that order; that is
-> the whole build path.** Nothing outside its Part One is needed to start work.
->
-> **This section does not restate any of it, and must never start doing so.**
-
-**Every branch is done as Explore → Plan → Code → Verify → Test → Commit**, under the branch, pull-request
-and merge rules in **§5.1 to §5.2**.
-
-**The shape summary, the rebuild arithmetic and one gate were CUT 2026-08-24, all twinned in the plan first.
-It had already drifted:** it said the rebuild addresses *"94 of the 170"* findings where the plan says
-**168**, measured.
-
-**Three sequencing facts are absolute, and they STAY because they are ORDER and §3 owns order** *(the cut
-tried to move them and `claudemd_claims.py` check 15 refused — the instrument was right)*:
-
-1. **The checks cannot be given teeth before the scope rule and the sanctioned way out exist**, or the
-   pipeline deadlocks with no compliant exit.
-2. **The delivered-document check cannot be built before the tidy-up script journals its edits.**
-3. **The formatting work's second slice cannot begin before the delivered-document check exists**, and must
-   carry the off-flag removal in the same branch.
+**Three sequencing facts are absolute** *(they are ORDER, which §3 owns)*: (1) the checks cannot be given
+teeth before the scope rule and the sanctioned way out exist, or the pipeline deadlocks; (2) the
+delivered-document check cannot be built before the tidy-up script journals its edits; (3) the formatting
+work's second slice cannot begin before the delivered-document check exists, and carries the off-flag
+removal in the same branch.
 
 #### Step 3 — Opus 5, and the verification run
 
-**`PLAN-3-opus5-migration.md` IS THIS STEP'S PLAN FILE and owns it in full** — the two branches, Step C, the arms,
-**INPUT POINT 2**. The outline was cut 2026-08-24, every fact twinned there first.
-
-**§3 owns the order, so one rule stays: do this AFTER the build, never alongside it.** Together, attribution
-is impossible — if a grade moves you cannot tell the fix from the model configuration.
+`PLAN-3-opus5-migration.md` owns this step in full (two branches, Step C, INPUT POINT 2). **Do it AFTER the
+build, never alongside** — together, a moved grade cannot be attributed to the fix or the model.
 
 #### Step 4 — Revisit, then publish
 
-**Only the gates** *(compressed 2026-08-24; this step gets a plan file when it is reached, not before)*.
-
-1. **Step D FIRST, and it does not open with packaging.** Consolidate everything — A1, A2, A3, A4, steps 2
-   and 3, Step C, **and both input points** — then revisit on that basis. **Anything still short is explored
-   in the Step B style, not patched straight to code.** Re-run and re-grade after any change.
-2. **Then `feature/repackage-and-publish`:** both confidentiality controls and the publication check over the
-   archives **and the commit history** · nothing changelog-like inside the archives · **"run at maximum
-   thinking"** into `SKILL.md` and both READMEs.
-   **NEVER MAKE A REPO PUBLIC, OR PUBLISH, WITHOUT WOUTER'S EXPLICIT OK** — the only irreversible act here.
-3. **Two deferred items land here, not in step 2:** D3's **manifest and coverage-and-size discipline**, and
-   the claims-pass residue. **The manifest first** — a Markdown file cannot carry its own integrity guard.
+Step D consolidates everything (A1–A4, steps 2–3, Step C, both input points), re-graded after any change;
+then `feature/repackage-and-publish` runs both confidentiality controls and the publication check over the
+archives AND the commit history. **Never make a repo public or publish without Wouter's explicit OK** — the
+only irreversible act here. D3's manifest (built first) and the claims-pass residue land here, not in step 2.
 
 #### Step 5 — the private run-logging tier, and the monthly analysis
 
-**`DECISIONS-LOG.md`, 2026-08-20, owns the reasoning. This section owns only where it sits and what it
-waits on.** Wouter's words: *"make sure that all logs of legal translation are logged for me and researched
-by an agent every month, and tested against the then installed skill!! Analyse and present solutions, then
-verify."*
-
-**The five gates, compressed 2026-08-24 to their conditions** — the reasoning behind every one is in that
-dated entry, which is fuller than this list ever was, and must not be summarised back to here.
-
-1. **A config overlay, NOT a third variant**, so the 2026-07-27 decision stands rather than being overturned.
-   **The capability ships, the verbosity does not.**
-2. **Built only after the UK and US skills are published.** But the log **FORMAT** is designed at **D3**,
-   because §5.5 and §5.7 make the forensic log and the shipped run report *the same artefact*.
-3. **The monthly job REPLAYS, it does not merely read** — against the skill as it stands that month.
-4. **Portable, reproducible and observable from commit one:** every location by environment variable, and it
-   **exits non-zero on VOID** rather than reporting a clean run over an empty set.
-5. **The verbose logs contain client text** — sibling folder, the evidence guard must name it, sanitised
-   conclusions only, and the register needs a **production-evidence origin class**.
-
-**Its field list, its scheduling mechanism and the shape of what it presents are NOT decided**, and the step-4
-rule above governs: explored in the Step B style, not patched straight to code.
-
-> **AND ONE TOOL IS ON THE TABLE, UNEXAMINED: NOTION.** *(Wouter, 2026-08-20 — he may want it to track the
-> automation. **He has never worked with it and has not installed it**, and is going on "I heard it is the
-> right tool". Recorded at that strength deliberately: an option nobody has tested is not a choice yet.)*
-> **This block stays in the charter because nothing else in the repository carries it** — measured
-> 2026-08-24, and `DECISIONS-LOG.md` does not, because it is not a decision.
->
-> **The line to draw before anything is installed is between tracking that the automation RAN and storing
-> what it FOUND.** Its status — did the job run, when, did it exit clean — is metadata and looks safe. **The
-> ANALYSIS is not:** it derives from logs quoting real client text, Notion is a third-party cloud service,
-> and **2026-07-29 already ruled third-party telemetry non-viable for a skill that processes privileged
-> documents**, on the reasoning that even a filename is unsafe. **Neither is decided, and the tool has been
-> evaluated against no alternative** — including the plainest, a file in the private folder.
+`DECISIONS-LOG.md`, 2026-08-20 owns the reasoning. A config overlay, never a third variant, built only after
+publication; the monthly job REPLAYS against the skill as it then stands; the verbose logs contain client
+text, so the sibling-folder rule and the evidence guard apply. Its field list and scheduling are NOT decided,
+and one tool is on the table untested — Notion — where the line to draw is between tracking that the
+automation RAN (metadata, safe) and storing what it FOUND (client text; 2026-07-29 ruled third-party
+telemetry non-viable for a skill that processes privileged documents).
 
 #### Autonomy, and the two input points
 
-Run the translation and grading work **as autonomously as possible**: no mid-run questions, no confirming
-obvious choices, no step-by-step progress reports. **There are exactly two input points, and they bracket
-the two autonomous blocks.**
-
-| | autonomous block | → | Wouter's input |
-|---|---|---|---|
-| **1** | **A1 + A2** — translate all 11 plus the arm, log forensically, grade | → | **INPUT POINT 1 — his blind review of all 12.** **CLOSED 2026-07-31** |
-| **2** | **Step C** — translate 11, log forensically, grade | → | **INPUT POINT 2 — he reviews all 11.** Feeds Step D. Protocol at §5.4 |
-
-**What autonomy does NOT change.** It covers *running the skill and grading the output*. It is not a licence
-to skip the collaboration rules on code: **every branch still gets explore and plan with Wouter, a pull
-request, a presented review, and Wouter's approval before merge. Autonomy never means self-merging.** If an
-autonomous run hits something genuinely blocking, finish everything that does not depend on the answer
-first, then ask once.
+Run the translation and grading work **as autonomously as possible** — no mid-run questions. **There are
+exactly two input points:** INPUT POINT 1, Wouter's blind review of all 12 A1+A2 documents (CLOSED
+2026-07-31); INPUT POINT 2, his review of all 11 Step C documents (protocol §5.4). **Autonomy covers running
+and grading, never the collaboration rules on code:** every branch still gets explore, plan, a PR, a
+presented review and Wouter's approval before merge. **Autonomy never means self-merging.** If an autonomous
+run hits something blocking, finish everything independent of the answer first, then ask once.
 
 ---
 
 ## 4. Tech stack
 
-**Anything is acceptable as long as the result works well as a skill in Claude Cowork.** That is the hard
-constraint, and it is easy to forget from inside a terminal: **most users will NOT be in Claude Code.**
-Cowork (and Chat) is the primary runtime; **Claude Code is the development environment only.**
+**Anything is acceptable as long as it works well as a skill in Claude Cowork** — the hard constraint, easy
+to forget from a terminal: **most users will NOT be in Claude Code.** Cowork (and Chat) is the primary
+runtime; Claude Code is the development environment only.
 
-**The skill's own stack:**
+**The skill's own stack:** `SKILL.md` plus progressive-disclosure Markdown, packaged as a `.skill`/`.zip` ·
+**Python 3** for all 20 pipeline scripts, standard library where avoidable, **`lxml` the only third-party
+import (7 of 20)** · **OOXML manipulated as text**, the hard rules in §5.7 (each a production incident) ·
+lexicons and step documents split small · run Python via **`uv run`** (house rule).
 
-- **Skill format:** `SKILL.md` (YAML frontmatter plus Markdown) and progressive-disclosure Markdown
-  documents — meaning the skill loads a little at a time, at the step that needs it, rather than all at
-  once. Packaged as a `.skill` / `.zip`.
-- **Python 3** for all 20 pipeline scripts. **No third-party dependencies beyond the standard library where
-  avoidable** — the skill must run in whatever sandbox Cowork gives it. **`lxml` is the only third-party
-  import, in 7 of the 20 scripts.**
-- **OOXML manipulated as text**, not through an XML object model. The hard rules are §5.7 and they are not
-  stylistic preferences — each one is a production incident.
-- **Lexicons and step documents as Markdown**, deliberately split small so only a few load at once.
-- Run Python via **`uv run`** (inherited house rule).
-
-**Dev-host toolchain, every element load-bearing — RE-MEASURED 2026-09-10: FOUR of the seven rows were stale.**
+**Dev-host toolchain, every element load-bearing** *(re-measured 2026-09-10)*:
 
 | tool | version | used for |
 |---|---|---|
-| Python | **3.12.12 under `uv run`** — and bare `python` is **3.14.3**, a *different interpreter*. Nothing pins a version here *(no `.python-version`, no `pyproject.toml`)*, and **register I-25 is what the difference costs**: bare python links a different zlib and silently rewrites all eighteen fixtures' bytes | the 20 pipeline scripts and every measurement script |
-| `lxml` | 6.1.3 | the only third-party import in the skill — **confirmed 2026-09-10 by an AST sweep of both trees**, 7 of 20, control fired |
-| `uv` | 0.11.16 | house rule: run Python via `uv run` — **which is why the Python row above reads 3.12, not 3.14** |
-| **Microsoft Word (COM)** | 16.0 | **reference-fidelity `.doc → .docx`** — our own evidence baseline |
-| **LibreOffice** | 26.8.0.3 | the **user-reality** converter, and `docx → pdf` |
-| **pandoc** | 3.10 | the grader's `docx → markdown` comparison |
-| **PyMuPDF** (`fitz`) | 1.28.2 | `pdf → png` page rendering |
+| Python | **3.12.12 under `uv run`**; bare `python` is **3.14.3**, a *different interpreter* (nothing pins a version), and register I-25 is the cost — bare python links a different zlib and silently rewrites all eighteen fixtures' bytes | the 20 pipeline scripts and every measurement script |
+| `lxml` | 6.1.3 | the only third-party import (7 of 20), AST-confirmed 2026-09-10 |
+| `uv` | 0.11.16 | run Python via `uv run` — which is why Python reads 3.12, not 3.14 |
+| Microsoft Word (COM) | 16.0 | reference-fidelity `.doc → .docx`, our evidence baseline |
+| LibreOffice | 26.8.0.3 | the user-reality converter, and `docx → pdf` |
+| pandoc | 3.10 | the grader's `docx → markdown` comparison |
+| PyMuPDF (`fitz`) | 1.28.2 | `pdf → png` rendering |
 
-**The rendered visual diff — the project's highest-yield defect detector — is available on this host**, and
-A1 proved it: it produced or confirmed the top finding on every document. **Convert legacy `.doc` with Word
-for our own evidence and with LibreOffice for user reality: the comparison between the two IS the test.**
+**The rendered visual diff is the highest-yield defect detector and is available on this host** — convert
+legacy `.doc` with Word for our evidence and LibreOffice for user reality; the comparison between the two IS
+the test.
 
 ---
 
@@ -498,10 +345,9 @@ rules and the ones that apply to particular kinds of session.*
 
 ### 5.1 The cycle — Explore → Plan → Code → Verify → Test → Commit
 
-**THE SIX STAGES — AND THAT THEY APPLY TO EVERYTHING WRITTEN, NOT ONLY CODE — ARE IN
-`…\Coding\.claude\CLAUDE.md`, WHICH AUTO-LOADS HERE, AND ARE NOT RESTATED** *(phase 12, 2026-08-25)*.
-**Probed rule by rule: 14 of this section's 16 rules have a twin there.** The table below is what **this
-project** adds at each stage, and nothing else.
+**The six stages, and that they apply to everything written, are in `…\Coding\.claude\CLAUDE.md`, which
+auto-loads here, and are not restated** *(14 of this section's 16 rules twinned)*. What **this project** adds
+at each stage:
 
 | | what THIS PROJECT adds to the stage |
 |---|---|
@@ -513,329 +359,172 @@ project** adds at each stage, and nothing else.
 
 #### The cycle must produce ARTEFACTS, not intentions
 
-**THE RULE IS THE HOUSE FILE'S** — a step list opened before any code, every item crossed off only against
-the output of a command that has been run, a **declared N/A with its reason** where an item does not apply,
-and a branch whose VERIFY and TEST entries are not crossed off is **not finished** whatever its diff looks
-like. **WHAT THIS PROJECT ADDS IS MECHANICAL ENFORCEMENT, because prose is what was already read and skipped
-past:** `tools/cycle_evidence.py` records that a verify and a test command ran and exited 0, bound to a hash
-of the staged content — so editing a file after testing it invalidates the evidence automatically. The
-pre-commit hook refuses a commit with no matching evidence. **It proves a command ran against this content
-and exited zero; it cannot prove the command was a good one, and it says so in its own output.**
+**The step-list rule is the house file's** — every item crossed off only against a command's output, a
+declared N/A where it does not apply, a branch whose VERIFY and TEST are not crossed off not finished.
+**This project adds mechanical enforcement:** `tools/cycle_evidence.py` binds a passing verify and test to a
+hash of the staged content, and the pre-commit hook refuses a commit with no matching evidence — it proves a
+command ran and exited zero, not that it was a good one.
 
-**AND THE MAXIM §5.3 CITES BY NAME AS *"§5.1's run, do not read rule"*: RUN, DO NOT READ.** Every error
-worth finding in this project has been found by running something; **re-reading has never found one.** *(The
-house file states the same rule as* re-measure, do not re-read; *this wording stays because §5.3 points at
-it.)*
+**RUN, DO NOT READ** *(the house file's* re-measure, do not re-read; **§5.3 cites this wording)*. Every error
+worth finding here was found by running; re-reading has never found one. **And the failure shape with no
+house twin: a check that passes for the WRONG REASON** — never a two-word needle, ask the same question a
+second way, and a figure agreeing with the one you expected is the moment to re-derive it, not to relax.
+`EVIDENCE-measurement.md` sections 3.3 and 3.5 hold the eleven instances.
 
-**THE FAILURE SHAPE WITH NO HOUSE TWIN — A CHECK THAT PASSES FOR THE WRONG REASON.** Eleven logged instances,
-several inside this project's own verification scripts. **Never a two-word needle; ask the same question a
-second way; and when a figure agrees with the one you expected, that is the moment to re-derive it, not to
-relax.** *(The other three shapes — a fix scoped to one caller, an instrument reporting on an empty set, and
-an exit code of 0 that is not evidence — are the house file's. **What all of it cost here is
-`EVIDENCE-measurement.md` sections 3.3 and 3.5.**)*
-
-**Two disciplines bind every option, and they are not in tension with taking a leap:** every change points
-at a **specific observed failure or grade**, never at theory; and **the anti-drift safeguards are not on the
-table.**
+**Two disciplines bind every option:** every change points at a specific observed failure or grade, never at
+theory; and the anti-drift safeguards are not on the table.
 
 ### 5.2 Branches, pull requests, and what "done" means
 
 #### Branches, pull requests and commits
 
-- **THE HOUSE RULE GOVERNS AND THIS CHARTER NO LONGER DISAGREES** *(Wouter, 2026-09-10, with the cost
-  named)*: **attended STANDARD-MODE work commits straight to `main`**, the review having already happened
-  in the conversation — **but NOT while branch protection stands**, which rejects a direct push with
-  `GH006` even for an admin, and relaxing that is his separate act. **UNTIL THEN: a PR per branch, the
-  diff walked and PRESENTED, Wouter merges, squash-and-merge**, push and update §7 after each branch.
-- **STACKED BRANCHES: MERGE FROM THE BOTTOM UP, AND DO NOT DELETE A BASE BRANCH WHILE ANYTHING SITS ON IT.**
-  *(2026-08-07, and it cost a pull request.)* Where branch B is opened against branch A rather than `main`,
-  **deleting A on merge makes GitHub CLOSE B**, and a closed PR **cannot be reopened or retargeted** once its
-  base is gone — `gh pr edit --base` fails with *"Cannot change the base branch of a closed pull request"*.
-  The work is not lost, but the PR number, its review and its discussion are. **Either retarget B to `main`
-  BEFORE merging A, or merge A with the branch left in place and delete it afterwards.** The recovery is a
-  fresh branch off the new `main` plus `git cherry-pick`, which applies cleanly because the squash of A
-  already contains everything B was built on — **re-run the full check set on the rebuilt branch before
-  pushing it**, since it is a different commit on a different base and the old evidence does not carry over.
-  **This is why stacking is a cost, not a convenience:** prefer branching from `main` whenever the change is
-  genuinely independent, and stack only when the later branch truly needs the earlier one's content.
-- **TWO HOUSE RULES BIND HERE AND ARE NOT RESTATED** *(probed 2026-09-10, each has a verbatim twin)*: before every commit run `git status` and **explain it to Wouter** in plain terms; and on a **session restart** after a gap of more than a day read the last ~8 commit messages plus §7 and summarise them back first.
-- **Branch protection on `main` — LIVE since the repository went public, 2026-08-07.** Require a PR; block
-  force pushes and branch deletion; **`enforce_admins` TRUE**. Required approvals stay **0** — on a solo repo
-  GitHub would otherwise refuse to let Wouter merge his own PR, breaking the agreed workflow rather than
-  protecting it. **Tested both ways on the day:** a direct push to `main` is now rejected with `GH006`, even
-  for an admin with the local override set; and a pull request remains `MERGEABLE` with no review required,
-  so nothing about Wouter's merging is made harder.
-  **AND THE LIMIT MATTERS MORE THAN THE SETTING.** No GitHub configuration can make Claude ask Wouter's
-  permission, because Claude operates under Wouter's own account — to GitHub they are one identity. What
-  actually requires his approval is the rule below, the local hooks, and compliance. The setting stops the
-  *accident*; it cannot stop the *decision*. Add the smoke suite and the parity check as required
-  status checks once they run in CI. Fall back to a repository **ruleset** if protection is unavailable.
-- **`README.md` from the first commit, kept current.** It is the **public front door** on two public repos
-  and the install instructions for a non-technical lawyer — a product surface, not a formality. **Update it
-  in the same PR as any change that alters behaviour, the feature list or installation.**
-- **Debugging a regression: `git bisect`, not guesswork** — but bisect needs a *cheap, deterministic*
-  pass/fail test, and "translate a document and grade it" is neither. **Bisect against the smoke suite or
-  the fixture byte-comparison.**
+- **The house commit-flow rule governs and this charter no longer disagrees** *(Wouter, 2026-09-10)*:
+  attended STANDARD-MODE work commits straight to `main` — **but NOT while branch protection stands**, which
+  rejects a direct push with `GH006` even for an admin. **Until it is relaxed: a PR per branch, the diff
+  presented, Wouter merges (squash), push, update §7.**
+- **Stacked branches: merge bottom-up, and never delete a base branch while anything sits on it**
+  *(2026-08-07, cost a PR)*. Deleting base A on merge makes GitHub CLOSE branch B, and a closed PR cannot be
+  retargeted. Prefer branching from `main`; stack only when B truly needs A's content, and re-run the full
+  check set on any rebuilt branch — a different commit on a different base carries no old evidence.
+- **Two house rules bind and are not restated** *(each verbatim-twinned)*: `git status` explained to Wouter
+  before every commit; after a gap over a day, read the last ~8 commit messages plus §7 first.
+- **Branch protection on `main` is LIVE, `enforce_admins` TRUE, required approvals 0** (a solo repo needs 0,
+  or GitHub refuses to let Wouter merge his own PR). It stops the accident, not the decision: no GitHub
+  setting can make Claude ask permission, because it runs under Wouter's own account. Add the smoke suite
+  and parity check as required status checks once they run in CI.
+- **`README.md` is the public front door on two public repos** — update it in the same PR as any change to
+  behaviour, the feature list or installation.
+- **Debug a regression with `git bisect`**, against the smoke suite or the fixture byte-comparison, never
+  "translate and grade" (not deterministic).
 
 #### Definition of done — every branch, every step
 
-**THE HOUSE DEFINITION OF DONE APPLIES IN FULL AND IS NOT RESTATED** *(phase 12, 2026-08-25 — probed, 8 of
-its 12 items have a twin there)*. It ends *"plus any gate the project's own charter adds"*; **these are
-those gates.** Parity check green from branch 2 onward · **the branch's own *Done when* condition in
-section 3 of `PLAN-2-step-b.md` met**, tested by the method its branch kind requires in **that document's
-section 4** · **no criterion regressed against the frozen v3 baseline** wherever a graded run applies ·
-**rendered PDF visual diff against the source, page by page, BOTH documents** · **both confidentiality
-controls and the publication check run.**
+**The house definition of done applies in full and is not restated** *(8 of its 12 items twinned)*. The
+gates THIS charter adds: parity check green from branch 2 · the branch's *Done when* in section 3 of
+`PLAN-2-step-b.md` met, tested by its kind's method in that document's section 4 · no criterion regressed
+against the frozen v3 baseline where a graded run applies · rendered PDF visual diff of BOTH documents,
+page by page · both confidentiality controls and the publication check run.
 
 ### 5.3 VERIFY — proving this change did what it claimed
 
 #### "IT EXITED 0" IS NOT "IT DID THE WORK" — and this section is here because §7 gets replaced
 
-**THE VERIFICATION-HYGIENE RULES ARE IN `…\Coding\.claude\CLAUDE.md`, WHICH AUTO-LOADS HERE, AND ARE NOT
-RESTATED** *(phase 12, 2026-08-25)* — assert the artefact not the exit code · a sentinel FILE · never two
-suites at once · pin a baseline to a REVISION · a control that opened no files is VOID · `rc=$?` on the very
-next line. **Probed one grep per rule: six of the eight have a twin there.**
+**The verification-hygiene rules are in `…\Coding\.claude\CLAUDE.md`, which auto-loads here, and are not
+restated** *(6 of the 8 twinned)* — assert the artefact not the exit code, a sentinel file, never two suites
+at once, pin a baseline to a revision, a control that opened no files is VOID, `rc=$?` on the next line.
 
-**THE ONE RULE WITH NO TWIN, so it stays: RUN THIS PROJECT'S SUITES AS TOP-LEVEL COMMANDS, NEVER FROM A
-PARENT RUNNER** — and make a before/after suite exit **VOID** when the baseline turns out byte-identical to
-the working tree. **Its two measurements are `EVIDENCE-measurement.md` section 3.4.**
+**The five rules with no twin, each a check that passed here for the WRONG reason** *(worked examples, and
+the six earlier dated instances, in `EVIDENCE-measurement.md` section 3)*:
 
-**A SECOND RULE WITH NO TWIN, ADDED 2026-09-02 ON A MEASURED FALSE GREEN: A CLAIM THAT MEASURES ITSELF
-AGAINST `main` IS GREEN ON THE BRANCH THAT BREAKS IT AND RED ONLY AFTER THE MERGE.** Same family as *pin a
-baseline to a revision* — the thing measured was not the thing under review — but failing in the opposite
-direction and at the opposite moment. `audit_branches`' fixture count read the merged tree, so the branch
-adding a fixture saw the OLD denominator, passed, closed, and went red afterwards with nobody looking.
-**Ask whether a claim asserts a HISTORICAL DELIVERY or a LIVE INVENTORY** — the first may read `main`, the
-second must read the INDEX. **And the sweep of the other claims for the same shape is not done.**
-
-**A THIRD RULE WITH NO TWIN, ADDED 2026-09-02: A READER THAT NORMALISES ITS INPUT CANNOT SEE A CHANGE
-IN WHAT IT NORMALISED AWAY — AND THE READER IS USUALLY SHARED, WHICH IS WHY NOBODY LOOKS AT IT.**
-`para_texts` ends in `.strip()`, correctly — it matches a delivered paragraph against the notes' stripped
-`text`. A new before-and-after arm reused it, and C17's three real instances are every one a **trailing**
-space, so it reported **0 paragraphs changed** on two documents whose bytes had moved. **The fix is a
-second reader, not a changed one:** the two purposes have opposite requirements and whichever loses is
-silent. **Ask of any comparison what the function you are comparing WITH throws away.**
-
-**A FOURTH RULE WITH NO TWIN, ADDED 2026-09-08: A DIRECTIONAL "DID THE FIX FIRE?" CHECK DOES NOT GO QUIET
-WHEN ITS PREMISE STOPS HOLDING — IT FAILS.** Four instances in one file in one session, each a *guaranteed*
-report reading exactly like a real one: a **self-comparison**, where old == new so nothing *can* move; a fix
-**already in the pinned baseline**, so both arms carry it and the check has failed on every run since that
-merge, for ever; a **new arm** not wired into the older one's verdict; and a container fixed on an earlier
-branch still sitting in the count. **The general test: ask of every directional check what has to be TRUE
-for its question to still be open, and assert that** — `git merge-base --is-ancestor` settles the second
-exactly. **Same family as the second rule, one level up:** that one says a claim can measure the wrong
-tree; this one says it can measure a question already answered. *(All four are `apply_corpus_diff.py`'s.)*
-
-**A FIFTH RULE WITH NO TWIN, ADDED 2026-09-10: A CHECK THAT READS ITS SUBJECT INDEPENDENTLY MUST HONOUR THE
-SAME TEXT CONTRACT, OR IT REPORTS ITS OWN SEMANTICS AS A DEFECT.** Branch 8's completeness check may NOT
-import extraction's reader — sharing it would share its blind spots, which is C28 itself — so it restates
-the contract. Its first version collected `w:t` alone and called **four real corpus documents damaged**,
-because `extract_paragraphs` emits a newline at every plain `<w:br/>` and **no fixture in the tree contained
-one**. **Mirror of the third rule: there one SHARED reader normalised the change away; here two SEPARATE
-readers disagreed** — so *use a different reader* is not the remedy. **State the contract once, restate it
-deliberately, and let a test assert both obey it**, as branch 7 did with the container inventory.
-
-**THE SIX DATED INSTANCES MOVED TO `EVIDENCE-measurement.md` SECTION 3.3 ON 2026-08-25** — six green numbers, each reporting on something other than the thing being checked.
+1. **Run this project's suites as TOP-LEVEL commands, never from a parent runner**, and make a before/after
+   suite exit VOID when the baseline is byte-identical to the working tree.
+2. **A claim that measures itself against `main` is green on the branch that breaks it, red only after the
+   merge** — ask whether a claim asserts a HISTORICAL DELIVERY (may read `main`) or a LIVE INVENTORY (must
+   read the INDEX). The sweep of the other claims for this shape is not done.
+3. **A reader that normalises its input cannot see a change in what it normalised away**, and the reader is
+   usually shared — ask of any comparison what the function you compare WITH throws away; the fix is a second
+   reader, not a changed one.
+4. **A directional "did the fix fire?" check does not go quiet when its premise stops holding — it FAILS**
+   (a self-comparison, a fix already in the pinned baseline, an unwired new arm). Assert what must be TRUE
+   for its question to still be open; `git merge-base --is-ancestor` settles the pinned-baseline case.
+5. **A check that reads its subject independently must honour the same text contract**, or it reports its own
+   semantics as a defect — state the contract once, restate it deliberately, and let a test assert both obey
+   it.
 
 #### The checker roster — what this project keeps, and why it dropped the rest
 
-**9 INSTALLED · 4 DECLARED ABSENT · 13 TRACKED, `0 needing a decision` THROUGH A FRESH CLONE** *(2026-09-09,
-never on this machine — a local `core.autocrlf` does not travel)*. **The four reasons live in
-`verify.config.json` where the checker reads them and refuses a blank one.** Three things it cannot hold:
-
-| | |
-|---|---|
-| **the 13 are not the whole population** | `install_hooks.py` **is not the house script of that name and never was** — it installs THIS project's hooks from `tools/hooks/`, and its own header declares the collision so a byte comparison stops there rather than turning into a repair. **`0 needing a decision` is true of the thirteen and silent about anything outside them** — the accepted cost of a tracked list, not a defect in it. *(`trace_instructions.py` was four versions behind and CRLF against the house LF, unreported for the same reason; brought to house v5 on 2026-09-09.)* |
-| **33 scripts are PROJECT-SPECIFIC, and this is the declaration** | *Prefer the standard scripts* permits one only where a house checker genuinely cannot do the job. These are OOXML, the corpus, the register, leakage and descriptors, UK/US parity, and the Step-B audit family — **domains no house checker addresses at all** |
-| **one is a deliberate TWIN of a house checker** | `xref_check.py` does the house `verify_refs` checker's job — *every quoted cross-reference must resolve to a heading that exists* — and is the **strongest** reason that checker is declared absent rather than merely unsuited: **the local one is green where the house one misfires**, this corpus being 308 files whose content IS quoted terminology. *(Named without its `.py`, deliberately: `claudemd_claims` check 6 fails on any script this charter names that exists nowhere in the tree, and a DECLARED-ABSENT checker is exactly that — it caught this row on its first run.)* |
+**9 INSTALLED · 4 DECLARED ABSENT · 13 TRACKED, `0 needing a decision` THROUGH A FRESH CLONE**; the four
+reasons live in `verify.config.json`, blank refused. Three things the count cannot hold: **the 13 are not the
+whole population** (`install_hooks.py` is this project's own hook installer, not the house script; the count
+is silent about anything outside the thirteen); **33 scripts are PROJECT-SPECIFIC** — OOXML, the corpus, the
+register, leakage and descriptors, UK/US parity, the Step-B audit family, domains no house checker addresses;
+and **one is a deliberate TWIN**, `xref_check.py`, green where the house `verify_refs` misfires over 308 files
+whose content IS quoted terminology, which is the strongest reason that checker is declared absent.
 
 #### The audit gate — for any analysis deliverable
-**MOVED TO `.claude/skills/audit-gate/SKILL.md` ON 2026-08-24** — the seven-point method, the standing
-instruments with their commands, `PLAN-2-step-b.md`'s six suites, and the four scripts deliberately left
-in `temp/`. **Route 3: a procedure followed start to finish. The register validator every other section
-points here for is `uv run python tools/audit_register.py`.**
-
-**What stays is the TRIGGER, not the method.** **Wouter's standing requirement:** *"triple check, do a deep
-audit and verify your summary. This summary is the basis of the changes, and I REALLY don't want it to
-contain errors or omissions."* **It has found real errors EVERY time it has been asked for**, and **an audit
-that reports NOTHING found is evidence it was too shallow, not that the work was clean.** **Invoke the
-skill; do not improvise** — the seven points exist because seven kinds of error got through without them.
+**The seven-point method is `.claude/skills/audit-gate/SKILL.md`** (route 3); the register validator every
+section points here for is `uv run python tools/audit_register.py`. **What stays is the TRIGGER:** Wouter's
+standing requirement to *"triple check, do a deep audit and verify your summary"* — it has found real errors
+every time, and an audit reporting NOTHING is evidence it was too shallow. **Invoke the skill, do not
+improvise.**
 
 #### Never-regress — the rule, and how it becomes enforceable
 
-**Wouter's hard rule: quality must only IMPROVE, never go lower.** Today it is untestable — grading is
-manual, LLM-driven and non-deterministic, so re-grading every document per commit is not viable. **Two
-tiers make it real:**
-
-1. **A scripted mechanical gate, run on every change.** Most of what has been measured by hand is
-   deterministic: paragraph counts, footnote/endnote/**comment** reference counts, tab characters versus tab
-   stops, effective bold and italic **text**, run-property tables, remnant sweeps, invisible-character
-   sweeps, variant sweeps, definitions ordering, accept/reject reconstruction. That covers most of the
-   structural criteria, is reproducible, and **is what finally makes `git bisect` possible.**
-2. **A full LLM re-grade only at branch boundaries**, on a fixed subset, against the frozen v3 baselines.
-
-**Efficiency is strictly subordinate to this rule.** The expensive full-lexicon reads have paid on every
-document, so *"make it faster"* must never become *"read less"*. **And there is no separate efficiency
-workstream: fixing the defects IS the efficiency work**, because the gate cycles wasted on false alarms and
-the re-runs forced by tool bugs *are* the time.
-
-**The measurement that makes tier 1 possible:** between two runs of the same document, **about 40% of
-paragraphs differ linguistically and the mechanical output is identical.** That is measured on the project's
-only same-document repeat, not assumed. **So run-to-run variance is large in prose and nil in mechanics** —
-the case for a scripted mechanical gate as the primary instrument and against an LLM re-grade.
+**Wouter's hard rule: quality must only IMPROVE, never go lower.** Grading is manual and non-deterministic,
+so two tiers make it real: (1) **a scripted mechanical gate on every change** — the deterministic measures
+(paragraph, note and comment reference counts, tabs vs tab stops, effective bold/italic text, run-property
+tables, remnant and invisible-character sweeps, definitions ordering, accept/reject reconstruction), which
+covers most structural criteria and makes `git bisect` possible; (2) **a full LLM re-grade only at branch
+boundaries**, on a fixed subset, against the frozen v3 baselines. **Efficiency is strictly subordinate:**
+*"make it faster"* must never become *"read less"*, and fixing the defects IS the efficiency work. Measured
+on the only same-document repeat: ~40% of paragraphs differ linguistically while the mechanical output is
+identical — variance large in prose, nil in mechanics, the case for the mechanical gate as primary.
 
 ### 5.4 TEST — proving nothing else broke
 
 #### How a change is actually tested
-**MOVED TO `.claude/skills/frozen-intermediate-test/SKILL.md` ON 2026-08-24** — the freeze-the-intermediate
-trick, the two fixture tiers, the mandatory negative inputs, and the two ways a green suite means nothing.
-**Route 3. Section 4 of `PLAN-2-step-b.md` still owns the method per branch kind.**
-
-**Three things stay, because each binds OUTSIDE a test run.**
-
-1. **Synthetic fixtures in `tests/fixtures/` are committable and frozen intermediates NEVER are** — a location rule §5.6 and §6.4 own; this is the pointer.
-2. **A FROZEN-INTERMEDIATE RESULT IS EVIDENCE ABOUT THE MECHANICAL HALF ONLY.** It is the
-   *post-compliance* artefact, so it cannot reproduce a gate that was satisfied while the run was
-   happening — measured 2026-08-21, `validate_segment_shapes` finding 0 over 81 tracked-change
-   paragraphs. **A result reported without that qualifier reads as coverage it does not have.**
-3. **A change claimed to be non-behavioural is PROVED byte-for-byte, or it is not claimed.** That
-   discipline is what makes `git bisect` possible; never delete it in the name of tidying up.
+**The freeze-the-intermediate method is `.claude/skills/frozen-intermediate-test/SKILL.md`** (route 3);
+section 4 of `PLAN-2-step-b.md` owns the method per branch kind. **Three things stay, each binding outside a
+test run:** synthetic fixtures in `tests/fixtures/` are committable and frozen intermediates NEVER are
+*(§5.6, §6.4)*; a frozen-intermediate result is evidence about the MECHANICAL half only, not a gate satisfied
+mid-run; and a change claimed non-behavioural is PROVED byte-for-byte or not claimed — the discipline that
+makes `git bisect` possible.
 
 #### The review protocol — for INPUT POINT 2
 
-**The twelve-document review is complete; this is kept because Step C repeats it.** Only the rules that survived contact with reality are here.
+**Kept because Step C repeats it.** Per document: a helper opens original and translation side by side,
+read-only, no filename typed; Wouter gives input in any shape and Claude structures it; **open the NEXT pair
+immediately on his feedback** (so he reads n+1 while Claude analyses n), but finish n's analysis and update
+the register before the next feedback lands, running the validator after each edit.
 
-**The loop, per document.** A helper opens the original and the translation side by side, read-only, with no
-filename typed. **Wouter gives his input in whatever shape he likes** — prose, a list, a screenshot, a
-one-liner. **Claude does the structuring.** **Open the NEXT pair immediately on receiving his feedback,
-before analysing anything**, so he reads document *n+1* while Claude analyses document *n* — under the naive
-loop each sat idle through the other's work, which over twelve documents was the single largest waste. **But
-finish document *n*'s analysis and update the register before his next feedback lands.** Run the validator
-after each edit.
+**Three-way triage per point:** already reported (tick the row) · missed but the method COULD have caught it
+(fix the method, re-check earlier documents) · missed and it STRUCTURALLY could not — **expect most findings
+here**, the translation criterion being graded on a sample, and that axis is Wouter's alone.
 
-**The three-way triage, applied to every point he raises:**
-
-1. **Already reported** — confirms both instruments. Tick it into the existing row.
-2. **Missed, but the method COULD have caught it** — a gap in the *grading instrument*. Fix the method, then
-   **re-check the earlier documents for the same thing**.
-3. **Missed, and the method STRUCTURALLY could not.** **Expect most of his findings here**, because the
-   translation criterion is graded on a *sample*: Claude does not re-translate 230 paragraphs and judge
-   whether they read as a lawyer would write them. **That axis is his alone, and it is the whole reason the
-   review is worth doing.**
-
-**Two artefacts, two rules.** His raw feedback and Claude's per-document analysis go to the **logs folder
-and are never committed** — he quotes real clause text and party names. Only the **sanitised conclusions**
-enter the register, origin `WvdB`, with names *and commercial terms* genericised.
-
-**Order: ascending complexity**, so the method is proven before the largest document. **The D03/D03B pair is
-reviewed together and deliberately NOT blind** — same document, batch position the only variable, and the
-anchoring that would spoil a blind review is exactly what makes that comparison work. Say so in the write-up.
-
-**The blind rule:** Wouter forms his view **before** reading that document's grade report. Claude must not
-summarise the grade, name its findings, or hint at them before he has spoken. Knowing a *score* is far
-weaker anchoring than reading *findings*, so whether to skip the score is his call, not a rule. **Any tool
-touching a blind review inherits the blindness requirement** — a convenience field in the review helper once
-named four documents' findings outright and spoiled them before anyone noticed.
-
-**What Claude must not do:** defend the grade (if he finds something the grade missed, that is the review
-working) · modify the source or delivered documents (read-only; they are the evidence) · start fixing the
-skill (the review feeds the analysis, not a patch).
+**Two artefacts:** his raw feedback and Claude's per-document analysis go to the logs folder, never committed
+(real clause text and names); only sanitised conclusions enter the register, origin `WvdB`. **Order:
+ascending complexity.** The D03/D03B pair is reviewed together and NOT blind (batch position the only
+variable). **The blind rule:** Wouter forms his view before reading the grade; Claude must not summarise or
+hint at findings first, and any tool touching a blind review inherits the blindness. **Claude must not**
+defend the grade, modify the read-only documents, or start fixing the skill.
 
 ### 5.5 The instruments
 
 #### The measuring instruments
-**These are properties of the measurement, not of the skill. State them wherever numbers appear, and never
-vary one inside a comparison.** Two of the four have already cost this project real time, and **the two
-dated cost stories moved to `EVIDENCE-measurement.md` section 3 on 2026-08-24.**
+**These are properties of the measurement, not the skill. State them wherever numbers appear, and never vary
+one inside a comparison.** The seven measurement rules, forensic logging and the two reasons a corpus cannot
+reach a defect moved to `.claude/rules/instruments.md` on 2026-09-10 (route 4, `tools/**` · `tests/**`); the
+two dated cost stories are in `EVIDENCE-measurement.md` section 3. The instrument STATE stays here, because a
+session needs it without opening a tool:
 
 | instrument | state | the rule |
 |---|---|---|
-| **Grader** | **v3, FROZEN** until the verification run. Dated backups are in the private folder — the grader is deliberately not in Git, so those are the only revert path | **Do not change it until Step C is complete.** A moving ruler destroys the never-regress comparison |
-| **Harness** | **v2.2.** Two documents ran v1, one v2, one v2.1, the rest v2.2 | **Re-run, gate and iteration counts are NOT comparable across versions** |
-| **Thinking level** | **`extra` on all 12 runs.** The ladder is `low` < `high` < `extra` < `max` | **`max` has never been used, so every A1 grade is a LOWER BOUND** |
-| **Batch versus single** | Two documents have **batch-run** baselines; one document has **both** | **Reproduce the configuration** or the before/after is not like-for-like |
+| **Grader** | **v3, FROZEN** until the verification run; dated backups in the private folder (it is not in Git) | **do not change it until Step C is complete** — a moving ruler destroys the never-regress comparison |
+| **Harness** | **v2.2** (two docs v1, one v2, one v2.1, rest v2.2) | re-run, gate and iteration counts are NOT comparable across versions |
+| **Thinking level** | **`extra` on all 12 runs** (`low` < `high` < `extra` < `max`) | `max` never used, so every A1 grade is a LOWER BOUND |
+| **Batch versus single** | two docs batch-run, one has both | reproduce the configuration or the before/after is not like-for-like |
 
-**The grader is v3 and has 17 criteria.** `EVIDENCE-measurement.md` section 2 owns its package, its three
-gaps, and why a pairwise comparison of two runs reports sixteen rather than a different rubric. **Its bash
-paths are Cowork container paths; substitute local equivalents.**
-
-**SEVEN measurement rules came out of building it, and every one generalises beyond the grader** *(eight
-until 2026-09-10; *re-measure, do not re-read* swept as a THIRD copy — 3 → 2, §1.5 and the house file)*:
-
-- **Never score ANY run property from element counts — compare the affected TEXT, then render.** Translation
-  consolidates runs, so nearly every count falls even when nothing is lost — and **it fails in both
-  directions**, because putting the English back emits an explicit *off*-flag on every non-emphasised run.
-- **Count auxiliary REFERENCES, not just auxiliary parts.** A translated footnotes part whose pointer was
-  destroyed is unreachable, and the part-inventory check passes.
-- **Compare auxiliary part CONTENT, not the inventory.** Empty footnote and header parts exist as
-  boilerplate in any Word-written `.docx`.
-- **Render BOTH documents and compare page against page.** Inspection finds what looks wrong; only
-  comparison finds what is *missing*.
-- **Reconcile any tracked-change count drop** against legitimate coalescing before calling it loss.
-- **Identical paragraph properties are not evidence that layout survived.**
-- **Never compare properties BY PARAGRAPH INDEX across the definitions block** — that step permutes it.
-  Match definitions **by term**.
-
-**Forensic logging is a primary method, not a nice-to-have.** When observing the skill on a real document,
-log **everything** — every file read, tool call, reasoning step, gate firing, wasted call and iteration
-loop, every ambiguous instruction, plus per-step token and time cost. **A summary is not a log.** Every real
-fix in the rev16→rev44 history came out of it. **And take counts from the log analyser, never from the
-narrative** *(the figures are `EVIDENCE-measurement.md` section 3.2)* — **narratives remain the only source for *reasoning*.**
+**The grader is v3 with 17 criteria; `EVIDENCE-measurement.md` section 2 owns its package, its three gaps and
+why a pairwise comparison reports sixteen.** Its bash paths are Cowork container paths; substitute local.
 
 #### The test corpus
-**THE TWELVE-ROW LISTING MOVED TO `EVIDENCE-measurement.md` SECTION 1 ON 2026-08-24** — with the paragraph
-counts, the *what it uniquely tests* column and the full variant assignment. **What stays is the rule, and
-the three facts other sections point here for.**
+**The twelve-row listing is in `EVIDENCE-measurement.md` section 1.** Eleven real client documents live
+outside the repo tree, permanently, referred to **by instrument class and language only, per §5.6** — never
+by filename or subject matter.
 
-**Eleven real client documents, outside the repo tree, permanently.** Referred to **by instrument class and
-language only, per §5.6** — never by filename, because the filenames carry counterparty names, and never by
-subject matter.
-
-- **D03, Agreement (Norwegian), is the only language with NO sub-lexicon** — so it is the sole evidence for
-  §2.1's *"others translate very well too"*, and the only isolation of the lexicon's second layer.
-  **D03/D03B is the most controlled pair in the project**, batch position the only variable. **D09 is the
-  Step C arm document**, for its four known-answer judgement calls.
-- **Variant assignment — 3 US / 8 UK, and the principle is not arbitrary.** The **hard technical paths run
-  on UK**, the default, so a failure is unambiguously a pipeline defect rather than a variant defect; **US
-  goes to terminologically rich but technically straightforward documents**, so variant divergence is what
-  gets tested.
-- - **AND A FOURTH REASON, ADDED 2026-09-08 (N1): THE CORPUS CONTAINS THE SHAPE AND AN EARLIER STEP
-  REMOVES IT BEFORE THE STEP UNDER TEST EVER SEES IT.** Measured both ways: the pristine document
-  carries the one corpus `w:smartTag` and **the copy the pipeline applied to does not**, while that
-  paragraph's notes entry exists and `en != text`, so apply does rebuild it — there is simply no smart
-  tag left in it. **Nothing in either shipped tree removes one** *(grep both, control needle firing)*, so
-  it went upstream, in the conversion or re-save. **Unlike F16's, no gate refuses anything and nothing is
-  reported**; unlike the first reason, the shape IS in the corpus. **So the row closes on the synthetic
-  fixture alone and that must be DECLARED** — a fix whose only evidence is a fixture, reported beside a
-  corpus run that moved nothing, reads as corpus evidence. *(Bucket B in `.claude/rules/ooxml.md`'s
-  sense: inherited, not introduced by us — and whether the upstream removal is CORRECT is open.)*
-- - **AND THERE ARE TWO REASONS A CORPUS CANNOT REACH A DEFECT, NOT ONE** *(added 2026-09-02, F16)*.
-  The list below is the first kind — **the corpus does not CONTAIN the shape.** The second is that it
-  **CANNOT contain it, because a gate removes the shape before anything is recorded.** F16 is an
-  `en_runs` offset past the end of `en`; `validate_en_runs.py` runs BEFORE apply, so a run carrying
-  one could never have produced a frozen intermediate at all. **Measured: 0 across all 13, and the
-  zero was PROVED — 729 entries, the last offset landing on `len(en)` 729 times of 729, a planted
-  needle firing, a conforming input quiet.** **So the evidence base is clean BECAUSE the gate worked,
-  and a zero read as *already fixed* is the whole defect.** The test to apply before believing any
-  zero: **ask whether the artefact you are counting could physically have recorded the thing you are
-  counting.** *(§5.4 rule 2 is the same fact stated from the artefact's side.)*
-
-**THREE things the corpus cannot reach, so they need synthetic fixtures:** there are **no `Symbol` or
-  `Wingdings` runs anywhere**, so the Greek-glyph defect cannot be reproduced from a real document;
-  content controls, smart tags, images with alt text and charts with titles appear in none of the eleven;
-  and — **added 2026-09-02 — only ONE document has a TABLE OF CONTENTS at all.** So any measurement of
-  TOC handling is a measurement of **D06's house style**, and 26 of 26 on that document says nothing
-  about a roman-numeral page number, an unnumbered entry, or a page-number run carrying a stray space.
-  **A synthetic sweep found two real defects the corpus was structurally blind to** on its first run;
-  `tests/test_toc_shapes.py` owns that population and the reasoning. **The general lesson is §5.1's:** a
-  figure of 100% over one document is not a figure of 100%.
+- **D03, Agreement (Norwegian), is the only language with NO sub-lexicon** — the sole evidence for §2.1's
+  *"others translate very well too"*, and D03/D03B is the most controlled pair, batch position the only
+  variable. **D09 is the Step C arm document.**
+- **Variant assignment is 3 US / 8 UK, not arbitrary:** the hard technical paths run on UK (the default), so
+  a failure is unambiguously a pipeline defect; US goes to terminologically rich but technically
+  straightforward documents, so variant divergence is what gets tested.
+- **The two reasons a corpus cannot reach a defect, and the three shapes that need synthetic fixtures, are in
+  `.claude/rules/instruments.md`** — the general lesson is §5.1's: 100% over one document is not 100%.
 
 ### 5.6 Confidentiality
-**THE DATED EVIDENCE MOVED TO `EVIDENCE-confidentiality.md` ON 2026-08-24. NOT ONE RULE MOVED WITH IT, AND
-NONE MAY:** a confidentiality rule that is absent when it is needed is a publication that cannot be undone,
-so this is **route 1** — **not one line of this section may ever become a path-scoped rule or a skill.**
-That document holds the measurements, the dated incidents, the three controls' history, the 90-script
-committability census and the (a)/(b)/(c) closures. **Read it before touching a control.**
+**The dated evidence is in `EVIDENCE-confidentiality.md`; NOT ONE RULE MOVED WITH IT, AND NONE MAY** — a
+confidentiality rule absent when needed is a publication that cannot be undone, so this is **route 1: not one
+line of this section may become a path-scoped rule or a skill.** Read that document before touching a control.
 
 The skill is **published publicly**, and **the repository has been PUBLIC since 2026-08-07, so its whole
 history is served.** Treat every file in the repo as world-readable from the moment it is committed: **a
@@ -845,30 +534,22 @@ commit cannot be un-published.**
 includes examples.**
 
 - **No client or counterparty names, ever** — not in step docs, lexicons, script comments, test fixtures,
-  commit messages, any committed log, or this file. **Enumerating the names here in order to scan for them
-  would publish exactly what the rule protects.** The scan list lives in the **private sibling folder**,
-  *outside* the repo tree rather than merely gitignored, because a `.gitignore` entry is one mistake away
-  from failing and **a client name cannot be rotated once published.** The scanner reads the list by path or
-  from an environment variable, so CI can supply its own copy as a secret. **Keep the list current.**
-- **No real-document examples.** Every worked example, fixture and illustrative XML snippet must be
-  **synthetic** — invented for the purpose. **Anonymising a real example still leaks its shape, its clause
-  structure and its commercial terms.** Where a real document was the *source* of a lesson, keep the lesson
-  and discard the document. **Renaming is not enough**, and the existing step docs are known to contain
-  real-derived examples that were handled by renaming — replacing them is part of the claims pass in step 2.
-- **NAME A TEST DOCUMENT BY ITS INSTRUMENT CLASS AND ITS LANGUAGE, AND BY NOTHING ELSE** *(Wouter,
-  2026-08-06)* — **Agreement (Norwegian)** · **Power of Attorney (Hungarian)** · **Guarantee (Polish)** ·
-  **Deed (Italian)** · **MOU (Japanese)**. **Never say what the instrument is about.** The subject-matter
-  qualifier — the noun that says what the agreement is *over*, what the guarantee is *for*, what the deed
-  *conveys* — plus a language plus a date range identifies a real instrument far more sharply than a name
-  does, to anyone who knows the market, **and a name-based scan is STRUCTURALLY BLIND to it.**
-  **The qualifiers themselves are NOT listed here, and the omission is the point.** They live with the scan
-  list in the private folder; the probe reads them by path or from an environment variable.
-  **The same rule covers clause content:** say what a lost span *did* — *"an operative condition"* — never
-  what it said.
-  **What stays, because it is the evidence and it is not sensitive:** the technical character of the file.
-  No sub-lexicon · legacy binary `.doc` · only non-Latin script · most tables · 160 bold runs · paragraph
-  counts · batch position · tracked-change load. **Those describe the FILE, not the deal.** The doc-id →
-  real-document mapping lives in the private folder, as it always has.
+  commit messages, any committed log, or this file. The scan list lives in the **private sibling folder**,
+  outside the tree rather than merely gitignored, because **a client name cannot be rotated once published**;
+  the scanner reads it by path or environment variable. **Keep the list current.**
+- **No real-document examples** — every worked example, fixture and XML snippet must be **synthetic**.
+  Anonymising still leaks the shape, clause structure and commercial terms; keep the lesson, discard the
+  document. **Renaming is not enough**, and replacing the known real-derived step-doc examples is part of the
+  claims pass in step 2.
+- **NAME A TEST DOCUMENT BY ITS INSTRUMENT CLASS AND ITS LANGUAGE, AND BY NOTHING ELSE** *(Wouter)* —
+  Agreement (Norwegian), Power of Attorney (Hungarian), Guarantee (Polish), Deed (Italian), MOU (Japanese).
+  **Never say what the instrument is about:** the subject-matter qualifier plus a language plus a date range
+  identifies a real instrument more sharply than a name, and a name-based scan is STRUCTURALLY BLIND to it.
+  The qualifiers are NOT listed here, deliberately — they live with the scan list in the private folder.
+  **The same rule covers clause content:** say what a lost span *did* (*"an operative condition"*), never
+  what it said. What stays, being evidence and not sensitive, is the FILE's technical character — no
+  sub-lexicon, legacy `.doc`, non-Latin script, tables, bold-run and paragraph counts, batch position,
+  tracked-change load — never the deal; the doc-id → real-document mapping is in the private folder.
 - **THE LOCATION RULE, and it is a rule about place rather than a judgement about content.** Raw forensic
   logs, the test corpus, Wouter's review feedback and the frozen intermediates live **entirely outside the
   repo**, in the sibling folders named in §6.4. **Only the *derived* work is committed.** Nothing depends on
@@ -887,157 +568,109 @@ includes examples.**
   not a ceiling: read a script and ask what it discloses about *which candidates get waved through*, not
   only what strings it holds.
 
-> **AND ONE LEAK CLASS NO CONTROL CAN REACH — THE TRANSCRIPT.** Every control here reads **committed**
-> content, and §6.4 says session metadata is reachable by neither the scanners nor the location rule, so
-> **there is no after-the-fact remedy at all and it cannot be un-said.** *(It has happened —
-> `EVIDENCE-confidentiality.md` section 2, and the rule it broke had been read that same morning, which is
-> §5.1's argument: prose is not a control.)* **So the control runs BEFORE the command:**
-> `tools/hooks/evidence_guard.py`, a PreToolUse hook wired in `.claude/settings.json`, blocks a
-> name-emitting command — `ls`, `find`, `tree`, `cat`, `Get-ChildItem`, or inline code that enumerates a
-> directory — whose target is an evidence folder. **THE HAZARD IS OUTPUT, NOT ACCESS:** a script that reads
-> those logs and prints counts still runs, and `tools/evidence_ls.py` is the sanctioned way to see a
-> folder's **shape**, printing no name ever — because **a block with no alternative gets worked around.**
+> **One leak class no control can reach — THE TRANSCRIPT.** Every control here reads committed content, and
+> session metadata reaches neither the scanners nor the location rule, so there is no after-the-fact remedy
+> *(it has happened — `EVIDENCE-confidentiality.md` section 2)*. **So the control runs BEFORE the command:**
+> `tools/hooks/evidence_guard.py`, a PreToolUse hook, blocks a name-emitting command (`ls`, `find`, `cat`,
+> `Get-ChildItem`, inline enumeration) aimed at an evidence folder. **The hazard is OUTPUT, not access:**
+> `tools/evidence_ls.py` is the sanctioned way to see a folder's shape, printing no name — a block with no
+> alternative gets worked around.
 >
-> **AND A SECOND ROUTE INTO IT, WITH NO HOOK AND NO REMEDY: A RENDERED PAGE OF A CORPUS DOCUMENT IS CLIENT
-> TEXT AS AN IMAGE, SO CLAUDE MAY NEVER LOOK AT ONE.** Real corpus is compared **MECHANICALLY**, every image
-> deleted; synthetic fixtures may be viewed; **a page-by-page read of a real document is Wouter's alone.**
-> *(Relocated here 2026-09-10 from `tools/render_diff.py`'s docstring — its ONLY tracked home, and a
-> docstring loads only if somebody opens that one file. The tool keeps a pointer.)*
+> **A rendered page of a corpus document is client text as an image, so Claude may never look at one.** Real
+> corpus is compared MECHANICALLY, every image deleted; synthetic fixtures may be viewed; a page-by-page read
+> of a real document is Wouter's alone *(the tool `render_diff.py` keeps a pointer)*.
 >
-> **Two limits, stated rather than implied. Hooks load at SESSION START**, so this one never protects the
-> session that adds it — probe it with a command naming a non-existent directory under an evidence folder,
-> which is BLOCKED if it is live. And the **test-document folder is not named in the guard**, because its
-> name is not committable; it is read from **gitignored `.claude/evidence-dirs.local`**, so **in a fresh
-> clone that folder is unguarded until someone creates that file.**
+> **Two limits:** hooks load at SESSION START, so this one never protects the session that adds it (probe it
+> with a command naming a non-existent directory under an evidence folder); and the test-document folder is
+> read from gitignored `.claude/evidence-dirs.local`, so in a fresh clone it is unguarded until that file
+> exists.
 
-**Three controls, they catch different things, and all three run on every committable file before any
-commit. EACH MUST REPORT WHAT IT READ** — a clean report from a control that could not reach the file is
-not a pass, and both list-readers were measured blind to `.claude/` on 2026-08-24.
+**Three controls, all run on every committable file before any commit, and EACH MUST REPORT WHAT IT READ** —
+a clean report from a control that could not reach the file is not a pass (both list-readers were once blind
+to `.claude/`):
 
-1. **`tools/leakage_scan.py`** — the name-and-term scan. **93 patterns, and it exits 2 when the list is
-   unreadable, so the pattern count in its output is the proof it ran.** **Not sufficient on its own:** it
-   reports 0 hits, correctly, on commercial terms and on subject-matter qualifiers, because neither is a
-   name. **Genericise commercial terms in committable prose** — *"the seven-figure guaranteed amount"* —
-   which preserves every analytical point without the value.
-2. **`tools/descriptor_shape_sweep.py`** — the shape-based sweep, **list-free**, so it can find a qualifier
-   nobody put on a list. Everything it prints is a candidate for judgement, not a hit.
-3. **`tools/publication_check.py`** — asserts the specific forbidden classes and **fails rather than
-   listing.** It has suppressed a real finding once, so **every pattern needs a test vector beside it.**
+1. **`tools/leakage_scan.py`** — the name-and-term scan, 93 patterns, exits 2 when the list is unreadable
+   (so the pattern count is the proof it ran). Not sufficient alone: it is silent on commercial terms and
+   subject-matter qualifiers. **Genericise commercial terms** (*"the seven-figure guaranteed amount"*).
+2. **`tools/descriptor_shape_sweep.py`** — the list-free shape sweep, so it can find a qualifier nobody
+   listed; everything it prints is a candidate for judgement.
+3. **`tools/publication_check.py`** — asserts the forbidden classes and fails rather than listing; it once
+   suppressed a real finding, so **every pattern needs a test vector beside it.**
 
-**Two list-maintenance rules, both learned the hard way.** Use `\s+` for every space in a multi-word
-pattern, never a literal space — one written with a single space silently failed against a doubled space,
-and **a missed name is invisible: the scan simply reports clean.** And **every pattern must be tested
-against the string it was written for, in the same commit** — `'\bName\b'` non-raw is BACKSPACE+Name+BACKSPACE.
-
-**Which files may never be committed — measured, not assumed. THE RULE THAT DECIDES IT is not *"is this a
-script?"* but *"does this file hold one real string per pattern?"*** — which is why a scanner is publishable
-and the list it reads never is. **The four files are listed in §6.4**, which is route 1; the 90-script
-census behind the rule is `EVIDENCE-confidentiality.md` section 4.
-
-**ONE ITEM IS STILL OPEN:** the scan list needs tightening before it is trusted as a pre-commit gate — its
-false-positive rate is high enough that a reviewer starts skimming, and **a control nobody believes is not
-a control.** Mitigated, not closed: `EVIDENCE-confidentiality.md` section 5.2.
-
-**`.gitignore` prevents accident; it is not a security control.** It removes nothing already committed and
-does not stop a deliberate `git add -f`. **Making a repo public exposes the entire history, not the current
-state**; the only correct response to a committed secret is to **rotate** it, and **for a leaked client name
-there is no rotation** — which is why the location rules matter more than any cleanup capability.
+**Two list-maintenance rules:** use `\s+` for every space in a multi-word pattern, never a literal space (a
+single space silently failed against a doubled one, and a missed name reports clean); and every pattern is
+tested against the string it was written for, in the same commit (`'\bName\b'` non-raw is
+BACKSPACE+Name+BACKSPACE). **Which files may never be committed is decided not by *"is it a script?"* but
+*"does it hold one real string per pattern?"*** — the four are in §6.4 (route 1); the 90-script census is
+`EVIDENCE-confidentiality.md` section 4. **One item is still open:** the scan list needs tightening before it
+is a trusted pre-commit gate *(EVIDENCE-confidentiality.md 5.2)*. **`.gitignore` prevents accident, not
+exposure** — making a repo public exposes the entire history, and a leaked client name cannot be rotated,
+which is why the location rules outweigh any cleanup.
 
 ### 5.7 The artefact — domain rules and deliverable conventions
 
 #### Gate philosophy and error handling — do not weaken this
 
-- **A gate firing is the script doing its job.** Gates print `SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A
-  SCRIPT ERROR`. **Never work around a gate** by patching the script, passing an override flag "just this
-  once", wrapping the script in Python, or skipping the validator. **Fix the input and re-run.**
-- **Never let the translator alter a source-faithful translation to satisfy a linter.** If a QC finding
-  conflicts with fidelity, **fidelity wins and the linter gets fixed.**
-- **A gate CAN be wrong in scope, and nothing in the skill currently says so** — its language actively
-  discourages the conclusion, and the operators improvised as a result. **The remedy is to fix the gate,
-  never to bypass it, and never to alter a faithful translation to satisfy it.** Surfacing that rule where
-  the operator meets the gate is **the cheapest fix in the project** and it makes every scoping defect
-  recoverable instead of expensive.
-- **Heuristic checks have false positives and false negatives** — validate a heuristic against ground truth
-  before trusting it. **A language-dependent check does not degrade to nothing; it degrades to a confident
-  wrong answer**, which is worse. Every one must announce that it is guessing and refuse to print CLEAN for
-  a language it does not support.
-- **Script-integrity failure means a corrupted install.** Stop and reinstall; never work around it.
+- **A gate firing is the script doing its job.** Never work around a gate — by patching the script, an
+  override flag, wrapping it in Python, or skipping the validator. **Fix the input and re-run.**
+- **Never alter a source-faithful translation to satisfy a linter:** if a QC finding conflicts with
+  fidelity, **fidelity wins and the linter gets fixed.**
+- **A gate CAN be wrong in scope**, and the skill's language discourages that conclusion, so operators
+  improvise — **the remedy is to fix the gate where the operator meets it, never to bypass it.** The cheapest
+  fix in the project, and it makes every scoping defect recoverable.
+- **Heuristic checks have false positives and negatives** — validate against ground truth; a
+  language-dependent check degrades not to nothing but to a confident wrong answer, so it must announce it is
+  guessing and refuse to print CLEAN for a language it does not support.
+- **Script-integrity failure means a corrupted install** — stop and reinstall, never work around it.
 
 #### OOXML hard rules — all confirmed in production
-**ALL TEN OOXML RULES MOVED TO `.claude/rules/ooxml.md` ON 2026-08-24**, scoped to `uk/**`, `us/**`,
-`tools/**/*.py` and `tests/**/*.py`. **Route 4 and not route 1 because forgetting one produces a file Word
-rejects, which is reversible.** The loading mechanism and its limits are the house file's *(§6.5 lists what
-this project has)* — **re-open that file deliberately if you need the rules twice.**
+**The ten OOXML rules are in `.claude/rules/ooxml.md`** *(route 4 not route 1: forgetting one produces a file
+Word rejects, which is reversible)*; §6.5 lists this project's scoped rules.
 
 #### Skill-authoring conventions
-**FIVE OF THE SEVEN MOVED TO `.claude/rules/skill-authoring.md` ON 2026-08-24**, scoped to `uk/**` and
-`us/**` — the anti-drift, step-numbering, run-report, sub-agent and shared-capability rules. Each keeps
-an unconditional twin here *(§2.4 item 5 · §6.3 · §2.5 and §3.2)*, so that file is the DETAIL.
-
-**THESE TWO DID NOT MOVE AND MUST NOT: forgetting either publishes client names into a distributed
-archive, and a commit cannot be un-published.** That is route 1, and a path-scoped rule is absent until a
-matching file is read.
-
-- **No changelog inside the archive, ever.** The packaged `.skill` contains zero changelog entries, and
-  there is no `CHANGELOG.md` going forward. **The rev16→rev44 history is not committed either** — it stays
-  in the archived revisions, outside the repository *(§5.6(c))*.
-- **No confidential data and no real-document examples** — §5.6.
+**Five of the seven are in `.claude/rules/skill-authoring.md`**, each with an unconditional twin here
+*(§2.4, §6.3, §2.5, §3.2)*. **The two that did NOT move and must not** — route 1, forgetting either publishes
+client names into a distributed archive: **no changelog inside the archive, ever** (the packaged `.skill` has
+zero changelog entries, and the rev16→rev44 history stays outside the repository, §5.6(c)); and **no
+confidential data and no real-document examples** (§5.6).
 
 ### 5.8 Working with this charter, and the session
 
 #### Adding to this file
-**REWRITTEN 2026-08-24 because a rule about what goes in a file has to describe THAT file. CUT AGAIN
-2026-08-25, phase 12, because its own opening claim was not true:** it declared the general mechanism *not
-restated*, and then five of its eight items restated it. **NOW GENUINELY NOT RESTATED, because
-`…\Coding\.claude\CLAUDE.md` AUTO-LOADS HERE AND CARRIES ALL OF IT** — the six relocation routes, the size
-classes, the one-line-pointer rule, what `§` means, **2 → 1 and never 2 → 0**, never delete a heading, never
-summarise a companion document, decide-where-before-writing, and count-by-listing-never-by-adding. **Probed
-one grep per rule: 14 of this section's 20 rules have a twin there.** These six do not. *(Two rules had to be
-rescued from §7 during the 2026-08-24 reduction — which is what "replaced, not appended to" costs when it is
-forgotten.)*
+**The general mechanism — the relocation routes, the size classes, the one-line-pointer rule, what `§`
+means, 2→1 never 2→0, never delete a heading, never summarise a companion document,
+decide-where-before-writing, count-by-listing — is in `…\Coding\.claude\CLAUDE.md`, which auto-loads here,
+and is not restated** *(14 of this section's 20 rules twinned)*. **The six this project adds:**
 
-**1. THIS CHARTER'S CAP IS MEASURED, AND §1.7 IS THE ONLY PLACE IT STATES ITS OWN LENGTH.** Class **L,
-500** *(raised from the retired 350 by Wouter, 2026-09-09 (4))*, §7 at **35**; both live in
-`verify.config.json`. **`file length` FAILS on every run by design while
-§1.7's exemption stands** — not a regression, and **never silence it by setting the cap to 0**, which
-reports *exempt* and measures nothing. **A declaration is prose, so no ordinary checker can see it going
-stale:** `tools/verify_charter_continuity.py` compares that sentence against the measurement, and it caught
-it twice within an hour of being promoted. **Re-derive it on the commit that changes it.**
+**1. This charter's cap is measured, and §1.7 is the only place it states its own length.** Class L, 500,
+§7 at 35, both in `verify.config.json`. **`file length` FAILS by design while §1.7's exemption stands** —
+never silence it by setting the cap to 0. A declaration is prose, so `tools/verify_charter_continuity.py`
+compares it against the measurement; re-derive it on the commit that changes it.
 
-**2. TWO THINGS THE REDUCTION MEASURED ABOUT ROUTES 3 AND 4 THAT THE HOUSE FILE DOES NOT CARRY.** **A
-skill's body is not in context until it is invoked**, and **neither a skill nor a scoped rule can be
-exercised in the session that creates it** — so a route whose proof needs a session boundary splits the step
-in two. **Therefore nothing whose absence is irreversible goes behind either — §5.6 and §6.4 are route 1
-entire**, and `verify_charter_continuity.py` check 6b asserts it.
+**2. Two facts about routes 3 and 4 the house file does not carry:** a skill's body is not in context until
+invoked, and neither a skill nor a scoped rule can be exercised in the session that creates it — so nothing
+whose absence is irreversible goes behind either. **§5.6 and §6.4 are route 1 entire**, asserted by
+`verify_charter_continuity.py` check 6b.
 
-**3. PREFER A RELATIONSHIP TO A NUMBER.** *"§7 is under its cap"* cannot go stale; *"§7 is 18 lines"* can.
-Every stale count in this project came from adding a delta to the figure already written down.
-**AND WHERE A NUMBER MUST BE WRITTEN, STATE ITS UNIT — a count whose unit is implicit is a count the next
-session re-derives differently.** *(Bought expensively: one figure was right under exactly ONE of six
-natural readings, and an audit that assumed the wrong one measured four against a stated ten and reported a
-failure. Relocated here 2026-09-09 from a dated STATE block above §1; the figure itself went, `precommit_gate`
-printing it live now, and the lesson stayed.)*
+**3. Prefer a relationship to a number:** *"§7 is under its cap"* cannot go stale, *"§7 is 18 lines"* can;
+every stale count here came from adding a delta to the figure written down. **Where a number must be
+written, state its unit** — an implicit unit is re-derived differently next session.
 
-**4. WHAT THE `§` RULE HAS ALREADY COST HERE:** **nineteen were found, eleven genuinely misdirected, one
-pointing at the wrong section of the right file** — because a sign aimed elsewhere **passes silently against
-the wrong section of this file**, so nothing fails. `tools/xdoc_signs.py` holds the judgement on the
-survivors and **fails on a new one.** *(Nine more were found in `EVIDENCE-measurement.md` on 2026-08-25 and
-rewritten in words.)*
+**4. What the `§` rule has cost here:** nineteen found, eleven genuinely misdirected, because a sign aimed
+elsewhere passes silently against the wrong section of this file. `tools/xdoc_signs.py` judges the survivors
+and fails on a new one.
 
-**5. WHERE THIS CHARTER AND A COMPANION DOCUMENT COULD DISAGREE, THIS ONE WINS** — the house rule says write
-down which wins, and this is that answer. The disagreement is a defect to fix, never a judgement call. §1.3
-says what each document owns.
+**5. Where this charter and a companion document could disagree, this one wins** — the disagreement is a
+defect to fix, never a judgement call; §1.3 says what each document owns.
 
-**6. AFTER ANY SUBSTANTIAL EDIT, RUN:** `verify_md.py` · `verify_charter_continuity.py` · `xdoc_signs.py` ·
-`md_tables.py` · and **all three confidentiality controls** *(§5.6)*. **Invoke the `audit-gate` skill for
-the method; do not improvise it.**
+**6. After any substantial edit, run** `verify_md.py`, `verify_charter_continuity.py`, `xdoc_signs.py`,
+`md_tables.py` and **all three confidentiality controls** (§5.6); invoke the `audit-gate` skill for the method.
 
 #### Inherited house rules
 
-**THE FOUR CRITICAL RULES LIVE IN `…\Coding\.claude\CLAUDE.md`, WHICH AUTO-LOADS INTO EVERY SESSION HERE,
-AND ARE NOT RESTATED** *(phase 12, 2026-08-25)*. **Probed one grep per rule: all four have a twin there.**
-**THE ONE RIDER WITH NO TWIN, so it stays:** the archived `.skill` revisions and the test corpus are
-**irreplaceable** — which is the half *"never delete files you didn't create"* does not say.
+**The four critical rules are in `…\Coding\.claude\CLAUDE.md`, which auto-loads here, and are not restated**
+*(all four twinned)*. **The one rider with no twin:** the archived `.skill` revisions and the test corpus
+are irreplaceable, the half *"never delete files you didn't create"* does not say.
 
 ## 6. File, folder & repo structure
 
@@ -1048,111 +681,53 @@ loaded at the right step. **Do NOT reduce the file count for its own sake.** The
 sub-lexicons rather than a few large ones, eight step documents rather than one monolith — is deliberate and
 **A3 confirmed it is correct in principle.**
 
-**Eleven structural questions were open until A3 answered them. They are settled; do not re-open them.**
-The measurement behind each is in section 5 of `EVIDENCE-a3-structure.md`.
-
-| # | the question | the settled answer |
-|---|---|---|
-| 1 | `SKILL.md` is 57 KB and always loads | **Re-motivate, do not cut for context.** The live reasons to shrink it are **findability and truncation, not tokens** |
-| 2 | `04-translate.md` is the second-largest thing loaded at the worst moment | **Change — as a consequence of the formatting fix, not as a size exercise.** Its longest rule is 8,028 bytes and exists *only* because extraction cannot compute effective formatting; it collapses at branch 17 |
-| 3 | the step-number gaps in filenames | **Keep** — intentional, not a defect. But packaging eleven steps into eight files *is* a live defect |
-| 4 | 176 of 198 files diverge over ~3,600 lines | **Change.** Both figures reproduce exactly: **3,593** changed lines whole-tree, **420** in the scripts folder. The line count is the *easy* part of the price |
-| 5 | one domain reference has no matching sub-lexicon | **Keep** — the only such asymmetry in either direction, documented and deliberate |
-| 6 | the scripts carry integrity sentinels — is the constraint live? | **Keep and extend.** 20 of 20 scripts protected and truncation-tested; **178 of 198 files unprotected**; three files per tree past the only observed cut. **And the detection is defeated at the point of USE as well** — one exit code is downgraded to a warning, another guard runs after the work it protects |
-| 7 | the two packages are not at the same revision | **Change, and wider than recorded** — the UK tree is behind in *executable logic*, not just spelling data |
-| 8 | the UK sub-lexicons have lost dual-variant annotations | **Change.** The shortfall is **158** across sub-lexicons and **165** whole-tree — **and the reference layer has eroded too**, which the original observation denied |
-| 9 | the 420 changed script lines are almost entirely comments | **Falsified in part** — true of 7 of 15 scripts; **3 differ in executable content** |
-| 10 | **Wouter's hypothesis** — almost none of the UK/US divergence is load-bearing | **Confirmed for `SKILL.md`** (31 of its 49 changed line-pairs *are* the variant-selection logic); **refuted everywhere else.** Converging is right, but it is an **editorial adjudication, not a merge**, because the two general-legal references carry *different advice* |
-| 11 | host detection enumerates products, not capabilities | **Change** — a documentation-only fix. Keep the user-facing warning text unchanged |
+**Eleven structural questions were open until A3 settled them; do not re-open them.** The questions, their
+settled answers (keep/change) and the measurement behind each are `EVIDENCE-a3-structure.md` sections 0 and
+5 — section 0 is *the eleven conclusions*, section 5 the keep/change/Step-B decision per observation.
 
 ### 6.2 The skill tree today
 
-**Latest published version: `v2026.04.22-rev44`** (13 May 2026). 198 files, 20 scripts, per variant.
-
-**The per-file byte table was CUT 2026-08-24, and it was ALREADY WRONG — measured, six of its eight US rows
-disagreed with the trees on the day it went.** `EVIDENCE-a3-structure.md` holds these **per directory for
-both trees, and per file for UK only**; the US per-file figures are **measured, not recorded anywhere** —
-`wc -c us/skill-docs/*` and read them. *(Stated precisely because the first version of this pointer claimed
-A3 held them per file, and an audit of the cut caught it.)* The line above stays because that revision token
-is **nowhere else in the repository and nowhere in either tree.** The byte-**55,466** truncation finding this
-section carried is register row **W1**; its rule is §6.1's question 6.
+**Latest published version: `v2026.04.22-rev44`** (13 May 2026), 198 files, 20 scripts per variant — the
+revision token is kept here because it is nowhere else in the repository or either tree. The per-file byte
+table was CUT 2026-08-24 (derivable, and it had drifted); `EVIDENCE-a3-structure.md` holds byte figures per
+directory, and the 55,466-byte truncation finding is register row W1.
 
 ### 6.3 What the build changes — the envisaged tree
 
-**The branch-by-branch table was CUT 2026-08-24** — derived from sections 2 and 3 of `PLAN-2-step-b.md`, so it went
-stale on every branch. Its two measured figures are §6.1's questions 2 and 8. **The conclusion stays, because
-it is a standing constraint on anyone tempted to reorganise:**
-
-- **The tree keeps its shape. No new directory, no reorganisation, NO RENUMBERING of the eleven steps** — a
-  renumber invalidates every step id in the forensic logs, the only behavioural evidence base.
-- **THE TREE MAY HOLD 199 FILES, IS AT 198, AND THE ONE REMAINING SLOT IS SPOKEN FOR** *(Wouter,
-  2026-09-10)*: **a Cowork skill over 200 files will not install**, lawve.ai adds a README to each published
-  root, and **D3's manifest is the committed `+1`** §3.2's step-4 block makes a precondition. **Another
-  branch wanting a file must free one, and §6.1 forbids the easy trims** — branch 8 was re-scoped on it.
-- **The context design is preserved intact** — A3 measured it correct, and its constraint was never binding.
+**Standing constraints on anyone tempted to reorganise:** the tree keeps its shape — no new directory, no
+reorganisation, **NO RENUMBERING of the eleven steps** (a renumber invalidates every step id in the forensic
+logs). **The tree may hold 199 files, is at 198, and the one remaining slot is spoken for** *(Wouter,
+2026-09-10)* — a Cowork skill over 200 files will not install, lawve.ai adds a README per root, and D3's
+manifest is the committed +1, so another branch wanting a file must free one (§6.1 forbids the easy trims).
+The context design is preserved intact — A3 measured it correct.
 
 ### 6.4 The repository — what it holds, what never enters it, and what ships from it
 
 #### The repository — CREATED 2026-08-06, PUBLIC SINCE 2026-08-07
 
-**One monorepo holding both full trees side by side. No build step. Plus an automated parity check.**
-Chosen over two independent repos and over a shared-core + generated-variant build.
-**`github.com/wjvandenberg/legal-translation-skill`** — distinct from the two public distribution repos.
+**One monorepo holding both full trees side by side, no build step, plus an automated parity check.**
+**`github.com/wjvandenberg/legal-translation-skill`**, distinct from the two public distribution repos.
+Making a repo public exposes **the whole history, not the current state** — nothing committed can be
+un-published *(§5.6; the flip measurement is in `DECISIONS-LOG.md`, 2026-08-07)*.
 
-> **THE FLIP WAS MEASURED, NOT ASSUMED, and the measurement now lives in `DECISIONS-LOG.md` under
-> 2026-08-07** — moved there on 2026-08-24, where it had no entry before. **The standing fact a session needs
-> is this:** making a repository public exposes **the whole history, not the current state**, so anything
-> committed here is published the moment the repository is, and there is no un-publishing. §5.6.
+> **FOUR SCRIPTS MAY NEVER BE COMMITTED, and this stays because forgetting it is irreversible.**
+> `confidentiality_sweep.py`, `corpus_descriptor_scan.py` and `confidentiality_review.py` live outside the
+> repo and the gate calls them by path; **`temp/audit_session_stepb.py` holds two corpus descriptors and
+> stays in gitignored `temp/` permanently.** The rule that decides all four is §5.6's — *does this file hold
+> one real string per pattern?* — **the scanner ships, the list never does.** *(No `docs/history/` either,
+> §5.6(c).)*
 
-**THE DIRECTORY DIAGRAM WAS CUT ON 2026-08-24 — a layout is derivable by listing the folder, and this
-one had drifted FOUR measured ways:** it said the repository had *"no `.git` in it"* · it showed a
-`README.md` and a `LICENSE` inside **each tree, neither of which exists** · it said `tools/` held **29**
-scripts and `tests/` **nine** `test_*.py`, **against a real 36 and 14 AS MEASURED THAT DAY**. *(Its own
-footnote recorded the same counts going stale once before, corrected then by listing rather than by
-adding to the figure already there — which is the house rule that now governs every count in this file.
-**Both of those "real" figures have since moved** — `precommit_gate` reported 41 tools on 2026-09-02, and
-that day's branch added a fifteenth test — which is the argument for the dating rather than a defect in
-it: the numbers are EVIDENCE OF THE DRIFT ON A DATE, not a live inventory, and `precommit_gate` prints
-the live one on every run. §5.8 rule 3 — prefer a relationship to a number.)*
+**The load-bearing property: `uk/` IS the publishable tree** — what you see in the repo is what ships, and
+**`tools/` and `tests/` are siblings of the variant trees, never inside them**, so nothing development-only
+can leak into a shipped skill. **`.gitignore` is BY PATH, never by extension** *(§2.5)* — a blanket `*.docx`
+would block the synthetic fixtures while doing nothing about a renamed client document.
 
-> **FOUR SCRIPTS MAY NEVER BE COMMITTED, and this stays because forgetting it is irreversible.** Counted
-> by listing them, not by adding one to a figure: `confidentiality_sweep.py`, `corpus_descriptor_scan.py`,
-> `confidentiality_review.py` — these three live outside the repository and the gate calls them **by
-> path** — and **`temp/audit_session_stepb.py`, which holds two corpus subject-matter descriptors and
-> stays in gitignored `temp/` permanently.** *(Added here 2026-08-24. §5.3 was its ONLY home, so moving
-> that subsection to the `audit-gate` skill would have taken an irreversible rule behind an invocation —
-> 2 → 0. The skill repeats it; this line is the copy that always loads.)* The rule that decides all four is
-> §5.6's — *does this file hold one real string per pattern?* — and `leakage_scan.py` is the pattern to
-> copy: **the scanner ships, the list never does.** *(There is no `docs/history/` either, decided
-> 2026-08-06 — §5.6(c).)*
-
-**THE LOAD-BEARING PROPERTY: `uk/` *IS* the publishable tree.** No assembly, no generator, **what you see in
-the repo is what ships** — and **`tools/` and `tests/` are siblings of the variant trees, never inside them**,
-so nothing development-only can leak into a shipped skill.
-
-**What the layout preserves, all deliberately, and none of it is tidy-up-able:** the **154 separate
-sub-lexicon files** *(the context design is the point)* · **both the US and the UK term in every lexicon row**
-*(a quality requirement, not a formatting preference)* · and the two public distribution repos keeping their
-URLs, descriptions and install instructions.
-
-**What it adds:** **one pull request touches both trees**, so a fix cannot land in one variant and be
-forgotten in the other — which happened once and shipped to a client. Plus the parity check.
-
-**What it costs, knowingly: the content is still edited twice.** This makes forgetting hard; it does not
-remove the duplication. **Removing it — one source with generated variants — is DEFERRED WITH A TRIGGER, not
-dropped:** revisit once the reconciliation's row-by-row adjudication is done and **the 618-pair residue is
-classified**, because that classification is the deciding number and the reconciliation produces it.
-
-**`.gitignore` is BY PATH, never by extension** *(§2.5, 2026-07-29)*. A blanket `*.docx` would block the
-synthetic fixtures while doing nothing about a real client document that had been renamed.
-
-**THE ANALYSIS DOCUMENTS DID CROWD THE ROOT AND THEY MOVED, 2026-09-10 — into `evidence/`, NOT the `docs/` this
-line predicted**, because a document's **KIND** now decides its **FOLDER** and the root keeps only what a session
-opens at its START: the charter, `README.md`, `DECISIONS-LOG.md` and the two LIVE plan files. **The method this
-line demanded was right and was followed** — ONE commit, `git mv` so `--follow` still reaches every revision, and
-every citation swept and asserted to fire exactly once. *(This charter carries more internal references than any
-other document here — `verify_md.py` counts them on every run, so the number is never typed. It read 136 until
-2026-09-01 and the checker then re-derived 135: stale when last quoted. §5.8 rule 3 — prefer a relationship.)*
+**What the layout preserves, none of it tidy-up-able:** the 154 separate sub-lexicon files, both the US and
+UK term in every lexicon row, and the two distribution repos' URLs. **What it adds:** one PR touches both
+trees, so a fix cannot land in one variant and be forgotten — which happened once and shipped. **What it
+costs:** the content is edited twice; removing the duplication (one source, generated variants) is DEFERRED
+until the reconciliation classifies the 618-pair residue. The analysis documents moved to `evidence/` on
+2026-09-10 — a document's KIND decides its folder, and the root keeps only what a session opens at its start.
 
 #### What never enters the repository
 
@@ -1189,19 +764,18 @@ the one irreversible act here — never publish without Wouter's explicit OK.)*
 
 ### 6.5 `.claude/rules/` — the path-scoped rules this project has
 
-**TWO, and until 2026-09-09 this project used route 4 twice and recorded it NOWHERE** — which is precisely
-the *"which scoped rules does this project actually have"* question this subsection exists to answer. **The
-mechanism, and the two ways a scoped rule saves nothing, are in the auto-loading house file and are not
-restated.** Discovered by listing `.claude/rules/`, never from a count.
+**THREE.** The mechanism, and the two ways a scoped rule saves nothing, are in the auto-loading house file
+and not restated. Discovered by listing `.claude/rules/`, never from a count.
 
 | file | its `paths:` | what it holds | its charter twin |
 |---|---|---|---|
-| **`ooxml.md`** | `uk/**` · `us/**` · `tools/**/*.py` · `tests/**/*.py` | the ten OOXML hard rules, every one a production incident | §5.7 |
-| **`skill-authoring.md`** | `uk/**` · `us/**` | **FIVE** of the seven skill-authoring conventions | §5.7 |
+| **`ooxml.md`** | `uk/**` · `us/**` · `tools/**/*.py` · `tests/**/*.py` | the ten OOXML hard rules, each a production incident | §5.7 |
+| **`skill-authoring.md`** | `uk/**` · `us/**` | five of the seven skill-authoring conventions | §5.7 |
+| **`instruments.md`** | `tools/**/*.py` · `tests/**/*.py` | the seven measurement rules, forensic logging, the corpus-blind-spot reasons | §5.5 |
 
-**THE TWO CONVENTIONS THAT DID NOT COME ARE THE WHOLE TEST:** *no changelog inside the archive* and *no
-confidential data or real-document examples* are **irreversible if forgotten** — each publishes client
-names into a distributed archive — so they are **route 1** and stay in the charter unconditionally.
+**The two conventions that did NOT move are the whole test:** *no changelog inside the archive* and *no
+confidential data or real-document examples* are irreversible if forgotten, so they are **route 1** and stay
+in the charter unconditionally.
 
 ---
 

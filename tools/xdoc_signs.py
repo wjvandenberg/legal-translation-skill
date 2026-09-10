@@ -59,15 +59,16 @@ DECLARED_BENIGN = [
      "this check caught on the commit that wrote it -- it is now 'that document's section 4' "
      "in words, and it is the exact silent misdirection the rule exists to prevent: §4 of "
      "THIS file is the tech stack, so the sign would have resolved, against the wrong section"),
-    ("rests on **D03 alone**",
-     "§5.5 is this charter's test corpus; A3 is cited on the same line as 'section 11' in words"),
+    ("D03 alone",
+     "§5.5 is this charter's test corpus; section 11 of A3 is cited in words on the same line"),
     ("all eleven structural questions settled",
      "§6.1 is this charter's own answer table -- and this is the cell that said §6.2 until "
      "step 8 read it"),
     ("turned out to be classes rather than defects",
      "§2.4 is this charter's evidence section"),
-    ("**Step 1** is the git history",
-     "§6.4 is this charter's repository section"),
+    ("produced register cluster X",
+     "§2.4 is this charter's evidence section; PLAN-2-step-b.md is named on the same line as "
+     "Step B, and §6.4 sits on the next line without a filename"),
     ("This file rewritten to seven sections",
      "§5.6 is this charter's confidentiality section"),
     # REMOVED 2026-08-25 BY PHASE 12, and the tool is what noticed. The declared line lived in
@@ -92,13 +93,25 @@ DECLARED_BENIGN = [
     # had -- and its table names each rule file beside the charter subsection it was relocated
     # FROM. That is a filename and a sign on one line, which is exactly the candidate shape, and
     # it went from 0 undeclared to 2 on the commit that added the table.
-    ("the ten OOXML hard rules, every one a production incident",
+    ("the ten OOXML hard rules, each a production incident",
      "§5.7 is THIS charter's artefact subsection, which carries the pointer stub the rule file "
      "was relocated OUT of — the sign names the source, not a section of `ooxml.md`, which has "
      "ZERO numbered headings (measured, not assumed)"),
     ("of the seven skill-authoring conventions",
      "§5.7 is the same charter subsection, for the same reason: `skill-authoring.md` carries "
      "FIVE of its rules and likewise has ZERO numbered headings"),
+    # ADDED 2026-09-10 BY THE CHARTER REDUCTION, and the tool is what noticed. Each is a
+    # relocation pointer written this session: a rule file or companion document named beside a
+    # sign that means THIS charter's own subsection, the source the block was relocated from.
+    ("the seven measurement rules, forensic logging",
+     "§5.5 is this charter's instruments subsection; `instruments.md` carries the rules "
+     "relocated out of it — the twin column names the source, not a section of `instruments.md`"),
+    ("the general lesson is §5.1's",
+     "§5.1 is this charter's cycle-and-method section; `instruments.md` is named as the "
+     "destination the corpus-blind-spot reasons moved to, not a section that owns §5.1"),
+    ("the flip measurement is in",
+     "§5.6 is this charter's confidentiality section; `DECISIONS-LOG.md` holds the public-flip "
+     "measurement by date, not a section 5.6 of its own"),
 ]
 
 
