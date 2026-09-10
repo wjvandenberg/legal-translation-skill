@@ -1238,4 +1238,4 @@ names into a distributed archive — so they are **route 1** and stay in the cha
 
 **What a new session would get wrong.** It would point `verify_confidential` at `leakage-names.txt` — that is the *leakage* list at 93 patterns; the right one is `VERIFY_FORBIDDEN_LIST=$USERPROFILE\.claude\house-forbidden.txt`, 8 phrases, and **the fingerprint is how you tell which ran**. It would read the whole-tree leakage scan's **86 hits across 28 files as new** — they are pre-existing lexicon noise over 520 files, none in any file this branch touched; the changed-file scan is the one that answers. It would trust the inherited claim that `stepb_audit` has one red. And it would **glob across the logs folder**: `evidence_guard` blocked exactly that, this session.
 
-**Context: not measured at the time of writing — asked at the close.**
+**Context: 63% — read by Wouter at the close, never estimated. The twenty-sixth recorded reading and the HIGHEST yet: it breaks the 26–54 band the house file's thirteen readings held, so that band is now a description of the past rather than a range. Recorded, never obeyed** — this session ended because its planned work ran out.
