@@ -464,7 +464,7 @@ def audit_b1():
     # goes red while whoever moved it is still here rather than after the merge. IT HAS NOW
     # DONE EXACTLY THAT ON THREE CONSECUTIVE SLICES, which is the fourth time that design has
     # paid. Re-derived 24 against a claimed 23, on this branch, with the fixture staged.
-    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 24)
+    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 25)
 
     hits = 0
     for nm in fx:

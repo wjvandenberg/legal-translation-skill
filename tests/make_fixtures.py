@@ -1661,6 +1661,76 @@ def _en_runs_offsets(path):
     _write_notes(path, notes)
 
 
+# ---------------------------------------------------------------------------
+# Branch 8 — extraction completeness. C28, C12 and M1.
+#
+# WHY THIS FIXTURE EXISTS AT ALL, when the corpus has eleven real documents. The check it
+# feeds compares the ORIGINAL document against what Step 2 captured, and the corpus proves
+# the BODY arm is already complete — measured over every reachable frozen intermediate,
+# zero paragraphs uncaptured. A suite of only-passing cases produces tests that pass
+# because nothing is being tested, so the failing inputs have to be built.
+#
+# AND ONE SHAPE THE CORPUS CANNOT REACH AT ALL, which is what makes this a fixture rather
+# than a corpus arm: NOT ONE FIXTURE IN THIS DIRECTORY CONTAINED A `<w:br/>` before this
+# one, and neither does anything else that is tested. extract_paragraphs.py walks a
+# paragraph in document order emitting `\n` at every PLAIN break and nothing at a PAGE
+# break — a contract stated in a comment and asserted by nothing. The first version of the
+# completeness check collected `w:t` and nothing else, and reported four paragraphs lost on
+# real documents that were not lost: it had reproduced its own reader as a finding. This
+# fixture is what stops that returning, and the page-break paragraph is its negative
+# control — a rule that emits a newline everywhere would pass the first case and fail this.
+# ---------------------------------------------------------------------------
+@fixture("extraction-completeness.docx",
+         "the shapes the extraction-completeness check must agree with extract_paragraphs "
+         "about: a PLAIN w:br (which emits a newline), a PAGE break (which must not), a run "
+         "holding two w:t children round a tab, a table-nested paragraph and an sdt — plus "
+         "a footnote and a header, which are aux text no body capture can account for")
+def _extraction_completeness(path):
+    # A run whose children are [t, tab, t]. Register C28 names this class from the skill's
+    # own documentation: reading only the first w:t "affected 45 paragraphs and 1,547
+    # characters" in one tested document. Invented wording, per CLAUDE.md 5.6.
+    two_t = ('<w:r><w:t xml:space="preserve">Clause 4.2</w:t><w:tab/>'
+             '<w:t xml:space="preserve">Payment milestones and consents.</w:t></w:r>')
+    # THE READER CONTRACT AND ITS NEGATIVE CONTROL, adjacent on purpose so a reader that
+    # treats the two breaks alike fails one of them whichever way it is wrong.
+    plain_br = ('<w:r><w:t xml:space="preserve">First address line</w:t><w:br/>'
+                '<w:t xml:space="preserve">Second address line</w:t></w:r>')
+    page_br = ('<w:r><w:t xml:space="preserve">End of part one.</w:t>'
+               '<w:br w:type="page"/>'
+               '<w:t xml:space="preserve">Part two begins here.</w:t></w:r>')
+    table = ('<w:tbl><w:tr><w:tc>' + p(r("Signature block, first party.")) +
+             '</w:tc><w:tc>' + p(r("Signature block, second party.")) +
+             '</w:tc></w:tr></w:tbl>')
+    contained = p('<w:sdt><w:sdtPr><w:id w:val="801"/></w:sdtPr><w:sdtContent>'
+                  + r("A term held inside a content control.") +
+                  '</w:sdtContent></w:sdt>')
+    footnotes = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+                 f'<w:footnotes {W}><w:footnote w:id="1">'
+                 f'{p(r("Subject to the qualification in the recitals."))}'
+                 f'</w:footnote></w:footnotes>')
+    header = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+              f'<w:hdr {W}>{p(r("Draft for discussion purposes only"))}</w:hdr>')
+    rels = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/'
+            'relationships">'
+            '<Relationship Id="rId20" Type="http://schemas.openxmlformats.org/'
+            'officeDocument/2006/relationships/footnotes" Target="footnotes.xml"/>'
+            '<Relationship Id="rId21" Type="http://schemas.openxmlformats.org/'
+            'officeDocument/2006/relationships/header" Target="header1.xml"/>'
+            '</Relationships>')
+    ct = ('<Override PartName="/word/footnotes.xml" ContentType="application/vnd.'
+          'openxmlformats-officedocument.wordprocessingml.footnotes+xml"/>\n'
+          '<Override PartName="/word/header1.xml" ContentType="application/vnd.'
+          'openxmlformats-officedocument.wordprocessingml.header+xml"/>\n')
+    body = (p(r("The parties agree as set out below.")) +
+            p(two_t) + p(plain_br) + p(page_br) + table + contained +
+            p(r("This clause carries the footnote."),
+              '<w:r><w:footnoteReference w:id="1"/></w:r>'))
+    docx(path, body, {"word/footnotes.xml": footnotes,
+                      "word/header1.xml": header,
+                      "word/_rels/document.xml.rels": rels}, ct)
+
+
 @fixture("not-a-zip.docx",
          "a file with a .docx name that is not a ZIP — the delivered-document integrity "
          "test must FAIL on this, and today a failed integrity test exits 0")

@@ -39,16 +39,31 @@ USAGE
     python validate_apply.py <workdir>/paragraphs.json <workdir>/final/word/document.xml
     python validate_apply.py <workdir>/paragraphs.json <workdir>/final/word/document.xml --strict
 
+There is also an EXTRACTION COMPLETENESS mode, which runs at Step 2 and asks
+the opposite question: not "did the declared translation land" but "did the
+reading-apart step capture everything the ORIGINAL document has". It is the
+only check in the skill that reads the original, and it needs no
+document.xml because at Step 2 there is not one yet:
+
+    python validate_apply.py <workdir>/paragraphs.json \
+        --extraction-completeness <original>.docx
+    python validate_apply.py <workdir>/paragraphs.json \
+        --extraction-completeness <original>.docx --strict
+
 Exit codes:
     0 - no misses (always returned in advisory mode)
-    1 - misses detected (only in --strict mode)
+    1 - misses detected (only in --strict mode); in extraction-completeness
+        mode, body text uncaptured (always) or auxiliary text uncaptured
+        (only with --strict)
     2 - input/IO error
+    3 - extraction-completeness only: VOID, nothing was examined
 """
 import argparse
 import json
 import os
 import re
 import sys
+import zipfile
 from collections import defaultdict
 
 from lxml import etree
@@ -696,13 +711,331 @@ def report_and_fix_clusters(paragraphs_json_path, apply_zwsp=False):
 
     return report, changes
 
+# ==========================================================================
+# EXTRACTION COMPLETENESS — registers C28, C12 and M1.
+# ==========================================================================
+# WHAT IT ASSERTS, AND WHY NO OTHER CHECK IN THIS TREE CAN. Every
+# post-production check compares the run's output against paragraphs.json --
+# WHICH THE RUN ITSELF WROTE AT STEP 2. So if extraction never captured a
+# span, nothing downstream can know it existed: validate_apply's own token
+# comparison, quality_check --with-source, lexicon_compliance and both drift
+# gates would each faithfully confirm that the run applied whatever the JSON
+# said. This mode is the only comparison in the skill that reads the ORIGINAL
+# DOCUMENT and asks what is missing from the capture.
+#
+# WHY IT IS A MODE HERE RATHER THAN A SCRIPT OF ITS OWN. A Cowork skill that
+# holds more than 200 files will not install; the publisher adds a README to
+# each published skill's root; and this tree is already 198 files. Exactly one
+# slot remains and the packaging manifest is its declared claimant. This check
+# compares what was DECLARED against what the document HAS, which is this
+# script's existing job with a different pair of inputs.
+#
+# IT READS THE ORIGINAL INDEPENDENTLY BUT HONOURS THE SAME TEXT CONTRACT, and
+# that distinction is the design. Importing extract_paragraphs' reader would
+# share extract_paragraphs' blind spots, which is the defect being closed. But
+# APPROXIMATING its contract is worse than sharing it: the first version of
+# this comparison collected w:t elements and nothing else, and reported four
+# paragraphs lost on real documents that were not lost at all --
+# extract_paragraphs walks the paragraph in document order and emits a newline
+# at every PLAIN <w:br/> (a page break emits nothing, being structural), so a
+# paragraph holding a line break reads "A\nB" in the notes and "AB" to a
+# w:t-only reader. Same contract, different code, and a test asserts the two
+# agree on a fixture built for it.
+#
+# IT PRINTS PARAGRAPH INDICES AND LENGTHS, NEVER DOCUMENT TEXT. A completeness
+# report is exactly the artefact somebody pastes into an email, and this one
+# names positions rather than content so that doing so is safe.
+#
+# THE PARTS IT EXAMINES ARE DISCOVERED BY GLOBBING THE ARCHIVE, never listed.
+# A control whose file list is hardcoded quietly stops covering whatever the
+# list forgot -- and unreadable members are REPORTED, never skipped, because a
+# scan whose denominator can shrink in silence is not a scan.
+
+_COMPLETENESS_WS = re.compile(r'\s+')
+# A paragraph carrying no letter at all -- a bare page number, a rule of
+# dashes -- is not translatable content. Counting one as uncaptured is the
+# count-not-content trap that made an earlier conversion probe overstate its
+# loss by an order of magnitude.
+_COMPLETENESS_LETTER = re.compile(r'[^\W\d_]', re.UNICODE)
+# Below this fraction of a paragraph's characters, the longest capture that
+# sits inside it is a coincidental short word rather than evidence of capture.
+_COMPLETENESS_COVERED = 0.60
+
+
+def _completeness_norm(text):
+    """Collapse whitespace runs to one space and strip. Stated because it is
+    the only normalisation applied: the comparison is otherwise character
+    exact, and a token-set comparison here would inherit the very blindness
+    this mode exists to escape."""
+    return _COMPLETENESS_WS.sub(' ', text or '').strip()
+
+
+def _completeness_para_texts(root):
+    """extract_paragraphs.py's full_text contract, restated (see the block
+    above). Returns [(paragraph_index, text)] for paragraphs carrying text."""
+    out = []
+    for idx, p in enumerate(root.iter(f'{{{W}}}p')):
+        pieces = []
+        for child in p.iter():
+            if child.tag == f'{{{W}}}t' and child.text:
+                pieces.append(child.text)
+            elif child.tag == f'{{{W}}}br':
+                if child.get(f'{{{W}}}type', '') != 'page':
+                    pieces.append('\n')
+        text = ''.join(pieces).strip()
+        if text:
+            out.append((idx, text))
+    return out
+
+
+def _completeness_parts(zf):
+    """Every archive member that actually carries paragraph text, found by
+    globbing. Returns (parts, unreadable) where parts maps member name to the
+    list this reader produced."""
+    parts, unreadable = {}, []
+    for name in sorted(zf.namelist()):
+        if not name.startswith('word/') or not name.endswith('.xml'):
+            continue
+        try:
+            root = etree.fromstring(zf.read(name))
+        except Exception as exc:
+            unreadable.append((name, type(exc).__name__))
+            continue
+        found = _completeness_para_texts(root)
+        if found:
+            parts[name] = found
+    return parts, unreadable
+
+
+def _completeness_captures(directory):
+    """Every string value in every JSON beside the notes file, at any depth.
+
+    DISCOVERED BY GLOB AND NOT BY A LIST OF FILENAMES, because a capture under
+    a name nobody predicted is still a capture -- and a check that demanded
+    'footnotes.json' would report a loss wherever the operator chose another
+    name. Returns (normalised strings, files read, files that would not
+    parse)."""
+    strings, read, failed = [], [], []
+
+    def walk(obj):
+        if isinstance(obj, str):
+            strings.append(obj)
+        elif isinstance(obj, dict):
+            for value in obj.values():
+                walk(value)
+        elif isinstance(obj, list):
+            for value in obj:
+                walk(value)
+
+    try:
+        names = sorted(os.listdir(directory))
+    except OSError as exc:
+        return set(), [], [(directory, type(exc).__name__)]
+    for name in names:
+        if not name.endswith('.json'):
+            continue
+        path = os.path.join(directory, name)
+        try:
+            with open(path, 'r', encoding='utf-8') as handle:
+                walk(json.load(handle))
+        except Exception as exc:
+            failed.append((name, type(exc).__name__))
+            continue
+        read.append(name)
+    normalised = [_completeness_norm(s) for s in strings]
+    return set(n for n in normalised if n), read, failed
+
+
+def _completeness_accounted(text, captured_set, captured_list):
+    """(is it accounted for, coverage fraction). Exact match, or the paragraph
+    sits inside a capture, or a capture accounts for most of it."""
+    norm = _completeness_norm(text)
+    if not norm:
+        return True, 1.0
+    if norm in captured_set:
+        return True, 1.0
+    for cap in captured_list:
+        if norm in cap:
+            return True, 1.0
+    longest = 0
+    for cap in captured_list:
+        if len(cap) > longest and cap in norm:
+            longest = len(cap)
+    fraction = longest / len(norm)
+    return fraction >= _COMPLETENESS_COVERED, fraction
+
+
+def _completeness_producer(zf):
+    """The producing application from docProps/app.xml. NEVER docProps/
+    core.xml, which names the author."""
+    if 'docProps/app.xml' not in zf.namelist():
+        return '(no app.xml)'
+    try:
+        root = etree.fromstring(zf.read('docProps/app.xml'))
+    except Exception as exc:
+        return f'(unreadable: {type(exc).__name__})'
+    for el in root.iter():
+        if etree.QName(el).localname == 'Application':
+            return (el.text or '').strip() or '(empty)'
+    return '(no Application element)'
+
+
+def check_extraction_completeness(original_docx, paragraphs_json, strict=False):
+    """Compare the ORIGINAL document's text against what Step 2 captured.
+
+    Returns an exit code: 0 complete, 1 text unaccounted for, 2 IO error,
+    3 VOID (nothing was examined, which is never the same as clean).
+    """
+    try:
+        with open(paragraphs_json, 'r', encoding='utf-8') as handle:
+            notes = json.load(handle)
+    except Exception as exc:
+        print(f'validate_apply: cannot read {paragraphs_json}: {exc}',
+              file=sys.stderr)
+        return 2
+    try:
+        archive = zipfile.ZipFile(original_docx)
+    except Exception as exc:
+        print(f'validate_apply: cannot open {original_docx}: {exc}',
+              file=sys.stderr)
+        return 2
+
+    with archive as zf:
+        parts, unreadable = _completeness_parts(zf)
+        producer = _completeness_producer(zf)
+
+    print('=' * 76)
+    print('EXTRACTION COMPLETENESS — the ORIGINAL document against what was captured')
+    print('=' * 76)
+    print('  This is the only check in the skill that reads the original document.')
+    print('  Every other one compares the run against notes the run itself wrote, so')
+    print('  a span extraction never captured is invisible to all of them.')
+    print('  It prints paragraph INDICES and LENGTHS, never document text.')
+
+    captured, read, failed = _completeness_captures(
+        os.path.dirname(os.path.abspath(paragraphs_json)))
+    captured_list = sorted(captured, key=len, reverse=True)
+
+    print(f'\n  WHAT WAS READ')
+    print(f'    archive members carrying paragraph text : {len(parts)}')
+    print(f'    capture files read                      : {len(read)} {read}')
+    if failed:
+        print(f'    capture files that would NOT parse      : {failed}')
+        print('    Those files were NOT searched. Treat every result below as')
+        print('    provisional until they parse.')
+    if unreadable:
+        print(f'    archive members that would NOT parse    : {unreadable}')
+    if not parts:
+        print('\n  VOID — no part of this archive carries paragraph text. Nothing was')
+        print('  compared, which is never the same as nothing being wrong.')
+        return 3
+
+    print(f'\n  THE LIMIT OF THIS ANSWER, stated because it cannot be measured from here')
+    print(f'    producing application: {producer!r}')
+    print('    This speaks for the .docx it was given and for nothing before it. If')
+    print('    that file is the output of a .doc conversion, whatever the conversion')
+    print('    dropped was never in it, so no comparison made here can see the loss.')
+    print('    Compare the aux inventory before and after conversion to close that.')
+
+    body_name = 'word/document.xml'
+    body = parts.get(body_name, [])
+    declared = set()
+    for entry in notes:
+        if isinstance(entry, dict):
+            norm = _completeness_norm(entry.get('text'))
+            if norm:
+                declared.add(norm)
+
+    # THE BODY ARM IS STRICT AGAINST THE `text` FIELD AND NOTHING ELSE, AND THE FIRST
+    # VERSION WAS NOT -- IT PASSED FOR THE WRONG REASON, WHICH IS THIS PROJECT'S COMMONEST
+    # DEFECT AND WAS CAUGHT BY ITS OWN NEGATIVE INPUT.
+    #
+    # The generous search below -- every string at any depth in every JSON beside the notes
+    # -- is right for AUXILIARY parts, where the operator may capture footnotes under any
+    # filename in any shape. Applied to the BODY it is wrong twice over. `paragraphs.json`
+    # entries carry a `runs` array whose every element holds a `text` key REPEATING the
+    # paragraph's own text, so a body paragraph deleted from the `text` field is still found
+    # in the same file's `runs` and cleared. Measured: with the two-w:t paragraph truncated
+    # to its first w:t, the check printed `captured in paragraphs.json : 7` one line above
+    # `NOT captured : 0` -- the two numbers disagreeing inside one report, which is the
+    # tell.
+    #
+    # And it is wrong on the merits, not merely on this input: the `text` field IS
+    # extraction's product. It is what the operator translates and what every later gate
+    # baselines against, so a paragraph absent from it is uncaptured however much of it
+    # survives elsewhere in the file. The coverage fraction is kept and PRINTED because it
+    # tells the operator whether they are looking at a split paragraph or at nothing at all
+    # -- but it decides nothing here.
+    print(f'\n  BODY — {body_name}, the one part extract_paragraphs.py reads')
+    hard = []
+    for idx, text in body:
+        if _completeness_norm(text) in declared:
+            continue
+        _accounted, fraction = _completeness_accounted(text, captured, captured_list)
+        hard.append((idx, len(text), fraction))
+    print(f'    paragraphs carrying text : {len(body)}')
+    print(f'    captured in paragraphs.json : {len(body) - len(hard)}')
+    print(f'    NOT captured             : {len(hard)}')
+    for idx, length, fraction in hard[:25]:
+        print(f'      paragraph index {idx}: {length} chars, '
+              f'{fraction:.0%} of it found elsewhere in the workdir (diagnostic only)')
+    if len(hard) > 25:
+        print(f'      ... {len(hard) - 25} more (suppressed)')
+
+    print(f'\n  AUXILIARY PARTS — by CONTENT, not by membership of the archive')
+    print('    Asking whether the part EXISTS is the question Step 2 used to ask, and')
+    print('    a part can exist, be empty, and pass. These are its text paragraphs.')
+    aux_missing = 0
+    aux_parts = 0
+    for name in sorted(parts):
+        if name == body_name:
+            continue
+        aux_parts += 1
+        texts = parts[name]
+        letters = [(i, t) for i, t in texts if _COMPLETENESS_LETTER.search(t)]
+        unaccounted = []
+        for idx, text in letters:
+            ok, fraction = _completeness_accounted(text, captured, captured_list)
+            if not ok:
+                unaccounted.append((idx, len(text), fraction))
+        aux_missing += len(unaccounted)
+        flag = '   <-- NOT ACCOUNTED FOR' if unaccounted else ''
+        print(f'    {name:<34s} {len(texts):3d} text para(s), '
+              f'{len(letters):3d} carrying letters, '
+              f'{len(unaccounted):3d} unaccounted{flag}')
+        for idx, length, fraction in unaccounted[:10]:
+            print(f'        paragraph index {idx}: {length} chars, '
+                  f'{fraction:.0%} accounted for')
+
+    print('\n' + '=' * 76)
+    if hard:
+        print(f'  FAIL — {len(hard)} body paragraph(s) exist in the original and in no')
+        print('  capture. Extraction did not read them, so nothing downstream can.')
+        return 1
+    print('  BODY COMPLETE — every text-bearing body paragraph is captured.')
+    if aux_missing:
+        print(f'  {aux_missing} auxiliary paragraph(s) across {aux_parts} part(s) are not')
+        print('  accounted for by any capture.')
+        if strict:
+            print('  FAIL (--strict): auxiliary text must be captured before delivery.')
+            return 1
+        print('  This is a WORK LIST, not a verdict: at Step 2 the auxiliary')
+        print('  translators have not run yet. Re-run with --strict before repacking,')
+        print('  when a capture is supposed to exist for every one of them.')
+    elif aux_parts:
+        print('  AUXILIARY COMPLETE — every auxiliary paragraph is accounted for.')
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(
         description='Validate that translated tokens from paragraphs.json '
                     'landed in the final document.xml. Also supports a '
                     '--report-clusters mode that inspects paragraphs.json '
                     'for consecutive-same-type TC cluster flags, without '
-                    'reading the final document.xml.'
+                    'reading the final document.xml, and an '
+                    '--extraction-completeness mode that compares the '
+                    'ORIGINAL document against what Step 2 captured.'
     )
     ap.add_argument('paragraphs_json', help='Path to paragraphs.json with filled en/en_segments fields')
     ap.add_argument('document_xml', nargs='?', default=None,
@@ -714,6 +1047,13 @@ def main():
     ap.add_argument('--report-clusters', action='store_true',
                     help='Inspect paragraphs.json for tc_cluster_hits flags '
                          'and print a summary. No document.xml required.')
+    ap.add_argument('--extraction-completeness', metavar='ORIGINAL_DOCX',
+                    default=None,
+                    help='Compare the ORIGINAL .docx against what Step 2 '
+                         'captured, and report every text-bearing paragraph '
+                         'the capture does not account for. No document.xml '
+                         'required — this runs at Step 2, before there is '
+                         'one. Registers C28, C12 and M1.')
     ap.add_argument('--apply-zwsp', action='store_true',
                     help='With --report-clusters, rewrite paragraphs.json '
                          'in place, injecting ZWSPs between short alpha-'
@@ -734,6 +1074,20 @@ def main():
         print(f'validate_apply: file not found: {args.paragraphs_json}',
               file=sys.stderr)
         return 2
+
+    if args.extraction_completeness:
+        # DISPATCHED BEFORE --report-clusters AND BEFORE THE document_xml
+        # REQUIREMENT, deliberately: this mode runs at Step 2, when no
+        # translated document.xml exists yet. A mode that demanded one could
+        # only ever run after the damage it exists to find.
+        if args.report_clusters:
+            print('validate_apply: --extraction-completeness and '
+                  '--report-clusters are separate modes; pass one.',
+                  file=sys.stderr)
+            return 2
+        return check_extraction_completeness(
+            args.extraction_completeness, args.paragraphs_json,
+            strict=args.strict)
 
     if args.report_clusters:
         try:
