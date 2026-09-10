@@ -224,9 +224,19 @@ GROUPS = {
  # sending the operator to read a message that was never printed. It is here rather than in
  # group 3 because nothing claims to have WORKED -- what is wrong is the shipped account of
  # what happened, which is F35's collision arriving from a third direction.
+ # F43 AND F44 ADDED 2026-09-10, and F43 had been UNASSIGNED SINCE IT WAS FILED ON 2026-09-09 --
+ # this file exited 1 on "1 unassigned" for a day and the handoff recorded that as a standing
+ # red rather than as a row nobody had placed. They are one pair: F43 asked whether unfilled
+ # header/footer scaffolds meant source-language text shipped (measured: NO, and the document
+ # carrying five of the seven has ENGLISH as its source language), and F44 is what the
+ # investigation found instead -- `--extract` tells the operator an already-English header may
+ # be left null and `--apply` then REFUSES the result, on 3 of 9 real documents, having never
+ # once fired on a real defect. Both are the shipped account being wrong rather than the code,
+ # which is this group, and F43 belongs here rather than in group 1 precisely because nothing
+ # was lost: what misled was the manual, and then a fill rate read as if it were a defect rate.
  "5 the manual is wrong": """
    F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40
-   E7 E8 K1 K2 K3 H3 L5 B2 B4 B5 B6 X3 X5 Y2 Y3 Y4 F41 F42 C29
+   E7 E8 K1 K2 K3 H3 L5 B2 B4 B5 B6 X3 X5 Y2 Y3 Y4 F41 F42 C29 F43 F44
    """,
 }
 # -------------------------------------------- options (a row may need more than one)
@@ -293,8 +303,13 @@ OPTIONS = {
  "8 protect the whole package": """
    W1 W2 W3 W4 C29 F35 Y1 Q1
    """,
+ # F43 and F44 added 2026-09-10. Both are a CLAIM being wrong rather than code: --extract
+ # promises that leaving `en` null preserves an already-English header verbatim, --apply
+ # refuses exactly that, and the two shipped sentences have to be reconciled before either
+ # side is touched. Option 5 is NOT their home -- a compliant way out exists (write
+ # `en == text` instead of null), so this is a contradiction to resolve, not a closed loop.
  "9 fix the claim, not only the code": """
-   X1 X2 X3 X4 X5 X6 C5 C11 K1 J1 L6 F12 C10 F39 F40 F42 Y1 Y2 Y3 Y4
+   X1 X2 X3 X4 X5 X6 C5 C11 K1 J1 L6 F12 C10 F39 F40 F42 Y1 Y2 Y3 Y4 F43 F44
    """,
  # Added 2026-08-05: pass B refuted option 3's claim to FIX the layout findings, so the
  # layout group needs an option of its own -- it is where decision 4 lives.

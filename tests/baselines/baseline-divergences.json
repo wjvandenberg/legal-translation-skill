@@ -3,7 +3,7 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 30,
+ "count": 32,
  "divergences": {
   "uk/SKILL.md": {
    "changed_by": "feature/checks-can-fail",
@@ -41,9 +41,9 @@
    "sha256_now": "b2430a50710643006d30aa2af68fbe834fb759e10d125972297bdc0b3f2dc8e8"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "feature/no-bytecode-in-shipped-tree",
-   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
-   "sha256_now": "e505abd621e2cbba15e705dc69f6fa50f8b8c97d805714c1eaec161478286952"
+   "changed_by": "feature/branch8-extraction-completeness",
+   "commit_subject": "Branch 8 - extraction completeness: the one check that reads the original, and the reader contract no fixture pinned",
+   "sha256_now": "2afd45f571805265f90888353629998534a15162e6c3b72d4d219d152ad625c9"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -54,6 +54,11 @@
    "changed_by": "feature/checks-can-fail",
    "commit_subject": "Branch 5 - checks can fail: the mandatory quality check gets an exit code, a corrupt deliverable stops the run and is written to a temporary name first, omitting --paragraphs refuses instead of warning, a validator's exit 3 blocks unconditionally, the truncation guard moves above __main__, and WARN stops being indistinguishable from PASS (register rows C3 C23 C25 W3 W4 L4)",
    "sha256_now": "b5bbddac8c4c6d83a04157cefe756bb6309356987ff48756893bab981af79175"
+  },
+  "uk/skill-docs/01-setup-and-extract.md": {
+   "changed_by": "feature/branch8-extraction-completeness",
+   "commit_subject": "Branch 8 - extraction completeness: the one check that reads the original, and the reader contract no fixture pinned",
+   "sha256_now": "718736deffa8fcd3cb3010d4838faaac3b9a4b907eb0490e7fb6140d937b5ff0"
   },
   "uk/skill-docs/04b-translate-gates.md": {
    "changed_by": "d3c7f19",
@@ -116,9 +121,9 @@
    "sha256_now": "3240155eff68d9f4d1a21f53f6966a121cd9adca68d7221b1a06eadb284a8ce4"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "feature/no-bytecode-in-shipped-tree",
-   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
-   "sha256_now": "858180500d8341acf957c649c199530d89399f08aa2a24b6bae796b4e558691b"
+   "changed_by": "feature/branch8-extraction-completeness",
+   "commit_subject": "Branch 8 - extraction completeness: the one check that reads the original, and the reader contract no fixture pinned",
+   "sha256_now": "d08e5a341d722e36c9879edc58dcf12aa3c2d644d68588ed4869375b9f15e905"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -129,6 +134,11 @@
    "changed_by": "feature/checks-can-fail",
    "commit_subject": "Branch 5 - checks can fail: the mandatory quality check gets an exit code, a corrupt deliverable stops the run and is written to a temporary name first, omitting --paragraphs refuses instead of warning, a validator's exit 3 blocks unconditionally, the truncation guard moves above __main__, and WARN stops being indistinguishable from PASS (register rows C3 C23 C25 W3 W4 L4)",
    "sha256_now": "1ef1eb2ced2bc24ee1aa8932c3e510a0d05335a9493d322d0ea8904344e4eec7"
+  },
+  "us/skill-docs/01-setup-and-extract.md": {
+   "changed_by": "feature/branch8-extraction-completeness",
+   "commit_subject": "Branch 8 - extraction completeness: the one check that reads the original, and the reader contract no fixture pinned",
+   "sha256_now": "718736deffa8fcd3cb3010d4838faaac3b9a4b907eb0490e7fb6140d937b5ff0"
   },
   "us/skill-docs/04b-translate-gates.md": {
    "changed_by": "d3c7f19",

@@ -103,16 +103,44 @@ A .docx stores footnotes, endnotes, and comments in **separate XML files** along
 If you only extract and translate `document.xml`, footnotes/endnotes/comments will remain
 in the source language in the output — a HIGH severity defect.
 
-After extracting the main body paragraphs, check whether the source .docx contains any of
-these files:
+#### Step 2 completeness check — MANDATORY, and it is the only check that reads the original
 
-```python
-import zipfile
-with zipfile.ZipFile('<original>.docx') as z:
-    for name in ['word/footnotes.xml', 'word/endnotes.xml', 'word/comments.xml']:
-        if name in z.namelist():
-            print(f'FOUND: {name} — must extract and translate')
+`extract_paragraphs.py` reads **one part of the archive**: `word/document.xml`. Every other
+part carrying text is captured at a different step. And **every other check in this skill
+compares the run against `paragraphs.json` — the file this step has just written** — so a
+paragraph extraction never read is invisible to all of them, for the whole rest of the run.
+
+Run this now, before translating anything:
+
+```bash
+python <skill-path>/scripts/validate_apply.py <workdir>/paragraphs.json \
+    --extraction-completeness <original>.docx
 ```
+
+It opens the original document independently and reports two things.
+
+**BODY — this must be zero, and the script exits non-zero if it is not.** A body paragraph
+present in `word/document.xml` and absent from `paragraphs.json` was not read. Do not
+proceed and do not translate around it. Re-run extraction; if the paragraph is still
+missing, its container is outside the extraction inventory, which is a defect to report,
+not to work around.
+
+**AUXILIARY — at this step this is a WORK LIST, not a verdict.** It names every other part
+that carries text, measured by CONTENT rather than by presence, because a part can exist,
+be empty and tell you nothing: Word emits `footnotes.xml`, headers and footers for almost
+any document, and the old check here asked only whether the file was in the archive. Those
+parts are captured and translated at their own steps below and at Step 8.
+
+**Two limits, stated because the report cannot measure either.** It speaks for the `.docx`
+you gave it and for nothing before it — **if that file came from a `.doc` conversion,
+whatever the conversion dropped was never in it**, so compare the auxiliary inventory
+before and after conversion if you need that answered. And it reports paragraph indices and
+lengths, never text, so its output is safe to paste into a note to the user.
+
+**Re-run it with `--strict` before repacking.** By then a capture is supposed to exist for
+every part it named, and `--strict` turns the auxiliary work list into a verdict.
+
+#### Capturing the auxiliary parts
 
 For each file that exists and contains substantive text (footnote IDs -1 and 0 are standard
 empty separator/continuation entries — skip those), extract paragraphs using the same
@@ -130,6 +158,10 @@ Before moving to the next step, confirm:
 - [ ] You converted .doc → .docx (if needed) using soffice, NOT pandoc
 - [ ] You inspected `clean_conversion_artifacts.py`'s author/ratio output and did not run it on a redline
 - [ ] You produced `paragraphs.json` with `extract_paragraphs.py`
+- [ ] **You ran `validate_apply.py --extraction-completeness` and its BODY count is zero.**
+      A non-zero body count means extraction did not read a paragraph, and nothing later in
+      the run can discover that — every other check baselines against the file this step wrote
+- [ ] You noted the auxiliary parts it listed, so each has a capture before repack
 - [ ] You did NOT manually edit document.xml or skip Step 1's integrity check
 - [ ] **If this is your second or later document this session:** you re-`Read('SKILL.md')` and you will re-`Read()` each step file as you arrive at it; you did NOT skip the per-document refresh on the assumption that the previous document's reads are still active
 
