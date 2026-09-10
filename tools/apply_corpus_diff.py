@@ -62,16 +62,24 @@ SCRIPT = "apply_translations_textmatch.py"
 # once read its "before" from HEAD, which worked only while the change was uncommitted and then
 # compared the new file against itself and reported 100% carried.
 #
-# MOVED TO 015c8b6 ON 2026-09-09, the squash-merge of the no-.pyc-in-a-shipped-tree slice
-# (PR #71) and the LAST COMMIT THAT TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE
-# MESSAGE: `git log --oneline -1 -- uk us` returns it, and `git diff 015c8b6 -- uk us` comes
+# MOVED TO 18a0798 ON 2026-09-10, the squash-merge of branch 8, extraction completeness
+# (PR #82) and the LAST COMMIT THAT TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE
+# MESSAGE: `git log --oneline -1 -- uk us` returns it, and `git diff 18a0798 -- uk us` comes
 # back empty. A pin left at the previous baseline reports the merged slice's own work as
 # movement belonging to whatever branch runs next, and the branch that inherits it cannot
 # tell.
 #
-# IT HAS NOW MOVED EIGHT TIMES IN FIVE DAYS -- 4a1c452, 049484e, 2a71e71, d3c7f19, 544f908,
-# ae48f6d, 010c34f, here -- and that cadence IS the argument for the rule rather than a
-# complaint about it: moving it is the FIRST act after a merge, never a closing tidy-up.
+# AND AT THIS PIN THE SELF-COMPARISON NOTICE IS EXPECTED TO BE PRESENT AGAIN. Branch 8 added
+# a read-only mode to validate_apply.py and rewrote a step document; it did not touch the
+# apply script this tool swaps. So both arms carry identical code BY DESIGN and the run is
+# all-quiet for a legitimate reason -- which is exactly what a STALE pin also produces, and
+# is why the notice is printed rather than left to be inferred. The .pyc slice, at the
+# previous pin, was the last run where the reading actually moved.
+#
+# IT HAS NOW MOVED NINE TIMES IN SIX DAYS -- 4a1c452, 049484e, 2a71e71, d3c7f19, 544f908,
+# ae48f6d, 010c34f, 015c8b6, here -- and that cadence IS the argument for the rule rather
+# than a complaint about it: moving it is the FIRST act after a merge, never a closing
+# tidy-up.
 #
 # AND THE HABIT ITSELF WENT STALE, WHICH IS THE MORE USEFUL LESSON THAN THE CADENCE. Every
 # close for five days moved "BOTH pins". Branch 7 slice 3 added a THIRD tool carrying one --
@@ -96,7 +104,7 @@ SCRIPT = "apply_translations_textmatch.py"
 # in tools/render_diff.py reading "Moved to 049484e" while its pin one line below said
 # 2a71e71 -- two claims disagreeing inside five lines, both true once. NOTHING CHECKS A
 # COMMENT. Re-derive both claims on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "015c8b6")
+REF = os.environ.get("LT_BASELINE_REF", "18a0798")
 
 # WHICH DIRECTIONAL CHECK BELONGS TO WHICH MERGED FIX — added 2026-09-08, on a measured false
 # alarm that would have recurred for ever.
