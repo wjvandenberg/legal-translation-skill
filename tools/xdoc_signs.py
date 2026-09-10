@@ -4,7 +4,7 @@
 CHECKER VERSION 1 (2026-08-24)
 
 A `§` RESOLVES AGAINST THE FILE IT APPEARS IN. So `§4` written on a line about
-`STEP-B-ANALYSIS.md` points at section 4 of THE CHARTER, not of the build plan -- and because
+`PLAN-2-step-b.md` points at section 4 of THE CHARTER, not of the build plan -- and because
 the charter has a section 4, it resolves. Nothing fails. `verify_md.py`'s internal-refs check
 reports PASS, because the checker cannot know which file a sign was meant for.
 
@@ -35,14 +35,23 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parent.parent
 
-DOC_RE = re.compile(r"`([A-Za-z0-9_.\-]+\.md)`")
+# `/` IS IN THE CLASS SINCE 2026-09-10, AND IT WAS A MEASURED COVERAGE LOSS, NOT A TIDY-UP. The
+# layout convention moved four documents into `evidence/`, so the charter began citing them as
+# `evidence/EVIDENCE-confidentiality.md`. Without the slash this pattern stopped recognising them
+# as documents at all: the candidate count fell from 10 to 8, the two lines carrying a
+# cross-document section sign went UNEXAMINED, and their DECLARED_BENIGN rows quietly became
+# unused -- an undeclared coverage loss and a stale declaration at the same time, from one
+# character. Nothing failed; the report simply got shorter, which is the shape that never gets
+# questioned. A REPORT LABEL IS AN IDENTIFIER, and a basename stops being one the moment a
+# document sits in a folder.
+DOC_RE = re.compile(r"`([A-Za-z0-9_.\-/]+\.md)`")
 SIGN_RE = re.compile(r"§\s*([0-9]+(?:\.[0-9]+)*)")
 
 # (fragment that identifies the line, why the sign on it really does mean THIS file)
 # Judged by reading, phase 3b step 8, 2026-08-24. Add a row only after reading the line.
 DECLARED_BENIGN = [
     ("how the work is done",
-     "'§5 here' -- the word 'here' is the disambiguator, and FINDINGS-REGISTER.md has no "
+     "'§5 here' -- the word 'here' is the disambiguator, and REGISTER-findings.md has no "
      "numbered sections at all"),
     ("rests on **D03 alone**",
      "§5.5 is this charter's test corpus; A3 is cited on the same line as 'section 11' in words"),

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """BRANCH 6 — STOP DELETING WHAT YOU DO NOT RECOGNISE. The synthetic arm.
 
-Option 1's first slice. Seven accountable rows from STEP-B-ANALYSIS.md section 9.3:
+Option 1's first slice. Seven accountable rows from PLAN-2-step-b.md section 9.3:
 A1 A2 A3 A6 A8 A9 F27. C16, C17 and F16 are a declared follow-on slice (2026-09-01) --
 they are boundary-whitespace and offset defects in three other functions, not deletions.
 
@@ -19,7 +19,7 @@ covers less than it appears to is this project's most frequent failure:
   A1 A2 A3 A8 F27   tests/fixtures/anchors-and-tabs.docx, sections 1 to 3.
   A9                tests/fixtures/cross-reference.docx, section 4. That fixture was BUILT
                     for this branch on 2026-09-01: no existing fixture carried a field
-                    skeleton, and STEP-B-ANALYSIS.md section 3.7's own fixture list for
+                    skeleton, and PLAN-2-step-b.md section 3.7's own fixture list for
                     branch 6 does not name one either, so until now A9's only instrument was
                     the D06 frozen intermediate.
 
@@ -287,7 +287,7 @@ else:
 # =========================================================================================
 # D05's SHAPE — AND WHAT IT PROVES THE POSITION CLAUSE CANNOT DO. Measured 2026-09-01.
 #
-# STEP-B-ANALYSIS.md section 6, Option 1 says branch 6 "closes the case where the tab dies
+# PLAN-2-step-b.md section 6, Option 1 says branch 6 "closes the case where the tab dies
 # inside a text-bearing run, and the RELOCATION case needs the position clause, which is why
 # the clause is in the proposal." Built, it does not follow, and the reason is structural
 # rather than a coding slip.

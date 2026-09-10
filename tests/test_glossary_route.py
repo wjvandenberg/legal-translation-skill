@@ -164,7 +164,7 @@ if not FIX.is_file() or not NOTES.is_file():
 # =========================================================================================
 # ARM 0 — THE FIXTURE ITSELF, and the basename trap it exists to catch.
 #
-# NEVER LIST AUX PARTS BY BASENAME. FINDINGS-REGISTER.md's own instrument note records what
+# NEVER LIST AUX PARTS BY BASENAME. REGISTER-findings.md's own instrument note records what
 # this cost: "my first aux listing showed no glossary part and I wrote 'C19 did not recur';
 # re-measuring on full paths found six word/glossary/ entries and the part untranslated."
 # word/glossary/document.xml and word/document.xml collapse to the same basename, so an

@@ -48,7 +48,7 @@ def truth(key):
                        capture_output=True, text=True, encoding="utf-8", errors="replace",
                        cwd=str(ROOT), env=ENV, timeout=600)
     for line in (r.stdout + r.stderr).splitlines():
-        if "derived from FINDINGS-REGISTER.md" in line:
+        if "derived from REGISTER-findings.md" in line:
             for part in line.split():
                 if part.startswith(key + "="):
                     return part.split("=", 1)[1]

@@ -32,7 +32,7 @@ rule in §2.4 item 5, the no-renumbering rule in §6.3, the telemetry prohibitio
   documents. *(It is the same artefact as the forensic log, so designing the log format well gives the
   shipped report for free.)*
 
-- **No sub-agents inside the skill** — §3 of `OPUS-5-MIGRATION.md`.
+- **No sub-agents inside the skill** — §3 of `PLAN-3-opus5-migration.md`.
 
 - **A shared capability lives in one place.** This is a rule for **our** maintenance of the artefact, not an
   instruction to the skill's operator, and it belongs here rather than in a shipped step document —

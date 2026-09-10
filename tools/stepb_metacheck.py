@@ -36,7 +36,7 @@ if hasattr(_sys.stdout, "reconfigure"):
 
 
 ROOT = Path(__file__).resolve().parent.parent
-DOC = ROOT / "STEP-B-ANALYSIS.md"
+DOC = ROOT / "PLAN-2-step-b.md"
 # The suites are COMMITTED in tools/ as of 2026-08-11. Pointing this at temp/ would make a
 # committed tool depend on a gitignored copy — it would pass here and fail in a fresh clone.
 TEMP = ROOT / "tools"
@@ -61,7 +61,7 @@ print("PART 1 — do all checks pass on the real document?  (a baseline, not a r
 print("=" * 86)
 base = {}
 for label, sc in SCRIPTS.items():
-    args = ["STEP-B-ANALYSIS.md"] if sc == "a3_md_tables.py" else ()
+    args = ["PLAN-2-step-b.md"] if sc == "a3_md_tables.py" else ()
     rc, out = run(sc, args)
     base[label] = rc
     print(f"  [{'PASS' if rc == 0 else 'FAIL'}] {label:<26} exit {rc}")
@@ -160,7 +160,7 @@ for label, mutate, script, why in MUTATIONS:
         continue
     DOC.write_text(mutated, encoding="utf-8")
     try:
-        args = ["STEP-B-ANALYSIS.md"] if script == "a3_md_tables.py" else ()
+        args = ["PLAN-2-step-b.md"] if script == "a3_md_tables.py" else ()
         rc, out = run(script, args)
     finally:
         DOC.write_text(ORIG, encoding="utf-8")

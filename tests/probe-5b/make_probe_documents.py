@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """BUILD THE TWO RIGGED DOCUMENTS FOR THE RULE-5b BEHAVIOURAL PROBE.
 
-STEP-B-ANALYSIS.md §2's fourth sequencing fact gates branch 5 on this probe: branch 5 turns
+PLAN-2-step-b.md §2's fourth sequencing fact gates branch 5 on this probe: branch 5 turns
 eighteen currently-silent defects into blocked runs, rule 5b is then the only legitimate way
 such a run can end, and no script can settle whether a model will actually apply it.
 
@@ -149,7 +149,7 @@ ARM2 = [
 
 # ARM 3 — THE TRUE DEADLOCK (register F28), and it is the arm the plan pointed at all along.
 #
-# WHY THIS ROW AND NOT F1. `STEP-B-ANALYSIS.md` §5.5 names three mandatory requirements that
+# WHY THIS ROW AND NOT F1. `PLAN-2-step-b.md` §5.5 names three mandatory requirements that
 # "cannot be met at all", and closes with the sentence that is rule 5b's situation written down
 # before rule 5b existed: "In each case the operator's only options were to disobey an instruction
 # or to ship against one." Those three are F28, F30 and F33. **F1 was never one of them** — it sat
@@ -241,5 +241,5 @@ if __name__ == "__main__":
     print("  All three are SYNTHETIC. Read tests/probe-5b/SCORING.md before running any of them.")
     print("  ARM 3 IS THE ONE TO RUN. Arm 1 has been run and turned out to be a decoy rather than")
     print("  a deadlock — a compliant repair existed under rule 5a. Arm 3 is built from F28, one")
-    print("  of the three requirements STEP-B-ANALYSIS.md §5.5 records as impossible to meet, and")
+    print("  of the three requirements PLAN-2-step-b.md §5.5 records as impossible to meet, and")
     print("  the only one of those three that branch 5 converts into a stopped run.")

@@ -31,16 +31,27 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 # The six that were hard-coded, kept by NAME so a rename is noticed rather than silently dropped.
-CORE = ["CLAUDE.md", "FINDINGS-REGISTER.md", "A3-STRUCTURAL-ANALYSIS.md", "STEP-B-ANALYSIS.md",
-        "DECISIONS-LOG.md", "OPUS-5-MIGRATION.md"]
+CORE = ["CLAUDE.md", "evidence/REGISTER-findings.md", "evidence/EVIDENCE-a3-structure.md", "PLAN-2-step-b.md",
+        "DECISIONS-LOG.md", "PLAN-3-opus5-migration.md"]
 # Globs, so a document added later is checked without anybody remembering to add it here.
+# THE `evidence/` GLOBS WERE ADDED 2026-09-10 IN THE SAME CHANGE AS THE MOVE THAT CREATED THAT
+# FOLDER. A root-relative glob stops reaching a document the moment it moves, and what it then
+# reports is a smaller population rather than an error -- which over a PUBLIC repository means a
+# document ships without this check ever opening it, while the check reports clean.
 DISCOVER = ["README.md", "EVIDENCE-*.md", "REGISTER-*.md", "PLAN-*.md",
+            "evidence/EVIDENCE-*.md", "evidence/REGISTER-*.md", "evidence/PLAN-*.md",
             ".claude/rules/*.md", ".claude/skills/*/SKILL.md", "tests/README.md"]
 
 
 def _targets(argv):
     if argv:
         return [Path(a) if Path(a).is_absolute() else ROOT / a for a in argv]
+    # A CORE NAME THAT HAS GONE IS PRINTED, NEVER SILENTLY FILTERED. The list is here so a
+    # rename is NOTICED; dropping it is the one behaviour that defeats that, and it read as a
+    # clean smaller run for as long as it stood.
+    _gone = [n for n in CORE if not (ROOT / n).exists()]
+    if _gone:
+        print(f"  CORE DOCUMENT(S) NAMED HERE BUT NOT ON DISK — renamed or moved? {_gone}")
     out = [ROOT / n for n in CORE if (ROOT / n).exists()]
     for g in DISCOVER:
         out.extend(sorted(ROOT.glob(g)))

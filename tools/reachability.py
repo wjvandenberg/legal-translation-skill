@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""STATIC REACHABILITY OF THE INSTRUCTION LAYER — STEP-B-ANALYSIS.md §4.1, half one.
+"""STATIC REACHABILITY OF THE INSTRUCTION LAYER — PLAN-2-step-b.md §4.1, half one.
 
 §4.1 splits the prose-reachability probe in two and assigns the halves to different places.
 Half two is behavioural, needs a run, and belongs at Step C. **Half one is this: static,
@@ -191,7 +191,7 @@ def analyse(tree):
     # step, so Arm 1 is blind to it by construction.
     #
     # The convention list is SOURCED, not invented -- these are the four that
-    # STEP-B-ANALYSIS.md §6, Option 5 gap 1 and prescriptions (i) and (ii) name.
+    # PLAN-2-step-b.md §6, Option 5 gap 1 and prescriptions (i) and (ii) name.
     # The reference and sub-lexicon layers are read at Step 3 -- SKILL.md: "You MUST read
     # both at Step 3". They are IN SCOPE for this arm and the first version left them out,
     # which made its silence meaningless: three of the four named conventions live there and
@@ -362,7 +362,7 @@ def unbounded_repair_sites(root):
 POINTER = re.compile(r"\b(?:see|described in|set out in|per|under)\b[^.]{0,80}\bStep\s+\d",
                      re.I)
 
-# The four conventions STEP-B-ANALYSIS.md §6 Option 5 names as lacking a single authority:
+# The four conventions PLAN-2-step-b.md §6 Option 5 names as lacking a single authority:
 # gap 1 (statute citation, the date rule, the priority rule) and prescription (ii)
 # (language metadata). Sourced from the build plan so the list is auditable rather than
 # a set of words somebody thought of.

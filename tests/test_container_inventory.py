@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """BRANCH 7 — THE CONTAINER INVENTORY. The synthetic arm.
 
-Option 1's second and last branch. Four accountable rows from STEP-B-ANALYSIS.md section 9.3:
+Option 1's second and last branch. Four accountable rows from PLAN-2-step-b.md section 9.3:
 A16 A19 N1 C19. This file covers the APPLY side -- A16 and N1 -- plus the two shapes measured
 in the same sweep that no register row names.
 

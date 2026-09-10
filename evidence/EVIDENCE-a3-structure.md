@@ -1,7 +1,7 @@
 # A3 — Structural analysis
 
 > **Phase 2, strand A3. The last strand of Step A.** Produces no code. This document is the input to
-> **Step B**, alongside `FINDINGS-REGISTER.md`.
+> **Step B**, alongside `REGISTER-findings.md`.
 >
 > **Date:** 2026-07-31. **Run at:** Opus 5, `max` thinking, in Claude Code.
 > **Subject, fixed in advance by the charter:** the eleven structural observations in charter §4; the
@@ -20,7 +20,7 @@ inferred to be distinguishable at a glance:
 | marker | means |
 |---|---|
 | **[M]** | **Measured** in this session by a script over the rev44 trees, or read directly out of the cited file. Re-derivable; the scripts are in `temp/`. |
-| **[C]** | **Cited** from `FINDINGS-REGISTER.md` or a changelog, and then checked against the file it cites. |
+| **[C]** | **Cited** from `REGISTER-findings.md` or a changelog, and then checked against the file it cites. |
 | **[I]** | **Inferred** — a reading of measured facts that could be wrong. Every keystone claim of the "this causes that" kind is marked here unless a controlled measurement isolates it. |
 | **[P]** | **Prediction** — not observed on any document. Recorded so it is not mistaken for evidence. |
 
@@ -1166,7 +1166,7 @@ standard than it asked for:
 | **validator after** | **the A15–A18 warning should disappear** | **PASS, 0 failures, 0 warnings** ✔ |
 
 Script: `temp/a3_reorg_register.py` (dry-run by default; refuses to write if any check fails). A pre-edit
-copy is at `temp/FINDINGS-REGISTER.md.pre-a3-backup`.
+copy is at `temp/REGISTER-findings.md.pre-a3-backup`.
 
 **The rendering defect also produced a check worth keeping, and it was validated in both directions** — the
 project's own rule for heuristics. `temp/a3_md_tables.py` asserts that every Markdown table row is
@@ -1429,12 +1429,12 @@ Wouter's own review ranks KS4 first. Those are four different questions and the 
 **This section owns the A2 grade baselines, and nothing else did.** It arrived here in phase 3b
 step 5: the charter carried it as *"the numbers to quote"*, but a 31-row measurement read only when a
 claim is disputed is evidence, and the charter's own rule forbids it holding a summary of evidence.
-**Checked before the move: neither this document nor `FINDINGS-REGISTER.md` held it** — the register's
+**Checked before the move: neither this document nor `REGISTER-findings.md` held it** — the register's
 origin classes are A4 27, WvdB 10, code 10 and **A3 just 1**, so the two documents are largely
 independent sources rather than one derived from the other. **A3 was chosen because it already owns the
 measurements** *(section 3 derives the runtime formula from exactly these runs)*, **because it is
 evidence and therefore uncapped**, and **because it is the least-read of the three — which is correct
-for a baseline you consult rather than follow.** `STEP-B-ANALYSIS.md` was rejected: it is a PLAN file
+for a baseline you consult rather than follow.** `PLAN-2-step-b.md` was rejected: it is a PLAN file
 already 3,447 lines against a declared cap of 400, and its overage trigger is its evidence being SPENT.
 
 **The text below is byte-identical to what the charter held.** Moved by script, asserted, not retyped.

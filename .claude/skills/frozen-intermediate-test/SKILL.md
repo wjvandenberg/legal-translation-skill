@@ -5,7 +5,7 @@ description: How a change to this pipeline is actually tested - freeze the trans
 
 # How a change is actually tested
 
-**Section 4 of `STEP-B-ANALYSIS.md` owns the method per branch kind. This is the principle behind it,**
+**Section 4 of `PLAN-2-step-b.md` owns the method per branch kind. This is the principle behind it,**
 and `CLAUDE.md` 5.8 keeps the standing rules and points here.
 
 ## THE TRICK: FREEZE THE TRANSLATED INTERMEDIATE FROM AN EXISTING RUN

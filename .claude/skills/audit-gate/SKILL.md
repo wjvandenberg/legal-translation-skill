@@ -56,14 +56,14 @@ should be treated as evidence the audit was too shallow, not that the work was c
 Run these after editing any of the committable documents:
 
 ```bash
-uv run python tools/md_tables.py CLAUDE.md FINDINGS-REGISTER.md A3-STRUCTURAL-ANALYSIS.md STEP-B-ANALYSIS.md DECISIONS-LOG.md OPUS-5-MIGRATION.md
+uv run python tools/md_tables.py CLAUDE.md REGISTER-findings.md EVIDENCE-a3-structure.md PLAN-2-step-b.md DECISIONS-LOG.md PLAN-3-opus5-migration.md
 ```
 
 ```bash
 uv run python tools/publication_check.py
 ```
 
-**Before editing `FINDINGS-REGISTER.md`, and after, run its validator** — hand-editing it has produced
+**Before editing `REGISTER-findings.md`, and after, run its validator** — hand-editing it has produced
 quiet errors twice, and two of the validator's checks exist because they caught real ones. Expect
 **PASS, 0 failures, 0 warnings**:
 
@@ -82,7 +82,7 @@ uv run python tools/verify_charter_continuity.py
 four-column row inserted into a two-column table, and an appendix that lost its delimiter row and stopped
 being a table. **The register's own validator passed both.**
 
-## `STEP-B-ANALYSIS.md`'s six suites
+## `PLAN-2-step-b.md`'s six suites
 
 After editing it, run all six. They live in `tools/` and are **COMMITTED as of 2026-08-11**, so a fix to
 one of them survives the session that makes it.

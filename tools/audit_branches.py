@@ -226,7 +226,7 @@ def audit_b0():
     # instruction to grep tools/ before moving a subsection, and I had written it without
     # following it.
     charter = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
-    a3_full = (ROOT / "A3-STRUCTURAL-ANALYSIS.md").read_text(encoding="utf-8")
+    a3_full = (ROOT / "evidence/EVIDENCE-a3-structure.md").read_text(encoding="utf-8")
     # SCOPED TO SECTION 11, and the scope is the whole fix. A3 ALREADY had a `| D03 | 98 | 33.1 |`
     # table of its own -- paragraphs and minutes, no grades -- hundreds of lines above the one
     # that arrived in step 5. An unscoped `re.search` finds that one first, reads no grade out of
@@ -235,7 +235,7 @@ def audit_b0():
     _m11 = re.search(r"^## 11\..*", a3_full, re.S | re.M)
     a3 = _m11.group(0) if _m11 else ""
     mism, where = [], None
-    for source, label in ((a3, "A3-STRUCTURAL-ANALYSIS.md section 11"),
+    for source, label in ((a3, "EVIDENCE-a3-structure.md section 11"),
                           (charter, "CLAUDE.md (pre-3b location)")):
         trial = []
         for r in bl["runs"]:

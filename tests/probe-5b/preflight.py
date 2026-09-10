@@ -343,7 +343,7 @@ else:
 # ======================================================================================
 head("ARM 3 — TRUE DEADLOCK (register F28): the check is RIGHT and no repair is legal")
 # ======================================================================================
-# WHY THIS ARM EXISTS AND ARM 1 DID NOT SUFFICE. `STEP-B-ANALYSIS.md` §5.5 names three mandatory
+# WHY THIS ARM EXISTS AND ARM 1 DID NOT SUFFICE. `PLAN-2-step-b.md` §5.5 names three mandatory
 # requirements that "cannot be met at all" and closes with rule 5b's situation in its own words:
 # "In each case the operator's only options were to disobey an instruction or to ship against
 # one." Those three are F28, F30 and F33 — and F1, which arm 1 was built from, was never one of

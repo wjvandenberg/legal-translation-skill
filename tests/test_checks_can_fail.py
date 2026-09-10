@@ -2,7 +2,7 @@
 """ACCEPTANCE TEST FOR BRANCH 5 — "checks can fail". Register C3 C23 C25 W3 W4 L4.
 
 Branch 5 is the first branch in step 2 that changes BEHAVIOUR: runs that used to finish now
-stop. STEP-B-ANALYSIS.md §3.2 gives slices 1, 3 and 4 a *Done when* line and gives slice 2
+stop. PLAN-2-step-b.md §3.2 gives slices 1, 3 and 4 a *Done when* line and gives slice 2
 none, so the condition asserted here is the one the plan's own logic implies and §5.1 states
 in general: **where a check is meant to catch known defects, its first run must reproduce
 them.** Seven changes, each with an input built to make its new block fire AND a conforming

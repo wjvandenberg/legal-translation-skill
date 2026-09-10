@@ -39,9 +39,9 @@ PRIV = ROOT.parent / "legal-translation-private"
 PUB = ROOT.parent / "skills" / "legal-translation" / "PUBLICATION VERSIONS"
 
 CMD = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
-REG = (ROOT / "FINDINGS-REGISTER.md").read_text(encoding="utf-8")
-A3 = (ROOT / "A3-STRUCTURAL-ANALYSIS.md").read_text(encoding="utf-8")
-SB = (ROOT / "STEP-B-ANALYSIS.md").read_text(encoding="utf-8")
+REG = (ROOT / "evidence/REGISTER-findings.md").read_text(encoding="utf-8")
+A3 = (ROOT / "evidence/EVIDENCE-a3-structure.md").read_text(encoding="utf-8")
+SB = (ROOT / "PLAN-2-step-b.md").read_text(encoding="utf-8")
 
 FLAT = re.sub(r"\s+", " ", CMD)
 
@@ -192,7 +192,7 @@ if not re.search(r"reference layer has eroded|`references/` has eroded too", CMD
     warn("2", "the correction text itself is not where it was expected")
 
 head(3, "REGISTER ARITHMETIC — every count CLAUDE.md states about the register")
-print(f"  derived from FINDINGS-REGISTER.md: rows={TRUTH['rows']} clusters="
+print(f"  derived from REGISTER-findings.md: rows={TRUTH['rows']} clusters="
       f"{TRUTH['clusters']} skill findings={TRUTH['skill_findings']} "
       f"(clustered {TRUTH['clustered']} + single {TRUTH['single']}) "
       f"positives={TRUTH['positives']} instrument={TRUTH['instrument']} "
@@ -282,9 +282,9 @@ a3_heads = {m.group(1): m.group(2).strip()
             for m in re.finditer(r"^#{2,3}\s+(\d+(?:\.\d+)?)\.?\s+(.*)$", A3, re.M)}
 REFS = [
     # (claim as CLAUDE.md makes it, doc, section, a word the heading must contain)
-    ("STEP-B-ANALYSIS.md §3 is the build brief", SB, sb_heads, "3", "build brief", False),
-    ("STEP-B-ANALYSIS.md §2 is the plan of work", SB, sb_heads, "2", "plan of work", False),
-    ("STEP-B-ANALYSIS.md §4 owns the test method", SB, sb_heads, "4", "tested", False),
+    ("PLAN-2-step-b.md §3 is the build brief", SB, sb_heads, "3", "build brief", False),
+    ("PLAN-2-step-b.md §2 is the plan of work", SB, sb_heads, "2", "plan of work", False),
+    ("PLAN-2-step-b.md §4 owns the test method", SB, sb_heads, "4", "tested", False),
     ("A3 §2 is the six keystones", A3, a3_heads, "2", "keystones", False),
     ("A3 §6 is the findings map", A3, a3_heads, "6", "structural map", False),
     ("A3 §5 answers the eleven observations", A3, a3_heads, "5", "observations", False),
@@ -314,7 +314,7 @@ if "POINTER" in s11 and "the answers — they live in §3" in SB:
        "calling §11 the decision record is stale")
 else:
     warn("4", "could not confirm §11's pointer status from the analysis itself")
-for s in ["`STEP-B-ANALYSIS.md` §11 rather than a summary",
+for s in ["`PLAN-2-step-b.md` §11 rather than a summary",
           "Its §11 is the decision record"]:
     if present(s):
         fail("4", f"stale §11 citation still present: {s!r}")
@@ -415,10 +415,10 @@ for label, truth in FS:
     (ok if truth else lambda m: fail("6", m))(f"{label}: {truth}")
 
 mds = sorted(p.name for p in ROOT.glob("*.md"))
-if present("The project folder contains **only** `CLAUDE.md`, `FINDINGS-REGISTER.md` and `temp/`"):
+if present("The project folder contains **only** `CLAUDE.md`, `REGISTER-findings.md` and `temp/`"):
     fail("6", f"the folder-contents claim is stale: it now holds {mds}")
-if present("the project folder contains `CLAUDE.md`, `FINDINGS-REGISTER.md`, "
-           "`A3-STRUCTURAL-ANALYSIS.md` and `temp/`"):
+if present("the project folder contains `CLAUDE.md`, `REGISTER-findings.md`, "
+           "`EVIDENCE-a3-structure.md` and `temp/`"):
     fail("6", f"a second, differently-worded folder-contents claim is also stale: {mds}")
 
 # No client artefact may sit anywhere the first commit could reach. temp/ is gitignored
@@ -679,7 +679,7 @@ head(13, "TWO SMALLER FIGURES, and the runtime range against the A1 table")
 # state where the never-regress baseline has actually been lost.
 NEEDLE = r"\| \*?\*?\d\.\d\*?\*? \| ([\d.]+) min"
 active = [float(x) for x in re.findall(NEEDLE, A3)]
-_where = "A3-STRUCTURAL-ANALYSIS.md section 11"
+_where = "EVIDENCE-a3-structure.md section 11"
 if not active:
     active = [float(x) for x in re.findall(NEEDLE, CMD)]
     _where = "CLAUDE.md (pre-3b location)"
@@ -696,7 +696,7 @@ if active:
         else:
             ok("the 18–50 minute range matches the table")
 else:
-    fail("13", "the A1 ACTIVE column is in NEITHER A3-STRUCTURAL-ANALYSIS.md nor CLAUDE.md. "
+    fail("13", "the A1 ACTIVE column is in NEITHER EVIDENCE-a3-structure.md nor CLAUDE.md. "
                "That table is the never-regress baseline every later run is compared against, "
                "so its absence from both is a loss, not a relocation")
 
@@ -748,7 +748,7 @@ else:
     else:
         ok("§1.6 carries the pointer and no contents table has been reintroduced")
 # every subsection referenced as §N.M must exist
-# strip references that name another document first -- "`STEP-B-ANALYSIS.md` §9.3" is not
+# strip references that name another document first -- "`PLAN-2-step-b.md` §9.3" is not
 # an internal reference, and treating it as one reported a false dangling link.
 _internal = re.sub(r"`[A-Z0-9\-]+\.md`[^.\n]{0,40}?§\d[\d.]*", " ", CMD)
 _internal = re.sub(r"(?:its|Its|that document's|the plan's|§\d of `[^`]+`)\s+§\d[\d.]*", " ", _internal)
@@ -760,7 +760,7 @@ if dangling:
 else:
     ok(f"all {len(refs)} internal subsection references resolve ({len(subs)} subsections)")
 # the two split-out documents must exist and be referenced
-for name in ("OPUS-5-MIGRATION.md", "DECISIONS-LOG.md"):
+for name in ("PLAN-3-opus5-migration.md", "DECISIONS-LOG.md"):
     exists, cited = (ROOT / name).exists(), f"`{name}`" in CMD
     (ok if (exists and cited) else lambda m: fail("14", m))(
         f"{name}: exists={exists} referenced={cited}")

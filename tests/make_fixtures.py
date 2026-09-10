@@ -584,7 +584,7 @@ def _write_notes(docx_path, notes):
 # ---------------------------------------------------------------------------
 # Branch 6, clause 3 — the ONE case in option 1 that is a DELETION rather than a
 # preservation. Added 2026-09-01, and it had to be built: anchors-and-tabs.docx carries no
-# field skeleton, and STEP-B-ANALYSIS.md section 3.7's own fixture list for branch 6 does not
+# field skeleton, and PLAN-2-step-b.md section 3.7's own fixture list for branch 6 does not
 # name one either, so finding A9's only instrument was the D06 frozen intermediate.
 # ---------------------------------------------------------------------------
 @fixture("toc-widened.docx",

@@ -1,4 +1,4 @@
-# OPUS-5-MIGRATION.md — goal (iii), and the verification run that follows it
+# PLAN-3-opus5-migration.md — goal (iii), and the verification run that follows it
 
 > **Split out of `CLAUDE.md` on 2026-08-06**, on Wouter's instruction, because it is a self-contained
 > workstream that nothing before it depends on. `CLAUDE.md` §1 and §3 point here; **this document owns the
@@ -7,6 +7,13 @@
 >
 > **STATUS: NOT STARTED. Blocked on the build** (`CLAUDE.md` §3, step 2). Nothing here is a decision
 > awaiting an answer — the design is settled. It is waiting for its turn.
+>
+> **RENAMED FROM `OPUS-5-MIGRATION.md` ON 2026-09-10** *(Wouter)*, when the location convention arrived: a
+> document's **KIND** decides its **FOLDER**, and this is a **plan** — step 3's — so it stays at the **ROOT
+> while LIVE** and goes to `archive/` when the step closes. **17 tracked citations were swept in the same
+> commit**, each asserted to fire exactly once. **It needs no over-cap declaration: 189 lines against the
+> plan-file L cap of 400**, measured on the commit that says so, and it is the only one of the four renamed
+> documents that fits its kind's cap.
 
 ---
 
@@ -153,7 +160,7 @@ worse prose; it is **silent substantive errors that pass every gate green.**
    known-answer calls did it get right, and did it render the output and look at it?"*
 
 **A third arm runs beside them: the prose-reachability probe.** Its full design is
-`STEP-B-ANALYSIS.md` §4.1. In one paragraph: one variable — **the mandatory step-file reads are suppressed**,
+`PLAN-2-step-b.md` §4.1. In one paragraph: one variable — **the mandatory step-file reads are suppressed**,
 headings only — everything else held, scored on the same four known-answer calls. It measures not *whether*
 the prose reaches the agent (the register already shows it does) but **how much**. **It can CONFIRM and it
 cannot REFUTE:** at n=1 a small effect is indistinguishable from none. And it carries a contamination the
