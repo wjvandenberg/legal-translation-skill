@@ -106,7 +106,7 @@ there was no config here at all, so both reported N/A on a 1,666-line file** —
 `tools/verify_md.py` reports on this section's shape **by omitting the row** — and a missing row reads
 exactly like a passed one.
 
-> **OVER-CAP EXEMPTION, RE-DECLARED 2026-09-09 (5): 1,233 lines against a cap of 500.** *(Taken from the
+> **OVER-CAP EXEMPTION, RE-DERIVED 2026-09-10: 1,237 lines against a cap of 500.** *(Taken from the
 > checker on the commit that declares it, never typed from memory, and re-derived **LAST**, because editing
 > this subsection moves the very number it declares. `tools/verify_charter_continuity.py` compares this
 > figure against the measurement on every run and has caught this line stale three times in one day, which
@@ -473,17 +473,17 @@ Cowork (and Chat) is the primary runtime; **Claude Code is the development envir
 - **Lexicons and step documents as Markdown**, deliberately split small so only a few load at once.
 - Run Python via **`uv run`** (inherited house rule).
 
-**Dev-host toolchain — installed and verified 2026-07-29, and every element of it is load-bearing:**
+**Dev-host toolchain, every element load-bearing — RE-MEASURED 2026-09-10: FOUR of the seven rows were stale.**
 
 | tool | version | used for |
 |---|---|---|
-| Python | 3.14.3 | the 20 pipeline scripts and every measurement script |
-| `lxml` | 6.0.2 | the only third-party import in the skill |
-| `uv` | — | house rule: run Python via `uv run` |
+| Python | **3.12.12 under `uv run`** — and bare `python` is **3.14.3**, a *different interpreter*. Nothing pins a version here *(no `.python-version`, no `pyproject.toml`)*, and **register I-25 is what the difference costs**: bare python links a different zlib and silently rewrites all eighteen fixtures' bytes | the 20 pipeline scripts and every measurement script |
+| `lxml` | 6.1.3 | the only third-party import in the skill — **confirmed 2026-09-10 by an AST sweep of both trees**, 7 of 20, control fired |
+| `uv` | 0.11.16 | house rule: run Python via `uv run` — **which is why the Python row above reads 3.12, not 3.14** |
 | **Microsoft Word (COM)** | 16.0 | **reference-fidelity `.doc → .docx`** — our own evidence baseline |
-| **LibreOffice** | 26.2.4.2 | the **user-reality** converter, and `docx → pdf` |
+| **LibreOffice** | 26.8.0.3 | the **user-reality** converter, and `docx → pdf` |
 | **pandoc** | 3.10 | the grader's `docx → markdown` comparison |
-| **PyMuPDF** (`fitz`) | 1.28.0 | `pdf → png` page rendering |
+| **PyMuPDF** (`fitz`) | 1.28.2 | `pdf → png` page rendering |
 
 **The rendered visual diff — the project's highest-yield defect detector — is available on this host**, and
 A1 proved it: it produced or confirmed the top finding on every document. **Convert legacy `.doc` with Word
@@ -509,7 +509,7 @@ project** adds at each stage, and nothing else.
 | **Plan** | *What it builds*, *what it must not do* and *what counts as done* are all three in §3 of the build plan; **do not invent your own** |
 | **Verify** | The acceptance condition in §3's *Done when* line — the byte comparison, the negative input that makes each new check fail, the named acceptance test |
 | **Test** | The method for that branch kind in **section 4 of `PLAN-2-step-b.md`**, plus the smoke suite, plus the parity check from branch 2 onward, plus a graded run where **that section** says a graded run |
-| **Commit** | §5.2 and §5.2 |
+| **Commit** | §5.2 — **both halves of it**, the branch-and-PR rules and the definition of done *(they were separate subsections until the 2026-09-09 mapping, and this cell read "§5.2 and §5.2" until 2026-09-10)* |
 
 #### The cycle must produce ARTEFACTS, not intentions
 
@@ -542,9 +542,11 @@ table.**
 
 #### Branches, pull requests and commits
 
-- **Pull requests, NOT direct merges.** Open a PR per branch, review the diff — walk it, summarise it, flag
-  the risks — and **present that review. Do not merge; Wouter approves.** Merge style is
-  **squash-and-merge**. Push and update §7 after each branch.
+- **THE HOUSE RULE GOVERNS AND THIS CHARTER NO LONGER DISAGREES** *(Wouter, 2026-09-10, with the cost
+  named)*: **attended STANDARD-MODE work commits straight to `main`**, the review having already happened
+  in the conversation — **but NOT while branch protection stands**, which rejects a direct push with
+  `GH006` even for an admin, and relaxing that is his separate act. **UNTIL THEN: a PR per branch, the
+  diff walked and PRESENTED, Wouter merges, squash-and-merge**, push and update §7 after each branch.
 - **STACKED BRANCHES: MERGE FROM THE BOTTOM UP, AND DO NOT DELETE A BASE BRANCH WHILE ANYTHING SITS ON IT.**
   *(2026-08-07, and it cost a pull request.)* Where branch B is opened against branch A rather than `main`,
   **deleting A on merge makes GitHub CLOSE B**, and a closed PR **cannot be reopened or retargeted** once its
@@ -556,7 +558,7 @@ table.**
   pushing it**, since it is a different commit on a different base and the old evidence does not carry over.
   **This is why stacking is a cost, not a convenience:** prefer branching from `main` whenever the change is
   genuinely independent, and stack only when the later branch truly needs the earlier one's content.
-- **Before every commit:** run `git status` and **explain it to Wouter** in plain terms.
+- **TWO HOUSE RULES BIND HERE AND ARE NOT RESTATED** *(probed 2026-09-10, each has a verbatim twin)*: before every commit run `git status` and **explain it to Wouter** in plain terms; and on a **session restart** after a gap of more than a day read the last ~8 commit messages plus §7 and summarise them back first.
 - **Branch protection on `main` — LIVE since the repository went public, 2026-08-07.** Require a PR; block
   force pushes and branch deletion; **`enforce_admins` TRUE**. Required approvals stay **0** — on a solo repo
   GitHub would otherwise refuse to let Wouter merge his own PR, breaking the agreed workflow rather than
@@ -574,8 +576,6 @@ table.**
 - **Debugging a regression: `git bisect`, not guesswork** — but bisect needs a *cheap, deterministic*
   pass/fail test, and "translate a document and grade it" is neither. **Bisect against the smoke suite or
   the fixture byte-comparison.**
-- **Session restart after a gap of more than a day:** read the last ~8 commit messages plus §7, summarise
-  them, *then* work.
 
 #### Definition of done — every branch, every step
 
@@ -635,8 +635,7 @@ can measure a question that is already answered. *(And a fourth, in the arm's ow
 fixed on an earlier branch sat in the new count, so 34 predicted and 53 stable fragments read as "the fix did
 not fire" on a document where there was never anything to fix.)*
 
-**THE SIX DATED INSTANCES MOVED TO `EVIDENCE-measurement.md` SECTION 3.3 ON 2026-08-25** — six green numbers
-in one session, each reporting on something other than the thing being checked.
+**THE SIX DATED INSTANCES MOVED TO `EVIDENCE-measurement.md` SECTION 3.3 ON 2026-08-25** — six green numbers, each reporting on something other than the thing being checked.
 
 #### The checker roster — what this project keeps, and why it dropped the rest
 
@@ -704,8 +703,7 @@ trick, the two fixture tiers, the mandatory negative inputs, and the two ways a 
 
 #### The review protocol — for INPUT POINT 2
 
-**The twelve-document review is complete. This is kept because Step C repeats it.** Only the rules that
-survived contact with reality are here.
+**The twelve-document review is complete; this is kept because Step C repeats it.** Only the rules that survived contact with reality are here.
 
 **The loop, per document.** A helper opens the original and the translation side by side, read-only, with no
 filename typed. **Wouter gives his input in whatever shape he likes** — prose, a list, a screenshot, a
@@ -761,7 +759,8 @@ dated cost stories moved to `EVIDENCE-measurement.md` section 3 on 2026-08-24.**
 gaps, and why a pairwise comparison of two runs reports sixteen rather than a different rubric. **Its bash
 paths are Cowork container paths; substitute local equivalents.**
 
-**Eight measurement rules came out of building it, and every one generalises beyond the grader:**
+**SEVEN measurement rules came out of building it, and every one generalises beyond the grader** *(eight
+until 2026-09-10; *re-measure, do not re-read* swept as a THIRD copy — 3 → 2, §1.5 and the house file)*:
 
 - **Never score ANY run property from element counts — compare the affected TEXT, then render.** Translation
   consolidates runs, so nearly every count falls even when nothing is lost — and **it fails in both
@@ -776,14 +775,12 @@ paths are Cowork container paths; substitute local equivalents.**
 - **Identical paragraph properties are not evidence that layout survived.**
 - **Never compare properties BY PARAGRAPH INDEX across the definitions block** — that step permutes it.
   Match definitions **by term**.
-- **Re-measure, do not re-read.** Re-measuring found defects that re-reading a previous report never would.
 
 **Forensic logging is a primary method, not a nice-to-have.** When observing the skill on a real document,
-log **everything** — every file read, every tool call, every reasoning step, every gate firing, every wasted
-call and iteration loop, every ambiguous instruction, plus per-step token and time cost. **A summary is not
-a log.** Every real fix in the rev16→rev44 history came out of exactly this kind of observation. **And take
-counts from the log analyser, never from the narrative** — measured, and the figures are in
-`EVIDENCE-measurement.md` section 3.2. **The narratives remain the only source for *reasoning*.**
+log **everything** — every file read, tool call, reasoning step, gate firing, wasted call and iteration
+loop, every ambiguous instruction, plus per-step token and time cost. **A summary is not a log.** Every real
+fix in the rev16→rev44 history came out of it. **And take counts from the log analyser, never from the
+narrative** *(the figures are `EVIDENCE-measurement.md` section 3.2)* — **narratives remain the only source for *reasoning*.**
 
 #### The test corpus
 **THE TWELVE-ROW LISTING MOVED TO `EVIDENCE-measurement.md` SECTION 1 ON 2026-08-24** — with the paragraph
@@ -881,7 +878,9 @@ includes examples.**
   contents. Never copy one into the repo, never name one in a commit message, never paste an excerpt into a
   public artefact.
 - **A separate rule for one artefact that DOES ship:** the run report goes inside the skill, so it must be
-  **metadata-only by construction** — counts and durations, never document text and never filenames.
+  **metadata-only by construction** — counts and durations, never document text and never filenames. **AND
+  IT IS THE ONLY EGRESS THERE IS: the skill authenticates against nothing and makes no network call** —
+  measured 2026-09-10, **0 network, auth or credential imports across the 40 shipped scripts**, control fired.
 - **A COMMENT SHIPS, AND AN EXAMPLE IN A DOCSTRING IS PUBLISHED PROSE. Invent the examples.** Three scripts
   intended for `tools/` were caught this way — `EVIDENCE-confidentiality.md` section 4.
 - **A PROBE CANNOT SEE WHAT A SCRIPT REVEALS ABOUT THE CONTROL.** §6.4's never-commit list is a floor and
@@ -898,6 +897,12 @@ includes examples.**
 > directory — whose target is an evidence folder. **THE HAZARD IS OUTPUT, NOT ACCESS:** a script that reads
 > those logs and prints counts still runs, and `tools/evidence_ls.py` is the sanctioned way to see a
 > folder's **shape**, printing no name ever — because **a block with no alternative gets worked around.**
+>
+> **AND A SECOND ROUTE INTO IT, WITH NO HOOK AND NO REMEDY: A RENDERED PAGE OF A CORPUS DOCUMENT IS CLIENT
+> TEXT AS AN IMAGE, SO CLAUDE MAY NEVER LOOK AT ONE.** Real corpus is compared **MECHANICALLY**, every image
+> deleted; synthetic fixtures may be viewed; **a page-by-page read of a real document is Wouter's alone.**
+> *(Relocated here 2026-09-10 from `tools/render_diff.py`'s docstring — its ONLY tracked home, and a
+> docstring loads only if somebody opens that one file. The tool keeps a pointer.)*
 >
 > **Two limits, stated rather than implied. Hooks load at SESSION START**, so this one never protects the
 > session that adds it — probe it with a command naming a non-existent directory under an evidence folder,
@@ -922,18 +927,16 @@ not a pass, and both list-readers were measured blind to `.claude/` on 2026-08-2
 **Two list-maintenance rules, both learned the hard way.** Use `\s+` for every space in a multi-word
 pattern, never a literal space — one written with a single space silently failed against a doubled space,
 and **a missed name is invisible: the scan simply reports clean.** And **every pattern must be tested
-against the string it was written for, in the same commit** — in Python, `'\bName\b'` in a non-raw literal
-is BACKSPACE+Name+BACKSPACE and will never match.
+against the string it was written for, in the same commit** — `'\bName\b'` non-raw is BACKSPACE+Name+BACKSPACE.
 
 **Which files may never be committed — measured, not assumed. THE RULE THAT DECIDES IT is not *"is this a
 script?"* but *"does this file hold one real string per pattern?"*** — which is why a scanner is publishable
 and the list it reads never is. **The four files are listed in §6.4**, which is route 1; the 90-script
 census behind the rule is `EVIDENCE-confidentiality.md` section 4.
 
-**ONE ITEM IS STILL OPEN, and it is the only one:** the scan list needs tightening before it is trusted as
-a pre-commit gate — its false-positive rate against the skill trees is high enough that a reviewer starts
-skimming, and **a control nobody believes is not a control.** Mitigated, not closed:
-`EVIDENCE-confidentiality.md` section 5.2.
+**ONE ITEM IS STILL OPEN:** the scan list needs tightening before it is trusted as a pre-commit gate — its
+false-positive rate is high enough that a reviewer starts skimming, and **a control nobody believes is not
+a control.** Mitigated, not closed: `EVIDENCE-confidentiality.md` section 5.2.
 
 **`.gitignore` prevents accident; it is not a security control.** It removes nothing already committed and
 does not stop a deliberate `git add -f`. **Making a repo public exposes the entire history, not the current
@@ -962,10 +965,9 @@ there is no rotation** — which is why the location rules matter more than any 
 
 #### OOXML hard rules — all confirmed in production
 **ALL TEN OOXML RULES MOVED TO `.claude/rules/ooxml.md` ON 2026-08-24**, scoped to `uk/**`, `us/**`,
-`tools/**/*.py` and `tests/**/*.py`. **They load when you open such a file and not at launch — observed
-in both directions, not assumed.** Forgetting one produces a file Word rejects, which is reversible; that
-is why they are route 4 and not route 1. **A scoped rule is good for ONE USE PER SESSION**, so re-open
-that file deliberately if you need them twice.
+`tools/**/*.py` and `tests/**/*.py`. **Route 4 and not route 1 because forgetting one produces a file Word
+rejects, which is reversible.** The loading mechanism and its limits are the house file's *(§6.5 lists what
+this project has)* — **re-open that file deliberately if you need the rules twice.**
 
 #### Skill-authoring conventions
 **FIVE OF THE SEVEN MOVED TO `.claude/rules/skill-authoring.md` ON 2026-08-24**, scoped to `uk/**` and
@@ -1011,12 +1013,10 @@ entire**, and `verify_charter_continuity.py` check 6b asserts it.
 **3. PREFER A RELATIONSHIP TO A NUMBER.** *"§7 is under its cap"* cannot go stale; *"§7 is 18 lines"* can.
 Every stale count in this project came from adding a delta to the figure already written down.
 **AND WHERE A NUMBER MUST BE WRITTEN, STATE ITS UNIT — a count whose unit is implicit is a count the next
-session re-derives differently.** *(Relocated here 2026-09-09 from a dated STATE block that sat above §1 and
-was the only thing in it with no twin. The figure it belonged to — the skill-file lines modified to remove
-real-document material — had gone a month stale and is now printed live by `precommit_gate` and recorded per
-file in `baseline-divergences.json`, so the number went and the lesson stayed. It was bought expensively: the
-figure was right under exactly one of six natural readings, four of the six gave a different answer, and an
-audit that assumed the wrong one measured four against a stated ten and reported a failure.)*
+session re-derives differently.** *(Bought expensively: one figure was right under exactly ONE of six
+natural readings, and an audit that assumed the wrong one measured four against a stated ten and reported a
+failure. Relocated here 2026-09-09 from a dated STATE block above §1; the figure itself went, `precommit_gate`
+printing it live now, and the lesson stayed.)*
 
 **4. WHAT THE `§` RULE HAS ALREADY COST HERE:** **nineteen were found, eleven genuinely misdirected, one
 pointing at the wrong section of the right file** — because a sign aimed elsewhere **passes silently against
@@ -1155,7 +1155,7 @@ other document here — `verify_md.py` counts them on every run, so the number i
 
 #### What never enters the repository
 
-**Three sibling folders, outside the repo tree — not merely gitignored.**
+**FOUR sibling folders, outside the repo tree — not merely gitignored.** *(It said THREE until 2026-09-10, one line above a table of four — counted by LISTING them, which is the only thing that catches it.)*
 
 | folder | what is in it | why it can never be committed |
 |---|---|---|
@@ -1210,24 +1210,28 @@ path-scoped rule is absent until a matching file is read, and then good for ONE 
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8, and the 35-line cap in §1.7)*.
 
-### HANDOFF — 2026-09-09. BRANCH 7 CLOSED AND MERGED. THE `.pyc` SLICE BUILT. NEXT IS BRANCH 8
+### HANDOFF — 2026-09-10. THE INTERVIEW SWEEP AND THE PROMPT REWRITE. NEXT IS BRANCH 8
 
-**Merged this session, in order — a list rather than a count, because a count goes stale on the next merge: PR #68 `f6f1458` (slice 2's close), PR #69 `010c34f` (slice 3 — A19), PR #70 `6c1be4c` (branch 7's close), PR #71 `015c8b6` (the `.pyc` slice), plus this close.** **BRANCH 7 IS CLOSED — all four of its rows.** A19 got a **REPORT** over every graphic surface in every part, in extraction's Step 2, naming the route or its absence; and a **TRANSLATION ROUTE** for header and footer alt text at **Step 8b.2b** — no new step number — on the scaffold `translate_headers_footers.py` already had and the bundling repack already does. **One inventory, IMPORTED by both halves rather than restated.** A surface with **NO ROUTE is REPORTED, never refused** *(§5.7's compliant-exit test, which decided slice 2's refusal the other way)*.
+**WHAT WAS DONE, HOW, AND WAS THE PURPOSE MET — YES.** The purpose was to supply the half no checker can see: earlier sessions made this charter house-SHAPED, and **nothing this house owns can tell a complete section from a well-formed one.** All **43** of the template's Round 1 questions are now classified — **40 ANSWERED** quoting the section, **2 ANSWERED-BUT-STALE**, **1 UNANSWERED**, **0 N/A**, and **the four buckets sum to 43** *(re-derived by LISTING as 4 · 11 · 5 · 5 · 12 · 6; Round 0's eight and Round S's five are a different population, declared separately)*. Wouter settled the unanswered one and three findings with `AskUserQuestion`.
 
-**A19's EVIDENCE IS FIXTURE-ONLY AND SAYS SO.** The corpus holds **14 graphics across 3 of 10 documents and not one attribute of prose** — `@descr` 0, `@title` 0, `v:shape/@alt` 0 — and 0 across both trees' 396 files, 396 opened, control FIRED. **The row never named the VML surface, which is a third of the real population.** `tools/hf_corpus_diff.py` is new, measures that corpus-wide zero, and **proves it a real zero by planting a `@descr` and watching the same code path find it.**
+**THE TWO STALE ANSWERS WERE FOUND BY RUNNING, WHICH IS THE ONLY WAY THEY EVER ARE.** §4's dev-host table was re-measured and **four of its seven rows were wrong.** The Python row is the expensive one: **`uv run python` is 3.12.12 while bare `python` is 3.14.3**, nothing pins a version *(no `.python-version`, no `pyproject.toml`)*, and **register I-25 is exactly what that difference costs** — so the table had been recording the interpreter the house rules forbid using. Also lxml 6.0.2→6.1.3, LibreOffice 26.2.4.2→26.8.0.3, PyMuPDF 1.28.0→1.28.2; Word COM 16.0 and pandoc 3.10 were current. **Re-measure that table, never re-read it.**
 
-**BOTH OWED MEASUREMENTS DISCHARGED.** *(a)* The header/footer inline `sdt` was **RUN, and the reading held** — nothing stranded. The corpus cannot settle it: its one instance sits in a footer whose frozen `en` is null, so apply never rebuilds it. **§5.5's THIRD reason, and deliberately not a fifth** *(Wouter)*. *(b)* `w:dataBinding` is **3 elements across 2 documents, ALL FOOTERS** — sharper than the decision log; preserved intact, Word-in-the-loop **declared VOID with what it would take written down**.
+**THE ONE UNANSWERED QUESTION IS NOW A CHECKABLE CLAIM IN §5.6:** the skill authenticates against nothing and makes no network call — **0 network, auth or credential imports across the 40 shipped scripts**, control fired at 18 `zipfile` importers. It was true and nobody had written it down, so nothing could catch a change to it.
 
-**THEN THE `.pyc` SLICE, WHICH WOUTER SCHEDULED AT THE CLOSE AND WHICH IS THE MORE REUSABLE RESULT.** Slice 3's new import can leave a `.pyc` inside a **SHIPPED** tree; `precommit_gate` check 6 caught one on the commit that added it. **Four other tree scripts imported a sibling the same way and none guarded.** `tests/test_no_bytecode_in_tree.py` **DISCOVERS the importers by reading the tree** rather than listing the five, so caller N+1 is covered — **RED FIRST at 6 failures, arm 2 writing three real `.pyc` files with `PYTHONDONTWRITEBYTECODE` stripped from the child environment**, because every suite here sets it and a static arm alone would be green on a tree that still writes bytecode for a real operator.
+**A ROUTE-1 CONFIDENTIALITY RULE WAS LIVING IN A TOOL DOCSTRING.** *"CLAUDE MAY NEVER LOOK AT A RENDER OF A REAL DOCUMENT"* existed in exactly ONE tracked place, `tools/render_diff.py` — `git grep -F` for it returned **rc 1**, with two controls firing. It is now in **§5.6**, route 1, and the tool keeps a pointer. §5.6 had covered the transcript leak class only for command OUTPUT and never for client text as an IMAGE.
 
-**AND DOING IT ALONE TURNED A CONFOUND INTO A PROOF.** It touches apply, so `apply_corpus_diff`'s baseline is **genuinely different for the first time in three slices**: the self-comparison notice is **absent**, and **13 of 13 frozen intermediates come back byte-identical with 0 unexplained movement.** That is §5.4 rule 3 — *proved byte-for-byte, or not claimed* — on real documents. Inside slice 3 the same line would have made the arm unreadable.
+**EVERY CHARTER ADDITION WAS PAID FOR IN-SECTION AND NO CAP WAS RAISED.** All seven sections are back at exactly their caps — **127 · 153 · 162 · 37 · 548 · 166 · 30/35** — and §1–§6 are byte-for-byte back at 1,233 lines, so **every one of the substantive additions was funded, not absorbed.** The file reads **1,237** only because THIS handoff is four lines longer than the one it replaced, well inside §7's own cap. The payment was PROBED, never assumed: two bullets with a verbatim house twin merged into one pointer *(house lines 822 and 842)*, plus word-level trimming.
 
-**AND WOUTER CAUGHT A STATUS BLOCK IN §1 THAT HAD BEEN STALE FOR A MONTH — the defect §7 exists to prevent, in the one place it is read first.** A dated `STATE, 2026-08-07` blockquote sat above §1 asserting the repository's state, Step A/B's closure and a skill-file line count. **Deleted, −17 lines, every claim probed for a twin first rather than eyeballed** *(§2.5's 2026-08-05 and 2026-08-06 rows, §3.1's step-1 row, §6.4's own heading)*. **Its one orphan — *state a count's unit* — moved to §5.8 rule 3 instead of dying with it**, and the superseded figure went for good because `precommit_gate` prints the live one every run. **The general lesson is not "that block was old": it is that §1 can hold status at all, and nothing checks for it.** `verify_md` measures section LENGTHS and `verify_charter_continuity` compares the declared figure; **neither can see a status claim in the wrong section**, so this was caught by a person reading the top of the file, which is the only instrument that has ever caught it.
+**COMMIT FLOW CHANGED AND IS NOT YET IN FORCE** *(Wouter, 2026-09-10)*. The HOUSE rule governs — attended standard-mode work commits straight to `main`. **Branch protection still rejects a direct push with `GH006`**, so §5.2 carries the decision and the interim flow, and relaxing the protection is his separate act, not a session's.
 
-**THE SINGLE NEXT ACTION: BRANCH 8** — reading-apart completeness, **C28 C12 M1**. **The queue stays in order** *(Wouter)*: 8, then 9 — which unblocks 11 — then 10, then 11. Register T6 calls C18 the highest-value single item and it is branch 11's. **AND BRANCH 8's SESSION ALSO INVESTIGATES REGISTER F43** *(Wouter, this session)*.
+**THE NEXT-SESSION PROMPT MOVED, AND IS NOW ONE FILE.** `NEXT-SESSION-PROMPT.md` at the **ROOT**, gitignored by name — **and it was NOT, until this session added the entry**: `git check-ignore` returned **rc=1** on that exact filename over a PUBLIC repository, so a handoff naming branch state and paths would have been committed. Three prompt-shaped files sat in `temp/` distinguishable only by mtime; all three are now in `temp/archive/`, moved **SHA-identical**.
 
-**Open, none blocking.** **(1)** **F43, filed at candidate strength**: the frozen header/footer scaffolds went partly or wholly UNFILLED on the 3 workdirs matching a corpus document (5 of 5 on one, 1 of 3 on another) — if those are delivered runs, header/footer text shipped untranslated. **NOT established:** the other 7 of 10 match nothing and hold 0–1 entries, so a fill rate over a population of unknown provenance is not a fill rate. The row says what would settle it. **(2)** whether Word repopulates a bound control from `customXml` on open — the dev host already has Word 16.0. **(3)** whether the upstream smart-tag removal is correct. **(4)** branch 6's residue: C16, A20's corpus measurement, the commit-identity decision (**read its figure from `verify_code`, never from this handoff**), G12's 16 unclassified findings, the scan list's false-positive rate, `verify_code`'s other two reds.
+**THE SINGLE NEXT ACTION: BRANCH 8** — reading-apart completeness, **C28 C12 M1**, and register **F43** in the same session. Its prompt is the root file, and it now describes the tree as it stands: **five stale paths and NINE stale `§5.N` references repaired**, four of the nine pointing at nothing and **five at a real but WRONG section** — the silent direction, and the one nobody notices.
 
-**SESSION COST: 44%, read by Wouter at the close and not estimated** — three merges plus a fifth slice, inside the 26–54% band the fifteen recorded readings now span. **Recorded, never obeyed:** the session ended because its planned work ran out.
+**Open, none blocking.** **(1)** whether to relax branch protection — his. **(2)** F43, plus branch 7's three carried items. **(3)** §1.7's trigger is KNOWN-false and owed elsewhere — do not fix it on sight. **(4)** `md.files` is still `["CLAUDE.md"]`, so 371 tracked markdown documents are measured by nothing.
 
-**What a new session would get wrong.** **It would move "BOTH pins".** There are **THREE** carriers since this session, and `tools/hf_corpus_diff.py`'s is **FIXED at `ae48f6d` on purpose** — moving it makes the tool VOID for ever, measured. **`git grep -F <old sha>` enumerates the carriers; a phrase naming a COUNT cannot.** It would match an OOXML element on its **LOCALNAME** where the name is shared — `a:t`, `w:t` and `dgm:t` all end in `t`, which doubled a chart part's reported surfaces; the rule is in `.claude/rules/ooxml.md`, **path-scoped and good for one use per session**. It would assert `"ns0:" not in output` and read a **pre-existing** prefix mapping as a rebind: a needle must be **source-relative**. It would manufacture a visual arm — **neither A19 surface renders on any page, in this renderer or in Word**. It would lift an example string out of a step document into a fixture; §5.6 requires every fixture string to be **invented for the purpose**, and `leakage_scan` caught exactly that. It would copy a tree script over its twin: **measured divergences are `extract_paragraphs` 2, `translate_headers_footers` 3, `apply_translations_textmatch` 13, `validate_apply` 17, `repack_docx` 0, the step doc 9** — and `quality_check`'s 1152 is a line-offset artefact of a naive zip comparison, not real divergence. It would run `tests/make_fixtures.py` with bare `python` and rewrite every fixture *(I-25)*. It would forget to **stage** a new fixture before `audit_branches` counts it — **that claim has now caught three consecutive slices** — or to refresh `sha256_now` **and** `changed_by` from the **staged** blob. **It would run two suites at once:** the full sweep takes over two minutes and they share the working tree. **It would run `verify_charter_continuity.py` with `LT_HOUSE_TEMPLATES` at `…\Coding\templates` instead of `…\Coding\templates\evidence`, where check 7 FAILS.** **Two reds are BY DESIGN** — `verify_md`'s `file length` while §1.7's exemption stands, and `stepb_audit` check 10 at 8 unverified quotations. **`verify_code` is a third and fails three.** **AND `claudemd_disposal` IS A FOURTH, newly named here because no previous handoff listed it:** 37 items carried nowhere, 8 declared drops. **Measured identical at `HEAD` and in the working tree on 2026-09-09** — so it is pre-existing and was NOT caused by deleting the §1 status block, which is the thing it would most plausibly have been blamed for. Nobody has scoped it. **Four pre-existing leakage hits stand**, two per tree — **proved pre-existing by scanning the `HEAD` versions**, same patterns and shas. Do not re-judge them as new.
+**GATE: 8 green / 4 red, exactly the four declared, no fifth** — compared command by command against the previous capture: **12 compared, 0 before-only, 0 after-only, 9 IDENTICAL, 3 CHANGED, every change attributed.** Project suite **PASS** *(14 of 14 cases, 16 fixtures byte-identical twice)* · installed runner **13 suites / 7 entry points PASS** · cycle gate **VERDICT PASS** · confidentiality **tree PASS 520, added lines PASS 68, all history blobs PASS 917, control FIRED**; the one FAIL is the deferred commit-message population.
+
+**What a new session would get wrong.** It would **point `verify_confidential` at `leakage-names.txt`** — that is the *leakage* list at 93 patterns, and it returns a confident tree FAIL that reads as a regression. The right one is the HOUSE forbidden-phrase list — **8 phrases, fingerprint `e76c67eb55c1`** — whose path the house charter names and which this public file therefore must not; **the fingerprint is how you tell which list actually ran**, and it is printed on every run. It would read `claudemd_disposal`'s `[LOST]` rows as lost rules — **they are PHRASE needles, so rewording a rule breaks the needle while still carrying the rule**; four went LOST here and all four were repaired by RESTORING THE PHRASE, never by loosening the checker. It would **enumerate the private folder**: `evidence_guard` blocks that and did, this session. And it would read `verify_code`'s moved denominators as a defect — they are **+1 for the new root prompt file, which a disk-glob checker reads even though git ignores it** *(§5.3's hygiene rule 5: honest, not a defect)*.
+
+**Context: not measured at the time of writing — asked at the close.**

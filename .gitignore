@@ -11,7 +11,8 @@
 # below lives OUTSIDE this tree rather than merely being named here.
 
 # ─────────────────────────────────────────────────────────────────────────────
-# The three sibling folders that may never enter the repository (charter §6.5).
+# The three sibling folders that may never enter the repository (charter §6.4; this read
+# §6.5 until 2026-09-10, and §6.5 is now a real but WRONG section — the path-scoped rules).
 # They are siblings, so Git cannot see them from here. These entries exist for the
 # one case that would defeat that: a copy landing INSIDE the tree, at any depth.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -41,6 +42,14 @@ tests/frozen/
 # ─────────────────────────────────────────────────────────────────────────────
 temp/
 *.local
+
+# THE NEXT-SESSION PROMPT — one file, at the root, IGNORED BY NAME (house convention).
+# Added 2026-09-10, in the same change that moved the prompt here from `temp/`, because the
+# root is NOT covered by `temp/` and this repository is public. A handoff prompt names branch
+# state, paths and open questions; it is working material, never a deliverable. Before this
+# entry existed a root prompt file would have been committed — measured with `git check-ignore`,
+# which returned rc=1 (NOT ignored) on exactly this filename.
+NEXT-SESSION-PROMPT.md
 
 # Packaged skills are BUILD OUTPUT — `tools/package.py` regenerates them at release time.
 # What you see in `uk/` and `us/` is what ships; the archive is derived from it.

@@ -1,15 +1,25 @@
 # -*- coding: utf-8 -*-
 """THE RENDERED PAGE COMPARISON — CLAUDE.md 5.2's gate, made runnable.
 
-Section 5.3 makes a "rendered PDF visual diff against the source, page by page, BOTH
-documents" a condition of done for every branch, and 2.5 item 4 calls the rendered diff the
+Section 5.2 makes a "rendered PDF visual diff against the source, page by page, BOTH
+documents" a condition of done for every branch, and 2.4 item 4 calls the rendered diff the
 PRIMARY instrument rather than a final check. No tool existed for it. This is that tool.
+(Those two numbers read 5.3 and 2.5 until 2026-09-10: the 2026-09-09 charter mapping moved
+them, and a stale section sign resolves against a real but WRONG section, silently.)
 
 ONE CONSTRAINT SHAPES THE WHOLE DESIGN, AND IT IS A CONFIDENTIALITY CONSTRAINT RATHER THAN A
-TECHNICAL ONE. A rendered page of a corpus document is client text as an image. CLAUDE.md 6.4
-says session metadata is reachable by neither the scanners nor the location rule, so there is
-no after-the-fact remedy and it cannot be un-said. THEREFORE CLAUDE MAY NEVER LOOK AT A
-RENDER OF A REAL DOCUMENT. The gate splits in two:
+TECHNICAL ONE. A rendered page of a corpus document is client text as an image, and CLAUDE.md
+6.4 says session metadata is reachable by neither the scanners nor the location rule, so there
+is no after-the-fact remedy and it cannot be un-said. THEREFORE CLAUDE MAY NEVER LOOK AT A
+RENDER OF A REAL DOCUMENT.
+
+  THE RULE ITSELF NOW LIVES IN CLAUDE.md 5.6, WHICH IS ROUTE 1 AND ALWAYS LOADS. Until
+  2026-09-10 this docstring was its ONLY tracked home, and a docstring loads only if somebody
+  opens this one file -- weaker than a path-scoped rule, for a confidentiality rule whose
+  failure cannot be undone. This paragraph is the pointer that relocation leaves behind; it
+  is not the copy of record. If the two ever disagree, 5.6 wins.
+
+The gate splits in two:
 
   --doc ID       REAL CORPUS. Renders outside the repository, compares pages MECHANICALLY,
                  prints percentages and page counts, then DELETES every image. No page is
