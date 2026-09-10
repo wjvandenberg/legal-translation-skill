@@ -38,7 +38,7 @@ if hasattr(_sys.stdout, "reconfigure"):
 
 
 ROOT = Path(__file__).resolve().parent.parent
-doc = (ROOT / "STEP-B-ANALYSIS.md").read_text(encoding="utf-8")
+doc = (ROOT / "PLAN-2-step-b.md").read_text(encoding="utf-8")
 # strip markdown emphasis before flattening: a needle like "auxiliary-part content" must
 # match "auxiliary-part *content*" in the source, or the check reports a false MISS.
 # NOT underscore in the strip class: it would break identifier needles like definitions_range

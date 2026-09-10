@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Structural + consistency validator for FINDINGS-REGISTER.md.
+"""Structural + consistency validator for REGISTER-findings.md.
 
 Checks things eyeballing misses:
   1  every finding row parses into 5 columns with a valid severity
@@ -12,7 +12,7 @@ Exit 0 only if everything passes.
 """
 import re, sys, os
 
-REG = 'FINDINGS-REGISTER.md'
+REG = 'evidence/REGISTER-findings.md'
 SEV = {'CRITICAL', 'HIGH', 'MED', 'LOW', 'POS', '—', '-'}
 fails, warns = [], []
 

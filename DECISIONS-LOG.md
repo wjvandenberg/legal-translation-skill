@@ -53,7 +53,7 @@ actually wrong. Arm 1's operator said so directly — it began composing a 5b bl
 too early. **5b did its work by not being used.** *(2)* **Its product is the disclosure, not the escape.**
 The register records operators improvising out of closed loops; the rule that a known defect may never ship
 unspoken is load-bearing however rarely the channel fires. *(3)* **"Near-unreachable" describes the TEST,
-not the rule.** Two of section 5.5 of `STEP-B-ANALYSIS.md`'s three impossible requirements — **F30** and **F33** — remain genuine dead
+not the rule.** Two of section 5.5 of `PLAN-2-step-b.md`'s three impossible requirements — **F30** and **F33** — remain genuine dead
 ends; they simply do not run through a script that returns an exit code, so branch 5 cannot block on them
 and this gate could never have reached them.
 
@@ -167,7 +167,7 @@ reviews it and asks his critical questions first. **A NEW STRAND A4 IS ADDED —
 same skill judged from the outside by a notional competition judge who has seen no test result, scored
 against **eleven** criteria **fixed and frozen before looking at the skill**, producing a second report that Step B reads
 alongside A3. **Overlap between the two is expected and wanted.** **The blindness is an operational
-constraint, not an aspiration: `CLAUDE.md` and `FINDINGS-REGISTER.md` now contain the answers, so A4 needs
+constraint, not an aspiration: `CLAUDE.md` and `REGISTER-findings.md` now contain the answers, so A4 needs
 a sealed brief that excludes both** — I-11's lesson, which cost four spoiled documents in the last review.
 **A4 is PLANNED in one session and RUN in another.** Also decided at Wouter's prompting: **A3 owed answers
 on RUNTIME and on REDUNDANCY** and had given neither — both are now measured sections rather than Step B
@@ -177,7 +177,7 @@ fact about the skill, not a fact about a fix.
 **2026-07-31** — **A1 COMPLETE.** Batch session graded; register extended with cluster **T**; **A17's
 mechanism corrected** (character style, not paragraph style) and **C19 reversed** (it recurs,
 unrepaired). **A name-based leakage scan is not sufficient on its own** — two controls now required, and
-three private tool files identified as never-committable. **`FINDINGS-REGISTER.md` gets a validator**,
+three private tool files identified as never-committable. **`REGISTER-findings.md` gets a validator**,
 run before and after every edit. **This file rewritten and restructured**; pre-rewrite copy archived
 privately.
 
@@ -304,7 +304,7 @@ all in *Roadmap → Phase 3 → THE AGREED SHAPE OF THE STEP B ANALYSIS*, which 
 brief.
 
 > **EDITORIAL NOTE, 2026-08-06.** That brief lived in `CLAUDE.md` and was removed when the charter was
-> rewritten, **because the session it briefed has run and `STEP-B-ANALYSIS.md` is what it produced.** The
+> rewritten, **because the session it briefed has run and `PLAN-2-step-b.md` is what it produced.** The
 > reference above is preserved as written; the four requirements it set are recorded here so nothing depends
 > on a deleted section. **(1) Every option gets FOUR columns — pros · cons · what it would BREAK · what it
 > does NOT fix** — the last two added because this project's documented failure mode is under-scoping, not
@@ -344,8 +344,8 @@ wanted**, and the only defence is someone checking a pair they did not propose.*
 
 ## 2026-08-24 — the companion files keep their legacy names until after phase 3d
 
-**The names hide what the documents ARE.** `STEP-B-ANALYSIS.md` is a **PLAN** — formally step 2's plan file
-— and reads as an analysis. `A3-STRUCTURAL-ANALYSIS.md` is **EVIDENCE**. `OPUS-5-MIGRATION.md` is a
+**The names hide what the documents ARE.** `PLAN-2-step-b.md` is a **PLAN** — formally step 2's plan file
+— and reads as an analysis. `EVIDENCE-a3-structure.md` is **EVIDENCE**. `PLAN-3-opus5-migration.md` is a
 **PLAN**. The house naming convention would call them `PLAN-`, `EVIDENCE-` and `REGISTER-`, and a reader
 who does not already know cannot tell which is which. *(Wouter raised it in exactly those terms.)*
 
@@ -356,11 +356,11 @@ and the six `tools/stepb_*.py` scripts whose own filenames carry one of them.
 
 | document | references | in files |
 |---|---:|---:|
-| `STEP-B-ANALYSIS.md` | 68 | 24 |
-| `FINDINGS-REGISTER.md` | 40 | 17 |
-| `A3-STRUCTURAL-ANALYSIS.md` | 31 | 14 |
+| `PLAN-2-step-b.md` | 68 | 24 |
+| `REGISTER-findings.md` | 40 | 17 |
+| `EVIDENCE-a3-structure.md` | 31 | 14 |
 | `DECISIONS-LOG.md` | 22 | 11 |
-| `OPUS-5-MIGRATION.md` | 17 | 11 |
+| `PLAN-3-opus5-migration.md` | 17 | 11 |
 
 **Why not now, and it is the same reasoning `PLAN-3d-lt-route0.md` already uses against renumbering:**
 phase 3d is still **moving content between these files**, so a cross-reference audit run today is an audit
@@ -448,7 +448,7 @@ well gives the shipped report for free.
 
 ---
 
-**2026-08-05 (Step B ran, and every option was decided).** `STEP-B-ANALYSIS.md` was written, reviewed option
+**2026-08-05 (Step B ran, and every option was decided).** `PLAN-2-step-b.md` was written, reviewed option
 by option, and then **reorganised into build order** on Wouter's instruction at the close of the second
 session. **Eleven options explored; ten approved and the rebuild declined on measured arithmetic** — it
 addresses at most 94 of the recorded findings, cannot be decomposed into merge-sized steps, and risks the
@@ -508,12 +508,12 @@ rules · 6 file, folder & repo structure · 7 current status**, with **§3 carry
 done** and **§7 carrying only the handoff.** Three consequences recorded because they are decisions rather
 than edits:
 
-1. **`OPUS-5-MIGRATION.md` and this file were split out**, on the same principle Wouter set for the Opus 5
+1. **`PLAN-3-opus5-migration.md` and this file were split out**, on the same principle Wouter set for the Opus 5
    work: a self-contained workstream, and a dated historical record, are both easier to keep true outside a
    charter than inside one. **A new standing rule follows** and is in `CLAUDE.md` §5.4: anything
    substantial being added to the charter is placed in §2–§6 by subject, and if it is extensive, **ask
    whether it belongs in its own document before writing it in.**
-2. **The build plan is no longer restated in the charter.** `STEP-B-ANALYSIS.md` §2 owns the order, §3 the
+2. **The build plan is no longer restated in the charter.** `PLAN-2-step-b.md` §2 owns the order, §3 the
    brief and §4 the test method. The charter's old indicative branch list, its six-keystone framing and its
    fourteen-item scoping-caution list are **superseded**, and the standing prescription check
    (`temp/stepb_harvest.py`) proves every one of the cautions was carried into the analysis — **63 carried,
@@ -649,7 +649,7 @@ decision.** What actually requires his approval is the charter rule, the local h
 ---
 
 **2026-08-07 (how an instruction branch is tested — the graded run is replaced, not skipped).** Branch 3 was
-presented with `STEP-B-ANALYSIS.md` §4's method for instruction branches — *"a graded run plus your review"* —
+presented with `PLAN-2-step-b.md` §4's method for instruction branches — *"a graded run plus your review"* —
 and with the honest caveat that folding it into Step C would be a **new** decision, since §4 records that
 answer only for option 4. Wouter's response was neither: **"Can you not test this in any other way? Please
 let's explore this first."**
@@ -691,7 +691,7 @@ model will *apply* the rule. That is behavioural, and no script can settle it.
 deliberately rigged deadlock. **The reasoning is sequencing, not thoroughness:** branch 5 is what turns
 eighteen silent defects into blocked runs, and 5b is then the only legitimate way such a run can end — so if
 5b fails, branch 5 makes the pipeline unusable on real documents, and Step C comes *after* branch 5 has
-shipped. Recorded as a fourth sequencing fact in `STEP-B-ANALYSIS.md` §2, with its design and the direction
+shipped. Recorded as a fourth sequencing fact in `PLAN-2-step-b.md` §2, with its design and the direction
 to read it in.
 
 **Also decided the same day, both cheap and both converting an unverifiable claim into a checkable one.**

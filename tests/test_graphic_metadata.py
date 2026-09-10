@@ -488,7 +488,7 @@ if (wd3 / "final" / "word" / "footer1.xml").is_file():
        f"source has &apos;: {'&apos;' in _ftr}; written has it: {'&apos;' in f}")
     void("whether Word REPOPULATES that control's text from customXml on open",
          "needs Word in the loop; no instrument in this repository has it. Recorded as an "
-         "owed measurement rather than answered — see FINDINGS-REGISTER.md A19")
+         "owed measurement rather than answered — see REGISTER-findings.md A19")
 else:
     void("owed measurement (b)", "arm 3's apply did not produce a footer")
 

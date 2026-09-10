@@ -24,8 +24,8 @@ if hasattr(_sys.stdout, "reconfigure"):
 
 
 ROOT = Path(__file__).resolve().parent.parent
-reg = (ROOT / "FINDINGS-REGISTER.md").read_text(encoding="utf-8")
-a3 = (ROOT / "A3-STRUCTURAL-ANALYSIS.md").read_text(encoding="utf-8")
+reg = (ROOT / "evidence/REGISTER-findings.md").read_text(encoding="utf-8")
+a3 = (ROOT / "evidence/EVIDENCE-a3-structure.md").read_text(encoding="utf-8")
 cmd = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 
 ID_RE = re.compile(r"^\|\s*(?:\*\*)?([A-Z]{1,2}-?\d{1,2}[a-z]?)(?:\*\*)?\s*\|")
@@ -186,7 +186,7 @@ C3. Which findings does NOTHING in the option list close?  (omission check
     against the nine options — run stepb_verify.py for the assignment proof.)""")
 print("    stepb_verify.py asserts 0 unassigned. The residual risk is a row assigned")
 print("    to an option that would not actually close it — checked case by case in")
-print("    STEP-B-ANALYSIS.md's 'what it does NOT fix' column.")
+print("    PLAN-2-step-b.md's 'what it does NOT fix' column.")
 
 print("""
 C4. Is there a register row for the BLIND REVIEW's packaging findings that never

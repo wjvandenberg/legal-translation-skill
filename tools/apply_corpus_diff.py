@@ -136,7 +136,7 @@ def fix_in_baseline(key):
                        capture_output=True, cwd=ROOT)
     return r.returncode == 0
 
-# WHICH ROW OWNS WHICH STRUCTURE — taken from FINDINGS-REGISTER.md's `docs` column, used as
+# WHICH ROW OWNS WHICH STRUCTURE — taken from REGISTER-findings.md's `docs` column, used as
 # a LABEL rather than as the gate. The documents named are the ones that were MEASURED, not
 # the extent of the mechanism: A3's whitelist bug is in one branch of one classifier and
 # applies to every document, so a tab restored on a document nobody measured is A3's evidence

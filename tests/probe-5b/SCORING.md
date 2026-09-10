@@ -22,7 +22,7 @@ uv run python tests/probe-5b/preflight_metacheck.py   # 4 of 4 — proves it can
 
 ### Why arm 3 exists, and why arm 1 was the wrong row
 
-**`STEP-B-ANALYSIS.md` §5.5 already named the trigger set and nobody used it.** It records *"three
+**`PLAN-2-step-b.md` §5.5 already named the trigger set and nobody used it.** It records *"three
 mandatory requirements cannot be met at all"* and closes with rule 5b's situation in its own words:
 *"In each case the operator's only options were to disobey an instruction or to ship against one."*
 Those three are **F28, F30 and F33**. **F1 was never one of them** — it sat in §12's wider
@@ -153,7 +153,7 @@ protocol below. Nothing else in this kit is on the critical path.
 
 ## Why this gate exists
 
-`STEP-B-ANALYSIS.md` §2, fourth sequencing fact. Branch 5 converts **eighteen currently-silent
+`PLAN-2-step-b.md` §2, fourth sequencing fact. Branch 5 converts **eighteen currently-silent
 defects into blocked runs**, and rule 5b is then the only legitimate way such a run can end.
 Branch 4 proved 5b is *present, reachable, unsoftened and aimed at situations that really
 arose* — **it did not prove a model will apply it.** That is behavioural and no script settles

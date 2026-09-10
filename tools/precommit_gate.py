@@ -52,15 +52,30 @@ PRIV = Path(os.environ.get("LT_PRIVATE_DIR", ROOT.parent / "legal-translation-pr
 #
 # The six stay by NAME so a rename is caught rather than silently dropped; everything else is a
 # glob, so a document added later is gated without anybody remembering to add it here.
-_CORE_DOCS = ["CLAUDE.md", "FINDINGS-REGISTER.md", "A3-STRUCTURAL-ANALYSIS.md",
-              "STEP-B-ANALYSIS.md", "DECISIONS-LOG.md", "OPUS-5-MIGRATION.md"]
-_DISCOVER_DOCS = ["EVIDENCE-*.md", "REGISTER-*.md", "PLAN-*.md"]
+#
+# AND THAT COMMENT WAS FALSE FOR AS LONG AS IT STOOD -- FIXED 2026-09-10, MEASURED. `_all_docs`
+# opened with `[d for d in _CORE_DOCS if (root / d).exists()]`, so a renamed CORE document was
+# FILTERED OUT rather than caught, and `missing` was then computed over the already-filtered
+# list and could never be anything but empty. The layout change measured it: the commit list
+# went from 8 documents to 6 and still printed "all present". A named document that has gone
+# is now REPORTED, which is what the comment always claimed.
+#
+# THE GLOBS ARE ROOT-RELATIVE AND THE DOCUMENTS MOVED. `EVIDENCE-*.md` at the root found the
+# two EVIDENCE- documents until they went to `evidence/`, and then found nothing -- the third
+# thing a move breaks, and the only one that fails in silence. The `evidence/` globs are added
+# in the SAME change as the move, and `p.name` becomes the RELATIVE PATH, because a basename
+# taken from a subfolder no longer resolves against the root.
+_CORE_DOCS = ["CLAUDE.md", "evidence/REGISTER-findings.md", "evidence/EVIDENCE-a3-structure.md",
+              "PLAN-2-step-b.md", "DECISIONS-LOG.md", "PLAN-3-opus5-migration.md"]
+_DISCOVER_DOCS = ["EVIDENCE-*.md", "REGISTER-*.md", "PLAN-*.md",
+                  "evidence/EVIDENCE-*.md", "evidence/REGISTER-*.md", "evidence/PLAN-*.md"]
 
 
 def _all_docs(root):
-    out = [d for d in _CORE_DOCS if (root / d).exists()]
+    """Every gated document, plus the CORE names that have GONE - reported, never dropped."""
+    out = list(_CORE_DOCS)
     for g in _DISCOVER_DOCS:
-        out.extend(sorted(p.name for p in root.glob(g)))
+        out.extend(sorted(p.relative_to(root).as_posix() for p in root.glob(g)))
     seen, uniq = set(), []
     for d in out:
         if d not in seen:
@@ -143,7 +158,13 @@ p = need("corpus_descriptor_scan.py")
 if p is None:
     print("  targeted term list        CONTROL VOID — scanner not found in the private folder")
 else:
-    out, rc = run(p)
+    # THE DOCUMENT LIST IS PASSED, NOT REDISCOVERED — 2026-09-10. This scanner carried its OWN
+    # hard-coded copy of the six core names plus root-only globs, and its own comment records
+    # that copy going stale ONCE ALREADY ("6 of 8", 2026-08-24). The layout change made it stale
+    # a second time, at 4 of 8. A list duplicated across five scripts goes stale in whichever
+    # copy nobody edited; passing DOCS gives it ONE source, and the denominator assertion below
+    # then cannot disagree with the gate about what the population is.
+    out, rc = run(p, *DOCS)
     t = re.search(r"TOTAL: (\d+) hit\(s\) across (\d+) files", out)
     read = int(t.group(2)) if t else 0
     print(f"  targeted term list        {t.group(1) if t else '?'} hit(s) across "
@@ -176,7 +197,7 @@ p = need("confidentiality_review.py")
 if p is None:
     print("  CONTROL VOID — the judgement pass is not in the private folder")
 else:
-    out, rc = run(p)
+    out, rc = run(p, *DOCS)          # passed, not rediscovered — see the note on the scan above
     # DID IT ACTUALLY READ THE DOCUMENTS? When this script was moved into the private folder
     # its idea of the repository root moved with it, so it scanned nothing and reported zero
     # in every category -- a clean bill of health from a control that had opened no files.

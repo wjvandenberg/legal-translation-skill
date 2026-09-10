@@ -10,7 +10,7 @@ own lists and found three items that had been disposed of nowhere.
 
 WHAT IT DOES. Every substantive block of `temp/CLAUDE.md.pre-overhaul` is listed below with
 a phrase that could only appear if the thing is actually carried, and the check reports which
-of the four destinations carries it: the rewritten `CLAUDE.md`, `OPUS-5-MIGRATION.md`,
+of the four destinations carries it: the rewritten `CLAUDE.md`, `PLAN-3-opus5-migration.md`,
 `DECISIONS-LOG.md`, or the build plan itself. Anything carried nowhere is either a real omission or a deliberate drop,
 and a deliberate drop must be declared HERE, with its reason, rather than discovered later.
 
@@ -38,12 +38,12 @@ def norm(t):
 OLD = norm((ROOT / "temp" / "CLAUDE.md.pre-overhaul").read_text(encoding="utf-8"))
 DEST = {
     "CLAUDE": norm((ROOT / "CLAUDE.md").read_text(encoding="utf-8")),
-    "OPUS5": norm((ROOT / "OPUS-5-MIGRATION.md").read_text(encoding="utf-8")),
+    "OPUS5": norm((ROOT / "PLAN-3-opus5-migration.md").read_text(encoding="utf-8")),
     "DECIS": norm((ROOT / "DECISIONS-LOG.md").read_text(encoding="utf-8")),
-    # STEP-B-ANALYSIS.md is a legitimate destination too: the charter deliberately handed
+    # PLAN-2-step-b.md is a legitimate destination too: the charter deliberately handed
     # its fix-scoping cautions to the build plan, and stepb_harvest.py proves all eight
     # arrived. Omitting it from this list reported four of them as lost.
-    "STEPB": norm((ROOT / "STEP-B-ANALYSIS.md").read_text(encoding="utf-8")),
+    "STEPB": norm((ROOT / "PLAN-2-step-b.md").read_text(encoding="utf-8")),
 }
 
 # (old section, what it is, phrase that proves it is carried, expected destination)
@@ -336,7 +336,7 @@ DROPPED = [
  ("the phase 0-5 numbering and the DONE/LEFT tables",
   "superseded: §3 is four steps of future work, §2.3 holds what was done"),
  ("the indicative branch list and the six-keystone scoping",
-  "superseded by STEP-B-ANALYSIS.md, which the standing prescription check proves carries "
+  "superseded by PLAN-2-step-b.md, which the standing prescription check proves carries "
   "every charter hand-off (63 of 63)"),
  ("the fourteen-item 'scoping cautions' list",
   "there were eight, not fourteen, and stepb_harvest.py tracks all eight by id (SC1-SC8)"),
@@ -344,7 +344,7 @@ DROPPED = [
   "all five strands are complete; §2.3 records what each produced"),
  ("THE AGREED SHAPE OF THE STEP B ANALYSIS (a 140-line brief)",
   "it was a brief for a session that has run; its four decisions are in DECISIONS-LOG.md "
-  "and its output is STEP-B-ANALYSIS.md"),
+  "and its output is PLAN-2-step-b.md"),
  ("the A4 design narrative and the blindness protocol",
   "the experiment is over and the rules are spent; the two lessons that outlived them are "
   "in DECISIONS-LOG.md"),

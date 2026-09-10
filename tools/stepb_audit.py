@@ -43,10 +43,10 @@ def _a4(*parts):
 
 
 ROOT = Path(__file__).resolve().parent.parent
-DOC = ROOT / "STEP-B-ANALYSIS.md"
+DOC = ROOT / "PLAN-2-step-b.md"
 doc = DOC.read_text(encoding="utf-8")
-reg = (ROOT / "FINDINGS-REGISTER.md").read_text(encoding="utf-8")
-a3 = (ROOT / "A3-STRUCTURAL-ANALYSIS.md").read_text(encoding="utf-8")
+reg = (ROOT / "evidence/REGISTER-findings.md").read_text(encoding="utf-8")
+a3 = (ROOT / "evidence/EVIDENCE-a3-structure.md").read_text(encoding="utf-8")
 cmp_ = (ROOT.parent / "legal-translation-private" / "A4-A3-COMPARISON.md").read_text(encoding="utf-8")
 cmd = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 # CHARTER SOURCE, 2026-08-06. `CLAUDE.md` was rewritten on 2026-08-06 and several sentences
@@ -59,7 +59,7 @@ cmd = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 # WIDENED 2026-08-06: most of what moved out of CLAUDE.md is still LIVE, in the two
 # documents split out of it. Check those before falling back to the archive, or the
 # archive becomes an excuse and the check stops noticing real loss.
-for _extra in ("OPUS-5-MIGRATION.md", "DECISIONS-LOG.md",
+for _extra in ("PLAN-3-opus5-migration.md", "DECISIONS-LOG.md",
                "temp/CLAUDE.md.pre-overhaul"):
     _p = ROOT / _extra
     if _p.exists():
@@ -448,7 +448,7 @@ openi = [f for f in INSTR if re.search(r"\|\s*open\s*\|?\s*$", rows[f]["text"])]
 print(f"  open instrument defects (our own tooling): {sorted(openi)}")
 for i in sorted(openi):
     cited = i in doc
-    print(f"      {i} named in STEP-B-ANALYSIS.md: {cited}")
+    print(f"      {i} named in PLAN-2-step-b.md: {cited}")
     if not cited: warn("8c", f"{i} (an OPEN defect in our own harness) is not mentioned")
 # 8d: positives protection
 unprot = [p for p in sorted(POS) if p not in doc]
@@ -519,7 +519,7 @@ def norm(t):
     for a_, b_ in [("“", '"'), ("”", '"'), ("‘", "'"), ("’", "'")]:
         t = t.replace(a_, b_)
     return re.sub(r"\s+", " ", t).strip()
-BACKUP = ROOT / "temp" / "STEP-B-ANALYSIS.md.pre-deepaudit"
+BACKUP = ROOT / "temp" / "PLAN-2-step-b.md.pre-deepaudit"
 prev = norm(BACKUP.read_text(encoding="utf-8")) if BACKUP.exists() else ""
 hay = norm(ALLSRC)
 # A quotation ATTRIBUTED to Wouter is his spoken instruction: it lives in no file and is

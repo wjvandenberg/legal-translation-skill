@@ -38,17 +38,27 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 ROOT = Path(__file__).resolve().parent.parent
 
 # The six that were hard-coded, kept as names so a rename is noticed rather than silently dropped.
-CORE = ["CLAUDE.md", "FINDINGS-REGISTER.md", "A3-STRUCTURAL-ANALYSIS.md",
-        "STEP-B-ANALYSIS.md", "DECISIONS-LOG.md", "OPUS-5-MIGRATION.md"]
+# A NAMED DOCUMENT THAT HAS GONE IS REPORTED BY THE CALLER'S DENOMINATOR COMPARISON, not filtered
+# out here -- `precommit_gate.py` asserts this sweep read as many documents as it was given, and a
+# list that quietly shrinks defeats that check by making both numbers agree on the wrong total.
+CORE = ["CLAUDE.md", "evidence/REGISTER-findings.md", "evidence/EVIDENCE-a3-structure.md",
+        "PLAN-2-step-b.md", "DECISIONS-LOG.md", "PLAN-3-opus5-migration.md"]
 # Everything else committable that carries prose. Globs, so a document added later is swept
-# without anybody remembering to add it here.
+# without anybody remembering to add it here. THE `evidence/` GLOBS WERE ADDED 2026-09-10 IN THE
+# SAME CHANGE AS THE MOVE THAT CREATED THAT FOLDER: a root-relative glob stops reaching a document
+# the moment it moves, and reports a smaller population rather than an error.
 DISCOVER = ["README.md", "EVIDENCE-*.md", "REGISTER-*.md", "PLAN-*.md",
+            "evidence/EVIDENCE-*.md", "evidence/REGISTER-*.md", "evidence/PLAN-*.md",
             ".claude/rules/*.md", ".claude/skills/*/SKILL.md", "tests/README.md"]
 
 
 def targets(argv):
     if argv:
         return [Path(a) for a in argv]
+    # A CORE NAME THAT HAS GONE IS PRINTED, NEVER SILENTLY FILTERED -- see the note on CORE.
+    _gone = [n for n in CORE if not (ROOT / n).exists()]
+    if _gone:
+        print(f"  CORE DOCUMENT(S) NAMED HERE BUT NOT ON DISK — renamed or moved? {_gone}")
     out = [ROOT / n for n in CORE if (ROOT / n).exists()]
     for g in DISCOVER:
         out.extend(sorted(ROOT.glob(g)))

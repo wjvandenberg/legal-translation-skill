@@ -2,7 +2,7 @@
 """ACCEPTANCE TEST FOR THE INSTRUCTION LAYER — branch 3 (the scope rule), and the file the
 later instruction branches extend.
 
-STEP-B-ANALYSIS.md §4 puts branches 3, 4, 13, 17 and 19 in one row: "instruction and
+PLAN-2-step-b.md §4 puts branches 3, 4, 13, 17 and 19 in one row: "instruction and
 dictionary changes ... a graded run plus your review. There is no script instrument for
 these." **This is a script instrument for the part of them that IS decidable** -- not for
 whether the prose persuades an operator, which needs Step C, but for whether the rule is
@@ -176,7 +176,7 @@ PRESERVED = [
     ("skill-docs/05-apply.md",
      "The gates exist because every prior occasion the operator went around them shipped "
      "output below the quality the skill is designed to deliver."),
-    # Branch 4's own guard rails. STEP-B-ANALYSIS.md calls the exception channel "the
+    # Branch 4's own guard rails. PLAN-2-step-b.md calls the exception channel "the
     # highest-risk documentation change in the whole plan" -- written loosely it is a licence
     # to bypass checks. These four sentences are what stop that reading, so they are asserted
     # byte-for-byte exactly like the anti-drift text they sit beside.
@@ -608,7 +608,7 @@ for n, c in results:
 print()
 print("  WHAT THIS DOES NOT PROVE: that an operator meeting a wrongly-scoped gate will")
 print("  now do the right thing. That is behavioural, it needs a model in the loop, and")
-print("  STEP-B-ANALYSIS.md §4.1 puts it at Step C. This proves the rule is there, says")
+print("  PLAN-2-step-b.md §4.1 puts it at Step C. This proves the rule is there, says")
 print("  what the register requires, is in both trees, and softened nothing.")
 print("=" * 96)
 sys.exit(0 if ok == len(results) else 1)

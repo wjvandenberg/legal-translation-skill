@@ -4,7 +4,7 @@ Step B — measurement pass 2: VERIFICATION PASS A of the brief's three passes.
 
 "does every proposal cite recorded failures that exist and say what is claimed"
 
-For every claim STEP-B-ANALYSIS.md will make, this asserts:
+For every claim PLAN-2-step-b.md will make, this asserts:
   - the register row exists
   - the row's own text contains the substring the claim rests on
 It also holds the consequence-group and option assignment maps, and proves
@@ -32,8 +32,8 @@ if hasattr(_sys.stdout, "reconfigure"):
 
 
 ROOT = Path(__file__).resolve().parent.parent
-reg = (ROOT / "FINDINGS-REGISTER.md").read_text(encoding="utf-8")
-a3 = (ROOT / "A3-STRUCTURAL-ANALYSIS.md").read_text(encoding="utf-8")
+reg = (ROOT / "evidence/REGISTER-findings.md").read_text(encoding="utf-8")
+a3 = (ROOT / "evidence/EVIDENCE-a3-structure.md").read_text(encoding="utf-8")
 
 FAIL = []
 
@@ -376,7 +376,7 @@ print("\n=== A3b. THE ARITHMETIC LINE UNDER §9.1 MUST MATCH THE TABLE ABOVE IT 
 # group 3 and 170 in total -- stale by two, in a line whose own severity-mix column
 # disagreed with it as well. This asserts the typed line against the generated groups, per
 # group and in total, so it cannot drift again.
-_doc = (ROOT / "STEP-B-ANALYSIS.md").read_text(encoding="utf-8")
+_doc = (ROOT / "PLAN-2-step-b.md").read_text(encoding="utf-8")
 _m = re.search(r"\*\*([\d]+(?:\s*\+\s*[\d]+)+)\s*=\s*(\d+)\s*.\*\*", _doc)
 if not _m:
     FAIL.append("A3b: no `a + b + ... = n` arithmetic line found under §9.1 — it is the "

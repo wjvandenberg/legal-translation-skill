@@ -36,9 +36,9 @@ if hasattr(_sys.stdout, "reconfigure"):
 
 
 ROOT = Path(__file__).resolve().parent.parent
-doc = (ROOT / "STEP-B-ANALYSIS.md").read_text(encoding="utf-8")
-reg = (ROOT / "FINDINGS-REGISTER.md").read_text(encoding="utf-8")
-a3 = (ROOT / "A3-STRUCTURAL-ANALYSIS.md").read_text(encoding="utf-8")
+doc = (ROOT / "PLAN-2-step-b.md").read_text(encoding="utf-8")
+reg = (ROOT / "evidence/REGISTER-findings.md").read_text(encoding="utf-8")
+a3 = (ROOT / "evidence/EVIDENCE-a3-structure.md").read_text(encoding="utf-8")
 cmp_ = (ROOT.parent / "legal-translation-private" / "A4-A3-COMPARISON.md").read_text(encoding="utf-8")
 cmd = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 ALL = "\n".join([reg, a3, cmp_, cmd])
