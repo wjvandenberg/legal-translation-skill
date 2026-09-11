@@ -37,7 +37,7 @@
         "name": "charter",
         "command": ["uv", "run", "python", "tools/verify_md.py", "--report-json", "CLAUDE.md"],
         "tolerated": {
-          "verify_md.py::CLAUDE.md::file length": "BY DESIGN while section 1.7's over-cap declaration stands. THE CHARTER REDUCTION ran 2026-09-10 and reduced the charter using every relocation route (route 0 the auto-loading house file, route 2 the evidence documents, route 3 the skills, route 4 the new .claude/rules/instruments.md), trimming all narration to its rule. It cannot reach 500 without dropping load-bearing rules or relocating section 5.6 (confidentiality, route 1, irreversible if forgotten), both forbidden; and a freshly generated charter for this archetype (Analysis + rebuild, in on every optional column) is itself 563 against a 500 cap, so 500 is below the archetype's generative floor. Section 1.7 ALONE states the figure and verify_charter_continuity.py compares it to the measurement; it is NOT restated here, because this comment once carried a number for a day after the charter had moved on. THE CAP-VERSUS-FLOOR IS WOUTER'S DECISION, recorded at the sub-step's close; until it is taken this row stays. NEVER silence it by setting the cap to 0, which reports 'exempt' and measures nothing."
+          "verify_md.py::CLAUDE.md::file length": "BY DESIGN while section 1.7's over-cap declaration stands. TWO REDUCTIONS HAVE RUN: 2026-09-10 used every relocation route (route 0 the auto-loading house file, route 2 the evidence documents, route 3 the skills, route 4 the new .claude/rules/instruments.md), and 2026-09-11 ran the house REDUCTION-TEMPLATE.md procedure (route 5 on the step blocks, route 3 on the INPUT POINT 2 protocol, route 2 on the dated lessons). 500 IS NOT REACHABLE, AND THAT IS MEASURED RATHER THAN ASSERTED, by three independent floors: the file's headings and table rows are over 130 lines no rewrite touches, a heading being the return path every pointer resolves against and a row shrinking only by deleting a rule; section 5.6 is route 1 entire, irreversible if forgotten; and the archetype's generated floor is itself well above the cap. RE-MEASURE THAT FLOOR WITH new_charter.py RATHER THAN QUOTING A NUMBER - the figure on record went stale by 84 lines inside three days, and five of eleven archetypes now emit over 500 where the record says one. Section 1.7 ALONE states this charter's own figure and verify_charter_continuity.py compares it to the measurement; it is NOT restated here, because this comment once carried a number for a day after the charter had moved on, and carried a stale archetype floor for longer. THE CAP-VERSUS-FLOOR IS WOUTER'S DECISION, recorded at the sub-step's close; until it is taken this row stays. NEVER silence it by setting the cap to 0, which reports 'exempt' and measures nothing."
         }
       },
       {
@@ -115,8 +115,11 @@
       "1.1": "which loads in every project",
       "1.5": "not restated",
       "2.1": "owns the description",
+      "3.2": "owns it entire",
+      "5.4": "Invoke it, do not improvise",
       "5.5": "route 4",
-      "6.1": "do not re-open them"
+      "6.1": "do not re-open them",
+      "6.4": "DECISIONS-LOG.md`, 2026-09-11"
     }
   },
   "_comments_md": {

@@ -70,11 +70,10 @@ plan and the register is large risk for no gain, and this mapping buys the same 
 ### 1.5 Two rules about reading, both bought with real time
 
 **Never work from a précis, and re-measure do not re-read, are in the user-global `.claude/CLAUDE.md`, not
-restated** *(§5.3 has the cost stories)*. **A third, project-specific, added 2026-09-08: a claim can be refuted for the
-WRONG REASON, which costs more than believing it.** A behavioural claim about A16 was refuted from the XML
-shape alone and turned out exactly right on measurement — **a claim about behaviour is measured where the
-behaviour happens** (the operator's notes), not in the document's structure. The tell is a refutation reached
-from a different KIND of evidence than the claim was made from.
+restated** *(§5.3 has the cost stories)*. **A third, project-specific: a claim can be refuted for the WRONG
+REASON, which costs more than believing it — so measure a claim about BEHAVIOUR where the behaviour happens,
+never in the document's structure.** The tell is a refutation reached from a different KIND of evidence than
+the claim was made from; the A16 instance that bought this is in `EVIDENCE-measurement.md`.
 
 ### 1.6 Contents
 
@@ -83,33 +82,29 @@ from a different KIND of evidence than the claim was made from.
 
 ### 1.7 The size class, and the cap this charter is held to
 
-**ARCHETYPE: Analysis + rebuild of an existing artefact** — the closest of the template's eleven, and the one row that is ● on every optional column, so this charter carries those blocks rather than dropping any; the reduction moves them to destinations instead.
+**ARCHETYPE: Analysis + rebuild of an existing artefact** (`rebuild`) — the closest of the template's eleven,
+and the one row ● on every optional column, so this charter carries those blocks rather than dropping any.
 
-**SIZE CLASS: L — cap 500 lines; ALL SEVEN SECTIONS CAPPED at measured size since 2026-09-09, §7 at 35.** L
-rather than M because this project has run far past eight sessions, the observable test rather than a judgement
-about how big it feels. Every cap is **enforced, not aspirational**: they live in `verify.config.json`, and
-`verify_md.py` reports each with a per-section breakdown showing where the weight sits. **Until 2026-08-24
-there was no config here at all, so both reported N/A on a 1,666-line file** — a cap nothing measures is not a cap.
-**AND CHECK THE COPY YOU RUN:** the `charter structure` row arrived in **v25**, so an older local
-`tools/verify_md.py` reports on this section's shape **by omitting the row** — and a missing row reads
-exactly like a passed one.
+**SIZE CLASS: L — cap 500 lines, §7 at 35, all seven sections capped in `verify.config.json`.** L rather than
+M because this project has run far past eight sessions — the observable test, not a judgement about how big
+it feels. **Every cap is enforced, not aspirational**, and `verify_md.py` reports each with a per-section
+breakdown showing where the weight sits. **AND CHECK THE COPY YOU RUN:** the `charter structure` row arrived
+in **v25**, so an older local `tools/verify_md.py` reports on this section's shape **by omitting the row** —
+and a missing row reads exactly like a passed one.
 
-> **OVER-CAP, RE-DERIVED 2026-09-10: 815 lines against a cap of 500.** *(Taken from the checker, re-derived
-> LAST because editing this subsection moves the number it declares; `tools/verify_charter_continuity.py`
-> compares it against the measurement every run. §7 is UNDER its 35.)* **The cap is stated in three places
-> and only `verify.config.json`'s `max_lines` gates** — this sentence and `DECLARED_CAP` in
-> `verify_charter_continuity.py` must move with it.
+> **OVER-CAP, RE-DERIVED 2026-09-11: 776 lines against a cap of 500.** *(From the checker, re-derived LAST
+> because editing this subsection moves the number it declares; `tools/verify_charter_continuity.py` compares
+> it against the measurement every run.)* **The cap is stated in three places and only `verify.config.json`'s
+> `max_lines` gates** — this sentence and `DECLARED_CAP` in `verify_charter_continuity.py` move with it.
 >
-> **THE CHARTER REDUCTION (2026-09-10) took it from 1,241 to 815 using every route** — route 0 (the
-> auto-loading house file), route 2 (`EVIDENCE-measurement.md`, `EVIDENCE-a3-structure.md`,
-> `DECISIONS-LOG.md`), route 3 (the three skills), route 4 (`.claude/rules/instruments.md`, new) — and
-> trimmed all narration to its rule. **It cannot reach 500 without dropping load-bearing rules or relocating
-> §5.6 (confidentiality, route 1, irreversible if forgotten), both forbidden.** A freshly generated charter
-> for this archetype — *Analysis + rebuild*, ● on every optional column — is itself 563 against a 500 cap, so
-> 500 is below this archetype's generative floor, and this mature instance legitimately carries more (a
-> confidentiality section built from real incidents, five verification lessons, the instrument state). **The
-> cap-versus-floor is Wouter's decision, recorded at the sub-step's close.** Over the cap means RELOCATE,
-> never delete, and every relocation left a one-line pointer.
+> **TWO REDUCTIONS HAVE RUN — 1,241 → 815 (2026-09-10, every route) and 815 → 776 (2026-09-11, the
+> `REDUCTION-TEMPLATE.md` procedure).** **500 IS NOT REACHABLE, AND THAT IS NOW MEASURED RATHER THAN
+> ASSERTED.** Three independent floors say so: the file's **59 headings and 74 table rows are 133 lines no
+> rewrite touches** — a heading is the return path every pointer resolves against, and a row only shrinks by
+> deleting a rule; **§5.6 is route 1 entire** (86 lines, irreversible if forgotten); and **a freshly
+> generated `rebuild` charter measures 647**, so the cap sits below this archetype's generative floor.
+> *(647 re-measured 2026-09-11 — the 563 on record was stale by 84, and **five of eleven archetypes now emit
+> over 500**, where the record says one.)* **The cap-versus-floor is Wouter's decision.**
 
 ---
 
@@ -151,62 +146,45 @@ Not a feature-add project. Four goals, in priority order, with where each now st
 
 ### 2.3 What has been done
 
-**Do not re-open any of it.** **Eight strands, each with an owner** *(§1.3 says what each document holds)*:
-Step 0's choices in `DECISIONS-LOG.md` · A1+A2's twelve runs in the logs folder, results in
-section 11 of `EVIDENCE-a3-structure.md` · Wouter's blind review, **INPUT POINT 1, CLOSED 2026-07-31**, in the register
-under origin `WvdB` · A3 its own document, answers §6.1 · A4 its 2,222-line report in the sealed directory ·
-the A3↔A4 comparison produced register cluster X *(§2.4)* · Step B is `PLAN-2-step-b.md` · Step 1 is the git
-history and §6.4, **the repository PUBLIC, protection live.**
+**Do not re-open any of it.** Eight strands, each with an owner *(§1.3 says which document holds what)*:
+Step 0's choices · A1+A2's twelve runs · **INPUT POINT 1, CLOSED 2026-07-31** · A3 · A4's sealed report ·
+the A3↔A4 comparison, which produced register cluster X · Step B · Step 1, **the repository PUBLIC,
+protection live.**
 
-**The evidence-base counts are not typed here** — the §5.3 validator prints them (`PASS, 0 failures`), and
-§1.5 records the one time a session reasoned from a summary of the register and was wrong. **Quote the
-instrument count from `audit_register.py`** *(`instrument=22(18f/4o)`)* **and name the population:** I-1 to
-I-11 are defects in the A1 harness and review tooling, I-12 onward in the repository's own committed checks;
-the skill-finding counts are untouched by either, none being a defect in the skill.
+**NEVER TYPE AN EVIDENCE-BASE COUNT HERE** — the §5.3 validator prints them, and a typed one goes stale
+silently. **Quote the instrument count from `audit_register.py` and name the population:** I-1 to I-11 are
+defects in the A1 harness and review tooling, I-12 onward in the repository's own committed checks; no
+skill-finding count is affected by either, none being a defect in the skill.
 
 ### 2.4 What the evidence says — the seven things a new session must know
 
-**1. THIS IS NOT A FORMATTING PROJECT.** The pipeline has silently destroyed legally material content — a
-deed's only footnote, fourteen of twenty-eight comment anchors, a contract's closing bracket and terminal
-full stop, untranslated source text on a delivered first page. **In every case the auxiliary part was
-translated perfectly and the *pointer* destroyed**, so the English is in the package and unreachable — **and
-every gate reported PASS.**
+1. **THIS IS NOT A FORMATTING PROJECT.** The pipeline has silently destroyed legally material content — a
+   deed's only footnote, 14 of 28 comment anchors, a contract's closing bracket and terminal full stop,
+   untranslated source text on a delivered first page. **In every case the auxiliary part was translated
+   perfectly and the *pointer* destroyed, and every gate reported PASS.**
+2. **Do not scope this from the token-set sentence alone — THREE independent mechanisms explain why nothing
+   was caught**, and building against one under-builds it *(that mistake was made here and cost a wrong
+   prediction)*: `validate_apply --strict` polices only *missing* tokens · the mandatory quality gate
+   discards its own verdict · a delivered `.docx` failing its own ZIP test prints a warning and exits 0.
+3. **Do not spend the build on translation** — quality and terminology scored 9 on all twelve graded
+   documents and variant conformance 10 on all twelve. **Translation quality is not the problem.**
+4. **Render BOTH documents: the visual diff is the PRIMARY instrument, not a final check** — reading the
+   translation alone misses what is *absent*. §5.2 makes it a condition of done.
+5. **DO NOT WEAKEN THE ANTI-DRIFT SAFEGUARDS in response to any of this** — the move is the *missing* rule,
+   never a softer existing one. A gate can be wrong in SCOPE; fix the gate, never bypass it, and never alter
+   a faithful translation to satisfy a linter.
+6. **Fix the CLAIM as well as the code** — six findings need it *(register cluster X)*. An independent reader
+   praised as the strongest feature the exact layer the register shows is blind, and credited as coverage a
+   device it shows leaks; **both readings are correct**, which measures how convincingly the skill claims
+   things it does not do. *(Pointed at by number — do not renumber this item.)*
+7. **Judge a layout device on its RENDERED EFFECT, never on its element count** — the pipeline preserves form
+   as counts and flags, never as effects. And **what looked like one cluster is two independent failures:**
+   putting the English back *deletes* structure it should keep, while the data contract *cannot describe* the
+   formatting. Two fixes, two files, neither closing the other's rows.
 
-**2. THREE independent mechanisms explain why nothing was caught, and ONE SENTENCE IS NOT ENOUGH:**
-`validate_apply --strict` **compares token sets** and polices only *missing* tokens · the mandatory quality
-gate **discards its own verdict** · a delivered `.docx` failing its own ZIP test **prints a warning and exits
-0.** **Anyone scoping this from the token-set sentence alone will under-build it** — that mistake was made in
-this file and cost a wrong prediction. *(Each mechanism's proof is in the register.)*
-
-**3. TRANSLATION QUALITY IS NOT THE PROBLEM.** Quality and terminology scored **9 on all twelve** graded
-documents, variant conformance **10 on all twelve**. **Do not spend the build on translation.**
-
-**4. The rendered visual diff is the PRIMARY instrument, not a final check, and BOTH documents must be
-rendered** — reading the translation alone misses what is *absent*. §5.2 makes it a condition of done.
-
-**5. DO NOT WEAKEN THE ANTI-DRIFT SAFEGUARDS in response to any of this.** The correct move is the **missing
-rule**, not a softer version of the existing ones: *a gate can be wrong in scope; fix the gate, never bypass
-it, and never alter a faithful translation to satisfy a linter.* An independent reader called the present
-absolutism *"mature"*.
-
-**6. SIX FINDINGS NEED THE CLAIM FIXED AS WELL AS THE CODE — register cluster X, and a new class.** A
-competent independent reader, from the published package alone, **praised as the artefact's strongest feature
-the exact layer the register shows is blind**, and credited as coverage a device it shows leaks. **Both
-readings are correct.** Not a disagreement to resolve — a measurement of how convincingly the skill claims
-things it does not do. *(§2.1 and §2.3 point at this item by number. Do not renumber it.)*
-
-**7. TWO STRUCTURAL STATEMENTS OUTWEIGH ANY INDIVIDUAL FINDING.** *(1)* **The pipeline preserves form as
-COUNTS and FLAGS, never as EFFECTS** — so **a layout device must be judged on its RENDERED EFFECT, never on
-its element count.** *(2)* **What looked like one cluster is two independent failures:** putting the English
-back *deletes* structure it should keep, and the data contract is *unable to describe* the formatting.
-**Two fixes, two files, and neither closes the other's rows.**
-
-**Each of the four defects Wouter named at the outset turned out to be a CLASS, not a defect** — bold reaches
-a run three ways, the signature block has four mechanisms, tracked changes are on six of eleven documents,
-truncation detection never left the scripts folder; the register holds each with its measurement, and two
-further classes (document furniture, the conversion/extraction/post-apply-blind baseline) are workstreams in
-`PLAN-2-step-b.md`. **The 12-run performance table and the six conclusions are in `EVIDENCE-a3-structure.md`
-section 11** — the never-regress comparison, read when a claim is disputed.
+**Each of the four defects Wouter named at the outset is a CLASS, not a defect** — the register holds each
+with its measurement, and two further classes are workstreams in `PLAN-2-step-b.md`. The 12-run performance
+table and the six conclusions are in `EVIDENCE-a3-structure.md` section 11.
 
 ### 2.5 Decisions that still bind
 
@@ -279,33 +257,28 @@ removal in the same branch.
 
 #### Step 3 — Opus 5, and the verification run
 
-`PLAN-3-opus5-migration.md` owns this step in full (two branches, Step C, INPUT POINT 2). **Do it AFTER the
-build, never alongside** — together, a moved grade cannot be attributed to the fix or the model.
+`PLAN-3-opus5-migration.md` owns it entire. **Do it AFTER the build, never alongside** — together, a moved
+grade cannot be attributed to the fix or the model.
 
 #### Step 4 — Revisit, then publish
 
-Step D consolidates everything (A1–A4, steps 2–3, Step C, both input points), re-graded after any change;
-then `feature/repackage-and-publish` runs both confidentiality controls and the publication check over the
-archives AND the commit history. **Never make a repo public or publish without Wouter's explicit OK** — the
-only irreversible act here. D3's manifest (built first) and the claims-pass residue land here, not in step 2.
+`PLAN-2-step-b.md` owns D3's manifest and `feature/repackage-and-publish`; Step D consolidates and re-grades.
+**Never make a repo public or publish without Wouter's explicit OK** — the only irreversible act here.
 
 #### Step 5 — the private run-logging tier, and the monthly analysis
 
-`DECISIONS-LOG.md`, 2026-08-20 owns the reasoning. A config overlay, never a third variant, built only after
-publication; the monthly job REPLAYS against the skill as it then stands; the verbose logs contain client
-text, so the sibling-folder rule and the evidence guard apply. Its field list and scheduling are NOT decided,
-and one tool is on the table untested — Notion — where the line to draw is between tracking that the
-automation RAN (metadata, safe) and storing what it FOUND (client text; 2026-07-29 ruled third-party
-telemetry non-viable for a skill that processes privileged documents).
+`DECISIONS-LOG.md`, 2026-08-20 owns it — a config overlay, never a third variant, built only after
+publication. **The verbose logs contain client text**, so the sibling-folder rule and the evidence guard
+apply. Field list and scheduling are NOT decided; on Notion the line is tracking that the automation **RAN**
+(metadata, safe) against storing what it **FOUND** (client text, ruled non-viable 2026-07-29).
 
 #### Autonomy, and the two input points
 
-Run the translation and grading work **as autonomously as possible** — no mid-run questions. **There are
-exactly two input points:** INPUT POINT 1, Wouter's blind review of all 12 A1+A2 documents (CLOSED
-2026-07-31); INPUT POINT 2, his review of all 11 Step C documents (protocol §5.4). **Autonomy covers running
-and grading, never the collaboration rules on code:** every branch still gets explore, plan, a PR, a
-presented review and Wouter's approval before merge. **Autonomy never means self-merging.** If an autonomous
-run hits something blocking, finish everything independent of the answer first, then ask once.
+**Exactly two input points:** 1, the 12 A1+A2 documents, CLOSED 2026-07-31; 2, the 11 Step C documents
+(protocol §5.4). Run translation and grading **as autonomously as possible**, no mid-run questions — but
+**autonomy covers running and grading, never the collaboration rules on code, and never means
+self-merging:** every branch still gets explore, plan, a PR, a presented review and Wouter's approval before
+merge. Blocked mid-run, finish everything independent of the answer, then ask once.
 
 ---
 
@@ -472,21 +445,11 @@ makes `git bisect` possible.
 
 #### The review protocol — for INPUT POINT 2
 
-**Kept because Step C repeats it.** Per document: a helper opens original and translation side by side,
-read-only, no filename typed; Wouter gives input in any shape and Claude structures it; **open the NEXT pair
-immediately on his feedback** (so he reads n+1 while Claude analyses n), but finish n's analysis and update
-the register before the next feedback lands, running the validator after each edit.
-
-**Three-way triage per point:** already reported (tick the row) · missed but the method COULD have caught it
-(fix the method, re-check earlier documents) · missed and it STRUCTURALLY could not — **expect most findings
-here**, the translation criterion being graded on a sample, and that axis is Wouter's alone.
-
-**Two artefacts:** his raw feedback and Claude's per-document analysis go to the logs folder, never committed
-(real clause text and names); only sanitised conclusions enter the register, origin `WvdB`. **Order:
-ascending complexity.** The D03/D03B pair is reviewed together and NOT blind (batch position the only
-variable). **The blind rule:** Wouter forms his view before reading the grade; Claude must not summarise or
-hint at findings first, and any tool touching a blind review inherits the blindness. **Claude must not**
-defend the grade, modify the read-only documents, or start fixing the skill.
+**The protocol is `.claude/skills/input-point-2-review/SKILL.md`** (route 3, 2026-09-11 — a section that had
+grown into a procedure rather than a fact). **Invoke it, do not improvise.** What stays here, because it
+binds outside a review run: **there are exactly two input points** — 1 CLOSED 2026-07-31, 2 the 11 Step C
+documents — and **Wouter forms his view before reading the grade**, so Claude must not summarise or hint at
+findings first, and **any tool touching a blind review inherits the blindness.**
 
 ### 5.5 The instruments
 
@@ -722,12 +685,10 @@ un-published *(§5.6; the flip measurement is in `DECISIONS-LOG.md`, 2026-08-07)
 can leak into a shipped skill. **`.gitignore` is BY PATH, never by extension** *(§2.5)* — a blanket `*.docx`
 would block the synthetic fixtures while doing nothing about a renamed client document.
 
-**What the layout preserves, none of it tidy-up-able:** the 154 separate sub-lexicon files, both the US and
-UK term in every lexicon row, and the two distribution repos' URLs. **What it adds:** one PR touches both
-trees, so a fix cannot land in one variant and be forgotten — which happened once and shipped. **What it
-costs:** the content is edited twice; removing the duplication (one source, generated variants) is DEFERRED
-until the reconciliation classifies the 618-pair residue. The analysis documents moved to `evidence/` on
-2026-09-10 — a document's KIND decides its folder, and the root keeps only what a session opens at its start.
+**The duplication is deliberate and its removal is DEFERRED** until the reconciliation classifies the
+618-pair residue — one PR touches both trees, so a fix cannot land in one variant and be forgotten, which
+happened once and shipped; the accepted cost is that content is edited twice. *(What the layout preserves
+and what it costs: `DECISIONS-LOG.md`, 2026-09-11.)*
 
 #### What never enters the repository
 
@@ -806,7 +767,7 @@ in the charter unconditionally.
 
 **THE SINGLE NEXT ACTION: BRANCH 9 — the change journal** (C15, B6), which is what makes branch 11 buildable. Its brief is section 3.8 of `PLAN-2-step-b.md`; the order is §3.1.
 
-**Open, none blocking.** **(1) PR #81 is STILL UNMERGED** and edits §7's last line — merge it before or with this branch, or resolve one §7 conflict by hand. **(2)** `validate_apply.py` is now **52,165 bytes, only 3,301 under the 55,466 truncation point** register W1 names — thinner than I would like, and it gates apply and repack. **(3)** F44 has no branch: option 9's residue is D2's. **(4)** `md.files` is still `["CLAUDE.md"]`, so 371 tracked markdown documents are measured by nothing.
+**Open, none blocking.** **(1) PR #81 MERGED** *(corrected 2026-09-11 — `gh pr list` returned 0 open PRs; this row had claimed it unmerged)*. **(2)** `validate_apply.py` is now **52,165 bytes, only 3,301 under the 55,466 truncation point** register W1 names — thinner than I would like, and it gates apply and repack. **(3)** F44 has no branch: option 9's residue is D2's. **(4)** `md.files` is still `["CLAUDE.md"]`, so 371 tracked markdown documents are measured by nothing.
 
 **GATE: 8 green / 4 red, exactly the declared four, no fifth — AND TWO REDS CLOSED.** `stepb_verify` was red on **"1 unassigned"**, which was **F43 never allocated to a consequence group**; it and F44 are now placed and it is GREEN. `stepb_audit` had **three** failures on unmodified main, not the one the handoff I inherited recorded — 5a and 6b were already stale — and it is down to its declared check-10 VOID. Suites: new 32/32 both variants · baseline **364 of 396, 32 declared** · parity **0 NEW** · smoke **17 fixtures byte-identical twice** · containers/glossary/graphic/TOC/stop-deleting/whitespace all green · render quiet, as declared. Confidentiality: tree **PASS 523**, added lines **PASS 1677**, all history blobs **PASS 921**, **control FIRED**, fingerprint `e76c67eb55c1`; the one FAIL is the deferred commit-message population.
 
