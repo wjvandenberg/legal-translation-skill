@@ -145,6 +145,24 @@ in the test runner, came back through the audit tool, came back again through th
 **fourth** time through the tests added alongside the fix for the third. **Three of four callers patched
 reads exactly like four of four until somebody greps.**
 
+### 3.6 The A16 refutation, 2026-09-08 — a claim refuted for the WRONG REASON, and right after all
+
+**Moved here from section 1.5 of `CLAUDE.md` on 2026-09-11, at THE CHARTER REDUCTION part (e), under route
+2.** The rule it bought stays in the charter: **a claim can be refuted for the WRONG REASON, which costs
+more than believing it — so measure a claim about BEHAVIOUR where the behaviour happens, never in the
+document's structure.** **This is why anyone believes it.**
+
+**A behavioural claim about A16 was refuted from the XML shape alone — and turned out exactly right on
+measurement.** The refutation read as sound: the structure did not show what the claim implied. But the claim
+was never about structure. **A claim about what an operator DOES is measured in the operator's notes**, which
+is where the behaviour happens; the document's structure is a different kind of evidence entirely and cannot
+settle it in either direction.
+
+**THE TELL, and it is the transferable part: a refutation reached from a different KIND of evidence than the
+claim was made from.** It is not a weak refutation — it is a refutation of a different proposition, and
+nothing in its output says so. It cost more than simply believing the claim would have, because a claim
+believed stays open to measurement while a claim refuted is closed.
+
 ---
 
 ## 4 — This document's own confidentiality review

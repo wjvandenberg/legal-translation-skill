@@ -882,3 +882,27 @@ tooling repository's campaign record** — a file nothing in this project reads.
 says in terms that what to do about a history already carrying the wrong address belongs to **this project's
 own §3, with its trigger**. *A rule that lives in exactly one place, and that place is not where the work
 happens, is the shape this whole propagation exists to remove.*
+
+## 2026-09-11 — what the monorepo layout preserves, adds and costs
+
+**Relocated out of `CLAUDE.md` §6.4 at THE CHARTER REDUCTION part (e), under route 2.** The charter keeps the
+live constraint — *the duplication is deliberate and its removal is DEFERRED until the reconciliation
+classifies the 618-pair residue* — and points here for the rest. **This is the reasoning, not a second copy
+of the rule.**
+
+**WHAT THE LAYOUT PRESERVES, none of it tidy-up-able.** The **154 separate sub-lexicon files** *(§6.1 forbids
+reducing the file count for its own sake, and A3 measured the design correct)* · **both the US and the UK
+term in every lexicon row**, which is what makes a variant build a selection rather than a translation · and
+**the two distribution repos' URLs**, which users install from.
+
+**WHAT IT ADDS:** one pull request touches **both** trees, so a fix cannot land in one variant and be
+forgotten. **That is not hypothetical — it happened once and it shipped**, which is the whole reason the
+monorepo was chosen over two repositories on 2026-07-28.
+
+**WHAT IT COSTS:** the content is edited twice. **Removing the duplication — one source, generated variants —
+is DEFERRED**, and the trigger is the reconciliation classifying the **618-pair residue**. Until that
+classification exists, a generator would have to guess which of a pair is canonical, and a wrong guess ships
+into both variants at once.
+
+*(The layout itself — `uk/` IS the publishable tree, `tools/` and `tests/` siblings never inside it,
+`.gitignore` by path — stays in `CLAUDE.md` §6.4: it is load-bearing every session, not reasoning.)*
