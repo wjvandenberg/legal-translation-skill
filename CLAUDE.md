@@ -85,7 +85,9 @@ the claim was made from; the A16 instance that bought this is in `EVIDENCE-measu
 **ARCHETYPE: Analysis + rebuild of an existing artefact** (`rebuild`) — the closest of the template's eleven,
 and the one row ● on every optional column, so this charter carries those blocks rather than dropping any.
 
-**SIZE CLASS: L — cap 500 lines, §7 at 35, all seven sections capped in `verify.config.json`.** L rather than
+**SIZE CLASS: L — every cap lives in `verify.config.json`, where the checker reads it, and none is restated
+here** *(the §7 figure stated here read 35 for a day after the house lowered it to 25 — a restated cap is a
+second place to go stale, and this is what it looks like when it does)*. L rather than
 M because this project has run far past eight sessions — the observable test, not a judgement about how big
 it feels. **Every cap is enforced, not aspirational**, and `verify_md.py` reports each with a per-section
 breakdown showing where the weight sits. **AND CHECK THE COPY YOU RUN:** the `charter structure` row arrived
@@ -743,27 +745,17 @@ in the charter unconditionally.
 ## 7. Current status
 
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
-> never appended to; fold anything durable into §1–§6 first** *(§5.8, and the 35-line cap in §1.7)*.
+> never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-09-10. BRANCH 8 IS BUILT AND REGISTER F43 IS CLOSED
+### HANDOFF — 2026-09-12. §7's CAP IS 25 NOW, DOWN FROM 35, AND THIS HANDOFF WAS BUILT TO IT
 
-**WHAT WAS DONE, HOW, AND WAS THE PURPOSE MET — YES, BOTH HALVES.** Branch 8, reading-apart completeness: **C28 CLOSED · C12 PARTIAL · M1's count-not-content half CLOSED**, as `validate_apply.py --extraction-completeness` in both trees, replacing Step 2's `zipfile.namelist()` snippet. Its purpose was C28's — every other check in the skill baselines against `paragraphs.json`, *which the run itself wrote*, so a span extraction never captured is invisible to all of them. This is now the only check that opens the original.
+**PRODUCED IN THIS PROJECT TODAY: this section, its cap, and the restated cap in §1.7 — nothing else.** No skill file, tool, test or delivered byte touched. The house lowered §7 from 35 to 25 on 2026-09-11; this config still said 35 and §1.7 said it a second time in prose, so a 34-line handoff read green against a cap that no longer existed. **Trimmed by dropping what another document already owns, never by dropping what the next session needs.**
 
-**AND IT IS NOT A NEW FILE, WHICH IS THE DAY'S BIGGEST CONSTRAINT AND WAS NOT WRITTEN DOWN ANYWHERE** *(Wouter)*. **A Cowork skill over 200 files will not install**, lawve.ai adds a README to each published root, and each tree is at 198 — so **199 is the ceiling and exactly one slot remains, which D3's manifest already claims**. Recorded in §6.3. It reversed a placement decision taken an hour earlier, and **D3's manifest is now the last file either tree may ever gain**.
+**BRANCH 8 IS BUILT AND REGISTER F43 IS CLOSED** *(2026-09-10, and the detail is `PLAN-2-step-b.md`'s and the registers' — not restated here)*. Reading-apart completeness: **C28 CLOSED · C12 PARTIAL · M1's count-not-content half CLOSED**, as `validate_apply.py --extraction-completeness` in both trees. **F43 closed as NOT A LOSS; F44 filed as the inverse of what F43 feared** — a gate that has never once caught a real defect, unfixed here because it is a different script and a different mechanism.
 
-**THE ACCEPTANCE CONDITION WAS STATED BEFORE MEASURING AND BOTH HALVES HELD.** `tools/extraction_corpus_arm.py`: **body ZERO uncaptured on all 12 reachable frozen intermediates**, D06 declared **VOID** (its source is the legacy `.doc` no script here can read), **a planted truncation firing as the positive control** — so the zeros are calibration, not silence. Auxiliary: **40 paragraphs across 6 documents** no capture accounts for (comments 32, footers 3, footnotes 3, headers 2), and **`footnotes.json` in 0 of 13 frozen runs** while two documents carry footnote text.
+**THE HARD CONSTRAINT, AND IT IS THE ONE A NEW SESSION WILL BREAK: A Cowork skill over 200 files will not install**, lawve.ai adds a README to each published root, and each tree is at 198 — so **199 is the ceiling, exactly one slot remains, and D3's manifest already claims it.** Recorded in §6.3. **D3's manifest is the last file either tree may ever gain.**
 
-**`apply_corpus_diff.py` CANNOT SEE THIS BRANCH, AND THAT WAS DECLARED BEFORE THE RUN.** It drives apply; nothing here touches apply or a delivered byte. Its self-comparison **NOTICE IS PRESENT** and its 13-byte-identical result is a regression guard only.
-
-**THE READER CONTRACT IS THE LESSON, AND IT IS NOW §5.3's FIFTH NO-TWIN RULE.** A check that reads its subject independently must honour the SAME text contract or it reports its own semantics as a defect: the first version collected `w:t` alone and called **four real corpus documents damaged**, because `extract_paragraphs` emits a newline at every plain `<w:br/>` — and **no fixture in the tree contained one**. Paid for in-section; all seven caps hold.
-
-**THE SUITE WAS RED FIRST AND CAUGHT A DEFECT IN THE CHECK.** 32 checks, 0 failures, 0 void, both variants. The body arm had searched every string at any depth, and `paragraphs.json`'s `runs` array repeats each paragraph's text — so a paragraph deleted from `text` was re-supplied by the same file. The tell was its own output: `captured in paragraphs.json : 7` one line above `NOT captured : 0`.
-
-**REGISTER F43 IS CLOSED AS NOT A LOSS, AND ITS REASON FOR DOUBTING ITSELF WAS REFUTED FIRST.** All 13 frozen workdirs are **deliveries** — the "7 of 10 match no document" was the earlier probe's matching KEY, not the population. Three documents carry unfilled header entries, not two. None of the seven lost anything, and **the document carrying five of them has ENGLISH as its source language**. *A fill rate cannot distinguish "nobody did the work" from "there was no work to do."*
-
-**F44 FILED — THE INVERSE OF WHAT F43 FEARED.** `--extract` tells the operator an already-English header may be left null; `--apply` refuses exactly that. Measured over all 9 reachable scaffolded documents: **rev44 fired on 6, the working tree fires on 3, and every firing is a false positive** — the gate has never once caught a real defect. Not fixed here: different script, different mechanism.
-
-**AND I WITHDREW A FINDING OF MY OWN**, which cost less than the claim would have: two documents scored 0 remnant hits over ~9,300 characters, read as a new defect until the corpus listing dissolved both — one is C9's known Norwegian misdetection, the other is correct because that document is English.
+**THE LESSON, NOW §5.3's FIFTH NO-TWIN RULE:** a check that reads its subject independently must honour the SAME text contract, or it reports its own semantics as a defect — the first version called **four real corpus documents damaged** because `extract_paragraphs` emits a newline at every plain `<w:br/>` and **no fixture in the tree contained one**.
 
 **THE SINGLE NEXT ACTION: BRANCH 9 — the change journal** (C15, B6), which is what makes branch 11 buildable. Its brief is section 3.8 of `PLAN-2-step-b.md`; the order is §3.1.
 
