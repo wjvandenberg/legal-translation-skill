@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""verify_md.py - the document checker.  CHECKER VERSION 27 (2026-09-10)
+"""verify_md.py - the document checker.  CHECKER VERSION 29 (2026-09-14)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -106,8 +106,8 @@ from pathlib import Path
 from house_common import (                                       # noqa: E402
     FAIL, JUDGE, NA, PASS, RC_COULD_NOT_RUN, VOID, Case, Report,
     added_line_runs, baseline_guard, finish, git, isolated_env, load_section,
-    loaded_lines, read_phrase_list, report_pairing, resolve_list, resolve_revision,
-    run_cases, selftest_config, wants_report_json, write_section,
+    loaded_lines, raw_lines, read_phrase_list, report_pairing, resolve_list,
+    resolve_revision, run_cases, selftest_config, wants_report_json, write_section,
 )
 
 # --------------------------------------------------------------------------- config
@@ -147,6 +147,7 @@ DEFAULT_CONFIG = {
     "size_scope": ["CLAUDE.md", "*/CLAUDE.md"],
     "plan_scope": [],
     "report_section_sizes": True,
+    "report_section_shape": True,
 }
 
 #: THE TEMPLATE'S OWN SUBSECTION COUNTS, section 1 to 7, and they live HERE rather than in
@@ -245,6 +246,7 @@ CONFIG_COMMENT = {
     "plan_scope": "Which files the 'plan purpose' check applies to, as filename globs - the LIVE plan file(s), and nothing else. EMPTY BY DEFAULT, reporting N/A with that reason rather than passing silently. IT IS DECLARED AND NOT INFERRED, on a measurement: of 15 plan files in the house repository the 14 CLOSED ones never used strikethrough - they recorded completion in a 'status' COLUMN - so 44 finished rows read as OPEN and a 'every PLAN-*.md' default reddens twelve finished records. And the next discriminator that suggests itself is worse: the LIVE file's status row contains the word CLOSED (naming which steps are), so prose-matching it marks the one live plan finished and the check passes over the very file it exists to read. Name the live plan file here; updating this glob is the same act as renaming the file when the phase turns over. A CLOSED plan file is left out - it is a finished record, and rewriting one to satisfy a convention it predates destroys evidence.",
     "section_caps": "Per-section caps, e.g. {\"7\": 60}, keyed by top-level section number. A capped section that is ABSENT is a finding, not a silent pass. Empty = do not check.",
     "report_section_sizes": "List each top-level section's loaded line count, so you can see WHERE the weight sits. Never fails.",
+    "report_section_shape": "Beside each section size, what the section is MADE of - prose, table rows, headings, blanks - and the FLOOR those last three add up to. Never fails. It exists because a size alone cannot say whether a section is reducible: a heading may never be deleted (it is the return path every relocated pointer resolves against) and a table row is one line however long it is, so rewriting a verbose row saves nothing and only the prose count answers 'how much can a rewrite touch'. Measured on the first two reductions this house ran, savings estimated off the SPAN came in at about a third of estimate, uniformly optimistic, because the model assumed prose where the file held structure. The floor also settles reachability BEFORE the work rather than after: a target below blank+heading+table cannot be met without deleting a heading or dropping a rule, and finding that out at the end costs a session.",
 }
 
 SECTION_SIGN = "§"
@@ -933,6 +935,71 @@ def section_sizes(lines):
     return out
 
 
+def shape_of(lines):
+    """{'blank': n, 'heading': n, 'table': n, 'prose': n} - what a span is MADE of.
+
+    WHY A REDUCTION CANNOT BE PLANNED WITHOUT IT. Two blocks of eighty lines are not the
+    same size of problem. A heading may never be deleted - it is the return path every
+    relocated pointer resolves against - and A TABLE ROW IS ONE LINE HOWEVER LONG IT IS, so
+    rewriting a verbose row to a tight clause saves exactly nothing. Only the PROSE count is
+    reducible by rewriting, and a saving estimated off the span instead of off the prose is
+    optimistic by however much structure the span holds. Measured on the first two
+    reductions this house ran, estimates made that way came in at about a THIRD of estimate.
+
+    IT IS ALSO THE FLOOR. blank + heading + table is the smallest a span can become without
+    deleting a heading or dropping a rule, so a target BELOW that floor is unreachable and
+    can be shown to be unreachable before the work starts rather than after it.
+
+    EVERY LINE IS COUNTED EXACTLY ONCE, so the four sum to the span and the sum is the
+    control - a classifier that double-counts or drops a line reports a shape that looks
+    plausible and is wrong. Fenced code is PROSE here on purpose: it is neither structure
+    nor a rule, and it is reducible, which is the only question this measure is asked.
+    """
+    mask = code_fence_mask(lines)
+    out = {"blank": 0, "heading": 0, "table": 0, "prose": 0}
+    for i, ln in enumerate(lines):
+        s = ln.strip()
+        if not s:
+            out["blank"] += 1
+        elif mask[i]:
+            out["prose"] += 1
+        elif s.startswith("#"):
+            out["heading"] += 1
+        elif s.startswith("|"):
+            out["table"] += 1
+        else:
+            out["prose"] += 1
+    return out
+
+
+def section_shapes(lines):
+    """{'1': {...}, ...} - shape_of for each TOP-LEVEL numbered section.
+
+    Spans are taken the same way section_sizes takes them, and the SUM of each section's
+    four counts is asserted against section_sizes in the selftest - two span measurements in
+    one report is how the report comes to disagree with itself, which is the defect
+    section_size_report exists to make impossible.
+
+    headings() reports ONE-BASED line numbers, which is why the slice is [i - 1:end - 1] and
+    not [i:end]. Taken the obvious way this measure starts one line late and ends one line
+    early, and STILL SUMS TO THE RIGHT TOTAL - so the control would have passed while every
+    section's first line was the previous section's last. Caught only by reading the helper
+    it borrows from.
+    """
+    hs = [(i, lvl, key) for i, lvl, _, key in headings(lines)]
+    out = {}
+    for at, (i, lvl, key) in enumerate(hs):
+        if not key or "." in key:
+            continue
+        end = len(lines) + 1
+        for j, lvl2, _ in hs[at + 1:]:
+            if lvl2 <= lvl:
+                end = j
+                break
+        out[key] = shape_of(lines[i - 1:end - 1])
+    return out
+
+
 def expand_targets(root, entries):
     """Expand any glob in 'md.files'; return (paths, globs-that-matched-nothing).
 
@@ -1046,13 +1113,23 @@ def check_file_length(rep, doc, text, limit, in_scope=True, path=None):
             reason = "not in size_scope - a cap is a charter's"
         rep.record(doc, "file length", 0, [], na_reason=reason)
         return
-    got = loaded_lines(text)
+    got, raw = loaded_lines(text), raw_lines(text)
     over = []
     if got > cap:
         via = f" (via {glob!r})" if glob else ""
         over.append(f"{got} lines loaded against a cap of {cap}{via} - {got - cap} over. "
                     f"RELOCATE, do not delete: a path-scoped rule, a companion document, "
                     f"a plan document, or a hook")
+    # RAW BESIDE LOADED, AND ONLY WHEN THEY DIFFER. The cap is enforced on what Claude
+    # receives, but it is READ as a promise about how much document a person scrolls, and
+    # block-level HTML comments are invisible to exactly one of those two. Equal numbers say
+    # nothing worth a line; unequal numbers mean a maintainer note exists and has to be
+    # declared rather than found later. It is a FINDING, not a failure - the note may be
+    # entirely legitimate - so it is appended only when the file is already over, and
+    # otherwise carried in the size breakdown where a person reading sizes will see it.
+    if raw != got and over:
+        over.append(f"and {raw} lines RAW - {raw - got} line(s) sit inside HTML comments, "
+                    f"which the cap does not count and a reader still scrolls past")
     rep.record(doc, "file length", got, over)
 
 
@@ -1289,6 +1366,34 @@ def check_core_sections(rep, doc, lines, declared, in_scope=True):
             problems.append(
                 f"CORE subsection {key} is declared absent, but the charter has it "
                 f"- the declaration is stale")
+        elif present:
+            # GAP 62, CHECKER VERSION 29. A PRESENT heading is not a present SUBSECTION, and
+            # until now this arm could not tell them apart: it asked whether the heading
+            # existed and never whether anything stood under it. MEASURED 2026-09-14 on a
+            # charter reduction - a verifier emptied a CORE subsection to nothing and the file
+            # went 354 -> 308 lines with THIS ROW READING PASS AT 14 AND THE RUN OVERALL PASS.
+            #
+            # WHY THAT IS THE DANGEROUS DIRECTION. A reduction's whole method is collapsing a
+            # block to a one-line pointer, so the failure mode it tends towards is collapsing
+            # one block too far - and that was the single route with no mechanical check at
+            # all, guarded only by a person reading the blueprint's rule 1.
+            #
+            # A POINTER IS ENOUGH AND MUST STAY ENOUGH: the test is whether ANY non-blank,
+            # non-heading, non-rule line stands in the body, not how many. Deliberately NOT a
+            # line-count floor - that would fight the relocation regime it exists to protect.
+            # A container section whose own prose is nil still passes, because _section_body
+            # spans to the next heading of the same or higher level and so includes the
+            # subsections' bodies.
+            body = _section_body(lines, key)
+            if body is not None and not [
+                    ln for ln in body[1:]
+                    if ln.strip() and not ln.lstrip().startswith("#")
+                    and set(ln.strip()) != {"-"}]:
+                problems.append(
+                    f"CORE subsection {key} has its HEADING but NOTHING UNDER IT. The tier "
+                    f"table marks it CORE, and an emptied subsection is indistinguishable "
+                    f"from a deleted one to every other arm here - leave at least the "
+                    f"one-line pointer a relocation owes")
     rep.record(doc, "core sections present", examined, problems)
 
 
@@ -1608,7 +1713,10 @@ def section_size_report(path, body, cfg):
         against = "  (no cap applies - not in size_scope)"
     else:
         against = " (no cap set)"
-    out = [f"  {path}: {loaded_lines(body)} loaded{against}"]
+    got, raw = loaded_lines(body), raw_lines(body)
+    also = "" if raw == got else f" ({raw} raw - {raw - got} in HTML comments)"
+    out = [f"  {path}: {got} loaded{also}{against}"]
+    shapes = section_shapes(body.splitlines()) if cfg["report_section_shape"] else {}
     for key in sorted(sizes, key=lambda k: (len(str(k)), str(k))):
         mark = ""
         sc = cfg["section_caps"].get(key)
@@ -1618,6 +1726,18 @@ def section_size_report(path, body, cfg):
         elif sc:
             mark = "  <- capped elsewhere, not here"
         out.append(f"      section {key:<4} {sizes[key]:>5} lines{mark}")
+        sh = shapes.get(key)
+        if sh:
+            # THE FLOOR IS PRINTED, NOT LEFT TO BE ADDED UP. blank + heading + table is the
+            # smallest this section can become without deleting a heading or dropping a
+            # rule, and a target under it is unreachable - which is worth knowing BEFORE
+            # the rewriting starts rather than after. Only 'prose' answers "how much of
+            # this can a rewrite touch", and an estimate taken off the span instead came
+            # in at about a third of estimate on the first two reductions this house ran.
+            floor = sh["blank"] + sh["heading"] + sh["table"]
+            out.append(f"             shape: {sh['prose']:>4} prose  "
+                       f"{sh['table']:>4} table  {sh['heading']:>3} heading  "
+                       f"{sh['blank']:>4} blank   -> floor {floor}")
     return out
 
 
@@ -2977,6 +3097,43 @@ def selftest(root: Path) -> int:
         return _selftest_body(root, cfg, tmp)
 
 
+def selftest_shape():
+    """shape_of and section_shapes, and the THIRD case is the one that earns its keep.
+
+    The sum control - four counts adding to the span - is necessary and NOT sufficient, and
+    that is measured rather than asserted. section_shapes borrows its spans from the helper
+    section_sizes uses, whose line numbers are ONE-BASED; sliced the obvious way it starts
+    one line late and ends one line early, so every section's first line is the previous
+    section's last. Planted here, that defect leaves the sum of every MIDDLE section exactly
+    right - only the last section, where the slice runs off the end, moves at all. So on a
+    charter of seven sections the sum control sees one and misses six, and it is the
+    alignment case that catches every one: a section's first line must BE its heading.
+
+    The classifier is proved on a fixture holding one of each kind plus a fenced block, so
+    'fenced code counts as prose' is asserted rather than merely intended - and the sum
+    catches any future kind that gets counted twice or not at all.
+    """
+    ok = True
+    doc = ["# Title", "", "## 1 - one", "prose line", "| a | b |", "", "```", "# not a heading",
+           "```", "", "## 2 - two", "more prose"]
+    sh = shape_of(doc)
+    cases = [("one of each kind is classified", (sh["heading"], sh["table"], sh["blank"]), (3, 1, 3)),
+             ("fenced code counts as prose", sh["prose"], 5),
+             ("every line counted exactly once", sum(sh.values()), len(doc))]
+    sizes, shapes = section_sizes(doc), section_shapes(doc)
+    cases.append(("shape sums to the section span",
+                  [sum(shapes[k].values()) for k in sorted(shapes)],
+                  [sizes[k] for k in sorted(sizes)]))
+    # THE DISCRIMINATING ONE. A shape whose spans are off by one passes every case above.
+    cases.append(("a section's shape starts at its heading",
+                  shapes["2"], {"blank": 0, "heading": 1, "table": 0, "prose": 1}))
+    for label, got, want in cases:
+        good = got == want
+        ok &= good
+        print(f"  {'OK  ' if good else 'MISS'} {label:<28} -> {got} (want {want})")
+    return ok
+
+
 def _selftest_body(root: Path, cfg, tmp: Path) -> int:
     """The suite itself. Split out ONLY so the env isolation can wrap it whole."""
     try:
@@ -3021,6 +3178,7 @@ def _selftest_body(root: Path, cfg, tmp: Path) -> int:
 
         report_pairing(paired, unpaired + 2)
 
+        ok &= selftest_shape()
         ok &= selftest_forbidden(tmp)
         ok &= selftest_added_lines(tmp)
         ok &= selftest_required(tmp)

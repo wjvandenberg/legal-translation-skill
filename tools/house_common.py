@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""house_common.py - the plumbing every house checker shares.  CHECKER VERSION 17 (2026-09-09)
+"""house_common.py - the plumbing every house checker shares.  CHECKER VERSION 18 (2026-09-11)
 
 WHAT IS HERE AND WHY IT IS HERE. The result model (PASS / FAIL / VOID / N-A / JUDGE, the
 denominator rule, the exit-code convention), reading verify.config.json, and the selftest that
@@ -181,6 +181,29 @@ def loaded_lines(text):
     if lines and lines[-1] == "":
         lines.pop()
     return sum(1 for ln in lines if COMMENTED not in ln or ln.strip(COMMENTED + " \t"))
+
+
+def raw_lines(text):
+    """The number of lines IN THE FILE - what `wc -l` answers, and what a READER scrolls.
+
+    IT EXISTS BECAUSE THE TWO NUMBERS CAN DIVERGE IN SILENCE. loaded_lines strips block-level
+    HTML comments because Claude never receives them; a cap that measured the file instead
+    would measure the wrong thing for adherence. But the cap is ALSO read as a promise about
+    how much document a person has to navigate, and a comment is invisible to one of those
+    readers and not the other. Reporting only the smaller number lets a file grow for the
+    human while every check says it did not.
+
+    SO NEITHER NUMBER IS "THE" LENGTH AND BOTH ARE PRINTED. What gates stays loaded_lines -
+    changing what a cap measures would re-verdict every charter in the house at once - and
+    this is printed beside it so a divergence has to be declared rather than discovered.
+
+    It matches `wc -l`: a trailing newline ends the last line rather than starting a new one.
+    """
+    t = text.replace("\r\n", "\n").replace("\r", "\n")
+    lines = t.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    return len(lines)
 
 
 class Report:
@@ -1105,6 +1128,17 @@ def _selftest_loaded_lines():
                               ("loaded_lines ignores a comment", "<!--\n" + plain + "\n-->", 0),
                               ("an inline comment keeps its line", "a <!-- note --> b", 1)):
         got = loaded_lines(text)
+        good = got == want
+        ok &= good
+        print(f"  {'OK  ' if good else 'MISS'} {label:<34} -> {got} (want {want})")
+    # raw_lines is proved AGAINST loaded_lines, not beside it: the pair only earns its keep
+    # if one of the cases makes them DISAGREE. A raw measure that silently called
+    # loaded_lines would pass every case a shared fixture could offer, so the commented
+    # fixture - 7 raw against 0 loaded - is the discriminating one and is why both run here.
+    for label, text, want in (("raw_lines counts plain lines", plain, 5),
+                              ("raw_lines COUNTS a comment", "<!--\n" + plain + "\n-->", 7),
+                              ("raw_lines ignores a trailing newline", plain + "\n", 5)):
+        got = raw_lines(text)
         good = got == want
         ok &= good
         print(f"  {'OK  ' if good else 'MISS'} {label:<34} -> {got} (want {want})")
