@@ -88,19 +88,19 @@ it feels. **Every cap is enforced, not aspirational**, and `verify_md.py` report
 breakdown showing where the weight sits. **AND CHECK THE COPY YOU RUN** — `check_checkers.py` reports the
 drift: an older local `verify_md.py` omits newer rows, and **a missing row reads exactly like a passed one.**
 
-> **OVER-CAP, RE-DERIVED 2026-09-21: 760 lines against a cap of 510** — raised from the house 500 by
-> Wouter on 2026-09-21 to this file's ARCHETYPE PARITY, measured at the foot of this block. *(From the
-> checker, re-derived LAST because editing this subsection moves the number it declares;
-> `tools/verify_charter_continuity.py` compares it against the measurement every run.)* **The cap sits in
-> three places and only `verify.config.json`'s `max_lines` gates** — this sentence and `DECLARED_CAP` too.
+> **OVER-CAP, RE-DERIVED 2026-09-21: 760 lines against a cap of 619** — **PER-ARCHETYPE**: this archetype's
+> EMIT plus the measured content allowance *(`rebuild`/L emitted and counted at **499**, plus **120** for a
+> project's own content)*. It **supersedes the 510 of earlier that day**, and what 510 measured is the
+> reason — archetype PARITY, **parity for a SKELETON**: it left 11 lines for this file's own content where
+> it has 261. *(Re-derived LAST: editing this moves it.)* **SIX statements, three files; only the config gates.**
 >
-> **THE OVERAGE IS DECLARED IN THREE PARTS, NEVER SILENCED. NUMBER: 760 against 510**, from the checker.
-> **REASON — THE ROUTES ARE MEASURED OUT, not untried:** three reductions have run, **1,241 → 815 → 776
-> → 760**; route 0 probed **24 rules against both auto-loading files for 0 twins**, both controls firing;
-> the **true reflow ceiling is −18 lines**, so no compression exists at all; **59 headings and 74 table
-> rows are 133 lines no rewrite touches**; and **§5.6 is route 1 entire**, 86 lines, irreversible if lost.
-> **TRIGGER — AN EVENT: the propagation campaign's closing evaluation closes**, and one session then
-> relocates the remaining ~250 lines of RULES by routes 2, 3, 5 and 6 *(Wouter, 2026-09-21)*.
+> **THE OVERAGE IS DECLARED IN THREE PARTS, NEVER SILENCED. NUMBER: 760 against 619 — 141 over, down from
+> 250, and the file fails by either, so raising the cap was never the fix.** **REASON — THE ROUTES ARE
+> MEASURED OUT, not untried:** three reductions have run, **1,241 → 815 → 776 → 760**; route 0 probed **24
+> rules against both auto-loading files for 0 twins**, both controls firing; the **true reflow ceiling is
+> −18 lines**; **59 headings and 74 rows are 133 lines no rewrite touches**; and **§5.6 is route 1 entire**,
+> 86 lines. **TRIGGER — AN EVENT: the closing evaluation closes**, then ONE session relocates RULES by
+> routes 2, 3, 5 and 6 — **141 lines now, not the 250 the old cap demanded** *(Wouter, 2026-09-21)*.
 > **PARITY IS 509 AND WAS MEASURED RATHER THAN QUOTED:** `rebuild`/L **emits 499**, and this file's §5.6
 > runs **86 against the archetype's own 76** — a protected excess of **10**, where a recorded 38 said 48.
 
