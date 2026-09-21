@@ -88,21 +88,21 @@ it feels. **Every cap is enforced, not aspirational**, and `verify_md.py` report
 breakdown showing where the weight sits. **AND CHECK THE COPY YOU RUN** — `check_checkers.py` reports the
 drift: an older local `verify_md.py` omits newer rows, and **a missing row reads exactly like a passed one.**
 
-> **OVER-CAP, RE-DERIVED 2026-09-14: 760 lines against a cap of 500.** *(From the checker, re-derived LAST
-> because editing this subsection moves the number it declares; `tools/verify_charter_continuity.py` compares
-> it against the measurement every run.)* **The cap is stated in three places and only `verify.config.json`'s
-> `max_lines` gates** — this sentence and `DECLARED_CAP` in `verify_charter_continuity.py` move with it.
+> **OVER-CAP, RE-DERIVED 2026-09-21: 760 lines against a cap of 510** — raised from the house 500 by
+> Wouter on 2026-09-21 to this file's ARCHETYPE PARITY, measured at the foot of this block. *(From the
+> checker, re-derived LAST because editing this subsection moves the number it declares;
+> `tools/verify_charter_continuity.py` compares it against the measurement every run.)* **The cap sits in
+> three places and only `verify.config.json`'s `max_lines` gates** — this sentence and `DECLARED_CAP` too.
 >
-> **THREE REDUCTIONS HAVE RUN — 1,241 → 815, 815 → 776, and 776 → 760** *(2026-09-14, the full
-> `REDUCTION-TEMPLATE.md` route set)*. **THE FLOOR IS MEASURED, AND ONE OF ITS THREE LEGS HAS GONE.** Still
-> binding: the file's **59 headings and 74 table rows are 133 lines no rewrite touches** — a heading is the
-> return path every pointer resolves against, and a row only shrinks by deleting a rule — and **§5.6 is
-> route 1 entire**, 86 lines, irreversible if forgotten. **RETIRED: the archetype floor.** `rebuild`/L emits
-> **499, UNDER the cap**, where this block recorded 647; the generator's selftest now gates every archetype
-> under 500. **What replaced it is sharper, because it is about this file rather than its kind:** route 0
-> probed 24 rules against both auto-loading files and found **0 twins**, and the **true reflow ceiling is
-> −18 lines** — so no compression exists at all, every line must come from relocation, and the destination
-> documents already hold what they own. **The cap-versus-floor is Wouter's decision.**
+> **THE OVERAGE IS DECLARED IN THREE PARTS, NEVER SILENCED. NUMBER: 760 against 510**, from the checker.
+> **REASON — THE ROUTES ARE MEASURED OUT, not untried:** three reductions have run, **1,241 → 815 → 776
+> → 760**; route 0 probed **24 rules against both auto-loading files for 0 twins**, both controls firing;
+> the **true reflow ceiling is −18 lines**, so no compression exists at all; **59 headings and 74 table
+> rows are 133 lines no rewrite touches**; and **§5.6 is route 1 entire**, 86 lines, irreversible if lost.
+> **TRIGGER — AN EVENT: the propagation campaign's closing evaluation closes**, and one session then
+> relocates the remaining ~250 lines of RULES by routes 2, 3, 5 and 6 *(Wouter, 2026-09-21)*.
+> **PARITY IS 509 AND WAS MEASURED RATHER THAN QUOTED:** `rebuild`/L **emits 499**, and this file's §5.6
+> runs **86 against the archetype's own 76** — a protected excess of **10**, where a recorded 38 said 48.
 
 ---
 
