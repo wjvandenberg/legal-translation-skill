@@ -155,13 +155,23 @@ HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE = {
            "gained the 6.5 it had never had",
 }
 
-SECTION_7_CAP = 35
-# RAISED FROM 350 TO 500 ON 2026-09-09 (4) BY WOUTER: 350 is the RETIRED cap and 500 is the
-# live gate, the same number for M and L.  IT MUST EQUAL verify.config.json's max_lines for
-# CLAUDE.md -- this constant, that config key and section 1.7's prose are THREE statements of
-# ONE number, and only the config one is the gate.  Check 3 fails when the charter's declared
-# cap disagrees with this constant, so moving either alone trades one red for another.
-DECLARED_CAP = 500
+SECTION_7_CAP = 25
+# LOWERED FROM 35 TO 25 ON 2026-09-21: the house lowered section 7's cap to 25 on 2026-09-11
+# and verify.config.json's section_caps followed it the same week, while THIS constant stayed
+# at 35 for ten days.  It never went red -- section 7 measured 24 throughout -- which is the
+# whole point: a control set 10 lines looser than the gate it mirrors reports PASS over every
+# breach in between, and nothing distinguishes that from a real pass.  It mirrors the config;
+# the config is the gate.
+#
+# RAISED FROM 500 TO 510 ON 2026-09-21 BY WOUTER: 510 is THIS FILE'S ARCHETYPE PARITY, not the
+# house 500 -- `rebuild`/L emits 499 and this charter's 5.6 runs 86 against the archetype's own
+# 76, a protected excess of 10.  Both figures were EMITTED AND COUNTED that day; the 38 a record
+# had carried for the archetype's 5.6 was wrong by 38 and made the excess look like 48.
+# IT MUST EQUAL verify.config.json's max_lines for CLAUDE.md -- this constant, that config key
+# and section 1.7's prose are THREE statements of ONE number, and only the config one is the
+# gate.  Check 3 fails when the charter's declared cap disagrees with this constant, so moving
+# either alone trades one red for another.
+DECLARED_CAP = 510
 
 # --------------------------------------------------------------------------- check 3 data
 # A DECLARATION is a sentence in which the charter states ITS OWN length. Each pattern below has a
