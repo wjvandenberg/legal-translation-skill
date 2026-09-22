@@ -71,21 +71,22 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 SCRIPT = "apply_translations_textmatch.py"
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.3.
 #
-# MOVED TO 18a0798 ON 2026-09-10: the squash-merge of branch 8, extraction completeness
-# (PR #82), and the last commit to touch either tree. DERIVED, NOT READ OFF THE MERGE MESSAGE
-# -- `git log --oneline -1 -- uk us` returns it and `git diff 18a0798 -- uk us` comes back
+# MOVED TO c803b56 ON 2026-09-22: the squash-merge of branch 9, the change journal (PR #93),
+# and the last commit to touch either tree. DERIVED, NOT READ OFF THE MERGE MESSAGE
+# -- `git log --oneline -1 -- uk us` returns it and `git diff c803b56 -- uk us` comes back
 # empty.
 #
 # AND EXPECT THE ALL-QUIET NOTICE AT THIS PIN, WHICH IS THE POINT WORTH CARRYING FORWARD.
 # The fixture path prints "BYTE-IDENTICAL to the working tree, so old and new are the same
 # code and an all-quiet render proves nothing" whenever the swapped script matches the pin.
-# Branch 8 changed validate_apply and a step document -- NOT the apply script this tool
-# swaps -- so the notice is CORRECT here and a quiet render is the expected result rather
-# than evidence. The .pyc slice, at the previous pin, was the last one where it was absent.
-# A stale pin produces the same honest-looking notice for an illegitimate reason, which is
-# why it moves as the first act after a merge and not as a closing tidy-up.
+# Branch 9 added a change journal to post_process.py and rewrote a step document -- NOT the
+# apply script this tool swaps -- so the notice is CORRECT here and a quiet render is the
+# expected result rather than evidence. The .pyc slice, five branches back, was the last one
+# where it was absent. A stale pin produces the same honest-looking notice for an
+# illegitimate reason, which is why it moves as the first act after a merge and not as a
+# closing tidy-up.
 #
-# THE PIN HAS NOW MOVED NINE TIMES IN SIX DAYS, and this comment block has gone stale twice
+# THE PIN HAS NOW MOVED TEN TIMES, and this comment block has gone stale twice
 # and been caught twice -- which is the whole argument for rewriting it rather than appending
 # to it. Once it read "Moved to 049484e" while the pin one line below said 2a71e71: both true
 # once, disagreeing inside five lines. NOTHING CHECKS A COMMENT, so a stale one is
@@ -97,12 +98,18 @@ SCRIPT = "apply_translations_textmatch.py"
 # before-and-after question, one in bytes and one in pixels, and a disagreement between their
 # baselines would be invisible in either one's output.
 #
-# THREE TOOLS CARRY A PIN SINCE 2026-09-09, NOT TWO, AND tools/hf_corpus_diff.py's IS FIXED
-# RATHER THAN MOVING -- deliberately, and measured. Do not "keep all three in step": that
-# tool proves a kind-less scaffold entry is still a paragraph entry, a question that only
-# exists against a tree predating the `kind` key, so moving its pin makes it VOID for ever.
-# `git grep -F <old sha>` enumerates the carriers; a phrase naming a COUNT does not.
-REF = os.environ.get("LT_BASELINE_REF", "18a0798")
+# DO NOT TRUST ANY COUNT OF THE CARRIERS, INCLUDING THIS SENTENCE'S ABSENCE OF ONE. This
+# block said THREE from 2026-09-09; branch 9 added tools/postprocess_corpus_arm.py AND
+# tests/test_change_journal.py in one commit, and the session that wrote them still said
+# "three" one paragraph before enumerating and finding FOUR moving carriers. A phrase naming
+# a count is wrong the moment the thing it counts changes, and wrong again next time.
+# `git grep -F <old sha>` enumerates them and is the only reading that cannot go stale.
+#
+# AND THE INSTRUCTION IS NOT "MOVE THEM ALL". tools/hf_corpus_diff.py's pin is FIXED at
+# ae48f6d, deliberately and measured: it proves a kind-less scaffold entry is still a
+# paragraph entry, a question that only exists against a tree predating the `kind` key, so
+# moving it makes that tool VOID for ever. Three suites are likewise fixed at 2178cce.
+REF = os.environ.get("LT_BASELINE_REF", "c803b56")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
 # Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
 # glance whether the pages in front of them belong to the run being discussed.

@@ -44,9 +44,12 @@ nothing from the script it measures, and asserts the journal accounts for every 
 Arm 4 then plants a defect in the journal and proves arm 3 goes red for it.
 
 WHAT THIS SUITE CANNOT SEE, said before it is run rather than after.
-  - tools/apply_corpus_diff.py drives apply and cannot see this branch at all. Worse, at pin
-    18a0798 apply is byte-identical to the working tree, so it prints its self-comparison
+  - tools/apply_corpus_diff.py drives apply and cannot see this branch at all. Worse, at the
+    current pin apply is byte-identical to the working tree, so it prints its self-comparison
     notice and an all-quiet run there evidences nothing whatever.
+  - ARM 6's PIN IS FIXED AT THE LAST COMMIT BEFORE THE JOURNAL EXISTED, and the block above
+    it says why: moved forward at the close, as the other pins correctly are, it reports VOID
+    for ever. It was moved once, measured, and moved back in the same session.
   - tools/render_diff.py has NO PAGE for this branch. Nothing delivered changes, so there is
     nothing to render; manufacturing a visual arm would be theatre.
   - The real-corpus completeness answer is tools/postprocess_corpus_arm.py's, not this
@@ -82,9 +85,27 @@ ap.add_argument("--keep", action="store_true")
 args = ap.parse_args()
 SCRIPTS = ROOT / args.variant / "scripts"
 
-# PINNED TO A COMMIT, NEVER TO HEAD — CLAUDE.md 5.3. This is the byte-identity arm's
-# baseline: the last commit that touched either tree. A pin left behind reports the previous
-# branch's work as this one's, and a pin read from HEAD compares the file against itself.
+# A FIXED PIN, NOT A MOVING ONE, AND IT WAS MOVED ONCE BY MISTAKE BEFORE THIS BLOCK EXISTED.
+#
+# 18a0798 is THE LAST COMMIT BEFORE THE CHANGE JOURNAL EXISTED, and that is the whole point.
+# Arm 6 asks one question: does post_process WITH the journal produce a document.xml
+# byte-identical to post_process WITHOUT it? That question only exists against a tree that
+# predates the journal. Branch 9's close mechanically moved this to its own squash-merge
+# along with the three tools that genuinely move, and the result was measured immediately:
+# the baseline became this file's own code, the self-comparison guard fired correctly, and
+# arm 6 reported `VOID — nothing to compare` on every run, for ever. A check that can only
+# report VOID is not a check, and a permanently-void row is one people learn to scroll past.
+#
+# SO IT FOLLOWS tools/hf_corpus_diff.py's PRECEDENT rather than apply_corpus_diff.py's, and
+# it is the FIFTH fixed pin in this repository: test_no_delivered_byte_moves.py,
+# test_check_scoping.py and test_check_scoping_properties.py all pin to 2178cce, and
+# hf_corpus_diff.py to ae48f6d, every one of them for this same reason.
+#
+# WHEN TO MOVE IT, AND IT IS NOT AT A CLOSE. Move it only when a future branch LEGITIMATELY
+# changes what post_process writes for a real document — branch 10, the tidy-up split, is
+# the first such branch, and there the bytes MUST move, so arm 6 goes red and whoever moved
+# them records why and re-pins here in the same commit. Until then a close that mechanically
+# "moves the pins" must leave this one alone.
 REF = os.environ.get("LT_BASELINE_REF", "18a0798")
 
 FAIL, CHECKED, VOIDED = [], 0, []
