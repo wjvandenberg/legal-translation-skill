@@ -96,9 +96,9 @@ aspirational**, and `check_checkers.py` reports whether the copy you run is the 
 > against the day's 25 new house rules: **2 twins, ~4 lines.** **Reflow ceiling −18**; **59 headings and 65
 > table rows are lines no rewrite touches.**
 >
-> **TRIGGER — AN EVENT: Wouter's decision on the last 67 lines.** Every block left is one imperative per line
-> with its load-bearing reason as a trailing clause, so the only routes remaining are RETIREMENT of rules,
-> his alone, or a change to the cap regime *(Wouter, 2026-09-22, stopping at the measured floor by choice)*.
+> **TRIGGER — AN EVENT, AND THE PREVIOUS ONE HAS FIRED.** Wouter DECLARED this measured floor on **2026-09-22 (4)**,
+> over retiring rules and over moving the cap, every block left being one imperative with its reason as a trailing
+> clause. **It ends when the `rebuild` EMIT moves — phase 6, Cowork, is the next scheduled — or when he RETIRES rules here.**
 
 ---
 
@@ -665,19 +665,19 @@ unconditionally — as is §5.6 entire.
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-09-14. THE FULL ROUTE SET RAN, 768 → 760, AND THE CAP IS WOUTER'S DECISION NOW
+### HANDOFF — 2026-09-14, ITS CAP CLAIMS SUPERSEDED 2026-09-22 (4). §1.7 OWNS EVERY LIVE FIGURE; READ IT FIRST
 
-**PURPOSE: NOT MET, and that verdict IS the finding.** The written target was `file length` ≤ 495; the file is **760**. The routes ran out, not the effort. **PRODUCED: this section, §1.7's corrected floor, §4's derived toolchain, two de-counted rows in §1.3 and §5.3, and the seven section caps re-set at measured size.** No skill file, tool, test or delivered byte touched.
+**PURPOSE: NOT MET, and that verdict IS the finding.** The written target was `file length` ≤ 495; the file was **760** that day — **it is 686 after two further passes on 2026-09-22, and §1.7 owns every live number while this paragraph owns none of them.** The routes ran out, not the effort. **PRODUCED: this section, §1.7's corrected floor, §4's derived toolchain, two de-counted rows in §1.3 and §5.3, and the seven section caps re-set at measured size** *(re-set AGAIN on 2026-09-22; the figures below are the 09-14 ones)*. No skill file, tool, test or delivered byte touched.
 
 **THREE MEASUREMENTS REPLACE THE OLD FLOOR ARGUMENT, and §1.7 carries them.** **Route 0 is EXHAUSTED** — 24 rules probed against both auto-loading files, **0 twins**, both controls fired, the positive one carrying an accent so the folding was exercised rather than assumed. **The style pass is NOT A LEVER** — the **true reflow ceiling is −18 lines**, this file being wrapped tighter than its own width; the same instrument returns **+17** on the emitted archetype, which is what makes −18 a measurement instead of a broken script. **And the third leg of the old declaration is RETIRED:** `rebuild`/L emits **499, UNDER the cap**, where §1.7 recorded **647** — stale by 148, and the generator's selftest now gates every archetype under 500.
 
-**THE DECISION, WITH ITS ARITHMETIC.** 59 headings + 74 table rows = **133 lines** no rewrite touches; **§5.6 is route 1 entire at 86**; §7 is 24 — an absolute floor of **240**. But **archetype parity for this file is ≈545**, because its route-1 §5.6 runs **86 against the archetype's 38**. So 495 is below what a *fresh* charter of this archetype emits while carrying a 48-line protected excess, and reaching it means deleting rules, which rule 6 forbids. **Three ways out, all Wouter's: raise this charter's cap · sign off a §5.6 bulletising line by line · or accept a declared overage with a trigger.**
+**THE DECISION, WITH ITS ARITHMETIC.** 59 headings + 74 table rows = **133 lines** no rewrite touches; **§5.6 is route 1 entire at 86**; §7 is 24 — an absolute floor of **240**. But **archetype parity for this file is ≈545**, because its route-1 §5.6 runs **86 against the archetype's 38**. So 495 is below what a *fresh* charter of this archetype emits while carrying a 48-line protected excess, and reaching it means deleting rules, which rule 6 forbids. **Three ways out, all Wouter's: raise this charter's cap · sign off a §5.6 bulletising line by line · or accept a declared overage with a trigger. HE TOOK THE THIRD, 2026-09-22 (4)** — declared at **686 against 619** with all seven routes measured; §1.7 carries it and its live trigger, and **the ≈545 parity in this paragraph is superseded**, the archetype's §5.6 emitted and counted being **76, not 38**.
 
 **GAP 44 IS CLOSED HERE, and it mattered more than it sounds.** The seven caps summed to **1,218 against a 768-line file**, so **not one could fire** — and while `file length` is declared-exempt they are the only control left. Re-set at measured size **99 / 97 / 77 / 25 / 328 / 105 / 25**, every margin zero but section 5's stated **+4**, where the closing evaluation's lessons sweep lands. **PROVED TO BITE:** a line planted in zero-margin section 4 took `section length` RED naming it, and the charter was restored **byte-identically**. Section 5's provisional 548 is **discharged, not carried** — 324 beats it.
 
 **THE SINGLE NEXT ACTION IS UNCHANGED: BRANCH 9 — the change journal** (C15, B6), which is what makes branch 11 buildable. Its brief is section 3.8 of `PLAN-2-step-b.md`; the order is §3.1.
 
-**Open, none blocking.** **(1)** The cap decision above. **(2)** `validate_apply.py` is only **3,301 bytes under the 55,466 truncation point** register W1 names, and it gates apply and repack. **(3)** F44 has no branch: option 9's residue is D2's. **(4)** `md.files` is still `["CLAUDE.md"]`, so 371 tracked markdown documents are measured by nothing.
+**Open, none blocking.** **(1)** ~~The cap decision above~~ — **TAKEN 2026-09-22 (4); §1.7 owns it.** **(2)** `validate_apply.py` is only **3,301 bytes under the 55,466 truncation point** register W1 names, and it gates apply and repack. **(3)** F44 has no branch: option 9's residue is D2's. **(4)** `md.files` is still `["CLAUDE.md"]`, so 371 tracked markdown documents are measured by nothing.
 
 **GATE: the same declared reds as the baseline, no new one.** `verify_md` green on every arm but the declared `file length` — **`core sections present` PASS 14** under v29's new arm, `section length` PASS 7 against the re-set caps, `charter structure` 7, `relocation pointers` 8. `xdoc_signs` **PASS, 0 undeclared** *(it caught one this session introduced)*; `verify_charter_continuity` **0 failures** with `LT_HOUSE_TEMPLATES` set; `verify_expected` PASS 3; `md_tables` CLEAN; suite **PASS — 14 of 14 negative cases, 17 fixtures byte-identical twice**; `verify_code` its three declared reds. Confidentiality: tree **PASS 525** with the read-denominator control at 525, all history blobs **PASS 954**, control **FIRED**, fingerprint `e76c67eb55c1`; the one FAIL is the deferred commit-message population. **Conservation: 16 candidates, 0 real losses**, both controls fired.
 
