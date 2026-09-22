@@ -163,15 +163,21 @@ SECTION_7_CAP = 25
 # breach in between, and nothing distinguishes that from a real pass.  It mirrors the config;
 # the config is the gate.
 #
-# RAISED FROM 500 TO 510 ON 2026-09-21 BY WOUTER: 510 is THIS FILE'S ARCHETYPE PARITY, not the
-# house 500 -- `rebuild`/L emits 499 and this charter's 5.6 runs 86 against the archetype's own
-# 76, a protected excess of 10.  Both figures were EMITTED AND COUNTED that day; the 38 a record
-# had carried for the archetype's 5.6 was wrong by 38 and made the excess look like 48.
-# IT MUST EQUAL verify.config.json's max_lines for CLAUDE.md -- this constant, that config key
-# and section 1.7's prose are THREE statements of ONE number, and only the config one is the
-# gate.  Check 3 fails when the charter's declared cap disagrees with this constant, so moving
-# either alone trades one red for another.
-DECLARED_CAP = 510
+# RAISED 500 -> 510 -> 619 ON 2026-09-21 BY WOUTER, TWICE IN ONE DAY, AND THE SECOND MOVE IS NOT
+# a correction of the first's arithmetic.  510 was ARCHETYPE PARITY: `rebuild`/L emits 499 and
+# this charter's 5.6 runs 86 against the archetype's own 76, a protected excess of 10.  That is
+# parity for a SKELETON -- it gave this charter 11 lines for its own content where it has 261.
+# 619 is that same emit plus the MEASURED CONTENT ALLOWANCE of 120, which is the question that
+# actually gates: not "could a freshly generated charter of this archetype fit?" but "can a
+# FILLED one?".  Both emits were EMITTED TO A FILE AND COUNTED rather than quoted; the 38 a
+# record had carried for the archetype's 5.6 was wrong by 38, and re-deriving it moved the
+# recommendation from 560 to 510 before the allowance moved it again.
+# IT MUST EQUAL verify.config.json's max_lines for CLAUDE.md -- and the number is stated in SIX
+# places across three files, not the THREE this comment used to claim: that config key, its
+# comment, section 1.7's opening sentence, 1.7's NUMBER clause, this constant and this note.
+# Only the config key gates, and check 3 sees only ONE of the six -- the "N lines against a cap
+# of C" sentence -- so moving any of them alone trades one red for another.
+DECLARED_CAP = 619
 
 # --------------------------------------------------------------------------- check 3 data
 # A DECLARATION is a sentence in which the charter states ITS OWN length. Each pattern below has a
