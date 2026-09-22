@@ -109,9 +109,26 @@ DECLARED_BENIGN = [
     ("the general lesson is §5.1's",
      "§5.1 is this charter's cycle-and-method section; `instruments.md` is named as the "
      "destination the corpus-blind-spot reasons moved to, not a section that owns §5.1"),
-    ("the flip measurement is in",
-     "§5.6 is this charter's confidentiality section; `DECISIONS-LOG.md` holds the public-flip "
-     "measurement by date, not a section 5.6 of its own"),
+    # ADDED 2026-09-22 BY THE FOURTH REDUCTION. The first is a sign that was NOT a candidate
+    # until this session: the vocabulary TABLE became prose, which put the sign and the document
+    # name on ONE line for the first time. The other two are the two new route-4 rows in 6.5,
+    # identical in kind to the three above them.
+    ("an item on a branch's task list is a **sub-step**",
+     "§5.1 is this charter's own cycle subsection, where the task list lives; "
+     "`PLAN-2-step-b.md` is named on the same line for a different fact, the branch numbering"),
+    ("the five ways a check passes here for the WRONG reason",
+     "§5.3 is THIS charter's verification subsection, the source `verification.md` was "
+     "relocated out of on 2026-09-22 — the twin column names the source, and that rule "
+     "file has ZERO numbered headings"),
+    ("the five gate-philosophy and error-handling rules",
+     "§5.7 is THIS charter's artefact subsection, the source `gates.md` was relocated out "
+     "of on 2026-09-22 — the twin column names the source, and that rule file has ZERO "
+     "numbered headings"),
+    ("the current state** *(§5.6; the creation and flip",
+     "§5.6 is this charter's confidentiality section; `DECISIONS-LOG.md` holds the creation "
+     "and public-flip records by date, not a section 5.6 of its own. THE FRAGMENT CHANGED "
+     "on 2026-09-22 — it read 'the flip measurement is in' until the fourth reduction "
+     "reworded that sentence, and the stale-declaration arm is what reported it"),
 ]
 
 
