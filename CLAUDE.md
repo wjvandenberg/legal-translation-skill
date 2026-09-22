@@ -35,7 +35,7 @@ from a summary of the evidence and reached a wrong conclusion.
 | **`PLAN-3-opus5-migration.md`** *(root)* | goal (iii) and the verification run that follows it | at step 3, not before | the Opus 5 branches and Step C's design |
 | **`DECISIONS-LOG.md`** | the dated record of what was decided and why | when tempted to re-open something settled | the reasoning behind closed questions |
 | **`evidence/EVIDENCE-confidentiality.md`** | the dated evidence behind §5.6 — **and it owns no rule at all**, deliberately: every rule stayed in the charter under route 1 | **before touching any confidentiality control**, and never in place of §5.6 | the measurements, the dated incidents, the three controls' history, the 90-script census, the (a)/(b)/(c) closures |
-| **`evidence/EVIDENCE-measurement.md`** | the twelve-row test-corpus listing *(from §5.5)*, the dated cost stories behind the measurement rules *(from §5.5)*, and **the dated instances behind the verification-hygiene rules** *(from §5.3 and §5.1, phase 12)* | when you need a corpus document's paragraph count or what it uniquely tests, or what a verification defect cost | the corpus as a listing · the grader's package and its three gaps · **every dated cost story, measurement and verification alike** |
+| **`evidence/EVIDENCE-measurement.md`** | the twelve-row test-corpus listing *(from §5.5)*, the dated cost stories behind the measurement rules *(from §5.5)*, and **the dated instances behind the verification-hygiene rules** *(from §5.3 and §5.1, phase 12)* | when you need a corpus document's paragraph count or what it uniquely tests, or what a verification defect cost | the corpus as a listing · the grader's package and its three gaps · **every dated cost story, measurement and verification alike** · **the deterministic measures the mechanical gate computes**, section 3.7, relocated 2026-09-22 |
 | **the private sibling folder** | `context.md` (real paths, employer, corpus composition), `leakage-names.txt`, the whole A4 set, the grader backups, the harness | before anything touching confidentiality, packaging or publication | **never committable** |
 
 **Three of these are live inputs to the work ahead — the build plan, the register and the structural
@@ -76,29 +76,29 @@ the claim was made from; the A16 instance that bought this is in `EVIDENCE-measu
 and the one row ● on every optional column, so this charter carries those blocks rather than dropping any.
 
 **SIZE CLASS: L — every cap lives in `verify.config.json`, where the checker reads it, and none is restated
-here** *(the §7 figure stated here read 35 for a day after the house lowered it to 25, and §5.8 rule 1
-carried a stale 500 and 35 until 2026-09-22 — a restated cap is a second place to go stale, twice over)*. L
-because this project has run far past eight sessions, the observable test. **Every cap is enforced, not
+here** *(the §7 figure read 35 here for a day after the house lowered it to 25, and §5.8 rule 1 carried a
+stale 500 and 35 until 2026-09-22 — a restated cap is a second place to go stale, twice over)*. L because
+this project has run far past eight sessions, the observable test. **Every cap is enforced, not
 aspirational**, and `check_checkers.py` reports whether the copy you run is the current one.
 
-> **OVER-CAP, RE-DERIVED 2026-09-22 AFTER THE FOURTH REDUCTION: 691 lines against a cap of 619** —
-> **PER-ARCHETYPE**: this archetype's emit *(`rebuild`/L, emitted and counted at 499)* plus the measured
-> **120** allowance for a project's own content. *(Re-derived LAST: editing this block moves it.)*
+> **OVER-CAP, RE-DERIVED 2026-09-22 AFTER THE FIFTH REDUCTION: 686 lines against a cap of 619 — 67 OVER**, the cap
+> being this archetype's emit *(`rebuild`/L, counted at 499)* plus the measured **120** for a project's own
+> content. Ladder **1,241 → 815 → 776 → 760 → 691 → 686**. *(Re-derived LAST: editing this block moves it.)*
 >
-> **DECLARED IN THREE PARTS, NEVER SILENCED. NUMBER: 691 against 619 — 72 over**, down from 141 at the start
-> of this reduction and 250 before the cap was corrected. **REASON — THE ROUTES ARE MEASURED OUT, AND THE
-> FOURTH REDUCTION IS WHAT MEASURED THEM:** four reductions have now run, **1,241 → 815 → 776 → 760 → 691**.
-> Route 0 was **re-probed against the 25 rules the auto-loading files gained on 2026-09-22** — a verdict of
-> *exhausted* taken before its destination grew is worth nothing — and returned **2 genuine twins worth ~4
-> lines**, both controls behaving. The **true reflow ceiling is −18 lines**; **59 headings and 65 table rows
-> are lines no rewrite touches**; **§5.6 is route 1 entire**, and Wouter's approved bulletising of it yielded
-> **8 lines out of 77 of prose** — which settles whether route 1 was hiding slack, and it was not.
-> **Route 4 took out the two reversible rule-groups** *(§5.3's five verification rules and §5.7's five gate
-> rules, now `.claude/rules/verification.md` and `gates.md`)*, the last route this charter had. **Across 27
-> collapsed blocks the return was 1–3 lines each**, against a blueprint estimate of a third of prose.
-> **TRIGGER — AN EVENT: a decision by Wouter on the last 72 lines.** The only routes left are RETIREMENT of
-> rules, which is his alone, or a change to the cap regime itself *(Wouter, 2026-09-22, choosing to stop at
-> the measured floor and record it rather than drop rules to reach a number)*.
+> **REASON — EVERY ROUTE IS NOW MEASURED, AND THE PER-HEADING INVENTORY IS WHAT MEASURED THEM.** Pass one
+> collapsed 27 blocks for **−49**, bulletised route-1 §5.6 for **−7 out of 77 prose lines** *(so route 1 was
+> not hiding slack)* and took two rule-groups out by route 4 for **−14** — but it worked from a block list
+> and **never filled the blueprint's inventory, so routes 2, 3 and 5 were never assigned.** Pass two filled
+> it: **59 headings, one disposition each. ROUTE 3 IS EMPTY** *(every procedure here is already a skill)*;
+> **ROUTE 5 IS FOUR HEADINGS AND YIELDS ZERO**, three being two-line pointers and §2.5 eleven TABLE rows,
+> where a row is one line however long; **ROUTE 2 IS FIVE BLOCKS AND YIELDED 5**, the gate's measures going
+> to `EVIDENCE-measurement.md` 3.7 with the needle test and both controls clean. **Route 0** re-probed
+> against the day's 25 new house rules: **2 twins, ~4 lines.** **Reflow ceiling −18**; **59 headings and 65
+> table rows are lines no rewrite touches.**
+>
+> **TRIGGER — AN EVENT: Wouter's decision on the last 67 lines.** Every block left is one imperative per line
+> with its load-bearing reason as a trailing clause, so the only routes remaining are RETIREMENT of rules,
+> his alone, or a change to the cap regime *(Wouter, 2026-09-22, stopping at the measured floor by choice)*.
 
 ---
 
@@ -152,9 +152,8 @@ the A1 harness and review tooling, I-12 onward in the repository's own committed
 ### 2.4 What the evidence says — the seven things a new session must know
 
 1. **THIS IS NOT A FORMATTING PROJECT.** The pipeline has silently destroyed legally material content — a
-   deed's only footnote, 14 of 28 comment anchors, a closing bracket and terminal full stop, untranslated
-   source on a delivered first page. **Every time, the auxiliary part was translated perfectly and the
-   *pointer* destroyed, and every gate reported PASS.**
+   deed's only footnote, 14 of 28 comment anchors, and more in `REGISTER-findings.md`. **Every time, the
+   auxiliary part was translated perfectly and the *pointer* destroyed, and every gate reported PASS.**
 2. **Do not scope this from the token-set sentence alone — THREE independent mechanisms explain why nothing
    was caught**, and building against one under-builds it: `validate_apply --strict` polices only *missing*
    tokens · the mandatory quality gate discards its own verdict · a delivered `.docx` failing its own ZIP
@@ -173,8 +172,7 @@ the A1 harness and review tooling, I-12 onward in the repository's own committed
    the data contract *cannot describe* the formatting. Two fixes, two files, neither closing the other's rows.
 
 **Each of the four defects Wouter named at the outset is a CLASS, not a defect** — `REGISTER-findings.md`
-holds each with its measurement, two further classes being workstreams in `PLAN-2-step-b.md`; the 12-run
-table and the six conclusions are `EVIDENCE-a3-structure.md` section 11's.
+holds each with its measurement, two further classes being workstreams in `PLAN-2-step-b.md`.
 
 ### 2.5 Decisions that still bind
 
@@ -309,18 +307,18 @@ at each stage:
 
 #### The cycle must produce ARTEFACTS, not intentions
 
-**The step-list rule is the house file's** — every item crossed off only against a command's output, a
-declared N/A where it does not apply, a branch whose VERIFY and TEST are not crossed off not finished.
-**This project adds mechanical enforcement:** `tools/cycle_evidence.py` binds a passing verify and test to a
-hash of the staged content and the pre-commit hook refuses a commit with no matching evidence — proving a
-command ran and exited zero, not that it was a good one.
+**The step-list rule is the house file's** — every item crossed off against a command's output, a declared
+N/A where it does not apply, a branch whose VERIFY and TEST are not crossed off not finished. **This project
+enforces it mechanically:** `tools/cycle_evidence.py` binds a passing verify and test to a hash of the STAGED
+content and the pre-commit hook refuses a commit with no matching evidence — proving a command ran and
+exited zero, never that it was a good one.
 
-**RUN, DO NOT READ** *(the house file's* re-measure, do not re-read; **§5.3 cites this wording)*. Every error
-worth finding here was found by running. **The failure shape with no house twin: a check that passes for the
-WRONG REASON** — never a two-word needle, ask the same question a second way, and a figure agreeing with the
-one you expected is the moment to re-derive it *(the eleven instances: `EVIDENCE-measurement.md` 3.3, 3.5)*.
-**Two disciplines bind every option:** every change points at a specific observed failure or grade, never at
-theory; and the anti-drift safeguards are not on the table.
+**RUN, DO NOT READ** *(the house file's* re-measure, do not re-read; **§5.3 cites this wording)*.
+**The failure shape with no house twin: a check that passes for the WRONG REASON** — never a two-word needle,
+ask the same question a second way, and a figure agreeing with the one you expected is the moment to
+re-derive it *(the eleven instances: `EVIDENCE-measurement.md` 3.3 and 3.5)*. **Two disciplines bind every
+option:** every change points at a specific observed failure or grade, never at theory; and the anti-drift
+safeguards are not on the table.
 
 ### 5.2 Branches, pull requests, and what "done" means
 
@@ -380,14 +378,11 @@ improvise.**
 #### Never-regress — the rule, and how it becomes enforceable
 
 **Wouter's hard rule: quality must only IMPROVE, never go lower.** Grading is manual and non-deterministic,
-so two tiers make it real: **(1) a scripted mechanical gate on every change** — the deterministic measures
-(paragraph, note and comment reference counts, tabs vs tab stops, effective bold/italic, run-property tables,
-remnant and invisible-character sweeps, definitions ordering, accept/reject reconstruction), which makes
-`git bisect` possible — and **(2) a full LLM re-grade only at branch boundaries**, on a fixed subset, against
-the frozen v3 baselines. **Efficiency is strictly subordinate:** *"make it faster"* must never become *"read
-less"*, and fixing the defects IS the efficiency work. *(The same-document repeat that makes the mechanical
-gate primary — ~40% of paragraphs differing linguistically with the mechanical output identical — is
-`EVIDENCE-measurement.md` section 3's.)*
+so two tiers make it real: **(1) a scripted mechanical gate on every change** — the deterministic measures,
+enumerated in `EVIDENCE-measurement.md` section 3.7, which is what makes `git bisect` possible — and **(2) a
+full LLM re-grade only at branch boundaries**, on a fixed subset, against the frozen v3 baselines.
+**Efficiency is strictly subordinate:** *"make it faster"* must never become *"read less"*, and fixing the
+defects IS the efficiency work.
 
 ### 5.4 TEST — proving nothing else broke
 
@@ -540,23 +535,23 @@ confidential data and no real-document examples** (§5.6).
 delete a heading, never summarise a companion, decide-where-before-writing, count-by-listing — is in
 `…\Coding\.claude\CLAUDE.md`, which auto-loads here, and is not restated.** **The five this project adds:**
 
-**1. No cap is stated in this file**; §1.7 says where they live and `verify.config.json` alone gates. A
-declaration is prose, so `tools/verify_charter_continuity.py` compares it against the measurement.
-*(This rule carried a stale 500 and 35 until 2026-09-22 — three lines after §1.7 forbids restating a cap.)*
+**1. No cap is stated in this file**; §1.7 says where they live and `verify.config.json` alone gates.
+A declaration is prose, so `tools/verify_charter_continuity.py` compares it against the measurement.
+*(This rule itself carried a stale cap until 2026-09-22 — the instance is `EVIDENCE-measurement.md` 3.7.)*
 
 **2. A skill's body is not in context until invoked, and neither a skill nor a scoped rule can be exercised
-in the session that creates it** — so nothing whose absence is irreversible goes behind either. **§5.6 and
-§6.4 are route 1 entire**, asserted by `verify_charter_continuity.py` check 6b.
+in the session that creates it** — so nothing whose absence is irreversible goes behind either.
+**§5.6 and §6.4 are route 1 entire**, asserted by `verify_charter_continuity.py` check 6b.
 
-**3. Prefer a relationship to a number** — *"§7 is under its cap"* cannot go stale, *"§7 is 18 lines"* can —
-and where a number must be written **state its unit**, an implicit one being re-derived differently next time.
+**3. Prefer a relationship to a number** — *"§7 is under its cap"* cannot go stale, *"§7 is 18
+lines"* can — and where a number must be written **state its unit**.
 
 **4. Where this charter and a companion document disagree, this one wins** — a defect to fix, never a
-judgement call; §1.3 says what each owns. `tools/xdoc_signs.py` judges a `§` aimed elsewhere, which passes
-silently against the wrong section of this file *(what that has cost: `EVIDENCE-measurement.md` section 3.7)*.
+judgement call; §1.3 says what each owns. `tools/xdoc_signs.py` judges a `§` aimed elsewhere, which
+passes silently against the wrong section of this file *(what that has cost: `EVIDENCE-measurement.md` 3.7)*.
 
 **5. After any substantial edit, run** `verify_md.py`, `verify_charter_continuity.py`, `xdoc_signs.py`,
-`md_tables.py` and **all three confidentiality controls** (§5.6); invoke the `audit-gate` skill for the method.
+`md_tables.py` and **all three confidentiality controls** (§5.6); invoke the `audit-gate` skill.
 
 #### Inherited house rules
 
@@ -596,24 +591,24 @@ another branch wanting a file must free one (§6.1 forbids the easy trims).
 
 **One monorepo, both full trees side by side, no build step, plus an automated parity check** —
 **`github.com/wjvandenberg/legal-translation-skill`**, distinct from the two public distribution repos.
-Making a repo public exposes **the whole history, not the current state** *(§5.6; the creation and flip
-records, and the measurement behind them, are `DECISIONS-LOG.md`'s, 2026-08-06 and 2026-08-07)*.
+Making a repo public exposes **the whole history, not the current state** *(§5.6; the creation and
+flip records are `DECISIONS-LOG.md`'s, 2026-08-06 and 2026-08-07)*.
 
 > **FOUR SCRIPTS MAY NEVER BE COMMITTED, and this stays because forgetting it is irreversible.**
 > `confidentiality_sweep.py`, `corpus_descriptor_scan.py` and `confidentiality_review.py` live outside the
 > repo and the gate calls them by path; **`temp/audit_session_stepb.py` holds two corpus descriptors and
-> stays in gitignored `temp/` permanently.** The rule that decides all four is §5.6's — *does this file hold
-> one real string per pattern?* — **the scanner ships, the list never does.** *(No `docs/history/` either,
-> §5.6(c).)*
+> stays in gitignored `temp/` permanently.** The rule that decides all four is §5.6's — *does this
+> file hold one real string per pattern?* — **the scanner ships, the list never does.** *(No `docs/history/`
+> either.)*
 
 **The load-bearing property: `uk/` IS the publishable tree** — what you see is what ships, and **`tools/` and
 `tests/` are siblings of the variant trees, never inside them**, so nothing development-only can leak into a
-shipped skill. **`.gitignore` is BY PATH, never by extension** *(§2.5)* — a blanket `*.docx` blocks the
-synthetic fixtures and does nothing about a renamed client document.
+shipped skill. **`.gitignore` is BY PATH, never by extension** — a blanket `*.docx` blocks the synthetic
+fixtures and does nothing about a renamed client document.
 
 **The duplication is deliberate and its removal is DEFERRED** until the reconciliation classifies the
 618-pair residue — one PR touches both trees, so a fix cannot land in one variant and be forgotten
-*(`DECISIONS-LOG.md`, 2026-09-11, owns what the layout preserves and what it costs)*.
+*(`DECISIONS-LOG.md`, 2026-09-11)*.
 
 #### What never enters the repository
 

@@ -165,6 +165,31 @@ believed stays open to measurement while a claim refuted is closed.
 
 ---
 
+### 3.7 The deterministic measures the mechanical gate computes — relocated from the charter, 2026-09-22
+
+**Relocated out of `CLAUDE.md` section 5.3's *Never-regress* block under route 2.** What stayed in the
+charter is the rule and both its tiers; what moved here is the ENUMERATION, which is mechanism narration: a
+session needs to know a mechanical gate exists and that it is tier one, not to recite what it computes.
+
+**Tier one, run on every change**, and between them these cover most of the structural criteria, which is
+what makes `git bisect` usable on this pipeline at all:
+
+- paragraph counts
+- note and comment REFERENCE counts *(references, never parts — a translated footnotes part whose pointer
+  was destroyed is unreachable while the part inventory still passes)*
+- tabs against tab stops
+- effective bold and italic text
+- run-property tables
+- remnant and invisible-character sweeps
+- definitions ordering
+- accept/reject reconstruction
+
+**Tier two is a full LLM re-grade at branch boundaries only**, on a fixed subset, against the frozen v3
+baselines. **The measurement that makes tier one primary rather than merely cheaper** is the only
+same-document repeat this project has: **~40% of paragraphs differed linguistically while the mechanical
+output was identical** — variance large in prose, nil in mechanics. A grading tier that moves by 40% on an
+unchanged document cannot be the gate; a tier that does not move at all can.
+
 ## 4 — This document's own confidentiality review
 
 **Run before its first commit, like `EVIDENCE-confidentiality.md`'s** — and it matters more here, because
