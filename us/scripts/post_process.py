@@ -20,10 +20,313 @@ Usage:
 Without --fix, prints a report of issues found.
 With --fix, applies all fixes and saves.
 """
+import json
 import os
 import sys
 import re
 from lxml import etree
+
+# === CHANGE JOURNAL ===
+#
+# WHY THIS EXISTS, AND IT IS NOT FOR THIS SCRIPT'S BENEFIT. This stage rewrites text
+# DOWNSTREAM of every content check, so a character-exact comparison of the delivered
+# document against what was declared is impossible unless the stage says what it changed.
+# Either the opinionated passes move upstream of that comparison, or the stage journals
+# every change it makes so the comparison can account for exactly those and nothing else.
+# This is the second answer. Two findings say it is real rather than theoretical: one
+# validator invoked three times on one file gave two different opinions about it, and on
+# another document the operator was shown a DRIFT error where the cause was a TERMINOLOGY
+# override — a diagnosis pointing at the wrong file entirely.
+#
+# THE TEXT CONTRACT, STATED ONCE. The journal records text borne by `w:t` and `w:delText`,
+# in document order, identified by FLAT ORDINAL over the whole part. A flat ordinal is used
+# rather than a paragraph-and-run pair because the passes below group by `p.iter()`, which
+# reaches INTO a nested paragraph, while the skill's reading half deliberately does not —
+# a paragraph-keyed identity would have to pick one of the two and would misattribute under
+# the other. The flat enumeration is the same under both.
+#
+# IT IS DECLARED BLIND TO NON-TEXT CHANGE, NEVER SILENTLY BLIND. The italic strip removes
+# `w:i`, the page-break pass adds `pageBreakBefore`, the spacing pass sets `xml:space`. None
+# of those is text and none is recorded as an edit. Each pass instead records its element
+# count before and after, so a structural change is VISIBLE as a count even where its
+# content is not recorded. A reader that believed this file recorded formatting would be
+# wrong, so the artefact says so in its own `text_contract` field rather than only here.
+#
+# AND IT REPORTS, IT DOES NOT REFUSE. An un-journalled change is a defect in THIS script,
+# not in the operator's document — so a gate here would fire on something nobody running
+# the skill could repair, which is exactly the shape the project has measured firing on
+# nothing six times out of six. The self-check prints loudly and the run continues; the
+# hard assertion lives in tests/test_change_journal.py and tools/postprocess_corpus_arm.py,
+# where whoever trips it can fix it.
+JOURNAL_SCHEMA = 'post-process-journal/1'
+JOURNAL_NAME = 'post_process_journal.json'
+JOURNAL_TEXT_CONTRACT = (
+    'w:t and w:delText, in document order, identified by flat ordinal over the part; '
+    'paragraphs grouped by the nested-paragraph rule (runs inside a nested w:p belong to '
+    'that w:p). Attribute and structural change is NOT recorded as an edit — see the '
+    'per-pass element counts.'
+)
+
+_JT = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}t'
+_JDT = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}delText'
+_JP = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}p'
+
+
+def journal_flat_texts(root):
+    """Every text-bearing element's text, document order. Position IS the element's id."""
+    return [e.text or '' for e in root.iter() if e.tag in (_JT, _JDT)]
+
+
+def journal_paragraph_texts(root):
+    """Paragraph text under the nested-paragraph rule — the reading half's own grouping."""
+    out = []
+    for p in root.iter(_JP):
+        parts = []
+        for e in p.iter():
+            if e.tag not in (_JT, _JDT):
+                continue
+            a, nested = e.getparent(), False
+            while a is not None and a is not p:
+                if a.tag == _JP:
+                    nested = True
+                    break
+                a = a.getparent()
+            if not nested:
+                parts.append(e.text or '')
+        out.append(''.join(parts))
+    return out
+
+
+def journal_flat_paragraph_map(root):
+    """For each flat ordinal, the index of the paragraph that OWNS that element.
+
+    Ownership is the NEAREST ancestor w:p, which is the same rule
+    `journal_paragraph_texts` applies from the other direction: an element inside a nested
+    paragraph belongs to the inner one. Without this an edit could be located in the
+    document but not in a READING, and a reading is what the downstream check compares.
+    """
+    # The list is bound to a name and KEPT so the lxml proxies stay alive: lxml recreates a
+    # proxy on demand and a freed one's id() can be handed to a different element, which
+    # would silently mis-key the map. Walking UP from the element is what makes this the
+    # NEAREST ancestor — iterating paragraphs downwards finds the OUTER one first and would
+    # give a nested element to the paragraph that merely contains its container.
+    paragraphs = list(root.iter(_JP))
+    p_index = {id(p): i for i, p in enumerate(paragraphs)}
+    out = []
+    for e in root.iter():
+        if e.tag not in (_JT, _JDT):
+            continue
+        a = e.getparent()
+        while a is not None and a.tag != _JP:
+            a = a.getparent()
+        out.append(None if a is None else p_index.get(id(a)))
+    return out
+
+
+def journal_element_count(root):
+    """Every element, not only the text-bearing ones. This is what makes a structural
+    change visible even though the journal does not record its content."""
+    return sum(1 for _ in root.iter())
+
+
+class ChangeJournal:
+    """Accumulates what this invocation changed. Holds no document, only what moved."""
+
+    def __init__(self, variant):
+        self.variant = variant
+        self.pass_edits = []
+        self.pass_paragraphs = []
+        self.pass_counts = []
+        self.strip = None
+        self.unaccounted = []
+        self.notes = []
+
+    def record_pass(self, name, before_flat, after_flat,
+                    before_paras, after_paras, before_n, after_n, owner_map, fixes):
+        """One pass's contribution. Called with snapshots taken either side of it.
+
+        `fixes` is the pass's OWN return value, and it is recorded beside the text edits
+        because the two can disagree and the disagreement is the interesting number. A pass
+        that reports fixes while this journal records no text edit has changed something
+        that is NOT text — an italic run stripped, a page break inserted, an xml:space set.
+        MEASURED ON THE REAL CORPUS BEFORE THIS ARGUMENT EXISTED: one frozen intermediate
+        reported TOTAL 2 fixes against 0 journalled edits and a self-check of `accounted`,
+        which is true under the text contract and reads to any human as "this stage changed
+        nothing". It did not. The figure below is what stops that reading.
+        """
+        self.pass_counts.append({
+            'pass': name,
+            'fixes': fixes,
+            'elements_before': before_n,
+            'elements_after': after_n,
+        })
+        if len(before_flat) == len(after_flat):
+            for i, (b, a) in enumerate(zip(before_flat, after_flat)):
+                if b != a:
+                    self.pass_edits.append({
+                        'pass': name, 'elem': i,
+                        'para': owner_map[i] if i < len(owner_map) else None,
+                        'before': b, 'after': a,
+                    })
+        elif before_flat != after_flat:
+            # A pass that adds or removes a text-bearing element cannot be recorded by
+            # ordinal, because every ordinal after it shifts. None does so today; say so
+            # rather than record something false, and let the self-check fail on it.
+            self.notes.append(
+                f'{name} changed the number of text-bearing elements '
+                f'({len(before_flat)} -> {len(after_flat)}); its edits are NOT recorded '
+                f'by ordinal and the paragraph record below is the only account of it')
+        for i, (b, a) in enumerate(zip(before_paras, after_paras)):
+            if b != a:
+                self.pass_paragraphs.append({'para': i, 'before': b, 'after': a})
+
+    def record_strip(self, ran, before_paras, after_paras):
+        entry = {'stage': 'strip_noop_tracked_changes', 'ran': bool(ran),
+                 'paragraphs': []}
+        if ran and len(before_paras) == len(after_paras):
+            for i, (b, a) in enumerate(zip(before_paras, after_paras)):
+                if b != a:
+                    entry['paragraphs'].append({'para': i, 'before': b, 'after': a})
+        elif ran:
+            entry['paragraph_count_changed'] = [len(before_paras), len(after_paras)]
+            self.notes.append(
+                'the strip pass changed the paragraph COUNT, which it is not documented '
+                'to do; its text change is not accounted for')
+        self.strip = entry
+
+    def _collapse(self, records):
+        """Several passes may move one paragraph. Keep the first `before` and the last
+        `after`, so replaying the list in order reproduces the document exactly once."""
+        merged = {}
+        for r in records:
+            i = r['para']
+            if i in merged:
+                merged[i]['after'] = r['after']
+            else:
+                merged[i] = dict(r)
+        return [merged[k] for k in sorted(merged)]
+
+    def to_dict(self, doc_basename):
+        stages = [{
+            'stage': 'passes',
+            'edits': self.pass_edits,
+            'paragraphs': self._collapse(self.pass_paragraphs),
+            'counts': self.pass_counts,
+        }]
+        if self.strip is not None:
+            stages.append(self.strip)
+        return {
+            'schema': JOURNAL_SCHEMA,
+            'script': 'post_process.py',
+            'variant': self.variant,
+            # BASENAME ONLY, NEVER A PATH. A workdir path can carry a client or matter name
+            # and this file is written next to the operator's notes, not inside the
+            # deliverable — but a filename is the one thing a log has repeatedly leaked.
+            'document': doc_basename,
+            'text_contract': JOURNAL_TEXT_CONTRACT,
+            'stages': stages,
+            'self_check': {
+                'accounted': not self.unaccounted and not self.notes,
+                'unaccounted_paragraphs': self.unaccounted,
+                'notes': self.notes,
+                # WHAT `accounted` DOES NOT COVER, STATED IN THE ARTEFACT RATHER THAN ONLY
+                # IN THE SOURCE. `accounted` answers "was every TEXT change recorded". These
+                # passes reported a fix and produced no text edit, so they changed something
+                # the text contract does not describe — formatting, a page break, an
+                # attribute. A reader who takes `accounted: true` to mean "nothing else
+                # happened" is wrong, and this is the figure that tells them so.
+                'non_text_fixes': [
+                    {'pass': c['pass'], 'fixes': c['fixes']}
+                    for c in self.pass_counts
+                    if c['fixes'] and not any(e['pass'] == c['pass']
+                                              for e in self.pass_edits)
+                ],
+            },
+        }
+
+
+def journal_workdir(xml_path):
+    """<workdir>/final/word/document.xml -> <workdir>. The convention skill-docs/06 states.
+
+    Returns None when the layout is not the conventional one, and the journal is then NOT
+    written. It is deliberately never written beside the XML: `final/` is the directory
+    repack reads parts out of, and a file that cannot be there cannot be bundled by mistake.
+    """
+    try:
+        xml_abs = os.path.abspath(xml_path)
+        parent = os.path.dirname(xml_abs)
+        if os.path.basename(parent).lower() != 'word':
+            return None
+        final = os.path.dirname(parent)
+        if os.path.basename(final).lower() != 'final':
+            return None
+        workdir = os.path.dirname(final)
+        return workdir if os.path.isdir(workdir) else None
+    except (OSError, ValueError):
+        return None
+
+
+def journal_write(journal, xml_path, final_paras, original_paras):
+    """Write the journal, after checking it can reproduce the document it describes.
+
+    THE SELF-CHECK IS NOT THE PROOF. It shares this module's reader with the thing it
+    checks, so it can be self-consistently wrong; that is why the real assertion is made by
+    a SECOND reader in tests/test_change_journal.py. What it does catch is the gross case —
+    a pass that moved text no snapshot saw — and it says so where the operator will read it.
+    """
+    workdir = journal_workdir(xml_path)
+    if workdir is None:
+        print('  [journal] NOT WRITTEN — this document.xml is not at '
+              '<workdir>/final/word/, so there is no conventional place to put it. '
+              'Nothing is written beside the XML, because that directory is bundled.')
+        return None
+
+    replayed = list(original_paras)
+    for stage in journal.to_dict('x')['stages']:
+        for rec in stage.get('paragraphs', []):
+            i = rec['para']
+            if 0 <= i < len(replayed):
+                replayed[i] = rec['after']
+    if len(replayed) != len(final_paras):
+        journal.notes.append(
+            f'paragraph count moved during post-processing '
+            f'({len(replayed)} -> {len(final_paras)})')
+    else:
+        journal.unaccounted = [i for i, (r, f) in enumerate(zip(replayed, final_paras))
+                               if r != f]
+
+    data = journal.to_dict(os.path.basename(os.path.abspath(xml_path)))
+    out = os.path.join(workdir, JOURNAL_NAME)
+    # Written as BYTES with an explicit newline. `write_text`/text mode turns every \n into
+    # \r\n on Windows, which changes a file every byte-comparison in this project reads.
+    with open(out, 'wb') as fh:
+        fh.write((json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+                 .encode('utf-8'))
+
+    n_edits = len(data['stages'][0]['edits'])
+    n_paras = sum(len(s.get('paragraphs', [])) for s in data['stages'])
+    print(f'  [journal] {n_edits} edit(s) across {n_paras} paragraph(s) -> {JOURNAL_NAME}')
+    nontext = data['self_check']['non_text_fixes']
+    if nontext:
+        # SAID ON SCREEN, not only in the file. "0 edits" beside "TOTAL: 2 fixes" reads as
+        # a contradiction and sends the reader looking for a bug; the honest line is that
+        # those two fixes were not text and this journal does not describe them.
+        which = ', '.join(f"{n['pass']} ({n['fixes']})" for n in nontext)
+        print(f'  [journal] and {sum(n["fixes"] for n in nontext)} fix(es) NOT described '
+              f'here, because they are not text: {which}')
+    if not data['self_check']['accounted']:
+        print('  ' + '!' * 58)
+        print('  [journal] SELF-CHECK DID NOT ACCOUNT FOR EVERY CHANGE. This is a defect '
+              'in post_process.py, not in your document — the translation is unaffected '
+              'and the run continues. Report it; do NOT edit the document to suit it.')
+        for i in data['self_check']['unaccounted_paragraphs'][:10]:
+            print(f'    unaccounted paragraph index: {i}')
+        for note in data['self_check']['notes']:
+            print(f'    note: {note}')
+        print('  ' + '!' * 58)
+    return out
+# === CHANGE JOURNAL ENDS ===
+
 
 def _check_self_integrity():
     """Detect install-time truncation. Whole-file scan tolerates null-padding."""
@@ -1303,7 +1606,18 @@ def _run_validate_apply_post_strip(xml_path, paragraphs_json_path):
             f"requiring text that another mandatory step removed by design, "
             f"so both the document and paragraphs.json are correct and the "
             f"check is miscounting. This gate cannot tell you which, and it "
-            f"cannot detect (3) about itself. For (3), SKILL.md rule 5a "
+            f"cannot detect (3) about itself. "
+            f"BUT YOU ARE NO LONGER GUESSING BETWEEN THE THREE: "
+            f"`{JOURNAL_NAME}`, written beside paragraphs.json a moment ago, "
+            f"lists every piece of text THIS STEP changed and which pass "
+            f"changed it. READ IT FIRST. If the flagged text is in there, the "
+            f"document moved and this step moved it — that is (1), and the "
+            f"pass is named, so the diagnosis is not 'drift' but whatever that "
+            f"pass does. If the flagged text is NOT in there, this step did "
+            f"not touch it and the fault is upstream or in the check itself. "
+            f"A terminology override has already been diagnosed as drift once "
+            f"on a real document, and the repair went to the wrong file. "
+            f"For (3), SKILL.md rule 5a "
             f"governs: show the wrong scope from the check's own source or "
             f"stated contract, correct the check, keep the faithful "
             f"translation, and record it in the delivery notes. "
@@ -1347,21 +1661,48 @@ def post_process(xml_path, fix=True, variant='us', paragraphs_json=None):
     root = tree.getroot()
 
     results = {}
-    results['spacing'] = fix_spacing(root)
-    results['definition_boundaries'] = fix_definition_boundaries(root)
-    results['double_punctuation'] = fix_double_punctuation(root)
-    results['terminology'] = fix_terminology(root)
+    journal = ChangeJournal(variant)
+    original_paragraphs = journal_paragraph_texts(root)
+
+    def _journalled(name, fn, **kwargs):
+        """Run one pass between two snapshots. THE PASS ITSELF IS NOT TOUCHED — no
+        fix_* function knows this exists, which is what makes the journal provably
+        non-behavioural and what keeps a future pass from having to remember to record.
+
+        `kwargs` is forwarded because the two variant trees do NOT call every pass the
+        same way — one of them passes `variant=` to the Article-to-Clause detector — and a
+        wrapper that flattened that difference would silently change behaviour in one tree
+        while every test in the other went on passing."""
+        before_flat = journal_flat_texts(root)
+        before_paras = journal_paragraph_texts(root)
+        before_n = journal_element_count(root)
+        owner_map = journal_flat_paragraph_map(root)
+        count = fn(root, **kwargs)
+        journal.record_pass(name, before_flat, journal_flat_texts(root),
+                            before_paras, journal_paragraph_texts(root),
+                            before_n, journal_element_count(root), owner_map, count)
+        return count
+
+    results['spacing'] = _journalled('spacing', fix_spacing)
+    results['definition_boundaries'] = _journalled(
+        'definition_boundaries', fix_definition_boundaries)
+    results['double_punctuation'] = _journalled(
+        'double_punctuation', fix_double_punctuation)
+    results['terminology'] = _journalled('terminology', fix_terminology)
     if variant == 'uk':
-        results['uk_spelling'] = fix_uk_spelling(root)
+        results['uk_spelling'] = _journalled('uk_spelling', fix_uk_spelling)
     elif variant == 'us':
-        results['us_spelling'] = fix_us_spelling(root)
-    results['annex_to_schedule'] = fix_annex(root)
-    results['article_to_clause'] = fix_article_to_clause(root, variant=variant)
-    results['duplicates'] = fix_duplicates(root)
-    results['quotes'] = fix_quotes(root)
-    results['definition_line_breaks'] = fix_definition_line_breaks(root)
-    results['spurious_italic'] = fix_spurious_italic_runs(root)
-    results['schedule_page_breaks'] = fix_schedule_page_breaks(root)
+        results['us_spelling'] = _journalled('us_spelling', fix_us_spelling)
+    results['annex_to_schedule'] = _journalled('annex_to_schedule', fix_annex)
+    results['article_to_clause'] = _journalled(
+        'article_to_clause', fix_article_to_clause, variant=variant)
+    results['duplicates'] = _journalled('duplicates', fix_duplicates)
+    results['quotes'] = _journalled('quotes', fix_quotes)
+    results['definition_line_breaks'] = _journalled(
+        'definition_line_breaks', fix_definition_line_breaks)
+    results['spurious_italic'] = _journalled('spurious_italic', fix_spurious_italic_runs)
+    results['schedule_page_breaks'] = _journalled(
+        'schedule_page_breaks', fix_schedule_page_breaks)
 
     total = sum(results.values())
 
@@ -1394,7 +1735,25 @@ def post_process(xml_path, fix=True, variant='us', paragraphs_json=None):
     # Replaces the previous Step 6b as a separate operator command —
     # post_process now does both passes in one invocation.
     if fix and _xml_has_tracked_changes(xml_path):
+        # JOURNALLED TOO, AND IT IS A SEPARATE STAGE BECAUSE IT DELETES. The strip removes
+        # w:ins/w:del wrappers, so every text-bearing element's ordinal after one shifts
+        # and the element-level record the passes use cannot describe it. It is recorded
+        # at PARAGRAPH level instead, which is the level the downstream comparison reads.
+        before_strip = journal_paragraph_texts(etree.parse(xml_path).getroot())
         _run_strip_noop_subprocess(xml_path)
+        journal.record_strip(
+            True, before_strip,
+            journal_paragraph_texts(etree.parse(xml_path).getroot()))
+
+    # THE JOURNAL IS WRITTEN BEFORE THE DRIFT GATE, ON PURPOSE. When that gate fires the
+    # operator is shown a DRIFT error whatever the real cause was — the register's own
+    # instance is a terminology override diagnosed as drift, which sent the repair at the
+    # wrong file. The journal is the answer to "what moved, and which pass moved it", so it
+    # has to be on disk before the thing that raises, not after it.
+    if fix:
+        journal_write(journal, xml_path,
+                      journal_paragraph_texts(etree.parse(xml_path).getroot()),
+                      original_paragraphs)
 
     # post-strip drift gate. Auto-detect paragraphs.json by
     # convention if not supplied explicitly. Surfaces phantom-glue and

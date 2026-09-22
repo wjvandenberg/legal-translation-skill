@@ -329,29 +329,52 @@ drifted = with_mutation(
     lambda: read("uk", "SKILL.md").find("Fix the check, never work around it") == -1)
 check("the cross-tree prose check FAILS when one tree is edited alone", drifted is True)
 
-# (d) string-only-edit must FAIL on a control-flow change, not just pass on a text one
-sub = subprocess.run(
-    [sys.executable, str(ROOT / "tools" / "string_only_edit.py"), "origin/main",
-     "uk/scripts/post_process.py"],
-    capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
-clean_rc = sub.returncode
+# (d) string-only-edit must FAIL on a control-flow change, not just pass on a text one.
+#
+# BOTH ARMS NOW USE A PLANTED EDIT, AND THE REASON IS THAT THE OLD PAIR BROKE SILENTLY ON
+# BRANCH 9. They were aimed at `post_process.py` and compared it against origin/main, on the
+# premise that the only thing any branch had ever done to that file was reword a message.
+# Branch 9 added a change journal to it, and the pair came apart in BOTH directions at once:
+# the PASS arm failed honestly, which is how this was found — but the FAIL arm went on
+# reporting OK while testing nothing, because by then the file differed structurally from
+# origin/main whether the mutation was applied or not. A check whose premise is "no future
+# branch will ever touch this file" is a check with an expiry date nobody wrote down, and
+# the arm that keeps passing is the more expensive half.
+#
+# So both arms are aimed at a script the instrument branches do NOT edit, and each plants
+# its own difference: one a string, one a condition. The pair now calibrates the instrument
+# instead of describing somebody's diff, and it does not go stale when a branch edits a
+# script. `with_mutation` restores the bytes in a `finally` and never touches git.
+STRING_ONLY_TARGET = "scripts/extract_paragraphs.py"
 
 
 def _probe_string_only():
     rr = subprocess.run(
         [sys.executable, str(ROOT / "tools" / "string_only_edit.py"), "origin/main",
-         "uk/scripts/post_process.py"],
+         "uk/" + STRING_ONLY_TARGET],
         capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
     return rr.returncode
 
 
-flow_rc = with_mutation("scripts/post_process.py",
-                        lambda t: t.replace("    if result.returncode != 0:",
-                                            "    if result.returncode != 99:", 1),
-                        _probe_string_only)
-check("string_only_edit PASSES on the real text-only edit", clean_rc == 0,
+clean_rc = with_mutation(
+    STRING_ONLY_TARGET,
+    lambda t: t.replace('print(f"Extracted {len(paragraphs)} paragraphs',
+                        'print(f"Read apart {len(paragraphs)} paragraphs', 1),
+    _probe_string_only)
+flow_rc = with_mutation(
+    STRING_ONLY_TARGET,
+    lambda t: t.replace("    if len(sys.argv) != 3:",
+                        "    if len(sys.argv) != 4:", 1),
+    _probe_string_only)
+check("string_only_edit PASSES on a planted text-only edit", clean_rc == 0,
       f"exit {clean_rc}")
 check("string_only_edit FAILS when control flow changes", flow_rc == 1, f"exit {flow_rc}")
+# AND THE THIRD READING THE PAIR NEVER TOOK: with nothing planted at all the answer must
+# also be 0, which is what proves the two arms above differ because of the PLANT and not
+# because the file was already dirty. Without it, a target that some other branch had
+# edited would make the pass arm fail for a reason neither arm names.
+check("and the unmutated file is itself clean against origin/main",
+      _probe_string_only() == 0, f"exit {_probe_string_only()}")
 
 # ---- BRANCH 4's negatives ------------------------------------------------------------
 # (e) remove the exception channel -> reachability must notice it is unreachable. Rule 5a

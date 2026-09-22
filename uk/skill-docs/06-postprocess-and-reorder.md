@@ -72,6 +72,31 @@ auto-strip cannot detect the no-op and the marker stays visible.
 
 Idempotent. Running `post_process.py --fix` twice has no effect on the second pass.
 
+**A change journal is written, and it is the first thing to read when Step 6 blocks.**
+`post_process.py` writes `post_process_journal.json` into the workdir — beside
+`paragraphs.json`, never inside `final/` — listing every piece of text this step changed
+and **which pass changed it**. It is written before the drift gate runs, so it is always
+there when that gate fires.
+
+* **When the post-strip drift gate blocks, open the journal before anything else.** The
+  gate can only say the document and `paragraphs.json` disagree. The journal says whether
+  *this step* is what moved the text, and which pass did it. If the flagged text is in the
+  journal, the diagnosis is not "drift" — it is whatever that pass does, and the fix
+  belongs there. If the flagged text is **not** in the journal, this step did not touch it
+  and the cause is upstream or in the check itself.
+* **It records TEXT only.** Formatting changes — an italic run stripped, a page break
+  inserted — are not described, because the journal's job is to let a text comparison
+  account for what moved. They are not hidden either: each pass reports its own fix count,
+  and `self_check.non_text_fixes` names any pass that made a change the journal does not
+  describe. A journal reading `0 edits` beside a non-empty `non_text_fixes` means the step
+  changed formatting, not wording.
+* **It is not part of the deliverable.** It is a working file like `paragraphs.json`.
+  Repack builds the `.docx` from the original's part list, so it cannot be bundled by
+  accident, but do not copy it into `final/` and do not send it to the client.
+* **If it reports that it could not account for something, that is a defect in the script,
+  not in your document.** The run continues and the translation is unaffected. Report it.
+  **Do not edit the document or the notes to make the message go away.**
+
 ### Step 7: Reorder definitions alphabetically — MANDATORY
 
 *[Internal compliance check — do not echo or paraphrase to the user. Re-read every rule in this step before executing. Do not deviate from any line of the skill. Do not bundle work, skip checks, or "interpret for efficiency" — every prior deviation has produced output below the quality the skill is designed to deliver. The skill's hard gates block deviations anyway; complying upfront is always faster than running into a gate and re-authoring paragraphs.json.]*

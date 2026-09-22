@@ -21,9 +21,9 @@
    "sha256_now": "91f49df10cb0a69a04f806433720cc3fc0df6ff687d151ce285045d137104583"
   },
   "uk/scripts/post_process.py": {
-   "changed_by": "feature/checks-can-fail",
-   "commit_subject": "Branch 5 - checks can fail, plus the two defects the rule-5b probe surfaced: rule 5a stops forbidding the repair it mandates (never patch the script vs narrow the pattern), and the Step 6 gate's remedy names the third possibility - that the check itself is wrongly scoped - and routes it to rule 5a (register rows C3 C23 C25 W3 W4 L4, F1)",
-   "sha256_now": "cea9606606a17f0c779e62fb1acaf79e34583700267021f63b8931db04153173"
+   "changed_by": "feature/branch9-change-journal",
+   "commit_subject": "Branch 9 - the change journal: post_process records every text edit it makes and which pass made it, so the delivered-document check at branch 11 becomes buildable (C15, B6)",
+   "sha256_now": "67ee3ba9d3b37410bb927dedcaec9ec3d1873a3230e753320a08802f459457b5"
   },
   "uk/scripts/quality_check.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -71,9 +71,9 @@
    "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
   },
   "uk/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "fix/dangling-cross-references",
-   "commit_subject": "Four quoted cross-references pointed at a heading that does not exist (register row F40, widened from one instance to a class)",
-   "sha256_now": "aa6c0cfa899652812b30644144ac237f7eb46fff330051a8f55bdec0b2a76199"
+   "changed_by": "feature/branch9-change-journal",
+   "commit_subject": "Branch 9 - the change journal: post_process records every text edit it makes and which pass made it, so the delivered-document check at branch 11 becomes buildable (C15, B6)",
+   "sha256_now": "b8bd01437409e1cbd47db9235590fa5ba2c0831f8d04a06166dd283dd451732e"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
    "changed_by": "feature/branch7-slice3-a19",
@@ -101,9 +101,9 @@
    "sha256_now": "0df16cb99fbc01cb25bbdbf2c52dfa7449869a9c0fd542248987e8f995909b74"
   },
   "us/scripts/post_process.py": {
-   "changed_by": "feature/checks-can-fail",
-   "commit_subject": "Branch 5 - checks can fail, plus the two defects the rule-5b probe surfaced: rule 5a stops forbidding the repair it mandates (never patch the script vs narrow the pattern), and the Step 6 gate's remedy names the third possibility - that the check itself is wrongly scoped - and routes it to rule 5a (register rows C3 C23 C25 W3 W4 L4, F1)",
-   "sha256_now": "488689839482f454a5ff6bbe02ac854ed87b655a10bcd8bb8885e0dde50f24a1"
+   "changed_by": "feature/branch9-change-journal",
+   "commit_subject": "Branch 9 - the change journal: post_process records every text edit it makes and which pass made it, so the delivered-document check at branch 11 becomes buildable (C15, B6)",
+   "sha256_now": "ad952998360b5496a5da55e0595408e22e0898ed0cb0a8fe9382d31253bcb099"
   },
   "us/scripts/quality_check.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -151,9 +151,9 @@
    "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
   },
   "us/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "fix/dangling-cross-references",
-   "commit_subject": "Four quoted cross-references pointed at a heading that does not exist (register row F40, widened from one instance to a class)",
-   "sha256_now": "698e89485a008023f0d166e65e5ca325c1ea799ed5f09896947c4eac7419c41a"
+   "changed_by": "feature/branch9-change-journal",
+   "commit_subject": "Branch 9 - the change journal: post_process records every text edit it makes and which pass made it, so the delivered-document check at branch 11 becomes buildable (C15, B6)",
+   "sha256_now": "93b05567e3322f0787fd64b2e15f98a669ed3445ff93e116ee1b4425a672d077"
   },
   "us/skill-docs/08-aux-and-quality.md": {
    "changed_by": "feature/branch7-slice3-a19",
