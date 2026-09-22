@@ -124,7 +124,7 @@ DECLARED_BENIGN = [
      "§5.7 is THIS charter's artefact subsection, the source `gates.md` was relocated out "
      "of on 2026-09-22 — the twin column names the source, and that rule file has ZERO "
      "numbered headings"),
-    ("the current state** *(§5.6; the creation and flip",
+    ("the current state** *(§5.6; the creation and",
      "§5.6 is this charter's confidentiality section; `DECISIONS-LOG.md` holds the creation "
      "and public-flip records by date, not a section 5.6 of its own. THE FRAGMENT CHANGED "
      "on 2026-09-22 — it read 'the flip measurement is in' until the fourth reduction "
