@@ -1434,6 +1434,55 @@ def _italic_declared(path):
     _write_notes(path, notes)
 
 
+@fixture("lexicon-choice.docx",
+         "BRANCH 10 SLICE 3b — five strings a LEXICON in the skill presents as correct and a "
+         "mandatory rewrite used to overwrite (Annex twice, a sub-lexicon heading, the "
+         "reference's own term, a benchmark name SPLIT ACROSS TWO RUNS, a lexicon-listed "
+         "name containing Annex), beside two rewrites no lexicon sanctions that must STILL "
+         "fire. Ships its own lexicon-choice.notes.json")
+def _lexicon_choice(path):
+    """The page slice 3b is judged on, and why the rows are shaped the way they are.
+
+    EVERY ROW BEGINS WITH ITS OWN LABEL, and that is load-bearing twice. It lets a reader of
+    the render see which rows must differ between the arms and which must not. And it keeps
+    every row out of the page-break pass, which fires on a paragraph that STARTS with
+    Annex or Schedule: a heading here would gain a page break in the working arm and not in
+    the source, and the source-to-new page count would move for B7's reason rather than this
+    slice's.
+
+    THE NOTES ARE MODELLED AS THE OTHER NOTES-BEARING FIXTURES ARE: `text` must equal the
+    document's own paragraph text, which `_write_notes` asserts, so `text` == `en` here and
+    the detector will say "source wording" rather than "declared". What that costs is the
+    realism of the reason; what it keeps is the only thing the page shows -- whether the
+    string survived. The "declared" reason is exercised by tests/test_lexicon_choice.py,
+    which builds its own notes with a distinct `text`.
+    """
+    rows = [
+        ["KEPT — The milestones are set out in Annex 1 and Annex 2."],
+        ["KEPT — BANKING TRANSPARENCY"],
+        ["KEPT — The registration and publicity formalities are complete."],
+        # THE SPLIT: the name spans two runs, so only a paragraph-wide reading sees it.
+        ["KEPT — Interest accrues at the Secured Overnight ",
+         "Financing Rate plus the margin."],
+        ["KEPT — The Credit Support Annex governs the collateral."],
+        ["CONTROL — The Financing Agreement is signed today."],
+        ["CONTROL — Each credit line remains available."],
+    ]
+    docx(path, "".join(p(*[r(frag) for frag in frags]) for frags in rows))
+
+    notes = []
+    for idx, frags in enumerate(rows):
+        text = "".join(frags)
+        runs, pos = [], 0
+        for frag in frags:
+            runs.append({"start": pos, "end": pos + len(frag), "text": frag,
+                         "bold": False, "italic": False})
+            pos += len(frag)
+        notes.append({"idx": idx, "text": text, "en": text, "style": "Normal",
+                      "runs": runs, "en_runs": None})
+    _write_notes(path, notes)
+
+
 @fixture("tracked-changes.docx",
          "an insertion, a deletion, and a deletion whose text is in the source language — "
          "the document must read correctly both when accepted and when rejected")

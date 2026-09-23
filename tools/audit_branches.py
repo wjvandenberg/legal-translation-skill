@@ -461,12 +461,13 @@ def audit_b1():
     # COUNTED BY LISTING, from `git ls-files`, never by adding a delta to the figure above.
     # This claim reads the INDEX, deliberately, and is the only one in this block that does --
     # so a fixture added on a branch must be STAGED before the number is right, and the claim
-    # goes red while whoever moved it is still here rather than after the merge. IT HAS NOW
-    # DONE EXACTLY THAT ON FOUR CONSECUTIVE SLICES, which is the fifth time that design has
-    # paid. Re-derived 27 against a claimed 25, on branch 10 slice 3a: italic-declared.docx
-    # and its shipped italic-declared.notes.json, TWO files from one fixture, which is the
-    # reason this is counted by LISTING and never by adding an expected delta of one.
-    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 27)
+    # goes red while whoever moved it is still here rather than after the merge. IT HAS DONE
+    # EXACTLY THAT ON EVERY SLICE THAT ADDED A FIXTURE, and states no count of how many,
+    # because the count it stated went stale the next time it fired. Re-derived 29 against a
+    # claimed 27 on branch 10 slice 3b, the run going red FIRST and the figure moved after:
+    # lexicon-choice.docx and its shipped lexicon-choice.notes.json, TWO files from one
+    # fixture, which is the reason this is counted by LISTING and never by adding a delta.
+    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 29)
 
     hits = 0
     for nm in fx:

@@ -234,9 +234,15 @@ GROUPS = {
  # once fired on a real defect. Both are the shipped account being wrong rather than the code,
  # which is this group, and F43 belongs here rather than in group 1 precisely because nothing
  # was lost: what misled was the manual, and then a fill rate read as if it were a defect rate.
+ # B9, F45 AND F46 ADDED 2026-09-23 (branch 10 slice 3b), all three for the reason B5, B6
+ # and F29 sit here: a shipped table or map contradicts a shipped lexicon, and the operator
+ # who follows the lexicon is overruled. B9 is that pincer's wider population -- a term the
+ # reference calls correct, and three lexicon-listed names corrupted by a rewrite; F45 is
+ # F29's free choice overridden by a SECOND script; F46 is the lexicons contradicting
+ # THEMSELVES, a sub-lexicon offering what its own reference lists under Avoid.
  "5 the manual is wrong": """
    F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40
-   E7 E8 K1 K2 K3 H3 L5 B2 B4 B5 B6 X3 X5 Y2 Y3 Y4 F41 F42 C29 F43 F44
+   E7 E8 K1 K2 K3 H3 L5 B2 B4 B5 B6 X3 X5 Y2 Y3 Y4 F41 F42 C29 F43 F44 B9 F45 F46
    """,
 }
 # -------------------------------------------- options (a row may need more than one)
@@ -287,12 +293,19 @@ OPTIONS = {
  # C29 added 2026-09-02: half its fix is F36's exit-code class applied to the CALLER --
  # `_run_validator` maps every non-zero exit onto "intentional block", so a crash and a gate
  # are indistinguishable to it. That is this option's business; the packaging half is 8's.
+ # F45 AND F46 ADDED 2026-09-23 (branch 10 slice 3b). F45 is here beside F29, and for F29's
+ # reason: two authorities over one convention -- the lexicon's free choice and a script's
+ # mandatory map -- which is this option's subject even though option 6's principle is what
+ # closed it. F46 is here ALONE: which layer of the lexicon wins when a sub-lexicon offers
+ # what its reference lists under Avoid is a decision about authority, not about a script.
  "5 one authority, one way out, more than one gear": """
    A15 C5 C7 C26 C29 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28
-   F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 D3 D5
+   F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 D3 D5 F45 F46
    """,
+ # B9 AND F45 ADDED 2026-09-23: the passes' and the numbering map's authority to override a
+ # lexicon-sanctioned rendering is exactly what slice 3b took away.
  "6 take post_process's authority away": """
-   B1 B2 B3 B4 B5 B6 B7 B8 F29 D5 T1 T6
+   B1 B2 B3 B4 B5 B6 B7 B8 F29 D5 T1 T6 B9 F45
    """,
  "7 one tree instead of two": """
    U1 V1 V2 C21 F34 F8 Q1

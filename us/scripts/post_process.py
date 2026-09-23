@@ -5,8 +5,10 @@ Runs all quality fixes in a single pass:
 2. Definition boundary fixes ("Xmeans" -> "X means")
 3. Double punctuation fixes (::, .., ,,, ;;)
 4. Terminology/lexicon fixes (including standalone "Financing", Italian remnants, word order)
+   -- never where a lexicon in this skill sanctions the string (LEXICON_SANCTIONED)
 5. Spelling normalization (variant-aware: US default, UK under --variant uk)
-6. Annex -> Schedule (variant-agnostic; works in both US and UK English)
+6. Annex -> Schedule (variant-agnostic) -- a DETECTOR since branch 10 slice 3b: the lexicon
+   offers Annex as a free choice, so the pass reports what it finds and rewrites nothing
 7. Article -> Section (US default) / Clause (UK) for internal cross-references
 8. Double-word deduplication (within and across elements)
 9. Quote balancing on defined terms
@@ -719,7 +721,9 @@ UK_SPELLING = [
     (r'\bSkepticism\b', 'Scepticism'),
 ]
 
-# ANNEX -> Schedule (but not in legislation refs)
+# Legislation references fix_annex never considers. Since branch 10 slice 3b that pass rewrites
+# nothing (see its docstring); translate_numbering's _LABEL_EXCLUDE must equal this list, and
+# tests/test_lexicon_choice.py asserts it.
 ANNEX_EXCLUDE = ['Regulation', 'Directive', 'Law', 'Decree', 'Regolamento']
 
 # LEGISLATION KEYWORDS (paragraphs containing these keep "Article")
@@ -1223,25 +1227,184 @@ def fix_double_punctuation(root):
             found.append({'mark': 'double period', 'count': n})
     return 0
 
-def fix_terminology(root):
-    """Apply terminology replacements to all w:t elements."""
+# === LEXICON-SANCTIONED RENDERINGS ===
+#
+# B5, B6(a) AND F29 ARE ONE DEFECT THREE TIMES, AND THIS BLOCK IS THE ONE MECHANISM FOR ALL
+# OF THEM. A mandatory rewrite in this script overwrote a string that a LEXICON in this skill
+# tells the operator to write: `Annex`, which the reference lexicon's Attachments row offers
+# as a free choice against `Schedule`; a section heading that an Italian sub-lexicon
+# instructs verbatim; `registration and publicity`, which the finance reference names as the
+# CORRECT term. Each time, the operator followed the lexicon, this pass overrode them, and the
+# post-strip drift gate then blocked with an error naming neither cause.
+#
+# THE CONDITION THESE PASSES ALWAYS ASSUMED, NOW TESTED: does a lexicon present this string
+# as a correct rendering? A match lying inside a sanctioned span is LEFT EXACTLY AS WRITTEN
+# and reported (decision 2c revised). The span is read over the WHOLE PARAGRAPH rather than
+# the one w:t, so a lexicon-listed name split across two runs is still seen as a name.
+#
+# AND "DID THE OPERATOR DECLARE IT?" IS ANSWERED FROM THE NOTES -- AND IT CANNOT, BY
+# CONSTRUCTION, TURN A KEPT MATCH INTO A REWRITE. A paragraph the notes find is one whose
+# declared English equals its own text, so a sanctioned match in it IS the operator's; a
+# paragraph they do not find is undecidable, and under 2c an undecidable case changes
+# nothing. So the notes decide what the REPORT says -- declared, the source's own wording, or
+# undecidable -- and never what happens to the text. Said here so that nobody later reads
+# the classification as a second gate and "tightens" it into one.
+#
+# THE TABLE IS DECLARED, NOT PARSED FROM THE LEXICONS AT RUNTIME (Wouter, 2026-09-23), AND
+# THE LEXICON STAYS THE AUTHORITY ANYWAY. Every entry cites the row that sanctions it, and
+# tests/test_lexicon_choice.py reads every lexicon in both trees and goes RED on a rewritten
+# string a lexicon sanctions that this table does not cover, or on a citation that no longer
+# says what its entry claims. A Markdown parse inside the shipped pipeline would be a
+# heuristic in the one place where a wrong answer is silent.
+#
+# WHAT IS DELIBERATELY NOT HERE: a string the REFERENCE lexicon lists under Avoid, even where
+# a sub-lexicon offers it -- `credit line`, `election of domicile`. Three authorities agree
+# with the rewrite there (the reference's Avoid column, this script's table and
+# quality_check's violation list); a sub-lexicon contradicting its own reference is a defect
+# in the lexicons, and not a reason for this script to stop.
+#
+# Each entry: (label, pattern matched case-insensitively, lexicon file relative to the skill
+# root, a verbatim FRAGMENT that locates the row sanctioning it). The test reads the whole
+# line the fragment locates and checks that the pattern still matches there and still shields
+# a rewrite rule; the fragment itself need not contain the name. That is deliberate, and it
+# was measured before it was chosen: this slice's first version quoted the three names in
+# full, and the pre-commit gate's publication check -- whose shape for a personal name is
+# three capitalised words in a row -- read a benchmark, a regulation and a statute as three
+# people. The control was right about the shape and wrong about these strings; the answer was
+# to stop writing a person-shaped string where nothing needs one, not to loosen a
+# confidentiality check. The labels are lowercase for the same reason.
+LEXICON_SANCTIONED = (
+    ('Annex', r'\bAnnex(?:es)?\b',
+     'references/general-legal.md',
+     'Schedule (UK) or Annex (EU/international)'),
+    ('banking transparency', r'\bbanking\s+transparency\b',
+     'sub-lexicons/italian-finance-banking.md',
+     '| TRASPARENZA BANCARIA | BANKING TRANSPARENCY |'),
+    ('registration and publicity', r'\bregistration\s+and\s+publicity\b',
+     'references/finance-banking.md',
+     '| registration and publicity | The process of recording security interests'),
+    ('SOFR, the overnight financing benchmark', r'\bSecured\s+Overnight\s+Financing\s+Rate\b',
+     'references/trading-capital-markets.md',
+     '| SOFR |'),
+    ('SFTR, the securities financing regulation',
+     r'\bSecurities\s+Financing\s+Transactions\s+Regulation\b',
+     'sub-lexicons/french-finance-banking.md',
+     '| règlement SFTR |'),
+    ('the anti-terrorism financing act', r'\bAnti-Terrorism\s+Financing\s+Act\b',
+     'sub-lexicons/dutch-general-legal.md',
+     '(Wwft) |'),
+)
+_LEXICON_SANCTIONED_RE = tuple(re.compile(pat, re.IGNORECASE)
+                               for _label, pat, _file, _quote in LEXICON_SANCTIONED)
+
+# What the two passes below LEFT ALONE, for the detector line: one dict per kept match,
+# {'pass', 'entry' (index into LEXICON_SANCTIONED), 'reason'}. Each pass clears only its own
+# records, so running one pass on its own never erases the other's.
+LEXICON_CHOICE_KEPT = []
+
+
+def _own_paragraph(el):
+    """Nearest ancestor w:p -- the reading half's own grouping, so a nested paragraph's
+    text is never read as its outer paragraph's."""
+    a = el.getparent()
+    while a is not None and a.tag != f'{{{W}}}p':
+        a = a.getparent()
+    return a
+
+
+def _paragraph_context(t):
+    """A callable returning (prefix, suffix): the text of the rest of t's own paragraph on
+    either side of it. Computed at most once per element, and only when a rule matches."""
+    cache = []
+
+    def get():
+        if not cache:
+            p = _own_paragraph(t)
+            if p is None:
+                cache.append(('', ''))
+            else:
+                own = [x for x in p.iter(f'{{{W}}}t') if _own_paragraph(x) is p]
+                i = next((k for k, x in enumerate(own) if x is t), None)
+                if i is None:
+                    cache.append(('', ''))
+                else:
+                    cache.append((''.join(x.text or '' for x in own[:i]),
+                                  ''.join(x.text or '' for x in own[i + 1:])))
+        return cache[0]
+    return get
+
+
+def _sub_unless_sanctioned(rx, render, text, context, kept):
+    """`rx.sub(render, text)`, except that a match overlapping a LEXICON_SANCTIONED span --
+    read over the whole paragraph -- is left exactly as written and its entry index
+    appended to `kept`. Every other match is replaced exactly as re.sub would replace it:
+    same matches, same order, same replacement."""
+    out, last, spans, prefix = [], 0, None, ''
+    for m in rx.finditer(text):
+        if spans is None:
+            prefix, suffix = context()
+            whole = prefix + text + suffix
+            spans = [(s.start(), s.end(), i)
+                     for i, crx in enumerate(_LEXICON_SANCTIONED_RE)
+                     for s in crx.finditer(whole)]
+        a, b = len(prefix) + m.start(), len(prefix) + m.end()
+        hit = next((i for s0, s1, i in spans if s0 < b and a < s1), None)
+        if hit is not None:
+            kept.append(hit)
+            continue
+        out.append(text[last:m.start()])
+        out.append(render(m))
+        last = m.end()
+    if not out:
+        return text
+    out.append(text[last:])
+    return ''.join(out)
+
+
+def _record_kept(pass_name, t, kept, notes):
+    """Say WHY each kept match was kept. This changes nothing about the text -- see the
+    block comment above -- it decides what the detector line tells the operator."""
+    if not kept:
+        return
+    if notes is None:
+        reason = 'no notes'
+    else:
+        p = _own_paragraph(t)
+        full = ''.join(x.text or '' for x in p.iter(f'{{{W}}}t')) if p is not None else ''
+        entry = notes.get(_notes_norm(full))
+        if entry is None:
+            reason = 'no paragraph match'
+        elif _notes_norm(entry.get('text')) == _notes_norm(entry.get('en')):
+            reason = 'source wording'
+        else:
+            reason = 'declared'
+    for idx in kept:
+        LEXICON_CHOICE_KEPT.append({'pass': pass_name, 'entry': idx, 'reason': reason})
+# === LEXICON-SANCTIONED RENDERINGS ENDS ===
+
+
+def fix_terminology(root, notes=None):
+    """Apply terminology replacements to all w:t elements -- EXCEPT where a lexicon in this
+    skill sanctions the string being replaced (B5, B6(a), F29; see LEXICON_SANCTIONED).
+
+    Every other replacement is applied exactly as before: the literal rules in table order,
+    then the regex rules, each match replaced as re.sub would replace it."""
     fixes = 0
+    LEXICON_CHOICE_KEPT[:] = [k for k in LEXICON_CHOICE_KEPT if k['pass'] != 'terminology']
+    rules = ([(re.compile(old) if is_regex else re.compile(re.escape(old)),
+               (lambda m, n=new: m.expand(n)) if is_regex else (lambda m, n=new: n))
+              for old, new, is_regex in TERM_REPLACEMENTS]
+             + [(re.compile(pattern), lambda m, r=replacement: m.expand(r))
+                for pattern, replacement in TERM_REGEX_REPLACEMENTS])
     for t in root.iter(f'{{{W}}}t'):
         if t.text is None:
             continue
         orig = t.text
-
-        # Literal replacements
-        for old, new, is_regex in TERM_REPLACEMENTS:
-            if is_regex:
-                t.text = re.sub(old, new, t.text)
-            else:
-                t.text = t.text.replace(old, new)
-
-        # Regex replacements
-        for pattern, replacement in TERM_REGEX_REPLACEMENTS:
-            t.text = re.sub(pattern, replacement, t.text)
-
+        context = _paragraph_context(t)
+        kept = []
+        for rx, render in rules:
+            t.text = _sub_unless_sanctioned(rx, render, t.text, context, kept)
+        _record_kept('terminology', t, kept, notes)
         if t.text != orig:
             fixes += 1
     return fixes
@@ -1375,18 +1538,38 @@ def fix_us_spelling(root):
             fixes += 1
     return fixes
 
-def fix_annex(root):
-    """Replace 'Annex' with 'Schedule' except in legislation references."""
+def fix_annex(root, notes=None):
+    """Replace 'Annex' with 'Schedule' except in legislation references -- and, since branch
+    10 slice 3b, except where a lexicon sanctions it, which for this pass is EVERY match.
+
+    F29 and B6(a): the reference lexicon's Attachments row reads "Schedule (UK) or Annex
+    (EU/international)" and says to match the source document's convention, and five
+    sub-lexicons repeat the choice. The operator is the one who can see the source; this pass
+    cannot. So every match lies inside the `Annex` entry of LEXICON_SANCTIONED, the pass
+    rewrites nothing, and it is kept as a DETECTOR rather than deleted (decision 2c revised):
+    what it would have rewritten is exactly what the detector line reports.
+
+    The shape of the loop is unchanged ON PURPOSE, including the case-sensitive 'Annex'
+    pre-check that means the all-caps rule only ever ran beside a mixed-case 'Annex' in the
+    same element. Keeping it makes "kept now" equal "rewritten before", match for match,
+    which is what lets a before-and-after run explain every moved byte by this row."""
     fixes = 0
+    LEXICON_CHOICE_KEPT[:] = [k for k in LEXICON_CHOICE_KEPT
+                              if k['pass'] != 'annex_to_schedule']
+    rules = ((re.compile(r'\bAnnex\b'), lambda m: 'Schedule'),
+             (re.compile(r'\bANNEX\b'), lambda m: 'SCHEDULE'),
+             (re.compile(r'\bAnnexes\b'), lambda m: 'Schedules'))
     for t in root.iter(f'{{{W}}}t'):
         if t.text is None or 'Annex' not in t.text:
             continue
         if any(kw in t.text for kw in ANNEX_EXCLUDE):
             continue
         orig = t.text
-        t.text = re.sub(r'\bAnnex\b', 'Schedule', t.text)
-        t.text = re.sub(r'\bANNEX\b', 'SCHEDULE', t.text)
-        t.text = re.sub(r'\bAnnexes\b', 'Schedules', t.text)
+        context = _paragraph_context(t)
+        kept = []
+        for rx, render in rules:
+            t.text = _sub_unless_sanctioned(rx, render, t.text, context, kept)
+        _record_kept('annex_to_schedule', t, kept, notes)
         if t.text != orig:
             fixes += 1
     return fixes
@@ -2174,12 +2357,14 @@ def post_process(xml_path, fix=True, variant='us', paragraphs_json=None):
         'definition_boundaries', fix_definition_boundaries)
     results['double_punctuation'] = _journalled(
         'double_punctuation', fix_double_punctuation)
-    results['terminology'] = _journalled('terminology', fix_terminology)
+    results['terminology'] = _journalled('terminology', fix_terminology,
+                                         notes=declared_notes)
     if variant == 'uk':
         results['uk_spelling'] = _journalled('uk_spelling', fix_uk_spelling)
     elif variant == 'us':
         results['us_spelling'] = _journalled('us_spelling', fix_us_spelling)
-    results['annex_to_schedule'] = _journalled('annex_to_schedule', fix_annex)
+    results['annex_to_schedule'] = _journalled('annex_to_schedule', fix_annex,
+                                               notes=declared_notes)
     results['article_to_clause'] = _journalled(
         'article_to_clause', fix_article_to_clause, variant=variant)
     results['duplicates'] = _journalled('duplicates', fix_duplicates)
@@ -2233,6 +2418,27 @@ def post_process(xml_path, fix=True, variant='us', paragraphs_json=None):
               f"rule cannot tell an italic this pipeline introduced from one the "
               f"operator authored, and on a real document guessing destroyed an "
               f"entire drafting convention the operator had declared correctly.")
+    if LEXICON_CHOICE_KEPT:
+        # ONE LINE PER PASS, THE STRINGS NAMED BY THE TABLE'S OWN LABELS AND THE REASONS
+        # COUNTED APART. "declared" is the operator's choice and needs nothing; "no paragraph
+        # match" and "no notes" are the cases nobody decided -- the text is kept either way,
+        # and only the second kind is a reason to look at anything.
+        for pass_name in ('terminology', 'annex_to_schedule'):
+            mine = [k for k in LEXICON_CHOICE_KEPT if k['pass'] == pass_name]
+            if not mine:
+                continue
+            what, why = {}, {}
+            for k in mine:
+                label = LEXICON_SANCTIONED[k['entry']][0]
+                what[label] = what.get(label, 0) + 1
+                why[k['reason']] = why.get(k['reason'], 0) + 1
+            strings = ', '.join(f"{w} x{n}" for w, n in sorted(what.items()))
+            reasons = ', '.join(f"{r}: {n}" for r, n in sorted(why.items()))
+            print(f"  [detector] {pass_name} left {len(mine)} lexicon-sanctioned "
+                  f"rendering(s) AS WRITTEN ({strings}; {reasons}) — B5/B6/F29: a "
+                  f"lexicon in this skill presents the string as correct, and overwriting "
+                  f"it once overruled an operator who had followed the lexicon and then "
+                  f"blocked them with a drift error naming neither cause.")
 
 
     if fix and total > 0:
