@@ -71,22 +71,28 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 SCRIPT = "apply_translations_textmatch.py"
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.3.
 #
-# MOVED TO 5107aaf ON 2026-09-23: the squash-merge of branch 10 slice 1, the formatting
-# record (PR #95), and the last commit to touch either tree. DERIVED, NOT READ OFF THE MERGE
-# MESSAGE -- `git log --oneline -1 -- uk us` returns it and `git diff 5107aaf -- uk us` comes
+# MOVED TO fd98ec2 ON 2026-09-23: the squash-merge of branch 10 slice 2, the conditional
+# passes (PR #97), and the last commit to touch either tree. DERIVED, NOT READ OFF THE MERGE
+# MESSAGE -- `git log --oneline -1 -- uk us` returns it and `git diff fd98ec2 -- uk us` comes
 # back empty.
 #
 # AND EXPECT THE ALL-QUIET NOTICE AT THIS PIN, WHICH IS THE POINT WORTH CARRYING FORWARD.
 # The fixture path prints "BYTE-IDENTICAL to the working tree, so old and new are the same
 # code and an all-quiet render proves nothing" whenever the swapped script matches the pin.
-# Slice 1 added a FORMATTING record to post_process.py's journal and restated the contract in
-# a step document -- NOT the apply script this tool swaps -- so the notice is CORRECT here and
-# a quiet render is the expected result rather than evidence. The .pyc slice, six branches
-# back, was the last one where it was absent. A stale pin produces the same honest-looking
-# notice for an illegitimate reason, which is why it moves as the first act after a merge and
-# not as a closing tidy-up.
+# Slice 2 made four passes in post_process.py conditional and changed strip_noop and
+# validate_apply with them -- NOT the apply script this tool swaps -- so the notice is CORRECT
+# here and a quiet render is the expected result rather than evidence. The .pyc slice, seven
+# branches back, was the last one where it was absent. A stale pin produces the same
+# honest-looking notice for an illegitimate reason, which is why it moves as the first act
+# after a merge and not as a closing tidy-up.
 #
-# THE PIN HAS NOW MOVED ELEVEN TIMES, and this comment block has gone stale twice
+# AND NOTE WHAT THAT MEANS AFTER SLICE 2, BECAUSE IT IS THE ONE CASE WHERE THIS TOOL'S
+# SILENCE IS NOT THE WHOLE STORY: slice 2 DID change delivered bytes, on every document, and
+# this tool still shows nothing -- because its fixture path drives apply + repack and never
+# post_process. That is a limit of the instrument, not a property of the slice, and the
+# READ-ME below says so at length rather than letting a quiet render read as "no page".
+#
+# THE PIN HAS NOW MOVED TWELVE TIMES, and this comment block has gone stale twice
 # and been caught twice -- which is the whole argument for rewriting it rather than appending
 # to it. Once it read "Moved to 049484e" while the pin one line below said 2a71e71: both true
 # once, disagreeing inside five lines. NOTHING CHECKS A COMMENT, so a stale one is
@@ -112,7 +118,7 @@ SCRIPT = "apply_translations_textmatch.py"
 # ae48f6d, deliberately and measured: it proves a kind-less scaffold entry is still a
 # paragraph entry, a question that only exists against a tree predating the `kind` key, so
 # moving it makes that tool VOID for ever. Three suites are likewise fixed at 2178cce.
-REF = os.environ.get("LT_BASELINE_REF", "5107aaf")
+REF = os.environ.get("LT_BASELINE_REF", "fd98ec2")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
 # Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
 # glance whether the pages in front of them belong to the run being discussed.
