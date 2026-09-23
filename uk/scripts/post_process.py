@@ -789,15 +789,61 @@ def _skip_noise_after_article(text):
         return pos
     return -1
 
-def _is_external_article_ref(joined_text, match_end):
-    """Decide whether the "Article N" / "Articles N" match ending at
-    ``match_end`` in ``joined_text`` is an EXTERNAL legislation /
-    regulatory reference (keep as Article) or an INTERNAL
-    cross-reference (rewrite to Clause).
+ARTICLE_EXTERNAL = 'external'
+ARTICLE_INTERNAL = 'internal'
+ARTICLE_INDETERMINATE = 'indeterminate'
 
-    Returns True if external (keep). Default on ambiguity: False
-    (rewrite), preserving the v5 default for bare "Article N." with
-    no qualifier.
+# B2's detector output: the "Article N" references this run declined to
+# classify, and therefore declined to rewrite. Read by the caller after
+# `fix_article_to_clause` returns and printed with the pass summary, because a
+# pass that silently stops rewriting reads as a pass that found nothing to do.
+ARTICLE_UNDECIDED = []
+
+# B8's detector output: the doubled punctuation marks this run FOUND and
+# deliberately did not collapse. Same reason as above, and the same shape: the
+# pass's return value is journalled as a fix count, so a detection cannot ride
+# on it without making "changed nothing" and "found nothing" the same number.
+DOUBLE_PUNCTUATION_FOUND = []
+
+
+def _classify_article_ref(joined_text, match_end):
+    """Classify the "Article N" / "Articles N" match ending at ``match_end`` in
+    ``joined_text`` as an EXTERNAL legislation / regulatory reference (keep as
+    Article), an INTERNAL cross-reference (rewrite to Clause), or
+    INDETERMINATE.
+
+    **B2 — THE THIRD ANSWER IS THE FIX, AND IT USED TO BE SPELT "INTERNAL".**
+    This walk reads FORWARD from the number, and where the sentence runs out
+    with no decisive token it used to answer *internal* and the caller rewrote.
+    That is a guess presented as a decision, and on D05 it turned a STATUTORY
+    citation into an internal "Section N" that does not exist in the deed — a
+    substantive legal error, surfaced only because a declared token went
+    missing. The shape that defeats the walk is ordinary: in "Article 1341
+    thereof", `thereof` points BACKWARD at an instrument already named, and it
+    is not in `_INTERNAL_LOCATORS` — which holds only the HERE- family, words
+    that genuinely mean *this document* — so the walk skips it as lowercase
+    noise and reaches the end of the sentence having learnt nothing.
+
+    Decision 2c revised: a pass that cannot determine its condition REPORTS AND
+    CHANGES NOTHING. So the terminal answer is now INDETERMINATE and the caller
+    leaves the text alone.
+
+    WHAT IT COSTS, AND THE FIRST MEASUREMENT OF IT WAS TAKEN IN THE WRONG PLACE.
+    Over the APPLIED `document.xml` of all 13 frozen workdirs, joining each
+    paragraph exactly as the pass does: **58 references — 57 external, 0
+    decided internal by a token, and 1 INDETERMINATE.** That one is on the
+    corpus, not only in a fixture: running the stage over it, this pass
+    reported 1 fix before the change and 0 after, so a real document was having
+    a reference rewritten on a guess.
+
+    The figure was first taken from the `en` field of the frozen NOTES and came
+    back 0 indeterminate and 1 internal — from which it followed, wrongly, that
+    the change was free and that only a synthetic fixture could evidence it.
+    The notes and the document are different strings, assembled differently,
+    and this pass reads the document. A claim about BEHAVIOUR measured anywhere
+    but where the behaviour happens is a claim about something else.
+
+    Returns one of ARTICLE_EXTERNAL / ARTICLE_INTERNAL / ARTICLE_INDETERMINATE.
 
     **Rev16 — pure structural walk.** Instead of enumerating the
     civil-law citation modifiers that can appear between an article
@@ -817,7 +863,8 @@ def _is_external_article_ref(joined_text, match_end):
       * a Capitalised Proper Noun NOT preceded by an internal
         determiner → EXTERNAL (keep Article)
       * end of sentence reached without any decisive token
-        → internal default
+        → INDETERMINATE (report, change nothing) — was "internal default"
+          until B2
 
     Lowercase noise words (et, seq, of, the, paragraph, first, second,
     letter, comma, etc.) are simply skipped — no need to enumerate
@@ -887,14 +934,14 @@ def _is_external_article_ref(joined_text, match_end):
         word_start = wm.start()
         # Internal locator? ("above", "below", "hereof", etc.)
         if word.lower() in _INTERNAL_LOCATORS:
-            return False
+            return ARTICLE_INTERNAL
         # Lowercase word — pure noise; skip.
         if not word[0].isupper():
             pos = wm.end()
             continue
         # Internal anchor? ("Schedule", "Annex", "Section", ...)
         if word in _INTERNAL_ANCHOR_WORDS:
-            return False  # internal cross-reference
+            return ARTICLE_INTERNAL  # internal cross-reference
         # Capitalised non-anchor — check for an internal-determiner
         # immediately preceding ("this", "the said", "the present",
         # etc.). Strip trailing whitespace from the prefix and look
@@ -905,15 +952,25 @@ def _is_external_article_ref(joined_text, match_end):
             det = det.rstrip()  # _INTERNAL_DETERMINERS includes trailing space
             if (before_lower == det or
                     before_lower.endswith(' ' + det)):
-                return False  # "this Agreement", "the said Deed", etc.
+                # "this Agreement", "the said Deed", etc.
+                return ARTICLE_INTERNAL
         # Capitalised, not an anchor, not preceded by internal
         # determiner → external Proper Noun (Civil Code, Italian Code
         # of Civil Procedure, Resolution of the CICR, EU Regulation,
         # Presidential Decree, BGB, T.U.B., etc.)
-        return True
-    # No decisive token found within the same sentence → internal
-    # default (matches v5 behaviour for bare "Article N.").
-    return False
+        return ARTICLE_EXTERNAL
+    # NO DECISIVE TOKEN IN THE SENTENCE. This used to answer "internal", and
+    # answering was the defect — see `_is_external_article_ref` below.
+    return ARTICLE_INDETERMINATE
+
+
+def _is_external_article_ref(joined_text, match_end):
+    """Back-compatible boolean wrapper: True iff the reference is decided
+    EXTERNAL. An indeterminate reference is not external, so it reads False
+    here — which is why callers must use `_classify_article_ref` instead when
+    the difference matters, and `fix_article_to_clause` does.
+    """
+    return _classify_article_ref(joined_text, match_end) == ARTICLE_EXTERNAL
 
 # rev42: Predicate for fix_spacing's space-insertion rules. Extracted to
 # module level so apply_translations_textmatch.py can import it for the
@@ -962,8 +1019,31 @@ def will_fix_spacing_fire(prev_text, curr_text):
     return False
 
 
+def _is_rendered_separator(el):
+    """Return True if `el` renders as horizontal or line separation between the
+    text on either side of it — a tab CHARACTER or a break.
+
+    A ``w:tab`` INSIDE ``w:pPr/w:tabs`` IS A TAB STOP AND IS NOT ONE. It carries
+    the same tag name as a rendered tab and is a layout declaration, not content,
+    so a walk that sums the two treats a paragraph's tab-stop table as separation
+    that is not there and skips seams that should fire. That is the OOXML rule
+    "count tab CHARACTERS separately from tab STOPS", and it is why this function
+    tests ancestry rather than the tag alone.
+    """
+    tag = el.tag
+    if tag == f'{{{W}}}br':
+        return True
+    if tag != f'{{{W}}}tab':
+        return False
+    for anc in el.iterancestors():
+        if anc.tag == f'{{{W}}}tabs':
+            return False
+    return True
+
+
 def fix_spacing(root):
-    """Fix missing spaces between adjacent text elements within paragraphs.
+    """Insert a missing space between adjacent text elements within a paragraph
+    — but ONLY where nothing between them already supplies the separation.
 
     now iterates ``<w:t>`` AND ``<w:delText>`` together in
     document order. The  version only walked ``<w:t>``, so the
@@ -979,29 +1059,48 @@ def fix_spacing(root):
     text) is unaffected.
 
     rev42: the per-boundary rule check is now ``will_fix_spacing_fire``
-    (module-level) so apply_translations_textmatch.py can pre-empt this
-    function for non-Latin source paragraphs by injecting ZWSP at the
-    same boundaries — fix_spacing then sees ZWSP at the seam, the rules
-    don't fire, and the post-strip drift gate stays clean.
+    (module-level), a single source of truth for the per-boundary CHARACTER
+    rule. That predicate is unchanged by the fix below, deliberately: what
+    was wrong was never which character pairs need a space, but whether this
+    walk could see what sat between them.
+
+    **B4 — THE PASS NOW TESTS THE CONDITION IT ALWAYS ASSUMED.** It compared the
+    last character of one text element against the first of the next and
+    inserted a separator that the intervening element ALREADY PROVIDED, because
+    it collected text-bearing elements and threw everything else away. A tab or a
+    break between two runs renders as separation; adding a space to it puts a
+    spurious space at the head of the second column of a signature block, or
+    after every tab in a schedule. Measured over the frozen corpus: **25 such
+    seams across 7 of 13 documents**, against 91 seams with genuinely nothing
+    between them, which are untouched. The register's control is unusually good
+    — two runs of one document, one with the spurious spaces and one without,
+    same script — so the diagnosis was never inferred.
+
+    The condition is now read from the document: a seam bridged by a RENDERED
+    separator is skipped. Nothing else changes, and a seam with no element
+    between it behaves exactly as before.
     """
     fixes = 0
     text_tag = f'{{{W}}}t'
     deltext_tag = f'{{{W}}}delText'
     for p in root.iter(f'{{{W}}}p'):
-        # Collect text-bearing elements (both kinds) in document order.
-        text_elems = [
-            e for e in p.iter()
-            if (e.tag == text_tag or e.tag == deltext_tag) and e.text
-        ]
-        for i in range(1, len(text_elems)):
-            prev_elem = text_elems[i-1]
-            curr_elem = text_elems[i]
-            prev = prev_elem.text
-            curr = curr_elem.text
-            if will_fix_spacing_fire(prev, curr):
-                curr_elem.text = ' ' + curr_elem.text
-                curr_elem.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
-                fixes += 1
+        # ONE walk in document order, keeping what sits BETWEEN the text-bearing
+        # elements rather than discarding it. The previous version built a list of
+        # text elements only, which is precisely why it could not see a tab.
+        prev_elem = None
+        bridged = False
+        for e in p.iter():
+            if (e.tag == text_tag or e.tag == deltext_tag) and e.text:
+                if prev_elem is not None and not bridged:
+                    if will_fix_spacing_fire(prev_elem.text, e.text):
+                        e.text = ' ' + e.text
+                        e.set('{http://www.w3.org/XML/1998/namespace}space',
+                              'preserve')
+                        fixes += 1
+                prev_elem = e
+                bridged = False
+            elif prev_elem is not None and _is_rendered_separator(e):
+                bridged = True
     return fixes
 
 def fix_definition_boundaries(root):
@@ -1046,23 +1145,53 @@ def fix_definition_boundaries(root):
     return fixes
 
 def fix_double_punctuation(root):
-    """Fix double colons, double periods (not ellipsis), double commas, double semicolons."""
-    fixes = 0
+    """REPORT double colons, double periods (not ellipsis), double commas and
+    double semicolons. **This pass no longer rewrites anything.**
+
+    **B8 — THE CONDITION IT ASSUMED CANNOT BE TESTED FROM THE DOCUMENT, SO IT
+    REPORTS.** The rule assumed a doubled mark was an artefact of translation,
+    something this pipeline introduced and should tidy away. It is not
+    necessarily: the doubling is often PRE-EXISTING, and `document.xml` carries
+    nothing that says who wrote it. On D01 the hand-typed signature rule was a
+    dot leader of 36 ellipses containing `..`, and this pass collapsed it to
+    `.` — a character of SOURCE CONTENT deleted, invisibly, because
+    ``validate_apply --strict`` compares token SETS and a lone full stop is not
+    a token (C1). Severity is genuinely LOW — a decorative rule, no legal
+    content — but it is the fifth pass documented as altering faithful text
+    unasked, and it is the one where the operator saw the defect, found a cure
+    and rightly declined to use it.
+
+    Under decision 2c revised, a pass that cannot determine its condition
+    reports and changes nothing; a pass left with nothing to rewrite becomes a
+    DETECTOR and is not deleted. Answering "was this doubling mine or the
+    source's?" needs the declared notes, which is slice 3's input — so the
+    detector is what slice 2 can honestly build, and it stops the loss on every
+    document now rather than a slice later.
+
+    Returns 0 always: no fix is made, so no fix is counted. What it FOUND is in
+    ``DOUBLE_PUNCTUATION_FOUND``, a module-level list the caller reads, because
+    a return value journalled as a fix count must not carry a detection.
+    """
+    found = DOUBLE_PUNCTUATION_FOUND
+    del found[:]
+    # Anchored on the same four patterns the rewrite used, so the detector's
+    # population is EXACTLY what the pass would have changed — a detector built
+    # from a different rule would report a different document.
+    doubles = (('::', 'double colon'),
+               (',,', 'double comma'),
+               (';;', 'double semicolon'))
+    period_re = re.compile(r'\.\.(?!\.)')
     for t in root.iter(f'{{{W}}}t'):
         if t.text is None:
             continue
-        orig = t.text
-        # Double colon
-        t.text = t.text.replace('::', ':')
-        # Double period (but not ellipsis "...")
-        t.text = re.sub(r'\.\.(?!\.)', '.', t.text)
-        # Double comma
-        t.text = t.text.replace(',,', ',')
-        # Double semicolon
-        t.text = t.text.replace(';;', ';')
-        if t.text != orig:
-            fixes += 1
-    return fixes
+        for mark, label in doubles:
+            n = t.text.count(mark)
+            if n:
+                found.append({'mark': label, 'count': n})
+        n = len(period_re.findall(t.text))
+        if n:
+            found.append({'mark': 'double period', 'count': n})
+    return 0
 
 def fix_terminology(root):
     """Apply terminology replacements to all w:t elements."""
@@ -1176,20 +1305,32 @@ def fix_article_to_clause(root):
     or other authoritative sources keep 'Article'.
 
     per-match decision via the structural detector
-    ``_is_external_article_ref`` (no hardcoded keyword list). The
+    ``_classify_article_ref`` (no hardcoded keyword list). The
     detector looks at what follows "Article N" within the same
     sentence:
 
       * " of <Capitalized Proper Noun>" → external (keep Article)
       * " of this/the present/the said X" → internal (rewrite to Clause)
       * " of <internal anchor>" (Schedule, Annex, ...) → internal
-      * bare "Article N." or "(Article N)" → internal (rewrite)
+      * bare "Article N." or "(Article N)" → INDETERMINATE: keep Article
+        and REPORT. B2 — this used to rewrite, and on D05 it turned a
+        statutory citation into an internal "Section N" that does not
+        exist in the deed. See `_classify_article_ref`.
 
     The decision is per-match, so a single paragraph can contain a
     mix of internal and external references and each will be handled
     correctly.
+
+    Returns the fix count. The indeterminate references are reported through
+    ``ARTICLE_UNDECIDED``, a module-level list the caller reads after the pass,
+    because this function's return value is journalled as a fix COUNT and a
+    reference left alone is not a fix.
     """
     fixes = 0
+    # Reset per run: a detector report that accumulates across invocations
+    # would report the previous document's references as this one's.
+    undecided = ARTICLE_UNDECIDED
+    del undecided[:]
     article_re = re.compile(r'\bArticles?\s+\d[\d.:]*(?:-[A-Za-z]{1,15})*')
     for p in root.iter(f'{{{W}}}p'):
         # Build the joined paragraph text once for context lookup.
@@ -1198,11 +1339,19 @@ def fix_article_to_clause(root):
         if not article_re.search(joined):
             continue
         # Find absolute start positions in `joined` of all "Article N"
-        # matches that should KEEP Article (external references).
+        # matches that must KEEP Article. TWO reasons now reach that set and
+        # they are counted apart: the reference is decided EXTERNAL, or it is
+        # INDETERMINATE and B2 says report rather than guess. Folding the two
+        # together would make the indeterminate ones invisible, which is the
+        # state this fix exists to leave.
         external_starts = set()
         for m in article_re.finditer(joined):
-            if _is_external_article_ref(joined, m.end()):
+            verdict = _classify_article_ref(joined, m.end())
+            if verdict == ARTICLE_EXTERNAL:
                 external_starts.add(m.start())
+            elif verdict == ARTICLE_INDETERMINATE:
+                external_starts.add(m.start())
+                undecided.append(m.group(0))
         # Walk t_elems and rewrite per-element. Only rewrite matches
         # whose absolute start position is NOT in external_starts.
         running = 0
@@ -1784,6 +1933,26 @@ def post_process(xml_path, fix=True, variant='uk', paragraphs_json=None):
         if count:
             print(f"  {name}: {count} fixes")
     print(f"  TOTAL: {total} fixes")
+
+    # THE DETECTOR REPORTS — decision 2c's other limb, and they are printed
+    # SEPARATELY FROM THE FIX COUNTS ON PURPOSE. A detection is not a fix, and
+    # adding it to `total` would make "this stage changed nothing" and "this
+    # stage found nothing" the same number, which is the reading branch 9's
+    # `non_text_fixes` figure exists to prevent one level down.
+    if DOUBLE_PUNCTUATION_FOUND:
+        n = sum(d['count'] for d in DOUBLE_PUNCTUATION_FOUND)
+        kinds = sorted({d['mark'] for d in DOUBLE_PUNCTUATION_FOUND})
+        print(f"  [detector] double_punctuation FOUND {n} occurrence(s) "
+              f"({', '.join(kinds)}) and CHANGED NOTHING — B8: nothing in "
+              f"document.xml says whether a doubled mark is the source's or "
+              f"ours, and one was a character of source content on a real "
+              f"document. Deciding it needs the declared notes.")
+    if ARTICLE_UNDECIDED:
+        print(f"  [detector] article_to_clause could not classify "
+              f"{len(ARTICLE_UNDECIDED)} reference(s) and LEFT THEM AS "
+              f"'Article' — B2: the sentence after the number carries no "
+              f"decisive token, and guessing 'internal' once rewrote a "
+              f"statutory citation into a clause that does not exist.")
 
     if fix and total > 0:
         tree.write(xml_path, xml_declaration=True, encoding='UTF-8',

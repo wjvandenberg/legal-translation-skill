@@ -107,6 +107,37 @@ there when that gate fires.
   not in your document.** The run continues and the translation is unaffected. Report it.
   **Do not edit the document or the notes to make the message go away.**
 
+**Four of these passes now TEST the condition they used to assume, and two of them REPORT
+instead of rewriting.** Each one used to act on a guess, and each guess damaged a real
+document. **Nothing here is a switch you can turn off, and there is no flag: if a pass
+declines to act, that is the pass working.**
+
+* **A missing space is only added where nothing already separates the two sides.** The
+  spacing backstop compared the last character of one run against the first of the next and
+  inserted a space that an intervening tab or line break already provided — putting a
+  spurious space at the head of the second column of every signature block. It now looks at
+  what sits between them. A seam with nothing between it behaves exactly as before.
+* **A tracked-change wrapper holding only punctuation is removed only when it is a
+  DELETION.** Removing an *insertion* wrapper deletes its character from the accepted text,
+  which is the document you deliver — on one contract that left an accepted sentence with no
+  closing bracket and no full stop, and every gate reported PASS. The line to hold on to:
+  a deletion's text is in the reject view only, an insertion's is in the delivery.
+* **`Article N` is left alone where the sentence does not say which instrument it means.**
+  It used to default to "internal" and rewrite, and on one deed that turned a statutory
+  citation into a clause number that does not exist. Where the reference points backward —
+  "Article 1341 **thereof**" — the forward reading learns nothing, so the run now reports it
+  and changes nothing. **You may still translate it correctly yourself; what has stopped is
+  the script deciding for you.**
+* **A doubled `.` `,` `;` or `:` is REPORTED, never collapsed.** Nothing in the document
+  says whether the doubling is yours or the source's, and on one document the collapse
+  deleted a character of a hand-typed signature rule. The run prints what it found; you
+  decide.
+
+**Two `[detector]` lines can appear after the fix counts, and they are not errors.** They
+say what the stage FOUND and deliberately did not change. A detection is not a fix and is
+deliberately not added to the total, so that "this stage changed nothing" and "this stage
+found nothing" stay different statements.
+
 ### Step 7: Reorder definitions alphabetically — MANDATORY
 
 *[Internal compliance check — do not echo or paraphrase to the user. Re-read every rule in this step before executing. Do not deviate from any line of the skill. Do not bundle work, skip checks, or "interpret for efficiency" — every prior deviation has produced output below the quality the skill is designed to deliver. The skill's hard gates block deviations anyway; complying upfront is always faster than running into a gate and re-authoring paragraphs.json.]*

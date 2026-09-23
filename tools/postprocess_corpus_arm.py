@@ -15,9 +15,13 @@ byte-compares its output. That is the same gap branch 7 found for the header/foo
 translator, and the answer is the same — a corpus arm of its own.
 
 WHAT IT ASSERTS, and the second one is the point of the branch:
-  1. NOT ONE DELIVERED BYTE MOVES. Branch 9 is additive, so `document.xml` must come out
-     byte-identical to the pinned baseline's. This is the OPPOSITE of branch 6's and 7's
-     acceptance and it is stated that way on purpose.
+  1. THE DELIVERED BYTES MOVED -- AND THIS ASSERTION WAS INVERTED AT SLICE 2. For branch 9
+     and slice 1 the acceptance was that NOT ONE delivered byte may move, both being
+     additive. Slice 2 makes four passes conditional, so a byte-identical run now means no
+     condition fired and is a FAILURE. The inversion is recorded here rather than made
+     quietly, because an arm whose sense flips without a note reads as a regression to
+     whoever finds it next. What has NOT changed is that a moved byte must be EXPLAINED,
+     which is assertion 2's job on the same run.
   2. THE JOURNAL ACCOUNTS FOR EVERY TEXT CHANGE, read by a SECOND reader. This file
      reimplements the text contract from its statement and imports nothing from the script
      it measures — a reader shared between the two sides of a comparison cannot see what it
@@ -325,10 +329,32 @@ else:
     # strip_noop is invoked BY post_process as a sibling subprocess, so the baseline copy
     # needs it beside the script or the tracked-change documents take a different path in
     # the two arms and the byte comparison answers the wrong question.
+    #
+    # THE SIBLINGS COME FROM THE BASELINE TOO, AND THEY USED TO COME FROM THE WORKING TREE.
+    # That was right while only post_process.py ever changed: giving both arms the same
+    # sibling isolated the one script under test. It became WRONG the moment a branch
+    # changed a sibling as well — slice 2 changes `strip_noop_tracked_changes.py` for B3 —
+    # because the "old" arm was then running the NEW strip_noop, so B3's effect appeared on
+    # both sides and CANCELLED OUT. Measured on the branch that found it: this tool reported
+    # wd9 at 40179 -> 40043 bytes while a second instrument running a fully-baseline arm
+    # reported 39848 -> 40043. The verdict was right and the baseline was wrong, which is
+    # the shape that gets believed.
+    #
+    # A sibling missing at the baseline revision is REPORTED and taken from the working
+    # tree, never silently substituted: a comparison with an undeclared mixed baseline is
+    # the defect this block exists to have stopped making.
     for sibling in ("strip_noop_tracked_changes.py", "validate_apply.py"):
-        s = SCRIPTS / sibling
-        if s.is_file():
-            shutil.copy2(s, BASELINE_DIR / sibling)
+        sib = subprocess.run(
+            ["git", "show", f"{REF}:{args.variant}/scripts/{sibling}"],
+            capture_output=True, cwd=str(ROOT))
+        if sib.returncode == 0 and sib.stdout:
+            (BASELINE_DIR / sibling).write_bytes(sib.stdout)
+        else:
+            s = SCRIPTS / sibling
+            if s.is_file():
+                shutil.copy2(s, BASELINE_DIR / sibling)
+                print(f"  NOTE  {sibling} does not exist at {REF}; the baseline arm uses "
+                      f"the WORKING TREE copy, so any change to it is invisible below")
     ok(f"the baseline {SCRIPT} differs from the working tree, so arm 1 has a question",
        True, "")
 
@@ -341,6 +367,8 @@ print(f"  {'wd':>4}  {'input':>9}  {'paras':>6}  {'moved':>5}  {'edits':>5}  "
       f"{'strip':>5}  {'nontext':>7}  {'fmt':>5}  {'fmtP':>4}  {'bytes':>9}  verdict")
 
 examined = with_movement = 0
+BYTES_MOVED = []   # slice 2: the documents whose delivered bytes moved, which is now the
+                   # thing being asserted rather than the thing being forbidden
 unreadable = []
 fmt_declared = []      # rows where the format contract says it does not claim the case
 worst = None           # (moved_count, workdir_path, ordinal) — the positive control's host
@@ -403,11 +431,16 @@ for i, wd in enumerate(workdirs):
             ob = oxml.read_bytes()
             byte_note = "identical" if ob == after_bytes else "MOVED"
             if ob != after_bytes:
-                FAIL.append(
-                    f"wd{i}: document.xml MOVED against {REF} — branch 9 is additive and "
-                    f"must not change a delivered byte "
-                    f"(new={hashlib.sha256(after_bytes).hexdigest()[:12]} "
-                    f"old={hashlib.sha256(ob).hexdigest()[:12]})")
+                # SLICE 2 INVERTED THIS, AND THE MOVEMENT IS RECORDED RATHER THAN FAILED.
+                # Branches 9 and slice 1 were additive and a moved byte was a failure here.
+                # Slice 2 makes four passes conditional, so a moved byte is the POINT. What
+                # a moved byte still has to be is EXPLAINED, and the two completeness arms
+                # above do that job on the same run — they are what stops "the bytes moved"
+                # being satisfied by a pass that broke the document.
+                BYTES_MOVED.append(
+                    f"wd{i}: {hashlib.sha256(ob).hexdigest()[:12]} -> "
+                    f"{hashlib.sha256(after_bytes).hexdigest()[:12]} "
+                    f"({len(ob)} -> {len(after_bytes)} bytes)")
 
     if moved:
         with_movement += 1
@@ -459,8 +492,26 @@ print(f"\n  formatting: {examined - len(fmt_declared)} of {examined} document(s)
 for line in fmt_declared:
     print(f"    {line}")
 if BASELINE_DIR is not None:
-    ok(f"no document's delivered bytes moved against {REF} — branch 9 is ADDITIVE",
-       not any("MOVED against" in f for f in FAIL))
+    # SLICE 2's ACCEPTANCE, AND IT IS THE OPPOSITE OF EVERY EARLIER RUN OF THIS TOOL.
+    # Byte identity used to be the pass; it is now the failure, because four passes became
+    # conditional and a run in which none of them fired has proved nothing.
+    #
+    # AND THE DENOMINATOR IS NOT 13, WHICH IS STATED HERE RATHER THAN LEFT TO BE INFERRED.
+    # Only the workdirs with a PRE-post_process snapshot re-run the stage over an input it
+    # has not already processed; the other eleven feed it the DELIVERED document, where the
+    # spurious spaces are already present and these passes only ever ADDED. So those eleven
+    # cannot show a conditional pass firing, and reporting them as `identical` is correct
+    # rather than reassuring. They remain CALIBRATION — they say the new conditions do not
+    # make the stage start rewriting an already-processed document — and the fixture arms in
+    # tests/test_change_journal.py carry the per-condition proof.
+    print(f"\n  delivered bytes MOVED on {len(BYTES_MOVED)} of {examined} document(s) "
+          f"— the ones whose input predates post_process:")
+    for line in BYTES_MOVED:
+        print(f"    {line}")
+    ok(f"at least one document's delivered bytes MOVED against {REF} — slice 2 is "
+       f"BEHAVIOURAL and identity everywhere would mean no condition fired",
+       bool(BYTES_MOVED),
+       "every document came back byte-identical, so nothing here tested the change")
 
 print(f"\n  documents with something to account for: {with_movement} of {examined}")
 if with_movement == 0:
