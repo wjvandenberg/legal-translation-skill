@@ -843,6 +843,33 @@ number, one of them saying the opposite of the other. Deleted.)*
 > with nothing to rewrite becomes a detector and feeds the checking work — it is not deleted.
 
 
+> **SLICE 2's SHAPE CHANGED ON EXPLORATION, 2026-09-23, AND BOTH CORRECTIONS ARE RECORDED RATHER THAN
+> APPLIED QUIETLY.** The four slices were cut by *what each pass must READ*. Reading the rows against the
+> code moved two things.
+>
+> **(a) B8 IS NOT A no-new-input PASS AND MOVES TO SLICE 3.** Its condition is *"is this character mine or
+> the source's?"*, and `fix_double_punctuation` cannot answer that from the document — the doubling it
+> collapses is pre-existing, so nothing in `document.xml` says who wrote it. It needs the DECLARED NOTES,
+> which is slice 3's defining input. *(The alternative — make it a pure DETECTOR under 2c's
+> report-and-change-nothing limb, which needs no input at all — is a real option and is Wouter's, not a
+> session's: it stops a LOW-severity loss of one decorative character on every document.)*
+>
+> **(b) B4's "two-line change" IS NOT TWO LINES, AND THE REASON IS A COUPLING THE ROW DOES NOT MENTION.**
+> The fix itself is small: `fix_spacing` compares the last character of one text element with the first of
+> the next and inserts a separator the intervening element already provides, so the condition to test is
+> whether a RENDERED separator sits between them. Two things make it bigger. **First, a `w:tab` inside
+> `pPr/tabs` is a tab STOP and carries the same tag name as a rendered tab**, so the test must exclude it or
+> it will skip seams that should fire. **Second, and this is the one that costs: `validate_apply.py` in BOTH
+> trees SIMULATES this pass** — it calls `will_fix_spacing_fire` over `en_segments` to keep the declared and
+> applied sides tokenising identically across the post-strip drift gate. **Measured: `en_segments` carry only
+> `type` and `en` and hold no structural information at all**, so the simulation cannot know a tab
+> intervenes. Change the pass without the simulation and the gate gains a FALSE POSITIVE on exactly the seams
+> B4 is about — the same shape as G9's alpha-collision half, which is recorded UNFIXABLE by scoping for this
+> identical reason. **So slice 2 touches four files across two trees, not one**, and the honest options are to
+> teach the segments the structure, or to let `validate_apply` read the change journal instead of simulating
+> — **which is branch 11's stated work**, and would make branch 11 a dependency of slice 2 rather than the
+> other way round. **That ordering question is Wouter's and is open.**
+
 **Wouter's verdict, in his words:** *"go, revised 2c."* Reached after he challenged the word *optional*.
 
 **Decision 2 is answered as 2c REVISED, and the revision is the substance:** every pass tests the condition
