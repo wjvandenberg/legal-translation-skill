@@ -60,35 +60,34 @@ SCRIPT = "apply_translations_textmatch.py"
 
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. CLAUDE.md 5.3: a before-and-after check
 #
-# MOVED TO d3efa24 ON 2026-09-23, the squash-merge of branch 10 slice 3a -- the italic strip
-# made conditional on what the operator DECLARED (PR #100) -- and the LAST COMMIT THAT
+# MOVED TO 6d8bbab ON 2026-09-23, the squash-merge of branch 10 slice 3b -- a mandatory rewrite
+# no longer overrules a rendering the LEXICON sanctions (PR #103) -- and the LAST COMMIT THAT
 # TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE: `git log --oneline -1 -- uk
 # us` returns it. A pin left at the previous baseline reports the merged branch's own work as
 # movement belonging to whatever branch runs next, and the branch that inherits it cannot
 # tell.
 #
-# AND AT THIS PIN THE SELF-COMPARISON NOTICE IS EXPECTED TO BE PRESENT, STILL. Slice
-# 3a changed post_process.py, which this tool does not drive -- it swaps the APPLY
-# script. So both arms carry identical code BY DESIGN and an all-quiet run is correct
-# rather than evidence, which is exactly what a STALE pin also produces and is why the
-# notice is printed rather than left to be inferred. The .pyc slice remains the last run
-# where this tool's reading actually moved.
+# AND AT THIS PIN THE SELF-COMPARISON NOTICE IS EXPECTED TO BE PRESENT, STILL. Slices
+# 3a and 3b changed post_process.py and translate_numbering.py, neither of which this
+# tool drives -- it swaps the APPLY script. So both arms carry identical code BY DESIGN
+# and an all-quiet run is correct rather than evidence, which is exactly what a STALE pin
+# also produces and is why the notice is printed rather than left to be inferred.
 #
 # THE CARRIERS ARE ENUMERATED, NEVER COUNTED FROM MEMORY. `git grep -F <old sha>` found
-# THREE at this close, as it did at slice 1's and slice 2's, and FOUR at branch 9's -- where
-# the session writing them had just said three. A phrase naming a count is wrong the moment
-# the thing it counts changes. The instruction is still not "move them all":
+# THREE PINS at this close, as at slice 3a's, and more MENTIONS than that -- the charter, the
+# plan and one suite's comment name the old sha as history, and a close that "moves every
+# match" would have rewritten the record. The instruction is still not "move them all":
 # tools/hf_corpus_diff.py is FIXED at ae48f6d and three suites at 2178cce, each for a reason
-# in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it moves in the
-# commit that moves the BYTES, never at a close, and slice 3a deliberately left it at
-# 5107aaf because a combined slice-2-plus-3a movement is still a movement its journal claims.
+# in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it stays at
+# 5107aaf, a decision RE-TAKEN at slice 3b and recorded in its own block rather than here.
 #
 # THIS BLOCK IS REWRITTEN ON EVERY MOVE RATHER THAN APPENDED TO, because it has gone stale
-# twice and been caught twice -- once naming a commit as "the merge-base of this branch" long
-# after it was not, and once reading "Moved to 049484e" five lines above a pin that said
-# 2a71e71. NOTHING CHECKS A COMMENT, so a stale one is indistinguishable from a current one.
-# Re-derive every claim in it on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "d3efa24")
+# before and been caught -- once naming a commit as "the merge-base of this branch" long after
+# it was not, once reading "Moved to 049484e" five lines above a pin that said 2a71e71, and at
+# slice 3a claiming that arm 0 "reports VOID" where the code beside it prints a NOTICE.
+# NOTHING CHECKS A COMMENT, so a stale one is indistinguishable from a current one. Re-derive
+# every claim in it on the commit that moves the pin.
+REF = os.environ.get("LT_BASELINE_REF", "6d8bbab")
 
 # WHICH DIRECTIONAL CHECK BELONGS TO WHICH MERGED FIX — added 2026-09-08, on a measured false
 # alarm that would have recurred for ever.
@@ -124,8 +123,13 @@ FIX_LANDED = {
     # has a premise B1's merge could kill. Adding a row would install a suppression for a
     # check that does not exist, which is its own small defect.
     # What DOES watch B1 is tools/postprocess_corpus_arm.py, and its equivalent guard is arm
-    # 0: it reports VOID rather than passing once the baseline stops differing from the
-    # working tree.
+    # 0: it prints its self-comparison notice and omits the byte column, rather than
+    # passing, once the baseline stops differing from the working tree.
+    # B5, B6, F29, B9 AND F45 ARE NOT HERE EITHER, BY THE SAME TEST, RE-ASKED AT SLICE 3b
+    # RATHER THAN INHERITED: 3b changed post_process.py and translate_numbering.py, this map's
+    # two consumers are both about APPLY, and so no directional check here has a premise the
+    # merge could kill. The instruments that watch 3b -- the corpus arm and
+    # tests/test_lexicon_choice.py -- carry their own guards.
 }
 
 

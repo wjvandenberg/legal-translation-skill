@@ -71,39 +71,39 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 SCRIPT = "apply_translations_textmatch.py"
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.3.
 #
-# MOVED TO d3efa24 ON 2026-09-23, the squash-merge of branch 10 slice 3a -- the italic strip
-# made conditional on what the operator DECLARED (PR #100) -- and the LAST COMMIT THAT
+# MOVED TO 6d8bbab ON 2026-09-23, the squash-merge of branch 10 slice 3b -- a mandatory rewrite
+# no longer overrules a rendering the LEXICON sanctions (PR #103) -- and the LAST COMMIT THAT
 # TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE: `git log --oneline -1 -- uk
 # us` returns it. A pin left at the previous baseline reports the merged branch's own work as
 # movement belonging to whatever branch runs next, and the branch that inherits it cannot
 # tell.
 #
 # AND SINCE SLICE 3a THE FIXTURE PATH CAN DRIVE post_process DIRECTLY, via
-# --post-process, which is what discharged CLAUDE.md 5.2's rendered-diff gate for branch
-# 10 after two slices carried it open. In that mode the baseline arm swaps
-# post_process.py and its siblings rather than the apply script: swapping a script the
-# run never executes made both arms identical and reported the page UNCHANGED, which is
-# indistinguishable from a fix that worked. WHICH SCRIPT THE BASELINE SWAPS NOW FOLLOWS
-# WHICH SCRIPT THE RUN DRIVES.
+# --post-process. In that mode the baseline arm swaps post_process.py and its siblings
+# rather than the apply script: swapping a script the run never executes made both arms
+# identical and reported the page UNCHANGED, which is indistinguishable from a fix that
+# worked. WHICH SCRIPT THE BASELINE SWAPS FOLLOWS WHICH SCRIPT THE RUN DRIVES.
 #
-# For the DEFAULT fixture path the all-quiet notice is still expected at this pin: slice
-# 3a touched post_process.py and not apply.
+# AT THIS PIN BOTH post_process FIXTURES READ THE SAME ON BOTH ARMS -- italic-declared
+# and lexicon-choice alike -- because 3a's and 3b's code is now the baseline. That is
+# correct, not a regression. For the DEFAULT fixture path the all-quiet notice is
+# still expected: slice 3b touched post_process.py and translate_numbering.py, not apply.
 #
 # THE CARRIERS ARE ENUMERATED, NEVER COUNTED FROM MEMORY. `git grep -F <old sha>` found
-# THREE at this close, as it did at slice 1's and slice 2's, and FOUR at branch 9's -- where
-# the session writing them had just said three. A phrase naming a count is wrong the moment
-# the thing it counts changes. The instruction is still not "move them all":
+# THREE PINS at this close, as at slice 3a's, and more MENTIONS than that -- the charter, the
+# plan and one suite's comment name the old sha as history, and a close that "moves every
+# match" would have rewritten the record. The instruction is still not "move them all":
 # tools/hf_corpus_diff.py is FIXED at ae48f6d and three suites at 2178cce, each for a reason
-# in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it moves in the
-# commit that moves the BYTES, never at a close, and slice 3a deliberately left it at
-# 5107aaf because a combined slice-2-plus-3a movement is still a movement its journal claims.
+# in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it stays at
+# 5107aaf, a decision RE-TAKEN at slice 3b and recorded in its own block rather than here.
 #
 # THIS BLOCK IS REWRITTEN ON EVERY MOVE RATHER THAN APPENDED TO, because it has gone stale
-# twice and been caught twice -- once naming a commit as "the merge-base of this branch" long
-# after it was not, and once reading "Moved to 049484e" five lines above a pin that said
-# 2a71e71. NOTHING CHECKS A COMMENT, so a stale one is indistinguishable from a current one.
-# Re-derive every claim in it on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "d3efa24")
+# before and been caught -- once naming a commit as "the merge-base of this branch" long after
+# it was not, once reading "Moved to 049484e" five lines above a pin that said 2a71e71, and at
+# slice 3a claiming that arm 0 "reports VOID" where the code beside it prints a NOTICE.
+# NOTHING CHECKS A COMMENT, so a stale one is indistinguishable from a current one. Re-derive
+# every claim in it on the commit that moves the pin.
+REF = os.environ.get("LT_BASELINE_REF", "6d8bbab")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
 # Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
 # glance whether the pages in front of them belong to the run being discussed.
