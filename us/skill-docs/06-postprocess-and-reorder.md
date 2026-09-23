@@ -19,10 +19,16 @@ This applies automated quality fixes:
 - Missing spaces between elements
 - Definition boundary spacing ("Xmeans" → "X means")
 - Double punctuation (::, .., ,,, ;;)
-- Terminology standardization (Facility Agreement, Secured Assets, etc.)
+- Terminology standardization (Facility Agreement, Secured Assets, etc.) — **never
+  where a lexicon in this skill presents the string as correct**: a heading or term you
+  wrote because a lexicon told you to is left as you wrote it, and the run prints a
+  `[detector]` line naming it
 - Spelling fixes per the active variant (default: US — authorize, judgment, favor,
   center, organization, etc.)
-- Annex → Schedule
+- Annex / Schedule — **reported, never rewritten.** The lexicon offers "Schedule (UK) or
+  Annex (EU/international)" as a free choice matched to the source's convention, so the
+  label you wrote in `paragraphs.json` is the one delivered. Use one label throughout:
+  auto-numbered attachment headings follow it at Step 8a
 - Article → Section for internal cross-references (US default); → Clause under --variant uk
 - Duplicate word removal
 - Quote balancing on defined terms

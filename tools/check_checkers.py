@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """check_checkers.py - is this project's copy of each standard script current?
-CHECKER VERSION 16 (2026-09-22)
+CHECKER VERSION 17 (2026-09-23)
 
 Every project gets its OWN COPY of the standard scripts in its tools\\ folder. Copies drift:
 the shared one gets fixed and yours does not hear about it, or yours gets edited and the fix
@@ -171,10 +171,16 @@ if hasattr(sys.stdout, "reconfigure"):
 # it in, and the accepted cost of an unreported drift ("tolerable for an instrument a person
 # reads, NOT FOR A CHECKER THAT GATES") does not apply. It is also the entry whose drift
 # matters most: a confidentiality scanner that has silently fallen behind reports CLEAN.
+# purpose_guard.py JOINS ON THAT SAME SENTENCE, 2026-09-23 - twelve days late, and found by a
+# project installing it rather than by this list. It GATES harder than any checker here: as a
+# PreToolUse hook it REFUSES an edit outright, exit 2. Its v2 fixed a real hole (gap 87 - every
+# session after a day's first inherited the first one's line), and a project on v1 kept that hole
+# while this report printed nothing about it: a stale guard is the one drift that reads as a
+# working control. Its selftest and --probe run under run_tests, so the recorded test puts it in.
 TRACKED = ["house_common.py", "verify_md.py", "verify_code.py", "verify_deliverable.py",
            "verify_crossdoc.py", "verify_refs.py", "verify_expected.py",
            "verify_confidential.py", "cycle_evidence.py", "check_checkers.py",
-           "run_tests.py", "auto_mode.py", "auto_mode_guard.py"]
+           "run_tests.py", "auto_mode.py", "auto_mode_guard.py", "purpose_guard.py"]
 
 
 def default_shared() -> Path:

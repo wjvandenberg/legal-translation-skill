@@ -3,7 +3,7 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 34,
+ "count": 36,
  "divergences": {
   "uk/SKILL.md": {
    "changed_by": "feature/checks-can-fail",
@@ -21,9 +21,9 @@
    "sha256_now": "91f49df10cb0a69a04f806433720cc3fc0df6ff687d151ce285045d137104583"
   },
   "uk/scripts/post_process.py": {
-   "changed_by": "feature/branch10-slice3a-italic-declared",
-   "commit_subject": "Branch 10 slice 3a - the italic strip made conditional on what the operator declared (B1)",
-   "sha256_now": "b66fa45a4f14dc37c6e4e35713a4db7d92f3ecb67a611321492b3dacb7636269"
+   "changed_by": "feature/branch10-slice3b-lexicon-choice",
+   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
+   "sha256_now": "d6c2bd47758668866c89204e6f33f87c7569ff9a20f4cd554df0eec57375e191"
   },
   "uk/scripts/quality_check.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -44,6 +44,11 @@
    "changed_by": "feature/branch7-slice3-a19",
    "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
    "sha256_now": "b2430a50710643006d30aa2af68fbe834fb759e10d125972297bdc0b3f2dc8e8"
+  },
+  "uk/scripts/translate_numbering.py": {
+   "changed_by": "feature/branch10-slice3b-lexicon-choice",
+   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
+   "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "uk/scripts/validate_apply.py": {
    "changed_by": "feature/branch10-slice2-conditional-passes",
@@ -76,14 +81,14 @@
    "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
   },
   "uk/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "feature/branch10-slice2-conditional-passes",
-   "commit_subject": "Branch 10 slice 2 - the conditional passes: every pass tests the condition it assumes, and the validator reads the record instead of predicting it (B4, B3, B2, B8, C15)",
-   "sha256_now": "49b4c09a9b218848391148fa9ac4123dc4be773c5ebaaaae62254a9306400d74"
+   "changed_by": "feature/branch10-slice3b-lexicon-choice",
+   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
+   "sha256_now": "29cccd35a92542e03003ef6d1f345bbfadd0197c9e10be92019f23579b2b0a26"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch7-slice3-a19",
-   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
-   "sha256_now": "e888a814a3331965de35a08c54ca19a8ccf2aa2a4f6de137edafe189df6baf0c"
+   "changed_by": "feature/branch10-slice3b-lexicon-choice",
+   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
+   "sha256_now": "e44608dc3a9312c46e0e7778bd46c1ead679071aae0982b766ed9282b17a138c"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/branch7-glossary-route",
@@ -106,9 +111,9 @@
    "sha256_now": "0df16cb99fbc01cb25bbdbf2c52dfa7449869a9c0fd542248987e8f995909b74"
   },
   "us/scripts/post_process.py": {
-   "changed_by": "feature/branch10-slice3a-italic-declared",
-   "commit_subject": "Branch 10 slice 3a - the italic strip made conditional on what the operator declared (B1)",
-   "sha256_now": "70c953191d864da4cc4e9bc2202b85cae5353afb180ce66952b052324e2b3d3f"
+   "changed_by": "feature/branch10-slice3b-lexicon-choice",
+   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
+   "sha256_now": "7865518aa5c3db5fb2c517c6b04dc0cd59b1ff86f0ce0ad78a37335b1ab2a072"
   },
   "us/scripts/quality_check.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -129,6 +134,11 @@
    "changed_by": "feature/branch7-slice3-a19",
    "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
    "sha256_now": "3240155eff68d9f4d1a21f53f6966a121cd9adca68d7221b1a06eadb284a8ce4"
+  },
+  "us/scripts/translate_numbering.py": {
+   "changed_by": "feature/branch10-slice3b-lexicon-choice",
+   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
+   "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "us/scripts/validate_apply.py": {
    "changed_by": "feature/branch10-slice2-conditional-passes",
@@ -161,14 +171,14 @@
    "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
   },
   "us/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "feature/branch10-slice2-conditional-passes",
-   "commit_subject": "Branch 10 slice 2 - the conditional passes: every pass tests the condition it assumes, and the validator reads the record instead of predicting it (B4, B3, B2, B8, C15)",
-   "sha256_now": "1b447d3708bae41bf40c7f6fce0555006f02c1a604c0ef2529ce7eb53c361411"
+   "changed_by": "feature/branch10-slice3b-lexicon-choice",
+   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
+   "sha256_now": "43209e354c30a6cd0a0fc497ce3d743d9350ae003d1f6bdc7e41b1c32a5729b6"
   },
   "us/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch7-slice3-a19",
-   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
-   "sha256_now": "ce0966159057375e5171dd8415ca84923b697803527ee417ade0126830656ac3"
+   "changed_by": "feature/branch10-slice3b-lexicon-choice",
+   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
+   "sha256_now": "a2e07148c6e48ac889995b5e21df65157a07a15554c9eb7911430b6710375968"
   },
   "us/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/branch7-glossary-route",

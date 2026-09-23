@@ -142,6 +142,15 @@ SCRIPTS = ROOT / args.variant / "scripts"
 # asking a live question — did the conditional passes change what post_process writes? — and
 # would go red if slice 3 reverted them. Move it only when a later slice needs the comparison
 # to start from a tree that already has slice 2's conditions in it.
+#
+# RE-TAKEN AT SLICE 3b, 2026-09-23, AND LEFT AT 5107aaf FOR A REASON THAT IS NOT HABIT. This
+# slice changed paragraph 0 of the input, so the movement here is now slice 2's AND 3b's
+# together -- and the arm does not need to tell them apart, because it asserts only that the
+# bytes moved and the journal accounts for it, which holds against any earlier tree. 3b's own
+# isolation is proved where it is claimed: tests/test_lexicon_choice.py's behaviour arms,
+# proved RED against d3efa24 on both variants at the slice (PLAN-2-step-b.md section 3.8
+# records it). A pin moved to d3efa24 here would add nothing that suite does not already
+# assert, and would lose slice 2's coverage.
 REF = os.environ.get("LT_BASELINE_REF", "5107aaf")
 
 FAIL, CHECKED, VOIDED = [], 0, []
@@ -252,9 +261,17 @@ def doc(paragraphs):
             "</w:body></w:document>").encode("utf-8")
 
 
-# Paragraph 0 trips the Annex rewrite; 4 the spacing backstop across an element seam, which
-# is C15's own mechanism; 5 is the negative control INSIDE the document and no pass in either
-# variant may touch it.
+# Paragraph 0 trips the TERMINOLOGY rewrite; 4 the spacing backstop across an element seam,
+# which is C15's own mechanism; 5 is the negative control INSIDE the document and no pass in
+# either variant may touch it.
+#
+# PARAGRAPH 0 USED TO TRIP THE ANNEX REWRITE, AND SINCE SLICE 3b THAT PASS REWRITES NOTHING.
+# The lexicon offers Annex as a free choice, so `annex_to_schedule` is a detector and the
+# input would have tripped two rewriting passes where arm 2 asks for three. The paragraph
+# keeps its `Annex 1` -- now a string that must SURVIVE, which arm 8 asserts -- and gains a
+# `Financing Agreement`, which no lexicon sanctions and the terminology pass still rewrites.
+# Changing the input rather than lowering arm 2's threshold is deliberate: a count lowered to
+# meet the code is a count that stopped measuring anything.
 #
 # PARAGRAPH 3 USED TO TRIP THE DOUBLE-PUNCTUATION COLLAPSE AND NOW TRIPS ITS DETECTOR.
 # Since B8 the pass reports `Definitions::` and changes nothing, so this input trips THREE
@@ -269,7 +286,7 @@ def doc(paragraphs):
 # under uk only and paragraph 2 under us only, so the count is four either way.
 CONTROL_PARA = 5
 PASSES_DOC = doc([
-    [("t", "Annex 1 sets out the delivery milestones.")],
+    [("t", "Annex 1 to the Financing Agreement sets out the delivery milestones.")],
     [("t", "The steering committee shall authorize each drawdown.")],
     [("t", "The organisation shall recognise the transfer.")],
     [("t", "Definitions::")],
@@ -437,7 +454,8 @@ pass_stage = next((s for s in j1.get("stages", []) if s.get("stage") == "passes"
 ok("there is a `passes` stage", pass_stage is not None)
 edits = (pass_stage or {}).get("edits", [])
 # THREE, NOT FOUR, SINCE SLICE 2 — AND THE MISSING ONE IS THE POINT RATHER THAN A REGRESSION.
-# This input trips annex_to_schedule, a spelling pass, fix_spacing and, until B8,
+# This input trips terminology (annex_to_schedule until slice 3b), a spelling pass,
+# fix_spacing and, until B8,
 # fix_double_punctuation on `Definitions::`. That fourth pass is now a DETECTOR: it reports
 # the doubled colon and changes nothing, so it contributes no edit and must not. Arm 9 asserts
 # the other half — that the colon SURVIVED and was REPORTED — so the number below going from
@@ -639,6 +657,11 @@ if OPEN in uk_src and OPEN in us_src and CLOSE in uk_src and CLOSE in us_src:
 # journal is on disk despite the raise, (b) it NAMES the pass that moved the text, and (c)
 # the banner sends the operator to it. If the journal were written after the gate, or the
 # banner never mentioned it, the operator would be exactly where B6 left them.
+#
+# SINCE SLICE 3b THE PASS THAT FIRES THE GATE HERE IS NO LONGER THE ONE B6 NAMES. The Annex
+# rewrite is a detector now, so the text is moved by the terminology and spelling passes --
+# rewrites no lexicon sanctions, which the gate is RIGHT to stop. What this arm proves about
+# the diagnosis is unchanged; the two B6(a) limbs below prove the override itself is gone.
 # =========================================================================================
 print("\nARM 8 — B6: when the drift gate fires, is the right diagnosis available?")
 d5, x5 = stage("b6", PASSES_DOC)
@@ -666,6 +689,16 @@ else:
                     for e in st.get("edits", [])}
         ok("and it NAMES the pass that moved the text — the diagnosis B6 says is missing",
            bool(moved_by), f"passes named: {sorted(moved_by)}")
+        # B6's OTHER HALF, CLOSED AT SLICE 3b, AND ASSERTED ON THE SAME RUN. The gate still
+        # fires here -- the terminology and spelling passes legitimately rewrite declared
+        # text -- but the lexicon-sanctioned choice B6 is about is no longer among what
+        # moved. A run that shows the diagnosis while the override still happens would be
+        # half a fix reported as a whole one.
+        ok("B6(a): the Annex pass moved NOTHING, though the operator declared `Annex 1`",
+           "annex_to_schedule" not in moved_by, f"passes named: {sorted(moved_by)}")
+        ok("B6(a): and `Annex 1` is still in the document the gate complained about",
+           "Annex 1" in "".join(own_paragraph_texts(x5.read_bytes())),
+           "the lexicon-sanctioned label was rewritten")
         claimed5 = {r.get("para") for st in j5.get("stages", [])
                     for r in st.get("paragraphs", [])}
         ok("the paragraph the gate is complaining about is one the journal claims",

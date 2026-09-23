@@ -47,6 +47,7 @@ because a baseline the tool measuring it can modify is not a baseline.
 
     uv run --with lxml python tools/postprocess_corpus_arm.py
     uv run --with lxml python tools/postprocess_corpus_arm.py --variant us
+    uv run --with lxml python tools/postprocess_corpus_arm.py --from-apply   # 13 real inputs
 """
 import argparse
 import hashlib
@@ -117,6 +118,13 @@ PRE_SNAPSHOT_NAMES = (".pre-postprocess-document.xml", "doc_pre_postprocess.xml"
 ap = argparse.ArgumentParser()
 ap.add_argument("--variant", default="uk", choices=("uk", "us"))
 ap.add_argument("--limit", type=int, default=0, help="examine at most N workdirs")
+ap.add_argument("--from-apply", action="store_true",
+                help="BRANCH 10 SLICE 3b: for a workdir with no pre-post_process snapshot, "
+                     "REBUILD one by running the working tree's apply over the matched source "
+                     ".docx and the frozen notes, instead of feeding the stage its own "
+                     "delivered output. Without it 11 of the 13 inputs have already been "
+                     "through every pass and this tool cannot see a pass that stopped "
+                     "rewriting.")
 args = ap.parse_args()
 SCRIPTS = ROOT / args.variant / "scripts"
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
@@ -332,10 +340,117 @@ def gate_fired(result):
         (result.stderr or "") + (result.stdout or ""))
 
 
+# =========================================================================================
+# --from-apply: THE INPUT THIS TOOL WAS BLIND WITHOUT, ADDED AT BRANCH 10 SLICE 3b.
+#
+# Eleven of the thirteen workdirs kept no pre-post_process snapshot, so this tool fed the
+# stage the DELIVERED document -- already through every pass. That was right for branch 9
+# and slice 1, where the question was "does the journal account for what moved", and it is
+# BLIND to a pass that STOPS rewriting: the delivered document holds no Annex left to keep,
+# because the pass it is testing already turned every one into a Schedule. Measured before
+# this flag existed, a delivered input reads as a clean zero for every row slice 3b is about.
+#
+# So the genuine input is REBUILT: the WORKING TREE's apply over the matched source .docx and
+# the frozen notes. Apply is not under test here -- no slice of branch 10 touches it -- and
+# BOTH arms are handed the SAME rebuilt file, so whatever apply does it does identically to
+# each. The source is matched by MEASUREMENT (which candidate's paragraph text the notes'
+# `text` field reproduces), never by name, because the corpus filenames carry counterparty
+# names; the helpers below are the same method tools/apply_corpus_diff.py uses, restated
+# here rather than imported because that tool runs its whole comparison on import.
+# =========================================================================================
+APPLY = "apply_translations_textmatch.py"
+
+
+def _corpus_dirs():
+    out, cfg = [], ROOT / ".claude" / "evidence-dirs.local"
+    names = []
+    if cfg.is_file():
+        names += [ln.strip() for ln in cfg.read_text(encoding="utf-8", errors="replace")
+                  .splitlines() if ln.strip() and not ln.strip().startswith("#")]
+    if os.environ.get("LT_CORPUS_DIR"):
+        names.append(os.environ["LT_CORPUS_DIR"])
+    for name in names:
+        p = Path(name)
+        if not p.is_absolute():
+            p = (ROOT.parent / name).resolve()
+        if p.is_dir() and any(p.glob("*.docx")):
+            out.append(p)
+    return out
+
+
+_SRC_TEXTS = {}
+
+
+def _source_paragraphs(cand):
+    """Paragraph texts of a .docx, cached. Never returned to a printer."""
+    import zipfile
+    k = str(cand)
+    if k not in _SRC_TEXTS:
+        try:
+            with zipfile.ZipFile(cand) as z:
+                root = etree.fromstring(z.read("word/document.xml"))
+            texts = set()
+            for p in root.iter(f"{{{W}}}p"):
+                pieces = []
+                for el in p.iter():
+                    if el.tag == f"{{{W}}}t" and el.text:
+                        pieces.append(el.text)
+                    elif (el.tag == f"{{{W}}}br"
+                          and el.get(f"{{{W}}}type", "") != "page"):
+                        pieces.append("\n")
+                texts.add("".join(pieces).strip())
+            _SRC_TEXTS[k] = texts
+        except Exception:
+            _SRC_TEXTS[k] = None
+    return _SRC_TEXTS[k]
+
+
+def rebuild_from_apply(ordinal, wd, corpus):
+    """(path to a rebuilt pre-post_process document.xml, matched fraction) or (None, why)."""
+    try:
+        notes = json.loads((wd / "paragraphs.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return None, f"notes unreadable ({type(exc).__name__})"
+    wanted = {(e.get("text") or "").strip() for e in notes
+              if isinstance(e, dict) and (e.get("text") or "").strip()}
+    best, frac = None, 0.0
+    for group in [sorted(wd.glob("*.docx"))] + [sorted(d.glob("*.docx")) for d in corpus]:
+        for cand in group:
+            t = _source_paragraphs(cand)
+            if not t or not wanted:
+                continue
+            f = len(wanted & t) / len(wanted)
+            if f > frac:
+                best, frac = cand, f
+        if frac >= 0.9:
+            break
+    if best is None or frac < 0.5:
+        return None, f"no source matched (best {frac:.0%})"
+    a = TMP / f"apply{ordinal:02d}"
+    a.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(best, a / "src.docx")
+    for name in ("paragraphs.json", ".validate-state.json", "comments_translations.json",
+                 "headers_footers.json", "_boldmap.json"):
+        if (wd / name).is_file():
+            shutil.copyfile(wd / name, a / name)
+    r = subprocess.run(["uv", "run", "--with", "lxml", "python", str(SCRIPTS / APPLY),
+                        str(a / "src.docx"), str(a / "paragraphs.json"), str(a / "out.xml")],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       cwd=str(ROOT), env=ENV, timeout=1800)
+    if not (a / "out.xml").is_file():
+        return None, f"apply produced no output (rc={r.returncode})"
+    return a / "out.xml", frac
+
+
 print("=" * 96)
 print(f"BRANCH 9 CORPUS ARM — is the change journal complete on the real documents?  "
-      f"[{args.variant}]")
+      f"[{args.variant}]{'  --from-apply' if args.from_apply else ''}")
 print("=" * 96)
+CORPUS = _corpus_dirs() if args.from_apply else []
+if args.from_apply:
+    # SAY WHAT WAS SEARCHED WITHOUT SAYING WHERE: a reachable-corpus count of 0 is the
+    # difference between "eleven documents were rebuilt" and "eleven were never opened".
+    print(f"  --from-apply: corpus folder(s) reachable: {len(CORPUS)}")
 
 if not LOGS.is_dir():
     print("\n  VOID — the logs root is not present, so the real arm is unavailable in this")
@@ -424,6 +539,8 @@ BYTES_MOVED = []   # slice 2: the documents whose delivered bytes moved, which i
                    # thing being asserted rather than the thing being forbidden
 unreadable = []
 GATE_FIRED_ON = []     # rows where the post-strip drift gate fired; reported, not dropped
+GATE_FIRED_OLD = []    # the same, for the BASELINE arm -- measured, never asserted in prose
+INPUTS = {}            # ordinal -> the exact input both arms were given, for the premise test
 NO_NOTES_ON = []       # rows where the conditional pass never received a declaration
 fmt_declared = []      # rows where the format contract says it does not claim the case
 worst = None           # (moved_count, workdir_path, ordinal) — the positive control's host
@@ -435,6 +552,16 @@ for i, wd in enumerate(workdirs):
         pre = [c for c in wd.rglob("*.xml") if c.name in PRE_SNAPSHOT_NAMES]
     if pre:
         src, kind = pre[0], "pre-snap"
+    elif args.from_apply:
+        rebuilt, why = rebuild_from_apply(i, wd, CORPUS)
+        if rebuilt is None:
+            # REPORTED, NEVER SILENTLY FALLEN BACK TO THE DELIVERED DOCUMENT: a mixed input
+            # population is the defect this flag exists to remove.
+            unreadable.append(i)
+            print(f"  {i:>4}  {'—':>9}  --from-apply could not rebuild it: {why} — "
+                  f"NOT EXAMINED")
+            continue
+        src, kind = rebuilt, "apply"
     elif delivered.is_file():
         src, kind = delivered, "delivered"
     else:
@@ -451,6 +578,7 @@ for i, wd in enumerate(workdirs):
         print(f"  {i:>4}  {kind:>9}  unreadable ({type(exc).__name__}) — NOT EXAMINED")
         continue
 
+    INPUTS[i] = src
     work, xml = stage_input(i, src, "new", notes_src=wd / "paragraphs.json")
     r = run_post_process(SCRIPTS, xml)
     if r.returncode != 0 and not gate_fired(r):
@@ -491,6 +619,8 @@ for i, wd in enumerate(workdirs):
         # two runs incomparable — and this tool has already shipped that defect once.
         owork, oxml = stage_input(i, src, "old", notes_src=wd / "paragraphs.json")
         ro = run_post_process(BASELINE_DIR, oxml)
+        if gate_fired(ro):
+            GATE_FIRED_OLD.append(i)
         if ro.returncode != 0 and not gate_fired(ro):
             byte_note = f"old rc{ro.returncode}"
         else:
@@ -503,10 +633,24 @@ for i, wd in enumerate(workdirs):
                 # a moved byte still has to be is EXPLAINED, and the two completeness arms
                 # above do that job on the same run — they are what stops "the bytes moved"
                 # being satisfied by a pass that broke the document.
+                # WHICH PASSES MOVED IT, from the two arms' OWN journals -- pass names and
+                # counts only. A moved byte with no pass beside it is a movement somebody
+                # has to explain by reading a diff, which is the step this avoids.
+                deltas = ""
+                ojp = owork / JOURNAL_NAME
+                if ojp.is_file():
+                    oj = json.loads(ojp.read_text(encoding="utf-8"))
+                    oc = {c["pass"]: c["fixes"] for s in oj.get("stages", [])
+                          if s.get("stage") == "passes" for c in s.get("counts", [])}
+                    nc = {c["pass"]: c["fixes"] for c in st.get("counts", [])}
+                    deltas = ", ".join(f"{p} {oc.get(p, 0)}->{nc.get(p, 0)}"
+                                       for p in sorted(set(oc) | set(nc))
+                                       if oc.get(p, 0) != nc.get(p, 0))
                 BYTES_MOVED.append(
                     f"wd{i}: {hashlib.sha256(ob).hexdigest()[:12]} -> "
                     f"{hashlib.sha256(after_bytes).hexdigest()[:12]} "
-                    f"({len(ob)} -> {len(after_bytes)} bytes)")
+                    f"({len(ob)} -> {len(after_bytes)} bytes)"
+                    f"{'  passes: ' + deltas if deltas else '  passes: none changed count'}")
 
     if moved:
         with_movement += 1
@@ -556,10 +700,75 @@ ok("every enumerated workdir was examined or REPORTED as not examined",
 # so the presence of that phrase is the proof the notes did NOT arrive. It is asserted on
 # the RUN OUTPUT rather than on the staging code, because staging a file and the pass
 # reading it are two different claims and only the second one matters.
+# "INHERITED" USED TO BE PRINTED HERE AS A FACT, AND NOTHING CHECKED IT. It was true when
+# written and a slice that changes which documents the gate fires on -- 3b's whole premise is
+# a pass that stops provoking it -- would have left the sentence standing over a different
+# population. So the baseline arm's firings are now MEASURED, and the word is earned or not.
 print(f"\n  post-strip drift gate fired on {len(GATE_FIRED_ON)} of {examined} "
-      f"document(s) — INHERITED, it fires identically at {REF}; the journal is written "
-      f"before the gate, so the rows above are complete:")
-print(f"    {sorted(GATE_FIRED_ON) if GATE_FIRED_ON else 'none'}")
+      f"document(s); the journal is written before the gate, so the rows above are "
+      f"complete either way:")
+print(f"    working tree: {sorted(GATE_FIRED_ON) if GATE_FIRED_ON else 'none'}")
+if BASELINE_DIR is not None:
+    same = sorted(GATE_FIRED_ON) == sorted(GATE_FIRED_OLD)
+    print(f"    at {REF}:     {sorted(GATE_FIRED_OLD) if GATE_FIRED_OLD else 'none'}  — "
+          + ("IDENTICAL, so every firing is INHERITED" if same else
+             "DIFFERENT: stopped firing on "
+             f"{sorted(set(GATE_FIRED_OLD) - set(GATE_FIRED_ON)) or 'none'}, started on "
+             f"{sorted(set(GATE_FIRED_ON) - set(GATE_FIRED_OLD)) or 'none'}"))
+    # THE PREMISE IS TESTED PER DOCUMENT, NOT ASSUMED, AND IT FAILED ON ITS FIRST RUN. "A pass
+    # that begins provoking the gate has broken the agreement between document and notes"
+    # assumes the INPUT agreed with its notes. Slice 3b's first run found a document where it
+    # did not: a pre-post_process snapshot taken BEFORE the operator edited the notes to suit
+    # the old rewrite, so the snapshot carries the lexicon's string and the notes the
+    # script's. The old arm "agreed" only because its rewrite coincided with notes edited to
+    # match it. So a document that STARTS firing is run through the real validator AS IT WAS
+    # BEFORE THE STAGE: if that input already disagreed with its notes, the firing is the gate
+    # reporting a disagreement the stage did not create, and it is EXPLAINED and printed; if
+    # the input agreed, the stage broke it, and that is a FAILURE. Nothing goes quiet.
+    def input_rc(k):
+        """validate_apply --strict over wd k's input AS IT WAS BEFORE THE STAGE. Exit code
+        only: its output quotes document text and is never printed."""
+        w = TMP / f"premise{k:02d}"
+        w.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(INPUTS[k], w / "document.xml")
+        shutil.copy2(workdirs[k] / "paragraphs.json", w / "paragraphs.json")
+        return subprocess.run(["uv", "run", "--with", "lxml", "python",
+                               str(SCRIPTS / "validate_apply.py"), str(w / "paragraphs.json"),
+                               str(w / "document.xml"), "--strict"],
+                              capture_output=True, text=True, encoding="utf-8",
+                              errors="replace", cwd=str(ROOT), env=ENV,
+                              timeout=900).returncode
+
+    started = sorted(set(GATE_FIRED_ON) - set(GATE_FIRED_OLD))
+    broke = []
+    if started:
+        # THE PREMISE TEST MUST BE ABLE TO SAY "AGREED", or the EXPLAINED branch below would
+        # absorb every firing, a real breakage included. Proved on a document the gate never
+        # fired on: its input must pass the same validator.
+        quiet = [k for k in sorted(INPUTS) if k not in GATE_FIRED_ON and k not in GATE_FIRED_OLD]
+        ctl_k = next((k for k in quiet if input_rc(k) == 0), None)
+        if ctl_k is None:
+            void("premise control", "no quiet document's input passed validate_apply --strict, "
+                                    "so the premise test is not shown able to say 'agreed'")
+        else:
+            ok(f"CONTROL: the premise test CAN report an input that agreed (wd{ctl_k}, rc=0)",
+               True)
+    for k in started:
+        rc_k = input_rc(k)
+        if rc_k == 0:
+            broke.append(k)
+            print(f"    wd{k}: its INPUT agreed with its notes before the stage "
+                  f"(validate_apply --strict rc=0), so the stage broke the agreement")
+        else:
+            print(f"    wd{k}: EXPLAINED — its INPUT already disagreed with its own notes "
+                  f"before the stage ran (validate_apply --strict rc={rc_k}); the "
+                  f"baseline's silence was its rewrite coinciding with notes edited to suit it")
+    ok("no document STARTED firing the drift gate against the baseline unless its INPUT "
+       "already disagreed with its own notes — measured per document by the real validator",
+       not broke, f"the stage broke the agreement on wd{broke}")
+else:
+    print(f"    at {REF}: NOT MEASURED — arm 0 found no baseline to run, so whether these "
+          f"firings are inherited is not known from this run")
 ok("no document reached the conditional italic pass without its declared notes",
    not NO_NOTES_ON,
    f"the pass reported 'no notes' on wd{NO_NOTES_ON} — the notes were not staged, so "
@@ -585,8 +794,10 @@ if BASELINE_DIR is not None:
     # rather than reassuring. They remain CALIBRATION — they say the new conditions do not
     # make the stage start rewriting an already-processed document — and the fixture arms in
     # tests/test_change_journal.py carry the per-condition proof.
-    print(f"\n  delivered bytes MOVED on {len(BYTES_MOVED)} of {examined} document(s) "
-          f"— the ones whose input predates post_process:")
+    print(f"\n  delivered bytes MOVED on {len(BYTES_MOVED)} of {examined} document(s)"
+          + (" — every input here predates post_process, rebuilt by apply where no "
+             "snapshot was kept:" if args.from_apply
+             else " — the ones whose input predates post_process:"))
     for line in BYTES_MOVED:
         print(f"    {line}")
     ok(f"at least one document's delivered bytes MOVED against {REF} — slice 2 is "

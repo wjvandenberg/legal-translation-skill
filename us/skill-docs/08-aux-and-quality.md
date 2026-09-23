@@ -43,6 +43,13 @@ The script auto-detects the source language from the format strings and applies 
 built-in translation map (Hungarian, Italian, German, French, Spanish, Portuguese,
 Dutch, Polish, Finnish). Pass `--language` if auto-detect fails.
 
+**An attachment label follows YOUR declared English.** The script reads
+`<workdir>/paragraphs.json` and writes `Annex %1` when your text labels attachments
+"Annex" and never "Schedule", and `Schedule %1` otherwise — so an auto-numbered heading
+agrees with the cross-references you wrote. It prints which it chose and why; a `MIXED`
+line means your text uses both labels, and the fix is in `paragraphs.json`, not here. A
+`--custom` map entry for the same pattern still wins.
+
 **Do not skip.** Mixed-language numbering ("1. sz. Melléklet" instead of "Schedule 1")
 is immediately visible. If the script reports "No word/numbering.xml found" or "No
 translatable format strings found", the document doesn't need this — exit cleanly.

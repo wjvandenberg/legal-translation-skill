@@ -1,0 +1,121 @@
+[
+  {
+    "idx": 0,
+    "text": "KEPT — The milestones are set out in Annex 1 and Annex 2.",
+    "en": "KEPT — The milestones are set out in Annex 1 and Annex 2.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 57,
+        "text": "KEPT — The milestones are set out in Annex 1 and Annex 2.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 1,
+    "text": "KEPT — BANKING TRANSPARENCY",
+    "en": "KEPT — BANKING TRANSPARENCY",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 27,
+        "text": "KEPT — BANKING TRANSPARENCY",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 2,
+    "text": "KEPT — The registration and publicity formalities are complete.",
+    "en": "KEPT — The registration and publicity formalities are complete.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 63,
+        "text": "KEPT — The registration and publicity formalities are complete.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 3,
+    "text": "KEPT — Interest accrues at the Secured Overnight Financing Rate plus the margin.",
+    "en": "KEPT — Interest accrues at the Secured Overnight Financing Rate plus the margin.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 49,
+        "text": "KEPT — Interest accrues at the Secured Overnight ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 49,
+        "end": 80,
+        "text": "Financing Rate plus the margin.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 4,
+    "text": "KEPT — The Credit Support Annex governs the collateral.",
+    "en": "KEPT — The Credit Support Annex governs the collateral.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 55,
+        "text": "KEPT — The Credit Support Annex governs the collateral.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 5,
+    "text": "CONTROL — The Financing Agreement is signed today.",
+    "en": "CONTROL — The Financing Agreement is signed today.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 50,
+        "text": "CONTROL — The Financing Agreement is signed today.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 6,
+    "text": "CONTROL — Each credit line remains available.",
+    "en": "CONTROL — Each credit line remains available.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 45,
+        "text": "CONTROL — Each credit line remains available.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  }
+]

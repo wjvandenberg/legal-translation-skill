@@ -379,11 +379,29 @@ for k in OPTIONS:
         subsumed |= set(OPTIONS[k])
 print(f"  union of options 1,2,3,6 = {len(subsumed)} findings")
 print(f"  left untouched            = {len(SKILL) - len(subsumed)}")
-m = re.search(r"at most (\d+) of\s*\n?the 160 findings", doc) or re.search(r"at most (\d+) of the 160", doc)
-print(f"  the document claims: 'at most {m.group(1)} of 160'" if m else "  (claim not found)")
-if m and int(m.group(1)) != len(subsumed):
-    fail("6a", f"document says {m.group(1)}, union is {len(subsumed)}")
-else: ok("rebuild arithmetic reproduces")
+# THE CLAIM IS FOUND BY ITS SHAPE, AND NOT FINDING IT IS A FAILURE -- measured 2026-09-23,
+# branch 10 slice 3b. This used to search for the literal "the 160 findings". The register
+# left 160 behind long ago, so the claim was never found, the line printed "(claim not found)",
+# and the else-branch then printed "rebuild arithmetic reproduces" -- a check reporting OK
+# over a claim it had not read, while the live sentence said "at most 98 of the 177" against
+# a union of 100. So the total is read from the sentence rather than hardcoded, a sentence
+# wrapped across a line still matches, BOTH numbers are asserted, and more than one live copy
+# fails: the arithmetic has one owner (section 6's Option 10) and everything else points at it.
+claims = list(re.finditer(r"at most (\d+) of\s+(?:the\s+)?(\d+)\s+findings", LIVE))
+for c in claims:
+    print(f"  the document claims: 'at most {c.group(1)} of {c.group(2)}'")
+if not claims:
+    fail("6a", "no 'at most N of M findings' claim in the live document — the check cannot run, "
+               "and a check that read nothing has not passed")
+else:
+    if len(claims) > 1:
+        fail("6c", f"{len(claims)} live copies of the rebuild arithmetic — one owns it, the rest "
+                   f"must point at it rather than restate a number that goes stale")
+    c = claims[0]
+    if int(c.group(1)) != len(subsumed) or int(c.group(2)) != len(SKILL):
+        fail("6a", f"document says {c.group(1)} of {c.group(2)}, the maps say "
+                   f"{len(subsumed)} of {len(SKILL)}")
+    else: ok("rebuild arithmetic reproduces")
 m2 = re.search(r"leaves (?:at least )?(\d+) exactly where they are", LIVE)
 if m2 and int(m2.group(1)) != len(SKILL) - len(subsumed):
     fail("6b", f"document says leaves {m2.group(1)}, actual {len(SKILL) - len(subsumed)}")

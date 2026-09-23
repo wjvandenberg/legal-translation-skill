@@ -19,6 +19,10 @@ The script also accepts a JSON file with custom translations:
 
 The JSON format is: {"source pattern": "target pattern", ...}
 where patterns can use %1, %2, etc. as numbering placeholders.
+
+An auto-numbered attachment label follows the operator's declared English in
+paragraphs.json: "Annex %1" where the notes label attachments Annex and never
+Schedule, "Schedule %1" otherwise (--paragraphs, or found beside final/).
 """
 import sys
 import os
@@ -193,7 +197,89 @@ def detect_language_from_numbering(numbering_xml_text):
         return max(scores, key=scores.get)
     return None
 
-def translate_numbering(orig_docx, output_xml, language=None, custom_map=None):
+# === ATTACHMENT LABEL FOLLOWS THE OPERATOR ===
+#
+# BRANCH 10 SLICE 3b. The built-in maps render an auto-numbered attachment label --
+# Allegato, Annexe, Anlage, Anexo, Melléklet and the rest -- as `Schedule %N` whatever the
+# operator chose. The reference lexicon's Attachments row offers "Schedule (UK) or Annex
+# (EU/international)" as a FREE CHOICE, and post_process stopped overriding that choice in
+# the body text in the same slice (register F29, B6). Leaving this map unconditional would
+# ship an operator's "Annex 1" in the text beside a "Schedule 1" heading -- and it is not
+# hypothetical: measured on the corpus, the document whose Annex rewrite B6 records
+# auto-numbers its attachments through two paragraph styles.
+#
+# So the label follows the operator's DECLARED English, read from the same paragraphs.json
+# post_process reads: `Annex %N` where the notes label attachments Annex and never Schedule;
+# `Schedule %N` otherwise, which is today's behaviour and the lexicon's UK-first rendering.
+# A MIX is reported and keeps Schedule; so is having no notes. An operator's own --custom map
+# is applied after this and still wins.
+#
+# IT NEVER EXITS AND NEVER RAISES, and that is load-bearing: this is one of the two scripts
+# in the skill that cannot block a run, and tools/audit_branches.py asserts it (B1.mute).
+_ANNEX_LABEL_RE = re.compile(r'\bAnnex(?:es)?\s+(?:\d+|[IVXLC]+\b|[A-Z]\b)')
+_SCHEDULE_LABEL_RE = re.compile(r'\bSchedules?\s+(?:\d+|[IVXLC]+\b|[A-Z]\b)')
+# A legislation reference is not a label choice. The SAME keywords as post_process's
+# ANNEX_EXCLUDE, so the two scripts agree on what counts; tests/test_lexicon_choice.py
+# asserts the two lists are equal.
+_LABEL_EXCLUDE = ('Regulation', 'Directive', 'Law', 'Decree', 'Regolamento')
+
+
+def _autodetect_paragraphs_json(output_xml):
+    """<workdir>/final/word/numbering.xml -> <workdir>/paragraphs.json, the layout
+    skill-docs/08 gives for Step 8a. None when that file is not there."""
+    try:
+        workdir = os.path.dirname(os.path.dirname(os.path.dirname(
+            os.path.abspath(output_xml))))
+        candidate = os.path.join(workdir, 'paragraphs.json')
+        return candidate if os.path.isfile(candidate) else None
+    except (OSError, ValueError):
+        return None
+
+
+def declared_attachment_label(paragraphs_json_path):
+    """('Annex' | 'Schedule' | None, why) from the operator's declared English.
+
+    None means "keep today's default"; `why` says which of the four cases it was, so the
+    run can print it rather than leave the operator to infer it."""
+    if not paragraphs_json_path or not os.path.isfile(paragraphs_json_path):
+        return None, 'no notes'
+    try:
+        with open(paragraphs_json_path, 'r', encoding='utf-8') as f:
+            entries = json.load(f)
+    except (OSError, ValueError):
+        return None, 'notes unreadable'
+    if not isinstance(entries, list):
+        return None, 'notes unreadable'
+    annex = schedule = 0
+    for e in entries:
+        en = e.get('en') if isinstance(e, dict) else None
+        if not isinstance(en, str) or not en:
+            continue
+        if any(kw in en for kw in _LABEL_EXCLUDE):
+            continue
+        annex += len(_ANNEX_LABEL_RE.findall(en))
+        schedule += len(_SCHEDULE_LABEL_RE.findall(en))
+    if annex and not schedule:
+        return 'Annex', f'{annex} Annex label(s) declared and no Schedule label'
+    if schedule and not annex:
+        return 'Schedule', f'{schedule} Schedule label(s) declared and no Annex label'
+    if annex and schedule:
+        return None, (f'MIXED — {annex} Annex and {schedule} Schedule label(s) declared; '
+                      f'the default is kept, and the text should use one of the two')
+    return None, 'no attachment label declared'
+
+
+def _follow_label(tmap, label):
+    """The map with every replacement that begins `Schedule` rendered as `label` instead."""
+    if label != 'Annex':
+        return dict(tmap)
+    return {k: (('Annex' + v[len('Schedule'):]) if v.startswith('Schedule') else v)
+            for k, v in tmap.items()}
+# === ATTACHMENT LABEL FOLLOWS THE OPERATOR ENDS ===
+
+
+def translate_numbering(orig_docx, output_xml, language=None, custom_map=None,
+                        paragraphs_json=None):
     """Extract, translate, and write word/numbering.xml."""
 
     # Read numbering.xml from the .docx
@@ -222,6 +308,13 @@ def translate_numbering(orig_docx, output_xml, language=None, custom_map=None):
     tmap = {}
     if language and language.lower() in LANGUAGE_MAPS:
         tmap.update(LANGUAGE_MAPS[language.lower()])
+    # The attachment label follows the operator (see the block above) -- BEFORE the custom
+    # map, so an explicit --custom entry for the same pattern still wins.
+    if any(v.startswith('Schedule') for v in tmap.values()):
+        label, why = declared_attachment_label(
+            paragraphs_json or _autodetect_paragraphs_json(output_xml))
+        tmap = _follow_label(tmap, label)
+        print(f"Attachment label: {label or 'Schedule'} — {why}")
     if custom_map:
         tmap.update(custom_map)
 
@@ -282,6 +375,10 @@ if __name__ == '__main__':
     parser.add_argument('output', help='Output numbering.xml path')
     parser.add_argument('--language', help='Source language (hungarian, italian, german, french, spanish, portuguese, dutch, polish, finnish)', default=None)
     parser.add_argument('--custom', help='JSON file with custom translations', default=None)
+    parser.add_argument('--paragraphs', dest='paragraphs_json', default=None,
+                        help=('paragraphs.json whose declared English decides the attachment '
+                              'label (Annex or Schedule). When omitted, found by the Step 8a '
+                              'layout: <workdir>/paragraphs.json beside final/.'))
     args = parser.parse_args()
 
     custom = None
@@ -289,6 +386,7 @@ if __name__ == '__main__':
         with open(args.custom) as f:
             custom = json.load(f)
 
-    translate_numbering(args.original, args.output, language=args.language, custom_map=custom)
+    translate_numbering(args.original, args.output, language=args.language, custom_map=custom,
+                        paragraphs_json=args.paragraphs_json)
 
 # === SKILL FILE COMPLETE ===
