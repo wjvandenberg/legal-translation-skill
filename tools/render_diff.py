@@ -249,6 +249,12 @@ ap.add_argument("--expect-block", action="append", default=[],
                 help="fixture stem whose NEW arm is EXPECTED to be refused by a gate. Its "
                      "old arm still renders, so the page shows what used to ship; a run "
                      "that produced output anyway is the FAILURE for such a fixture")
+ap.add_argument("--post-process", action="store_true",
+                help="BRANCH 10: drive post_process.py over the fixture instead of apply + "
+                     "repack. Branch 10 changes post_process and nothing else, so without "
+                     "this the fixture arms render the SAME apply code twice and an "
+                     "all-quiet page is guaranteed — which is a limit of the instrument, "
+                     "not evidence about the branch. Section 5.2's gate needs this arm.")
 ap.add_argument("--variant", default="uk", choices=("uk", "us"))
 ap.add_argument("--pages", type=int, action="append", default=[],
                 help="force these page numbers to be written even if they did not change "
@@ -289,6 +295,40 @@ def run_apply(scripts_dir, src_docx, notes_json, out_xml):
         capture_output=True, text=True, encoding="utf-8", errors="replace",
         cwd=str(ROOT), env=env, timeout=1800)
     return (out_xml if out_xml.is_file() else None), p
+
+
+def run_post_process_arm(scripts_dir, adir):
+    """Run post_process over the fixture's own document.xml, in a real workdir layout.
+
+    Returns (document.xml path, completed process) or (None, process).
+
+    THE LAYOUT MATTERS AND IS NOT DECORATION. `post_process` finds the notes by walking up
+    from <workdir>/final/word/document.xml, and since slice 3a the italic pass READS them.
+    Staged anywhere else the pass would find nothing, decline to decide, and render a page
+    on which the condition was never evaluated -- an all-quiet render that looks exactly
+    like a working fix.
+
+    A fired drift gate is NOT a failure here. The fixture's notes declare the pre-pass
+    English, so a pass that legitimately rewrites text makes the document disagree with
+    them -- B6's situation, not this arm's. post_process writes the document before the
+    gate raises, so the page is on disk either way. Compared by the gate's own words rather
+    than by rc, because a toleration pinned to an exit code removes the one signal a
+    regression would have used.
+    """
+    wd = adir / "wd"
+    (wd / "final" / "word").mkdir(parents=True, exist_ok=True)
+    dest = wd / "final" / "word" / "document.xml"
+    with zipfile.ZipFile(adir / "source.docx") as z:
+        dest.write_bytes(z.read("word/document.xml"))
+    shutil.copyfile(adir / "paragraphs.json", wd / "paragraphs.json")
+    proc = subprocess.run(
+        [sys.executable, str(Path(scripts_dir) / "post_process.py"), str(dest),
+         "--fix", "--variant", args.variant],
+        capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(ROOT))
+    blob = (proc.stdout or "") + (proc.stderr or "")
+    if proc.returncode != 0 and "SKILL GATE FIRED" not in blob:
+        return None, proc
+    return (dest, proc) if dest.is_file() else (None, proc)
 
 
 def _gate_line(proc):
@@ -400,25 +440,38 @@ def repack(scripts_dir, src_docx, doc_xml, out_docx, notes_json):
 # asymmetry was invisible because only the corpus path was ever red.
 FX_OLDTREE = None
 if args.fixture:
-    _blob = subprocess.run(["git", "show", f"{REF}:{args.variant}/scripts/{SCRIPT}"],
-                           capture_output=True, cwd=ROOT)
-    if _blob.returncode != 0:
-        print(f"\n  VOID — cannot read {SCRIPT} at {REF}; no baseline arm for the fixtures.")
-        sys.exit(1)
+    # WHICH SCRIPT THE BASELINE ARM SWAPS IS DECIDED BY WHICH SCRIPT THE RUN DRIVES.
+    # It was hardwired to apply, which was right while the fixture path only ever ran
+    # apply + repack. In --post-process mode that hardwiring is the defect: the arm would
+    # swap a script the run never executes, report the two arms as the same code, and
+    # render an all-quiet page — indistinguishable from a fix that worked.
+    FX_SCRIPTS = ["post_process.py", "strip_noop_tracked_changes.py",
+                  "validate_apply.py"] if args.post_process else [SCRIPT]
     _fxtmp = Path(tempfile.mkdtemp(prefix="fx-oldtree-"))
     FX_OLDTREE = _fxtmp / "old_scripts"
     shutil.copytree(ROOT / args.variant / "scripts", FX_OLDTREE)
-    (FX_OLDTREE / SCRIPT).write_bytes(_blob.stdout)
-    # The sentinel is a plain string at the file's end, so a copied script still passes its own
-    # integrity check -- proved rather than assumed, because failing it would exit 3 and the
-    # arm would silently not exist.
-    if b"\n# === SKILL FILE COMPLETE ===" not in (FX_OLDTREE / SCRIPT).read_bytes():
-        print("  VOID — the baseline copy has no integrity sentinel; it would exit 3.")
-        sys.exit(1)
-    _same = _blob.stdout == (ROOT / args.variant / "scripts" / SCRIPT).read_bytes()
-    print(f"  fixture baseline arm: {REF}"
-          + ("   NOTE: BYTE-IDENTICAL to the working tree, so old and new are the same code "
-             "and an all-quiet render proves nothing" if _same else ""))
+    _any_diff = False
+    for _name in FX_SCRIPTS:
+        _blob = subprocess.run(["git", "show", f"{REF}:{args.variant}/scripts/{_name}"],
+                               capture_output=True, cwd=ROOT)
+        if _blob.returncode != 0:
+            print(f"\n  VOID — cannot read {_name} at {REF}; no baseline arm for the "
+                  f"fixtures.")
+            sys.exit(1)
+        (FX_OLDTREE / _name).write_bytes(_blob.stdout)
+        # The sentinel is a plain string at the file's end, so a copied script still passes
+        # its own integrity check -- proved rather than assumed, because failing it would
+        # exit 3 and the arm would silently not exist.
+        if b"\n# === SKILL FILE COMPLETE ===" not in (FX_OLDTREE / _name).read_bytes():
+            print(f"  VOID — the baseline copy of {_name} has no integrity sentinel; it "
+                  f"would exit 3.")
+            sys.exit(1)
+        if _blob.stdout != (ROOT / args.variant / "scripts" / _name).read_bytes():
+            _any_diff = True
+    print(f"  fixture baseline arm: {REF}  ({', '.join(FX_SCRIPTS)})"
+          + ("" if _any_diff else
+             "   NOTE: BYTE-IDENTICAL to the working tree, so old and new are the same code "
+             "and an all-quiet render proves nothing"))
 
 for stem in args.fixture:
     fx = ROOT / "tests" / "fixtures" / f"{stem}.docx"
@@ -473,8 +526,23 @@ for stem in args.fixture:
         adir.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(fx, adir / "source.docx")
         shutil.copyfile(nj, adir / "paragraphs.json")
-        xml, p_ = run_apply(scripts_dir, adir / "source.docx", adir / "paragraphs.json",
-                            adir / "document.xml")
+        if args.post_process:
+            # BRANCH 10 SLICE 3a — THE ARM THAT CLOSES SECTION 5.2's GATE FOR THIS BRANCH.
+            #
+            # Slices 1 and 2 left the rendered diff undischarged and said why in terms: this
+            # tool's fixture path drives apply and repack and NEVER post_process, so no
+            # slice of branch 10 could reach a page. That was a limit of the instrument and
+            # was recorded as a gap rather than waved through as an N/A. This is the arm the
+            # previous READ-ME named as what would close it.
+            #
+            # It runs post_process over the fixture's OWN document.xml -- the fixture is
+            # already the English here, which is what makes B1's condition testable -- with
+            # the notes beside it, because the pass is now conditional on them and an arm
+            # that withheld them would render a document the condition never touched.
+            xml, p_ = run_post_process_arm(scripts_dir, adir)
+        else:
+            xml, p_ = run_apply(scripts_dir, adir / "source.docx",
+                                adir / "paragraphs.json", adir / "document.xml")
         if xml is None:
             # A REFUSAL IS A RESULT FOR A FIXTURE THAT DECLARES ONE, AND A FAILURE OTHERWISE.
             # en-runs-offsets.docx exists so a gate REFUSES it; reporting that as a broken
@@ -491,6 +559,24 @@ for stem in args.fixture:
             continue
         deliv, rp = repack(scripts_dir, adir / "source.docx", xml,
                            adir / "applied.docx", adir / "paragraphs.json")
+        if deliv is None and args.post_process:
+            # IN post_process MODE A REFUSED REPACK IS EXPECTED ON EITHER ARM, AND IT IS
+            # SYMMETRIC. The notes declare the pre-pass English, so any pass that rewrites
+            # text makes the repack-time validator disagree with them — the same B6
+            # situation the stage's own gate reports. The pages are assembled by byte
+            # substitution purely to be LOOKED AT, on BOTH arms or neither: assembling one
+            # arm differently from the other is how a rendering difference stops being
+            # about the code under test.
+            print(f"       the {arm.upper()} arm's repack was refused; the page is "
+                  f"assembled by byte substitution, symmetrically with the other arm. "
+                  f"It is not a deliverable.")
+            print(f"         {_gate_line(rp)}")
+            deliv = _repack_bypass(adir / "source.docx", xml, adir / "bypassed.docx")
+            if deliv is None:
+                ok(f"{stem}: {arm} arm assembled for rendering", False)
+                continue
+            built[arm] = deliv
+            continue
         if deliv is None and arm == "old":
             # THE PRE-FIX CODE FAILING ITS OWN REPACK GATE IS A RESULT, NOT A BROKEN FIXTURE.
             # Reported as the finding it is, and then the arm is assembled without the gates
@@ -571,83 +657,82 @@ for stem in args.fixture:
         # is a per-branch artefact living in a permanent file, and the only thing keeping it
         # true is that somebody remembers. Every other per-branch claim in this repository
         # that nothing checks has gone stale at least once.
-        "WHAT THIS BRANCH CHANGED — BRANCH 10 SLICE 2, THE CONDITIONAL PASSES (B4, B3, B2,",
-        "B8, and C15's half of the validator). AND THE HONEST ANSWER IS STILL: NOTHING THESE",
-        "PAGES CAN SHOW — BUT FOR A DIFFERENT REASON FROM EVERY PREVIOUS SLICE, AND THE",
-        "DIFFERENCE IS THE POINT.",
+        "WHAT THIS BRANCH CHANGED — BRANCH 10 SLICE 3a, THE ITALIC STRIP MADE CONDITIONAL ON",
+        "WHAT THE OPERATOR DECLARED (B1). AND FOR THE FIRST TIME IN TEN BRANCHES THE ANSWER IS:",
+        "SOMETHING THESE PAGES DO SHOW. Render italic-declared.docx with --post-process and",
+        "compare old-p1.png against new-p1.png.",
         "",
-        "THE LAST EIGHT BRANCHES HAD NO PAGE BECAUSE THE CHANGE HAD NO PAGE. This one DOES:",
-        "it changes delivered bytes on every document, and B4's damage in particular is",
-        "VISIBLE — a spurious space at the head of the second column of every two-column",
-        "signature block. The previous slice's own READ-ME predicted exactly that, in terms:",
-        "`on those slices these pages carry the branch's work and are worth hunting`.",
+        "WHAT IS ON THE TWO PAGES, line by line, so a reviewer knows what to look for:",
+        "  line 1  `Preservation of the Security`   OLD: roman.  NEW: ITALIC. The operator",
+        "          declared it italic in en_runs and the pass destroyed it anyway. This is the",
+        "          defect, and on one real document it ran to roughly twenty cross-reference",
+        "          titles, six defined facility terms, a statute name and two address labels.",
+        "  line 2  `the borrower shall notify`      OLD: roman.  NEW: roman, UNCHANGED. The",
+        "          notes cover this run and do not declare it italic, so the pass still strips",
+        "          it. This line is the limb that catches a pass which stopped working rather",
+        "          than became conditional — without it every other line could be satisfied by",
+        "          deleting the pass.",
+        "  line 3  `under Ejemplo de Ley Sintetica` OLD: all roman.  NEW: `under` roman and the",
+        "          term ITALIC. No en_runs covers it; the SOURCE run carries the identical text",
+        "          and is italic, because the term was never translated. D03B in the register is",
+        "          exactly this case, and it is the one the function's own docstring carve-out",
+        "          always claimed to protect and never did.",
+        "  line 4  `Force Majeure`                  italic on BOTH arms. Two words, so it was",
+        "          never a candidate under any version of the rule. The control.",
         "",
-        "SO WHY IS THERE NOTHING HERE? BECAUSE THIS TOOL DRIVES THE WRONG SCRIPT. Its",
-        "fixture path is apply + repack ONLY — `WHAT THESE PAGES ARE NOT`, below, has said",
-        "so since branch 6: no definitions reorder, no tidy-up pass, NO post_process. Slice 2",
-        "changes post_process.py and strip_noop_tracked_changes.py and touches apply not at",
-        "all, so `old` and `new` here are the same apply code and an all-quiet render is the",
-        "EXPECTED result. **THIS IS A LIMIT OF THE INSTRUMENT, NOT A PROPERTY OF THE SLICE**,",
-        "and that distinction is the whole reason this paragraph is long: every earlier slice",
-        "could say `the change has no page`, and saying it again here would be FALSE.",
+        "SECTION 5.2's RENDERED-DIFF GATE IS DISCHARGED FOR THIS BRANCH, AND IT WAS OPEN ON THE",
+        "TWO SLICES BEFORE IT. Their READ-MEs recorded it as a real gap rather than an N/A and",
+        "named precisely what would close it: `a fixture arm that runs post_process.py over a",
+        "SYNTHETIC document and renders before and after`. That arm is `--post-process`, and it",
+        "is what these pages come from. The fixture is synthetic, so the pages may be looked at.",
         "",
-        "WHAT WOULD CLOSE IT, NAMED SO THE NEXT SESSION DOES NOT HAVE TO REDERIVE IT: a",
-        "fixture arm that runs post_process.py over a SYNTHETIC document carrying a",
-        "two-column signature block — the B4_DOC shape already in tests/test_change_journal.py",
-        "— and renders before and after. That is real visual evidence and it may be LOOKED AT,",
-        "the fixture being synthetic. It is NOT built, it is NOT claimed, and it is the",
-        "outstanding half of this slice's section 5.2 gate. Recorded as a gap rather than",
-        "discharged as an N/A, because the gate genuinely bites here for the first time.",
+        "TWO THINGS THE ARM ITSELF GOT WRONG FIRST, BOTH CAUGHT BY AN ALL-QUIET PAGE:",
+        "  (1) the fixture baseline swapped apply_translations_textmatch.py — the script this",
+        "      run never executes — so both arms ran identical post_process code and page 1 was",
+        "      reported UNCHANGED. Which script the baseline swaps now follows which script the",
+        "      run drives.",
+        "  (2) a refused repack has to be handled SYMMETRICALLY. The notes declare the pre-pass",
+        "      English, so the repack-time validator refuses both arms; assembling one arm by",
+        "      byte substitution and the other through the gate would make the rendering",
+        "      difference be about the assembly rather than about the code under test.",
+        "  Neither was visible as an error. Both produced a well-formed page and a PASS.",
         "",
-        "WHAT IS NOT A REASON TO SKIP IT, stated because the previous eight READ-MEs supply a",
-        "ready-made excuse: `manufacturing a visual arm would be theatre` was TRUE of a change",
-        "with no page and is NOT true of this one. Do not reuse that sentence here.",
+        "  WHERE THE REST OF THIS SLICE'S PROOF IS, and all of it is in bytes:",
+        "    tests/test_change_journal.py            81 checks on each variant, 0 failures, 0",
+        "      void. ARM 14 is B1's acceptance and carries all five limbs above plus the one",
+        "      that has no page: with NO notes at all the pass changes NOTHING and SAYS so.",
+        "      That limb exists because arm 6 runs post_process on a fixture with no notes",
+        "      beside it, so after this slice the italic pass legitimately does nothing there",
+        "      and arm 6 still passes on the other passes' movement — a suite could have gone",
+        "      green over a condition it never evaluated once.",
+        "    tools/postprocess_corpus_arm.py         13 of 13 examined, 0 not examined; the",
+        "      bytes MOVED on 2, and both positive controls fire. ITS ACCEPTANCE IS SLICE 2's,",
+        "      not slice 1's: identity everywhere would mean no condition fired.",
         "",
-        "  WHERE THIS SLICE'S PROOF ACTUALLY IS, and all of it is in bytes:",
-        "    tests/test_change_journal.py            72 checks on each variant, 0 failures,",
-        "      0 void. RED FIRST, and PROVED red rather than asserted: the new arms were",
-        "      re-run with the three edited scripts swapped for their 5107aaf blobs, and",
-        "      EIGHT of them went red there — both B4 seams, B3's surviving insertion, both",
-        "      B2 arms, both B8 arms and the validator's journal route — while the three",
-        "      `must still fire` limbs stayed GREEN, which is the half that catches a pass",
-        "      that stopped working rather than became conditional. Arm 6 could not be proved",
-        "      that way and says so: swapping the baseline in makes it compare 5107aaf with",
-        "      itself, correctly VOID. Its red was taken the other way — on the first run of",
-        "      the real code, while it still asserted byte IDENTITY, at 790 bytes against 789.",
-        "      ARM 6's QUESTION IS NOW INVERTED: the bytes must MOVE, and the journal must",
-        "      account for the movement. Re-pinned to 5107aaf in the commit that moved them,",
-        "      which is what its own pin block told this branch to do.",
-        "    tools/postprocess_corpus_arm.py         the corpus arm, and ITS ACCEPTANCE IS",
-        "      INVERTED BY THIS SLICE TOO. For branch 9 and slice 1 a moved delivered byte",
-        "      was a FAILURE, both being additive. Here identity everywhere would mean no",
-        "      condition fired, so a moved byte is the assertion. 13 of 13 examined, 0 not",
-        "      examined; the bytes MOVED on 2 — the two whose input predates post_process —",
-        "      and every text and formatting change is still accounted for, with both",
-        "      positive controls firing. THE DENOMINATOR IS 2, NOT 13, AND THE TOOL SAYS SO:",
-        "      the other eleven feed it the DELIVERED document, where these passes have",
-        "      already run and only ever ADDED, so they cannot show a condition firing and",
-        "      are CALIBRATION.",
+        "  THE INSTRUMENT WAS WRONG BEFORE THE DELIVERABLE WAS, AGAIN, AND THIS TIME IT WAS THE",
+        "  CORPUS ARM's INPUT. It withheld paragraphs.json from every staged workdir, on a",
+        "  reason that was sound until a pass started reading them: staging the notes makes the",
+        "  post-strip drift gate fire, measured on 6 of the 13 — and it fires identically at the",
+        "  pinned baseline, so it is inherited. But with no notes the conditional pass cannot",
+        "  determine its condition, changes nothing, AND THE BYTES MOVE ANYWAY because the",
+        "  baseline stripped. Every signal the tool prints would have said the slice worked",
+        "  while the condition was never evaluated. The notes are now staged for BOTH arms, a",
+        "  fired gate is REPORTED rather than dropping the row from the denominator, and a new",
+        "  assertion fails the run if any document reached the pass without its notes.",
         "",
         "  EVERY MOVED BYTE IS EXPLAINED BY A REGISTER ROW, AND `THE BYTES MOVED` ON ITS OWN",
         "  WOULD NOT HAVE BEEN AN ACCEPTANCE — a pass that broke the document moves bytes too.",
-        "  Diffing the two arms' own journals pass by pass: on one document `article_to_clause`",
-        "  went 1 -> 0 (B2, +1 byte, `Article` being one character longer than `Clause`); on",
-        "  the other `spacing` went 11 -> 0 (B4) and the strip stage's paragraph record 3 -> 1",
-        "  (B3). UNEXPLAINED PASS MOVEMENTS: 0.",
+        "  Diffing the two arms' own journals pass by pass: `spurious_italic` went 36 -> 9 on",
+        "  one document and 1 -> 0 on another, both B1. UNEXPLAINED PASS MOVEMENTS: 0, over a",
+        "  denominator of 13 of 13.",
         "",
-        "  AND TWO INSTRUMENTS WERE WRONG BEFORE THE DELIVERABLE WAS, BOTH FOUND BY MAKING",
-        "  THEM DISAGREE. (1) This corpus arm built its baseline from the pinned",
-        "  post_process.py but took strip_noop_tracked_changes.py and validate_apply.py from",
-        "  the WORKING TREE — right while only post_process ever changed, and wrong the moment",
-        "  a slice changed a sibling, because B3's effect then appeared on BOTH sides and",
-        "  cancelled. It reported wd9 at 40179 -> 40043 bytes; a fully-baseline second",
-        "  instrument reported 39848 -> 40043. The verdict was right and the baseline was",
-        "  wrong, which is the shape that gets believed. (2) B2's population was first counted",
-        "  in the frozen NOTES and came back `0 indeterminate`, from which it followed that",
-        "  the fix was free and that only a synthetic fixture could evidence it. Both",
-        "  conclusions reached two shipped docstrings before the STAGE ITSELF disagreed: on",
-        "  the applied document.xml the figure is 1, on a real corpus document. The notes and",
-        "  the document are different strings and this pass reads the document.",
+        "  AND B1's OPEN 36-VERSUS-38 IS NOW MEASURED, WITH THE HYPOTHESIS REFUTED. The row",
+        "  supposed the pass `removed 38 then and removes 36 now` because branches 5 to 9",
+        "  landed upstream of it. Run rev44's OWN post_process — branch 0 committed both",
+        "  published trees unmodified — against the same archived snapshot: it removes 36. So",
+        "  did slice 2's. The count never moved, and the row's own proposed test (diff the",
+        "  snapshot against the archived delivery) yields 11, because that delivery has also",
+        "  been through strip_noop and the repack and cannot isolate one pass.",
         "",
         "PREVIOUS BRANCH, FOR ORIENTATION ONLY — BRANCH 8, extraction completeness (C28,",
         "C12, M1): the one check that reads the ORIGINAL document. That is now in the pinned",

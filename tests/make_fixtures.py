@@ -1362,6 +1362,78 @@ def _emphasis(path):
     docx(path, body)
 
 
+@fixture("italic-declared.docx",
+         "BRANCH 10 SLICE 3a — the four italic runs B1 turns on: one the operator DECLARED "
+         "italic in en_runs, one the notes cover and do NOT declare, one untranslated and "
+         "italic in the SOURCE runs, and a two-word run that was never a candidate. Ships "
+         "its own italic-declared.notes.json, because the declaration IS the input")
+def _italic_declared(path):
+    """The fixture the rendered-diff arm needs, and the reason it needs one.
+
+    Section 5.2's rendered-diff gate went undischarged on slices 1 and 2 and was recorded
+    as a real gap rather than an N/A: `render_diff`'s fixture path drives apply and repack
+    and never `post_process`, so no slice of branch 10 could appear on a page. B1's damage
+    is the first in this branch that HAS a page — italic lost across a definitions block —
+    so the arm is worth building here, and the fixture is synthetic, which is what makes
+    the render lookable-at at all.
+
+    The italic strings are all >2 words, unparenthesised, and free of every listed Latin
+    term as a SUBSTRING — the pass tests `lt in text.lower()`, so `in rem` would match
+    `in remuneration`.
+    """
+    I = '<w:r><w:rPr><w:i/></w:rPr><w:t xml:space="preserve">%s</w:t></w:r>'
+    declared = "Preservation of the Security"
+    undeclared = "the borrower shall notify"
+    retained = "Ejemplo de Ley Sintetica"
+    short = "Force Majeure"
+
+    body = (
+        p(I % declared) +
+        p(I % undeclared) +
+        p(r("under "), I % retained) +
+        p(I % short)
+    )
+    docx(path, body)
+
+    # The declaration is the fixture's INPUT and ships with it.
+    #
+    # `runs` SLICES `text`, and this builder asserts it — which is what forced the modelling
+    # below to be honest. In a real workdir `text` is the SOURCE and `en` the translation,
+    # so a source run's text is source-language and matches an English run only where the
+    # term was never translated. A fixture cannot have it both ways: `text` must equal the
+    # document's own paragraph text, so here `text` == `en` and the source runs carry the
+    # ENGLISH strings. What that costs is realism of the STRINGS; what it keeps is the only
+    # thing this fixture tests — the ITALIC FLAGS the decision reads. Paragraph 2 is the one
+    # case where the strings are realistic anyway, the term being untranslated.
+    def one(text, italic):
+        return [{"start": 0, "end": len(text), "text": text,
+                 "bold": False, "italic": italic}]
+
+    notes = [
+        # 0: the operator DECLARED italic in en_runs -> must SURVIVE the pass.
+        {"idx": 0, "text": declared, "en": declared, "style": "Normal",
+         "runs": one(declared, False),
+         "en_runs": [{"start": 0, "end": len(declared), "bold": False, "italic": True}]},
+        # 1: the notes COVER it and declare it not italic -> must STILL be stripped.
+        {"idx": 1, "text": undeclared, "en": undeclared, "style": "Normal",
+         "runs": one(undeclared, False),
+         "en_runs": [{"start": 0, "end": len(undeclared), "bold": False, "italic": False}]},
+        # 2: no en_runs at all, and the SOURCE run is italic -> the source arm must keep it.
+        {"idx": 2, "text": "under " + retained, "en": "under " + retained,
+         "style": "Normal",
+         "runs": [{"start": 0, "end": 6, "text": "under ",
+                   "bold": False, "italic": False},
+                  {"start": 6, "end": 6 + len(retained), "text": retained,
+                   "bold": False, "italic": True}],
+         "en_runs": None},
+        # 3: two words — never a candidate, whatever the notes say.
+        {"idx": 3, "text": short, "en": short, "style": "Normal",
+         "runs": one(short, False),
+         "en_runs": None},
+    ]
+    _write_notes(path, notes)
+
+
 @fixture("tracked-changes.docx",
          "an insertion, a deletion, and a deletion whose text is in the source language — "
          "the document must read correctly both when accepted and when rejected")
