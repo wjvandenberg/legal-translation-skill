@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """verify_expected.py - is the failing set EXACTLY the set this project declared?
-CHECKER VERSION 1 (2026-08-31)
+CHECKER VERSION 2 (2026-09-23)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -154,8 +154,17 @@ def check_runs(rep: Report, root: Path, cfg) -> None:
     void_reason = "; ".join(void) if void else None
     rep.record("every failure is declared", judged, undeclared, void_reason=void_reason)
     rep.record("every declaration still fails", judged, stale, void_reason=void_reason)
-    rep.record("every toleration states a reason",
-               sum(len(e.get("tolerated") or {}) for e in runs), unreasoned)
+    # ZERO TOLERATIONS IS N/A, NOT VOID - and the difference decides whether a project that has
+    # done the right thing can ever show a green gate. This row's denominator is the number of
+    # tolerations, so a project with none examined nothing and got VOID: "a check could not run".
+    # But there is nothing wrong with the instrument here; there is simply nothing to check, and
+    # that is the state every comment in this script argues for. VOID is for a check that could
+    # not look. N/A is for one with nothing to look at, and it is what the row six lines above
+    # already does when no run is declared at all.
+    n_tolerated = sum(len(e.get("tolerated") or {}) for e in runs)
+    rep.record("every toleration states a reason", n_tolerated, unreasoned,
+               na_reason=None if n_tolerated else
+               "no toleration is declared - nothing to check, and the intended state")
 
 
 def main(argv) -> int:
@@ -263,6 +272,14 @@ def _cases(tmp: Path):
              cfg(one_fail, 1, {key: "declared"}), want=VOID),
         Case("nothing declared is N/A, never a pass", declared,
              cfg(one_fail, 1, {}), lambda t: ({"runs": []}, tmp), good_want=NA),
+        # ZERO TOLERATIONS IS THE GOAL STATE, AND IT USED TO TURN THE WHOLE RUN VOID.
+        # The reasons row counted tolerations as its denominator, so a project that had driven
+        # its declarations to zero - exactly what this script exists to encourage - got
+        # "examined nothing" and a VOID verdict it could never clear. Every other case here
+        # probes ONE row, which is why no existing case saw it: the stale-declaration case
+        # already used a zero-toleration config as its GOOD input and only ever read row 1.
+        Case("zero tolerations is N/A, never VOID", reasons,
+             cfg(one_fail, 1, {key: "   "}), cfg(all_pass, 0, {}), good_want=NA),
     ]
 
 

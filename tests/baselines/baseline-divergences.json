@@ -21,9 +21,9 @@
    "sha256_now": "91f49df10cb0a69a04f806433720cc3fc0df6ff687d151ce285045d137104583"
   },
   "uk/scripts/post_process.py": {
-   "changed_by": "feature/branch9-change-journal",
-   "commit_subject": "Branch 9 - the change journal: post_process records every text edit it makes and which pass made it, so the delivered-document check at branch 11 becomes buildable (C15, B6)",
-   "sha256_now": "67ee3ba9d3b37410bb927dedcaec9ec3d1873a3230e753320a08802f459457b5"
+   "changed_by": "feature/branch10-slice1-format-journal",
+   "commit_subject": "Branch 10 slice 1 - the formatting record: the journal's declared blind spot, closed on the text contract's own coordinates (B1, B7)",
+   "sha256_now": "16d01ee664776ac0d49f27504ec395ec24976bdc490ab0c3c7342e12a8c82f25"
   },
   "uk/scripts/quality_check.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -71,9 +71,9 @@
    "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
   },
   "uk/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "feature/branch9-change-journal",
-   "commit_subject": "Branch 9 - the change journal: post_process records every text edit it makes and which pass made it, so the delivered-document check at branch 11 becomes buildable (C15, B6)",
-   "sha256_now": "b8bd01437409e1cbd47db9235590fa5ba2c0831f8d04a06166dd283dd451732e"
+   "changed_by": "feature/branch10-slice1-format-journal",
+   "commit_subject": "Branch 10 slice 1 - the formatting record: the journal's declared blind spot, closed on the text contract's own coordinates (B1, B7)",
+   "sha256_now": "993f0c5f68087b16848adc771140ae0718b95daa8bdc7d257af76898f6c32fc7"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
    "changed_by": "feature/branch7-slice3-a19",
@@ -101,9 +101,9 @@
    "sha256_now": "0df16cb99fbc01cb25bbdbf2c52dfa7449869a9c0fd542248987e8f995909b74"
   },
   "us/scripts/post_process.py": {
-   "changed_by": "feature/branch9-change-journal",
-   "commit_subject": "Branch 9 - the change journal: post_process records every text edit it makes and which pass made it, so the delivered-document check at branch 11 becomes buildable (C15, B6)",
-   "sha256_now": "ad952998360b5496a5da55e0595408e22e0898ed0cb0a8fe9382d31253bcb099"
+   "changed_by": "feature/branch10-slice1-format-journal",
+   "commit_subject": "Branch 10 slice 1 - the formatting record: the journal's declared blind spot, closed on the text contract's own coordinates (B1, B7)",
+   "sha256_now": "144eeb02993bf794a02cf1481849af32752c2ccb51d41ddfafa6d5e626902222"
   },
   "us/scripts/quality_check.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -151,9 +151,9 @@
    "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
   },
   "us/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "feature/branch9-change-journal",
-   "commit_subject": "Branch 9 - the change journal: post_process records every text edit it makes and which pass made it, so the delivered-document check at branch 11 becomes buildable (C15, B6)",
-   "sha256_now": "93b05567e3322f0787fd64b2e15f98a669ed3445ff93e116ee1b4425a672d077"
+   "changed_by": "feature/branch10-slice1-format-journal",
+   "commit_subject": "Branch 10 slice 1 - the formatting record: the journal's declared blind spot, closed on the text contract's own coordinates (B1, B7)",
+   "sha256_now": "78f0e665f1dd73b7348ebb36ec0b260f7f39f87df6aca5d34380da94ccb66972"
   },
   "us/skill-docs/08-aux-and-quality.md": {
    "changed_by": "feature/branch7-slice3-a19",

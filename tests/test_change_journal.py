@@ -606,6 +606,249 @@ else:
     ok("and it still carries the three-possibility framing the rule-5b probe bought",
        "WORK OUT WHICH OF THREE THINGS IS WRONG" in blob5)
 
+# =========================================================================================
+# BRANCH 10 SLICE 1 — THE FORMATTING CONTRACT.
+#
+# Branch 9 DECLARED the journal blind to non-text change and reported it as a bare figure.
+# That was honest and it was not enough, because branch 10 slice 3 turns the italic strip
+# into a CONDITIONAL pass and no count can show a conditional pass did the right thing.
+#
+# The two shapes below are B1's and B7's, and they are the register's own: on the one frozen
+# document that keeps a pre-post_process snapshot, `spurious_italic` reports 36 fixes against
+# an element delta of exactly -36, and `schedule_page_breaks` reports 3 against +3 — which
+# matches B7's measured `pageBreakBefore` 0 -> 3 on that document exactly. Neither moved a
+# single character of text, which is why branch 9's journal recorded nothing for either.
+#
+# THE READERS BELOW ARE REIMPLEMENTED FROM THE CONTRACT AND IMPORT NOTHING FROM THE SCRIPT.
+# A reader shared between the two sides of a comparison cannot see what it normalised away,
+# and the fix for that is a second reader, never a changed one.
+# =========================================================================================
+R_TAG = f"{{{W}}}r"
+PPR_TAG = f"{{{W}}}pPr"
+P_TAG = f"{{{W}}}p"
+
+
+def _shape(el):
+    """Tag plus sorted attributes, no text. FULL {namespace}localname, never the localname
+    alone: `t` is w:t, a:t and dgm:t, and a localname match once counted one chart part as
+    four surfaces."""
+    return el.tag + "".join(f" {k}={v}" for k, v in sorted(el.attrib.items()))
+
+
+def _subtree(el):
+    return " | ".join(_shape(x) for x in el.iter())
+
+
+def flat_formats(xml_bytes):
+    """For each text-bearing element, the shape of the w:r carrying it — same ordinal as
+    flat_texts. Written from the contract's words, not from the script's code."""
+    root = etree.fromstring(xml_bytes)
+    out = []
+    for e in root.iter():
+        if e.tag not in TEXT_TAGS:
+            continue
+        a = e.getparent()
+        while a is not None and a.tag != R_TAG:
+            a = a.getparent()
+        out.append(_shape(e) if a is None else _subtree(a))
+    return out
+
+
+def paragraph_formats(xml_bytes):
+    """For each paragraph, the shape of its own w:pPr — same index as own_paragraph_texts."""
+    root = etree.fromstring(xml_bytes)
+    out = []
+    for p in root.iter(P_TAG):
+        ppr = p.find(PPR_TAG)
+        out.append("" if ppr is None else _subtree(ppr))
+    return out
+
+
+def format_replay(before_xml, after_xml, jrnl):
+    """Apply the journal's FORMATTING record to the before-shapes and return what it
+    predicts. This is what branch 11 will have to do for a conditional pass: account for
+    exactly the declared changes and nothing else."""
+    before = flat_formats(before_xml)
+    after = flat_formats(after_xml)
+    if len(before) != len(after):
+        return None, None, "the element count moved; the contract does not claim that case"
+    owners = owner_map(before_xml)
+    for st in jrnl.get("stages", []):
+        for e in st.get("format_edits", []):
+            i = e.get("elem")
+            if not isinstance(i, int) or not (0 <= i < len(before)):
+                return None, None, f"format edit names element {i}, out of range"
+            if before[i] != e.get("before"):
+                return None, None, f"format edit {i}: before-shape is not the document's"
+            if e.get("para") != owners[i]:
+                return None, None, (f"format edit {i} says paragraph {e.get('para')}, "
+                                    f"the document says {owners[i]}")
+            before[i] = e.get("after")
+    return before, after, None
+
+
+def paragraph_format_replay(before_xml, after_xml, jrnl):
+    before = paragraph_formats(before_xml)
+    after = paragraph_formats(after_xml)
+    if len(before) != len(after):
+        return None, None, "the paragraph count moved; the contract does not claim that"
+    for st in jrnl.get("stages", []):
+        for r in st.get("format_paragraphs", []):
+            i = r.get("para")
+            if not isinstance(i, int) or not (0 <= i < len(before)):
+                return None, None, f"format paragraph record names {i}, out of range"
+            if before[i] != r.get("before"):
+                return None, None, f"paragraph {i}: before-shape is not the document's"
+            before[i] = r.get("after")
+    return before, after, None
+
+
+# Paragraph 0 is B1's shape: an italic run of more than two words, unparenthesised, not a
+# Latin term, in a paragraph whose own properties do not set italic. Paragraph 1 is B7's: a
+# schedule heading short enough and labelled well enough for the page-break pass to impose a
+# break the source never asked for. Paragraph 2 is the negative control INSIDE the document
+# — no pass may touch it and no record may name it.
+FORMAT_CONTROL_PARA = 2
+FORMAT_DOC = (
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+    f'<w:document xmlns:w="{W}"><w:body>'
+    '<w:p><w:r><w:rPr><w:i/></w:rPr>'
+    '<w:t xml:space="preserve">the italicised cross reference title</w:t>'
+    '</w:r></w:p>'
+    '<w:p><w:r><w:t xml:space="preserve">Schedule 1</w:t></w:r></w:p>'
+    '<w:p><w:r><w:rPr><w:b/></w:rPr>'
+    '<w:t xml:space="preserve">This bold sentence must not move.</w:t>'
+    '</w:r></w:p>'
+    '</w:body></w:document>').encode("utf-8")
+
+print("\nARM 9 — the FORMATTING record: is branch 9's declared blind spot closed?")
+d9, x9 = stage("format", FORMAT_DOC)
+before9 = x9.read_bytes()
+r9 = run([SCRIPTS / "post_process.py", x9, "--fix", "--variant", args.variant])
+after9 = x9.read_bytes()
+j9 = journal_of(d9)
+if j9 is None:
+    void("the formatting record", f"no journal was written (rc={r9.returncode})")
+else:
+    counts9 = {c["pass"]: c["fixes"] for c in j9["stages"][0].get("counts", [])}
+    # ASSERT THE ARTEFACT FIRST. If neither pass fired, every check below would pass by
+    # describing an empty record, which is the shape of a check that tests nothing.
+    fired = counts9.get("spurious_italic", 0), counts9.get("schedule_page_breaks", 0)
+    if not any(fired):
+        void("the formatting record",
+             f"neither pass fired on the fixture (italic={fired[0]}, "
+             f"page_breaks={fired[1]}), so there is nothing to record")
+    else:
+        ok("the journal declares a FORMAT contract beside the text one",
+           isinstance(j9.get("format_contract"), str)
+           and "w:pPr" in (j9.get("format_contract") or ""),
+           repr(j9.get("format_contract"))[:120])
+        ok("the schema version moved, because the artefact describes something new",
+           j9.get("schema") == "post-process-journal/2", repr(j9.get("schema")))
+
+        fmt_edits = [e for st in j9["stages"] for e in st.get("format_edits", [])]
+        fmt_paras = [r for st in j9["stages"] for r in st.get("format_paragraphs", [])]
+
+        # B1 — the italic strip, recorded at element level and NAMING the pass.
+        italic = [e for e in fmt_edits if e.get("pass") == "spurious_italic"]
+        ok("B1's italic strip is RECORDED, and the record names the pass",
+           len(italic) == counts9.get("spurious_italic", 0) and len(italic) > 0,
+           f"{len(italic)} record(s) against {counts9.get('spurious_italic', 0)} fix(es)")
+        ok("and what it records is the w:i LEAVING the run, not merely that something moved",
+           all(f"{{{W}}}i" in (e.get("before") or "")
+               and f"{{{W}}}i" not in (e.get("after") or "") for e in italic),
+           "a record whose before/after do not show the italic going is not evidence")
+
+        # B7 — the imposed page break, recorded at paragraph level.
+        pbreak = [r for r in fmt_paras if r.get("pass") == "schedule_page_breaks"]
+        ok("B7's imposed page break is RECORDED at paragraph level",
+           len(pbreak) == counts9.get("schedule_page_breaks", 0) and len(pbreak) > 0,
+           f"{len(pbreak)} record(s) against "
+           f"{counts9.get('schedule_page_breaks', 0)} fix(es)")
+        ok("and it shows pageBreakBefore ARRIVING where the source had none",
+           all(f"{{{W}}}pageBreakBefore" not in (r.get("before") or "")
+               and f"{{{W}}}pageBreakBefore" in (r.get("after") or "") for r in pbreak),
+           "the record does not show the break being introduced")
+
+        # THE SECOND READER. Replay the record over the before-document and require it to
+        # reproduce the after-document's shapes exactly.
+        pred, actual, err = format_replay(before9, after9, j9)
+        ok("the element-level record REPLAYS onto the finished document", err is None, err)
+        if err is None:
+            missed = [i for i, (p, a) in enumerate(zip(pred, actual)) if p != a]
+            ok("and it accounts for every run whose shape moved — no formatting change "
+               "the journal does not claim", not missed, f"unaccounted ordinals: {missed}")
+        ppred, pactual, perr = paragraph_format_replay(before9, after9, j9)
+        ok("the paragraph-level record replays too", perr is None, perr)
+        if perr is None:
+            pmissed = [i for i, (p, a) in enumerate(zip(ppred, pactual)) if p != a]
+            ok("and accounts for every paragraph whose properties moved",
+               not pmissed, f"unaccounted paragraphs: {pmissed}")
+
+        # THE NEGATIVE CONTROL INSIDE THE DOCUMENT.
+        named = {e.get("para") for e in fmt_edits} | {r.get("para") for r in fmt_paras}
+        ok("the control paragraph is named by NO formatting record",
+           FORMAT_CONTROL_PARA not in named, f"records name paragraphs {sorted(named)}")
+
+        # THE FIGURE THAT SHOULD NOW BE EMPTY.
+        ok("nothing is left UNEXPLAINED — every fix is a text edit or a formatting one",
+           j9["self_check"].get("unexplained_fixes") == [],
+           repr(j9["self_check"].get("unexplained_fixes")))
+        ok("and non_text_fixes SURVIVES at schema 2, because it has live consumers",
+           isinstance(j9["self_check"].get("non_text_fixes"), list),
+           repr(j9["self_check"].get("non_text_fixes")))
+
+# =========================================================================================
+# ARM 10 — THE POSITIVE CONTROL FOR THE FORMATTING ARM. Remove one recorded formatting edit
+# and require ARM 9's replay to go RED for it. Branch 9's own control caught two real
+# defects in the check on its first run — an element record that was walked but never used,
+# so deleting an entry changed nothing, and entries carrying no paragraph id. Both read as
+# working. An arm that reports "accounted" everywhere must be shown able to say otherwise.
+# =========================================================================================
+print("\nARM 10 — the positive control: drop one formatting record and prove ARM 9 fails")
+if j9 is None:
+    void("formatting positive control", "no journal to plant a defect in")
+else:
+    planted = json.loads(json.dumps(j9))
+    victim = None
+    for st in planted.get("stages", []):
+        if st.get("format_edits"):
+            victim = st["format_edits"].pop(0)
+            break
+    if victim is None:
+        void("formatting positive control",
+             "the fixture produced no element-level formatting record to remove")
+    else:
+        pred2, actual2, err2 = format_replay(before9, after9, planted)
+        caught = err2 is not None or (
+            pred2 is not None
+            and any(p != a for p, a in zip(pred2, actual2)))
+        ok("with one formatting record removed the replay reports the run as UNACCOUNTED, "
+           "so ARM 9 can fail", caught,
+           "the replay still reported everything accounted for — it is not load-bearing")
+
+# =========================================================================================
+# ARM 11 — THE STRIP STAGE CARRIES THE FORMAT CONTRACT TOO. It is the one stage that
+# DELETES, so its ordinals shift and only the paragraph level can describe it. Leaving it
+# out would have been cheaper and wrong: a contract with one stage silently exempt reads as
+# coverage, and B3 — slice 2's — is a defect in exactly this stage.
+# =========================================================================================
+print("\nARM 11 — the strip stage is inside the formatting contract, not exempt from it")
+d11, x11 = stage("format_strip", TC_DOC)
+r11 = run([SCRIPTS / "post_process.py", x11, "--fix", "--variant", args.variant])
+j11 = journal_of(d11)
+if j11 is None:
+    void("strip formatting record", f"no journal written (rc={r11.returncode})")
+else:
+    strip11 = [st for st in j11.get("stages", [])
+               if st.get("stage") == "strip_noop_tracked_changes"]
+    if not strip11:
+        void("strip formatting record", "the strip stage did not run on this fixture")
+    else:
+        ok("the strip stage carries a format_paragraphs key, present even when empty",
+           isinstance(strip11[0].get("format_paragraphs"), list),
+           repr(strip11[0].get("format_paragraphs"))[:120])
+
 print("\n" + "=" * 92)
 print(f"  {CHECKED} check(s), {len(FAIL)} failure(s), {len(VOIDED)} void")
 for f in FAIL:
