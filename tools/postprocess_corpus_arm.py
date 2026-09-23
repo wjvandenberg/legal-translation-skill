@@ -70,31 +70,44 @@ W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"))
 
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. A before-and-after check in this
-# project once read its "before" from HEAD, which worked only while the change was
-# uncommitted and then compared the new file against itself and reported 100% carried.
 #
-# MOVED TO fd98ec2 ON 2026-09-23, the squash-merge of branch 10 slice 2 (PR #97) and the LAST
-# COMMIT THAT TOUCHED EITHER TREE — derived, not read off a merge message: `git log --oneline
-# -1 -- uk us` returns it. It moved as the FIRST act after that merge, never as a closing
-# tidy-up. `git grep -F <old sha>` enumerates the carriers and is the only reading of "which
-# pins move" that cannot go stale — it found FOUR moving ones at branch 9's close, where the
-# session writing them had just said three, and THREE at each of slice 1's and slice 2's,
-# where the enumeration is the only reason that is known rather than assumed.
+# MOVED TO d3efa24 ON 2026-09-23, the squash-merge of branch 10 slice 3a -- the italic strip
+# made conditional on what the operator DECLARED (PR #100) -- and the LAST COMMIT THAT
+# TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE: `git log --oneline -1 -- uk
+# us` returns it. A pin left at the previous baseline reports the merged branch's own work as
+# movement belonging to whatever branch runs next, and the branch that inherits it cannot
+# tell.
 #
-# AND AT THIS PIN ARM 0 IS EXPECTED TO REPORT **VOID**, WHICH IS THE CORRECT ANSWER AND NOT
-# A FAILURE. Slice 2 merged the very post_process.py this tool swaps, so the baseline is
-# now byte-identical to the working tree and arm 1 would be comparing a file against itself.
-# Arm 0 says so rather than letting arm 1 report a confident row of verdicts that mean
-# nothing.
+# AND AT THIS PIN ARM 0 IS EXPECTED TO REPORT **VOID**, WHICH IS THE CORRECT ANSWER AND
+# NOT A FAILURE. Slice 3a merged the very post_process.py this tool swaps, so the
+# baseline is now byte-identical to the working tree and arm 1 would be comparing a file
+# against itself. Arm 0 says so rather than letting arm 1 report a confident row of
+# verdicts that mean nothing. It starts answering again the moment slice 3b edits
+# post_process, and what it will then assert is slice 2's inverted acceptance: the bytes
+# MUST move, and every movement must be explained by a register row.
 #
-# THE PREVIOUS VERSION OF THIS BLOCK PREDICTED THAT SLICE 2 WOULD BE THE LAST VOID CLOSE, AND
-# THAT PREDICTION WAS WRONG IN A WAY WORTH KEEPING. It read the situation right — slice 2 did
-# change behaviour and the bytes did move — but confused WHEN the tool answers with WHAT it
-# answers. This pin is moved to the merge of whatever last touched the tree, so between
-# branches the baseline IS the working tree and arm 0 is void EVERY time, whatever the merged
-# branch did. Arm 0 starts answering again the moment slice 3 edits post_process, and what it
-# will then assert is slice 2's inverted acceptance: the bytes MUST move.
-REF = os.environ.get("LT_BASELINE_REF", "fd98ec2")
+# AND SINCE SLICE 3a THIS TOOL STAGES paragraphs.json FOR BOTH ARMS. It withheld them
+# for a reason that was sound until a pass READ them: the post-strip drift gate then
+# fires, measured on 6 of the 13 and identically at the baseline, so it is inherited.
+# But with no notes a conditional pass cannot determine its condition, changes nothing,
+# AND THE BYTES MOVE ANYWAY -- every signal reading as success over a condition never
+# evaluated once.
+#
+# THE CARRIERS ARE ENUMERATED, NEVER COUNTED FROM MEMORY. `git grep -F <old sha>` found
+# THREE at this close, as it did at slice 1's and slice 2's, and FOUR at branch 9's -- where
+# the session writing them had just said three. A phrase naming a count is wrong the moment
+# the thing it counts changes. The instruction is still not "move them all":
+# tools/hf_corpus_diff.py is FIXED at ae48f6d and three suites at 2178cce, each for a reason
+# in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it moves in the
+# commit that moves the BYTES, never at a close, and slice 3a deliberately left it at
+# 5107aaf because a combined slice-2-plus-3a movement is still a movement its journal claims.
+#
+# THIS BLOCK IS REWRITTEN ON EVERY MOVE RATHER THAN APPENDED TO, because it has gone stale
+# twice and been caught twice -- once naming a commit as "the merge-base of this branch" long
+# after it was not, and once reading "Moved to 049484e" five lines above a pin that said
+# 2a71e71. NOTHING CHECKS A COMMENT, so a stale one is indistinguishable from a current one.
+# Re-derive every claim in it on the commit that moves the pin.
+REF = os.environ.get("LT_BASELINE_REF", "d3efa24")
 SCRIPT = "post_process.py"
 
 # The two snapshot names seen in the frozen set. Named EXPLICITLY rather than globbed:

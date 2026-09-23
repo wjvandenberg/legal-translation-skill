@@ -666,7 +666,7 @@ unconditionally — as is §5.6 entire.
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-09-23. BRANCH 10 SLICE 3a IS BUILT: B1 CLOSED, the rendered-diff gate DISCHARGED, and the row's own open measurement REFUTED. PR #100 open at `d40fa5b`, nothing merged, tree clean
+### HANDOFF — 2026-09-23. BRANCH 10 SLICE 3a IS MERGED (`d3efa24`, PR #100) AND CLOSED: B1 CLOSED, the rendered-diff gate DISCHARGED, and the row's own open measurement REFUTED. The three moving pins are at `d3efa24`
 
 **PURPOSE: MET.** 3a's target was *stop the italic strip destroying formatting the operator declared, without stopping the work it genuinely does.* The word-count rule now decides only CANDIDACY; `en_runs`, read in its own offsets, decides the rest, with the source `runs` matched by EXACT equality for the untranslated-term case. Of the 37 runs the pass strips today, **28 are accounted for, 9 are not, none undecided** — the paragraph join resolved **37 of 37**, so no positional fallback was needed and none was written.
 
@@ -680,7 +680,7 @@ unconditionally — as is §5.6 entire.
 
 **AND TWO INSTRUMENTS WERE WRONG BEFORE THE DELIVERABLE WAS.** (1) `postprocess_corpus_arm` withheld `paragraphs.json` from every staged workdir — sound until a pass read them, and after that catastrophic: the condition could never be determined, the pass would change nothing, **and the bytes would move anyway**, so every signal would have read as success over a condition never evaluated. Both positive controls had the same defect. (2) `render_diff`'s fixture baseline swapped the APPLY script, which this run never executes, so both arms ran identical code and the page was reported unchanged. Neither looked like an error; both produced a clean PASS.
 
-**THE SINGLE NEXT ACTION: merge the PR, then move the three pins** — `apply_corpus_diff.py`, `render_diff.py`, `postprocess_corpus_arm.py`, at `fd98ec2`, enumerated with `git grep -F`, never a remembered count. **Then build slice 3b** (B5, B6(a), F29), whose input is the LEXICON, not the notes.
+**THE SINGLE NEXT ACTION: build slice 3b** — B5, B6(a) and F29, whose input is the **LEXICON in the tree**, not the notes: `general-legal.md` line 152 offers Annex/Schedule as a free choice while `fix_annex` overrides it unconditionally. **3b designs ONE shared mechanism, not three conditions.** The pins are already moved and `B1` was deliberately NOT added to `apply_corpus_diff`'s `FIX_LANDED` — that map's only two consumers are about APPLY, which this fix does not touch, and the reasoning is written into it.
 
 **Open, none blocking.** **(1)** `tests/test_change_journal.py` arm 6's pin stays at `5107aaf` — decided deliberately, not skipped: its own block says move it only when a later slice needs the comparison to start from slice 2's tree, and a combined movement is still a movement. **(2)** `claudemd_claims` check 2, inherited. **(3)** `fix_double_punctuation`'s docstring says answering B8 *"needs the declared notes, which is slice 3's input"* — the notes have now arrived, so B8 could become conditional; it is CLOSED as a detector under 2c revised and was deliberately left alone as out of 3a's scope.
 

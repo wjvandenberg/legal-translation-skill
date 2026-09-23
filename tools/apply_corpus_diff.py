@@ -59,57 +59,36 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 SCRIPT = "apply_translations_textmatch.py"
 
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. CLAUDE.md 5.3: a before-and-after check
-# once read its "before" from HEAD, which worked only while the change was uncommitted and then
-# compared the new file against itself and reported 100% carried.
 #
-# MOVED TO fd98ec2 ON 2026-09-23, the squash-merge of branch 10 slice 2, the conditional
-# passes (PR #97) and the LAST COMMIT THAT TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE
-# MERGE MESSAGE: `git log --oneline -1 -- uk us` returns it, and `git diff fd98ec2 -- uk us`
-# comes back empty. A pin left at the previous baseline reports the merged branch's own work
-# as movement belonging to whatever branch runs next, and the branch that inherits it cannot
+# MOVED TO d3efa24 ON 2026-09-23, the squash-merge of branch 10 slice 3a -- the italic strip
+# made conditional on what the operator DECLARED (PR #100) -- and the LAST COMMIT THAT
+# TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE: `git log --oneline -1 -- uk
+# us` returns it. A pin left at the previous baseline reports the merged branch's own work as
+# movement belonging to whatever branch runs next, and the branch that inherits it cannot
 # tell.
 #
-# AND AT THIS PIN THE SELF-COMPARISON NOTICE IS EXPECTED TO BE PRESENT. Slice 2 made four
-# passes in post_process.py conditional and changed strip_noop_tracked_changes.py and
-# validate_apply.py with them; it did not touch the apply script this tool swaps. So both
-# arms carry identical code BY DESIGN and the run is all-quiet for a legitimate reason --
-# which is exactly what a STALE pin also produces, and is why the notice is printed rather
-# than left to be inferred. THE .pyc SLICE IS STILL THE LAST RUN WHERE THIS TOOL'S READING
-# ACTUALLY MOVED, seven branches ago now.
+# AND AT THIS PIN THE SELF-COMPARISON NOTICE IS EXPECTED TO BE PRESENT, STILL. Slice
+# 3a changed post_process.py, which this tool does not drive -- it swaps the APPLY
+# script. So both arms carry identical code BY DESIGN and an all-quiet run is correct
+# rather than evidence, which is exactly what a STALE pin also produces and is why the
+# notice is printed rather than left to be inferred. The .pyc slice remains the last run
+# where this tool's reading actually moved.
 #
-# IT HAS NOW MOVED TWELVE TIMES -- 4a1c452, 049484e, 2a71e71, d3c7f19, 544f908, ae48f6d,
-# 010c34f, 015c8b6, 18a0798, c803b56, 5107aaf, here -- and that cadence IS the argument for
-# the rule rather than a complaint about it: moving it is the FIRST act after a merge, never a
-# closing tidy-up.
+# THE CARRIERS ARE ENUMERATED, NEVER COUNTED FROM MEMORY. `git grep -F <old sha>` found
+# THREE at this close, as it did at slice 1's and slice 2's, and FOUR at branch 9's -- where
+# the session writing them had just said three. A phrase naming a count is wrong the moment
+# the thing it counts changes. The instruction is still not "move them all":
+# tools/hf_corpus_diff.py is FIXED at ae48f6d and three suites at 2178cce, each for a reason
+# in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it moves in the
+# commit that moves the BYTES, never at a close, and slice 3a deliberately left it at
+# 5107aaf because a combined slice-2-plus-3a movement is still a movement its journal claims.
 #
-# AND THE HABIT ITSELF WENT STALE TWICE, WHICH IS THE MORE USEFUL LESSON THAN THE CADENCE.
-# First: every close for five days moved "BOTH pins", and branch 7 slice 3 had already added
-# a THIRD carrier -- tools/hf_corpus_diff.py -- so "both" was wrong on the commit that
-# introduced it. Then branch 9 added a FOURTH and a FIFTH in one commit
-# (tools/postprocess_corpus_arm.py and tests/test_change_journal.py), and the session that
-# wrote them still said "three" one paragraph before enumerating and finding four. A PHRASE
-# NAMING A COUNT IS WRONG THE MOMENT THE THING IT COUNTS CHANGES, and it is wrong again the
-# next time. `git grep -F <old sha>` enumerates the carriers and is the only reading that
-# cannot go stale. Note the instruction is still not "move them all": hf_corpus_diff.py
-# needs a FIXED pin, and so do three suites at 2178cce. See those files' own blocks.
-#
-# THE PIN THAT MATTERS IS THE ONE WHOSE READING MOVES, AND FOR THIS TOOL IT HAS NOT MOVED
-# SINCE THE .pyc SLICE. Branch 6 slice 4, branch 7 slices 2 and 3, branch 8 and now branch 9
-# all changed scripts this tool does not drive, so its two arms were byte-identical BY
-# DESIGN and it reported 13 of 13 unchanged -- a correct-looking all-quiet run a stale pin
-# would have reproduced exactly. The .pyc slice touched APPLY, so the baseline genuinely
-# differed, the self-comparison notice was ABSENT, and 13 of 13 came back byte-identical
-# with 0 unexplained movement. That is what this tool looks like when it is actually
-# answering its question, and it is the shape to compare against: AN ALL-QUIET RUN WITH THE
-# NOTICE PRESENT PROVES NOTHING.
-#
-# AND THE PROSE ABOVE THE PIN GOES STALE AS READILY AS THE PIN, WHICH IS WHY THIS BLOCK IS
-# REWRITTEN EACH TIME RATHER THAN APPENDED TO. It has gone stale twice and been caught twice:
-# once still naming 79a8c14 as "the merge-base of this branch", and once with the same block
-# in tools/render_diff.py reading "Moved to 049484e" while its pin one line below said
-# 2a71e71 -- two claims disagreeing inside five lines, both true once. NOTHING CHECKS A
-# COMMENT. Re-derive both claims on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "fd98ec2")
+# THIS BLOCK IS REWRITTEN ON EVERY MOVE RATHER THAN APPENDED TO, because it has gone stale
+# twice and been caught twice -- once naming a commit as "the merge-base of this branch" long
+# after it was not, and once reading "Moved to 049484e" five lines above a pin that said
+# 2a71e71. NOTHING CHECKS A COMMENT, so a stale one is indistinguishable from a current one.
+# Re-derive every claim in it on the commit that moves the pin.
+REF = os.environ.get("LT_BASELINE_REF", "d3efa24")
 
 # WHICH DIRECTIONAL CHECK BELONGS TO WHICH MERGED FIX — added 2026-09-08, on a measured false
 # alarm that would have recurred for ever.
@@ -136,6 +115,17 @@ FIX_LANDED = {
     # guaranteed false defect -- register I-24, for the second time, on the branch that
     # filed it.
     "CONTAINER": "544f908",   # branch 7 slice 1
+    # B1 IS DELIBERATELY NOT HERE, AND THE ABSENCE IS REASONED RATHER THAN OVERLOOKED.
+    # Register I-24 says a directional "did the fix fire?" check gets its row the moment its
+    # fix merges, because the premise dies on merge and the check becomes a guaranteed false
+    # defect. THE TEST IS WHETHER SUCH A CHECK EXISTS -- and this map has exactly two
+    # consumers, both in this file, both about APPLY. Branch 10 slice 3a changed
+    # post_process.py, which this tool does not drive at all, so no directional check here
+    # has a premise B1's merge could kill. Adding a row would install a suppression for a
+    # check that does not exist, which is its own small defect.
+    # What DOES watch B1 is tools/postprocess_corpus_arm.py, and its equivalent guard is arm
+    # 0: it reports VOID rather than passing once the baseline stops differing from the
+    # working tree.
 }
 
 
