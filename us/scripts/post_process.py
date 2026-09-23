@@ -45,12 +45,28 @@ from lxml import etree
 # a paragraph-keyed identity would have to pick one of the two and would misattribute under
 # the other. The flat enumeration is the same under both.
 #
-# IT IS DECLARED BLIND TO NON-TEXT CHANGE, NEVER SILENTLY BLIND. The italic strip removes
-# `w:i`, the page-break pass adds `pageBreakBefore`, the spacing pass sets `xml:space`. None
-# of those is text and none is recorded as an edit. Each pass instead records its element
-# count before and after, so a structural change is VISIBLE as a count even where its
-# content is not recorded. A reader that believed this file recorded formatting would be
-# wrong, so the artefact says so in its own `text_contract` field rather than only here.
+# IT WAS DECLARED BLIND TO NON-TEXT CHANGE, AND SINCE BRANCH 10 SLICE 1 IT IS NOT. Branch 9
+# declared the blind spot rather than hiding it and reported it as a bare figure. Branch 10
+# is the branch that makes it matter: slice 3 turns the italic strip into a CONDITIONAL
+# pass, and there is no way to show a conditional pass did the right thing from a count.
+#
+# FOUR NON-TEXT SHAPES, COUNTED FROM THE CODE RATHER THAN ASSUMED. The spacing and
+# definition-boundary passes set `xml:space` on a `w:t`; the line-break pass removes a
+# `w:br` from a run; the italic strip removes `w:i` from a `w:rPr`; the page-break pass
+# creates a `w:pPr` and inserts `w:pageBreakBefore`. Not one is text.
+#
+# SO THERE IS A SECOND CONTRACT, AND IT SITS ON THE FIRST ONE'S COORDINATES. The formatting
+# record uses the SAME flat ordinal and the SAME paragraph index as the text record, so a
+# text edit and a formatting change at one place are readable as one place and a consumer
+# needs no second coordinate system. What it holds is every tag and attribute of the `w:r`
+# that carries the element, and of the paragraph's `w:pPr` — descendants included, TEXT
+# EXCLUDED, because the text contract already owns text and a record holding both would
+# report every text edit twice.
+#
+# WHAT IT STILL DOES NOT CLAIM. Where a pass changes the NUMBER of text-bearing elements or
+# of paragraphs, every ordinal after the change shifts and neither record can describe it by
+# ordinal; that case is reported as a note, exactly as the text record reports it. The
+# per-pass element counts remain, because they are the only thing that survives that case.
 #
 # AND IT REPORTS, IT DOES NOT REFUSE. An un-journalled change is a defect in THIS script,
 # not in the operator's document — so a gate here would fire on something nobody running
@@ -58,18 +74,33 @@ from lxml import etree
 # nothing six times out of six. The self-check prints loudly and the run continues; the
 # hard assertion lives in tests/test_change_journal.py and tools/postprocess_corpus_arm.py,
 # where whoever trips it can fix it.
-JOURNAL_SCHEMA = 'post-process-journal/1'
+# SCHEMA 2 IS BRANCH 10 SLICE 1's FORMATTING RECORD. The version moves because the artefact
+# now describes something it did not before; a version string that never moves is one
+# nobody can key on. Nothing is REMOVED at 2 — `non_text_fixes` in particular stays, because
+# tools/postprocess_corpus_arm.py, tests/test_change_journal.py and both skill-docs/06 read
+# it, and a field with live consumers is not quietly repurposed.
+JOURNAL_SCHEMA = 'post-process-journal/2'
 JOURNAL_NAME = 'post_process_journal.json'
 JOURNAL_TEXT_CONTRACT = (
     'w:t and w:delText, in document order, identified by flat ordinal over the part; '
     'paragraphs grouped by the nested-paragraph rule (runs inside a nested w:p belong to '
-    'that w:p). Attribute and structural change is NOT recorded as an edit — see the '
-    'per-pass element counts.'
+    'that w:p). TEXT ONLY: formatting and structure belong to the format contract, which '
+    'uses these same ordinals.'
+)
+JOURNAL_FORMAT_CONTRACT = (
+    'for each text-bearing element, every tag and attribute of the w:r that carries it, '
+    'descendants included and text excluded, at the SAME flat ordinal as the text record; '
+    'for each paragraph, the same reading of its w:pPr, at the same paragraph index. '
+    'Recorded only where the count of text-bearing elements, or of paragraphs, did not '
+    'move; where it moved, the note says so and the per-pass element counts are the '
+    'only account.'
 )
 
 _JT = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}t'
 _JDT = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}delText'
 _JP = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}p'
+_JR = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}r'
+_JPPR = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}pPr'
 
 
 def journal_flat_texts(root):
@@ -129,6 +160,66 @@ def journal_element_count(root):
     return sum(1 for _ in root.iter())
 
 
+def _journal_shape(el):
+    """One element as tag plus sorted attributes. NO TEXT, deliberately.
+
+    The tag is the FULL `{namespace}localname` and not the localname alone. `t` is one of
+    the most reused names in OOXML — `w:t` is a text run, `a:t` a DrawingML one — and a
+    report written on localnames counted one chart part as four surfaces on branch 7.
+    Attributes are sorted because lxml preserves source order and a re-serialisation that
+    reorders them is not a formatting change.
+    """
+    return el.tag + ''.join(f' {k}={v}' for k, v in sorted(el.attrib.items()))
+
+
+def _journal_subtree_shape(el):
+    """An element and every descendant, as shapes. This is what makes `w:i` disappearing
+    from a `w:rPr`, and a `w:br` disappearing from a run, both visible as one string."""
+    return ' | '.join(_journal_shape(x) for x in el.iter())
+
+
+def journal_flat_formats(root):
+    """For each text-bearing element, the shape of the `w:r` that carries it.
+
+    SAME ORDINAL AS `journal_flat_texts`, which is the whole point: the two records index
+    one enumeration, so a consumer reading both does not have to reconcile two coordinate
+    systems. An element with no `w:r` ancestor falls back to its own shape rather than to
+    None, because `None` would be indistinguishable from "this run has no properties".
+    """
+    # The list is bound to a name and KEPT so the lxml proxies stay alive, for the reason
+    # journal_flat_paragraph_map states: lxml recreates a proxy on demand and a freed one's
+    # id() can be handed to a different element, which would silently mis-key the map.
+    runs = list(root.iter(_JR))
+    by_run = {id(r): _journal_subtree_shape(r) for r in runs}
+    out = []
+    for e in root.iter():
+        if e.tag not in (_JT, _JDT):
+            continue
+        a = e.getparent()
+        while a is not None and a.tag != _JR:
+            a = a.getparent()
+        if a is None:
+            out.append(_journal_shape(e))
+        else:
+            cached = by_run.get(id(a))
+            out.append(_journal_subtree_shape(a) if cached is None else cached)
+    return out
+
+
+def journal_paragraph_formats(root):
+    """For each paragraph, the shape of its `w:pPr` — the empty string where it has none.
+
+    `find` and not `iter`: a paragraph's OWN properties are a direct child, and a nested
+    paragraph's `w:pPr` belongs to the nested paragraph. Same index as
+    `journal_paragraph_texts`, which enumerates paragraphs the same way.
+    """
+    out = []
+    for p in root.iter(_JP):
+        ppr = p.find(_JPPR)
+        out.append('' if ppr is None else _journal_subtree_shape(ppr))
+    return out
+
+
 class ChangeJournal:
     """Accumulates what this invocation changed. Holds no document, only what moved."""
 
@@ -136,13 +227,16 @@ class ChangeJournal:
         self.variant = variant
         self.pass_edits = []
         self.pass_paragraphs = []
+        self.pass_format_edits = []
+        self.pass_format_paragraphs = []
         self.pass_counts = []
         self.strip = None
         self.unaccounted = []
         self.notes = []
 
     def record_pass(self, name, before_flat, after_flat,
-                    before_paras, after_paras, before_n, after_n, owner_map, fixes):
+                    before_paras, after_paras, before_n, after_n, owner_map, fixes,
+                    before_fmt, after_fmt, before_pfmt, after_pfmt):
         """One pass's contribution. Called with snapshots taken either side of it.
 
         `fixes` is the pass's OWN return value, and it is recorded beside the text edits
@@ -179,10 +273,48 @@ class ChangeJournal:
         for i, (b, a) in enumerate(zip(before_paras, after_paras)):
             if b != a:
                 self.pass_paragraphs.append({'para': i, 'before': b, 'after': a})
+        # THE FORMATTING RECORD, on the two enumerations above and not on a third. The
+        # length guards are the text record's own, for the text record's own reason: a pass
+        # that adds or removes a text-bearing element or a paragraph shifts every ordinal
+        # after it, so a record written by ordinal would be false rather than incomplete.
+        if len(before_fmt) == len(after_fmt):
+            for i, (b, a) in enumerate(zip(before_fmt, after_fmt)):
+                if b != a:
+                    self.pass_format_edits.append({
+                        'pass': name, 'elem': i,
+                        'para': owner_map[i] if i < len(owner_map) else None,
+                        'before': b, 'after': a,
+                    })
+        elif before_fmt != after_fmt:
+            self.notes.append(
+                f'{name} changed the number of text-bearing elements, so its FORMATTING '
+                f'change is not recorded by ordinal either')
+        if len(before_pfmt) == len(after_pfmt):
+            for i, (b, a) in enumerate(zip(before_pfmt, after_pfmt)):
+                if b != a:
+                    self.pass_format_paragraphs.append({
+                        'pass': name, 'para': i, 'before': b, 'after': a,
+                    })
+        elif before_pfmt != after_pfmt:
+            self.notes.append(
+                f'{name} changed the number of paragraphs ({len(before_pfmt)} -> '
+                f'{len(after_pfmt)}); its paragraph FORMATTING change is not recorded')
 
-    def record_strip(self, ran, before_paras, after_paras):
+    def record_strip(self, ran, before_paras, after_paras,
+                     before_pfmt, after_pfmt):
         entry = {'stage': 'strip_noop_tracked_changes', 'ran': bool(ran),
-                 'paragraphs': []}
+                 'paragraphs': [], 'format_paragraphs': []}
+        # THE STRIP GETS THE FORMAT CONTRACT TOO, AT PARAGRAPH LEVEL ONLY. It DELETES
+        # w:ins/w:del wrappers, so every text-bearing element's flat ordinal after one
+        # shifts and the element-level record cannot describe it — the same reason its text
+        # is recorded per paragraph. Leaving the stage out entirely would have been the
+        # cheaper thing and the wrong one: a contract with one stage silently exempt reads
+        # as coverage, and B3 is a defect in exactly this stage.
+        if ran and len(before_pfmt) == len(after_pfmt):
+            for i, (b, a) in enumerate(zip(before_pfmt, after_pfmt)):
+                if b != a:
+                    entry['format_paragraphs'].append(
+                        {'para': i, 'before': b, 'after': a})
         if ran and len(before_paras) == len(after_paras):
             for i, (b, a) in enumerate(zip(before_paras, after_paras)):
                 if b != a:
@@ -211,6 +343,13 @@ class ChangeJournal:
             'stage': 'passes',
             'edits': self.pass_edits,
             'paragraphs': self._collapse(self.pass_paragraphs),
+            # NOT collapsed, and the difference from `paragraphs` above is deliberate. The
+            # text record collapses so that replaying it reproduces the document exactly
+            # once. A formatting record is read to answer WHICH PASS changed this run, and
+            # collapsing two passes' changes into one entry destroys exactly that — which
+            # is the question branch 10 slice 3 has to answer about a conditional pass.
+            'format_edits': self.pass_format_edits,
+            'format_paragraphs': self.pass_format_paragraphs,
             'counts': self.pass_counts,
         }]
         if self.strip is not None:
@@ -224,6 +363,7 @@ class ChangeJournal:
             # deliverable — but a filename is the one thing a log has repeatedly leaked.
             'document': doc_basename,
             'text_contract': JOURNAL_TEXT_CONTRACT,
+            'format_contract': JOURNAL_FORMAT_CONTRACT,
             'stages': stages,
             'self_check': {
                 'accounted': not self.unaccounted and not self.notes,
@@ -235,11 +375,31 @@ class ChangeJournal:
                 # the text contract does not describe — formatting, a page break, an
                 # attribute. A reader who takes `accounted: true` to mean "nothing else
                 # happened" is wrong, and this is the figure that tells them so.
+                #
+                # KEPT UNCHANGED AT SCHEMA 2 THOUGH THE FORMAT RECORD NOW EXPLAINS MOST OF
+                # IT. It has live consumers — the corpus arm, the suite and both
+                # skill-docs/06 — and a field whose MEANING changes under a name that does
+                # not is worse than a new field. What answers it is `unexplained_fixes`.
                 'non_text_fixes': [
                     {'pass': c['pass'], 'fixes': c['fixes']}
                     for c in self.pass_counts
                     if c['fixes'] and not any(e['pass'] == c['pass']
                                               for e in self.pass_edits)
+                ],
+                # THE FIGURE THAT SHOULD BE EMPTY, and the one to read first. A pass that
+                # reported a fix while NEITHER record shows anything changed at any ordinal
+                # has done something both contracts are blind to. Before slice 1 every
+                # non-text fix was in this position and there was no way to tell them apart;
+                # now the italic strip and the page-break pass explain themselves and what
+                # is left here is a genuine gap rather than a known one.
+                'unexplained_fixes': [
+                    {'pass': c['pass'], 'fixes': c['fixes']}
+                    for c in self.pass_counts
+                    if c['fixes']
+                    and not any(e['pass'] == c['pass'] for e in self.pass_edits)
+                    and not any(e['pass'] == c['pass'] for e in self.pass_format_edits)
+                    and not any(e['pass'] == c['pass']
+                                for e in self.pass_format_paragraphs)
                 ],
             },
         }
@@ -305,15 +465,26 @@ def journal_write(journal, xml_path, final_paras, original_paras):
 
     n_edits = len(data['stages'][0]['edits'])
     n_paras = sum(len(s.get('paragraphs', [])) for s in data['stages'])
+    n_fmt = sum(len(s.get('format_edits', [])) for s in data['stages'])
+    n_fmt_p = sum(len(s.get('format_paragraphs', [])) for s in data['stages'])
     print(f'  [journal] {n_edits} edit(s) across {n_paras} paragraph(s) -> {JOURNAL_NAME}')
+    if n_fmt or n_fmt_p:
+        print(f'  [journal] and {n_fmt} formatting change(s) on {n_fmt_p} paragraph(s) '
+              f'— run properties and paragraph properties, not text')
     nontext = data['self_check']['non_text_fixes']
+    unexplained = data['self_check']['unexplained_fixes']
     if nontext:
         # SAID ON SCREEN, not only in the file. "0 edits" beside "TOTAL: 2 fixes" reads as
-        # a contradiction and sends the reader looking for a bug; the honest line is that
-        # those two fixes were not text and this journal does not describe them.
+        # a contradiction and sends the reader looking for a bug. Since schema 2 the honest
+        # line is narrower than it was: those fixes are not TEXT, and most of them are now
+        # described after all — by the formatting record, one line up.
         which = ', '.join(f"{n['pass']} ({n['fixes']})" for n in nontext)
-        print(f'  [journal] and {sum(n["fixes"] for n in nontext)} fix(es) NOT described '
-              f'here, because they are not text: {which}')
+        print(f'  [journal] {sum(n["fixes"] for n in nontext)} of those fix(es) changed no '
+              f'text: {which}')
+    if unexplained:
+        which = ', '.join(f"{n['pass']} ({n['fixes']})" for n in unexplained)
+        print(f'  [journal] and {sum(n["fixes"] for n in unexplained)} fix(es) that NEITHER '
+              f'record describes — a genuine gap, not a known one: {which}')
     if not data['self_check']['accounted']:
         print('  ' + '!' * 58)
         print('  [journal] SELF-CHECK DID NOT ACCOUNT FOR EVERY CHANGE. This is a defect '
@@ -1676,11 +1847,15 @@ def post_process(xml_path, fix=True, variant='us', paragraphs_json=None):
         before_flat = journal_flat_texts(root)
         before_paras = journal_paragraph_texts(root)
         before_n = journal_element_count(root)
+        before_fmt = journal_flat_formats(root)
+        before_pfmt = journal_paragraph_formats(root)
         owner_map = journal_flat_paragraph_map(root)
         count = fn(root, **kwargs)
         journal.record_pass(name, before_flat, journal_flat_texts(root),
                             before_paras, journal_paragraph_texts(root),
-                            before_n, journal_element_count(root), owner_map, count)
+                            before_n, journal_element_count(root), owner_map, count,
+                            before_fmt, journal_flat_formats(root),
+                            before_pfmt, journal_paragraph_formats(root))
         return count
 
     results['spacing'] = _journalled('spacing', fix_spacing)
@@ -1739,11 +1914,16 @@ def post_process(xml_path, fix=True, variant='us', paragraphs_json=None):
         # w:ins/w:del wrappers, so every text-bearing element's ordinal after one shifts
         # and the element-level record the passes use cannot describe it. It is recorded
         # at PARAGRAPH level instead, which is the level the downstream comparison reads.
-        before_strip = journal_paragraph_texts(etree.parse(xml_path).getroot())
+        _pre_strip_root = etree.parse(xml_path).getroot()
+        before_strip = journal_paragraph_texts(_pre_strip_root)
+        before_strip_fmt = journal_paragraph_formats(_pre_strip_root)
         _run_strip_noop_subprocess(xml_path)
+        _post_strip_root = etree.parse(xml_path).getroot()
         journal.record_strip(
             True, before_strip,
-            journal_paragraph_texts(etree.parse(xml_path).getroot()))
+            journal_paragraph_texts(_post_strip_root),
+            before_strip_fmt,
+            journal_paragraph_formats(_post_strip_root))
 
     # THE JOURNAL IS WRITTEN BEFORE THE DRIFT GATE, ON PURPOSE. When that gate fires the
     # operator is shown a DRIFT error whatever the real cause was — the register's own

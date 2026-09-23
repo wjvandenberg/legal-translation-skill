@@ -160,6 +160,95 @@ def accounted_for(before_paras, after_paras, jrnl):
     return moved, sorted(moved - claimed), sorted(claimed - moved)
 
 
+R_TAG = f"{{{W}}}r"
+PPR_TAG = f"{{{W}}}pPr"
+
+
+def _shape(el):
+    """Tag plus sorted attributes, no text. FULL {namespace}localname and never the
+    localname alone — `t` is w:t, a:t and dgm:t, and a localname match once counted one
+    chart part as four surfaces."""
+    return el.tag + "".join(f" {k}={v}" for k, v in sorted(el.attrib.items()))
+
+
+def _subtree(el):
+    return " | ".join(_shape(x) for x in el.iter())
+
+
+def flat_formats(xml_bytes):
+    """BRANCH 10 SLICE 1's SECOND READER for the FORMAT contract, written from the
+    contract's words and importing nothing from the script it measures. For each
+    text-bearing element, the shape of the w:r carrying it, at the same flat ordinal the
+    text record uses."""
+    root = etree.fromstring(xml_bytes)
+    out = []
+    for e in root.iter():
+        if e.tag not in TEXT_TAGS:
+            continue
+        a = e.getparent()
+        while a is not None and a.tag != R_TAG:
+            a = a.getparent()
+        out.append(_shape(e) if a is None else _subtree(a))
+    return out
+
+
+def paragraph_formats(xml_bytes):
+    """For each paragraph, the shape of its own w:pPr — same index as paragraph_texts."""
+    root = etree.fromstring(xml_bytes)
+    out = []
+    for p in root.iter(f"{{{W}}}p"):
+        ppr = p.find(PPR_TAG)
+        out.append("" if ppr is None else _subtree(ppr))
+    return out
+
+
+def format_accounted_for(before_bytes, after_bytes, jrnl):
+    """Did the journal claim exactly the runs and paragraphs whose SHAPE moved?
+
+    Returns (moved_e, missing_e, elem_void, moved_p, missing_p, para_void, note). The two
+    VOID flags are returned explicitly rather than left to be read out of the note: a caller
+    that has to pattern-match prose to find out what was measured is one substitution away
+    from reporting a void as a clean zero.
+    """
+    be, ae = flat_formats(before_bytes), flat_formats(after_bytes)
+    bp, ap = paragraph_formats(before_bytes), paragraph_formats(after_bytes)
+    claimed_e = {e.get("elem") for st in jrnl.get("stages", [])
+                 for e in st.get("format_edits", [])}
+    claimed_p = {r.get("para") for st in jrnl.get("stages", [])
+                 for r in st.get("format_paragraphs", [])}
+
+    # THE TWO LEVELS VOID SEPARATELY, AND THE FIRST VERSION OF THIS FUNCTION VOIDED THEM
+    # TOGETHER — which the corpus caught and no fixture could have. This arm compares the
+    # ORIGINAL bytes with the FINAL bytes, so it spans BOTH stages; strip_noop DELETES
+    # w:ins/w:del wrappers, so on any tracked-change document the element count moves and
+    # every flat ordinal after the first deletion shifts. Folding the paragraph level into
+    # that void threw away coverage that was never in doubt: the strip does not add or
+    # remove PARAGRAPHS, so the paragraph enumeration is stable across the whole run.
+    # Reported as `n/a` for the element level alone, with the paragraph level still
+    # answering — a void that takes a sound measurement down with it is not caution.
+    note = None
+    if len(be) != len(ae):
+        note = (f"element count moved ({len(be)}->{len(ae)}), which is what strip_noop "
+                f"does on a tracked-change document; the format contract does not claim "
+                f"an ordinal record across that, and says so")
+        moved_e, missing_e = set(), []
+    else:
+        moved_e = {i for i, (b, a) in enumerate(zip(be, ae)) if b != a}
+        missing_e = sorted(moved_e - claimed_e)
+
+    if len(bp) != len(ap):
+        note = ((note + " AND ") if note else "") + (
+            f"paragraph count moved ({len(bp)}->{len(ap)}), which nothing in this stage is "
+            f"documented to do")
+        moved_p, missing_p = set(), []
+    else:
+        moved_p = {i for i, (b, a) in enumerate(zip(bp, ap)) if b != a}
+        missing_p = sorted(moved_p - claimed_p)
+
+    return (moved_e, missing_e, len(be) != len(ae),
+            moved_p, missing_p, len(bp) != len(ap), note)
+
+
 def run_post_process(scripts_dir, xml_path, timeout=900):
     return subprocess.run(
         ["uv", "run", "--with", "lxml", "python",
@@ -245,14 +334,16 @@ else:
 # =========================================================================================
 # ARM 1 — COMPLETENESS, AND BYTE IDENTITY, PER DOCUMENT.
 # =========================================================================================
-print("\nARM 1 — per document: does the journal account for every text change,")
-print("        and does document.xml still come out byte-identical to the baseline?")
+print("\nARM 1 — per document: does the journal account for every text change AND every")
+print("        formatting change, and is document.xml still byte-identical to the baseline?")
 print(f"  {'wd':>4}  {'input':>9}  {'paras':>6}  {'moved':>5}  {'edits':>5}  "
-      f"{'strip':>5}  {'nontext':>7}  {'bytes':>9}  verdict")
+      f"{'strip':>5}  {'nontext':>7}  {'fmt':>5}  {'fmtP':>4}  {'bytes':>9}  verdict")
 
 examined = with_movement = 0
 unreadable = []
+fmt_declared = []      # rows where the format contract says it does not claim the case
 worst = None           # (moved_count, workdir_path, ordinal) — the positive control's host
+worst_fmt = None       # the same, for the FORMATTING control — a different document may win
 for i, wd in enumerate(workdirs):
     delivered = wd / "final" / "word" / "document.xml"
     pre = [c for c in (wd / n for n in PRE_SNAPSHOT_NAMES) if c.is_file()]
@@ -321,13 +412,37 @@ for i, wd in enumerate(workdirs):
         with_movement += 1
         if worst is None or len(moved) > worst[0]:
             worst = (len(moved), src, i)
+    # BRANCH 10 SLICE 1 — THE FORMATTING ARM, read by the second reader above. Before this
+    # slice the `nontext` column to the left was the END of what could be said: a figure
+    # with no location and no pass behind it. These two columns are what turns it into an
+    # account, and slice 3 cannot show a CONDITIONAL pass did the right thing without them.
+    (moved_fe, missing_fe, elem_void,
+     moved_fp, missing_fp, para_void, fnote) = format_accounted_for(
+        before_bytes, after_bytes, jrnl)
+    fmt_note = "n/a" if elem_void else str(len(moved_fe))
+    fmtp_note = "n/a" if para_void else str(len(moved_fp))
+    if fnote:
+        # DECLARED, NOT SILENT — and counted separately from a failure, because a contract
+        # that says in its own words which case it does not claim has not failed to measure
+        # it. A run where every such row was folded into `0` would read as full coverage.
+        fmt_declared.append(f"wd{i}: {fnote}")
+    if missing_fe or missing_fp:
+        FAIL.append(
+            f"wd{i}: {len(missing_fe)} run(s) and {len(missing_fp)} paragraph(s) "
+            f"changed SHAPE with no formatting record claiming them")
+    if not elem_void and moved_fe and (
+            worst_fmt is None or len(moved_fe) > worst_fmt[0]):
+        worst_fmt = (len(moved_fe), src, i)
+
     verdict = "accounted" if not missing and not phantom else "UNACCOUNTED"
     if missing or phantom:
         FAIL.append(f"wd{i}: {len(missing)} moved-and-unclaimed, "
                     f"{len(phantom)} claimed-and-unmoved")
+    if not fnote and (missing_fe or missing_fp):
+        verdict = "UNACCOUNTED"
     print(f"  {i:>4}  {kind:>9}  {len(before_paras):>6}  {len(moved):>5}  "
           f"{len(st['edits']):>5}  {len(strip['paragraphs']) if strip else 0:>5}  "
-          f"{nontext:>7}  {byte_note:>9}  {verdict}")
+          f"{nontext:>7}  {fmt_note:>5}  {fmtp_note:>4}  {byte_note:>9}  {verdict}")
 
 print(f"\n  examined {examined} of {len(workdirs)} frozen workdirs; "
       f"{len(unreadable)} not examined")
@@ -336,6 +451,12 @@ ok("every enumerated workdir was examined or REPORTED as not examined",
    f"{examined} + {len(unreadable)} != {len(workdirs)}")
 ok("no document had a text change the journal failed to claim",
    not any(f.startswith("wd") and "unclaimed" in f for f in FAIL))
+ok("no document had a FORMATTING change the journal failed to claim",
+   not any("changed SHAPE" in f for f in FAIL))
+print(f"\n  formatting: {examined - len(fmt_declared)} of {examined} document(s) measured "
+      f"at BOTH levels; {len(fmt_declared)} carry a DECLARED limitation, named below")
+for line in fmt_declared:
+    print(f"    {line}")
 if BASELINE_DIR is not None:
     ok(f"no document's delivered bytes moved against {REF} — branch 9 is ADDITIVE",
        not any("MOVED against" in f for f in FAIL))
@@ -387,6 +508,51 @@ else:
                "UNACCOUNTED — so the arm above can fail",
                removed["para"] in missing1,
                f"removed para {removed['para']}, missing={missing1[:5]}")
+
+# =========================================================================================
+# ARM 3 — THE POSITIVE CONTROL FOR THE FORMATTING RECORD, and it is a SEPARATE control
+# rather than a second assertion inside ARM 2. ARM 2's host is chosen by how much TEXT
+# moved; the document whose formatting moves most is a different one, and on this corpus it
+# is. A control planted in the wrong document proves the arm can fail somewhere it was never
+# going to be asked.
+# =========================================================================================
+print("\nARM 3 — the positive control: a journal with one FORMATTING record removed")
+if worst_fmt is None:
+    void("formatting positive control",
+         "no document's run shapes moved at a measurable level, so there is nothing to "
+         "remove — the formatting arm is UNPROVEN on this corpus, not clean")
+else:
+    n_fmt, fsrc, fordinal = worst_fmt
+    fwork, fxml = stage_input(901, fsrc, "fctl")
+    rf = run_post_process(SCRIPTS, fxml)
+    fjpath = fwork / JOURNAL_NAME
+    if rf.returncode != 0 or not fjpath.is_file():
+        void("formatting positive control",
+             f"the control run produced no journal (rc={rf.returncode})")
+    else:
+        fj = json.loads(fjpath.read_text(encoding="utf-8"))
+        fbefore, fafter = fsrc.read_bytes(), fxml.read_bytes()
+        _me, miss0, _ev, _mp, missp0, _pv, _n = format_accounted_for(fbefore, fafter, fj)
+        ok(f"the host document is clean before the control is planted "
+           f"(wd{fordinal}, {n_fmt} run shape(s) moved)",
+           not miss0 and not missp0,
+           f"missing elems={len(miss0)} paras={len(missp0)}")
+        fholed = json.loads(json.dumps(fj))
+        fremoved = None
+        for stg in fholed["stages"]:
+            if stg.get("format_edits"):
+                fremoved = stg["format_edits"].pop()
+                break
+        if fremoved is None:
+            void("formatting positive control",
+                 "the journal carried no element-level formatting record to remove")
+        else:
+            _m1, miss1, _e1, _p1, _mp1, _v1, _n1 = format_accounted_for(
+                fbefore, fafter, fholed)
+            ok("with one formatting record removed the comparison reports that run as "
+               "UNACCOUNTED — so the formatting arm above can fail",
+               fremoved["elem"] in miss1,
+               f"removed elem {fremoved['elem']}, missing={miss1[:5]}")
 
 print("\n" + "=" * 96)
 print(f"  {CHECKED} check(s), {len(FAIL)} failure(s), {len(VOIDED)} void")

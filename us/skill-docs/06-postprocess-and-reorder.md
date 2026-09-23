@@ -83,12 +83,22 @@ there when that gate fires.
   journal, the diagnosis is not "drift" — it is whatever that pass does, and the fix
   belongs there. If the flagged text is **not** in the journal, this step did not touch it
   and the cause is upstream or in the check itself.
-* **It records TEXT only.** Formatting changes — an italic run stripped, a page break
-  inserted — are not described, because the journal's job is to let a text comparison
-  account for what moved. They are not hidden either: each pass reports its own fix count,
-  and `self_check.non_text_fixes` names any pass that made a change the journal does not
-  describe. A journal reading `0 edits` beside a non-empty `non_text_fixes` means the step
-  changed formatting, not wording.
+* **It records TEXT and FORMATTING, in two separate records that share one numbering.**
+  The text record lists every character that moved. The formatting record lists every run
+  whose properties changed — an italic stripped — and every paragraph whose properties
+  changed — a page break imposed. Both use the same element and paragraph numbers, so a
+  wording change and a formatting change in one place read as one place.
+* **`self_check.unexplained_fixes` is the figure to read first, and it should be empty.**
+  It names any pass that reported a fix which *neither* record describes. `non_text_fixes`
+  sits beside it and still names the passes that changed no wording — but those changes
+  are now described, by the formatting record. So `0 edits` beside a non-empty
+  `non_text_fixes` no longer means "something happened and we cannot say what": look at
+  the formatting record and it will say what.
+* **One case the formatting record does not claim, and it says so.** Where a pass changes
+  the *number* of text-bearing elements or of paragraphs, every number after that point
+  shifts and no record written against them would be true. The strip pass does exactly
+  that on a tracked-change document. The journal states the case in its `notes` rather
+  than reporting a clean zero.
 * **It is not part of the deliverable.** It is a working file like `paragraphs.json`.
   Repack builds the `.docx` from the original's part list, so it cannot be bundled by
   accident, but do not copy it into `final/` and do not send it to the client.
