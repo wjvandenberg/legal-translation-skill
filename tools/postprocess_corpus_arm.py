@@ -69,22 +69,23 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 # project once read its "before" from HEAD, which worked only while the change was
 # uncommitted and then compared the new file against itself and reported 100% carried.
 #
-# MOVED TO c803b56 ON 2026-09-22, the squash-merge of branch 9 (PR #93) and the LAST COMMIT
-# THAT TOUCHED EITHER TREE — derived, not read off a merge message: `git log --oneline -1 --
-# uk us` returns it. It moved as the FIRST act after that merge, never as a closing tidy-up.
-# `git grep -F <old sha>` enumerates the carriers and is the only reading of "which pins
-# move" that cannot go stale — it found FOUR moving ones at branch 9's close, where the
-# session writing them had just said three.
+# MOVED TO 5107aaf ON 2026-09-23, the squash-merge of branch 10 slice 1 (PR #95) and the LAST
+# COMMIT THAT TOUCHED EITHER TREE — derived, not read off a merge message: `git log --oneline
+# -1 -- uk us` returns it. It moved as the FIRST act after that merge, never as a closing
+# tidy-up. `git grep -F <old sha>` enumerates the carriers and is the only reading of "which
+# pins move" that cannot go stale — it found FOUR moving ones at branch 9's close, where the
+# session writing them had just said three, and THREE at slice 1's, where the enumeration is
+# the only reason that is known rather than assumed.
 #
 # AND AT THIS PIN ARM 0 IS EXPECTED TO REPORT **VOID**, WHICH IS THE CORRECT ANSWER AND NOT
-# A FAILURE. Branch 9 merged the very post_process.py this tool swaps, so the baseline is
+# A FAILURE. Slice 1 merged the very post_process.py this tool swaps, so the baseline is
 # now byte-identical to the working tree and arm 1 would be comparing a file against itself.
 # Arm 0 says so rather than letting arm 1 report a confident row of `identical` verdicts that
-# mean nothing. THE NEXT BRANCH TO EDIT post_process.py — branch 10, the tidy-up split — is
-# the one where this pin's reading starts moving again, and where a byte-identical result
-# would mean the OPPOSITE of what it means today: branch 10 changes behaviour on every
-# document, so its bytes MUST move.
-REF = os.environ.get("LT_BASELINE_REF", "c803b56")
+# mean nothing. THIS IS THE SECOND CONSECUTIVE CLOSE AT WHICH ARM 0 IS VOID, and it is the
+# LAST: slice 2 changes what post_process DOES, so at the next close a byte-identical result
+# would mean the OPPOSITE of what it means today — slice 2 changes behaviour on every
+# document, so its bytes MUST move, and an all-quiet run there is a FAILURE.
+REF = os.environ.get("LT_BASELINE_REF", "5107aaf")
 SCRIPT = "post_process.py"
 
 # The two snapshot names seen in the frozen set. Named EXPLICITLY rather than globbed:
