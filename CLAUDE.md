@@ -666,7 +666,7 @@ unconditionally — as is §5.6 entire.
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-09-23. BRANCH 10 SLICE 3a IS BUILT: B1 CLOSED, the rendered-diff gate DISCHARGED, and the row's own open measurement REFUTED. PR open, nothing merged
+### HANDOFF — 2026-09-23. BRANCH 10 SLICE 3a IS BUILT: B1 CLOSED, the rendered-diff gate DISCHARGED, and the row's own open measurement REFUTED. PR #100 open at `d40fa5b`, nothing merged, tree clean
 
 **PURPOSE: MET.** 3a's target was *stop the italic strip destroying formatting the operator declared, without stopping the work it genuinely does.* The word-count rule now decides only CANDIDACY; `en_runs`, read in its own offsets, decides the rest, with the source `runs` matched by EXACT equality for the untranslated-term case. Of the 37 runs the pass strips today, **28 are accounted for, 9 are not, none undecided** — the paragraph join resolved **37 of 37**, so no positional fallback was needed and none was written.
 
