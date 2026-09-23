@@ -122,6 +122,25 @@ SCRIPTS = ROOT / args.variant / "scripts"
 #
 # 5107aaf is the squash-merge of slice 1 and the last commit before slice 2 to touch either
 # tree — `git log --oneline -1 -- uk us` at that point returns it.
+#
+# AND IT DID NOT MOVE AGAIN AT SLICE 2's CLOSE, WHICH IS A DIFFERENT ANSWER FROM "IT IS A
+# FIXED PIN" AND IS MEASURED RATHER THAN ARGUED. The three tool pins move to the merge of
+# whatever last touched the tree, so they sit on their own baseline between branches and
+# report a self-comparison notice. THIS ARM CANNOT DO THAT: a self-comparison here is VOID,
+# and this suite exits non-zero on a void. Measured on the merge commit, both ways —
+#
+#     pin left at 5107aaf   rc=0, 72 checks, arm 6 green
+#     pin moved to fd98ec2  rc=1, 69 checks + 1 VOID, and red on every run on `main`
+#                           until slice 3 lands
+#
+# — so moving it mechanically would have made the suite permanently red for a reason that is
+# not a defect, which is the exact failure this block already records from branch 9's close.
+#
+# THE RULE, STATED SO THE NEXT CLOSE DOES NOT HAVE TO RE-DERIVE IT: this pin moves in the
+# COMMIT THAT MOVES THE BYTES, never at the close that merges it. At 5107aaf the arm keeps
+# asking a live question — did the conditional passes change what post_process writes? — and
+# would go red if slice 3 reverted them. Move it only when a later slice needs the comparison
+# to start from a tree that already has slice 2's conditions in it.
 REF = os.environ.get("LT_BASELINE_REF", "5107aaf")
 
 FAIL, CHECKED, VOIDED = [], 0, []

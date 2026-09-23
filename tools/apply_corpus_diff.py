@@ -62,25 +62,25 @@ SCRIPT = "apply_translations_textmatch.py"
 # once read its "before" from HEAD, which worked only while the change was uncommitted and then
 # compared the new file against itself and reported 100% carried.
 #
-# MOVED TO 5107aaf ON 2026-09-23, the squash-merge of branch 10 slice 1, the formatting
-# record (PR #95) and the LAST COMMIT THAT TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE
-# MERGE MESSAGE: `git log --oneline -1 -- uk us` returns it, and `git diff 5107aaf -- uk us`
+# MOVED TO fd98ec2 ON 2026-09-23, the squash-merge of branch 10 slice 2, the conditional
+# passes (PR #97) and the LAST COMMIT THAT TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE
+# MERGE MESSAGE: `git log --oneline -1 -- uk us` returns it, and `git diff fd98ec2 -- uk us`
 # comes back empty. A pin left at the previous baseline reports the merged branch's own work
 # as movement belonging to whatever branch runs next, and the branch that inherits it cannot
 # tell.
 #
-# AND AT THIS PIN THE SELF-COMPARISON NOTICE IS EXPECTED TO BE PRESENT. Slice 1 added a
-# FORMATTING record to post_process.py's journal and restated the contract in a step
-# document; it did not touch the apply script this tool swaps. So both arms carry identical
-# code BY DESIGN and the run is all-quiet for a legitimate reason -- which is exactly what a
-# STALE pin also produces, and is why the notice is printed rather than left to be inferred.
-# THE .pyc SLICE IS STILL THE LAST RUN WHERE THIS TOOL'S READING ACTUALLY MOVED, six
-# branches ago now.
+# AND AT THIS PIN THE SELF-COMPARISON NOTICE IS EXPECTED TO BE PRESENT. Slice 2 made four
+# passes in post_process.py conditional and changed strip_noop_tracked_changes.py and
+# validate_apply.py with them; it did not touch the apply script this tool swaps. So both
+# arms carry identical code BY DESIGN and the run is all-quiet for a legitimate reason --
+# which is exactly what a STALE pin also produces, and is why the notice is printed rather
+# than left to be inferred. THE .pyc SLICE IS STILL THE LAST RUN WHERE THIS TOOL'S READING
+# ACTUALLY MOVED, seven branches ago now.
 #
-# IT HAS NOW MOVED ELEVEN TIMES -- 4a1c452, 049484e, 2a71e71, d3c7f19, 544f908, ae48f6d,
-# 010c34f, 015c8b6, 18a0798, c803b56, here -- and that cadence IS the argument for the rule
-# rather than a complaint about it: moving it is the FIRST act after a merge, never a closing
-# tidy-up.
+# IT HAS NOW MOVED TWELVE TIMES -- 4a1c452, 049484e, 2a71e71, d3c7f19, 544f908, ae48f6d,
+# 010c34f, 015c8b6, 18a0798, c803b56, 5107aaf, here -- and that cadence IS the argument for
+# the rule rather than a complaint about it: moving it is the FIRST act after a merge, never a
+# closing tidy-up.
 #
 # AND THE HABIT ITSELF WENT STALE TWICE, WHICH IS THE MORE USEFUL LESSON THAN THE CADENCE.
 # First: every close for five days moved "BOTH pins", and branch 7 slice 3 had already added
@@ -109,7 +109,7 @@ SCRIPT = "apply_translations_textmatch.py"
 # in tools/render_diff.py reading "Moved to 049484e" while its pin one line below said
 # 2a71e71 -- two claims disagreeing inside five lines, both true once. NOTHING CHECKS A
 # COMMENT. Re-derive both claims on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "5107aaf")
+REF = os.environ.get("LT_BASELINE_REF", "fd98ec2")
 
 # WHICH DIRECTIONAL CHECK BELONGS TO WHICH MERGED FIX — added 2026-09-08, on a measured false
 # alarm that would have recurred for ever.
