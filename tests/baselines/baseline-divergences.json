@@ -21,9 +21,9 @@
    "sha256_now": "91f49df10cb0a69a04f806433720cc3fc0df6ff687d151ce285045d137104583"
   },
   "uk/scripts/post_process.py": {
-   "changed_by": "feature/branch10-slice2-conditional-passes",
-   "commit_subject": "Branch 10 slice 2 - the conditional passes: every pass tests the condition it assumes, and the validator reads the record instead of predicting it (B4, B3, B2, B8, C15)",
-   "sha256_now": "c8f3f8b56ee3ecc5528923e43121f1e323d53cd3f3dcf25c7b6f1e1390dd723b"
+   "changed_by": "feature/branch10-slice3a-italic-declared",
+   "commit_subject": "Branch 10 slice 3a - the italic strip made conditional on what the operator declared (B1)",
+   "sha256_now": "b66fa45a4f14dc37c6e4e35713a4db7d92f3ecb67a611321492b3dacb7636269"
   },
   "uk/scripts/quality_check.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -106,9 +106,9 @@
    "sha256_now": "0df16cb99fbc01cb25bbdbf2c52dfa7449869a9c0fd542248987e8f995909b74"
   },
   "us/scripts/post_process.py": {
-   "changed_by": "feature/branch10-slice2-conditional-passes",
-   "commit_subject": "Branch 10 slice 2 - the conditional passes: every pass tests the condition it assumes, and the validator reads the record instead of predicting it (B4, B3, B2, B8, C15)",
-   "sha256_now": "20b757efda68df810c36ac34f6a584d9d7635f28cfb82829251d55b3105e38ce"
+   "changed_by": "feature/branch10-slice3a-italic-declared",
+   "commit_subject": "Branch 10 slice 3a - the italic strip made conditional on what the operator declared (B1)",
+   "sha256_now": "70c953191d864da4cc4e9bc2202b85cae5353afb180ce66952b052324e2b3d3f"
   },
   "us/scripts/quality_check.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",

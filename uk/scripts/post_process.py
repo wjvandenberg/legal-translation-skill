@@ -1496,7 +1496,120 @@ def fix_definition_line_breaks(root):
 
     return fixes
 
-def fix_spurious_italic_runs(root):
+# === THE DECLARED NOTES — slice 3a's input, and the first DECISION taken from them ===
+#
+# `post_process` has located `paragraphs.json` since rev18, but only ever to hand the
+# PATH to a subprocess (the post-strip drift gate). This is the first place the stage
+# READS the operator's notes to decide what to do, which is the seam branch 10's slices
+# were cut on: slice 2's passes needed no new input, these need the declaration.
+#
+# THE JOIN IS BY TEXT AND BY THE DECLARED OFFSETS — NEVER BY INDEX. One real document
+# produced 577 JSON entries for 564 XML paragraphs, a 6-13 position drift that under
+# index-matching corrupted styles, numbering and indentation and left the last ~60
+# paragraphs in the source language. Measured on the 13 frozen workdirs: the paragraph
+# join resolves 37 of 37 of the runs this pass touches, and the offset join covers all
+# 37 with nothing indeterminate, so nothing here needs a positional fallback.
+#
+# AND THE SOURCE ARM IS EXACT EQUALITY, NOT CONTAINMENT, BECAUSE `runs` HOLDS
+# SOURCE-LANGUAGE TEXT. An English run's text cannot match a source run's except where
+# the term was not translated. A containment join was measured first and looked better --
+# it kept 34 rather than 28, reproducing a figure register row B1 records from a wholly
+# separate measurement -- and that agreement was a COINCIDENCE, not corroboration: the
+# same join returned 7 verdicts that could only be accidental. Exact equality reaches the
+# case the row actually names, a deliberately RETAINED source-language term, and reaches
+# nothing by luck.
+DECLARED_ITALIC_UNDECIDED = []
+
+
+def _notes_norm(s):
+    """Whitespace-folded text, for the PARAGRAPH-level join only.
+
+    Deliberately NOT used to compare against `en_runs` offsets: those index the raw
+    `en` string, so folding before slicing would shift every boundary.
+    """
+    return ' '.join((s or '').split())
+
+
+def load_declared_notes(paragraphs_json_path):
+    """Read paragraphs.json into {folded `en` text: entry}, or None if unreadable.
+
+    Returns None -- never an empty dict -- when there are no notes to consult, because
+    the two mean opposite things to the caller: None is "the condition cannot be
+    determined, change nothing", while an empty dict would read as "nothing is declared,
+    strip everything". That distinction is the whole of decision 2c revised here.
+    """
+    if not paragraphs_json_path or not os.path.isfile(paragraphs_json_path):
+        return None
+    try:
+        with open(paragraphs_json_path, 'r', encoding='utf-8') as f:
+            entries = json.load(f)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(entries, list):
+        return None
+    by_en = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        if entry.get('en'):
+            by_en.setdefault(_notes_norm(entry['en']), entry)
+    return by_en or None
+
+
+def _declared_italic(entry, run_text):
+    """Do the operator's notes ACCOUNT for this run being italic?
+
+    True  -- declared italic, or carried unchanged from an italic source run: KEEP.
+    False -- the notes cover this run and neither side calls it italic: STRIP.
+    None  -- nothing in the notes covers this run at all: INDETERMINATE, change nothing.
+
+    Two arms, and they are asymmetric on purpose.
+
+    `en_runs` is the operator's explicit statement about the ENGLISH, and its spans are
+    offsets into `en`, so it is read in its own coordinates: locate the run's raw text
+    inside `en` and consult every segment whose span overlaps it.
+
+    `runs` is the SOURCE, in the source language, so it is matched by EXACT equality of
+    the folded text. That succeeds only where the term was never translated -- a retained
+    source-language title, a party or facility name, a statutory citation -- which is
+    exactly the sub-case this function's own docstring carve-out claims to protect and
+    which register row B1's third instance, D03B, is entirely about.
+    """
+    covered = False
+
+    en = entry.get('en') or ''
+    segments = entry.get('en_runs') or []
+    if run_text and segments:
+        start = en.find(run_text)
+        while start != -1:
+            end = start + len(run_text)
+            for seg in segments:
+                if not isinstance(seg, dict):
+                    continue
+                try:
+                    a, b = int(seg['start']), int(seg['end'])
+                except (KeyError, TypeError, ValueError):
+                    continue
+                if a < end and start < b:
+                    covered = True
+                    if seg.get('italic') is True:
+                        return True
+            start = en.find(run_text, start + 1)
+
+    folded = _notes_norm(run_text)
+    if folded:
+        for seg in (entry.get('runs') or []):
+            if not isinstance(seg, dict):
+                continue
+            if _notes_norm(seg.get('text')) == folded:
+                covered = True
+                if seg.get('italic') is True:
+                    return True
+
+    return False if covered else None
+
+
+def fix_spurious_italic_runs(root, notes=None):
     """Remove italic from runs in body paragraphs where italic is not appropriate.
 
     In Italian legal documents, defined terms are sometimes italic in the source, and
@@ -1512,8 +1625,31 @@ def fix_spurious_italic_runs(root):
 
     This function removes italic from runs that contain substantive English text (more
     than 3 words, not in parentheses, not a Latin term) in non-heading paragraphs.
+
+    **B1 — THE RULE ABOVE IS NOT A TEST OF WHETHER THE ITALIC WAS THE OPERATOR'S, AND
+    THAT IS THE DEFECT.** A run of more than two unparenthesised words that is not a
+    listed Latin term is *unsatisfiable by faithful work*: an italicised cross-reference
+    title cannot be written so as to pass it. On one real document the pass destroyed
+    an entire drafting convention document-wide -- roughly twenty italicised
+    cross-reference titles, six defined facility terms, a statute name, two notice-block
+    address labels -- and the operator had declared every one of them correctly. Three
+    of those classes were named unprompted, with matching counts, by a reading lawyer.
+
+    Under decision 2c revised the pass now tests the condition it always assumed: the
+    word-count rule decides only whether a run is a CANDIDATE, and `_declared_italic`
+    then decides whether the notes account for it. Where they do, the italic stays.
+    Where they cover the run and account for nothing, it goes, exactly as before. Where
+    nothing covers it -- and where there are no notes at all -- the pass CHANGES NOTHING
+    and says so through ``DECLARED_ITALIC_UNDECIDED``.
+
+    `notes` is the mapping from `load_declared_notes`, or None. **None is not "strip
+    nothing is declared": it is "this cannot be decided", and the pass reports instead
+    of guessing.** Measured across the 13 frozen workdirs: of the 37 runs this pass
+    strips today, 28 are accounted for by the notes and 9 are not, with none left
+    undecided.
     """
     fixes = 0
+    del DECLARED_ITALIC_UNDECIDED[:]
     latin_terms = {
         'inter alia', 'mutatis mutandis', 'pari passu', 'pro rata', 'bona fide',
         'vis-à-vis', 'de facto', 'de jure', 'prima facie', 'sui generis', 'et seq.',
@@ -1574,8 +1710,25 @@ def fix_spurious_italic_runs(root):
             if len(text) <= 5 and re.match(r'^[\d\.\(\)a-z]+$', text):
                 continue  # Numbering label like "1.1" or "(a)"
 
-            # If it's substantive text (more than 2 words) and italic, remove italic
+            # If it's substantive text (more than 2 words) and italic, the run is a
+            # CANDIDATE. Whether it is actually spurious is decided by the notes.
             if len(text.split()) > 2:
+                if notes is None:
+                    # No declaration to consult. B1: the pass cannot tell an italic it
+                    # introduced from one the operator authored, and guessing destroyed
+                    # a drafting convention on a real document. Report, change nothing.
+                    DECLARED_ITALIC_UNDECIDED.append('no notes')
+                    continue
+                entry = notes.get(_notes_norm(full))
+                if entry is None:
+                    DECLARED_ITALIC_UNDECIDED.append('no paragraph match')
+                    continue
+                verdict = _declared_italic(entry, t.text)
+                if verdict is True:
+                    continue          # declared, or carried from an italic source run
+                if verdict is None:
+                    DECLARED_ITALIC_UNDECIDED.append('run not covered')
+                    continue
                 rpr.remove(i_elem)
                 fixes += 1
 
@@ -1883,6 +2036,14 @@ def post_process(xml_path, fix=True, variant='uk', paragraphs_json=None):
     journal = ChangeJournal(variant)
     original_paragraphs = journal_paragraph_texts(root)
 
+    # THE NOTES ARE RESOLVED ONCE, HERE, AND THE SAME PATH FEEDS BOTH CONSUMERS.
+    # rev18 resolved it at the very end, for the drift gate alone; slice 3a needs it
+    # BEFORE the passes run. One resolution rather than two means the pass and the gate
+    # can never disagree about which notes describe this document -- a disagreement that
+    # would be invisible, both halves reporting normally against different files.
+    declared_json = paragraphs_json or _autodetect_paragraphs_json(xml_path)
+    declared_notes = load_declared_notes(declared_json)
+
     def _journalled(name, fn, **kwargs):
         """Run one pass between two snapshots. THE PASS ITSELF IS NOT TOUCHED — no
         fix_* function knows this exists, which is what makes the journal provably
@@ -1923,7 +2084,8 @@ def post_process(xml_path, fix=True, variant='uk', paragraphs_json=None):
     results['quotes'] = _journalled('quotes', fix_quotes)
     results['definition_line_breaks'] = _journalled(
         'definition_line_breaks', fix_definition_line_breaks)
-    results['spurious_italic'] = _journalled('spurious_italic', fix_spurious_italic_runs)
+    results['spurious_italic'] = _journalled(
+        'spurious_italic', fix_spurious_italic_runs, notes=declared_notes)
     results['schedule_page_breaks'] = _journalled(
         'schedule_page_breaks', fix_schedule_page_breaks)
 
@@ -1953,6 +2115,22 @@ def post_process(xml_path, fix=True, variant='uk', paragraphs_json=None):
               f"'Article' — B2: the sentence after the number carries no "
               f"decisive token, and guessing 'internal' once rewrote a "
               f"statutory citation into a clause that does not exist.")
+    if DECLARED_ITALIC_UNDECIDED:
+        # THE REASONS ARE COUNTED SEPARATELY BECAUSE THEY MEAN DIFFERENT THINGS.
+        # "no notes" is a whole document the pass declined to touch; the other two are
+        # individual runs the declaration did not reach. Folding them into one number
+        # would make a run standalone on ad-hoc XML look like a document with 200
+        # unmatched paragraphs, and only the second is a reason to look at anything.
+        why = {}
+        for reason in DECLARED_ITALIC_UNDECIDED:
+            why[reason] = why.get(reason, 0) + 1
+        detail = ', '.join(f"{k}: {n}" for k, n in sorted(why.items()))
+        print(f"  [detector] spurious_italic left "
+              f"{len(DECLARED_ITALIC_UNDECIDED)} italic run(s) ALONE because the "
+              f"declared notes do not settle them ({detail}) — B1: the word-count "
+              f"rule cannot tell an italic this pipeline introduced from one the "
+              f"operator authored, and on a real document guessing destroyed an "
+              f"entire drafting convention the operator had declared correctly.")
 
     if fix and total > 0:
         tree.write(xml_path, xml_declaration=True, encoding='UTF-8',
@@ -2007,9 +2185,12 @@ def post_process(xml_path, fix=True, variant='uk', paragraphs_json=None):
     # convention if not supplied explicitly. Surfaces phantom-glue and
     # placeholder-strip failures at end of Step 6 rather than at Step 10.
     if fix:
-        pjson = paragraphs_json or _autodetect_paragraphs_json(xml_path)
-        if pjson:
-            _run_validate_apply_post_strip(xml_path, pjson)
+        # `declared_json` was resolved at the top of this function and is the SAME path
+        # the conditional passes consulted. It is reused rather than re-derived: two
+        # resolutions of one path is a place for the pass and the gate to disagree
+        # silently about which notes describe this document.
+        if declared_json:
+            _run_validate_apply_post_strip(xml_path, declared_json)
 
     return results
 

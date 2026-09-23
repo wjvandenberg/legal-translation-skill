@@ -268,20 +268,55 @@ def run_post_process(scripts_dir, xml_path, timeout=900):
         cwd=str(ROOT), env=ENV, timeout=timeout)
 
 
-def stage_input(ordinal, src_xml, label):
-    """A fresh <workdir>/final/word/document.xml holding a COPY of the frozen input.
+GATE_MARKER = "SKILL GATE FIRED"
 
-    NO paragraphs.json is placed beside it, deliberately: the post-strip drift gate would
-    then run and RAISE on a document whose notes no longer match, which is a different
-    question from the one this arm asks and would stop the run before the journal could be
-    read. The journal is written BEFORE that gate, but the gate's exit code would still
-    mask this arm's result.
+
+def stage_input(ordinal, src_xml, label, notes_src=None):
+    """A fresh <workdir>/final/word/document.xml holding a COPY of the frozen input,
+    and -- since slice 3a -- a copy of that workdir's paragraphs.json beside it.
+
+    THE NOTES USED TO BE WITHHELD DELIBERATELY, AND THAT BECAME WRONG THE MOMENT A PASS
+    STARTED READING THEM. The old reason was sound for what it covered: staging the notes
+    makes the post-strip drift gate run, and it RAISES on a document whose notes no longer
+    match -- measured here, on 6 of the 13 workdirs, and it fires identically at the
+    pinned baseline, so it is inherited and not slice 3a's doing.
+
+    But withholding them silently answers a DIFFERENT QUESTION once `fix_spurious_italic_runs`
+    is conditional on them. With no notes the pass cannot determine its condition, so it
+    changes nothing -- and the delivered bytes MOVE anyway, because the baseline stripped
+    and the new copy did not. Every signal this tool prints would have said the slice
+    worked, while the condition it exists to test was never evaluated once. That is the
+    exact shape of a check passing for the wrong reason, and the arm would have been the
+    thing that was wrong rather than the deliverable.
+
+    So the notes are staged, for BOTH arms, from the SAME source. Symmetry is not
+    decoration here: slice 2 found this tool building its baseline from the pinned script
+    while taking its siblings from the working tree, so the change under test appeared on
+    both sides and CANCELLED. Two arms given different inputs cannot be compared at all.
+
+    The gate is NOT bypassed, suppressed or flagged off -- it fires exactly as it does in
+    production, and the caller reports that it fired. The journal is written BEFORE the
+    gate by design (post_process.py says so in terms), so a fired gate costs this arm its
+    exit code and none of its evidence.
     """
     d = TMP / f"{label}{ordinal:02d}" / "final" / "word"
     d.mkdir(parents=True, exist_ok=True)
     dest = d / "document.xml"
     shutil.copy2(src_xml, dest)
+    if notes_src is not None and Path(notes_src).is_file():
+        shutil.copy2(notes_src, TMP / f"{label}{ordinal:02d}" / "paragraphs.json")
     return TMP / f"{label}{ordinal:02d}", dest
+
+
+def gate_fired(result):
+    """Did post_process exit non-zero because the DRIFT GATE fired, rather than crash?
+
+    Compared by the gate's own refusal text, never by the exit code alone: a toleration
+    pinned to `rc` removes the one signal a regression would have used, and this tool has
+    to be able to tell a fired gate from a traceback for ever.
+    """
+    return result.returncode != 0 and GATE_MARKER in (
+        (result.stderr or "") + (result.stdout or ""))
 
 
 print("=" * 96)
@@ -375,6 +410,8 @@ examined = with_movement = 0
 BYTES_MOVED = []   # slice 2: the documents whose delivered bytes moved, which is now the
                    # thing being asserted rather than the thing being forbidden
 unreadable = []
+GATE_FIRED_ON = []     # rows where the post-strip drift gate fired; reported, not dropped
+NO_NOTES_ON = []       # rows where the conditional pass never received a declaration
 fmt_declared = []      # rows where the format contract says it does not claim the case
 worst = None           # (moved_count, workdir_path, ordinal) — the positive control's host
 worst_fmt = None       # the same, for the FORMATTING control — a different document may win
@@ -401,12 +438,21 @@ for i, wd in enumerate(workdirs):
         print(f"  {i:>4}  {kind:>9}  unreadable ({type(exc).__name__}) — NOT EXAMINED")
         continue
 
-    work, xml = stage_input(i, src, "new")
+    work, xml = stage_input(i, src, "new", notes_src=wd / "paragraphs.json")
     r = run_post_process(SCRIPTS, xml)
-    if r.returncode != 0:
+    if r.returncode != 0 and not gate_fired(r):
         unreadable.append(i)
         print(f"  {i:>4}  {kind:>9}  post_process exited {r.returncode} — NOT EXAMINED")
         continue
+    if gate_fired(r):
+        # THE GATE FIRING IS NOT THIS ARM'S QUESTION, AND IT IS NOT A REASON TO DROP THE
+        # ROW. It fires on the same 6 workdirs at the pinned baseline, so it is inherited;
+        # and the journal is on disk before the gate raises, so everything this arm reads
+        # is already there. Counting the row as NOT EXAMINED would shrink the denominator
+        # in silence and leave a smaller clean run looking exactly like a clean run.
+        GATE_FIRED_ON.append(i)
+    if "no notes" in (r.stdout or ""):
+        NO_NOTES_ON.append(i)
     examined += 1
 
     jpath = work / JOURNAL_NAME
@@ -428,9 +474,11 @@ for i, wd in enumerate(workdirs):
 
     byte_note = "—"
     if BASELINE_DIR is not None:
-        owork, oxml = stage_input(i, src, "old")
+        # THE SAME NOTES, FROM THE SAME SOURCE, FOR BOTH ARMS. Anything else makes the
+        # two runs incomparable — and this tool has already shipped that defect once.
+        owork, oxml = stage_input(i, src, "old", notes_src=wd / "paragraphs.json")
         ro = run_post_process(BASELINE_DIR, oxml)
-        if ro.returncode != 0:
+        if ro.returncode != 0 and not gate_fired(ro):
             byte_note = f"old rc{ro.returncode}"
         else:
             ob = oxml.read_bytes()
@@ -488,6 +536,21 @@ print(f"\n  examined {examined} of {len(workdirs)} frozen workdirs; "
 ok("every enumerated workdir was examined or REPORTED as not examined",
    examined + len(unreadable) == len(workdirs),
    f"{examined} + {len(unreadable)} != {len(workdirs)}")
+
+# SLICE 3a — DID THE CONDITIONAL PASS ACTUALLY GET ITS INPUT? This is the arm that stops
+# this tool reporting a clean run over a condition it never evaluated. `post_process`
+# prints a detector line naming "no notes" when it could not consult a declaration at all,
+# so the presence of that phrase is the proof the notes did NOT arrive. It is asserted on
+# the RUN OUTPUT rather than on the staging code, because staging a file and the pass
+# reading it are two different claims and only the second one matters.
+print(f"\n  post-strip drift gate fired on {len(GATE_FIRED_ON)} of {examined} "
+      f"document(s) — INHERITED, it fires identically at {REF}; the journal is written "
+      f"before the gate, so the rows above are complete:")
+print(f"    {sorted(GATE_FIRED_ON) if GATE_FIRED_ON else 'none'}")
+ok("no document reached the conditional italic pass without its declared notes",
+   not NO_NOTES_ON,
+   f"the pass reported 'no notes' on wd{NO_NOTES_ON} — the notes were not staged, so "
+   f"the condition was never evaluated and any byte movement below is meaningless")
 ok("no document had a text change the journal failed to claim",
    not any(f.startswith("wd") and "unclaimed" in f for f in FAIL))
 ok("no document had a FORMATTING change the journal failed to claim",
@@ -537,10 +600,16 @@ if worst is None:
     void("positive control", "no document moved, so there is no record to remove")
 else:
     n_moved, src, ordinal = worst
-    work, xml = stage_input(900, src, "ctl")
+    # THE CONTROL MUST RE-RUN ON THE SAME INPUT ARM 1 USED, NOTES INCLUDED. Staging it
+    # without them re-runs a DIFFERENT experiment: the conditional passes cannot
+    # determine their condition, so the journal the control holes is not the journal
+    # arm 1 measured. Found by the formatting control voiding while arm 1's own row for
+    # the same document reported nine run shapes moved — two instruments disagreeing.
+    work, xml = stage_input(900, src, "ctl",
+                            notes_src=workdirs[ordinal] / "paragraphs.json")
     r = run_post_process(SCRIPTS, xml)
     jpath = work / JOURNAL_NAME
-    if r.returncode != 0 or not jpath.is_file():
+    if (r.returncode != 0 and not gate_fired(r)) or not jpath.is_file():
         void("positive control", f"the control run did not produce a journal (rc={r.returncode})")
     else:
         jrnl = json.loads(jpath.read_text(encoding="utf-8"))
@@ -580,10 +649,15 @@ if worst_fmt is None:
          "remove — the formatting arm is UNPROVEN on this corpus, not clean")
 else:
     n_fmt, fsrc, fordinal = worst_fmt
-    fwork, fxml = stage_input(901, fsrc, "fctl")
+    # Same rule as the text control above, and this is the arm that exposed it: every
+    # element-level formatting record on this corpus comes from the italic strip, so a
+    # control run without notes produces NO record to remove and the control voids —
+    # while arm 1's row for the very same document reports nine.
+    fwork, fxml = stage_input(901, fsrc, "fctl",
+                              notes_src=workdirs[fordinal] / "paragraphs.json")
     rf = run_post_process(SCRIPTS, fxml)
     fjpath = fwork / JOURNAL_NAME
-    if rf.returncode != 0 or not fjpath.is_file():
+    if (rf.returncode != 0 and not gate_fired(rf)) or not fjpath.is_file():
         void("formatting positive control",
              f"the control run produced no journal (rc={rf.returncode})")
     else:

@@ -462,9 +462,11 @@ def audit_b1():
     # This claim reads the INDEX, deliberately, and is the only one in this block that does --
     # so a fixture added on a branch must be STAGED before the number is right, and the claim
     # goes red while whoever moved it is still here rather than after the merge. IT HAS NOW
-    # DONE EXACTLY THAT ON THREE CONSECUTIVE SLICES, which is the fourth time that design has
-    # paid. Re-derived 24 against a claimed 23, on this branch, with the fixture staged.
-    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 25)
+    # DONE EXACTLY THAT ON FOUR CONSECUTIVE SLICES, which is the fifth time that design has
+    # paid. Re-derived 27 against a claimed 25, on branch 10 slice 3a: italic-declared.docx
+    # and its shipped italic-declared.notes.json, TWO files from one fixture, which is the
+    # reason this is counted by LISTING and never by adding an expected delta of one.
+    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 27)
 
     hits = 0
     for nm in fx:

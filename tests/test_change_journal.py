@@ -64,6 +64,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -793,6 +794,25 @@ FORMAT_DOC = (
 print("\nARM 9 — the FORMATTING record: is branch 9's declared blind spot closed?")
 d9, x9 = stage("format", FORMAT_DOC)
 before9 = x9.read_bytes()
+# SINCE SLICE 3a THIS FIXTURE NEEDS NOTES, AND THAT IS NOT A CONVENIENCE. The italic strip
+# is now conditional on the declaration, so without one it changes nothing and this arm
+# would VOID on an empty record — a formatting arm reporting nothing to record, on a run
+# where the deliverable was working correctly. The notes declare the italic run as NOT
+# italic, which is the case where the pass must STILL fire; arm 14 owns the opposite limb.
+_fmt_notes = run([SCRIPTS / "extract_paragraphs.py", x9, d9 / "paragraphs.json"])
+if (d9 / "paragraphs.json").is_file():
+    _fn = json.loads((d9 / "paragraphs.json").read_text(encoding="utf-8"))
+    for e in _fn:
+        e["en"] = e.get("text", "")
+        e["en_runs"] = [{"start": 0, "end": len(e["en"]),
+                         "bold": False, "italic": False}]
+        # The SOURCE side must not answer for this arm: in a synthetic fixture the
+        # extractor reads the very runs under test, so `runs` would carry the English
+        # text AND its italic flag and the source arm would keep everything.
+        for _r in (e.get("runs") or []):
+            _r["italic"] = False
+    (d9 / "paragraphs.json").write_bytes(
+        (json.dumps(_fn, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
 r9 = run([SCRIPTS / "post_process.py", x9, "--fix", "--variant", args.variant])
 after9 = x9.read_bytes()
 j9 = journal_of(d9)
@@ -1043,6 +1063,169 @@ _other = "us" if args.variant == "uk" else "uk"
 _va_other = (ROOT / _other / "scripts" / "validate_apply.py").read_text(encoding="utf-8")
 ok(f"and the {_other} tree carries it too",
    "def load_spacing_record(" in _va_other)
+
+# =========================================================================================
+# ARM 14 — SLICE 3a: THE ITALIC STRIP TESTS THE CONDITION IT ASSUMES (B1).
+#
+# The old rule — more than two unparenthesised words, not a listed Latin term — is not a
+# test of whether the italic was the operator's. It is UNSATISFIABLE BY FAITHFUL WORK: an
+# italicised cross-reference title cannot be written so as to pass it. On one real document
+# the pass destroyed a drafting convention document-wide and the operator had declared
+# every instance correctly.
+#
+# FOUR LIMBS, AND THE LAST ONE IS THE REASON THIS ARM EXISTS RATHER THAN A SIMPLER ONE.
+# Arm 6 already runs post_process on a fixture with NO notes beside it, so after slice 3a
+# the italic pass changes nothing there — and arm 6 still passes, because the other passes
+# move bytes. A suite could therefore go green over a condition it never evaluated once.
+# Limb (d) is what makes that impossible to miss: it asserts the no-notes case REPORTS.
+#
+# The notes are produced by the real `extract_paragraphs.py` and then have `en` / `en_runs`
+# authored on top, exactly as arm 8 does. Offsets are COMPUTED from the strings, never
+# typed: a hand-typed offset is a second place for this arm to be wrong.
+# =========================================================================================
+print("\nARM 14 — slice 3a: the italic strip consults the declared notes (B1)")
+
+_I = '<w:r><w:rPr><w:i/></w:rPr><w:t xml:space="preserve">%s</w:t></w:r>'
+_P = '<w:r><w:t xml:space="preserve">%s</w:t></w:r>'
+
+# Every italic string below is >2 words, unparenthesised, and free of any listed Latin
+# term as a SUBSTRING — the pass tests `lt in text.lower()`, so "in rem" would match
+# "in remuneration". Checked against the shipped list rather than assumed.
+B1_DECLARED = "Preservation of the Security"      # en_runs says italic -> must SURVIVE
+B1_UNDECLARED = "the borrower shall notify"       # en_runs says NOT italic -> must GO
+B1_RETAINED = "Ejemplo de Ley Sintetica"          # invented, untranslated -> must SURVIVE
+B1_SHORT = "Force Majeure"                        # 2 words: never a candidate at all
+
+B1_DOC = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+          f'<w:document xmlns:w="{W}"><w:body>'
+          f'<w:p>{_I % B1_DECLARED}</w:p>'
+          f'<w:p>{_I % B1_UNDECLARED}</w:p>'
+          f'<w:p>{_P % "under "}{_I % B1_RETAINED}</w:p>'
+          f'<w:p>{_I % B1_SHORT}</w:p>'
+          '</w:body></w:document>').encode("utf-8")
+
+
+def _b1_notes(workdir, xml_path):
+    """Generate notes with the real extractor, then author the declaration on top.
+
+    Returns the notes list, or None if the extractor could not run — reported as VOID
+    rather than quietly skipped.
+    """
+    rx = run([SCRIPTS / "extract_paragraphs.py", xml_path, workdir / "paragraphs.json"])
+    if not (workdir / "paragraphs.json").is_file():
+        return None, rx
+    notes = json.loads((workdir / "paragraphs.json").read_text(encoding="utf-8"))
+    for e in notes:
+        txt = e.get("text", "")
+        e["en"] = txt
+        # THE SOURCE SIDE HAS TO BE MADE REALISTIC OR THIS ARM TESTS NOTHING. In a real
+        # run `runs` comes from the SOURCE-LANGUAGE document, so an English run's text
+        # matches one only where the term was never translated. In a synthetic fixture
+        # the extractor reads the very runs under test, so every source run would carry
+        # the English text AND its italic flag — and the source arm would keep
+        # everything, including limb (b). Found by this arm failing on its first run.
+        for _r in (e.get("runs") or []):
+            if _r.get("text") == B1_RETAINED:
+                _r["italic"] = True          # untranslated, italic in the source
+            else:
+                _r["text"] = "kildetekst %d" % len(_r.get("text") or "")
+                _r["italic"] = False
+        if B1_DECLARED in txt:
+            e["en_runs"] = [{"start": txt.index(B1_DECLARED),
+                             "end": txt.index(B1_DECLARED) + len(B1_DECLARED),
+                             "bold": False, "italic": True}]
+        elif B1_UNDECLARED in txt:
+            e["en_runs"] = [{"start": txt.index(B1_UNDECLARED),
+                             "end": txt.index(B1_UNDECLARED) + len(B1_UNDECLARED),
+                             "bold": False, "italic": False}]
+        else:
+            # No English declaration at all. The RETAINED paragraph must therefore be
+            # decided by the SOURCE arm, which is the whole point of limb (c).
+            e["en_runs"] = None
+    (workdir / "paragraphs.json").write_bytes(
+        (json.dumps(notes, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    return notes, rx
+
+
+def _italic_texts(xml_bytes):
+    """The texts of every run still carrying an ON w:i. Reads w:val and treats
+    0/false/off as OFF, per .claude/rules/ooxml.md."""
+    root = etree.fromstring(xml_bytes)
+    out = []
+    for r in root.iter(f"{{{W}}}r"):
+        rpr = r.find(f"{{{W}}}rPr")
+        if rpr is None:
+            continue
+        ie = rpr.find(f"{{{W}}}i")
+        if ie is None:
+            continue
+        v = ie.get(f"{{{W}}}val")
+        if v is not None and v.strip().lower() in ("false", "0", "off"):
+            continue
+        t = r.find(f"{{{W}}}t")
+        if t is not None and t.text:
+            out.append(t.text)
+    return out
+
+# Sanity: the strings really are candidates under the SHIPPED Latin list, not under a
+# retyped copy of it. A limb that silently stopped being a candidate would pass every
+# "must survive" assertion for the wrong reason.
+_pp_src = (SCRIPTS / "post_process.py").read_text(encoding="utf-8")
+_latin = re.findall(r"'([a-zà-ÿ .]+)',", _pp_src[_pp_src.index("latin_terms = {"):
+                                                 _pp_src.index("latin_terms = {") + 700])
+ok("ARM 14's fixture strings are not accidentally exempt as Latin terms",
+   _latin and not any(lt in s.lower() for lt in _latin
+                      for s in (B1_DECLARED, B1_UNDECLARED, B1_RETAINED)),
+   f"a fixture string matches the shipped Latin list ({len(_latin)} terms read)")
+
+d14, x14 = stage("b1-notes", B1_DOC)
+_notes14, _rx14 = _b1_notes(d14, x14)
+if _notes14 is None:
+    void("B1 conditional strip", f"could not produce notes (rc={_rx14.returncode})")
+else:
+    r14 = run([SCRIPTS / "post_process.py", x14, "--fix", "--variant", args.variant])
+    after14 = _italic_texts(x14.read_bytes())
+    # The drift gate may fire — the notes declare the pre-pass English and other passes
+    # move text. That is B6's situation, not this arm's, and the document is written
+    # before the gate raises. Compared by the gate's own words, never by rc alone.
+    ok("B1 fixture: post_process either exits 0 or fires the DRIFT GATE, not a crash",
+       r14.returncode == 0 or "SKILL GATE FIRED" in ((r14.stdout or "") + (r14.stderr or "")),
+       f"rc={r14.returncode}: {(r14.stderr or '')[-400:]}")
+    ok("B1 (a): italic the operator DECLARED in en_runs SURVIVES",
+       B1_DECLARED in after14,
+       "the pass stripped formatting the notes explicitly authorise — this is the defect")
+    ok("B1 (b): italic the notes cover and do NOT declare is STILL STRIPPED",
+       B1_UNDECLARED not in after14,
+       "the pass stopped firing altogether rather than becoming conditional")
+    ok("B1 (c): an untranslated term carried from an ITALIC SOURCE RUN survives",
+       B1_RETAINED in after14,
+       "the source arm did not fire — this is D03B, the case the function's own "
+       "docstring carve-out claims to protect")
+    ok("B1 (d): a two-word run was never a candidate and is untouched either way",
+       B1_SHORT in after14,
+       "the candidacy rule changed, which slice 3a must not do")
+
+# ---- limb (e): NO NOTES AT ALL -> change nothing, and SAY SO.
+d14b, x14b = stage("b1-nonotes", B1_DOC)
+r14b = run([SCRIPTS / "post_process.py", x14b, "--fix", "--variant", args.variant])
+after14b = _italic_texts(x14b.read_bytes())
+blob14b = (r14b.stdout or "") + (r14b.stderr or "")
+ok("B1 (e): with NO notes the pass changes NOTHING — it cannot determine its condition",
+   B1_UNDECLARED in after14b and B1_DECLARED in after14b,
+   "the pass stripped on a document where nothing said whether the italic was the "
+   "operator's — decision 2c revised says report and change nothing")
+ok("B1 (e): and it REPORTS that it declined, rather than reading as 'found nothing'",
+   "spurious_italic left" in blob14b and "no notes" in blob14b,
+   "a pass that silently stops rewriting is indistinguishable from one with no work "
+   "to do — which is how arm 6 could go green over a condition never evaluated")
+
+# BOTH TREES — arm 7's rule applied to this change.
+_pp_other = (ROOT / ("us" if args.variant == "uk" else "uk")
+             / "scripts" / "post_process.py").read_text(encoding="utf-8")
+ok(f"and the {'us' if args.variant == 'uk' else 'uk'} tree carries the conditional pass too",
+   "def _declared_italic(" in _pp_other
+   and "def fix_spurious_italic_runs(root, notes=None):" in _pp_other,
+   "a fix that lands in one variant and is forgotten in the other has shipped before")
 
 print("\n" + "=" * 92)
 print(f"  {CHECKED} check(s), {len(FAIL)} failure(s), {len(VOIDED)} void")

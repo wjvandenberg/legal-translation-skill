@@ -1,0 +1,87 @@
+[
+  {
+    "idx": 0,
+    "text": "Preservation of the Security",
+    "en": "Preservation of the Security",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 28,
+        "text": "Preservation of the Security",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 28,
+        "bold": false,
+        "italic": true
+      }
+    ]
+  },
+  {
+    "idx": 1,
+    "text": "the borrower shall notify",
+    "en": "the borrower shall notify",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 25,
+        "text": "the borrower shall notify",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 25,
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 2,
+    "text": "under Ejemplo de Ley Sintetica",
+    "en": "under Ejemplo de Ley Sintetica",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "text": "under ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 6,
+        "end": 30,
+        "text": "Ejemplo de Ley Sintetica",
+        "bold": false,
+        "italic": true
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 3,
+    "text": "Force Majeure",
+    "en": "Force Majeure",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 13,
+        "text": "Force Majeure",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  }
+]
