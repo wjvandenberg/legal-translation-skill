@@ -71,22 +71,22 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 SCRIPT = "apply_translations_textmatch.py"
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.3.
 #
-# MOVED TO c803b56 ON 2026-09-22: the squash-merge of branch 9, the change journal (PR #93),
-# and the last commit to touch either tree. DERIVED, NOT READ OFF THE MERGE MESSAGE
-# -- `git log --oneline -1 -- uk us` returns it and `git diff c803b56 -- uk us` comes back
-# empty.
+# MOVED TO 5107aaf ON 2026-09-23: the squash-merge of branch 10 slice 1, the formatting
+# record (PR #95), and the last commit to touch either tree. DERIVED, NOT READ OFF THE MERGE
+# MESSAGE -- `git log --oneline -1 -- uk us` returns it and `git diff 5107aaf -- uk us` comes
+# back empty.
 #
 # AND EXPECT THE ALL-QUIET NOTICE AT THIS PIN, WHICH IS THE POINT WORTH CARRYING FORWARD.
 # The fixture path prints "BYTE-IDENTICAL to the working tree, so old and new are the same
 # code and an all-quiet render proves nothing" whenever the swapped script matches the pin.
-# Branch 9 added a change journal to post_process.py and rewrote a step document -- NOT the
-# apply script this tool swaps -- so the notice is CORRECT here and a quiet render is the
-# expected result rather than evidence. The .pyc slice, five branches back, was the last one
-# where it was absent. A stale pin produces the same honest-looking notice for an
-# illegitimate reason, which is why it moves as the first act after a merge and not as a
-# closing tidy-up.
+# Slice 1 added a FORMATTING record to post_process.py's journal and restated the contract in
+# a step document -- NOT the apply script this tool swaps -- so the notice is CORRECT here and
+# a quiet render is the expected result rather than evidence. The .pyc slice, six branches
+# back, was the last one where it was absent. A stale pin produces the same honest-looking
+# notice for an illegitimate reason, which is why it moves as the first act after a merge and
+# not as a closing tidy-up.
 #
-# THE PIN HAS NOW MOVED TEN TIMES, and this comment block has gone stale twice
+# THE PIN HAS NOW MOVED ELEVEN TIMES, and this comment block has gone stale twice
 # and been caught twice -- which is the whole argument for rewriting it rather than appending
 # to it. Once it read "Moved to 049484e" while the pin one line below said 2a71e71: both true
 # once, disagreeing inside five lines. NOTHING CHECKS A COMMENT, so a stale one is
@@ -101,15 +101,18 @@ SCRIPT = "apply_translations_textmatch.py"
 # DO NOT TRUST ANY COUNT OF THE CARRIERS, INCLUDING THIS SENTENCE'S ABSENCE OF ONE. This
 # block said THREE from 2026-09-09; branch 9 added tools/postprocess_corpus_arm.py AND
 # tests/test_change_journal.py in one commit, and the session that wrote them still said
-# "three" one paragraph before enumerating and finding FOUR moving carriers. A phrase naming
-# a count is wrong the moment the thing it counts changes, and wrong again next time.
+# "three" one paragraph before enumerating and finding FOUR moving carriers. At slice 1's
+# close the enumeration found THREE -- because test_change_journal.py's pin had by then been
+# fixed at 18a0798 and stopped moving -- so the number went DOWN, which no remembered count
+# would ever have produced. A phrase naming a count is wrong the moment the thing it counts
+# changes, and wrong again next time.
 # `git grep -F <old sha>` enumerates them and is the only reading that cannot go stale.
 #
 # AND THE INSTRUCTION IS NOT "MOVE THEM ALL". tools/hf_corpus_diff.py's pin is FIXED at
 # ae48f6d, deliberately and measured: it proves a kind-less scaffold entry is still a
 # paragraph entry, a question that only exists against a tree predating the `kind` key, so
 # moving it makes that tool VOID for ever. Three suites are likewise fixed at 2178cce.
-REF = os.environ.get("LT_BASELINE_REF", "c803b56")
+REF = os.environ.get("LT_BASELINE_REF", "5107aaf")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
 # Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
 # glance whether the pages in front of them belong to the run being discussed.
