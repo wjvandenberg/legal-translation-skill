@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """check_checkers.py - is this project's copy of each standard script current?
-CHECKER VERSION 14 (2026-09-02)
+CHECKER VERSION 16 (2026-09-22)
 
 Every project gets its OWN COPY of the standard scripts in its tools\\ folder. Copies drift:
 the shared one gets fixed and yours does not hear about it, or yours gets edited and the fix
@@ -578,6 +578,22 @@ def selftest() -> int:
         ok &= good
         print(f"  {'OK  ' if good else 'MISS'} {'empty shared folder is VOID':<24} rc={rc} (want 2)")
 
+        # AND THE MIRROR CASE, WHICH REPORTS ITSELF AS A CLEAN RUN RATHER THAN A RED ONE.
+        # Driven through main() because that is where the guard sits, and an empty shared
+        # folder is not the same failure: there the comparison finds nothing, here it finds
+        # the project's own files and every one of them matches.
+        selfcmp = tmp / "selfcmp"
+        (selfcmp / "tools").mkdir(parents=True)
+        for n in [n for n in TRACKED if (shared / n).is_file()][:3]:
+            shutil.copyfile(shared / n, selfcmp / "tools" / n)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = main(["--project", str(selfcmp), "--shared", str(selfcmp / "tools")])
+        good = rc == 2 and "against itself" in buf.getvalue()
+        ok &= good
+        print(f"  {'OK  ' if good else 'MISS'} {'shared == the project OWN tools is VOID':<38} "
+              f"rc={rc} (want 2)")
+
         ok &= roster_selftest(tmp, shared)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -764,6 +780,54 @@ def main(argv=None):
     if args.selftest:
         return selftest()
     project, shared = Path(args.project), Path(args.shared)
+    # STANDING INSIDE THE SHARED FOLDER IS NOT AN UNPROPAGATED PROJECT, AND THE TWO
+    # PRODUCE THE SAME OUTPUT. With --project defaulting to the CWD, running this from
+    # within standard-scripts/ resolves the project root to the shared folder itself,
+    # which has no tools/ - so every tracked checker reports MISSING and the run exits 1.
+    # That is indistinguishable from a real finding about a project nothing has reached.
+    # Measured 2026-09-22: a repository whose own checkers were all present and current
+    # reported "13 tracked, 13 needing a decision" from in here and "13 tracked, 0 needing
+    # a decision" from one directory up. VOID rather than a verdict: the cost is not the
+    # false red but the habit it teaches, because a reader who learns that 13 MISSING is
+    # normal will read a real 13 MISSING the same way.
+    if not (project / "tools").is_dir():
+        pr, sh = project.resolve(), shared.resolve()
+        if pr == sh or sh in pr.parents or pr in sh.parents:
+            print("VOID - the project root resolved to the SHARED scripts folder, or to a")
+            print("       parent or child of it, and it holds no tools/ directory:")
+            print(f"         project : {pr}")
+            print(f"         shared  : {sh}")
+            print("       Every tracked checker would report MISSING, which is not a")
+            print("       finding about a project - it is this command run from the wrong")
+            print("       directory. Run it from the project root, or pass --project.")
+            return 2
+    # AND THE MIRROR OF THAT GUARD, WHICH IS THE DANGEROUS DIRECTION BECAUSE IT READS AS A
+    # CLEAN RUN RATHER THAN A RED ONE. default_shared() walks up from THIS FILE looking for
+    # the shared folder and, finding none, falls back to the file's own directory - which is
+    # the project's own tools/. Every comparison then runs a file AGAINST ITSELF, so every
+    # installed checker reports CURRENT and nothing can be STALE, DIVERGED or MISSING.
+    # WHY IT IS NOT COVERED BY 'empty shared folder is VOID': there the comparison finds
+    # nothing and says so; here it finds the project's own files and every one of them
+    # matches, which is the answer the reader was hoping for.
+    # AND IT BITES EXACTLY WHERE THE HOUSE SENDS YOU. The drift verdict is supposed to be
+    # taken from a FRESH CLONE, because the installing machine compares a copy with itself -
+    # and a clone is normally made somewhere else entirely, which is precisely where the
+    # walk-up cannot reach the shared folder. So the reading meant to be trustworthy is the
+    # one most likely to be void. Measured 2026-09-22: one commit read "9 tracked, 0 needing
+    # a decision" through a clone in a temp directory and "13 tracked, 0 needing a decision"
+    # beside the shared folder. THE DENOMINATOR WAS THE ONLY THING THAT GAVE IT AWAY - every
+    # row said CURRENT and no row said anything was wrong.
+    if (project / "tools").resolve() == shared.resolve():
+        print("VOID - the shared folder resolved to this project's OWN tools/ directory, so")
+        print("       every comparison would be a file against itself and every checker")
+        print("       would report CURRENT whatever its real state:")
+        print(f"         project : {project.resolve()}")
+        print(f"         shared  : {shared.resolve()}")
+        print("       Walking up from this script found no 'standard-scripts' folder. That")
+        print("       is normal in a FRESH CLONE taken outside the tree that holds it, which")
+        print("       is the very place a drift verdict is supposed to be read.")
+        print("       Pass --shared PATH, or set HOUSE_SCRIPTS_DIR.")
+        return 2
     # A UNION, AND THE CONFIG IS READ FIRST SO A COMMAND-LINE NAME CANNOT ERASE ITS REASON.
     # The config is the standing decision; --absent adds to it for one run. Neither
     # overrides the other, because an override would let a hurried run silence a recorded

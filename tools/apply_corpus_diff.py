@@ -62,41 +62,45 @@ SCRIPT = "apply_translations_textmatch.py"
 # once read its "before" from HEAD, which worked only while the change was uncommitted and then
 # compared the new file against itself and reported 100% carried.
 #
-# MOVED TO 18a0798 ON 2026-09-10, the squash-merge of branch 8, extraction completeness
-# (PR #82) and the LAST COMMIT THAT TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE
-# MESSAGE: `git log --oneline -1 -- uk us` returns it, and `git diff 18a0798 -- uk us` comes
-# back empty. A pin left at the previous baseline reports the merged slice's own work as
+# MOVED TO c803b56 ON 2026-09-22, the squash-merge of branch 9, the change journal (PR #93)
+# and the LAST COMMIT THAT TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE:
+# `git log --oneline -1 -- uk us` returns it, and `git diff c803b56 -- uk us` comes back
+# empty. A pin left at the previous baseline reports the merged branch's own work as
 # movement belonging to whatever branch runs next, and the branch that inherits it cannot
 # tell.
 #
-# AND AT THIS PIN THE SELF-COMPARISON NOTICE IS EXPECTED TO BE PRESENT AGAIN. Branch 8 added
-# a read-only mode to validate_apply.py and rewrote a step document; it did not touch the
-# apply script this tool swaps. So both arms carry identical code BY DESIGN and the run is
+# AND AT THIS PIN THE SELF-COMPARISON NOTICE IS EXPECTED TO BE PRESENT. Branch 9 added a
+# change journal to post_process.py and rewrote a step document; it did not touch the apply
+# script this tool swaps. So both arms carry identical code BY DESIGN and the run is
 # all-quiet for a legitimate reason -- which is exactly what a STALE pin also produces, and
-# is why the notice is printed rather than left to be inferred. The .pyc slice, at the
-# previous pin, was the last run where the reading actually moved.
+# is why the notice is printed rather than left to be inferred. THE .pyc SLICE IS STILL THE
+# LAST RUN WHERE THIS TOOL'S READING ACTUALLY MOVED, five branches ago now.
 #
-# IT HAS NOW MOVED NINE TIMES IN SIX DAYS -- 4a1c452, 049484e, 2a71e71, d3c7f19, 544f908,
-# ae48f6d, 010c34f, 015c8b6, here -- and that cadence IS the argument for the rule rather
+# IT HAS NOW MOVED TEN TIMES -- 4a1c452, 049484e, 2a71e71, d3c7f19, 544f908, ae48f6d,
+# 010c34f, 015c8b6, 18a0798, here -- and that cadence IS the argument for the rule rather
 # than a complaint about it: moving it is the FIRST act after a merge, never a closing
 # tidy-up.
 #
-# AND THE HABIT ITSELF WENT STALE, WHICH IS THE MORE USEFUL LESSON THAN THE CADENCE. Every
-# close for five days moved "BOTH pins". Branch 7 slice 3 added a THIRD tool carrying one --
-# tools/hf_corpus_diff.py -- so "both" was already wrong on the commit that introduced it, and
-# a phrase naming a COUNT is wrong the moment the thing it counts changes. `git grep -F <old
-# sha>` enumerates the carriers and is the only reading that cannot go stale. It found three,
-# and one of them needs a FIXED pin rather than this moving one -- so the instruction is not
-# "move them all" either. See hf_corpus_diff.py's own block for that measurement.
+# AND THE HABIT ITSELF WENT STALE TWICE, WHICH IS THE MORE USEFUL LESSON THAN THE CADENCE.
+# First: every close for five days moved "BOTH pins", and branch 7 slice 3 had already added
+# a THIRD carrier -- tools/hf_corpus_diff.py -- so "both" was wrong on the commit that
+# introduced it. Then branch 9 added a FOURTH and a FIFTH in one commit
+# (tools/postprocess_corpus_arm.py and tests/test_change_journal.py), and the session that
+# wrote them still said "three" one paragraph before enumerating and finding four. A PHRASE
+# NAMING A COUNT IS WRONG THE MOMENT THE THING IT COUNTS CHANGES, and it is wrong again the
+# next time. `git grep -F <old sha>` enumerates the carriers and is the only reading that
+# cannot go stale. Note the instruction is still not "move them all": hf_corpus_diff.py
+# needs a FIXED pin, and so do three suites at 2178cce. See those files' own blocks.
 #
-# THE PIN THAT MATTERS IS THE ONE WHOSE READING MOVES, AND THIS SLICE IS THE FIRST IN FOUR
-# WHERE IT DID. Branch 6 slice 4, branch 7 slices 2 and 3 all changed scripts this tool does
-# not drive, so its two arms were byte-identical BY DESIGN and it reported 13 of 13 unchanged
-# -- a correct-looking all-quiet run a stale pin would have reproduced exactly. The .pyc slice
-# touched APPLY, so the baseline genuinely differed, the self-comparison notice was ABSENT,
-# and 13 of 13 came back byte-identical with 0 unexplained movement. That is what this tool
-# looks like when it is actually answering its question, and it is the shape to compare
-# against: an all-quiet run with the notice PRESENT proves nothing.
+# THE PIN THAT MATTERS IS THE ONE WHOSE READING MOVES, AND FOR THIS TOOL IT HAS NOT MOVED
+# SINCE THE .pyc SLICE. Branch 6 slice 4, branch 7 slices 2 and 3, branch 8 and now branch 9
+# all changed scripts this tool does not drive, so its two arms were byte-identical BY
+# DESIGN and it reported 13 of 13 unchanged -- a correct-looking all-quiet run a stale pin
+# would have reproduced exactly. The .pyc slice touched APPLY, so the baseline genuinely
+# differed, the self-comparison notice was ABSENT, and 13 of 13 came back byte-identical
+# with 0 unexplained movement. That is what this tool looks like when it is actually
+# answering its question, and it is the shape to compare against: AN ALL-QUIET RUN WITH THE
+# NOTICE PRESENT PROVES NOTHING.
 #
 # AND THE PROSE ABOVE THE PIN GOES STALE AS READILY AS THE PIN, WHICH IS WHY THIS BLOCK IS
 # REWRITTEN EACH TIME RATHER THAN APPENDED TO. It has gone stale twice and been caught twice:
@@ -104,7 +108,7 @@ SCRIPT = "apply_translations_textmatch.py"
 # in tools/render_diff.py reading "Moved to 049484e" while its pin one line below said
 # 2a71e71 -- two claims disagreeing inside five lines, both true once. NOTHING CHECKS A
 # COMMENT. Re-derive both claims on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "18a0798")
+REF = os.environ.get("LT_BASELINE_REF", "c803b56")
 
 # WHICH DIRECTIONAL CHECK BELONGS TO WHICH MERGED FIX — added 2026-09-08, on a measured false
 # alarm that would have recurred for ever.

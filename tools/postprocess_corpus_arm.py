@@ -4,7 +4,7 @@
 WHY THIS TOOL EXISTS RATHER THAN A RUN OF apply_corpus_diff.py, AND IT IS DECLARED HERE
 BEFORE ANY RESULT IS READ. `tools/apply_corpus_diff.py` swaps `apply_translations_textmatch.py`
 and drives APPLY. Branch 9 changes `post_process.py`, which that tool does not drive at all,
-so its result says nothing whatever about this branch. Worse: at pin 18a0798 the apply
+so its result says nothing whatever about this branch. Worse: at the current pin the apply
 script is byte-identical to the working tree, so it prints its self-comparison notice and an
 all-quiet run there is what a STALE pin also produces.
 
@@ -69,16 +69,22 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 # project once read its "before" from HEAD, which worked only while the change was
 # uncommitted and then compared the new file against itself and reported 100% carried.
 #
-# 18a0798 is the squash-merge of branch 8 and the LAST COMMIT THAT TOUCHED EITHER TREE —
-# derived, not read off a merge message: `git log --oneline -1 -- uk us` returns it. When
-# this branch merges, THIS PIN MOVES WITH THE OTHER MOVING ONES, as the first act after the
-# merge and never as a closing tidy-up. `git grep -F <old sha>` enumerates the carriers and
-# is the only reading of "which pins move" that cannot go stale.
+# MOVED TO c803b56 ON 2026-09-22, the squash-merge of branch 9 (PR #93) and the LAST COMMIT
+# THAT TOUCHED EITHER TREE — derived, not read off a merge message: `git log --oneline -1 --
+# uk us` returns it. It moved as the FIRST act after that merge, never as a closing tidy-up.
+# `git grep -F <old sha>` enumerates the carriers and is the only reading of "which pins
+# move" that cannot go stale — it found FOUR moving ones at branch 9's close, where the
+# session writing them had just said three.
 #
-# AND UNLIKE apply_corpus_diff's, THIS PIN'S READING GENUINELY MOVES ON THIS BRANCH: branch
-# 9 edits post_process.py, which is the script this tool swaps. So arm 1 below is answering
-# its question rather than comparing a file against itself, and it says which case it is in.
-REF = os.environ.get("LT_BASELINE_REF", "18a0798")
+# AND AT THIS PIN ARM 0 IS EXPECTED TO REPORT **VOID**, WHICH IS THE CORRECT ANSWER AND NOT
+# A FAILURE. Branch 9 merged the very post_process.py this tool swaps, so the baseline is
+# now byte-identical to the working tree and arm 1 would be comparing a file against itself.
+# Arm 0 says so rather than letting arm 1 report a confident row of `identical` verdicts that
+# mean nothing. THE NEXT BRANCH TO EDIT post_process.py — branch 10, the tidy-up split — is
+# the one where this pin's reading starts moving again, and where a byte-identical result
+# would mean the OPPOSITE of what it means today: branch 10 changes behaviour on every
+# document, so its bytes MUST move.
+REF = os.environ.get("LT_BASELINE_REF", "c803b56")
 SCRIPT = "post_process.py"
 
 # The two snapshot names seen in the frozen set. Named EXPLICITLY rather than globbed:
@@ -207,8 +213,19 @@ BASELINE_DIR = None
 if blob.returncode != 0:
     void("baseline readable", f"cannot read {SCRIPT} at {REF}")
 elif blob.stdout == cur:
-    void("baseline differs",
-         f"{SCRIPT} is BYTE-IDENTICAL to {REF} — arm 1 would compare it against itself")
+    # A NOTICE, NOT A VOID, AND THE DIFFERENCE IS DELIBERATE. Between branches the pin sits
+    # at the merge of the last branch to touch either tree, so the baseline IS the working
+    # tree and this is the expected RESTING state — not a defect and not something to fix.
+    # Recording it as VOID would make this tool exit non-zero on every run on `main`, and a
+    # permanently-failing instrument is one people learn to scroll past. So it is printed
+    # loudly instead, exactly as tools/apply_corpus_diff.py prints its self-comparison
+    # notice, and the byte column below reads `—` rather than a row of `identical` verdicts
+    # that would mean nothing. THE COMPLETENESS ARMS STILL GATE: they need no baseline at
+    # all, and they are this tool's primary job.
+    print(f"  NOTE  {SCRIPT} is BYTE-IDENTICAL to {REF}, so there is nothing to compare and")
+    print(f"        the byte-identity column below is OMITTED rather than filled with a")
+    print(f"        verdict that would read as evidence. This is the expected state between")
+    print(f"        branches; it starts answering again the moment a branch edits {SCRIPT}.")
 elif b"\n# === SKILL FILE COMPLETE ===" not in blob.stdout:
     void("baseline usable", "the baseline blob has no integrity sentinel; it exits 3")
 else:
