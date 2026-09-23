@@ -71,54 +71,39 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 SCRIPT = "apply_translations_textmatch.py"
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.3.
 #
-# MOVED TO fd98ec2 ON 2026-09-23: the squash-merge of branch 10 slice 2, the conditional
-# passes (PR #97), and the last commit to touch either tree. DERIVED, NOT READ OFF THE MERGE
-# MESSAGE -- `git log --oneline -1 -- uk us` returns it and `git diff fd98ec2 -- uk us` comes
-# back empty.
+# MOVED TO d3efa24 ON 2026-09-23, the squash-merge of branch 10 slice 3a -- the italic strip
+# made conditional on what the operator DECLARED (PR #100) -- and the LAST COMMIT THAT
+# TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE: `git log --oneline -1 -- uk
+# us` returns it. A pin left at the previous baseline reports the merged branch's own work as
+# movement belonging to whatever branch runs next, and the branch that inherits it cannot
+# tell.
 #
-# AND EXPECT THE ALL-QUIET NOTICE AT THIS PIN, WHICH IS THE POINT WORTH CARRYING FORWARD.
-# The fixture path prints "BYTE-IDENTICAL to the working tree, so old and new are the same
-# code and an all-quiet render proves nothing" whenever the swapped script matches the pin.
-# Slice 2 made four passes in post_process.py conditional and changed strip_noop and
-# validate_apply with them -- NOT the apply script this tool swaps -- so the notice is CORRECT
-# here and a quiet render is the expected result rather than evidence. The .pyc slice, seven
-# branches back, was the last one where it was absent. A stale pin produces the same
-# honest-looking notice for an illegitimate reason, which is why it moves as the first act
-# after a merge and not as a closing tidy-up.
+# AND SINCE SLICE 3a THE FIXTURE PATH CAN DRIVE post_process DIRECTLY, via
+# --post-process, which is what discharged CLAUDE.md 5.2's rendered-diff gate for branch
+# 10 after two slices carried it open. In that mode the baseline arm swaps
+# post_process.py and its siblings rather than the apply script: swapping a script the
+# run never executes made both arms identical and reported the page UNCHANGED, which is
+# indistinguishable from a fix that worked. WHICH SCRIPT THE BASELINE SWAPS NOW FOLLOWS
+# WHICH SCRIPT THE RUN DRIVES.
 #
-# AND NOTE WHAT THAT MEANS AFTER SLICE 2, BECAUSE IT IS THE ONE CASE WHERE THIS TOOL'S
-# SILENCE IS NOT THE WHOLE STORY: slice 2 DID change delivered bytes, on every document, and
-# this tool still shows nothing -- because its fixture path drives apply + repack and never
-# post_process. That is a limit of the instrument, not a property of the slice, and the
-# READ-ME below says so at length rather than letting a quiet render read as "no page".
+# For the DEFAULT fixture path the all-quiet notice is still expected at this pin: slice
+# 3a touched post_process.py and not apply.
 #
-# THE PIN HAS NOW MOVED TWELVE TIMES, and this comment block has gone stale twice
-# and been caught twice -- which is the whole argument for rewriting it rather than appending
-# to it. Once it read "Moved to 049484e" while the pin one line below said 2a71e71: both true
-# once, disagreeing inside five lines. NOTHING CHECKS A COMMENT, so a stale one is
-# indistinguishable from a current one and costs a reader their bearings at exactly the moment
-# they are trying to establish what "-old" means. Re-derive both claims on the commit that
-# moves the pin.
+# THE CARRIERS ARE ENUMERATED, NEVER COUNTED FROM MEMORY. `git grep -F <old sha>` found
+# THREE at this close, as it did at slice 1's and slice 2's, and FOUR at branch 9's -- where
+# the session writing them had just said three. A phrase naming a count is wrong the moment
+# the thing it counts changes. The instruction is still not "move them all":
+# tools/hf_corpus_diff.py is FIXED at ae48f6d and three suites at 2178cce, each for a reason
+# in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it moves in the
+# commit that moves the BYTES, never at a close, and slice 3a deliberately left it at
+# 5107aaf because a combined slice-2-plus-3a movement is still a movement its journal claims.
 #
-# Kept in step with the same pin in tools/apply_corpus_diff.py: the two tools answer the same
-# before-and-after question, one in bytes and one in pixels, and a disagreement between their
-# baselines would be invisible in either one's output.
-#
-# DO NOT TRUST ANY COUNT OF THE CARRIERS, INCLUDING THIS SENTENCE'S ABSENCE OF ONE. This
-# block said THREE from 2026-09-09; branch 9 added tools/postprocess_corpus_arm.py AND
-# tests/test_change_journal.py in one commit, and the session that wrote them still said
-# "three" one paragraph before enumerating and finding FOUR moving carriers. At slice 1's
-# close the enumeration found THREE -- because test_change_journal.py's pin had by then been
-# fixed at 18a0798 and stopped moving -- so the number went DOWN, which no remembered count
-# would ever have produced. A phrase naming a count is wrong the moment the thing it counts
-# changes, and wrong again next time.
-# `git grep -F <old sha>` enumerates them and is the only reading that cannot go stale.
-#
-# AND THE INSTRUCTION IS NOT "MOVE THEM ALL". tools/hf_corpus_diff.py's pin is FIXED at
-# ae48f6d, deliberately and measured: it proves a kind-less scaffold entry is still a
-# paragraph entry, a question that only exists against a tree predating the `kind` key, so
-# moving it makes that tool VOID for ever. Three suites are likewise fixed at 2178cce.
-REF = os.environ.get("LT_BASELINE_REF", "fd98ec2")
+# THIS BLOCK IS REWRITTEN ON EVERY MOVE RATHER THAN APPENDED TO, because it has gone stale
+# twice and been caught twice -- once naming a commit as "the merge-base of this branch" long
+# after it was not, and once reading "Moved to 049484e" five lines above a pin that said
+# 2a71e71. NOTHING CHECKS A COMMENT, so a stale one is indistinguishable from a current one.
+# Re-derive every claim in it on the commit that moves the pin.
+REF = os.environ.get("LT_BASELINE_REF", "d3efa24")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
 # Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
 # glance whether the pages in front of them belong to the run being discussed.
