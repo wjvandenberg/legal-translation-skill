@@ -280,7 +280,14 @@ if FAIL:
         print(f"  · {f}")
     print("=" * 96)
     sys.exit(1)
-print(f"PASS — {CHECKED} assertions. Nothing this branch changed reaches a delivered byte:")
-print("the two reporters write nothing at all, and the two scripts that DO write produce")
-print(f"byte-identical output against {REF} = {SHA[:12]}.")
+# "THIS BRANCH" WAS THE WRONG WORD AND IT WENT STALE THE FIRST TIME IT WAS READ ON ANOTHER
+# ONE. This file is BRANCH 14's proof, over FOUR NAMED SCRIPTS, and it says nothing whatever
+# about whatever branch happens to be running it — branch 10 slice 2 changes delivered bytes
+# by design and this suite is green, correctly, because it does not watch post_process.py.
+# A pass message that reads as a claim about the reader's own work is a check borrowing
+# authority it does not have.
+print(f"PASS — {CHECKED} assertions. None of BRANCH 14's four scripts reaches a delivered")
+print("byte: the two reporters write nothing at all, and the two scripts that DO write")
+print(f"produce byte-identical output against {REF} = {SHA[:12]}.")
+print("This is a statement about those four scripts ONLY — never about the current branch.")
 print("=" * 96)

@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS.** Branches 3, 4, 5 and 14's `quality_check` slice MERGED. **Branch 6 slice 1 MERGED** `4a1c452` — A1 A2 A8 A9 F27. **Slices 2 and 3 MERGED** `049484e` and `2a71e71` *(2026-09-02)* — the table-of-contents tab placement and then the page-number widening, which together close **A3's TOC and doubled-tab instances**, so A3 is **PARTIAL** and **A6 has moved to branches 15–17**. **Slice 4, the last, MERGED** `d3c7f19`: **C17 and F16 CLOSED, C16 PARTIAL** — two mechanisms found and fixed, and the corpus instance shown to be neither. Two new register rows came out of it, **A20** and **C29**, and neither belongs to branch 6. **Branch 6 is CLOSED** — its four slices `4a1c452` `049484e` `2a71e71` `d3c7f19`, closed by PR #63, with the instruments branch PR #64 after it. **BRANCH 7's SLICE 1 IS MERGED** `544f908` *(2026-09-08)*: **A16 and N1 CLOSED**, the container class measured at twelve rather than three, two new rows **A21** and **A22** neither of which is branch 7's to fix. **BRANCH 7 IS CLOSED** `6c1be4c` *(2026-09-09)* — slices 2 and 3 merged `ae48f6d` and `010c34f`, all four of its rows closed, two new rows **A21** and **A22** belonging to neither. **BRANCH 8 IS CLOSED** `513b541` *(2026-09-10)* — **C28 CLOSED, C12 PARTIAL, M1's count-not-content half CLOSED**, built as a MODE on `validate_apply.py` rather than a new file because each tree is at 198 against a 199 ceiling; **F43 closed as NOT A LOSS and F44 filed** in the same session. **BRANCH 9 IS CLOSED** `c803b56`, closed `28cf6be` *(2026-09-23)* — **C15 PARTIAL, B6 PARTIAL with its misattribution half CLOSED**, the journal on disk in both trees and branch 11 buildable. **BRANCH 10 IS LIVE, 2026-09-23, AND IS CUT INTO FOUR SLICES BY WHAT EACH PASS MUST READ** *(Wouter, 2026-09-23)*: **1** the journal's FORMATTING arm *(additive, byte-identical acceptance)* · **2** the passes needing NO new input — B4 B8 B2 B3 · **3** the passes needing the DECLARED NOTES — B1 B5 B6(a) F29 · **4** the pass needing the ORIGINAL — B7, plus the principle and the detector reports. **It is NOT a two-file split**: each tree is at 198 against §6.3's 199 ceiling whose one slot is D3's, and §6's own Option 6 amendment says the split into two files stopped being the point. **The full corpus re-grade §3.8 makes mandatory is DEFERRED TO STEP C** *(Wouter, 2026-09-23)* — the grader is frozen at v3, `CLAUDE.md` §5.3 already scopes the never-regress re-grade to a FIXED SUBSET at branch boundaries, and the mechanical arm now reaches **13 of 13** because every frozen workdir matches a source 100%, so apply can regenerate a genuine pre-`post_process` input for every document. · **THIS SESSION — what · how · purpose:** build slices 1 and 2 — first the journal's FORMATTING arm, by recording the shape of each text-bearing element's owning `w:r` and of each paragraph's `w:pPr` **on the text contract's own coordinates**, then the four passes that need no new input, **so that B1's italic strip and B7's page break — the exact blind spot branch 9 declared and reported only as a bare count — become visible BEFORE slice 3 makes those passes conditional** |
+| **status** | **IN PROGRESS.** Branches 3, 4, 5 and 14's `quality_check` slice MERGED. **Branch 6 slice 1 MERGED** `4a1c452` — A1 A2 A8 A9 F27. **Slices 2 and 3 MERGED** `049484e` and `2a71e71` *(2026-09-02)* — the table-of-contents tab placement and then the page-number widening, which together close **A3's TOC and doubled-tab instances**, so A3 is **PARTIAL** and **A6 has moved to branches 15–17**. **Slice 4, the last, MERGED** `d3c7f19`: **C17 and F16 CLOSED, C16 PARTIAL** — two mechanisms found and fixed, and the corpus instance shown to be neither. Two new register rows came out of it, **A20** and **C29**, and neither belongs to branch 6. **Branch 6 is CLOSED** — its four slices `4a1c452` `049484e` `2a71e71` `d3c7f19`, closed by PR #63, with the instruments branch PR #64 after it. **BRANCH 7's SLICE 1 IS MERGED** `544f908` *(2026-09-08)*: **A16 and N1 CLOSED**, the container class measured at twelve rather than three, two new rows **A21** and **A22** neither of which is branch 7's to fix. **BRANCH 7 IS CLOSED** `6c1be4c` *(2026-09-09)* — slices 2 and 3 merged `ae48f6d` and `010c34f`, all four of its rows closed, two new rows **A21** and **A22** belonging to neither. **BRANCH 8 IS CLOSED** `513b541` *(2026-09-10)* — **C28 CLOSED, C12 PARTIAL, M1's count-not-content half CLOSED**, built as a MODE on `validate_apply.py` rather than a new file because each tree is at 198 against a 199 ceiling; **F43 closed as NOT A LOSS and F44 filed** in the same session. **BRANCH 9 IS CLOSED** `c803b56`, closed `28cf6be` *(2026-09-23)* — **C15 PARTIAL, B6 PARTIAL with its misattribution half CLOSED**, the journal on disk in both trees and branch 11 buildable. **BRANCH 10 IS LIVE, 2026-09-23, AND IS CUT INTO FOUR SLICES BY WHAT EACH PASS MUST READ** *(Wouter, 2026-09-23)*: **1** the journal's FORMATTING arm *(additive, byte-identical acceptance)* · **2** the passes needing NO new input — B4 B8 B2 B3 · **3** the passes needing the DECLARED NOTES — B1 B5 B6(a) F29 · **4** the pass needing the ORIGINAL — B7, plus the principle and the detector reports. **It is NOT a two-file split**: each tree is at 198 against §6.3's 199 ceiling whose one slot is D3's, and §6's own Option 6 amendment says the split into two files stopped being the point. **The full corpus re-grade §3.8 makes mandatory is DEFERRED TO STEP C** *(Wouter, 2026-09-23)* — the grader is frozen at v3, `CLAUDE.md` §5.3 already scopes the never-regress re-grade to a FIXED SUBSET at branch boundaries, and the mechanical arm now reaches **13 of 13** because every frozen workdir matches a source 100%, so apply can regenerate a genuine pre-`post_process` input for every document. **SLICE 1 IS MERGED** `5107aaf` *(PR #95)* **and CLOSED** `bc816cd` *(PR #96)*, which carried the THREE moving pins to the merge — a count that went DOWN from branch 9's four, and only the enumeration could have said so. · **THIS SESSION — what · how · purpose:** build slice 2, the four passes that need no new input, **each testing the condition it currently assumes and reporting rather than rewriting where it cannot tell** — B4 by asking whether a RENDERED separator already sits at the seam, B3 by refusing to strip an insertion wrapper whose removal would delete a character from the DELIVERED document, B2 by flipping its indeterminate default from rewrite to report, B8 by becoming a detector — with `validate_apply --post-spacing-fix` reading the journal instead of simulating a pass it can no longer predict, **so that `post_process` stops overwriting faithful work in every case the document itself can settle** |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **step 2**, Building. *(The house word for that unit is **phase**; this project says **step**. The mapping is in that charter's §1.3 and the vocabulary is deliberately not renamed.)* |
 | **produces** | branches **3–19 plus D1–D3** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -869,6 +869,73 @@ number, one of them saying the opposite of the other. Deleted.)*
 > teach the segments the structure, or to let `validate_apply` read the change journal instead of simulating
 > — **which is branch 11's stated work**, and would make branch 11 a dependency of slice 2 rather than the
 > other way round. **That ordering question is Wouter's and is open.**
+
+> **SLICE 2's WRITTEN PLAN, 2026-09-23 — AND THE SHAPE CHANGED AGAIN ON MEASUREMENT, IN BOTH
+> DIRECTIONS.** The block above recorded what exploration found; this records what MEASUREMENT found,
+> and two of its three claims moved. Every figure below is re-derived from the 13 frozen notes files
+> with a positive control, never quoted.
+>
+> **WHAT IT CHANGES — four passes and one validator, each testing the condition it currently assumes.**
+> **B4** `fix_spacing`: skip a seam where a RENDERED `w:tab` or `w:br` already supplies the separator,
+> excluding a `w:tab` inside `w:pPr/w:tabs`, which is a tab STOP carrying the same tag name.
+> **B3** `strip_noop_tracked_changes._strip_empty_wrappers`: never strip a `w:ins` wrapper whose
+> normalised text is non-empty, because removing the element deletes its text from the ACCEPT-ALL
+> view — the delivered document. **B2** `_is_external_article_ref`: its terminal default flips from
+> *internal, rewrite* to *indeterminate, report and change nothing*. **B8** `fix_double_punctuation`:
+> reports the collapse and changes nothing. **And `validate_apply --post-spacing-fix` READS THE
+> JOURNAL instead of simulating**, which B4 forces and which Wouter chose on 2026-09-23.
+>
+> **WHAT IT MUST NOT TOUCH.** No flag, no user question, no operator switch *(decision 2c)*. No
+> anti-drift safeguard. No pass outside the four. No new file in either tree — each is at 198 against
+> §6.3's 199 ceiling and the slot is D3's. And **no gate is thinned**: `--post-spacing-fix` moves from
+> a PREDICTION to a RECORD, which is strictly more informed, never more permissive.
+>
+> **WHAT IT IS CHECKED AGAINST, AND AT WHAT LEVEL.** The four register rows at ROW level, not title
+> level; the text and formatting contracts of `post-process-journal/2` at ORDINAL level; the twelve
+> journalled passes at PASS level; and both trees at BYTE level for the journal block, which
+> `test_change_journal` arm 7 already asserts.
+>
+> **DONE WHEN — AND THE ACCEPTANCE IS THE OPPOSITE OF SLICE 1's.** Slice 1 required that not one
+> delivered byte move. **Here the bytes MUST move, and every movement must be explained by a register
+> row**; a byte-identical corpus run is a FAILURE, not a pass. Plus: every new arm RED before it is
+> green, and `validate_apply`'s journal route proved against the simulation it replaces.
+>
+> **THE POPULATIONS, MEASURED BEFORE THE FIX RATHER THAN AFTER — and the two surprises are why this
+> block exists.** **B4 is 25 spurious spaces across 7 of 13 documents**, larger than the three
+> documents its row records. **Its coupling to the simulation is AT MOST 3 seams on ONE document**,
+> because the simulation runs only on paragraphs carrying `en_segments` and everything else uses the
+> flat `en` field — so the coupling that drove the whole ordering question is real and small, and the
+> option was chosen knowing that.
+> **B3 SPLITS 49 / 29 AND THAT SPLIT IS THE FIX.** Of 78 punctuation-only tracked-change wrappers,
+> **49 are `del`** — removing them touches only the reject view — and **29 are `ins` or
+> `ins_then_del`**, where removal deletes a character from the delivered document. Every instance of
+> damage the register records, on D07 and on D08, is an INSERTION wrapper. So the pass keeps 63% of
+> its work and loses exactly the half that can damage a delivery, and the condition needs nothing but
+> the wrapper's own tag.
+> **B2's DEFAULT BUCKET IS 1 OF 58 — AND THIS PARAGRAPH SAID 0 UNTIL THE STAGE ITSELF CONTRADICTED
+> IT, WHICH IS THE MOST USEFUL THING IN THIS BLOCK.** Over the APPLIED `document.xml` of all 13
+> workdirs, joined exactly as the pass joins it: **57 external, 0 decided internal by a token, 1
+> INDETERMINATE.** That one is on wd7, and it is not a hypothetical — running the stage there,
+> `article_to_clause` reported **1 fix before the change and 0 after**, so a real document was having
+> a reference rewritten on a guess. **So the corpus DOES evidence B2**, and the earlier conclusion
+> that only a synthetic fixture could was wrong with it.
+> **THE FIRST FIGURE CAME FROM THE `en` FIELD OF THE NOTES AND READ 0 INDETERMINATE, 1 INTERNAL.**
+> The notes and the document are different strings, assembled differently, and this pass reads the
+> document — §1.5 rule 3 exactly, and it had already been written into two shipped docstrings before
+> the stage disagreed. *(The same probe was ALSO wrong a first time, for an unrelated reason: it
+> RETYPED the detector's locator list and put `thereof` among the decisive tokens, where
+> `_INTERNAL_LOCATORS` holds only the HERE- family. The lists are now IMPORTED. **Two wrong readings
+> of one small number, from two different causes, and only the artefact settled it.**)*
+>
+> **AND THE CORPUS ARM ITSELF WAS WRONG IN THE SAME SESSION, FOUND BY THE TWO INSTRUMENTS
+> DISAGREEING.** `postprocess_corpus_arm.py` built its baseline arm from the pinned `post_process.py`
+> but copied `strip_noop_tracked_changes.py` and `validate_apply.py` from the **WORKING TREE**. That
+> isolated the one script under test while only that script ever changed, and became wrong the moment
+> slice 2 changed a sibling: B3's effect appeared on BOTH sides and cancelled. Measured — the tool
+> reported wd9 at **40179 → 40043** bytes while a fully-baseline second instrument reported
+> **39848 → 40043**. The verdict was right and the baseline was wrong, which is the shape that gets
+> believed. Fixed in the same commit, and a sibling missing at the pinned revision is now REPORTED
+> rather than silently taken from the working tree.
 
 **Wouter's verdict, in his words:** *"go, revised 2c."* Reached after he challenged the word *optional*.
 

@@ -106,7 +106,23 @@ SCRIPTS = ROOT / args.variant / "scripts"
 # the first such branch, and there the bytes MUST move, so arm 6 goes red and whoever moved
 # them records why and re-pins here in the same commit. Until then a close that mechanically
 # "moves the pins" must leave this one alone.
-REF = os.environ.get("LT_BASELINE_REF", "18a0798")
+#
+# THAT BRANCH HAS NOW ARRIVED, AND THE PIN MOVED ONCE, IN THE COMMIT THAT MOVED THE BYTES.
+# Slice 2 makes four passes conditional (B4, B3, B2, B8), so `post_process` deliberately
+# writes a DIFFERENT document.xml than it did before. The prediction above was measured
+# exactly right: arm 6 went red on the first run, at 790 bytes against 789.
+#
+# **AND THE ARM'S QUESTION CHANGED WITH IT, WHICH MATTERS MORE THAN THE SHA.** Re-pinning
+# alone would have left an arm asserting BYTE IDENTITY across a branch whose whole purpose is
+# to break it — a check that can only fail is worth no more than one that can only pass. So
+# the assertion below is INVERTED: the bytes must MOVE, and every movement must be claimed by
+# the journal. Arm 3 already proves the claim is complete; this arm proves there was
+# something to claim. Nothing is weakened — the two together are strictly stronger than byte
+# identity, which could be satisfied by a pass that did nothing at all.
+#
+# 5107aaf is the squash-merge of slice 1 and the last commit before slice 2 to touch either
+# tree — `git log --oneline -1 -- uk us` at that point returns it.
+REF = os.environ.get("LT_BASELINE_REF", "5107aaf")
 
 FAIL, CHECKED, VOIDED = [], 0, []
 TMP = Path(tempfile.mkdtemp(prefix="b9-journal-"))
@@ -190,12 +206,24 @@ def own_paragraph_texts(xml_bytes):
 # branch has no need of a .docx container — post_process takes a raw document.xml path.
 # Every string is invented. There is no client text in this file.
 # =========================================================================================
+#: Tags that carry no text and must be emitted as EMPTY elements. `<w:tab></w:tab>` parses,
+#: but a rendered tab is written `<w:tab/>` everywhere else in this repository and a fixture
+#: that differs from the shape under test is a fixture that can pass for the wrong reason.
+_EMPTY_TAGS = ("tab", "br")
+
+
 def doc(paragraphs):
-    """paragraphs :: list of list of (tag, text). Builds one w:p per entry."""
+    """paragraphs :: list of list of (tag, text). Builds one w:p per entry.
+
+    A tag in `_EMPTY_TAGS` ignores its text and emits a self-closing element, so a
+    paragraph can carry a rendered tab or break between two runs — which is what
+    slice 2's B4 arm needs and what no earlier fixture in this suite had.
+    """
     body = []
     for runs in paragraphs:
         cells = "".join(
-            f'<w:r><w:{tag} xml:space="preserve">{text}</w:{tag}></w:r>'
+            f'<w:r><w:{tag}/></w:r>' if tag in _EMPTY_TAGS
+            else f'<w:r><w:{tag} xml:space="preserve">{text}</w:{tag}></w:r>'
             for tag, text in runs)
         body.append(f"<w:p>{cells}</w:p>")
     return ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
@@ -204,9 +232,14 @@ def doc(paragraphs):
             "</w:body></w:document>").encode("utf-8")
 
 
-# Paragraph 0 trips the Annex rewrite; 3 the double-punctuation collapse; 4 the spacing
-# backstop across an element seam, which is C15's own mechanism; 5 is the negative control
-# INSIDE the document and no pass in either variant may touch it.
+# Paragraph 0 trips the Annex rewrite; 4 the spacing backstop across an element seam, which
+# is C15's own mechanism; 5 is the negative control INSIDE the document and no pass in either
+# variant may touch it.
+#
+# PARAGRAPH 3 USED TO TRIP THE DOUBLE-PUNCTUATION COLLAPSE AND NOW TRIPS ITS DETECTOR.
+# Since B8 the pass reports `Definitions::` and changes nothing, so this input trips THREE
+# rewriting passes rather than four. The paragraph stays exactly as it was, deliberately: it
+# is now the detector's input, and arm 12 asserts the colon survived and was reported.
 #
 # ONE SPELLING PARAGRAPH PER VARIANT, and the second one is here because the first version
 # of this input carried only the US-to-UK direction. Under `--variant us` that paragraph is
@@ -383,7 +416,14 @@ ok("it names the variant it ran as", j1.get("variant") == args.variant,
 pass_stage = next((s for s in j1.get("stages", []) if s.get("stage") == "passes"), None)
 ok("there is a `passes` stage", pass_stage is not None)
 edits = (pass_stage or {}).get("edits", [])
-ok("it recorded at least one edit on an input built to trip four passes", len(edits) >= 4,
+# THREE, NOT FOUR, SINCE SLICE 2 — AND THE MISSING ONE IS THE POINT RATHER THAN A REGRESSION.
+# This input trips annex_to_schedule, a spelling pass, fix_spacing and, until B8,
+# fix_double_punctuation on `Definitions::`. That fourth pass is now a DETECTOR: it reports
+# the doubled colon and changes nothing, so it contributes no edit and must not. Arm 9 asserts
+# the other half — that the colon SURVIVED and was REPORTED — so the number below going from
+# four to three is covered by a check rather than merely tolerated.
+ok("it recorded at least one edit on an input built to trip three rewriting passes",
+   len(edits) >= 3,
    f"edits={len(edits)}")
 named = {e.get("pass") for e in edits}
 ok("every edit names a pass", all(isinstance(e.get("pass"), str) and e["pass"]
@@ -507,11 +547,14 @@ else:
            e2 is None and p2 == a2, e2 or "replay did not reproduce the after")
 
 # =========================================================================================
-# ARM 6 — NOT ONE DELIVERED BYTE MOVES. Branch 9 is ADDITIVE (section 2's branch table;
-# Wouter 2026-09-22 declined the re-grade on that ground), so the acceptance is the OPPOSITE
-# of branch 6's and 7's: document.xml must come out byte-identical to the pinned baseline's.
+# ARM 6 — THE DELIVERED BYTES MOVED, AND THE JOURNAL CLAIMS THE MOVEMENT. Branch 9 and slice
+# 1 were ADDITIVE and this arm asserted the opposite of what it asserts now: not one byte may
+# move. Slice 2 changes behaviour on every document by design, so byte identity would be a
+# FAILURE and is asserted as such. The pin block above says why the question changed rather
+# than only the sha.
 # =========================================================================================
-print(f"\nARM 6 — document.xml is byte-identical to post_process at {REF}")
+print(f"\nARM 6 — the delivered bytes MOVED against post_process at {REF}, and the "
+      f"journal claims it")
 blob = subprocess.run(["git", "show", f"{REF}:{args.variant}/scripts/post_process.py"],
                       capture_output=True, cwd=str(ROOT))
 cur = (SCRIPTS / "post_process.py").read_bytes()
@@ -533,11 +576,18 @@ else:
     ok("both arms exit 0", rn.returncode == 0 and ro.returncode == 0,
        f"new={rn.returncode} old={ro.returncode}")
     nb, obb = x3.read_bytes(), x4.read_bytes()
-    ok("document.xml is byte-identical between the two arms", nb == obb,
+    ok("the delivered bytes MOVED — slice 2 changes behaviour, so identity is a failure",
+       nb != obb,
        f"new={hashlib.sha256(nb).hexdigest()[:12]} "
-       f"old={hashlib.sha256(obb).hexdigest()[:12]} ({len(nb)} vs {len(obb)} bytes)")
-    ok("the baseline arm wrote NO journal, so the arm is measuring a real difference",
-       not (d4 / JOURNAL_NAME).is_file())
+       f"old={hashlib.sha256(obb).hexdigest()[:12]} ({len(nb)} vs {len(obb)} bytes) "
+       f"— identical means no conditional pass fired on an input built to trip four")
+    # AND THE MOVEMENT IS EXPLAINED, NOT MERELY PRESENT. A pass that broke the document
+    # would also move the bytes, so "they moved" on its own is not an acceptance. The
+    # journal's own self-check is the other half, and arm 3 proves the claim is complete.
+    jn = json.loads((d3 / JOURNAL_NAME).read_text(encoding="utf-8"))
+    ok("the new arm's journal accounts for what it changed",
+       bool(jn.get("self_check", {}).get("accounted", False)),
+       f"self_check={jn.get('self_check')}")
 
 # =========================================================================================
 # ARM 7 — BOTH TREES CARRY IT. A fix that lands in one variant and is forgotten in the other
@@ -848,6 +898,132 @@ else:
         ok("the strip stage carries a format_paragraphs key, present even when empty",
            isinstance(strip11[0].get("format_paragraphs"), list),
            repr(strip11[0].get("format_paragraphs"))[:120])
+
+# =========================================================================================
+# ARM 12 — SLICE 2: EVERY PASS TESTS THE CONDITION IT ASSUMES. Four conditions, each with
+# BOTH limbs asserted — the case the pass must now skip AND the case it must still take.
+# One limb alone is half a check: a pass that stopped firing entirely would satisfy every
+# "must skip" and break the pipeline, and a pass that never changed would satisfy every
+# "must still fire".
+# =========================================================================================
+print("\nARM 12 — slice 2: each pass tests the condition it assumes (B4, B3, B2, B8)")
+
+# ---- B4: a seam bridged by a RENDERED tab or break already has its separator.
+B4_DOC = doc([
+    # 0: bridged by a rendered tab — must NOT gain a space.
+    [("t", "Signed"), ("tab", ""), ("t", "Dated")],
+    # 1: bridged by a break — must NOT gain a space.
+    [("t", "Address"), ("br", ""), ("t", "London")],
+    # 2: nothing between — must STILL gain one. This is the limb that catches a pass
+    #    which stopped working rather than became conditional.
+    [("t", "the"), ("t", "Facility")],
+])
+d12, x12 = stage("b4", B4_DOC)
+r12 = run([SCRIPTS / "post_process.py", x12, "--fix", "--variant", args.variant])
+ok("B4 fixture: post_process exits 0", r12.returncode == 0, r12.stderr[-400:])
+b4_after = x12.read_bytes().decode("utf-8")
+ok("B4: a seam bridged by a RENDERED TAB is left alone",
+   "Signed" in b4_after and "> Dated<" not in b4_after,
+   f"a space was inserted across a tab: {b4_after[:400]}")
+ok("B4: a seam bridged by a BREAK is left alone",
+   "> London<" not in b4_after,
+   f"a space was inserted across a break: {b4_after[:400]}")
+ok("B4: a seam with NOTHING between it still gains its space",
+   "> Facility<" in b4_after,
+   f"the pass stopped firing altogether: {b4_after[:400]}")
+
+# ---- B4b: a w:tab inside w:pPr/w:tabs is a tab STOP and must not bridge anything.
+B4_STOP_DOC = doc([[("t", "the"), ("t", "Facility")]]).replace(
+    b"<w:p><w:r>",
+    b'<w:p><w:pPr><w:tabs><w:tab w:val="left" w:pos="720"/></w:tabs></w:pPr><w:r>', 1)
+d12b, x12b = stage("b4stop", B4_STOP_DOC)
+r12b = run([SCRIPTS / "post_process.py", x12b, "--fix", "--variant", args.variant])
+ok("B4: a tab STOP in pPr/tabs does NOT bridge the seam — it is not a rendered tab",
+   "> Facility<" in x12b.read_bytes().decode("utf-8"),
+   "a tab stop was mistaken for a rendered tab and suppressed a real fix")
+
+# ---- B3: an insertion wrapper still carrying text is part of the DELIVERED document.
+B3_DOC = doc([[("t", "The completion date is fixed.")]]).replace(
+    b"<w:p><w:r><w:t xml:space=\"preserve\">The completion date is fixed.</w:t></w:r></w:p>",
+    ('<w:p>'
+     '<w:r><w:t xml:space="preserve">payable on </w:t></w:r>'
+     '<w:ins w:id="9" w:author="A"><w:r><w:t xml:space="preserve">[</w:t></w:r></w:ins>'
+     '<w:r><w:t xml:space="preserve">1 March 2026</w:t></w:r>'
+     '<w:ins w:id="10" w:author="A"><w:r><w:t xml:space="preserve">]</w:t></w:r></w:ins>'
+     '<w:del w:id="11" w:author="A">'
+     '<w:r><w:delText xml:space="preserve">,</w:delText></w:r></w:del>'
+     '<w:r><w:t xml:space="preserve"> in full.</w:t></w:r>'
+     '</w:p>').encode("utf-8"))
+d13, x13 = stage("b3", B3_DOC)
+r13 = run([SCRIPTS / "post_process.py", x13, "--fix", "--variant", args.variant])
+ok("B3 fixture: post_process exits 0", r13.returncode == 0, r13.stderr[-400:])
+b3_after = x13.read_bytes().decode("utf-8")
+# THE EXACT D08 SHAPE: the edit IS the brackets, and the old carve-out could not see it
+# because the only neighbours are REGULAR runs.
+ok("B3: a bracket-only INSERTION survives — removing it would delete a delivered character",
+   b3_after.count("<w:ins") == 2,
+   f"an insertion wrapper was stripped: {b3_after.count('<w:ins')} of 2 left")
+ok("B3: a punctuation-only DELETION is still stripped — it touches the reject view only",
+   "<w:del" not in b3_after,
+   "the del wrapper survived, so the pass lost work it should have kept doing")
+
+# ---- B2: an indeterminate Article reference is left alone and reported.
+B2_DOC = doc([
+    # 0: "thereof" points BACKWARD — the forward walk learns nothing. Must NOT be rewritten.
+    [("t", "The parties waive Article 1341 thereof.")],
+    # 1: decided internal by a determiner — must STILL be rewritten.
+    [("t", "Article 4 of this Agreement shall apply.")],
+])
+d14, x14 = stage("b2", B2_DOC)
+r14 = run([SCRIPTS / "post_process.py", x14, "--fix", "--variant", args.variant])
+ok("B2 fixture: post_process exits 0", r14.returncode == 0, r14.stderr[-400:])
+b2_after = x14.read_bytes().decode("utf-8")
+_internal = "Clause" if args.variant == "uk" else "Section"
+ok("B2: an INDETERMINATE reference keeps the word 'Article'",
+   "Article 1341 thereof" in b2_after,
+   "a statutory citation was rewritten on a guess — this is D05's defect")
+ok("B2: a reference decided INTERNAL is still rewritten",
+   f"{_internal} 4 of this Agreement" in b2_after,
+   f"the pass stopped rewriting altogether; expected '{_internal} 4'")
+ok("B2: the run REPORTS what it declined to classify",
+   "[detector] article_to_clause" in (r14.stdout or ""),
+   "the pass changed nothing and said nothing, which reads as nothing to do")
+
+# ---- B8: a doubled mark is reported, never collapsed.
+B8_DOC = doc([[("t", "Definitions::")]])
+d15, x15 = stage("b8", B8_DOC)
+r15 = run([SCRIPTS / "post_process.py", x15, "--fix", "--variant", args.variant])
+ok("B8: the doubled mark SURVIVES — nothing says whose it is",
+   "Definitions::" in x15.read_bytes().decode("utf-8"),
+   "a character of possible source content was deleted")
+ok("B8: and the run REPORTS it rather than staying silent",
+   "[detector] double_punctuation" in (r15.stdout or ""),
+   "the detector found nothing to say, so the loss is now silent instead of silent-and-real")
+
+# =========================================================================================
+# ARM 13 — THE VALIDATOR READS THE RECORD INSTEAD OF PREDICTING IT (C15). The prediction
+# could not see a tab, so the moment B4 landed it would have fired on exactly B4's seams.
+# =========================================================================================
+print("\nARM 13 — validate_apply's post-strip gate reads the journal, not a prediction")
+_va = SCRIPTS / "validate_apply.py"
+_va_src = _va.read_text(encoding="utf-8")
+ok("validate_apply can load the spacing record from the journal",
+   "def load_spacing_record(" in _va_src)
+ok("it names the journal by the same filename post_process writes",
+   f"'{JOURNAL_NAME}'" in _va_src or f'"{JOURNAL_NAME}"' in _va_src)
+ok("it still FALLS BACK to the prediction when no journal is beside the notes",
+   "will_fix_spacing_fire(prev_text, en)" in _va_src,
+   "the fallback was removed, so a caller with no journal now gets no mirror at all")
+ok("and it SAYS which of the two routes it took",
+   "PREDICTING fix_spacing rather than reading it" in _va_src
+   and "text(s) the pass recorded moving" in _va_src,
+   "a gate that reads on one run and guesses on the next must say which")
+# BOTH TREES, because a fix that lands in one variant and is forgotten in the other has
+# shipped to a client before — arm 7's rule, applied to this change.
+_other = "us" if args.variant == "uk" else "uk"
+_va_other = (ROOT / _other / "scripts" / "validate_apply.py").read_text(encoding="utf-8")
+ok(f"and the {_other} tree carries it too",
+   "def load_spacing_record(" in _va_other)
 
 print("\n" + "=" * 92)
 print(f"  {CHECKED} check(s), {len(FAIL)} failure(s), {len(VOIDED)} void")

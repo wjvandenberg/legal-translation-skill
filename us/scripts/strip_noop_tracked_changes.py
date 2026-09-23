@@ -227,7 +227,9 @@ def _has_content_bearing_tc_neighbour(paragraph, element, max_skip=8):
 
 def _strip_empty_wrappers(paragraph):
     """Pass 1: strip any <w:del> or <w:ins> whose text content is empty, all
-    whitespace, or all punctuation after normalization. Returns count stripped.
+    whitespace, or all punctuation after normalization.
+
+    Returns (removed, insertions_preserved).
 
     Exception: bracket-only ins/del (`[`, `]`, `(`, `)`, etc.) are PRESERVED
     when they sit adjacent to a content-bearing ins/del neighbor. This keeps
@@ -236,8 +238,43 @@ def _strip_empty_wrappers(paragraph):
     stripping the two bracket wrappers alone would leave the date insertion
     orphaned and the reviewer's Accept/Reject gesture would lose the "confirm
     this placeholder" context.
+
+    **B3 — AN INSERTION WRAPPER IS NEVER STRIPPED WHILE IT STILL CARRIES TEXT,
+    AND THE REASON IS WHICH VIEW EACH KIND OF WRAPPER OWNS.** Removing the
+    element removes everything inside it, so the two kinds are NOT symmetrical:
+
+      * ``<w:del>X</w:del>`` — X is absent from the accept-all view already and
+        present in reject-all. Removing the wrapper touches the REJECT view
+        only, which is the source-language redline nobody delivers.
+      * ``<w:ins>X</w:ins>`` — X is PRESENT in the accept-all view, which IS the
+        delivered document. Removing the wrapper DELETES A CHARACTER FROM THE
+        DELIVERY.
+
+    Every instance of damage the register records under this row is an
+    insertion. On D07 two content-bearing punctuation-only INSERTION wrappers
+    went — a dash in a party's registered address and a hyphen in a quoted
+    contract title, both visible on page 1. On D08 three bracket-only tracked
+    changes went where **the edit WAS the brackets**, producing an accepted text
+    whose closing bracket landed inside the following sentence and another
+    ending with no closing bracket and no full stop — after which
+    ``validate_apply --strict`` reported 811/811 PASSED, because `]` and `.` are
+    not word tokens, and the quality check printed "ready for delivery".
+
+    The old carve-out could not reach either case: it asks for a content-bearing
+    ins/del within 8 SIBLINGS, and D08's brackets had only regular runs beside
+    them, so survival came down to how many runs the neighboring text happened
+    to occupy. The condition below needs no window and no neighbor — the
+    wrapper's own tag settles it.
+
+    WHAT IT COSTS, MEASURED ON THE FROZEN CORPUS RATHER THAN ESTIMATED: of 78
+    punctuation-only wrappers, 49 are `del` and 29 are insertion-kind. The pass
+    keeps 63% of its work and loses exactly the half that can damage a delivery.
+    A preserved insertion is COUNTED and reported rather than silently kept,
+    because a pass that quietly stops doing something reads as a pass that had
+    nothing to do.
     """
     removed = 0
+    insertions_preserved = 0
     for element in list(paragraph):
         tag = _localname(element)
         if tag not in ('ins', 'del'):
@@ -245,13 +282,20 @@ def _strip_empty_wrappers(paragraph):
         text = _element_text(element)
         if not _is_noise_only(text):
             continue
+        # B3: an insertion still carrying text is part of the DELIVERED
+        # document. `_is_noise_only` returns True for empty and whitespace-only
+        # text as well, and those are genuine no-ops in both views, so the test
+        # is on what survives normalization rather than on the tag alone.
+        if tag == 'ins' and _normalise(text):
+            insertions_preserved += 1
+            continue
         # Bracket-aware exception: keep bracket-only wrappers that flank a
         # content-bearing insertion/deletion.
         if _is_bracket_only(text) and _has_content_bearing_tc_neighbour(paragraph, element):
             continue
         element.getparent().remove(element)
         removed += 1
-    return removed
+    return removed, insertions_preserved
 
 def _strip_matching_pairs(paragraph):
     """Pass 2: strip adjacent (w:del, w:ins) and (w:ins, w:del) pairs whose
@@ -348,9 +392,12 @@ def strip_noops(document_xml_path, keep_phantom_tcs=False):
     empties = 0
     pairs = 0
     phantoms = 0
+    preserved = 0
     for paragraph in root.iter(f'{{{W}}}p'):
         pairs += _strip_matching_pairs(paragraph)
-        empties += _strip_empty_wrappers(paragraph)
+        stripped, kept = _strip_empty_wrappers(paragraph)
+        empties += stripped
+        preserved += kept
         # Run the pair pass once more because stripping empties may have
         # exposed new adjacencies.
         pairs += _strip_matching_pairs(paragraph)
@@ -381,6 +428,10 @@ def strip_noops(document_xml_path, keep_phantom_tcs=False):
         'pairs_stripped': pairs,
         'empty_wrappers_stripped': empties,
         'phantom_ins_del_stripped': phantoms,
+        # B3's detector half. A pass that quietly stops doing something reads
+        # as a pass that had nothing to do, so what it DECLINED to strip is
+        # reported beside what it stripped.
+        'insertions_preserved': preserved,
     }
 
 def main():

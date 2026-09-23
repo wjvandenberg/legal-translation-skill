@@ -331,19 +331,90 @@ def _collect_required_tokens(paragraph_entry):
                                                   post_spacing_fix=False)
 
 
-def _collect_required_tokens_with_options(paragraph_entry, post_spacing_fix):
-    """Underlying token collector with the rev42 fix_spacing simulation
-    flag. When `post_spacing_fix=False` (the default, used by the
-    apply-time gate where the document has NOT yet been through
-    post_process.fix_spacing), join en_segments as-is and tokenize —
-    preserves rev41 behavior byte-for-byte. When `post_spacing_fix=True`
-    (used by the post-strip gate inside post_process.py, where fix_spacing
-    has already inserted spaces at element boundaries), simulate the
-    same insertion on the declared side by walking segments and inserting
-    ' ' between non-empty adjacent segments wherever
-    `will_fix_spacing_fire(prev, curr)` returns True. This mirrors
-    fix_spacing's element-boundary space-insertion, so declared and
-    applied tokenize identically across the post-strip drift gate.
+JOURNAL_NAME = 'post_process_journal.json'
+
+
+def load_spacing_record(paragraphs_json_path):
+    """Return the set of texts `fix_spacing` ACTUALLY prepended a space to on
+    this run, read from the change journal beside the notes — or None when there
+    is no journal to read.
+
+    WHY THIS REPLACED A SIMULATION, AND IT IS THE DEFECT C15 MEASURES. The
+    post-strip gate used to PREDICT what `fix_spacing` would do, by importing
+    that pass's own per-boundary predicate and re-running it over `en_segments`.
+    A prediction is only as good as what the predictor can see, and **`en_segments`
+    carry `type` and `en` and nothing else** — measured across the frozen corpus:
+    412 segments, two keys. They hold no structural information at all, so the
+    simulation cannot know that a rendered tab sits between two segments. The
+    moment `fix_spacing` learned to skip such a seam, the prediction and the
+    document parted company and this gate would have fired on exactly the seams
+    B4 is about — a FALSE POSITIVE at a mandatory gate, which blocks a real run.
+
+    So the declared side now reads the RECORD instead. `post_process` writes the
+    journal BEFORE this gate runs — measured on branch 9, and asserted by
+    `tests/test_change_journal.py` arm 8 — so the file is on disk by the time we
+    are asked. One validator gave two opinions about one file because it was
+    guessing; it now reads what happened.
+
+    NO NEW FLAG, NO OPERATOR SWITCH — decision 2c. The journal is found beside
+    the notes or it is not found, and when it is not found the caller falls back
+    to the prediction, so every existing caller behaves exactly as before.
+
+    MEMBERSHIP, NOT CONSUMPTION, AND THE CHOICE IS DELIBERATE. The record is
+    keyed by the moved text rather than by an ordinal, because the declared side
+    is a list of segments and the journal a list of document elements, and no
+    honest mapping between the two exists at this point in the run. Testing
+    membership degrades, in the one ambiguous case — the same string at both a
+    bridged and an unbridged seam — to exactly what the prediction did before.
+    Consuming from a multiset would instead invent a NEW failure, silently
+    dropping an insertion in a paragraph the walk reached second.
+    """
+    try:
+        d = os.path.dirname(os.path.abspath(paragraphs_json_path))
+        path = os.path.join(d, JOURNAL_NAME)
+        if not os.path.exists(path):
+            return None
+        with open(path, 'r', encoding='utf-8') as handle:
+            journal = json.load(handle)
+    except (OSError, ValueError):
+        return None
+    moved = set()
+    for stage in journal.get('stages') or []:
+        if stage.get('stage') != 'passes':
+            continue
+        for edit in stage.get('edits') or []:
+            if edit.get('pass') != 'spacing':
+                continue
+            before, after = edit.get('before'), edit.get('after')
+            # Only a LEADING-SPACE insertion is this pass's signature. Anything
+            # else under the same pass name is not what the declared side is
+            # being asked to mirror, and is left alone rather than guessed at.
+            if isinstance(before, str) and after == ' ' + before:
+                moved.add(before)
+    return moved
+
+
+def _collect_required_tokens_with_options(paragraph_entry, post_spacing_fix,
+                                          spacing_record=None):
+    """Underlying token collector with the rev42 fix_spacing flag.
+
+    When `post_spacing_fix=False` (the default, used by the apply-time gate where
+    the document has NOT yet been through post_process.fix_spacing), join
+    en_segments as-is and tokenize — preserves rev41 behavior byte-for-byte.
+
+    When `post_spacing_fix=True` (used by the post-strip gate inside
+    post_process.py, where fix_spacing has already inserted spaces at element
+    boundaries), mirror that insertion on the declared side so declared and
+    applied tokenize identically across the gate. TWO ROUTES REACH THAT MIRROR
+    and the first is preferred:
+
+      * `spacing_record` supplied — the set of texts the pass RECORDED moving,
+        read from the change journal. Insert where the record says it inserted.
+      * `spacing_record` None — fall back to PREDICTING with
+        `will_fix_spacing_fire`, the rev42 behavior, for any caller with no
+        journal to read.
+
+    `load_spacing_record` above says why the record beats the prediction.
     """
     required = set()
     segments = paragraph_entry.get('en_segments')
@@ -360,9 +431,13 @@ def _collect_required_tokens_with_options(paragraph_entry, post_spacing_fix):
                 continue
             if not en:
                 continue
-            if (post_spacing_fix and prev_text
-                    and will_fix_spacing_fire(prev_text, en)):
-                pieces.append(' ')
+            if post_spacing_fix and prev_text:
+                if spacing_record is not None:
+                    inserted = en in spacing_record
+                else:
+                    inserted = will_fix_spacing_fire(prev_text, en)
+                if inserted:
+                    pieces.append(' ')
             pieces.append(en)
             prev_text = en
         required |= _extract_tokens(''.join(pieces))
@@ -467,14 +542,28 @@ def validate(paragraphs_json_path, document_xml_path, post_spacing_fix=False):
     # rev42: when called with `post_spacing_fix=True` (from the post-strip
     # gate inside post_process.py, after fix_spacing has inserted spaces
     # at element boundaries on the applied side), the declared-side
-    # required tokens are built with the same simulated insertion so the
-    # comparison is symmetric. When called without the flag (apply-time
-    # gate, before fix_spacing runs), declared tokens match the raw
-    # post-distribute applied text — preserves rev41 behavior.
+    # required tokens are built so the comparison is symmetric. When called
+    # without the flag (apply-time gate, before fix_spacing runs), declared
+    # tokens match the raw post-distribute applied text — rev41 behavior.
+    #
+    # WHICH ROUTE WAS TAKEN IS PRINTED, NEVER INFERRED. A gate that reads a
+    # record on one run and guesses on the next, reporting the same way for
+    # both, is a gate whose verdict cannot be interpreted — and the fallback
+    # is silent by construction, because a missing file looks like nothing.
+    spacing_record = None
+    if post_spacing_fix:
+        spacing_record = load_spacing_record(paragraphs_json_path)
+        if spacing_record is None:
+            print(f'  [spacing] no {JOURNAL_NAME} beside the notes — '
+                  f'PREDICTING fix_spacing rather than reading it')
+        else:
+            print(f'  [spacing] read {JOURNAL_NAME}: '
+                  f'{len(spacing_record)} text(s) the pass recorded moving')
     indexed_entries = []  # list of (json_idx, entry, required_tokens)
     for ji, entry in enumerate(entries):
         req = _collect_required_tokens_with_options(
-            entry, post_spacing_fix=post_spacing_fix)
+            entry, post_spacing_fix=post_spacing_fix,
+            spacing_record=spacing_record)
         if req:
             indexed_entries.append((ji, entry, req))
 
