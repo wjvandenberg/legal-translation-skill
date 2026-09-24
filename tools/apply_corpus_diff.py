@@ -60,26 +60,30 @@ SCRIPT = "apply_translations_textmatch.py"
 
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. CLAUDE.md 5.3: a before-and-after check
 #
-# MOVED TO 6d8bbab ON 2026-09-23, the squash-merge of branch 10 slice 3b -- a mandatory rewrite
-# no longer overrules a rendering the LEXICON sanctions (PR #103) -- and the LAST COMMIT THAT
-# TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE: `git log --oneline -1 -- uk
-# us` returns it. A pin left at the previous baseline reports the merged branch's own work as
-# movement belonging to whatever branch runs next, and the branch that inherits it cannot
-# tell.
+# MOVED TO b47603d ON 2026-09-24, the squash-merge of branch 10 slice 4 -- the page-break
+# pass inserts nothing, the principle every pass obeys, and the detections in the journal
+# (PR #105) -- and the LAST COMMIT THAT TOUCHED EITHER TREE. It is also the merge that CLOSES
+# BRANCH 10, so this is the baseline branch 11 inherits. DERIVED, NOT READ OFF THE MERGE
+# MESSAGE: `git log --oneline -1 -- uk us` returns it. A pin left at the previous baseline
+# reports the merged branch's own work as movement belonging to whatever branch runs next,
+# and the branch that inherits it cannot tell.
 #
-# AND AT THIS PIN THE SELF-COMPARISON NOTICE IS EXPECTED TO BE PRESENT, STILL. Slices
-# 3a and 3b changed post_process.py and translate_numbering.py, neither of which this
-# tool drives -- it swaps the APPLY script. So both arms carry identical code BY DESIGN
-# and an all-quiet run is correct rather than evidence, which is exactly what a STALE pin
-# also produces and is why the notice is printed rather than left to be inferred.
+# AND AT THIS PIN THE SELF-COMPARISON NOTICE IS EXPECTED TO BE PRESENT, STILL. This tool
+# swaps the APPLY script, and `git log 28cf6be..b47603d` over it is EMPTY: not one of branch
+# 10's five slices touched it (the same range over post_process.py lists all five, which is
+# the control). So both arms carry identical code BY DESIGN and an all-quiet run is correct
+# rather than evidence, which is exactly what a STALE pin also produces and is why the
+# notice is printed rather than left to be inferred.
 #
 # THE CARRIERS ARE ENUMERATED, NEVER COUNTED FROM MEMORY. `git grep -F <old sha>` found
-# THREE PINS at this close, as at slice 3a's, and more MENTIONS than that -- the charter, the
-# plan and one suite's comment name the old sha as history, and a close that "moves every
-# match" would have rewritten the record. The instruction is still not "move them all":
-# tools/hf_corpus_diff.py is FIXED at ae48f6d and three suites at 2178cce, each for a reason
-# in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it stays at
-# 5107aaf, a decision RE-TAKEN at slice 3b and recorded in its own block rather than here.
+# THREE PINS at this close, as at slices 3a's and 3b's, and more MENTIONS than that -- the
+# charter and the plan name the old sha as history, and so does tools/render_diff.py's own
+# READ-ME text, which is a mention sitting in a file that also carries a pin. A close that
+# "moves every match" would have rewritten that record. The instruction is still not "move
+# them all": tools/hf_corpus_diff.py is FIXED at ae48f6d and three suites at 2178cce, each
+# for a reason in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it
+# stays at 5107aaf, a decision RE-TAKEN at this close on a measurement and recorded in its
+# own block rather than here.
 #
 # THIS BLOCK IS REWRITTEN ON EVERY MOVE RATHER THAN APPENDED TO, because it has gone stale
 # before and been caught -- once naming a commit as "the merge-base of this branch" long after
@@ -87,7 +91,7 @@ SCRIPT = "apply_translations_textmatch.py"
 # slice 3a claiming that arm 0 "reports VOID" where the code beside it prints a NOTICE.
 # NOTHING CHECKS A COMMENT, so a stale one is indistinguishable from a current one. Re-derive
 # every claim in it on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "6d8bbab")
+REF = os.environ.get("LT_BASELINE_REF", "b47603d")
 
 # WHICH DIRECTIONAL CHECK BELONGS TO WHICH MERGED FIX — added 2026-09-08, on a measured false
 # alarm that would have recurred for ever.
@@ -130,6 +134,11 @@ FIX_LANDED = {
     # two consumers are both about APPLY, and so no directional check here has a premise the
     # merge could kill. The instruments that watch 3b -- the corpus arm and
     # tests/test_lexicon_choice.py -- carry their own guards.
+    # B7 IS NOT HERE EITHER, RE-ASKED AT SLICE 4's CLOSE RATHER THAN INHERITED: slice 4
+    # changed post_process.py and two skill documents, and nothing on the apply side, so the
+    # same test gives the same answer. What watches B7 is tests/test_pass_conditions.py, and
+    # tools/render_diff.py's --expect-pages-move -- whose premise DOES die with this merge,
+    # which that file's pin block records rather than this map, because it is not a consumer.
 }
 
 

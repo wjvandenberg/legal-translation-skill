@@ -71,12 +71,13 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 SCRIPT = "apply_translations_textmatch.py"
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.3.
 #
-# MOVED TO 6d8bbab ON 2026-09-23, the squash-merge of branch 10 slice 3b -- a mandatory rewrite
-# no longer overrules a rendering the LEXICON sanctions (PR #103) -- and the LAST COMMIT THAT
-# TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE: `git log --oneline -1 -- uk
-# us` returns it. A pin left at the previous baseline reports the merged branch's own work as
-# movement belonging to whatever branch runs next, and the branch that inherits it cannot
-# tell.
+# MOVED TO b47603d ON 2026-09-24, the squash-merge of branch 10 slice 4 -- the page-break
+# pass inserts nothing, the principle every pass obeys, and the detections in the journal
+# (PR #105) -- and the LAST COMMIT THAT TOUCHED EITHER TREE. It is also the merge that CLOSES
+# BRANCH 10, so this is the baseline branch 11 inherits. DERIVED, NOT READ OFF THE MERGE
+# MESSAGE: `git log --oneline -1 -- uk us` returns it. A pin left at the previous baseline
+# reports the merged branch's own work as movement belonging to whatever branch runs next,
+# and the branch that inherits it cannot tell.
 #
 # AND SINCE SLICE 3a THE FIXTURE PATH CAN DRIVE post_process DIRECTLY, via
 # --post-process. In that mode the baseline arm swaps post_process.py and its siblings
@@ -84,18 +85,32 @@ SCRIPT = "apply_translations_textmatch.py"
 # identical and reported the page UNCHANGED, which is indistinguishable from a fix that
 # worked. WHICH SCRIPT THE BASELINE SWAPS FOLLOWS WHICH SCRIPT THE RUN DRIVES.
 #
-# AT THIS PIN BOTH post_process FIXTURES READ THE SAME ON BOTH ARMS -- italic-declared
-# and lexicon-choice alike -- because 3a's and 3b's code is now the baseline. That is
-# correct, not a regression. For the DEFAULT fixture path the all-quiet notice is
-# still expected: slice 3b touched post_process.py and translate_numbering.py, not apply.
+# AT THIS PIN ALL THREE post_process FIXTURES READ THE SAME ON BOTH ARMS --
+# italic-declared, lexicon-choice and schedule-breaks -- because 3a's, 3b's and 4's code is
+# now the baseline. That is correct, not a regression. For the DEFAULT fixture path the
+# all-quiet notice is still expected: no slice of branch 10 touched apply.
+#
+# AND ONE FLAG'S PREMISE DIED WITH THIS MOVE: --expect-pages-move INVERTS the old -> new
+# page-count assertion and requires the counts to DIFFER, which is true only while the old
+# arm still imposes B7's page. Against b47603d it no longer does, so `--post-process
+# --fixture schedule-breaks --expect-pages-move schedule-breaks` now FAILS by design, 3 -> 3,
+# its line reading as though the fix did nothing. The byte-identity NOTE printed above it
+# says why, so this is loud and explained rather than silent, which is what verification
+# rule 4 (.claude/rules/verification.md) asks of a check whose premise has died. The READ-ME
+# below therefore names the baseline that still has the defect: LT_BASELINE_REF=6d8bbab,
+# the last merge before slice 4, which renders 4 -> 3 and passes. Without the flag,
+# schedule-breaks passes at this pin, 3 -> 3, like the other two fixtures. All three runs
+# were measured at slice 4's close and are recorded in its commit.
 #
 # THE CARRIERS ARE ENUMERATED, NEVER COUNTED FROM MEMORY. `git grep -F <old sha>` found
-# THREE PINS at this close, as at slice 3a's, and more MENTIONS than that -- the charter, the
-# plan and one suite's comment name the old sha as history, and a close that "moves every
-# match" would have rewritten the record. The instruction is still not "move them all":
-# tools/hf_corpus_diff.py is FIXED at ae48f6d and three suites at 2178cce, each for a reason
-# in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it stays at
-# 5107aaf, a decision RE-TAKEN at slice 3b and recorded in its own block rather than here.
+# THREE PINS at this close, as at slices 3a's and 3b's, and more MENTIONS than that -- the
+# charter and the plan name the old sha as history, and so does THIS FILE's READ-ME text,
+# twice now: once for where slice 4's suite was proved red, once for the baseline that
+# still shows the defect. A close that "moves every match" would have rewritten both. The
+# instruction is still not "move them all": tools/hf_corpus_diff.py is FIXED at ae48f6d and
+# three suites at 2178cce, each for a reason in its own block; and
+# tests/test_change_journal.py's arm 6 is NEITHER -- it stays at 5107aaf, a decision
+# RE-TAKEN at this close on a measurement and recorded in its own block rather than here.
 #
 # THIS BLOCK IS REWRITTEN ON EVERY MOVE RATHER THAN APPENDED TO, because it has gone stale
 # before and been caught -- once naming a commit as "the merge-base of this branch" long after
@@ -103,7 +118,7 @@ SCRIPT = "apply_translations_textmatch.py"
 # slice 3a claiming that arm 0 "reports VOID" where the code beside it prints a NOTICE.
 # NOTHING CHECKS A COMMENT, so a stale one is indistinguishable from a current one. Re-derive
 # every claim in it on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "6d8bbab")
+REF = os.environ.get("LT_BASELINE_REF", "b47603d")
 DPI = int(os.environ.get("LT_RENDER_DPI", "100"))
 # Stamped ONCE per run and written into every manifest, so a reviewer can tell at a
 # glance whether the pages in front of them belong to the run being discussed.
@@ -657,8 +672,10 @@ for stem in args.fixture:
         # that somebody remembers. Every other per-branch claim in this repository that nothing
         # checks has gone stale at least once.
         "WHAT THIS BRANCH CHANGED — BRANCH 10 SLICE 4, THE PAGE-BREAK PASS INSERTS NOTHING (B7).",
-        "Render schedule-breaks.docx with --post-process --expect-pages-move schedule-breaks,",
-        "then compare old-pN.png against new-pN.png, and new-pN.png against source-pN.png.",
+        "Render schedule-breaks.docx with --post-process --expect-pages-move schedule-breaks",
+        "AND LT_BASELINE_REF=6d8bbab, the last merge before this slice -- at the default pin",
+        "both arms carry the fix and that flag fails by design -- then compare old-pN.png",
+        "against new-pN.png, and new-pN.png against source-pN.png.",
         "",
         "WHAT IS ON THE PAGES. EVERY HEADING LABELS WHAT ITS SOURCE DOES:",
         "  SCHEDULE 1   the source runs it on under the body text.  OLD: forced onto a page",
