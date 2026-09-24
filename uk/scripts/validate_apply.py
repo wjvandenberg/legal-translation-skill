@@ -1116,6 +1116,295 @@ def check_extraction_completeness(original_docx, paragraphs_json, strict=False):
     return 0
 
 
+# ==========================================================================
+# DELIVERED-DOCUMENT CHECK — branch 11 slice 1: registers C1 and C18, and the
+# anchor half of A1 and A2.
+# ==========================================================================
+# WHAT IT ASSERTS, AND WHY NO OTHER CHECK HERE CAN. Every other post-apply
+# check reads either the notes the run wrote -- so it cannot see what apply,
+# post_process and the reorder did -- or word TOKENS, which carry neither order
+# nor punctuation nor whitespace. C1 is the cost: a token-set comparison passed
+# a deleted word because the same word occurred elsewhere in the paragraph.
+# This mode rebuilds BOTH readings of every body paragraph from the DELIVERED
+# document -- every tracked change accepted, every one rejected -- and asks for
+# each declared paragraph there CHARACTER FOR CHARACTER, once the change
+# journal's recorded edits are applied to the declared side. It also counts
+# footnote, endnote and comment anchors against the ORIGINAL, because an anchor
+# is not text and no text comparison can see one go.
+#
+# ONE TEXT CONTRACT, THE JOURNAL'S: text and deleted text in document order,
+# each element owned by its NEAREST paragraph, a tab and a line break adding
+# nothing -- exactly _paragraph_applied_text above and post_process's
+# journal_paragraph_texts. A declared tab or newline is therefore dropped on
+# the declared side too. What that gives up is seeing a lost line break as
+# TEXT, which is a layout question and branch 18's.
+#
+# MATCHED BY TEXT, NEVER BY POSITION. Step 7 permutes the definitions, and a
+# positional pairing mispaired 127 entries across the corpus (L1). A delivered
+# paragraph can satisfy one declared entry at most.
+#
+# IT PRINTS INDICES, CLASSES AND LENGTHS, NEVER DOCUMENT TEXT, for the reason
+# the extraction-completeness block gives: a report like this gets pasted.
+# It judges nothing about the English. Every test here is an equality.
+
+_DELIV_ANCHORS = ('footnoteReference', 'endnoteReference', 'commentReference',
+                  'commentRangeStart', 'commentRangeEnd')
+_DELIV_SIMILAR = 0.60
+
+
+def _deliv_readings(root):
+    """[(index, mixed, accept, reject)] for every body paragraph carrying text.
+
+    mixed is the journal's contract (w:t and w:delText); accept drops text
+    inside w:del and keeps text inside w:ins; reject is the reverse."""
+    t_tag, dt_tag, p_tag = f'{{{W}}}t', f'{{{W}}}delText', f'{{{W}}}p'
+    del_tag, ins_tag = f'{{{W}}}del', f'{{{W}}}ins'
+    paragraphs = list(root.iter(p_tag))
+    owner = {id(p): i for i, p in enumerate(paragraphs)}
+    parts = [([], [], []) for _ in paragraphs]
+    for el in root.iter(t_tag, dt_tag):
+        a, in_del, in_ins = el.getparent(), False, False
+        while a is not None and a.tag != p_tag:
+            in_del = in_del or a.tag == del_tag
+            in_ins = in_ins or a.tag == ins_tag
+            a = a.getparent()
+        if a is None:
+            continue
+        mixed, acc, rej = parts[owner[id(a)]]
+        text = el.text or ''
+        mixed.append(text)
+        if el.tag == t_tag and not in_del:
+            acc.append(text)
+        if (el.tag == t_tag and not in_ins) or (el.tag == dt_tag and in_del):
+            rej.append(text)
+    out = []
+    for i, (m, a, r) in enumerate(parts):
+        m = ''.join(m)
+        if m.strip():
+            out.append((i, m, ''.join(a), ''.join(r)))
+    return out
+
+
+def _deliv_declared(entry):
+    """(mixed, accept, reject) as the notes declare them, or None when the entry
+    declares nothing. reject is None when the declaration cannot express it."""
+    def clean(s):
+        return (s or '').replace('\t', '').replace('\n', '')
+    segs = entry.get('en_segments')
+    if isinstance(segs, list) and segs and all(isinstance(s, dict) for s in segs):
+        mixed = ''.join(clean(s.get('en')) for s in segs)
+        acc = ''.join(clean(s.get('en')) for s in segs
+                      if s.get('type') in ('regular', 'ins'))
+        rej = ''.join(clean(s.get('en')) for s in segs
+                      if s.get('type') in ('regular', 'del'))
+        return (mixed, acc, rej) if mixed.strip() else None
+    en = entry.get('en')
+    if not isinstance(en, str) or not en.strip():
+        return None
+    if entry.get('en_deleted'):
+        return clean(en) + clean(entry['en_deleted']), clean(en), None
+    return clean(en), clean(en), clean(en)
+
+
+def _deliv_journal_map(journal_path):
+    """before -> after for every paragraph record in the journal, or ({}, why)."""
+    if not journal_path:
+        return {}, 'no journal given'
+    try:
+        with open(journal_path, 'r', encoding='utf-8') as fh:
+            data = json.load(fh)
+    except (OSError, ValueError) as exc:
+        return {}, f'journal unreadable ({type(exc).__name__})'
+    mapping = {}
+    for stage in data.get('stages', []):
+        for rec in stage.get('paragraphs', []):
+            b, a = rec.get('before'), rec.get('after')
+            if isinstance(b, str) and isinstance(a, str) and b != a:
+                mapping[b] = a
+    return mapping, f"read, schema {data.get('schema', '?')}, {len(mapping)} record(s)"
+
+
+def _deliv_shape(want, got):
+    """What differs, by character class: space, punctuation or word."""
+    import difflib
+    changed = []
+    for op, i1, i2, j1, j2 in difflib.SequenceMatcher(
+            None, want, got, autojunk=False).get_opcodes():
+        if op != 'equal':
+            changed.append(want[i1:i2] + got[j1:j2])
+    chars = ''.join(changed)
+    if chars and not chars.strip():
+        return 'space'
+    if chars and all(not c.isalnum() for c in chars):
+        return 'punctuation'
+    return 'word'
+
+
+def _deliv_edge(want, got):
+    """Which edge's whitespace moved, and which way: lead/trail, lost/gained."""
+    out = []
+    for name, strip in (('lead', str.lstrip), ('trail', str.rstrip)):
+        w, g = len(want) - len(strip(want)), len(got) - len(strip(got))
+        if w != g:
+            out.append(f"{name}-{'lost' if w > g else 'gained'}")
+    return '+'.join(out)
+
+
+def check_delivered(paragraphs_json, delivered, original=None, journal=None,
+                    strict=False, report_json=None):
+    """Compare the DELIVERED document against what was declared, and its
+    anchors against the original. Exit: 0 clean or advisory, 1 findings under
+    --strict, 2 IO error, 3 VOID (nothing was examined, never the same as
+    clean)."""
+    import difflib
+    import zipfile
+    from collections import Counter
+
+    def body_root(path):
+        if path.lower().endswith('.xml'):
+            return etree.parse(path).getroot()
+        with zipfile.ZipFile(path) as zf:
+            return etree.fromstring(zf.read('word/document.xml'))
+
+    try:
+        with open(paragraphs_json, 'r', encoding='utf-8') as fh:
+            entries = json.load(fh)
+        root = body_root(delivered)
+    except Exception as exc:
+        print(f'validate_apply --delivered: cannot read input ({exc})',
+              file=sys.stderr)
+        return 2
+    if journal is None:
+        beside = os.path.join(os.path.dirname(os.path.abspath(paragraphs_json)),
+                              JOURNAL_NAME)
+        journal = beside if os.path.isfile(beside) else None
+    jmap, jnote = _deliv_journal_map(journal)
+    got = _deliv_readings(root)
+    # ONE POOL, KEYED BY ALL THREE READINGS, so a match consumes exactly one
+    # delivered paragraph. Two separate tallies -- one of texts, one of reading
+    # pairs -- can each be satisfied by a DIFFERENT paragraph for one entry.
+    remaining = Counter((m, a, r) for _, m, a, r in got)
+    by_mixed = {}
+    for key in remaining:
+        by_mixed.setdefault(key[0], []).append(key)
+
+    def take(mixed, acc, rej):
+        for key in by_mixed.get(mixed, ()):
+            if remaining[key] > 0 and acc in (None, key[1]) and rej in (None, key[2]):
+                remaining[key] -= 1
+                return True
+        return False
+
+    findings, counts, undeclared = [], Counter(), 0
+    pending = []
+    for ji, entry in enumerate(entries if isinstance(entries, list) else []):
+        decl = _deliv_declared(entry) if isinstance(entry, dict) else None
+        if decl is None:
+            undeclared += 1
+            continue
+        mixed, acc, rej = decl
+        idx = entry.get('idx', ji)
+        seen = set()
+        while mixed in jmap and mixed not in seen:
+            seen.add(mixed)
+            mixed = jmap[mixed]
+        if seen:
+            acc = rej = None                       # the journal records mixed only
+        if take(mixed, acc, rej):
+            counts['exact'] += 1
+        else:
+            pending.append((idx, mixed, acc, rej))
+    left = [list(key) for key, n in remaining.items() for _ in range(n)]
+    ws = re.compile(r'\s+')
+    for idx, mixed, acc, rej in pending:
+        cls, shape, best = 'missing', '', None
+        for cand in left:
+            m, a, r = cand
+            if m == mixed:
+                cls, best = 'readings', cand          # same text, other tracked changes
+                break
+            if m.strip() == mixed.strip():
+                cls, best = 'edge-space', cand
+                break
+            if ws.sub(' ', m).strip() == ws.sub(' ', mixed).strip():
+                cls, best = 'inner-space', cand
+                break
+        if best is None:
+            ratio = 0.0
+            for cand in left:
+                sm = difflib.SequenceMatcher(None, mixed, cand[0], autojunk=False)
+                if sm.real_quick_ratio() < _DELIV_SIMILAR or sm.quick_ratio() < _DELIV_SIMILAR:
+                    continue
+                r = sm.ratio()
+                if r > ratio:
+                    ratio, best = r, cand
+            if best is not None and ratio >= _DELIV_SIMILAR:
+                cls, shape = 'changed', _deliv_shape(mixed, best[0])
+            else:
+                best = None
+        if best is not None:
+            left.remove(best)
+            if cls == 'edge-space':
+                shape = _deliv_edge(mixed, best[0])
+        counts[cls] += 1
+        findings.append({'idx': idx, 'class': cls, 'shape': shape,
+                         'declared_len': len(mixed),
+                         'delivered_len': len(best[0]) if best else 0})
+    anchors = []
+    if original:
+        try:
+            oroot = body_root(original)
+        except Exception as exc:
+            print(f'validate_apply --delivered: cannot read the original ({exc})',
+                  file=sys.stderr)
+            return 2
+        for name in _DELIV_ANCHORS:
+            tag = f'{{{W}}}{name}'
+            o = sum(1 for _ in oroot.iter(tag))
+            d = sum(1 for _ in root.iter(tag))
+            anchors.append({'anchor': name, 'original': o, 'delivered': d})
+            if d != o:
+                findings.append({'idx': None, 'class': 'anchor-lost' if d < o
+                                 else 'anchor-gained', 'shape': name,
+                                 'declared_len': o, 'delivered_len': d})
+                counts['anchor-lost' if d < o else 'anchor-gained'] += 1
+    examined = sum(counts[c] for c in counts if not c.startswith('anchor'))
+    print('Delivered-document check (branch 11): every declared body paragraph looked '
+          'for, character for character, in both readings of the delivered document')
+    print(f'  declared paragraphs examined: {examined}  (no declaration: {undeclared})  '
+          f'delivered paragraphs with text: {len(got)}  (claimed by nothing: {len(left)})')
+    print(f'  journal: {jnote}')
+    print(f'  original: {"anchors counted" if original else "NOT GIVEN - anchors not counted"}')
+    print('  ' + '  '.join(f'{c}={counts[c]}' for c in
+                           ('exact', 'edge-space', 'inner-space', 'readings', 'changed',
+                            'missing', 'anchor-lost', 'anchor-gained')))
+    for a in anchors:
+        mark = '' if a['original'] == a['delivered'] else '   <- differs'
+        print(f"  anchor {a['anchor']:<18} original {a['original']:>4}  "
+              f"delivered {a['delivered']:>4}{mark}")
+    for f in findings:
+        where = f"idx={f['idx']}" if f['idx'] is not None else 'document'
+        print(f"  FINDING  {where:<10} {f['class']:<13} {f['shape']:<17} "
+              f"declared {f['declared_len']}  delivered {f['delivered_len']}")
+    if report_json:
+        with open(report_json, 'wb') as fh:
+            fh.write((json.dumps({'examined': examined, 'undeclared': undeclared,
+                                  'delivered_paragraphs': len(got),
+                                  'unclaimed_delivered': len(left), 'journal': jnote,
+                                  'counts': dict(counts), 'anchors': anchors,
+                                  'findings': findings}, indent=1) + '\n').encode('utf-8'))
+    if examined == 0 or not got:
+        print('  VOID - nothing was examined, which is never the same as clean')
+        return 3
+    if findings:
+        print(f'  {len(findings)} finding(s)'
+              + (' - BLOCKING under --strict' if strict else ' - advisory'))
+        return 1 if strict else 0
+    print('  PASSED: every declared paragraph is in the delivered document, '
+          'and every anchor the original has')
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(
         description='Validate that translated tokens from paragraphs.json '
@@ -1143,6 +1432,21 @@ def main():
                          'the capture does not account for. No document.xml '
                          'required — this runs at Step 2, before there is '
                          'one. Registers C28, C12 and M1.')
+    ap.add_argument('--delivered', metavar='DELIVERED',
+                    default=None,
+                    help='Compare the DELIVERED .docx (or its document.xml) '
+                         'against what paragraphs.json declares, character for '
+                         'character in both tracked-change readings, with the '
+                         'change journal applied. Registers C1 and C18.')
+    ap.add_argument('--original', metavar='ORIGINAL_DOCX', default=None,
+                    help='With --delivered: count footnote, endnote and comment '
+                         'anchors against this original (A1, A2).')
+    ap.add_argument('--journal', metavar='JOURNAL_JSON', default=None,
+                    help='With --delivered: the change journal to apply. '
+                         'Default: post_process_journal.json beside the notes.')
+    ap.add_argument('--report-json', metavar='PATH', default=None,
+                    help='With --delivered: also write the findings as JSON '
+                         '(indices, classes and lengths only, never text).')
     ap.add_argument('--apply-zwsp', action='store_true',
                     help='With --report-clusters, rewrite paragraphs.json '
                          'in place, injecting ZWSPs between short alpha-'
@@ -1177,6 +1481,15 @@ def main():
         return check_extraction_completeness(
             args.extraction_completeness, args.paragraphs_json,
             strict=args.strict)
+
+    if args.delivered:
+        if args.report_clusters or args.document_xml:
+            print('validate_apply: --delivered is its own mode; pass it with '
+                  'paragraphs.json alone.', file=sys.stderr)
+            return 2
+        return check_delivered(args.paragraphs_json, args.delivered,
+                               original=args.original, journal=args.journal,
+                               strict=args.strict, report_json=args.report_json)
 
     if args.report_clusters:
         try:
