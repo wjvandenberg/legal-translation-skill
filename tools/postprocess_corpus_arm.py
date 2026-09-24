@@ -72,33 +72,41 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. A before-and-after check in this
 #
-# MOVED TO 6d8bbab ON 2026-09-23, the squash-merge of branch 10 slice 3b -- a mandatory rewrite
-# no longer overrules a rendering the LEXICON sanctions (PR #103) -- and the LAST COMMIT THAT
-# TOUCHED EITHER TREE. DERIVED, NOT READ OFF THE MERGE MESSAGE: `git log --oneline -1 -- uk
-# us` returns it. A pin left at the previous baseline reports the merged branch's own work as
-# movement belonging to whatever branch runs next, and the branch that inherits it cannot
-# tell.
+# MOVED TO b47603d ON 2026-09-24, the squash-merge of branch 10 slice 4 -- the page-break
+# pass inserts nothing, the principle every pass obeys, and the detections in the journal
+# (PR #105) -- and the LAST COMMIT THAT TOUCHED EITHER TREE. It is also the merge that CLOSES
+# BRANCH 10, so this is the baseline branch 11 inherits. DERIVED, NOT READ OFF THE MERGE
+# MESSAGE: `git log --oneline -1 -- uk us` returns it. A pin left at the previous baseline
+# reports the merged branch's own work as movement belonging to whatever branch runs next,
+# and the branch that inherits it cannot tell.
 #
 # AND AT THIS PIN ARM 0 PRINTS ITS SELF-COMPARISON NOTICE AND OMITS THE BYTE COLUMN --
 # a NOTICE and not a VOID, as arm 0's own comment says, because this is the expected
-# resting state between branches. Slice 3b merged the very post_process.py this tool
-# swaps. It starts answering again the moment slice 4 edits post_process, and what it
-# will then assert is slice 2's inverted acceptance: the bytes MUST move, and every
-# movement must be explained by a register row. At the notice the gate-premise test is
-# reported NOT MEASURED, there being no baseline to compare firings against.
+# resting state between branches. Slice 4 merged the very post_process.py this tool
+# swaps. It starts answering again the next time a branch edits post_process.py ITSELF --
+# arm 0 compares that one file and nothing else, so a branch that changes ONLY a sibling
+# this tool swaps in (strip_noop_tracked_changes.py, validate_apply.py) leaves the notice in
+# place, and must say so rather than read the quiet as a result. Branch 11 is the likely
+# first case, validate_apply.py being where branch 8 put its check. What the tool asserts
+# once it answers depends on that branch: slice 2's inverted acceptance if the change is
+# meant to move bytes, branch 9's byte identity if it is meant to be additive. At the
+# notice the gate-premise test is reported NOT MEASURED, there being no baseline to compare
+# firings against.
 #
-# AND SINCE SLICE 3b THIS TOOL HAS --from-apply, and slice 4 needs it more than 3b did:
-# a DELIVERED document has already been through every pass -- for B7 every page break
-# is already inserted -- so without it 11 of the 13 inputs cannot show a pass that
-# stops acting.
+# --from-apply, added at slice 3b, is what let slice 4 reach 13 of 13: a DELIVERED
+# document has already been through every pass -- for B7 every page break was already
+# inserted -- so without it 11 of the 13 inputs could not show a pass that stops acting.
+# Any later branch whose question is "did a pass stop acting?" needs it for the same reason.
 #
 # THE CARRIERS ARE ENUMERATED, NEVER COUNTED FROM MEMORY. `git grep -F <old sha>` found
-# THREE PINS at this close, as at slice 3a's, and more MENTIONS than that -- the charter, the
-# plan and one suite's comment name the old sha as history, and a close that "moves every
-# match" would have rewritten the record. The instruction is still not "move them all":
-# tools/hf_corpus_diff.py is FIXED at ae48f6d and three suites at 2178cce, each for a reason
-# in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it stays at
-# 5107aaf, a decision RE-TAKEN at slice 3b and recorded in its own block rather than here.
+# THREE PINS at this close, as at slices 3a's and 3b's, and more MENTIONS than that -- the
+# charter and the plan name the old sha as history, and so does tools/render_diff.py's own
+# READ-ME text, which is a mention sitting in a file that also carries a pin. A close that
+# "moves every match" would have rewritten that record. The instruction is still not "move
+# them all": tools/hf_corpus_diff.py is FIXED at ae48f6d and three suites at 2178cce, each
+# for a reason in its own block; and tests/test_change_journal.py's arm 6 is NEITHER -- it
+# stays at 5107aaf, a decision RE-TAKEN at this close on a measurement and recorded in its
+# own block rather than here.
 #
 # THIS BLOCK IS REWRITTEN ON EVERY MOVE RATHER THAN APPENDED TO, because it has gone stale
 # before and been caught -- once naming a commit as "the merge-base of this branch" long after
@@ -106,7 +114,7 @@ LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"
 # slice 3a claiming that arm 0 "reports VOID" where the code beside it prints a NOTICE.
 # NOTHING CHECKS A COMMENT, so a stale one is indistinguishable from a current one. Re-derive
 # every claim in it on the commit that moves the pin.
-REF = os.environ.get("LT_BASELINE_REF", "6d8bbab")
+REF = os.environ.get("LT_BASELINE_REF", "b47603d")
 SCRIPT = "post_process.py"
 
 # The two snapshot names seen in the frozen set. Named EXPLICITLY rather than globbed:

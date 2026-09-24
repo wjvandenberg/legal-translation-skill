@@ -143,14 +143,28 @@ SCRIPTS = ROOT / args.variant / "scripts"
 # would go red if slice 3 reverted them. Move it only when a later slice needs the comparison
 # to start from a tree that already has slice 2's conditions in it.
 #
-# RE-TAKEN AT SLICE 3b, 2026-09-23, AND LEFT AT 5107aaf FOR A REASON THAT IS NOT HABIT. This
-# slice changed paragraph 0 of the input, so the movement here is now slice 2's AND 3b's
-# together -- and the arm does not need to tell them apart, because it asserts only that the
-# bytes moved and the journal accounts for it, which holds against any earlier tree. 3b's own
-# isolation is proved where it is claimed: tests/test_lexicon_choice.py's behaviour arms,
-# proved RED against d3efa24 on both variants at the slice (PLAN-2-step-b.md section 3.8
-# records it). A pin moved to d3efa24 here would add nothing that suite does not already
-# assert, and would lose slice 2's coverage.
+# RE-TAKEN AT SLICE 4's CLOSE, 2026-09-24, WHICH IS ALSO BRANCH 10's CLOSE, AND LEFT AT
+# 5107aaf ON A MEASUREMENT RATHER THAN BY INHERITANCE. Run on the merge commit b47603d, uk:
+#
+#     pin left at 5107aaf   rc=0, 83 checks, 0 void, arm 6 green
+#     pin moved to b47603d  rc=1, 80 checks + 1 VOID -- the self-comparison, red on `main`
+#     pin at 6d8bbab        rc=0, 83 checks, arm 6 green
+#
+# The third line is the new fact: slice 4 moved THIS arm's input too. PASSES_DOC's paragraph
+# 0 is a body SENTENCE, 68 characters, opening "Annex 1" -- and the old page-break rule,
+# read at 6d8bbab, admits it as a schedule heading: its pattern matches, it is under the
+# 120-character cap, and its label token is a digit. That cause is INFERRED from the rule;
+# what was measured is only that the bytes moved. So the movement against 5107aaf is now
+# slices 2, 3b and 4 together, and the arm still does not need to tell them apart -- it
+# asserts only that the bytes moved and the journal accounts for it, which holds against any
+# earlier tree. Each slice's isolation is proved where it is claimed: 3b's by
+# tests/test_lexicon_choice.py, proved RED against d3efa24; 4's by
+# tests/test_pass_conditions.py, proved RED against 6d8bbab (PLAN-2-step-b.md section 3.8
+# records both). WHAT THIS ARM CANNOT CATCH, stated so it is not over-read: it goes red only
+# when post_process writes this input exactly as 5107aaf did, i.e. on a revert of the WHOLE
+# branch's behaviour here. One pass reverted while the others still act leaves the bytes
+# moved and this arm green; that pass's own suite is what catches it. The pin moves only in
+# the commit of a later branch that moves post_process's bytes again, as above.
 REF = os.environ.get("LT_BASELINE_REF", "5107aaf")
 
 FAIL, CHECKED, VOIDED = [], 0, []
