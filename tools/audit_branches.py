@@ -467,7 +467,11 @@ def audit_b1():
     # claimed 27 on branch 10 slice 3b, the run going red FIRST and the figure moved after:
     # lexicon-choice.docx and its shipped lexicon-choice.notes.json, TWO files from one
     # fixture, which is the reason this is counted by LISTING and never by adding a delta.
-    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 29)
+    # 31 SINCE 2026-09-24, branch 10 slice 4: +2, schedule-breaks.docx and its shipped
+    # schedule-breaks.notes.json. B7's damage is a PAGE the source never had, and the only
+    # corpus pages that show it are client text no one but Wouter may look at -- so a
+    # synthetic page is the only render of it this side can ever make.
+    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 31)
 
     hits = 0
     for nm in fx:

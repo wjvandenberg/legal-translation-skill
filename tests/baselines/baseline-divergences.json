@@ -21,9 +21,9 @@
    "sha256_now": "91f49df10cb0a69a04f806433720cc3fc0df6ff687d151ce285045d137104583"
   },
   "uk/scripts/post_process.py": {
-   "changed_by": "feature/branch10-slice3b-lexicon-choice",
-   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
-   "sha256_now": "d6c2bd47758668866c89204e6f33f87c7569ff9a20f4cd554df0eec57375e191"
+   "changed_by": "feature/branch10-slice4-page-break-detector",
+   "commit_subject": "Branch 10 slice 4 - the page-break pass inserts nothing, the principle every pass obeys, and the detections in the journal (B7)",
+   "sha256_now": "7a4064265a13db83d9bc9dd00319cc3df278ce5704f1ca52996d7fc1c9d6b8c1"
   },
   "uk/scripts/quality_check.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -81,9 +81,9 @@
    "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
   },
   "uk/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "feature/branch10-slice3b-lexicon-choice",
-   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
-   "sha256_now": "29cccd35a92542e03003ef6d1f345bbfadd0197c9e10be92019f23579b2b0a26"
+   "changed_by": "feature/branch10-slice4-page-break-detector",
+   "commit_subject": "Branch 10 slice 4 - the page-break pass inserts nothing, the principle every pass obeys, and the detections in the journal (B7)",
+   "sha256_now": "2a5256931f4f6fafd4e916ce9a7e34d77d70cacdd01885dc183414e7a7a652fe"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
    "changed_by": "feature/branch10-slice3b-lexicon-choice",
@@ -91,9 +91,9 @@
    "sha256_now": "e44608dc3a9312c46e0e7778bd46c1ead679071aae0982b766ed9282b17a138c"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/branch7-glossary-route",
-   "commit_subject": "Branch 7 slice 2 — C19: the glossary part gets a route in and a route out, and the refusal pattern the decision named turned out to be a warning",
-   "sha256_now": "a50bd6c7004f9a75b2930868d7b24219593538461046b4767c9f8f0b95f8f4c7"
+   "changed_by": "feature/branch10-slice4-page-break-detector",
+   "commit_subject": "Branch 10 slice 4 - the page-break pass inserts nothing, the principle every pass obeys, and the detections in the journal (B7)",
+   "sha256_now": "e4e9a016e89cf7b2e7301f47b11eb7053348519cf3e016a92f10b74a6cde4456"
   },
   "us/SKILL.md": {
    "changed_by": "feature/checks-can-fail",
@@ -111,9 +111,9 @@
    "sha256_now": "0df16cb99fbc01cb25bbdbf2c52dfa7449869a9c0fd542248987e8f995909b74"
   },
   "us/scripts/post_process.py": {
-   "changed_by": "feature/branch10-slice3b-lexicon-choice",
-   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
-   "sha256_now": "7865518aa5c3db5fb2c517c6b04dc0cd59b1ff86f0ce0ad78a37335b1ab2a072"
+   "changed_by": "feature/branch10-slice4-page-break-detector",
+   "commit_subject": "Branch 10 slice 4 - the page-break pass inserts nothing, the principle every pass obeys, and the detections in the journal (B7)",
+   "sha256_now": "1211578c21f75a42ea81489889142b68d0932871202f4df6ab4f2f1040a011ba"
   },
   "us/scripts/quality_check.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -171,9 +171,9 @@
    "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
   },
   "us/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "feature/branch10-slice3b-lexicon-choice",
-   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
-   "sha256_now": "43209e354c30a6cd0a0fc497ce3d743d9350ae003d1f6bdc7e41b1c32a5729b6"
+   "changed_by": "feature/branch10-slice4-page-break-detector",
+   "commit_subject": "Branch 10 slice 4 - the page-break pass inserts nothing, the principle every pass obeys, and the detections in the journal (B7)",
+   "sha256_now": "1d00ae2484912d4351d876e5d320ed52d6d48e4c60f92f3844ea13ab32c19871"
   },
   "us/skill-docs/08-aux-and-quality.md": {
    "changed_by": "feature/branch10-slice3b-lexicon-choice",
@@ -181,9 +181,9 @@
    "sha256_now": "a2e07148c6e48ac889995b5e21df65157a07a15554c9eb7911430b6710375968"
   },
   "us/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/branch7-glossary-route",
-   "commit_subject": "Branch 7 slice 2 — C19: the glossary part gets a route in and a route out, and the refusal pattern the decision named turned out to be a warning",
-   "sha256_now": "00446b2f4691b8f667521d790512b4d918654311fdff075b2b5820ccb0094f35"
+   "changed_by": "feature/branch10-slice4-page-break-detector",
+   "commit_subject": "Branch 10 slice 4 - the page-break pass inserts nothing, the principle every pass obeys, and the detections in the journal (B7)",
+   "sha256_now": "2170ca8713277f66258a958e161ddc63e20411779186e23f8b572dd2d7da01d8"
   }
  }
 }

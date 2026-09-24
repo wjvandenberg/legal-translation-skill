@@ -33,8 +33,12 @@ This applies automated quality fixes:
 - Duplicate word removal
 - Quote balancing on defined terms
 - Definition line-break removal
-- Spurious italic removal
-- Schedule page-break insertion (each Schedule starts on a new page)
+- Spurious italic removal — **only where your notes cover the run and neither your English
+  nor the source marks it italic**; an italic you declared, or one your notes do not
+  settle, is kept and reported
+- Schedule page breaks — **reported, never inserted.** A schedule starts on a new page in
+  the translation exactly where it does in the source, and the run prints a `[detector]`
+  line saying how each schedule heading starts its page
 
 **Tracked-change run formatting is preserved as-authored.** Run-level properties
 inside `w:ins` / `w:del` wrappers (`w:sz`, `w:szCs`, `w:rFonts`, `w:color`) are
@@ -92,7 +96,7 @@ there when that gate fires.
 * **It records TEXT and FORMATTING, in two separate records that share one numbering.**
   The text record lists every character that moved. The formatting record lists every run
   whose properties changed — an italic stripped — and every paragraph whose properties
-  changed — a page break imposed. Both use the same element and paragraph numbers, so a
+  changed, which no pass now does. Both use the same element and paragraph numbers, so a
   wording change and a formatting change in one place read as one place.
 * **`self_check.unexplained_fixes` is the figure to read first, and it should be empty.**
   It names any pass that reported a fix which *neither* record describes. `non_text_fixes`
@@ -112,9 +116,9 @@ there when that gate fires.
   not in your document.** The run continues and the translation is unaffected. Report it.
   **Do not edit the document or the notes to make the message go away.**
 
-**Four of these passes now TEST the condition they used to assume, and two of them REPORT
-instead of rewriting.** Each one used to act on a guess, and each guess damaged a real
-document. **Nothing here is a switch you can turn off, and there is no flag: if a pass
+**Each pass below, and the terminology, Annex and italic passes in the list above, now TESTS
+the condition it used to assume; where it cannot tell, it REPORTS instead of rewriting.**
+Each one used to act on a guess, and each guess damaged a real document. **Nothing here is a switch you can turn off, and there is no flag: if a pass
 declines to act, that is the pass working.**
 
 * **A missing space is only added where nothing already separates the two sides.** The
@@ -137,11 +141,35 @@ declines to act, that is the pass working.**
   says whether the doubling is yours or the source's, and on one document the collapse
   deleted a character of a hand-typed signature rule. The run prints what it found; you
   decide.
+* **A schedule heading is never given a page break the source did not have.** The pass used
+  to start every Schedule or Annex heading on a new page. On real documents that left a
+  blank page where the translated text already filled the page, split a listing from its
+  own heading, and doubled breaks the source had already made. It now reports how each
+  heading starts its page and inserts nothing. **If a delivered schedule does not start the
+  page the source's does, the break was lost before this step: report it as a defect, and
+  do not reword the heading to work around it.**
 
-**Two `[detector]` lines can appear after the fix counts, and they are not errors.** They
-say what the stage FOUND and deliberately did not change. A detection is not a fix and is
-deliberately not added to the total, so that "this stage changed nothing" and "this stage
-found nothing" stay different statements.
+**`[detector]` lines can appear after the fix counts, and they are not errors.** Each says
+what the stage FOUND and deliberately did not change, and each is also recorded in the
+journal's `detections` list, by paragraph number and with no document text. A detection is
+not a fix and is never added to the total, so that "this stage changed nothing" and "this
+stage found nothing" stay different statements. **What to do with each, and which belong in
+the delivery notes:**
+
+* `double_punctuation` — compare the doubled mark with the source. If the source has it,
+  leave it; if it is yours, correct `paragraphs.json` and re-run from Step 5. Nothing to
+  disclose.
+* `article_to_clause` — an `Article N` left as written. Decide from the source whether it
+  cites a statute or the document itself, and translate it that way. **If you cannot tell,
+  say so under item 3 of the delivery notes** — it is an ambiguity the reviewing lawyer
+  should resolve.
+* `spurious_italic` — an italic kept because your notes do not settle it. Nothing to
+  disclose: the source's italics are what is kept.
+* `terminology` and `annex_to_schedule` — a rendering a lexicon presents as correct, kept
+  as you wrote it. **Where it is one of two defensible renderings, such as Annex or
+  Schedule, name your choice under item 3 of the delivery notes.**
+* `schedule_page_breaks` — how each schedule heading starts its page. Nothing to disclose:
+  the pagination follows the source.
 
 ### Step 7: Reorder definitions alphabetically — MANDATORY
 

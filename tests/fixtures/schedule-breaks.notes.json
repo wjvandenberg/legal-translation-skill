@@ -1,0 +1,130 @@
+[
+  {
+    "idx": 0,
+    "text": "SCHEDULE-BREAKS FIXTURE. Every schedule heading below says what its source does.",
+    "en": "SCHEDULE-BREAKS FIXTURE. Every schedule heading below says what its source does.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 80,
+        "text": "SCHEDULE-BREAKS FIXTURE. Every schedule heading below says what its source does.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 1,
+    "text": "Body text of the agreement, on the first page.",
+    "en": "Body text of the agreement, on the first page.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 46,
+        "text": "Body text of the agreement, on the first page.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 2,
+    "text": "SCHEDULE 1 - the source runs this heading on, under the body text",
+    "en": "SCHEDULE 1 - the source runs this heading on, under the body text",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 65,
+        "text": "SCHEDULE 1 - the source runs this heading on, under the body text",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 3,
+    "text": "Text of schedule one, which the source keeps on the first page.",
+    "en": "Text of schedule one, which the source keeps on the first page.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 63,
+        "text": "Text of schedule one, which the source keeps on the first page.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 4,
+    "text": "SCHEDULE 2 - the source starts this page with a break at the head of the heading",
+    "en": "SCHEDULE 2 - the source starts this page with a break at the head of the heading",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 80,
+        "text": "SCHEDULE 2 - the source starts this page with a break at the head of the heading",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 5,
+    "text": "Text of schedule two.",
+    "en": "Text of schedule two.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 21,
+        "text": "Text of schedule two.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 6,
+    "text": "ANNEX A - control: the source gives this heading its own page break",
+    "en": "ANNEX A - control: the source gives this heading its own page break",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 67,
+        "text": "ANNEX A - control: the source gives this heading its own page break",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 7,
+    "text": "Text of annex A.",
+    "en": "Text of annex A.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 16,
+        "text": "Text of annex A.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  }
+]

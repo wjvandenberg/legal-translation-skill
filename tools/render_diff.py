@@ -234,6 +234,11 @@ ap.add_argument("--expect-block", action="append", default=[],
                 help="fixture stem whose NEW arm is EXPECTED to be refused by a gate. Its "
                      "old arm still renders, so the page shows what used to ship; a run "
                      "that produced output anyway is the FAILURE for such a fixture")
+ap.add_argument("--expect-pages-move", action="append", default=[],
+                help="BRANCH 10 SLICE 4: fixture stem whose OLD arm is EXPECTED to have a "
+                     "different page count from the new one, the defect BEING pages the "
+                     "source never had. For such a fixture the old->new assertion inverts: "
+                     "the counts must DIFFER, and source->new must still match")
 ap.add_argument("--post-process", action="store_true",
                 help="BRANCH 10: drive post_process.py over the fixture instead of apply + "
                      "repack. Branch 10 changes post_process and nothing else, so without "
@@ -603,8 +608,16 @@ for stem in args.fixture:
               f"{name}-p1.png ...")
     if "old" in pdfs and "new" in pdfs:
         po, pn = page_hashes(pdfs["old"]), page_hashes(pdfs["new"])
-        ok(f"{stem}: page count unchanged old -> new  {len(po)} -> {len(pn)}",
-           len(po) == len(pn))
+        if stem in args.expect_pages_move:
+            # INVERTED FOR A FIXTURE THAT DECLARES IT, AND ONLY FOR ONE. B7's defect IS a
+            # page the source never had, so an unchanged count old -> new would mean the
+            # fix did nothing -- the assertion every other fixture needs is exactly wrong
+            # here. The source -> new check below still has to hold.
+            ok(f"{stem}: the OLD arm's page count DIFFERS from the new one, as this fixture "
+               f"declares  {len(po)} -> {len(pn)}", len(po) != len(pn))
+        else:
+            ok(f"{stem}: page count unchanged old -> new  {len(po)} -> {len(pn)}",
+               len(po) == len(pn))
         moved = [i + 1 for i, (a, b) in enumerate(zip(po, pn)) if a != b]
         # NOT AN ASSERTION EITHER WAY. Some fixtures must change on the page and some must
         # not; the manifest says which pages moved and the suite owns the expectation.
@@ -643,65 +656,47 @@ for stem in args.fixture:
         # per-branch artefact living in a permanent file, and the only thing keeping it true is
         # that somebody remembers. Every other per-branch claim in this repository that nothing
         # checks has gone stale at least once.
-        "WHAT THIS BRANCH CHANGED — BRANCH 10 SLICE 3b, A MANDATORY REWRITE NO LONGER OVERRULES",
-        "THE LEXICON (B5, B6(a), F29, B9, F45). Render lexicon-choice.docx with --post-process",
-        "and compare old-p1.png against new-p1.png.",
+        "WHAT THIS BRANCH CHANGED — BRANCH 10 SLICE 4, THE PAGE-BREAK PASS INSERTS NOTHING (B7).",
+        "Render schedule-breaks.docx with --post-process --expect-pages-move schedule-breaks,",
+        "then compare old-pN.png against new-pN.png, and new-pN.png against source-pN.png.",
         "",
-        "WHAT IS ON THE TWO PAGES, row by row. EVERY ROW LABELS ITSELF: a KEPT row must differ",
-        "between the arms, a CONTROL row must read the same on both.",
-        "  KEPT row 1  `Annex 1 and Annex 2`          OLD: Schedule 1 and Schedule 2.  NEW: as",
-        "              written. The reference lexicon offers Schedule (UK) or Annex",
-        "              (EU/international) as a FREE CHOICE matched to the source; the operator",
-        "              can see the source and the pass cannot. F29 and B6(a).",
-        "  KEPT row 2  a section heading an Italian sub-lexicon instructs VERBATIM.  OLD: the",
-        "              table's own rendering.  NEW: as written. B5.",
-        "  KEPT row 3  `registration and publicity`   OLD: `registration and perfection`.  NEW:",
-        "              as written — the finance REFERENCE lexicon lists it as the correct term.",
-        "  KEPT row 4  `Secured Overnight Financing Rate`, SPLIT ACROSS TWO RUNS.  OLD:",
-        "              `Secured Overnight Facility Rate` — a benchmark's name corrupted.  NEW: as",
-        "              written, because the shield is read over the whole paragraph and not over",
-        "              the one run the rule matched in. B9.",
-        "  KEPT row 5  `Credit Support Annex`         OLD: `Credit Support Schedule`.  NEW: as",
-        "              written — an ISDA document's name, caught by the Annex rule. B9.",
-        "  CONTROL 1   `Financing Agreement`          `Facility Agreement` on BOTH arms. No",
-        "              lexicon sanctions it, so the rewrite must still fire; this is the limb",
-        "              that catches a pass which stopped working rather than became conditional.",
-        "  CONTROL 2   `credit line`                  `credit facility` on BOTH arms — a",
-        "              DECLARED exception: the reference lexicon lists it under Avoid and",
-        "              quality_check flags it, though sub-lexicons offer it (F46, open).",
+        "WHAT IS ON THE PAGES. EVERY HEADING LABELS WHAT ITS SOURCE DOES:",
+        "  SCHEDULE 1   the source runs it on under the body text.  OLD: forced onto a page",
+        "               of its own the source never gave it.  NEW: where the source put it.",
+        "               B7's own case -- on real documents, a blank page, or a listing split",
+        "               from its heading.",
+        "  SCHEDULE 2   the source starts this page with a break at the head of the heading.",
+        "               OLD: the pass adds a SECOND break.  NEW: one break, the source's.",
+        "               THIS ROW LOOKS THE SAME ON BOTH ARMS HERE, AND THE PAGES ARE NOT",
+        "               TELLING THE WHOLE TRUTH: LibreOffice, which renders them, lays the two",
+        "               breaks out as one. WORD DOES NOT -- counted in Word, a copy carrying",
+        "               only this doubled break is 4 pages against a control's 3, and the old",
+        "               arm is 5 where LibreOffice says 4. It is a blank page in the program a",
+        "               reviewer opens, and this tool cannot see it: register row I-26.",
+        "  ANNEX A      CONTROL -- the source gives it its own page break. The same on both",
+        "               arms: the old pass skipped a heading that already had one, and the",
+        "               new one removes nothing.",
         "",
-        "BOTH ARMS' REPACKS ARE REFUSED, AND THAT IS CORRECT RATHER THAN A FIXTURE DEFECT. The",
-        "fixture's notes declare the English as it stands, so the OLD arm's five rewrites and",
-        "BOTH arms' two control rewrites leave the document disagreeing with them. The pages are",
-        "assembled by byte substitution on both arms or neither, exactly as for 3a.",
-        "",
-        "WHAT THESE PAGES CANNOT SHOW: F45. The attachment label in auto-NUMBERING is written",
-        "by translate_numbering at Step 8a, which this run does not drive. Its proof is in",
-        "bytes — tests/test_lexicon_choice.py's arm 5, seven cases on each variant.",
+        "THE NEW ARM MUST HAVE THE SOURCE'S PAGE COUNT AND THE OLD ONE MUST NOT, and this tool",
+        "asserts both for this fixture. The corpus's third shape -- a break the heading's STYLE",
+        "already carries, where the old pass's break was redundant and moved no page -- is not",
+        "on these pages: every fixture shares one styles part, so it is proved in bytes by",
+        "tests/test_pass_conditions.py instead.",
         "",
         "  WHERE THE REST OF THIS SLICE'S PROOF IS:",
-        "    tests/test_lexicon_choice.py            78 checks on each variant, 0 failures,",
-        "      0 void, and PROVED RED against d3efa24 on both — 30 named limbs red there, 22",
-        "      'must still fire' limbs green. Its first two arms read every lexicon in BOTH",
-        "      trees — 30,713 English cells — and go red on a rewritten string a lexicon",
-        "      sanctions that the table does not cover, each with a planted control that fires.",
+        "    tests/test_pass_conditions.py   71 checks on each variant, 0 failures, 0 void, and",
+        "      PROVED RED against 6d8bbab on both. It also enforces the PRINCIPLE: a pass",
+        "      post_process runs without a PASS_CONDITIONS row turns it red, and its planted",
+        "      controls prove it can.",
         "    tools/postprocess_corpus_arm.py --from-apply   13 of 13 real inputs, rebuilt",
-        "      through apply where no snapshot was kept, because a DELIVERED document has",
-        "      already been through the pass and reads as a clean zero. The bytes MOVED on 1:",
-        "      `terminology` 2 -> 1, 14 bytes, both variants, explained by B5, 0 unexplained.",
+        "      through apply where no snapshot was kept. The bytes MOVED on exactly 6, the page-",
+        "      break pass's count going N -> 0 on each, 11 breaks in all, both variants, and",
+        "      0 unexplained.",
         "",
-        "  THE INSTRUMENT WAS WRONG BEFORE THE DELIVERABLE WAS, A THIRD SLICE RUNNING. The corpus",
-        "  arm printed `the drift gate fires identically at the baseline` as a FACT, and nothing",
-        "  measured it. Measured, it was false on one US document — and the reason is the",
-        "  corpus rather than the code: that document's frozen notes had been edited to suit the",
-        "  OLD rewrite after its snapshot was taken, so its input already disagreed with its",
-        "  own notes before the stage ran. The tool now runs the real validator on the input",
-        "  of any document that STARTS firing, and fails the run unless that input already",
-        "  disagreed — with a control proving the test can also say `agreed`.",
-        "",
-        "PREVIOUS SLICE, FOR ORIENTATION ONLY — 3a, the italic strip made conditional on what the",
-        "operator declared (B1). Now in the pinned baseline, so no longer a difference here.",
-        "Render italic-declared.docx to see its four lines; its READ-ME was this block.",
+        "PREVIOUS SLICES, FOR ORIENTATION ONLY — 3b, a mandatory rewrite no longer overrules the",
+        "lexicon (B5, B6(a), F29, B9, F45); and 3a, the italic strip made conditional on what",
+        "the operator declared (B1). Both are in the pinned baseline, so neither is a difference",
+        "here. Render lexicon-choice.docx or italic-declared.docx to see their pages.",
         "",
         "PREVIOUS BRANCH, FOR ORIENTATION ONLY — BRANCH 8, extraction completeness (C28,",
         "C12, M1): the one check that reads the ORIGINAL document. That is now in the pinned",

@@ -1483,6 +1483,56 @@ def _lexicon_choice(path):
     _write_notes(path, notes)
 
 
+@fixture("schedule-breaks.docx",
+         "BRANCH 10 SLICE 4 — three schedule headings, each labelling what its SOURCE does: "
+         "one the source runs on under the body text, one the source starts with a page "
+         "break at the head of the heading, and a control that carries its own "
+         "pageBreakBefore. Ships its own schedule-breaks.notes.json")
+def _schedule_breaks(path):
+    """The page B7 is judged on: the old pass IMPOSED a break on the first heading and
+    DOUBLED the one the source made on the second, and the new one does neither.
+
+    TWO OF THE THREE PAGE-START SHAPES THE CORPUS MEASURED ARE HERE, AND THE THIRD IS NOT,
+    DELIBERATELY. The corpus's third shape is a break carried by the heading's STYLE, and
+    this builder's styles part is SHARED by every fixture -- adding a page-break style to it
+    would change the bytes of every fixture here, and tests/test_no_delivered_byte_moves.py
+    depends on those bytes. It is the one shape whose old behaviour did not move a page
+    anyway (the direct break was redundant), and it is proved in bytes by
+    tests/test_pass_conditions.py arm 5.
+
+    The notes carry `en` equal to `text`, as the other notes-bearing fixtures do, so the
+    drift gate agrees with the document on both arms: the page-break pass changes no text.
+    """
+    rows = [
+        (r("SCHEDULE-BREAKS FIXTURE. Every schedule heading below says what its source does."),
+         ""),
+        (r("Body text of the agreement, on the first page."), ""),
+        (r("SCHEDULE 1 - the source runs this heading on, under the body text"), ""),
+        (r("Text of schedule one, which the source keeps on the first page."), ""),
+        ('<w:r><w:br w:type="page"/><w:t xml:space="preserve">SCHEDULE 2 - the source '
+         'starts this page with a break at the head of the heading</w:t></w:r>', ""),
+        (r("Text of schedule two."), ""),
+        (r("ANNEX A - control: the source gives this heading its own page break"),
+         "<w:pPr><w:pageBreakBefore/></w:pPr>"),
+        (r("Text of annex A."), ""),
+    ]
+    docx(path, "".join(p(run, ppr=ppr) for run, ppr in rows))
+
+    texts = ["SCHEDULE-BREAKS FIXTURE. Every schedule heading below says what its source does.",
+             "Body text of the agreement, on the first page.",
+             "SCHEDULE 1 - the source runs this heading on, under the body text",
+             "Text of schedule one, which the source keeps on the first page.",
+             "SCHEDULE 2 - the source starts this page with a break at the head of the heading",
+             "Text of schedule two.",
+             "ANNEX A - control: the source gives this heading its own page break",
+             "Text of annex A."]
+    notes = [{"idx": i, "text": t, "en": t, "style": "Normal",
+              "runs": [{"start": 0, "end": len(t), "text": t, "bold": False,
+                        "italic": False}],
+              "en_runs": None} for i, t in enumerate(texts)]
+    _write_notes(path, notes)
+
+
 @fixture("tracked-changes.docx",
          "an insertion, a deletion, and a deletion whose text is in the source language — "
          "the document must read correctly both when accepted and when rejected")

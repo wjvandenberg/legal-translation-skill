@@ -906,3 +906,40 @@ into both variants at once.
 
 *(The layout itself — `uk/` IS the publishable tree, `tools/` and `tests/` siblings never inside it,
 `.gitignore` by path — stays in `CLAUDE.md` §6.4: it is load-bearing every session, not reasoning.)*
+
+## 2026-09-24 — the purpose guard's marker and route, and slice 4 made a detector rather than a reader of the original
+
+**THE PURPOSE GUARD, INSTALLED AT THE OPEN OF BRANCH 10 SLICE 4** *(deferred at slice 3b's close on a
+measurement: its probe looked for a marker this project's purpose line did not carry)*. Three choices, each
+on the recommended option, put to Wouter at the opening input point:
+
+1. **THE MARKER LIVES IN THE STATUS ROW.** The house guard accepts a line in a root `PLAN-*.md` carrying the
+   literal `SESSION PURPOSE` and today's date. This project's purpose line is the status row's clause, which
+   now opens **`THIS SESSION, <date> — SESSION PURPOSE — what · how · purpose:`**. `PLAN-3-opus5-migration.md`
+   stays in the root: the guard reads it too, harmlessly, it being a future plan rather than a closed one.
+2. **WIRED THROUGH THE HOUSE INSTALLER'S PURPOSE HALF ONLY.** Run as documented, the house
+   `install_hooks.py` would have done three things nobody asked for: copied the house `pre-push` over this
+   project's own, a different file by hash; wired `auto_mode_guard.py`, which `verify.config.json` declares
+   absent with a reason; and pointed the purpose entry at the shared copy. So its own install and bite-test
+   functions were called for the purpose guard alone, against `tools/purpose_guard.py`, and both git hooks
+   were verified byte-identical before and after.
+3. **AND THE SHARED INSTALLER WAS FIXED IN THE SAME SESSION**, under the house rule for a standard-script
+   bug: `install_hooks.py` v4, with `--only` and `--guard-dir`, committed in the templates repository. **Its
+   `standard-scripts/CHANGELOG.md` entry owns the reasoning** and it is not restated here.
+
+**AND IT PROTECTED THE SESSION THAT INSTALLED IT, WHICH THIS ENTRY FIRST SAID IT COULD NOT.** The first draft
+read *"hooks load at session start, so the first session it governs is the next one"* — the house
+rule, written down unmeasured. **Measured the same day:** the guard's state file carried the INSTALLING
+session's own id, written by the live hook on an edit made after the install, so an entry added to
+`settings.local.json` took effect mid-session in the desktop app. **Not generalised past what was measured:**
+the charter's section 5.6 sentence about the evidence guard concerns a different file and was not re-tested.
+**Its escape route, stated because an unwritten one is the same as
+none:** it matches only the four editing tools, so its entry in the gitignored `.claude/settings.local.json`
+can always be deleted through Bash or PowerShell.
+
+**SLICE 4's THREE CHOICES** — the page-break pass becomes a DETECTOR with no new input; the principle is a
+declared `PASS_CONDITIONS` table in `post_process.py`'s header, enforced by `tests/test_pass_conditions.py`;
+and the detections reach the change journal at schema 3 — **are owned, with the measurement they were chosen
+on, by section 3.8 of `PLAN-2-step-b.md`**, and are not summarised here. **What was DECLINED, and why it is
+recorded:** reading the original through a new `--original` input at Step 6, the slice's literal shape. On
+this corpus it would have restored **0 of 11** breaks, and it would have added the flag decision 2c forbids.

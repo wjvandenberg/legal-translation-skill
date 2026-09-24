@@ -55,7 +55,8 @@ checked.
    `validate_translations.py` (pre-apply, BLOCK on critical), plus
    `validate_segment_shapes.py` and `validate_reject_all.py` (pre-apply, TC docs only),
    plus `validate_apply.py --strict` (post-apply).** No separate invocation required.
-2. `post_process.py --fix` — spacing, italic, schedule page breaks fixed. **Auto-invokes
+2. `post_process.py --fix` — spacing and italic fixed, schedule page breaks reported and
+   never inserted. **Auto-invokes
    `strip_noop_tracked_changes.py` on TC docs** (collapses orthographic-only del/ins
    pairs + strips phantom ins-wraps-del wrappers).
 3. `reorder_definitions.py` — definitions sorted alphabetically by English term
