@@ -17,6 +17,12 @@ built in a temporary directory; nothing is read from the corpus. What each arm a
  12  notes declaring nothing are VOID, exit 3 -- never clean
  13  the report prints no document text, only indices, classes and lengths
  14  the block is byte-identical in both trees
+ 15  WOUTER'S RULING, 2026-09-24: a trailing-whitespace loss at a paragraph's end -- the SOURCE
+     paragraph ends in whitespace, the declaration mirrors it, the delivery drops it -- is
+     COUNTED and reported, never a blocking finding, because it renders nothing. And the four
+     shapes just outside it still block: a source with no trailing whitespace, a leading loss
+     beside the trailing one, readings that differ by more than the trailing whitespace, and a
+     lost space BETWEEN words.
 
     uv run --with lxml python tests/test_delivered_check.py
     uv run --with lxml python tests/test_delivered_check.py --variant us
@@ -209,6 +215,44 @@ for v in ("uk", "us"):
     blocks.append(t[s:t.find("def main():", s)] if s >= 0 else "")
 ok("the --delivered block exists in both trees and is byte-identical",
    bool(blocks[0]) and blocks[0] == blocks[1], f"uk={len(blocks[0])} us={len(blocks[1])}")
+
+print("\n15  Wouter's ruling: a trailing-whitespace loss is COUNTED, never blocking")
+
+
+def blocking(rep):
+    return [f for f in (rep or {}).get("findings", []) if f.get("blocking", True)]
+
+
+ruled = {"idx": 0, "text": "source 0 ", "en": A + " "}
+r, rep = case("ruled", [ruled, en(1, B)], [para(A), para(B)], strict=True)
+ok("the loss is still REPORTED — edge-space / trail-lost at idx 0",
+   [f["idx"] for f in findings(rep, "edge-space", "trail-lost")] == [0], str(rep and rep["findings"]))
+ok("...marked not blocking, and counted as such in the report",
+   rep is not None and blocking(rep) == [] and rep.get("counted") == 1 and rep.get("blocking") == 0,
+   str(rep and {k: rep.get(k) for k in ("counted", "blocking")}))
+ok("...so --strict exits 0", r.returncode == 0, f"rc={r.returncode}")
+ok("...and the line says COUNTED, never FINDING",
+   "COUNTED" in r.stdout and "FINDING" not in r.stdout, r.stdout[-300:])
+
+r, rep = case("ruled-nosrc", [en(0, A + " "), en(1, B)], [para(A), para(B)], strict=True)
+ok("a source with NO trailing whitespace still BLOCKS — the ruling's population, not a wider one",
+   len(blocking(rep)) == 1 and r.returncode == 1, f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("ruled-lead", [{"idx": 0, "text": " source 0 ", "en": " " + A + " "}, en(1, B)],
+              [para(A), para(B)], strict=True)
+ok("a LEADING loss beside the trailing one still BLOCKS",
+   len(blocking(rep)) == 1 and r.returncode == 1, f"rc={r.returncode} {rep and rep['findings']}")
+
+tc_ws = {"idx": 0, "text": "source 0 ", "en": "Sign here now ",
+         "en_segments": [{"type": "regular", "en": "Sign here"}, {"type": "ins", "en": " now "}]}
+r, rep = case("ruled-readings", [tc_ws, en(1, B)], [para("Sign here", " now"), para(B)], strict=True)
+ok("readings that differ by MORE than the trailing whitespace still BLOCK",
+   len(blocking(rep)) == 1 and r.returncode == 1, f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("ruled-inner", [{"idx": 0, "text": "source 0 ", "en": B}, en(1, A)],
+              [para(B.replace("shall be", "shallbe")), para(A)], strict=True)
+ok("a lost space BETWEEN words still BLOCKS",
+   len(blocking(rep)) == 1 and r.returncode == 1, f"rc={r.returncode} {rep and rep['findings']}")
 
 shutil.rmtree(TMP, ignore_errors=True)
 print("\n" + "=" * 88)
