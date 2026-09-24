@@ -14,7 +14,13 @@ Runs all quality fixes in a single pass:
 9. Quote balancing on defined terms
 10. Definition line-break removal (w:br in definition paragraphs)
 11. Spurious italic removal (italic on substantive body text)
-12. Schedule page-break insertion (pageBreakBefore on Schedule/Annex headings)
+12. Schedule page breaks -- a DETECTOR since branch 10 slice 4: it reports how each
+    Schedule/Annex heading starts its page and inserts nothing, so the source's pagination
+    is kept
+
+EVERY PASS ABOVE HAS A ROW IN `PASS_CONDITIONS`, BELOW THE IMPORTS -- the condition it
+assumes, what it reads to test it, and what it does when it cannot tell. A pass added
+without one turns tests/test_pass_conditions.py red. Read it before adding a pass.
 
 Usage:
     python post_process.py <document.xml> [--fix] [--report-only]
@@ -27,6 +33,116 @@ import os
 import sys
 import re
 from lxml import etree
+
+# === THE PRINCIPLE EVERY PASS OBEYS — branch 10 slice 4, and read it before adding one ===
+#
+# THIS STAGE RUNS DOWNSTREAM OF EVERY CONTENT CHECK, so a pass that acts on a guess ships the
+# guess. Branch 10 measured that eight times: the italic strip, the page breaks, Annex ->
+# Schedule, Article -> Clause, the punctuation collapse, the spacing repair, the terminology
+# rewrite and the empty-wrapper strip each acted on an assumption it NEVER TESTED, and each
+# damaged a real document. So the rule, decision 2c revised:
+#
+#   1  EVERY PASS NAMES THE CONDITION IT ASSUMES AND TESTS IT, from an input it can actually
+#      read -- the document, the declared notes, or a table in this file.
+#   2  WHERE THE CONDITION CANNOT BE DETERMINED, THE PASS REPORTS AND CHANGES NOTHING.
+#   3  A PASS LEFT WITH NOTHING TO REWRITE BECOMES A DETECTOR AND IS KEPT, NOT DELETED: what
+#      it finds goes into the journal's `detections`, where the checking work can read it.
+#   4  NO FLAG, NO USER QUESTION, NO OPERATOR SWITCH. A pass that declines to act is the pass
+#      working; a switch to turn it off is the override flag decision 3 rejected, renamed.
+#
+# THE TABLE BELOW IS THE RULE MADE CHECKABLE. One row per journalled pass: STATUS, the
+# condition it assumes, what it reads, and what it does when it cannot tell.
+# tests/test_pass_conditions.py goes RED on a pass run by post_process() that has no row, on a
+# row naming no pass, and on a status outside the four below -- so the next pass anyone adds
+# arrives here or fails.
+#
+#   CONDITIONAL      tests the condition it assumes and acts only where it holds
+#   DETECTOR         its condition is not in its input, so it reports and changes nothing
+#   MECHANICAL       its condition is decidable from the document alone and is decided there
+#   NOT YET TESTED   it acts on an assumption it does NOT test. DECLARED, NOT IMPLIED
+#                    COMPLIANT: no register row records one of these misfiring, and none was
+#                    branch 10's to fix, so each is a known gap rather than a hidden one
+PASS_STATUSES = ('CONDITIONAL', 'DETECTOR', 'MECHANICAL', 'NOT YET TESTED')
+PASS_CONDITIONS = {
+    'spacing': (
+        'CONDITIONAL',
+        'two text elements whose texts would glue need a separating space',
+        'document.xml: whether a RENDERED w:tab or w:br already sits between them (a w:tab '
+        'inside w:pPr/w:tabs is a tab stop and does not count)',
+        'decidable from the document; a seam already separated is left alone (B4)'),
+    'definition_boundaries': (
+        'NOT YET TESTED',
+        'a capital, closing quote or bracket glued to "means", "shall mean", "has the '
+        'meaning" or "indicates" is a missing space, never the source\'s own string',
+        'document.xml only',
+        'does not test it; no register row records a misfire'),
+    'double_punctuation': (
+        'DETECTOR',
+        'a doubled . , ; or : is ours to collapse -- which nothing in document.xml can say',
+        'document.xml, which cannot answer it',
+        'reports each occurrence and changes nothing (B8)'),
+    'terminology': (
+        'CONDITIONAL',
+        'a listed term is a calque or a variant to standardise',
+        'document.xml and the LEXICON_SANCTIONED table; the declared notes only to say why '
+        'a kept match was kept',
+        'a match inside a lexicon-sanctioned span is left as written and reported (B5, B9)'),
+    'uk_spelling': (
+        'NOT YET TESTED',
+        'every listed spelling is the variant\'s to change, never a proper name, a '
+        'quotation or a retained source-language term',
+        'the requested variant, which it does test; nothing that could tell a name apart',
+        'does not test it; no register row records a misfire'),
+    'us_spelling': (
+        'NOT YET TESTED',
+        'every listed spelling is the variant\'s to change, never a proper name, a '
+        'quotation or a retained source-language term',
+        'the requested variant, which it does test; nothing that could tell a name apart',
+        'does not test it; no register row records a misfire'),
+    'annex_to_schedule': (
+        'DETECTOR',
+        'Annex should read Schedule -- which the lexicon offers as a FREE choice, matched '
+        'to the source',
+        'document.xml, LEXICON_SANCTIONED and the declared notes',
+        'reports every Annex it finds and rewrites nothing (F29)'),
+    'article_to_clause': (
+        'CONDITIONAL',
+        '"Article N" is an internal cross-reference rather than a statutory citation',
+        'document.xml: what follows the number in the same sentence',
+        'an indeterminate reference keeps "Article" and is reported (B2)'),
+    'duplicates': (
+        'NOT YET TESTED',
+        'a word of three or more letters said twice is an error, never the source\'s own '
+        '("had had", "that that")',
+        'document.xml only',
+        'does not test it; no register row records a misfire'),
+    'quotes': (
+        'NOT YET TESTED',
+        'an unmatched opening quote before a definition verb is a missing closing quote',
+        'document.xml only',
+        'does not test it; no register row records a misfire'),
+    'definition_line_breaks': (
+        'NOT YET TESTED',
+        'every w:br in a paragraph holding a definition verb and a quote mark is a '
+        'translation artefact, never the source\'s own line break',
+        'document.xml only',
+        'does not test it; no register row records a misfire'),
+    'spurious_italic': (
+        'CONDITIONAL',
+        'an italic run of three or more words is ours, not the drafter\'s',
+        'the declared notes: en_runs in its own offsets, and the source runs by exact '
+        'equality',
+        'no notes, no paragraph match or a run not covered: the italic is kept and '
+        'reported (B1)'),
+    'schedule_page_breaks': (
+        'DETECTOR',
+        'every Schedule/Annex heading starts on a new page -- a house convention, never a '
+        'property of the source',
+        'document.xml, which carries every page-start device apply copied across from the '
+        'source (11 of 11 measured)',
+        'reports how each heading starts its page and inserts nothing (B7)'),
+}
+# === THE PRINCIPLE ENDS ===
 
 # === CHANGE JOURNAL ===
 #
@@ -55,7 +171,9 @@ from lxml import etree
 # FOUR NON-TEXT SHAPES, COUNTED FROM THE CODE RATHER THAN ASSUMED. The spacing and
 # definition-boundary passes set `xml:space` on a `w:t`; the line-break pass removes a
 # `w:br` from a run; the italic strip removes `w:i` from a `w:rPr`; the page-break pass
-# creates a `w:pPr` and inserts `w:pageBreakBefore`. Not one is text.
+# created a `w:pPr` and inserted `w:pageBreakBefore` -- until slice 4 made it a detector that
+# inserts nothing, so three shapes remain and the record's paragraph arm now proves an absence.
+# Not one is text.
 #
 # SO THERE IS A SECOND CONTRACT, AND IT SITS ON THE FIRST ONE'S COORDINATES. The formatting
 # record uses the SAME flat ordinal and the SAME paragraph index as the text record, so a
@@ -81,7 +199,13 @@ from lxml import etree
 # nobody can key on. Nothing is REMOVED at 2 — `non_text_fixes` in particular stays, because
 # tools/postprocess_corpus_arm.py, tests/test_change_journal.py and both skill-docs/06 read
 # it, and a field with live consumers is not quietly repurposed.
-JOURNAL_SCHEMA = 'post-process-journal/2'
+#
+# SCHEMA 3 IS BRANCH 10 SLICE 4's DETECTION RECORD. Decision 2c's second limb says a pass that
+# cannot decide REPORTS, and until slice 4 the report was a line on screen -- which dies with
+# the run and which nothing downstream can read. `detections` is that report as data: what
+# the stage FOUND and deliberately did not change, one record per finding. Again nothing is
+# removed, so every schema-2 consumer reads schema 3 unchanged.
+JOURNAL_SCHEMA = 'post-process-journal/3'
 JOURNAL_NAME = 'post_process_journal.json'
 JOURNAL_TEXT_CONTRACT = (
     'w:t and w:delText, in document order, identified by flat ordinal over the part; '
@@ -96,6 +220,13 @@ JOURNAL_FORMAT_CONTRACT = (
     'Recorded only where the count of text-bearing elements, or of paragraphs, did not '
     'move; where it moved, the note says so and the per-pass element counts are the '
     'only account.'
+)
+JOURNAL_DETECTION_CONTRACT = (
+    'one record per thing a pass FOUND and deliberately did NOT change: the pass, a reason '
+    'from that pass\'s fixed vocabulary, the paragraph index (the same index the text and '
+    'format records use; null where the pass cannot locate it) and a count. NO DOCUMENT '
+    'TEXT: a lexicon-sanctioned rendering is named by its index into LEXICON_SANCTIONED and '
+    'a page-start device by its code. A detection is NOT a fix and is never in `counts`.'
 )
 
 _JT = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}t'
@@ -235,6 +366,10 @@ class ChangeJournal:
         self.strip = None
         self.unaccounted = []
         self.notes = []
+        # SCHEMA 3. Filled once, after every pass has run, by collect_detections() -- never
+        # by the passes themselves, which is what keeps the fix counts and the findings two
+        # different numbers.
+        self.detections = []
 
     def record_pass(self, name, before_flat, after_flat,
                     before_paras, after_paras, before_n, after_n, owner_map, fixes,
@@ -366,7 +501,9 @@ class ChangeJournal:
             'document': doc_basename,
             'text_contract': JOURNAL_TEXT_CONTRACT,
             'format_contract': JOURNAL_FORMAT_CONTRACT,
+            'detection_contract': JOURNAL_DETECTION_CONTRACT,
             'stages': stages,
+            'detections': self.detections,
             'self_check': {
                 'accounted': not self.unaccounted and not self.notes,
                 'unaccounted_paragraphs': self.unaccounted,
@@ -473,6 +610,9 @@ def journal_write(journal, xml_path, final_paras, original_paras):
     if n_fmt or n_fmt_p:
         print(f'  [journal] and {n_fmt} formatting change(s) on {n_fmt_p} paragraph(s) '
               f'— run properties and paragraph properties, not text')
+    if data['detections']:
+        print(f"  [journal] and {len(data['detections'])} detection(s) — what the stage "
+              f"FOUND and deliberately did not change, one record each, no document text")
     nontext = data['self_check']['non_text_fixes']
     unexplained = data['self_check']['unexplained_fixes']
     if nontext:
@@ -798,7 +938,8 @@ ARTICLE_INTERNAL = 'internal'
 ARTICLE_INDETERMINATE = 'indeterminate'
 
 # B2's detector output: the "Article N" references this run declined to
-# classify, and therefore declined to rewrite. Read by the caller after
+# classify, and therefore declined to rewrite -- one {'para': index} each since
+# slice 4, the reference's text deliberately not kept. Read by the caller after
 # `fix_article_to_clause` returns and printed with the pass summary, because a
 # pass that silently stops rewriting reads as a pass that found nothing to do.
 ARTICLE_UNDECIDED = []
@@ -1185,16 +1326,23 @@ def fix_double_punctuation(root):
                (',,', 'double comma'),
                (';;', 'double semicolon'))
     period_re = re.compile(r'\.\.(?!\.)')
+    # SLICE 4: each finding carries its PARAGRAPH INDEX, the journal's own, so it can be
+    # located by whatever reads `detections`. The list is KEPT so the proxies stay alive --
+    # see journal_flat_paragraph_map for why an id() of a freed proxy is not an identity.
+    paras = list(root.iter(f'{{{W}}}p'))
+    p_index = {id(x): i for i, x in enumerate(paras)}
     for t in root.iter(f'{{{W}}}t'):
         if t.text is None:
             continue
+        own = _own_paragraph(t)
+        para = p_index.get(id(own)) if own is not None else None
         for mark, label in doubles:
             n = t.text.count(mark)
             if n:
-                found.append({'mark': label, 'count': n})
+                found.append({'mark': label, 'count': n, 'para': para})
         n = len(period_re.findall(t.text))
         if n:
-            found.append({'mark': 'double period', 'count': n})
+            found.append({'mark': 'double period', 'count': n, 'para': para})
     return 0
 
 # === LEXICON-SANCTIONED RENDERINGS ===
@@ -1348,8 +1496,17 @@ def _record_kept(pass_name, t, kept, notes):
             reason = 'source wording'
         else:
             reason = 'declared'
+    # SLICE 4: the paragraph index, the journal's own, so `detections` can locate the kept
+    # match. Found by IDENTITY while `own` holds the proxy alive, and only on this path --
+    # a kept match is rare, so the walk costs nothing on a document that has none.
+    own = _own_paragraph(t)
+    para = None
+    if own is not None:
+        root = t.getroottree().getroot()
+        para = next((i for i, x in enumerate(root.iter(f'{{{W}}}p')) if x is own), None)
     for idx in kept:
-        LEXICON_CHOICE_KEPT.append({'pass': pass_name, 'entry': idx, 'reason': reason})
+        LEXICON_CHOICE_KEPT.append({'pass': pass_name, 'entry': idx, 'reason': reason,
+                                    'para': para})
 # === LEXICON-SANCTIONED RENDERINGS ENDS ===
 
 
@@ -1515,7 +1672,9 @@ def fix_article_to_clause(root):
     undecided = ARTICLE_UNDECIDED
     del undecided[:]
     article_re = re.compile(r'\bArticles?\s+\d[\d.:]*(?:-[A-Za-z]{1,15})*')
-    for p in root.iter(f'{{{W}}}p'):
+    # SLICE 4: enumerated so a reference left alone carries its paragraph index -- the
+    # journal's own, root.iter over w:p being the journal's enumeration.
+    for p_i, p in enumerate(root.iter(f'{{{W}}}p')):
         # Build the joined paragraph text once for context lookup.
         t_elems = list(p.iter(f'{{{W}}}t'))
         joined = ''.join((t.text or '') for t in t_elems)
@@ -1534,7 +1693,7 @@ def fix_article_to_clause(root):
                 external_starts.add(m.start())
             elif verdict == ARTICLE_INDETERMINATE:
                 external_starts.add(m.start())
-                undecided.append(m.group(0))
+                undecided.append({'para': p_i})
         # Walk t_elems and rewrite per-element. Only rewrite matches
         # whose absolute start position is NOT in external_starts.
         running = 0
@@ -1701,6 +1860,9 @@ def fix_definition_line_breaks(root):
 # same join returned 7 verdicts that could only be accidental. Exact equality reaches the
 # case the row actually names, a deliberately RETAINED source-language term, and reaches
 # nothing by luck.
+#
+# One {'reason', 'para'} per run the pass left alone -- a bare reason string until slice 4,
+# which added the paragraph index so the journal's `detections` can locate each one.
 DECLARED_ITALIC_UNDECIDED = []
 
 
@@ -1839,7 +2001,7 @@ def fix_spurious_italic_runs(root, notes=None):
         'ad hoc', 'ab initio', 'ultra vires', 'per se', 'in rem',
     }
 
-    for p in root.iter(f'{{{W}}}p'):
+    for p_i, p in enumerate(root.iter(f'{{{W}}}p')):
         full = ''.join(t.text or '' for t in p.iter(f'{{{W}}}t'))
         if not full.strip():
             continue
@@ -1900,43 +2062,125 @@ def fix_spurious_italic_runs(root, notes=None):
                     # No declaration to consult. B1: the pass cannot tell an italic it
                     # introduced from one the operator authored, and guessing destroyed
                     # a drafting convention on a real document. Report, change nothing.
-                    DECLARED_ITALIC_UNDECIDED.append('no notes')
+                    DECLARED_ITALIC_UNDECIDED.append({'reason': 'no notes',
+                                                      'para': p_i})
                     continue
                 entry = notes.get(_notes_norm(full))
                 if entry is None:
-                    DECLARED_ITALIC_UNDECIDED.append('no paragraph match')
+                    DECLARED_ITALIC_UNDECIDED.append({'reason': 'no paragraph match',
+                                                      'para': p_i})
                     continue
                 verdict = _declared_italic(entry, t.text)
                 if verdict is True:
                     continue          # declared, or carried from an italic source run
                 if verdict is None:
-                    DECLARED_ITALIC_UNDECIDED.append('run not covered')
+                    DECLARED_ITALIC_UNDECIDED.append({'reason': 'run not covered',
+                                                      'para': p_i})
                     continue
                 rpr.remove(i_elem)
                 fixes += 1
 
     return fixes
 
+# B7's detector output: one record per schedule-shaped heading this run FOUND and how it
+# starts its page -- {'para', 'starts_new_page', 'device', 'styled'}. Reset per run, and read
+# by the caller for the detector line and the journal's `detections`.
+SCHEDULE_HEADINGS_FOUND = []
+
+# THE PAGE-START DEVICES VISIBLE IN document.xml, AND THE ONE THIS STAGE CANNOT SEE. The codes
+# are slice 4's probe's, so a record here reads directly against that measurement.
+#   pBB     the heading's own w:pageBreakBefore (not val=0/false/off)
+#   brLead  a w:br type=page inside the heading BEFORE its first text
+#   brTail  a w:br type=page after the last text of the previous text-bearing paragraph
+#   brEmp   a w:br type=page in an EMPTY paragraph between the two
+#   pBBEmp  w:pageBreakBefore on such an empty paragraph
+#   sect    a section break (nextPage, oddPage, evenPage -- or no type, which MEANS
+#           nextPage) ending a paragraph between the previous text and the heading
+# NOT VISIBLE HERE: a pageBreakBefore carried by the heading's STYLE. Styles live in
+# styles.xml, a part this stage is never handed, so a STYLED heading with no visible device is
+# reported as UNKNOWN -- never as "does not start a new page", which would be a guess. An
+# UNSTYLED heading takes the document's default paragraph style, and a default style carrying
+# pageBreakBefore would start EVERY paragraph on its own page; that is assumed away, and said.
+_PAGE_BREAK_OFF = {'0', 'false', 'off'}
+
+
+def _page_start_devices(paras, k):
+    """The device codes by which paragraph k starts on a new page, from document.xml alone.
+    Walks back over at most twelve EMPTY paragraphs to the previous text or section break."""
+    dev = set()
+
+    def _pbb_on(ppr):
+        pb = ppr.find(f'{{{W}}}pageBreakBefore') if ppr is not None else None
+        return pb is not None and (
+            (pb.get(f'{{{W}}}val', 'true') or 'true').lower() not in _PAGE_BREAK_OFF)
+
+    def _page_br(el):
+        return el.tag == f'{{{W}}}br' and el.get(f'{{{W}}}type') == 'page'
+
+    p = paras[k]
+    if _pbb_on(p.find(f'{{{W}}}pPr')):
+        dev.add('pBB')
+    for el in p.iter():
+        if el.tag == f'{{{W}}}t' and (el.text or '').strip():
+            break
+        if _page_br(el):
+            dev.add('brLead')
+    j, walked = k - 1, 0
+    while j >= 0 and walked < 12:
+        q = paras[j]
+        qppr = q.find(f'{{{W}}}pPr')
+        sp = qppr.find(f'{{{W}}}sectPr') if qppr is not None else None
+        if sp is not None:
+            ty = sp.find(f'{{{W}}}type')
+            tv = ty.get(f'{{{W}}}val') if ty is not None else 'nextPage'
+            if tv in ('nextPage', 'oddPage', 'evenPage'):
+                dev.add('sect')
+            break
+        texts = [el for el in q.iter(f'{{{W}}}t') if (el.text or '').strip()]
+        if texts:
+            after = False
+            for el in q.iter():
+                if el is texts[-1]:
+                    after = True
+                elif after and _page_br(el):
+                    dev.add('brTail')
+            break
+        if any(_page_br(el) for el in q.iter()):
+            dev.add('brEmp')
+        if _pbb_on(qppr):
+            dev.add('pBBEmp')
+        j -= 1
+        walked += 1
+    return dev
+
+
 def fix_schedule_page_breaks(root):
-    """Insert page breaks before Schedule/Annex headings.
+    """Find Schedule/Annex headings and REPORT how each starts its page. INSERTS NOTHING.
 
-    In Italian legal documents, each Schedule (Allegato) starts on a new page. After
-    translation, these page breaks may be lost. This function finds Schedule heading
-    paragraphs and ensures they have a w:pageBreakBefore element in their paragraph
-    properties (w:pPr).
+    B7, BRANCH 10 SLICE 4. Until slice 4 this pass gave every such heading a
+    w:pageBreakBefore, on two premises its docstring stated: that each schedule starts on a
+    new page, and that after translation these page breaks may be lost. Measured on all 13
+    frozen workdirs rebuilt through apply, in both trees, it fired 11 times and was needed on
+    none of them:
+      3  the source does NOT start the heading on a new page, and the imposed break made a
+         blank page or split a listing from its own heading -- B7's own three documents;
+      4  the source ALREADY starts it on a new page, by a page break at the head of the
+         heading or in an empty paragraph before it, and the added break DOUBLED it;
+      4  the heading's STYLE already carries pageBreakBefore, so the added one was redundant.
+    And on all 11 the document this pass receives carries the same page-start device as the
+    source, because apply copies every one of them across. So both premises are false: the
+    convention is the house's rather than the source's, and the breaks are not lost.
 
-    Matches paragraphs whose full text (stripped) matches patterns like:
-    - "SCHEDULE 1", "SCHEDULE A", "Schedule 1"
-    - "ANNEX 1", "ANNEX A", "Annex 1"
-    - "ALLEGATO 1", "ALLEGATO A"  (Italian remnants)
+    THE CANDIDACY RULE IS UNCHANGED, so what this reports is exactly what it used to act on:
+    the heading pattern, the length cap, the label-token check and the style skip-list below.
+    What changed is the action. Each candidate is recorded in SCHEDULE_HEADINGS_FOUND with how
+    it starts its page, and the document is left exactly as it arrived. Restoring a break apply
+    LOST would be repairing apply from downstream; comparing the delivery against the original
+    is the delivered-document check's work (branch 11). Neither is a guess for this stage.
 
-    Skips paragraphs that are TOC entries (style starts with "TOC") or body-content
-    schedule reference lists (styles like FWBL2, FWBCont1, FWBCont2, Normal) which
-    merely *mention* schedules but are not actual schedule heading pages. Only
-    dedicated schedule heading styles (e.g. ITScheduleL1, or paragraphs with no
-    body-content style) receive page breaks.
+    Returns 0, always: a detection is not a fix.
     """
-    fixes = 0
+    del SCHEDULE_HEADINGS_FOUND[:]
     schedule_pattern = re.compile(
         r'^\s*(SCHEDULE|Schedule|ANNEX|Annex|ALLEGATO|Allegato)\s+[\dA-Za-z]',
         re.IGNORECASE
@@ -1952,7 +2196,10 @@ def fix_schedule_page_breaks(root):
         'Normal',
     }
 
-    for p in root.iter(f'{{{W}}}p'):
+    # KEPT as a list for the walk-back in _page_start_devices, and because a kept list keeps
+    # the proxies alive -- see journal_flat_paragraph_map. The index is the journal's own.
+    paras = list(root.iter(f'{{{W}}}p'))
+    for k, p in enumerate(paras):
         full = ''.join(t.text or '' for t in p.iter(f'{{{W}}}t')).strip()
         if not full:
             continue
@@ -2009,44 +2256,51 @@ def fix_schedule_page_breaks(root):
 
         if style and (style in SKIP_STYLES or style.upper().startswith('TOC')):
             continue
-        if ppr is None:
-            ppr = etree.SubElement(p, f'{{{W}}}pPr')
-            # Move pPr to be the first child
-            p.remove(ppr)
-            p.insert(0, ppr)
 
-        # Check if pageBreakBefore already exists
-        pb = ppr.find(f'{{{W}}}pageBreakBefore')
-        if pb is None:
-            pb = etree.Element(f'{{{W}}}pageBreakBefore')
-            # Insert pageBreakBefore in correct OOXML pPr order (before rPr)
-            # Canonical ordering: pStyle, keepNext, keepLines, pageBreakBefore, ...
-            # rPr must always be last child of pPr
-            PPR_ORDER = [
-                'pStyle', 'keepNext', 'keepLines', 'pageBreakBefore',
-                'framePr', 'widowControl', 'numPr', 'suppressLineNumbers',
-                'pBdr', 'shd', 'tabs', 'suppressAutoHyphens', 'kinsoku',
-                'wordWrap', 'overflowPunct', 'topLinePunct', 'autoSpaceDE',
-                'autoSpaceDN', 'bidi', 'adjustRightInd', 'snapToGrid',
-                'spacing', 'ind', 'contextualSpacing', 'mirrorIndents',
-                'suppressOverlap', 'jc', 'textDirection', 'textAlignment',
-                'textboxTightWrap', 'outlineLvl', 'divId', 'cnfStyle',
-                'rPr',
-            ]
-            target_idx = PPR_ORDER.index('pageBreakBefore')
-            inserted = False
-            for i, child in enumerate(ppr):
-                child_local = child.tag.split('}')[1] if '}' in child.tag else child.tag
-                child_order = PPR_ORDER.index(child_local) if child_local in PPR_ORDER else len(PPR_ORDER) - 1
-                if child_order > target_idx:
-                    ppr.insert(i, pb)
-                    inserted = True
-                    break
-            if not inserted:
-                ppr.append(pb)
-            fixes += 1
+        # THE ACTION, AND THE ONLY LINES OF THIS PASS THAT CHANGED. Where the old code
+        # created a w:pPr and inserted w:pageBreakBefore, the candidate is now RECORDED.
+        dev = _page_start_devices(paras, k)
+        SCHEDULE_HEADINGS_FOUND.append({
+            'para': k,
+            'starts_new_page': True if dev else (None if style else False),
+            'device': sorted(dev),
+            'styled': bool(style),
+        })
 
-    return fixes
+    return 0
+
+
+def collect_detections():
+    """The journal's `detections`: every detector list the passes filled, as one record per
+    finding under JOURNAL_DETECTION_CONTRACT. Read AFTER every pass has run.
+
+    THE REASONS ARE EACH PASS'S OWN VOCABULARY, NOT A NEW ONE. A consumer reading "no notes"
+    here and "no notes" in a detector line on screen must be reading the same fact, or the
+    two reports of one run will disagree about it.
+    """
+    out = []
+    for d in DOUBLE_PUNCTUATION_FOUND:
+        out.append({'pass': 'double_punctuation', 'reason': d['mark'],
+                    'para': d.get('para'), 'count': d['count']})
+    for a in ARTICLE_UNDECIDED:
+        out.append({'pass': 'article_to_clause', 'reason': 'indeterminate',
+                    'para': a.get('para'), 'count': 1})
+    for it in DECLARED_ITALIC_UNDECIDED:
+        out.append({'pass': 'spurious_italic', 'reason': it['reason'],
+                    'para': it.get('para'), 'count': 1})
+    for k in LEXICON_CHOICE_KEPT:
+        out.append({'pass': k['pass'], 'reason': k['reason'], 'para': k.get('para'),
+                    'count': 1, 'entry': k['entry']})
+    for h in SCHEDULE_HEADINGS_FOUND:
+        if h['starts_new_page']:
+            reason = 'starts a new page'
+        elif h['starts_new_page'] is False:
+            reason = 'does not start a new page'
+        else:
+            reason = 'unknown: styled, and a style is not visible in document.xml'
+        out.append({'pass': 'schedule_page_breaks', 'reason': reason, 'para': h['para'],
+                    'count': 1, 'device': h['device']})
+    return out
 
 def extract_header(xml_text):
     """Extract XML declaration and root element opening tag from raw XML text."""
@@ -2276,6 +2530,10 @@ def post_process(xml_path, fix=True, variant='uk', paragraphs_json=None):
 
     total = sum(results.values())
 
+    # SCHEMA 3: what every pass FOUND and left alone, taken once, after the last pass and
+    # before anything is printed or written, so the screen and the journal report one run.
+    journal.detections = collect_detections()
+
     for name, count in results.items():
         if count:
             print(f"  {name}: {count} fixes")
@@ -2307,8 +2565,8 @@ def post_process(xml_path, fix=True, variant='uk', paragraphs_json=None):
         # would make a run standalone on ad-hoc XML look like a document with 200
         # unmatched paragraphs, and only the second is a reason to look at anything.
         why = {}
-        for reason in DECLARED_ITALIC_UNDECIDED:
-            why[reason] = why.get(reason, 0) + 1
+        for rec in DECLARED_ITALIC_UNDECIDED:
+            why[rec['reason']] = why.get(rec['reason'], 0) + 1
         detail = ', '.join(f"{k}: {n}" for k, n in sorted(why.items()))
         print(f"  [detector] spurious_italic left "
               f"{len(DECLARED_ITALIC_UNDECIDED)} italic run(s) ALONE because the "
@@ -2337,6 +2595,22 @@ def post_process(xml_path, fix=True, variant='uk', paragraphs_json=None):
                   f"lexicon in this skill presents the string as correct, and overwriting "
                   f"it once overruled an operator who had followed the lexicon and then "
                   f"blocked them with a drift error naming neither cause.")
+    if SCHEDULE_HEADINGS_FOUND:
+        on = [h for h in SCHEDULE_HEADINGS_FOUND if h['starts_new_page']]
+        off = [h for h in SCHEDULE_HEADINGS_FOUND if h['starts_new_page'] is False]
+        unknown = len(SCHEDULE_HEADINGS_FOUND) - len(on) - len(off)
+        by_device = {}
+        for h in on:
+            for code in h['device']:
+                by_device[code] = by_device.get(code, 0) + 1
+        how = ', '.join(f"{c} {n}" for c, n in sorted(by_device.items()))
+        print(f"  [detector] schedule_page_breaks found {len(SCHEDULE_HEADINGS_FOUND)} "
+              f"schedule heading(s) and INSERTED NO page break: {len(on)} already start a "
+              f"new page{f' ({how})' if how else ''}, {len(off)} do not, {unknown} unknown "
+              f"(styled, and a style's page break is not visible in document.xml) — B7: "
+              f"the break was a house convention imposed whatever the source did, and on "
+              f"real documents it made blank pages and doubled breaks the source already "
+              f"had. The source's pagination is kept.")
 
     if fix and total > 0:
         tree.write(xml_path, xml_declaration=True, encoding='UTF-8',

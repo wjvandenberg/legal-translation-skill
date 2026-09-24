@@ -865,8 +865,10 @@ else:
            isinstance(j9.get("format_contract"), str)
            and "w:pPr" in (j9.get("format_contract") or ""),
            repr(j9.get("format_contract"))[:120])
+        # /3 SINCE SLICE 4, which added `detections`. The claim is unchanged -- the version
+        # moves whenever the artefact describes something new -- and it moved again.
         ok("the schema version moved, because the artefact describes something new",
-           j9.get("schema") == "post-process-journal/2", repr(j9.get("schema")))
+           j9.get("schema") == "post-process-journal/3", repr(j9.get("schema")))
 
         fmt_edits = [e for st in j9["stages"] for e in st.get("format_edits", [])]
         fmt_paras = [r for st in j9["stages"] for r in st.get("format_paragraphs", [])]
@@ -881,16 +883,23 @@ else:
                and f"{{{W}}}i" not in (e.get("after") or "") for e in italic),
            "a record whose before/after do not show the italic going is not evidence")
 
-        # B7 — the imposed page break, recorded at paragraph level.
+        # B7 — INVERTED AT SLICE 4, AND THE INVERSION IS RECORDED RATHER THAN MADE QUIETLY.
+        # Until slice 4 this limb asserted the imposed break was RECORDED, because the page-
+        # break pass imposed one on paragraph 1 and the record had to catch it. Slice 4 made
+        # that pass a detector, so the same paragraph must now gain NOTHING and no record may
+        # name the pass. What the paragraph-level recorder can still do once a pass changes a
+        # w:pPr -- none does any more -- is proved on the recorder itself, in-process, by
+        # tests/test_pass_conditions.py arm 9.
         pbreak = [r for r in fmt_paras if r.get("pass") == "schedule_page_breaks"]
-        ok("B7's imposed page break is RECORDED at paragraph level",
-           len(pbreak) == counts9.get("schedule_page_breaks", 0) and len(pbreak) > 0,
-           f"{len(pbreak)} record(s) against "
-           f"{counts9.get('schedule_page_breaks', 0)} fix(es)")
-        ok("and it shows pageBreakBefore ARRIVING where the source had none",
-           all(f"{{{W}}}pageBreakBefore" not in (r.get("before") or "")
-               and f"{{{W}}}pageBreakBefore" in (r.get("after") or "") for r in pbreak),
-           "the record does not show the break being introduced")
+        ok("B7 FIXED: the schedule heading gains NO page break, and no record claims one",
+           counts9.get("schedule_page_breaks", 0) == 0 and not pbreak
+           and b"pageBreakBefore" not in after9,
+           f"{len(pbreak)} record(s), {counts9.get('schedule_page_breaks', 0)} fix(es)")
+        ok("and the journal REPORTS the heading it found instead",
+           any(d.get("pass") == "schedule_page_breaks" and d.get("para") == 1
+               for d in j9.get("detections", [])),
+           repr([d for d in j9.get("detections", [])
+                 if d.get("pass") == "schedule_page_breaks"])[:200])
 
         # THE SECOND READER. Replay the record over the before-document and require it to
         # reproduce the after-document's shapes exactly.
@@ -916,7 +925,7 @@ else:
         ok("nothing is left UNEXPLAINED — every fix is a text edit or a formatting one",
            j9["self_check"].get("unexplained_fixes") == [],
            repr(j9["self_check"].get("unexplained_fixes")))
-        ok("and non_text_fixes SURVIVES at schema 2, because it has live consumers",
+        ok("and non_text_fixes SURVIVES at schemas 2 and 3, because it has live consumers",
            isinstance(j9["self_check"].get("non_text_fixes"), list),
            repr(j9["self_check"].get("non_text_fixes")))
 
