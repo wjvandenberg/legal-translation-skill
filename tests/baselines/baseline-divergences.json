@@ -51,9 +51,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice1-delivered-body",
-   "commit_subject": "Branch 11 slice 1 - the delivered-document check, report-only: both readings of the finished file against the declaration (C1, C18)",
-   "sha256_now": "3af8e2b7eb819513de19935a5d569c116158744cf3abfda1cadb46939cb7f75d"
+   "changed_by": "feature/branch11-slice1-classify",
+   "commit_subject": "Branch 11 slice 1's owed items - B10 filed, the trailing-whitespace ruling in the check, the 30 blocking findings classified",
+   "sha256_now": "6ed2f878a8565df8d26b5aa9f474b19414aa0ee72f03df1a2cc2b2bc1b64affa"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -141,9 +141,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice1-delivered-body",
-   "commit_subject": "Branch 11 slice 1 - the delivered-document check, report-only: both readings of the finished file against the declaration (C1, C18)",
-   "sha256_now": "4a208086b3b82277b7b09462e46dc53d1f4e82f5c827a7da058609ff59b196be"
+   "changed_by": "feature/branch11-slice1-classify",
+   "commit_subject": "Branch 11 slice 1's owed items - B10 filed, the trailing-whitespace ruling in the check, the 30 blocking findings classified",
+   "sha256_now": "9012a0019b068734db2e4622abe6f07c30a73f999d325f403d1114ac0c4ef424"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",

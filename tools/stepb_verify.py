@@ -98,6 +98,9 @@ CLAIMS = [
  ("C12", "namelist()",                             "the Step 2 aux check is an inventory test"),
  ("A1",  "the pointer is gone",                    "footnote anchors deleted, aux part intact"),
  ("A2",  "28 → 14",                           "half the comment anchors destroyed on one document"),
+ ("A2",  "ONLY ONE OF THE FOUR WAS MECHANISM A-i", "D08's loss was one apply's, three strip_noop's"),
+ ("B10", "is never removed whole",             "a wrapper carrying an anchor is not a no-op"),
+ ("B10", "13 → 10",                            "today's pipeline still loses three of D08's anchors"),
  ("A16", "UNTRANSLATED SOURCE TEXT ON PAGE ONE",   "a content control stranded source text on page 1"),
  ("A19", "THIRD container",                        "graphic metadata is the third unenumerated container"),
  ("A3",  "80→10 tab characters",              "a 40-entry table of contents flattened"),
@@ -182,8 +185,13 @@ print(f"  {len(CLAIMS)} claims checked, {bad} failed, "
 # Exactly one group per skill finding.  Groups are by CONSEQUENCE, deliberately
 # cutting across the register's root-cause clusters.
 GROUPS = {
+ # B10 ADDED 2026-09-24 (branch 11 slice 1, found by its delivered-document check). strip_noop
+ # removes a tracked-change wrapper WHOLE because its text is a no-op, and the comment anchors
+ # inside go with it -- three comments shipped unreachable on D08, which is A2's harm, so it
+ # sits in A2's group and beside B3, the same pass's other defect.
  "1 loses content": """
    A1 A2 A3 A6 A8 A9 A16 A19 N1 C19 C17 C23 C28 C12 M1 B3 B8 A15 J1 C16 C13 C14 F16 F27 E4 S3 C2
+   B10
    """,
  # A20 added 2026-09-02 (branch 6, fourth slice). Apply slices the STRIPPED `en` with offsets
  # authored against the UNSTRIPPED one, so leading whitespace shifts every declared span and
@@ -268,9 +276,12 @@ OPTIONS = {
    A1 A2 A3 A8 A9 A16 A19 N1 A21 A22 C16 C17 C19 F16 F27 D4 T1 T6
    """,
  # G10 added 2026-08-12 (branch 5) — see the note on group 3 above.
+ # B10 added 2026-09-24 beside B8, for B8's reason: this option's delivered-document check is
+ # what saw it, and its fix is option 6's.
  "2 check against the original": """
    C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28
    G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
+   B10
    """,
  # A3 AND A6 BOTH ARRIVED HERE 2026-09-02. A3 is deliberately in TWO options -- the header
  # above says a row may need more than one, and A3 genuinely does: option 1 closed the
@@ -304,8 +315,11 @@ OPTIONS = {
    """,
  # B9 AND F45 ADDED 2026-09-23: the passes' and the numbering map's authority to override a
  # lexicon-sanctioned rendering is exactly what slice 3b took away.
+ # B10 ADDED 2026-09-24: strip_noop is post_process's auto-invoked pass and B10 is B3's pass seen
+ # from the other side -- a wrapper removed on a condition it assumed and never tested, that
+ # nothing but text lives inside it. Testing the assumed condition is this option's principle.
  "6 take post_process's authority away": """
-   B1 B2 B3 B4 B5 B6 B7 B8 F29 D5 T1 T6 B9 F45
+   B1 B2 B3 B4 B5 B6 B7 B8 F29 D5 T1 T6 B9 F45 B10
    """,
  "7 one tree instead of two": """
    U1 V1 V2 C21 F34 F8 Q1
@@ -431,8 +445,10 @@ else:
         print(f"  OK    {' + '.join(map(str, _actual))} = {sum(_actual)}  — the typed line "
               f"matches the generated groups")
 
-print("\n=== A4. Which options carry the 11 CRITICAL findings ===")
+# THE COUNT IN THIS HEADING WAS TYPED ('the 11 CRITICAL findings') UNTIL 2026-09-24, when B10
+# made it twelve -- a stated count beside the list that derives it goes stale on the next row.
 crit = [f for f in SKILL if rows[f]["sev"].startswith("CRITICAL")]
+print(f"\n=== A4. Which options carry the {len(crit)} CRITICAL findings ===")
 for c in crit:
     owners = [k for k in OPTIONS if c in O[k]]
     print(f"  {c:<5} {rows[c]['sev']:<9} -> {owners}")

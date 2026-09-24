@@ -1250,6 +1250,26 @@ def _deliv_edge(want, got):
     return '+'.join(out)
 
 
+def _deliv_trail_counted(source, acc, rej, cand):
+    """WOUTER'S RULING, 2026-09-24: COUNTED, NEVER BLOCKING. Asked only of an
+    edge-space / trail-lost finding. True when the SOURCE paragraph ends in
+    whitespace, the declaration mirrors it and the delivery drops it -- the
+    class that made up most of this check's findings on the corpus rebuilt
+    through today's pipeline. A paragraph's end renders nothing, so the loss
+    is reported and counted and never stops a run.
+
+    NARROWED TO THE POPULATION THE RULING WAS MADE ON, and each boundary is a
+    test: a source with no trailing whitespace, a leading loss beside the
+    trailing one, and readings that differ by more than the trailing
+    whitespace all still block. A wider exemption is his to grant, not this
+    function's to infer."""
+    if not (isinstance(source, str) and source[-1:].isspace()):
+        return False
+    _m, a, r = cand
+    return ((acc is None or acc.rstrip() == a.rstrip())
+            and (rej is None or rej.rstrip() == r.rstrip()))
+
+
 def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                     strict=False, report_json=None):
     """Compare the DELIVERED document against what was declared, and its
@@ -1313,10 +1333,10 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
         if take(mixed, acc, rej):
             counts['exact'] += 1
         else:
-            pending.append((idx, mixed, acc, rej))
+            pending.append((idx, mixed, acc, rej, entry.get('text')))
     left = [list(key) for key, n in remaining.items() for _ in range(n)]
     ws = re.compile(r'\s+')
-    for idx, mixed, acc, rej in pending:
+    for idx, mixed, acc, rej, source in pending:
         cls, shape, best = 'missing', '', None
         for cand in left:
             m, a, r = cand
@@ -1347,9 +1367,12 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
             if cls == 'edge-space':
                 shape = _deliv_edge(mixed, best[0])
         counts[cls] += 1
+        blocking = not (cls == 'edge-space' and shape == 'trail-lost'
+                        and _deliv_trail_counted(source, acc, rej, best))
         findings.append({'idx': idx, 'class': cls, 'shape': shape,
                          'declared_len': len(mixed),
-                         'delivered_len': len(best[0]) if best else 0})
+                         'delivered_len': len(best[0]) if best else 0,
+                         'blocking': blocking})
     anchors = []
     if original:
         try:
@@ -1366,9 +1389,12 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
             if d != o:
                 findings.append({'idx': None, 'class': 'anchor-lost' if d < o
                                  else 'anchor-gained', 'shape': name,
-                                 'declared_len': o, 'delivered_len': d})
+                                 'declared_len': o, 'delivered_len': d,
+                                 'blocking': True})
                 counts['anchor-lost' if d < o else 'anchor-gained'] += 1
     examined = sum(counts[c] for c in counts if not c.startswith('anchor'))
+    blockers = [f for f in findings if f['blocking']]
+    counted = len(findings) - len(blockers)
     print('Delivered-document check (branch 11): every declared body paragraph looked '
           'for, character for character, in both readings of the delivered document')
     print(f'  declared paragraphs examined: {examined}  (no declaration: {undeclared})  '
@@ -1378,13 +1404,16 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
     print('  ' + '  '.join(f'{c}={counts[c]}' for c in
                            ('exact', 'edge-space', 'inner-space', 'readings', 'changed',
                             'missing', 'anchor-lost', 'anchor-gained')))
+    print(f'  counted, never blocking: {counted}  (a trailing-whitespace loss at a '
+          f'paragraph end the source also ends in whitespace - renders nothing)')
     for a in anchors:
         mark = '' if a['original'] == a['delivered'] else '   <- differs'
         print(f"  anchor {a['anchor']:<18} original {a['original']:>4}  "
               f"delivered {a['delivered']:>4}{mark}")
     for f in findings:
         where = f"idx={f['idx']}" if f['idx'] is not None else 'document'
-        print(f"  FINDING  {where:<10} {f['class']:<13} {f['shape']:<17} "
+        print(f"  {'FINDING' if f['blocking'] else 'COUNTED'}  {where:<10} "
+              f"{f['class']:<13} {f['shape']:<17} "
               f"declared {f['declared_len']}  delivered {f['delivered_len']}")
     if report_json:
         with open(report_json, 'wb') as fh:
@@ -1392,16 +1421,20 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                                   'delivered_paragraphs': len(got),
                                   'unclaimed_delivered': len(left), 'journal': jnote,
                                   'counts': dict(counts), 'anchors': anchors,
+                                  'blocking': len(blockers), 'counted': counted,
                                   'findings': findings}, indent=1) + '\n').encode('utf-8'))
     if examined == 0 or not got:
         print('  VOID - nothing was examined, which is never the same as clean')
         return 3
-    if findings:
-        print(f'  {len(findings)} finding(s)'
-              + (' - BLOCKING under --strict' if strict else ' - advisory'))
+    if blockers:
+        print(f'  {len(blockers)} finding(s)'
+              + (' - BLOCKING under --strict' if strict else ' - advisory')
+              + (f', plus {counted} counted' if counted else ''))
         return 1 if strict else 0
     print('  PASSED: every declared paragraph is in the delivered document, '
-          'and every anchor the original has')
+          'and every anchor the original has'
+          + (f' - {counted} trailing-whitespace loss(es) counted, not blocking'
+             if counted else ''))
     return 0
 
 

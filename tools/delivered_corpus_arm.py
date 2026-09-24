@@ -248,6 +248,12 @@ def summarise(did, rep, rc):
                      for f in rep["findings"])
     print(f"  {did:5} examined {rep['examined']:4d}  exact {c['exact']:4d}  rc={rc}  "
           f"unclaimed-delivered {rep['unclaimed_delivered']:3d}  journal: {rep['journal']}")
+    # WOUTER'S RULING, 2026-09-24: a trailing-whitespace loss the source shares is COUNTED and
+    # never blocks. Printed per document, because a report that folded it into one total would
+    # hide which documents carry anything that still blocks. A report written by a check that
+    # predates the ruling has no such field, and says so rather than reading as zero.
+    print(f"        blocking {rep.get('blocking', 'n/a — pre-ruling report')}  "
+          f"counted {rep.get('counted', 'n/a — pre-ruling report')}")
     if shapes:
         print("        " + "  ".join(f"{k}={v}" for k, v in sorted(shapes.items())))
     for a in rep.get("anchors", []):
@@ -366,8 +372,19 @@ if args.arm in ("b", "both"):
     print("\n  ALL FINDINGS BY CLASS: " + "  ".join(f"{k}={v}" for k, v in sorted(classes.items())))
     print("  EDGE WHITESPACE AGAINST THE SOURCE: " + "  ".join(f"{k}={v}" for k, v in sorted(edges.items())))
     total = sum(len(rep["findings"]) for rep, _ in reports_b.values())
+    blk = [(key, f) for key, (rep, _) in reports_b.items() for f in rep["findings"]
+           if f.get("blocking", True)]
     print(f"\n  examined {len(reports_b)} of {len(workdirs)} workdirs; findings in all: {total} — "
-          f"each must be explained by a register row before the check may block")
+          f"{len(blk)} BLOCKING, {total - len(blk)} counted under Wouter's ruling (2026-09-24). "
+          f"Each blocking one must be explained by a register row before the check may block")
+    bclasses = Counter(f"{f['class']}/{f['shape']}" if f["shape"] else f["class"] for _, f in blk)
+    print("  BLOCKING BY CLASS: " + "  ".join(f"{k}={v}" for k, v in sorted(bclasses.items())))
+    by_doc = defaultdict(list)
+    for key, f in blk:
+        by_doc[key].append(f"{f['class']}/{f['shape']}@{f['idx']}" if f["idx"] is not None
+                           else f"{f['class']}/{f['shape']}")
+    for key in by_doc:
+        print(f"    {key:6} {' '.join(by_doc[key])}")
 
 shutil.rmtree(TMP, ignore_errors=True)
 print("\n" + "=" * 96)
