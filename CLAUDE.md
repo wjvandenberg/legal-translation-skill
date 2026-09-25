@@ -674,7 +674,7 @@ unconditionally — as is §5.6 entire.
 
 **THE ONE DESIGN STEP THE PLAN LEFT OPEN, TAKEN AND STATED:** the text comparison drops U+200B on BOTH sides and the new assertion owns every delivered one — kept, each would be reported twice, once as `punctuation`. So arm (b) blocks on 16 text and anchor findings plus 28 U+200B ones, J1's D02 84 among them, and 2b's "17 → 16" is met as U+200B 28 → 0. **D03B 12 is A16's**, bisected to `544f908`.
 
-**WHAT A NEW SESSION WOULD GET WRONG: repack never runs where post_process's drift gate fires** — uk D04 D05, us D02 D06 D09 D10, on both trees and before this slice — so 2b's *0 of 13 refused* can only be read of the remnant block. `tools/delivered_corpus_arm.py --arm b --ref <pin>` is 2b's instrument, repack included: it hands repack the side parts the July runs kept, and an unkept glossary as the original's.
+**WHAT A NEW SESSION WOULD GET WRONG: repack never runs where post_process's drift gate fires** — uk D04 D05, us D02 D06 D09 D10, on both trees and before this slice — so 2b's *0 of 13 refused* can only be read of the remnant block — and 2b's *bytes move on exactly the 6* reaches a `.docx` on uk 6 of 6 but us 4, D02 and D10 being two of the six. `tools/delivered_corpus_arm.py --arm b --ref <pin>` is 2b's instrument, repack included: it hands repack the side parts the July runs kept, and an unkept glossary as the original's.
 
 **SINGLE NEXT ACTION: if `gh pr view 113` says OPEN, ask Wouter to merge it; then build slice 2b** — the pre-repack scrub and the remnant block in `repack_docx.py`, which moves bytes and owes a rendered diff; its acceptance is in section 3.2 of `PLAN-2-step-b.md`, and the scrub is judged on the XML with tabs and breaks kept, never on the check's readings.
 
