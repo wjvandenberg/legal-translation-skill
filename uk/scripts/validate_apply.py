@@ -1146,10 +1146,26 @@ def check_extraction_completeness(original_docx, paragraphs_json, strict=False):
 # IT PRINTS INDICES, CLASSES AND LENGTHS, NEVER DOCUMENT TEXT, for the reason
 # the extraction-completeness block gives: a report like this gets pasted.
 # It judges nothing about the English. Every test here is an equality.
+#
+# TWO THINGS APPLY DOES THAT A MIXED-STRING EQUALITY MISREADS, fixed 2026-09-24
+# (4) after both were measured on the corpus as the check's OWN defects:
+# (a) apply collapses an adjacent del/ins pair of the same English into plain
+# text, so the delivered mixed string holds one copy where the notes hold two
+# -- such a declaration is matched by its two READINGS instead; and (b) the
+# journal's `before` is what post_process SAW, which is apply's output, so on a
+# paragraph apply had already changed an exact-text lookup misses it -- the
+# journal's edit is then REBASED onto the declaration where the two agree, and
+# what is left is apply's own change, judged like any other.
 
 _DELIV_ANCHORS = ('footnoteReference', 'endnoteReference', 'commentReference',
                   'commentRangeStart', 'commentRangeEnd')
 _DELIV_SIMILAR = 0.60
+# A journal record is rebased onto a declaration only when its `before` is this
+# close to it: apply's own change is a character or two, and a looser match
+# could replay one paragraph's edit onto another.
+_DELIV_REBASE = 0.90
+_DELIV_ZWSP = '​'
+_DELIV_DONE = object()                             # a pending entry the rebase settled
 
 
 def _deliv_readings(root):
@@ -1185,25 +1201,121 @@ def _deliv_readings(root):
     return out
 
 
-def _deliv_declared(entry):
-    """(mixed, accept, reject) as the notes declare them, or None when the entry
-    declares nothing. reject is None when the declaration cannot express it."""
+def _deliv_segments(entry):
+    """([(type, text)], reject_expressible) as the notes declare them, or
+    (None, False) when the entry declares nothing. A plain `en` is one regular
+    segment; an `en_deleted` beside it cannot express a reject reading."""
     def clean(s):
         return (s or '').replace('\t', '').replace('\n', '')
     segs = entry.get('en_segments')
     if isinstance(segs, list) and segs and all(isinstance(s, dict) for s in segs):
-        mixed = ''.join(clean(s.get('en')) for s in segs)
-        acc = ''.join(clean(s.get('en')) for s in segs
-                      if s.get('type') in ('regular', 'ins'))
-        rej = ''.join(clean(s.get('en')) for s in segs
-                      if s.get('type') in ('regular', 'del'))
-        return (mixed, acc, rej) if mixed.strip() else None
+        return [(s.get('type'), clean(s.get('en'))) for s in segs], True
     en = entry.get('en')
     if not isinstance(en, str) or not en.strip():
-        return None
+        return None, False
     if entry.get('en_deleted'):
-        return clean(en) + clean(entry['en_deleted']), clean(en), None
-    return clean(en), clean(en), clean(en)
+        return [('regular', clean(en)), ('deleted', clean(entry['en_deleted']))], False
+    return [('regular', clean(en))], True
+
+
+def _deliv_join(segs, rej_ok):
+    """(mixed, accept, reject) from declared segments; reject None when the
+    declaration cannot express it."""
+    mixed = ''.join(t for _, t in segs)
+    acc = ''.join(t for k, t in segs if k in ('regular', 'ins'))
+    rej = ''.join(t for k, t in segs if k in ('regular', 'del')) if rej_ok else None
+    return mixed, acc, rej
+
+
+def _deliv_declared(entry):
+    """(mixed, accept, reject) as the notes declare them, or None when the entry
+    declares nothing. reject is None when the declaration cannot express it."""
+    segs, rej_ok = _deliv_segments(entry)
+    if segs is None:
+        return None
+    mixed, acc, rej = _deliv_join(segs, rej_ok)
+    return (mixed, acc, rej) if mixed.strip() else None
+
+
+def _deliv_noop_pair(segs):
+    """True when the declaration carries an adjacent del/ins pair of the same
+    English -- APPLY'S OWN criterion (_collapse_orthographic_tc_pairs): U+200B
+    removed, edges stripped, non-empty. Apply collapses such a pair into plain
+    text, so the delivered mixed string holds one copy where the notes hold two."""
+    for (k1, t1), (k2, t2) in zip(segs, segs[1:]):
+        if {k1, k2} == {'del', 'ins'}:
+            n1 = t1.replace(_DELIV_ZWSP, '').strip()
+            if n1 and n1 == t2.replace(_DELIV_ZWSP, '').strip():
+                return True
+    return False
+
+
+def _deliv_zwsp_dropped(want, got):
+    """True when `got` is `want` with zero or more U+200B removed, and nothing
+    else changed. Never the other way round: a GAINED U+200B is J1's defect."""
+    i = 0
+    for ch in want:
+        if i < len(got) and got[i] == ch:
+            i += 1
+        elif ch != _DELIV_ZWSP:
+            return False
+    return i == len(got)
+
+
+def _deliv_rebase(segs, before, after):
+    """Replay one journal edit (before -> after) on the declared segments, at the
+    places where the declaration and `before` agree. `before` is what post_process
+    SAW -- apply's output -- so it can differ from the declaration by apply's own
+    change, and that change is exactly what must survive the replay to be judged.
+
+    Returns the new segments, or None when an edit falls on a character the two do
+    not share, or across a segment boundary: an edit that cannot be placed is not
+    guessed at, and the paragraph is then judged without it."""
+    import difflib
+    decl = ''.join(t for _, t in segs)
+    pos = {}
+    for bl in difflib.SequenceMatcher(None, before, decl, autojunk=False).get_matching_blocks():
+        for k in range(bl.size):
+            pos[bl.a + k] = bl.b + k
+    bounds, p = [], 0
+    for _, t in segs:
+        bounds.append((p, p + len(t)))
+        p += len(t)
+
+    def seg_of(c):
+        for k, (s, e) in enumerate(bounds):
+            if s <= c < e:
+                return k
+        return None
+
+    edits = []
+    for op, i1, i2, j1, j2 in difflib.SequenceMatcher(
+            None, before, after, autojunk=False).get_opcodes():
+        if op == 'equal':
+            continue
+        if i2 > i1:
+            if any(k not in pos for k in range(i1, i2)):
+                return None
+            d1, d2 = pos[i1], pos[i2 - 1] + 1
+            k = seg_of(d1)
+            if d2 - d1 != i2 - i1 or k is None or d2 > bounds[k][1]:
+                return None
+        elif i1 - 1 in pos:                        # an insertion, after the character before it
+            d1 = d2 = pos[i1 - 1] + 1
+            k = seg_of(d1 - 1)
+        elif i1 in pos:                            # ... or before the character after it
+            d1 = d2 = pos[i1]
+            k = seg_of(d1)
+        else:
+            return None
+        if k is None:
+            return None
+        edits.append((d1, d2, k, after[j1:j2]))
+    out = [[kind, t] for kind, t in segs]
+    for d1, d2, k, new in sorted(edits, key=lambda e: (e[0], e[1]), reverse=True):
+        s = bounds[k][0]
+        out[k][1] = out[k][1][:d1 - s] + new + out[k][1][d2 - s:]
+    return [(kind, t) for kind, t in out]
 
 
 def _deliv_journal_map(journal_path):
@@ -1270,6 +1382,55 @@ def _deliv_trail_counted(source, acc, rej, cand):
             and (rej is None or rej.rstrip() == r.rstrip()))
 
 
+def _deliv_gain_counted(source, mixed, acc, rej, cand):
+    """THE RULING WIDENED, 2026-09-24 (3): COUNTED, NEVER BLOCKING. Asked only of
+    an edge-space, inner-space or readings finding -- the classes whose mixed
+    strings differ by whitespace alone. True when each delivered READING is the
+    declared one or that reading with whitespace APPENDED, at least one gains,
+    and either the SOURCE paragraph ends in whitespace (the space is the
+    source's own) or the mixed string is unchanged (the space was only moved
+    from one reading to the other). The six findings the ruling names: three
+    gained in both readings, three moved into the other one.
+
+    Narrowed like the first ruling, each boundary a test: a gain where the
+    source has none and the text grew, a space moved or gained MID-reading,
+    and one reading gaining while the other changes all still block."""
+    if acc is None or rej is None:
+        return False
+    m, a, r = cand
+
+    def gained(want, got):
+        return got.startswith(want) and not got[len(want):].strip()
+
+    pairs = ((acc, a), (rej, r))
+    if not all(gained(w, g) for w, g in pairs) or all(w == g for w, g in pairs):
+        return False
+    return (isinstance(source, str) and source[-1:].isspace()) or m == mixed
+
+
+def _deliv_lead_counted(source, shape, acc, rej, cand):
+    """THE RULING WIDENED, 2026-09-24 (3): COUNTED, NEVER BLOCKING. Asked only of
+    an edge-space finding whose shape is lead-lost or lead-lost+trail-lost. True
+    when the SOURCE paragraph begins with whitespace -- and ends in it too when
+    the trailing whitespace went as well, the first ruling's own condition --
+    and each delivered reading is the declared one with edge whitespace removed
+    and nothing else. D08 idx 30's one-space indent is the finding it names.
+    Just outside, and still blocking: a source with no leading whitespace, and
+    a trailing loss beside the leading one that the source does not share."""
+    if not (isinstance(source, str) and source[:1].isspace()):
+        return False
+    if 'trail-lost' in shape and not source[-1:].isspace():
+        return False
+    _m, a, r = cand
+
+    def trimmed(want, got):
+        i = want.find(got) if got else -1
+        return (i >= 0 and want.strip() == got.strip() and not want[:i].strip()
+                and not want[i + len(got):].strip())
+
+    return ((acc is None or trimmed(acc, a)) and (rej is None or trimmed(rej, r)))
+
+
 def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                     strict=False, report_json=None):
     """Compare the DELIVERED document against what was declared, and its
@@ -1318,8 +1479,9 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
     findings, counts, undeclared = [], Counter(), 0
     pending = []
     for ji, entry in enumerate(entries if isinstance(entries, list) else []):
-        decl = _deliv_declared(entry) if isinstance(entry, dict) else None
-        if decl is None:
+        segs, rej_ok = _deliv_segments(entry) if isinstance(entry, dict) else (None, False)
+        decl = _deliv_join(segs, rej_ok) if segs is not None else None
+        if decl is None or not decl[0].strip():
             undeclared += 1
             continue
         mixed, acc, rej = decl
@@ -1333,11 +1495,72 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
         if take(mixed, acc, rej):
             counts['exact'] += 1
         else:
-            pending.append((idx, mixed, acc, rej, entry.get('text')))
+            pending.append([idx, mixed, acc, rej, entry.get('text'), segs, rej_ok, bool(seen)])
+    # THE JOURNAL, REBASED -- defect (b). A pending declaration the exact-text
+    # lookup missed is tried against every journal chain whose last `after` is a
+    # delivered paragraph still unclaimed and whose first `before` is within
+    # _DELIV_REBASE of it; the chain's edits are replayed on its segments, so the
+    # readings survive, and it is then judged like any other.
+    rebased = 0
+    jrev = {a: b for b, a in jmap.items()}
+    ends = [m for m in by_mixed if m in jrev]
+    chains = {}
+    for end in ends:
+        chain, x, walked = [], end, set()
+        while x in jrev and x not in walked:
+            walked.add(x)
+            chain.append((jrev[x], x))
+            x = jrev[x]
+        chains[end] = chain[::-1]
+    for p in pending:
+        if p[7] or not chains:
+            continue
+        mixed, segs, rej_ok = p[1], p[5], p[6]
+        best_end, ratio = None, 0.0
+        for end, chain in chains.items():
+            if not any(remaining[k] > 0 for k in by_mixed[end]):
+                continue
+            sm = difflib.SequenceMatcher(None, mixed, chain[0][0], autojunk=False)
+            if sm.real_quick_ratio() < _DELIV_REBASE or sm.quick_ratio() < _DELIV_REBASE:
+                continue
+            r = sm.ratio()
+            if r >= _DELIV_REBASE and r > ratio:
+                best_end, ratio = end, r
+        if best_end is None:
+            continue
+        new = segs
+        for b, a in chains[best_end]:
+            new = _deliv_rebase(new, b, a)
+            if new is None:
+                break
+        if new is None:
+            continue
+        rebased += 1
+        m2, a2, r2 = _deliv_join(new, rej_ok)
+        if take(m2, a2, r2):
+            counts['exact'] += 1
+            p[0] = _DELIV_DONE
+        else:
+            p[1], p[2], p[3], p[5] = m2, a2, r2, new
+    pending = [p for p in pending if p[0] is not _DELIV_DONE]
+    if jmap:
+        jnote += f'; rebased onto {rebased} declaration(s) apply had already changed'
     left = [list(key) for key, n in remaining.items() for _ in range(n)]
     ws = re.compile(r'\s+')
-    for idx, mixed, acc, rej, source in pending:
+    for idx, mixed, acc, rej, source, segs, _rej_ok, _j in pending:
         cls, shape, best = 'missing', '', None
+        # THE COLLAPSE -- defect (a). Judged by the two readings, never the
+        # mixed string, and only for a declaration apply's own criterion says
+        # it collapses.
+        if acc is not None and rej is not None and _deliv_noop_pair(segs):
+            for cand in left:
+                if _deliv_zwsp_dropped(acc, cand[1]) and _deliv_zwsp_dropped(rej, cand[2]):
+                    best = cand
+                    break
+            if best is not None:
+                left.remove(best)
+                counts['collapsed'] += 1
+                continue
         for cand in left:
             m, a, r = cand
             if m == mixed:
@@ -1367,12 +1590,20 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
             if cls == 'edge-space':
                 shape = _deliv_edge(mixed, best[0])
         counts[cls] += 1
-        blocking = not (cls == 'edge-space' and shape == 'trail-lost'
-                        and _deliv_trail_counted(source, acc, rej, best))
+        ruling = None
+        if cls == 'edge-space' and shape == 'trail-lost':
+            if _deliv_trail_counted(source, acc, rej, best):
+                ruling = 'trail-lost'
+        elif cls == 'edge-space' and shape in ('lead-lost', 'lead-lost+trail-lost'):
+            if _deliv_lead_counted(source, shape, acc, rej, best):
+                ruling = 'lead-lost'
+        if (ruling is None and best is not None and cls in ('edge-space', 'inner-space', 'readings')
+                and _deliv_gain_counted(source, mixed, acc, rej, best)):
+            ruling = 'trail-gained'
         findings.append({'idx': idx, 'class': cls, 'shape': shape,
                          'declared_len': len(mixed),
                          'delivered_len': len(best[0]) if best else 0,
-                         'blocking': blocking})
+                         'blocking': ruling is None, 'ruling': ruling})
     anchors = []
     if original:
         try:
@@ -1390,11 +1621,12 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                 findings.append({'idx': None, 'class': 'anchor-lost' if d < o
                                  else 'anchor-gained', 'shape': name,
                                  'declared_len': o, 'delivered_len': d,
-                                 'blocking': True})
+                                 'blocking': True, 'ruling': None})
                 counts['anchor-lost' if d < o else 'anchor-gained'] += 1
     examined = sum(counts[c] for c in counts if not c.startswith('anchor'))
     blockers = [f for f in findings if f['blocking']]
     counted = len(findings) - len(blockers)
+    by_ruling = Counter(f['ruling'] for f in findings if not f['blocking'])
     print('Delivered-document check (branch 11): every declared body paragraph looked '
           'for, character for character, in both readings of the delivered document')
     print(f'  declared paragraphs examined: {examined}  (no declaration: {undeclared})  '
@@ -1402,10 +1634,12 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
     print(f'  journal: {jnote}')
     print(f'  original: {"anchors counted" if original else "NOT GIVEN - anchors not counted"}')
     print('  ' + '  '.join(f'{c}={counts[c]}' for c in
-                           ('exact', 'edge-space', 'inner-space', 'readings', 'changed',
-                            'missing', 'anchor-lost', 'anchor-gained')))
-    print(f'  counted, never blocking: {counted}  (a trailing-whitespace loss at a '
-          f'paragraph end the source also ends in whitespace - renders nothing)')
+                           ('exact', 'collapsed', 'edge-space', 'inner-space', 'readings',
+                            'changed', 'missing', 'anchor-lost', 'anchor-gained')))
+    print(f'  counted, never blocking: {counted}'
+          + (' (' + '  '.join(f'{k}={v}' for k, v in sorted(by_ruling.items())) + ')'
+             if counted else '')
+          + '  - edge whitespace under Wouter\'s rulings of 2026-09-24')
     for a in anchors:
         mark = '' if a['original'] == a['delivered'] else '   <- differs'
         print(f"  anchor {a['anchor']:<18} original {a['original']:>4}  "
@@ -1414,7 +1648,8 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
         where = f"idx={f['idx']}" if f['idx'] is not None else 'document'
         print(f"  {'FINDING' if f['blocking'] else 'COUNTED'}  {where:<10} "
               f"{f['class']:<13} {f['shape']:<17} "
-              f"declared {f['declared_len']}  delivered {f['delivered_len']}")
+              f"declared {f['declared_len']}  delivered {f['delivered_len']}"
+              + (f"  [{f['ruling']}]" if f['ruling'] else ''))
     if report_json:
         with open(report_json, 'wb') as fh:
             fh.write((json.dumps({'examined': examined, 'undeclared': undeclared,
@@ -1433,7 +1668,7 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
         return 1 if strict else 0
     print('  PASSED: every declared paragraph is in the delivered document, '
           'and every anchor the original has'
-          + (f' - {counted} trailing-whitespace loss(es) counted, not blocking'
+          + (f' - {counted} edge-whitespace difference(s) counted, not blocking'
              if counted else ''))
     return 0
 
