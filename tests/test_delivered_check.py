@@ -21,8 +21,22 @@ built in a temporary directory; nothing is read from the corpus. What each arm a
      paragraph ends in whitespace, the declaration mirrors it, the delivery drops it -- is
      COUNTED and reported, never a blocking finding, because it renders nothing. And the four
      shapes just outside it still block: a source with no trailing whitespace, a leading loss
-     beside the trailing one, readings that differ by more than the trailing whitespace, and a
-     lost space BETWEEN words.
+     where the source has no leading whitespace, readings that differ by more than the trailing
+     whitespace, and a lost space BETWEEN words.
+ 16  THE RULING WIDENED, 2026-09-24 (3): a reading that GAINS trailing whitespace at the
+     paragraph's end -- in both readings when the source ends in whitespace, in one when the
+     source does or the space was only reassigned between readings -- and a LEADING space the
+     source has, lost, are COUNTED. Just outside: a gain where the source has none and the text
+     grew, a space reassigned mid-paragraph, a space gained mid-reading, and a lead loss beside a
+     trailing loss the source does not share, all still block.
+ 17  THE CHECK'S OWN DEFECT (a): a declared del/ins pair of the same English, which apply
+     collapses to plain text, is matched by its two READINGS -- each the declared one, U+200B
+     aside -- and is no finding. A lost space, a GAINED U+200B, and matching readings with no
+     declared pair all still block.
+ 18  THE CHECK'S OWN DEFECT (b): a journalled post_process edit on a paragraph apply had already
+     changed is REBASED onto the declaration, so what is left is apply's own change, judged as
+     usual -- counted when a ruling covers it, blocking when not -- and an edit that lands where
+     apply changed the text cannot turn a real difference into a pass.
 
     uv run --with lxml python tests/test_delivered_check.py
     uv run --with lxml python tests/test_delivered_check.py --variant us
@@ -238,9 +252,12 @@ r, rep = case("ruled-nosrc", [en(0, A + " "), en(1, B)], [para(A), para(B)], str
 ok("a source with NO trailing whitespace still BLOCKS — the ruling's population, not a wider one",
    len(blocking(rep)) == 1 and r.returncode == 1, f"rc={r.returncode} {rep and rep['findings']}")
 
-r, rep = case("ruled-lead", [{"idx": 0, "text": " source 0 ", "en": " " + A + " "}, en(1, B)],
+# RE-POINTED 2026-09-24 (4). This boundary read a leading loss beside the trailing one on a source
+# that STARTS in whitespace, which is exactly the shape Wouter's widening now counts (arm 16) -- so
+# the boundary moved to the shape just outside that one: a source with NO leading whitespace.
+r, rep = case("ruled-lead", [{"idx": 0, "text": "source 0 ", "en": " " + A + " "}, en(1, B)],
               [para(A), para(B)], strict=True)
-ok("a LEADING loss beside the trailing one still BLOCKS",
+ok("a LEADING loss where the source has no leading whitespace still BLOCKS",
    len(blocking(rep)) == 1 and r.returncode == 1, f"rc={r.returncode} {rep and rep['findings']}")
 
 tc_ws = {"idx": 0, "text": "source 0 ", "en": "Sign here now ",
@@ -253,6 +270,135 @@ r, rep = case("ruled-inner", [{"idx": 0, "text": "source 0 ", "en": B}, en(1, A)
               [para(B.replace("shall be", "shallbe")), para(A)], strict=True)
 ok("a lost space BETWEEN words still BLOCKS",
    len(blocking(rep)) == 1 and r.returncode == 1, f"rc={r.returncode} {rep and rep['findings']}")
+
+print("\n16  the ruling widened: trailing whitespace GAINED, and a leading space the source has, lost")
+
+
+def counted_only(rep, r, cls, shape=None):
+    """Exactly one finding, of this class, COUNTED and not blocking, and --strict exits 0."""
+    return (rep is not None and len(findings(rep, cls, shape)) == 1 and blocking(rep) == []
+            and rep.get("counted") == 1 and r.returncode == 0)
+
+
+def blocks_once(rep, r):
+    return len(blocking(rep)) == 1 and r.returncode == 1
+
+
+r, rep = case("gain-both", [{"idx": 0, "text": "source 0 ", "en": A}, en(1, B)],
+              [para(A + " "), para(B)], strict=True)
+ok("a trailing space GAINED in both readings, the source's own, is COUNTED — edge-space / trail-gained",
+   counted_only(rep, r, "edge-space", "trail-gained"), f"rc={r.returncode} {rep and rep['findings']}")
+
+moved = {"idx": 0, "text": "source 0", "en": "Sign here ",
+         "en_segments": [{"type": "regular", "en": "Sign here"}, {"type": "del", "en": " "}]}
+r, rep = case("gain-moved", [moved, en(1, B)], [para("Sign here", " "), para(B)], strict=True)
+ok("a trailing space only REASSIGNED between the readings, the source having none, is COUNTED — readings",
+   counted_only(rep, r, "readings"), f"rc={r.returncode} {rep and rep['findings']}")
+
+one = {"idx": 0, "text": "source 0 ", "en": "Sign here Old.",
+       "en_segments": [{"type": "ins", "en": "Sign here "}, {"type": "del", "en": "Old."}]}
+r, rep = case("gain-one", [one, en(1, B)], [para(("ins", "Sign here  "), ("del", "Old.")), para(B)],
+              strict=True)
+ok("a trailing space gained in ONE reading, the source ending in whitespace, is COUNTED — inner-space",
+   counted_only(rep, r, "inner-space"), f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("gain-nosrc", [en(0, A), en(1, B)], [para(A + " "), para(B)], strict=True)
+ok("a trailing space gained where the source has NONE and the text grew still BLOCKS",
+   blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
+
+mid = {"idx": 0, "text": "source 0 ", "en": "ab cd",
+       "en_segments": [{"type": "regular", "en": "ab"}, {"type": "ins", "en": " "},
+                       {"type": "regular", "en": "cd"}]}
+r, rep = case("gain-midmove", [mid, en(1, B)], [para("ab", ("del", " "), "cd"), para(B)], strict=True)
+ok("a space REASSIGNED MID-paragraph between the readings still BLOCKS",
+   blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("gain-inner", [{"idx": 0, "text": "source 0 ", "en": A}, en(1, B)],
+              [para(A.replace("agree", "agree ")), para(B)], strict=True)
+ok("a space GAINED mid-reading still BLOCKS — C16's shape, not the ruling's",
+   blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("lead", [{"idx": 0, "text": " source 0 ", "en": " " + A + " "}, en(1, B)],
+              [para(A), para(B)], strict=True)
+ok("a LEADING space the source has, lost with the trailing one, is COUNTED — D08 idx 30's shape",
+   counted_only(rep, r, "edge-space", "lead-lost+trail-lost"), f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("lead-only", [{"idx": 0, "text": " source 0", "en": " " + A}, en(1, B)],
+              [para(A), para(B)], strict=True)
+ok("...and a leading space the source has, lost on its own, is COUNTED — edge-space / lead-lost",
+   counted_only(rep, r, "edge-space", "lead-lost"), f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("lead-notrail", [{"idx": 0, "text": " source 0", "en": " " + A + " "}, en(1, B)],
+              [para(A), para(B)], strict=True)
+ok("a lead loss beside a trailing loss the source does NOT share still BLOCKS",
+   blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
+
+print("\n17  the check's own defect (a): a no-op del/ins pair apply collapses")
+Z = "​"
+noop = {"idx": 0, "text": "source 0", "en": "The Parties agree as follows.",
+        "en_segments": [{"type": "regular", "en": "The Parties "}, {"type": "del", "en": "agree" + Z},
+                        {"type": "ins", "en": "agree"}, {"type": "regular", "en": " as follows."}]}
+r, rep = case("collapse", [noop, en(1, B)], [para("The Parties ", "agree", " as follows."), para(B)],
+              strict=True)
+ok("a declared no-op pair apply collapsed is NO finding — both readings as declared, U+200B aside",
+   rep is not None and not rep["findings"] and rep["counts"].get("collapsed") == 1 and r.returncode == 0,
+   f"rc={r.returncode} {rep and (rep['counts'], rep['findings'])}")
+
+r, rep = case("collapse-space", [noop, en(1, B)], [para("The Parties", "agree", " as follows."), para(B)],
+              strict=True)
+ok("...but the same collapse with a space LOST still BLOCKS",
+   blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
+
+noop_plain = dict(noop, en_segments=[dict(s, en=s["en"].replace(Z, "")) for s in noop["en_segments"]])
+r, rep = case("collapse-zwsp", [noop_plain, en(1, B)],
+              [para("The Parties ", "agree" + Z, " as follows."), para(B)], strict=True)
+ok("...and a delivered reading that GAINS a U+200B still BLOCKS — J1 is not the collapse",
+   blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
+
+swap = {"idx": 0, "text": "source 0", "en": "ab cd ef",
+        "en_segments": [{"type": "regular", "en": "ab "}, {"type": "ins", "en": "cd"},
+                        {"type": "del", "en": " ef"}]}
+r, rep = case("collapse-nopair", [swap, en(1, B)], [para("ab ", ("del", " ef"), ("ins", "cd")), para(B)],
+              strict=True)
+ok("matching readings with NO declared no-op pair still BLOCK — the collapse is apply's, not a licence",
+   blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
+
+print("\n18  the check's own defect (b): the journal REBASED onto a paragraph apply had already changed")
+
+
+def jr(before, after, stage="passes"):
+    return {"schema": "post-process-journal/3",
+            "stages": [{"stage": stage, "paragraphs": [{"para": 0, "before": before, "after": after}]}]}
+
+
+r, rep = case("rebase-trail", [{"idx": 0, "text": "source 0 ", "en": "The colour is red. "}, en(1, B)],
+              [para("The color is red."), para(B)],
+              journal=jr("The colour is red.", "The color is red."), strict=True)
+ok("apply's lost trailing space plus a journalled edit: the edit is REBASED and what is left is COUNTED",
+   counted_only(rep, r, "edge-space", "trail-lost"), f"rc={r.returncode} {rep and rep['findings']}")
+ok("...and the report says the journal was rebased onto one declaration",
+   rep is not None and "rebased onto 1" in rep.get("journal", ""), str(rep and rep.get("journal")))
+
+r, rep = case("rebase-inner", [en(0, "The colour of each notice shall be red."), en(1, B)],
+              [para("The color of each notice  shall be red."), para(B)],
+              journal=jr("The colour of each notice  shall be red.",
+                         "The color of each notice  shall be red."), strict=True)
+ok("apply's inner space plus a journalled edit: rebased, and apply's space still BLOCKS as inner-space",
+   [f["idx"] for f in findings(rep, "inner-space")] == [0] and blocks_once(rep, r),
+   f"rc={r.returncode} {rep and rep['findings']}")
+
+segd = {"idx": 0, "text": "source 0 ", "en": "Sign here .....",
+        "en_segments": [{"type": "ins", "en": "Sign here "}, {"type": "del", "en": "....."}]}
+r, rep = case("rebase-segs", [segd, en(1, B)], [para(("ins", "Sign here  ")), para(B)],
+              journal=jr("Sign here  .....", "Sign here  ", stage="strip_noop_tracked_changes"),
+              strict=True)
+ok("a strip-pass edit rebased onto declared SEGMENTS, so the readings exist: the gained space is COUNTED",
+   counted_only(rep, r, "edge-space", "trail-gained"), f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("rebase-overlap", [en(0, "The colour is red."), en(1, B)], [para("The color is red."), para(B)],
+              journal=jr("The colur is red.", "The color is red."), strict=True)
+ok("an edit landing where apply changed the text cannot turn a real difference into a pass — BLOCKS",
+   blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
 
 shutil.rmtree(TMP, ignore_errors=True)
 print("\n" + "=" * 88)
