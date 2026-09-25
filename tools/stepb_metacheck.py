@@ -139,13 +139,13 @@ MUTATIONS = [
  # already failing for a declared reason hides every new failure behind it.
  #
  # THE ANCHOR CARRIES A LIVE COUNT, SO IT GOES INERT EVERY TIME THAT COUNT MOVES, and this
- # probe has now been re-anchored twice: 41 -> 42 on branch 5 (G10), 43 -> 44 on branch 14
- # (G12). It reports INERT rather than passing, which is the only reason the drift is visible
+ # probe has now been re-anchored three times: 41 -> 42 on branch 5 (G10), 43 -> 44 on branch 14
+ # (G12), 44 -> 45 on branch 11 slice 2b (G13). It reports INERT rather than passing, which is the only reason the drift is visible
  # at all -- a probe whose mutation silently stops applying is a test that has become a
  # decoration. Re-anchor it in the same commit that moves the count.
- ("state a group heading count the map contradicts (group 3: 44 -> 43)",
-  lambda t: t.replace("### 5.3 Things that say it worked when it did not — 44 findings",
-                      "### 5.3 Things that say it worked when it did not — 43 findings", 1),
+ ("state a group heading count the map contradicts (group 3: 45 -> 44)",
+  lambda t: t.replace("### 5.3 Things that say it worked when it did not — 45 findings",
+                      "### 5.3 Things that say it worked when it did not — 44 findings", 1),
   "stepb_audit.py",
   "NEW GUARD: check 5d compares EACH group heading to the map, not only their sum"),
 ]

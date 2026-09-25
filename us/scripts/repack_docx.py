@@ -8,15 +8,18 @@ the case-sensitivity and directory-entry issues that arise when using
 shell unzip + zip, which can produce files that Word on Windows refuses
 to open.
 
-Post-repack scan
-----------------
-After writing the final .docx, the script re-opens it and runs
-``source_language_markers.scan_remnants`` over every XML part. The source
-language is auto-detected from the ORIGINAL .docx's word/document.xml.
-Any source-language remnants surviving in the delivered .docx are
-printed as WARNING lines with their XML-file location so the operator
-can decide whether to re-run translation on the affected part. The scan
-is additive — the repack still exits 0 regardless of hits.
+The U+200B scrub and the remnant block
+--------------------------------------
+Every prose part (body, comments, footnotes, endnotes, glossary, headers,
+footers) has every U+200B removed from its character data as it is written,
+whatever the part's source: the operator's zero-width scaffolding is right
+while the pipeline runs and a defect in the deliverable (register J1). The
+archive is then read back BEFORE it is moved into place: a U+200B that
+survived refuses delivery, and so does a positive source-language remnant in
+any prose part (register C22) — the language auto-detected from the ORIGINAL's
+word/document.xml, the verdict source_language_markers.remnant_verdict's.
+Marker classes the scan cannot rule on only WARN; with no language detected
+the block says so and does not run.
 
 Exit codes:
   0 — the .docx was written to the delivery path
@@ -24,8 +27,9 @@ Exit codes:
       mandatory pre-bundle validator failed, or --paragraphs was not supplied
       so one could not run, or the ORIGINAL carries a text-bearing
       word/glossary/document.xml and --glossary was not supplied, or the
-      finished archive failed its own ZIP integrity or case-conflict check
-      and was deleted.
+      finished archive failed its own ZIP integrity or case-conflict check,
+      kept a U+200B, or carried a blocking source-language remnant, and was
+      deleted.
   3 — script-integrity check failed (re-install the skill)
 
 The archive is built under `<output>.docx.tmp` and moved into place only after
@@ -83,10 +87,10 @@ if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
 try:
     from source_language_markers import detect_language as _detect_lang
-    from source_language_markers import scan_remnants as _scan_remnants
-except Exception:  # pragma: no cover — scan is best-effort.
+    from source_language_markers import remnant_verdict as _remnant_verdict
+except Exception:  # pragma: no cover — the remnant block then REFUSES, below.
     _detect_lang = None
-    _scan_remnants = None
+    _remnant_verdict = None
 try:
     from lexicon_compliance import _guess_language as _guess_lang
 except Exception:  # pragma: no cover — the agreement control is best-effort.
@@ -107,6 +111,105 @@ _TAG_STRIP_RE = re.compile(r'<[^>]+>')
 _GLOSSARY_PART = 'word/glossary/document.xml'
 _GLOSSARY_TEXT_RE = re.compile(
     r'<w:(?:t|delText)(?:\s[^>]*)?>([^<]*)</w:(?:t|delText)>')
+
+# THE PROSE PARTS — one definition, read by the U+200B scrub and the remnant
+# block alike. Settings, styles, fontTable, theme and the like are structural.
+# The glossary by its FULL path: its basename is 'document.xml' (register C19).
+_PROSE_PARTS = {'word/document.xml', 'word/comments.xml', 'word/footnotes.xml',
+                'word/endnotes.xml', _GLOSSARY_PART}
+
+
+def _is_prose_part(name):
+    base = os.path.basename(name)
+    return name.startswith('word/') and name.lower().endswith('.xml') and (
+        name in _PROSE_PARTS or base.startswith('header') or base.startswith('footer'))
+
+
+# THE U+200B SCRUB — register J1: "always a defect, Latin and non-Latin alike",
+# and the fix "must be a PRE-REPACK SCRUB and must NOT be a prohibition on the
+# device", which on two documents was the only compliant way past a script
+# defect. The character has no width, so removing it moves nothing on the page.
+# CHARACTER DATA ONLY: an attribute value is in no reading, and a bookmark or
+# style name must still match what refers to it. Both character references count.
+_ZWSP = '​'.encode('utf-8')
+_ZWSP_REF_RE = re.compile(rb'&#(?:0*8203|[xX]0*200[bB]);')
+_CHARDATA_RE = re.compile(rb'>([^<]+)<')
+
+
+def _zwsp_count(chunk):
+    return chunk.count(_ZWSP) + len(_ZWSP_REF_RE.findall(chunk))
+
+
+def _scrub_zwsp(data):
+    """(data with every U+200B gone from its character data, how many went)."""
+    n = 0
+
+    def one(m):
+        nonlocal n
+        k = _zwsp_count(m.group(1))
+        if not k:
+            return m.group(0)
+        n += k
+        return b'>' + _ZWSP_REF_RE.sub(b'', m.group(1).replace(_ZWSP, b'')) + b'<'
+    return _CHARDATA_RE.sub(one, data), n
+
+
+def _remnant_gate(orig_docx, tmp_docx):
+    """THE REMNANT BLOCK — register C22: the one check that reads the finished
+    archive with the original in hand was advisory by design. Every prose part
+    of the archive ABOUT TO BE DELIVERED is scanned; a BLOCKING hit deletes it
+    and refuses, an advisory one warns (the classes are source_language_markers'
+    REMNANT_ADVISORY and LEXICON_KEPT_NAMES, each with its reason). The language
+    comes from the ORIGINAL, C9's source of truth; making that detection SAY it
+    is guessing, and reusing it for C9, are branch 12's."""
+    if _detect_lang is None or _remnant_verdict is None:
+        os.remove(tmp_docx)
+        raise RuntimeError(
+            "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. "
+            "source_language_markers.py could not be imported, so the remnant "
+            "block cannot run. Nothing was written to the delivery path. "
+            "Re-install the skill from the .skill / .zip archive.")
+    try:
+        src_lang = _detect_lang(_original_body_text(orig_docx))
+    except Exception:
+        src_lang = None
+    if not src_lang:
+        print("  Remnant block skipped: source language could not be "
+              "auto-detected from the original .docx.")
+        return
+    print(f"  Remnant block: language={src_lang}, reading every prose part of "
+          "the archive BEFORE it is delivered...")
+    blocking, advisory = [], []
+    with zipfile.ZipFile(tmp_docx) as z:
+        for part in z.namelist():
+            if _is_prose_part(part):
+                # Tags stripped so only reader-visible text is scanned, never
+                # attribute names, rsids or style ids.
+                text = _TAG_STRIP_RE.sub(' ', z.read(part).decode('utf-8', errors='ignore'))
+                b, a = _remnant_verdict(text, src_lang)
+                blocking += [(part,) + h for h in b]
+                advisory += [(part,) + h for h in a]
+    for part, pat, ctx, why in advisory[:10]:
+        print(f"  WARNING (ADVISORY, not blocking): {part}: {pat} — {why}: "
+              f"...{' '.join(ctx.split())[:100]}...")
+    if len(advisory) > 10:
+        print(f"  ... {len(advisory) - 10} more advisory hit(s) (suppressed)")
+    if not blocking:
+        if not advisory:
+            print(f"  Remnant block clean: no {src_lang} remnants in any prose part.")
+        return
+    os.remove(tmp_docx)
+    shown = "\n".join(f"  - {part}: {pat}: ...{' '.join(ctx.split())[:100]}..."
+                      for part, pat, ctx in blocking[:10])
+    raise RuntimeError(
+        "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. SOURCE-LANGUAGE "
+        f"REMNANT: {len(blocking)} {src_lang} remnant(s) in the repacked archive, "
+        f"so it was DELETED instead of delivered:\n{shown}\n"
+        "Nothing was written to the delivery path. Translate the text and re-run. "
+        "A remnant in a part you did not pass (comments, footnotes, a header) means "
+        "that part was not wired into this repack: pass its flag. If the text is "
+        "faithful and the check wrongly scoped, SKILL.md rule 5a governs — never "
+        "alter a faithful translation to satisfy it.")
 
 
 def _glossary_text_in(orig_docx):
@@ -352,8 +455,8 @@ def repack(orig_docx, translated_doc_xml, output_docx,
     # THE COMPLIANT WAY OUT EXISTS AND IS ALWAYS AVAILABLE (CLAUDE.md 5.9): pass --glossary.
     # Either the part translated per Step 8e, or — if the operator judges it needs no
     # translation — the original part unchanged. The second route is not a bypass: it makes
-    # the decision explicit and recorded, and the post-repack remnant scan now reads the
-    # delivered part, so a wrong judgement is still reported.
+    # the decision explicit and recorded, and the remnant block reads the part before
+    # delivery, so a wrong judgement is refused rather than shipped.
     _glossary_prompts = _glossary_text_in(orig_docx)
     if _glossary_prompts and not translated_glossary_xml:
         raise RuntimeError(
@@ -368,8 +471,8 @@ def repack(orig_docx, translated_doc_xml, output_docx,
             "  Translate it per Step 8e and pass --glossary "
             "<workdir>/final/word/glossary-document.xml. If you have read it and judged that "
             "it needs no translation, pass the ORIGINAL part to the same flag: that is a "
-            "recorded decision rather than a silent default, and the post-repack scan will "
-            "still report any source-language text left in it. Do NOT work around this gate."
+            "recorded decision rather than a silent default, and the remnant block will "
+            "still refuse any source-language text left in it. Do NOT work around this gate."
         )
 
     with open(translated_doc_xml, 'rb') as f:
@@ -523,7 +626,7 @@ def repack(orig_docx, translated_doc_xml, output_docx,
                 "",
                 "Refusing to repack: the delivered .docx would contain the "
                 "original (untranslated) headers/footers and the defect "
-                "would only surface via the post-repack remnant scan.",
+                "would only surface at the remnant block.",
             ]
             raise RuntimeError('\n'.join(msg_lines))
 
@@ -626,6 +729,7 @@ def repack(orig_docx, translated_doc_xml, output_docx,
         # an unfinished one by looking at it. The temp-then-move idiom is already
         # used in this tree by clean_conversion_artifacts.py; this is that pattern.
         tmp_docx = output_docx + '.tmp'
+        scrubbed = {}
         with zipfile.ZipFile(tmp_docx, 'w', zipfile.ZIP_DEFLATED) as zout:
             seen_normalized = set()  # track normalized paths to skip duplicates
             for item in zin.infolist():
@@ -651,29 +755,38 @@ def repack(orig_docx, translated_doc_xml, output_docx,
                 new_item.compress_type = item.compress_type
 
                 if norm_filename == 'word/document.xml':
-                    zout.writestr(new_item, new_doc_xml)
+                    data = new_doc_xml
 
                 elif norm_filename == 'word/numbering.xml' and new_numbering_xml:
-                    zout.writestr(new_item, new_numbering_xml)
+                    data = new_numbering_xml
 
                 elif norm_filename in hf_replacements:
-                    zout.writestr(new_item, hf_replacements[norm_filename])
+                    data = hf_replacements[norm_filename]
 
                 elif norm_filename in aux_replacements:
-                    zout.writestr(new_item, aux_replacements[norm_filename])
+                    data = aux_replacements[norm_filename]
 
                 elif norm_filename == 'word/settings.xml' and clean_track_revisions:
                     content = zin.read(item.filename).decode('utf-8')
                     content = re.sub(r'<w:trackRevisions[^/]*/>', '', content)
                     content = re.sub(r'<w:trackRevisions[^>]*>[^<]*</w:trackRevisions>', '', content)
-                    zout.writestr(new_item, content.encode('utf-8'))
+                    data = content.encode('utf-8')
 
                 elif item.filename in rels_fixups:
-                    zout.writestr(new_item, rels_fixups[item.filename])
+                    data = rels_fixups[item.filename]
 
                 else:
                     data = zin.read(item.filename)
-                    zout.writestr(new_item, data)
+
+                # THE U+200B SCRUB (J1), on every prose part whatever its source —
+                # a part copied from the original carries the defect as surely.
+                if _is_prose_part(norm_filename):
+                    data, n_zw = _scrub_zwsp(data)
+                    if n_zw:
+                        scrubbed[norm_filename] = n_zw
+                zout.writestr(new_item, data)
+        for _part, _n in sorted(scrubbed.items()):
+            print(f"  U+200B scrubbed: {_n} from {_part}")
 
     # --- VERIFY THE TEMPORARY FILE, AND PROMOTE IT ONLY IF BOTH CHECKS PASS ---
     #
@@ -720,116 +833,26 @@ def repack(orig_docx, translated_doc_xml, output_docx,
               "malformed — fix that, do not work around this gate."
         )
 
+    # --- READ THE ARCHIVE BACK: NO U+200B MAY SURVIVE THE SCRUB (J1) ---
+    # Asserted on the archive itself, never on the scrub's own count: a count
+    # proves the pattern matched, not what was written.
+    with zipfile.ZipFile(tmp_docx) as z:
+        survived = {n: k for n in z.namelist() if _is_prose_part(n)
+                    for k in [sum(_zwsp_count(c) for c in _CHARDATA_RE.findall(z.read(n)))] if k}
+    if survived:
+        os.remove(tmp_docx)
+        raise RuntimeError(
+            "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. U+200B SURVIVED "
+            "THE SCRUB in " + ", ".join(f"{n} ({k})" for n, k in sorted(survived.items()))
+            + ", so the archive was DELETED instead of delivered. Nothing was written "
+            "to the delivery path. This is a defect in repack itself: re-install the "
+            "skill from the .skill / .zip archive.")
+
+    # --- THE REMNANT BLOCK (C22), on the archive BEFORE it is moved into place ---
+    _remnant_gate(orig_docx, tmp_docx)
+
     shutil.move(tmp_docx, output_docx)
     print(f"Repacked: {output_docx}")
-
-    # --- Post-repack source-language remnant scan ---
-    # Re-open the delivered .docx and scan every XML part for source-language
-    # remnants using the same marker lists the apply step already uses. This
-    # catches untranslated parts (comments.xml, footnotes.xml, headerN.xml,
-    # text boxes inside document.xml, etc.) that would otherwise ship silently.
-    #
-    # Source language is auto-detected from the ORIGINAL .docx's
-    # word/document.xml. If detection fails (too little body text, unsupported
-    # language, or source_language_markers not importable), the scan is
-    # skipped silently — the repack itself is not affected.
-    if _detect_lang is not None and _scan_remnants is not None:
-        # ONE PLACE READS THE ORIGINAL'S BODY TEXT. This block used to carry its
-        # own copy of the zip-read and the tag strip, which is how the pre-repack
-        # gate came to be missing a language the post-repack scan already had
-        # (register C9): the capability existed eight lines away and was not
-        # reachable. `_original_body_text` is now that one place.
-        try:
-            src_lang = _detect_lang(_original_body_text(orig_docx))
-        except Exception:
-            src_lang = None
-
-        if src_lang:
-            print(
-                f"  Post-repack remnant scan: language={src_lang}, "
-                "scanning every XML part in the delivered .docx..."
-            )
-            total_hits = 0
-            per_part_hits = []
-            with zipfile.ZipFile(output_docx) as zout_check:
-                xml_parts = [
-                    n for n in zout_check.namelist()
-                    if n.lower().endswith('.xml')
-                    and (n.startswith('word/') or n == 'word/document.xml')
-                ]
-                # Narrow to the parts that actually carry user-visible prose.
-                # Settings/styles/fontTable/theme etc. are structural and can
-                # contain source-language strings that are never shown.
-                _PROSE_PARTS = {
-                    'word/document.xml',
-                    'word/comments.xml',
-                    'word/footnotes.xml',
-                    'word/endnotes.xml',
-                    # ADDED 2026-09-09, register C19 — and this is the arm that would have
-                    # caught the recurrence. The part had shipped byte-identical and
-                    # untranslated on a batch run, and the row records that it went "past
-                    # five separate remnant checks, none of which look at the glossary at
-                    # all". This is one of the five.
-                    #
-                    # IT MUST BE THE FULL PATH. `base` below is os.path.basename(part_name),
-                    # which for this part is 'document.xml' — so a basename-keyed membership
-                    # test would either miss it or match the body. The set is keyed on
-                    # part_name, which is the full path, and that is why this one line works.
-                    _GLOSSARY_PART,
-                }
-                for part_name in xml_parts:
-                    # Include headerN.xml, footerN.xml, and the fixed list above.
-                    base = os.path.basename(part_name)
-                    is_header_footer = (
-                        base.startswith('header') and base.endswith('.xml')
-                    ) or (
-                        base.startswith('footer') and base.endswith('.xml')
-                    )
-                    if part_name not in _PROSE_PARTS and not is_header_footer:
-                        continue
-                    try:
-                        part_bytes = zout_check.read(part_name)
-                        part_text = part_bytes.decode('utf-8', errors='ignore')
-                    except Exception:
-                        continue
-                    # Strip XML tags so we scan only the text that the reader sees,
-                    # not attribute names / rsid values / style IDs.
-                    text_only = _TAG_STRIP_RE.sub(' ', part_text)
-                    hits = _scan_remnants(text_only, src_lang)
-                    if hits:
-                        per_part_hits.append((part_name, hits))
-                        total_hits += len(hits)
-
-            if total_hits:
-                print(
-                    f"  WARNING: post-repack scan found {total_hits} "
-                    f"{src_lang} remnant(s) in the delivered .docx:"
-                )
-                for part_name, hits in per_part_hits:
-                    print(f"    {part_name}: {len(hits)} hit(s)")
-                    for pat, ctx in hits[:5]:
-                        snippet = ' '.join(ctx.split())[:120]
-                        print(f"      {pat}: ...{snippet}...")
-                    if len(hits) > 5:
-                        print(f"      ... {len(hits) - 5} more (suppressed)")
-                print(
-                    "           Some hits may be verbatim-preserved content "
-                    "(project names, entity names, reference codes) — review\n"
-                    "           before delivering. Hits inside comments.xml, "
-                    "footnotes.xml, or headerN.xml typically indicate the\n"
-                    "           corresponding auxiliary part was not wired "
-                    "into this repack. Re-run with the right flag."
-                )
-            else:
-                print(
-                    f"  Post-repack scan clean: no {src_lang} remnants "
-                    "detected in the delivered .docx's prose parts."
-                )
-        else:
-            print(
-                "  Post-repack scan skipped: source language could not be "
-                "auto-detected from the original .docx."
-            )
 
 if __name__ == '__main__':
     import argparse

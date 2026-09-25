@@ -33,6 +33,18 @@ SLICE 2a (2026-09-25) ADDS, STATED BEFORE MEASURING (PLAN-2-step-b.md section 3.
       journal, every member of the repacked .docx, by content) and every exit code is compared.
       A REF whose scripts equal the working tree's is a self-comparison and VOID, never a pass.
 
+SLICE 2b (2026-09-25 (3)) CHANGES WHAT (b) ASSERTS, DELIBERATELY, as branch 10 did per slice:
+repack now scrubs U+200B and blocks on a source-language remnant, so bytes MUST move -- by a
+U+200B removal and nothing else, and only where the pinned tree's delivery carried one. Per
+workdir: every exit code equal; every output identical or, for a .docx member, the pinned
+bytes with every U+200B removed; members moved IFF the pin's delivery carried a U+200B; and
+the pinned plan -- moved on uk D01 x2, D02, D03B, D10, D11, on us D01 x2, D03B, D11, repack
+STOPPED by the drift gate on uk D04 D05 and us D02 D06 D09 D10 -- for the documents in the run.
+The no-move case is this assertion's special case, so a pin with no U+200B still proves it.
+AND THE CHECK NOW READS THE REPACKED .docx wherever repack produced one: the reordered XML is
+read before repack, so it cannot see a scrub that happens inside repack. A stopped document is
+read from the XML, SAID to be stopped, and never counted as a pass.
+
 WHAT IT NEVER PRINTS: a filename, a path below the logs root, or any document text. Doc-ids,
 paragraph indices, classes and lengths only (CLAUDE.md 5.6). Nothing is written into the logs
 folder: every input is copied into a temporary directory first.
@@ -43,7 +55,6 @@ folder: every input is copied into a temporary directory first.
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref 3654842 --doc D02 --doc D03
 """
 import argparse
-import hashlib
 import io
 import json
 import os
@@ -347,14 +358,31 @@ CORPUS = corpus_dirs()
 print(f"  frozen workdirs enumerated: {len(workdirs)} · corpus folder(s) reachable: {len(CORPUS)}"
       + (f" · limited to {' '.join(args.doc)}" if args.doc else ""))
 
-REFTREE, BYTES = None, {}
+REFTREE, BYTES, BLOCK_NOTE = None, {}, {}
 # WHICH GATE STOPPED REPACK, by the fixed text of its own refusal -- a label is printed, never
 # repack's output, which can quote the document.
 REPACK_GATES = (("lexicon", "lexicon_compliance.py --stage pre-repack returned exit code"),
                 ("validate_apply", "validate_apply.py --strict (post-modification check) returned exit code"),
                 ("glossary", "and --glossary was not supplied"),
                 ("headers/footers", "original (untranslated) headers/footers"),
-                ("integrity", "failed its own integrity checks"))
+                ("integrity", "failed its own integrity checks"),
+                ("zwsp-survived", "U+200B SURVIVED THE SCRUB"),
+                ("remnant", "SOURCE-LANGUAGE REMNANT"))
+# SLICE 2b's PINNED PLAN (PLAN-2-step-b.md section 3.2): the workdirs per document whose delivery
+# must move, and the documents repack never reaches because post_process's drift gate stops them.
+MOVE_2B = {"uk": {"D01": 2, "D02": 1, "D03B": 1, "D10": 1, "D11": 1},
+           "us": {"D01": 2, "D03B": 1, "D11": 1}}
+STOP_2B = {"uk": {"D04", "D05"}, "us": {"D02", "D06", "D09", "D10"}}
+ZW = "​".encode("utf-8")
+ZREF = re.compile(rb"&#(?:0*8203|[xX]0*200[bB]);")
+
+
+def zcount(b):
+    return b.count(ZW) + len(ZREF.findall(b)) if b else 0
+
+
+def zstrip(b):
+    return ZREF.sub(b"", b.replace(ZW, b""))
 INPUTS = ("paragraphs.json", ".validate-state.json", "comments_translations.json",
           "headers_footers.json", "_boldmap.json")
 if args.ref and args.arm in ("b", "both"):
@@ -426,20 +454,47 @@ def chain(scripts_dir, d, src, wd):
     rcs["repack"] = rp.returncode
     rcs["repack_gate"] = next((label for label, marker in REPACK_GATES if marker in out),
                               "none" if rp.returncode == 0 else "unrecognised")
+    # What the remnant block ran in and which ADVISORY markers it warned on: a language name,
+    # zip member names and the skill's own marker patterns -- never repack's context snippets.
+    lang = re.search(r"Remnant block: language=(\w+)", out)
+    BLOCK_NOTE[d.name] = (lang.group(1) if lang else ("skipped" if "Remnant block skipped" in out
+                                                      else "not reached"),
+                          Counter(f"{m.group(1)} {m.group(2)}" for m in re.finditer(
+                              r"WARNING \(ADVISORY, not blocking\): (\S+): (\S+) —", out))
+                          + Counter({"(beyond the ten printed)": int(m.group(1)) for m in re.finditer(
+                              r"\.\.\. (\d+) more advisory hit", out)}))
     return rcs, pp
 
 
-def digest(d):
+def outputs(d):
     """Every output by content: the XML, the journal, each member of the repacked .docx."""
-    out = {rel: (hashlib.sha256((d / rel).read_bytes()).hexdigest() if (d / rel).is_file() else None)
+    out = {rel: ((d / rel).read_bytes() if (d / rel).is_file() else None)
            for rel in ("final/word/document.xml", "checked.xml", "post_process_journal.json")}
     if (d / "delivered.docx").is_file():
         with zipfile.ZipFile(d / "delivered.docx") as z:
             for name in sorted(z.namelist()):
-                out["docx:" + name] = hashlib.sha256(z.read(name)).hexdigest()
+                out["docx:" + name] = z.read(name)
     else:
         out["docx"] = None
     return out
+
+
+def compare(new, ref):
+    """Slice 2b's sense: each output identical, or a .docx member that is the PINNED bytes with
+    every U+200B removed and none left. Returns (moved members, U+200B removed, other movement,
+    whether the pin's delivery carried any U+200B at all)."""
+    moved, removed, other = [], 0, []
+    for k in sorted(set(new) | set(ref)):
+        a, b = new.get(k), ref.get(k)
+        if a == b:
+            continue
+        if k.startswith("docx:") and a is not None and b is not None and zstrip(b) == a and not zcount(a):
+            moved.append(k[5:])
+            removed += zcount(b)
+        else:
+            other.append(k)
+    carried = any(zcount(v) for k, v in ref.items() if k.startswith("docx:"))
+    return moved, removed, other, carried
 
 
 reports_a, reports_b = {}, {}
@@ -484,18 +539,25 @@ for n, wd in enumerate(workdirs, 1):
         if REFTREE is not None:
             rb = TMP / f"r{n:02d}"
             rrcs, _ = chain(REFTREE, rb, src, wd)
-            dn, dr = digest(b), digest(rb)
-            BYTES[key] = (rrcs == rcs, sorted(k for k in set(dn) | set(dr) if dn.get(k) != dr.get(k)),
-                          len(dn), rcs, rrcs)
+            dn, dr = outputs(b), outputs(rb)
+            BYTES[key] = (rrcs == rcs, compare(dn, dr), len(dn), rcs, rrcs)
             shutil.rmtree(rb, ignore_errors=True)
         journal = b / "post_process_journal.json"
-        rep, rc = delivered_check(b / "paragraphs.json", b / "checked.xml", b / "src.docx",
+        # THE REPACKED .docx WHERE REPACK PRODUCED ONE (slice 2b): the reordered XML predates
+        # repack, so it cannot see the scrub. A stopped document is read from the XML, and said.
+        docx_out = b / "delivered.docx"
+        target = docx_out if docx_out.is_file() else b / "checked.xml"
+        rep, rc = delivered_check(b / "paragraphs.json", target, b / "src.docx",
                                   journal if journal.is_file() else None, f"b{n:02d}")
         if rep is None:
             void(f"(b) {key}", f"the check wrote no report (rc={rc})")
         else:
+            rep["_read"] = "docx" if docx_out.is_file() else f"xml — repack STOPPED ({rcs['repack_gate']})"
+            rep["_gate"] = rcs["repack_gate"]
+            rep["_block"] = BLOCK_NOTE.get(b.name, ("not reached", Counter()))
             rep["_steps"] = (f"post_process rc={pp.returncode}{' (drift gate fired)' if gate else ''}, "
-                             f"reorder rc={rcs['reorder']}, repack rc={rcs['repack']}")
+                             f"reorder rc={rcs['reorder']}, repack rc={rcs['repack']}"
+                             f" [{rcs['repack_gate']}] · the check read the {rep['_read']}")
             rep["_edges"] = edge_vs_source(rep, notes)
             reports_b[key] = (rep, rc)
 
@@ -561,11 +623,48 @@ if args.arm in ("b", "both"):
         f"{k}={sum((rep.get(g) or {}).get(k, 0) for rep, _ in reports_b.values())}"
         for g, ks in (("zwsp", ("accept", "reject", "paragraphs")),
                       ("brackets", ("declared", "unbalanced", "a15", "other"))) for k in ks))
+    # SLICE 2b, the delivered check's own numbers: no U+200B where repack ran; the text and anchor
+    # findings, the non-U+200B blocking ones, printed per document; no delivery refused by the
+    # remnant block. A stopped document is listed as stopped and asserts nothing.
+    print("\n  SLICE 2b — THE DELIVERED CHECK ON THE REPACKED .docx:")
+    for key, (rep, _) in reports_b.items():
+        z = rep.get("zwsp") or {}
+        txt = sorted((f['class'], f['shape'], f['idx']) for f in rep["findings"]
+                     if f.get("blocking", True) and f["class"] != "zwsp")
+        if rep.get("_read") != "docx":
+            print(f"    {key:6} STOPPED — {rep['_read']}; U+200B accept {z.get('accept')} reject {z.get('reject')} "
+                  f"in {z.get('paragraphs')} paragraph(s), the scrub never ran; text/anchor blocking {len(txt)}")
+            continue
+        ok(f"{key}: the repacked .docx carries 0 U+200B in either reading",
+           not z.get("accept") and not z.get("reject"), f"accept {z.get('accept')} reject {z.get('reject')}")
+        blang, badv = rep.get("_block", ("n/a", Counter()))
+        print(f"        remnant block: language {blang}; advisory warnings {sum(badv.values())}"
+              + (" — " + "  ".join(f"{k} x{v}" for k, v in sorted(badv.items())) if badv else ""))
+        print(f"        text/anchor blocking {len(txt)}: "
+              + " ".join(f"{c}/{s}@{i}" if i is not None else f"{c}/{s}" for c, s, i in txt))
+    refused = [k for k, (rep, _) in reports_b.items() if rep.get("_gate") in ("remnant", "zwsp-survived")]
+    ok(f"no delivery refused by the remnant block or the U+200B survival check "
+       f"({len(reports_b)} examined)", not refused, f"refused: {refused}")
+    stopped = sorted({did_of(k) for k, (rep, _) in reports_b.items() if rep.get("_read") != "docx"})
+    present = {did_of(k) for k in reports_b}
+    ok(f"repack STOPPED exactly where the plan says ({args.variant}, of the documents in this run)",
+       set(stopped) == STOP_2B[args.variant] & present, f"stopped {stopped}")
     if REFTREE is not None:
-        print(f"\n  NO DELIVERED BYTE MOVES — the chain run with {args.ref}'s scripts and the working tree's:")
-        for key, (same_rc, moved, nparts, rcs, rrcs) in BYTES.items():
-            ok(f"{key}: {nparts} output(s) identical by content, every exit code equal {rcs}",
-               same_rc and not moved, f"moved {moved}; exit codes now {rcs}, at the ref {rrcs}")
+        print(f"\n  SLICE 2b — BYTES MOVE BY U+200B REMOVAL ONLY, AND ONLY WHERE THE PIN'S DELIVERY "
+              f"CARRIED ONE — the chain run with {args.ref}'s scripts and the working tree's:")
+        moved_by_doc = defaultdict(int)
+        for key, (same_rc, (moved, removed, other, carried), nparts, rcs, rrcs) in BYTES.items():
+            ok(f"{key}: every exit code equal {rcs}", same_rc, f"now {rcs}, at the ref {rrcs}")
+            ok(f"{key}: of {nparts} output(s), nothing moved but U+200B removals",
+               not other, f"other movement in {other}")
+            ok(f"{key}: moved IFF the pin's delivery carried a U+200B "
+               f"({'carried' if carried else 'none'}; {len(moved)} member(s), {removed} U+200B removed"
+               + (f": {' '.join(moved)}" if moved else "") + ")", bool(moved) == carried)
+            moved_by_doc[did_of(key)] += bool(moved)
+        want = {d: n for d, n in MOVE_2B[args.variant].items() if d in present}
+        got = {d: n for d, n in moved_by_doc.items() if n}
+        ok(f"the workdirs that moved are exactly the plan's ({args.variant}, of the documents in this run)",
+           got == want, f"moved {got}, plan {want}")
         print(f"  compared {len(BYTES)} of {len(reports_b)} rebuilt workdirs")
 
 shutil.rmtree(TMP, ignore_errors=True)

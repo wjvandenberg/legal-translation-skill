@@ -1,0 +1,77 @@
+[
+  {
+    "idx": 0,
+    "text": "Il presente contratto è stipulato tra le parti per la fornitura della turbina.",
+    "en": "This agreement is entered into​ between the parties for the supply of the turbine.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 78,
+        "text": "Il presente contratto è stipulato tra le parti per la fornitura della turbina.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 1,
+    "text": "Il Contratto di Fornitura prevale su ogni altro accordo che sia intervenuto tra le parti.",
+    "en": "The Supply​Agreement prevails over every other arrangement made between the parties.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 89,
+        "text": "Il Contratto di Fornitura prevale su ogni altro accordo che sia intervenuto tra le parti.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 2,
+    "text": "Ogni parte deve rispettare gli obblighi che sono previsti nel presente contratto.",
+    "en": "Each party shall comply with the obligations provided for in this agreement​.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 81,
+        "text": "Ogni parte deve rispettare gli obblighi che sono previsti nel presente contratto.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 3,
+    "text": "Le parti sono tenute alla riservatezza delle informazioni per tutta la durata.",
+    "en": "The parties shall keep the information confidential for the whole term.​",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 78,
+        "text": "Le parti sono tenute alla riservatezza delle informazioni per tutta la durata.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 4,
+    "text": "Il Contratto di Fornitura disciplina la fornitura, il trasporto, l'installazione e la messa in servizio delle turbine, nonché la manutenzione ordinaria e straordinaria per tutta la durata del periodo di garanzia, secondo le condizioni tecniche allegate al presente contratto.",
+    "en": "The Supply​Agreement governs the supply, transport, installation and commissioning of the turbines,​ together with the routine and extraordinary maintenance for the whole of the warranty period, on the technical​ terms annexed to this agreement.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 275,
+        "text": "Il Contratto di Fornitura disciplina la fornitura, il trasporto, l'installazione e la messa in servizio delle turbine, nonché la manutenzione ordinaria e straordinaria per tutta la durata del periodo di garanzia, secondo le condizioni tecniche allegate al presente contratto.",
+        "bold": false,
+        "italic": false
+      }
+    ]
+  }
+]

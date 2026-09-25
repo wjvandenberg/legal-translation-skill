@@ -3,12 +3,12 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 36,
+ "count": 38,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/checks-can-fail",
-   "commit_subject": "Branch 5 - checks can fail, plus the two defects the rule-5b probe surfaced: rule 5a stops forbidding the repair it mandates (never patch the script vs narrow the pattern), and the Step 6 gate's remedy names the third possibility - that the check itself is wrongly scoped - and routes it to rule 5a (register rows C3 C23 C25 W3 W4 L4, F1)",
-   "sha256_now": "9fe078ab330124682f5f4d098d7f9c34219e3570bbde5b6a55e7afca1c0bbd4a"
+   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
+   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
+   "sha256_now": "3f63b538064538a92c836f22455c52a9c9478890363f7c9ae85e1a6a41eac248"
   },
   "uk/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -31,9 +31,14 @@
    "sha256_now": "efbb157c8dcad6d7d80f8d9e4e41e76b6b8790d7c802a3a63cd523878e1b51f0"
   },
   "uk/scripts/repack_docx.py": {
-   "changed_by": "feature/no-bytecode-in-shipped-tree",
-   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
-   "sha256_now": "06806fe38f50ec91f5b1d657763c767213e5d5dc789bb95acc45b29f69f76993"
+   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
+   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
+   "sha256_now": "3b3ccde71b45ce5ec9a88388d44bd0fe837b377d8e4a327d938e0e11cf21592e"
+  },
+  "uk/scripts/source_language_markers.py": {
+   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
+   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
+   "sha256_now": "33fead97409512d999b9429434e6f4a0e8bf7f524b7441617282b077a32510a8"
   },
   "uk/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch10-slice2-conditional-passes",
@@ -91,14 +96,14 @@
    "sha256_now": "e44608dc3a9312c46e0e7778bd46c1ead679071aae0982b766ed9282b17a138c"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/branch10-slice4-page-break-detector",
-   "commit_subject": "Branch 10 slice 4 - the page-break pass inserts nothing, the principle every pass obeys, and the detections in the journal (B7)",
-   "sha256_now": "e4e9a016e89cf7b2e7301f47b11eb7053348519cf3e016a92f10b74a6cde4456"
+   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
+   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
+   "sha256_now": "a32e2ce5ebd31a0fc50258aae8a184fcf47fdc56a415379f8a104032043c54f9"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/checks-can-fail",
-   "commit_subject": "Branch 5 - checks can fail, plus the two defects the rule-5b probe surfaced: rule 5a stops forbidding the repair it mandates (never patch the script vs narrow the pattern), and the Step 6 gate's remedy names the third possibility - that the check itself is wrongly scoped - and routes it to rule 5a (register rows C3 C23 C25 W3 W4 L4, F1)",
-   "sha256_now": "b6b8b7fa11665f7bc720db1892e3e33362e86db52f0b241aabb9362725547ed1"
+   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
+   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
+   "sha256_now": "6f6a7ccfb8efc094fd5f3c8fa535fe15d625695daeb6eb26573fe3413be5cbfb"
   },
   "us/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -121,9 +126,14 @@
    "sha256_now": "359524280ee216a947502a3a00ac571a1639fa63e7672b73d5d776080e2a2b9f"
   },
   "us/scripts/repack_docx.py": {
-   "changed_by": "feature/no-bytecode-in-shipped-tree",
-   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
-   "sha256_now": "06806fe38f50ec91f5b1d657763c767213e5d5dc789bb95acc45b29f69f76993"
+   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
+   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
+   "sha256_now": "3b3ccde71b45ce5ec9a88388d44bd0fe837b377d8e4a327d938e0e11cf21592e"
+  },
+  "us/scripts/source_language_markers.py": {
+   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
+   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
+   "sha256_now": "f8a80b486039743046fda9758382ea7d6ecbad2fa40ee46cd850ded3879f942e"
   },
   "us/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch10-slice2-conditional-passes",
@@ -181,9 +191,9 @@
    "sha256_now": "a2e07148c6e48ac889995b5e21df65157a07a15554c9eb7911430b6710375968"
   },
   "us/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/branch10-slice4-page-break-detector",
-   "commit_subject": "Branch 10 slice 4 - the page-break pass inserts nothing, the principle every pass obeys, and the detections in the journal (B7)",
-   "sha256_now": "2170ca8713277f66258a958e161ddc63e20411779186e23f8b572dd2d7da01d8"
+   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
+   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
+   "sha256_now": "3e76fd94da035a97ee84b3b8245959ea6951985784632907428b0b2aff295e77"
   }
  }
 }

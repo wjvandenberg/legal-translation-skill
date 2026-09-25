@@ -66,7 +66,8 @@ checked.
    `headerN.xml`, `footerN.xml`, and `comments.xml` for source-language remnants.
 5. `repack_docx.py --paragraphs <paragraphs.json>` — bundles output. **Auto-runs
    `lexicon_compliance.py --stage pre-repack` and `validate_apply.py --strict` before
-   bundling**, plus the existing post-bundle source-language remnant scan.
+   bundling**, scrubs every U+200B from the prose parts, and reads the archive back BEFORE
+   delivery: a surviving U+200B or a source-language remnant refuses it.
 6. Any document-specific patches re-applied (e.g. numbering suff fixes).
 
 **Conditional — run only if the trigger applies:**
@@ -159,18 +160,25 @@ The script also automatically:
   pass; if either fails, the temporary file is **deleted** and the repack exits 1. A
   file Word cannot open is therefore never left at the delivery path, and a run that
   produced one can no longer report success
-- **Runs a post-repack source-language remnant scan** on the delivered
-  `.docx`: auto-detects the source language from the ORIGINAL `word/document.xml`
-  and then scans every prose XML part in the output (`word/document.xml`,
-  `word/comments.xml`, `word/footnotes.xml`, `word/endnotes.xml`, every
-  `header*.xml` / `footer*.xml`) for source-language remnants using the same
-  marker lists `apply_translations_textmatch.py` uses. Hits are printed as
-  WARNING lines grouped by part; the repack's exit code is not affected.
-  Treat the warnings as a pre-flight: some hits are legitimately preserved
-  content (project names, entity names, reference codes) and some indicate
-  an auxiliary part that was not wired into this repack. Extends the
-  silent-regression guard added in  by covering the delivered artifact
-  rather than only the workdir state.
+- **Scrubs every U+200B** (zero-width space) from the character data of every prose
+  part — `word/document.xml`, comments, footnotes, endnotes, the glossary, every
+  `header*.xml` / `footer*.xml` — whichever source the part came from. The ZWSP device
+  is right while the pipeline runs and a defect in the deliverable, so it is removed
+  here and never forbidden earlier. A U+200B inside an attribute value is in no reading
+  and is left alone.
+- **Blocks on a source-language remnant, BEFORE the file is moved into place.** The
+  source language is auto-detected from the ORIGINAL `word/document.xml`, and every
+  prose part of the archive is scanned with the marker lists
+  `apply_translations_textmatch.py` uses. A hit REFUSES delivery — exit 1, the
+  temporary file deleted — unless its class is declared advisory in
+  `source_language_markers.py`, where it prints a WARNING instead: `convention` (an
+  English word), five company-form nouns that sit inside kept registered names, CJK
+  characters, and six kept names the lexicons tell you to write (e.g. "Agenzia delle
+  Entrate"), each citing its lexicon row. A remnant in comments, footnotes or a header
+  usually means that part was not wired into this repack: pass its flag. If the
+  source language cannot be detected the block says so and does not run. A faithful
+  text refused by a wrongly scoped marker is `SKILL.md` rule 5a's case — never alter
+  the translation to satisfy it.
 
 > **Do not append aux files to the .docx after repacking with a hand-rolled `zipfile.writestr`.**
 > Earlier versions of the skill recommended doing that. It works *only* if the source XML was

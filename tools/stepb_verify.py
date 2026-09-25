@@ -100,6 +100,7 @@ CLAIMS = [
  ("A2",  "28 → 14",                           "half the comment anchors destroyed on one document"),
  ("A2",  "ONLY ONE OF THE FOUR WAS MECHANISM A-i", "D08's loss was one apply's, three strip_noop's"),
  ("B10", "is never removed whole",             "a wrapper carrying an anchor is not a no-op"),
+ ("G13", "SIX RENDERINGS",                     "the lexicons' own renderings fail Step 9"),
  ("B10", "13 → 10",                            "today's pipeline still loses three of D08's anchors"),
  ("A16", "UNTRANSLATED SOURCE TEXT ON PAGE ONE",   "a content control stranded source text on page 1"),
  ("A19", "THIRD container",                        "graphic metadata is the third unenumerated container"),
@@ -220,9 +221,11 @@ GROUPS = {
  # measured and deliberately UNCLASSIFIED because classifying it needs the finding text read
  # and each finding embeds real instrument text. It belongs in group 3 for the same reason
  # every other G row does — the check says something about the document that may not be so.
+ # G13 ADDED 2026-09-25 (branch 11 slice 2b's exploration): quality_check fails Step 9 on six
+ # renderings the lexicons prescribe -- a finding about the document that is not so, G12's group.
  "3 says it worked when it did not": """
    C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9
-   G10 G11 G12 S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6
+   G10 G11 G12 G13 S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6
    """,
  "4 hard to keep correct": """
    U1 V1 V2 W1 W2 T1 T2 T3 T4 T5 T6 F21 F23 F32 F36 F37 F38 L2 L3 E1 E2 E3 E5 E6 E10 E11 E13 E14 Q1 Y1
@@ -280,7 +283,7 @@ OPTIONS = {
  # what saw it, and its fix is option 6's.
  "2 check against the original": """
    C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28
-   G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
+   G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
    B10
    """,
  # A3 AND A6 BOTH ARRIVED HERE 2026-09-02. A3 is deliberately in TWO options -- the header
