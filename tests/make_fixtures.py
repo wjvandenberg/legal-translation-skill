@@ -1902,6 +1902,51 @@ def _extraction_completeness(path):
                       "word/_rels/document.xml.rels": rels}, ct)
 
 
+# ---------------------------------------------------------------------------
+# Branch 11 slice 2b — J1's U+200B scaffolding, so the pre-repack scrub has a PAGE. No
+# fixture carried one (measured: 0 in every fixture member and every notes file), so section
+# 5.2's rendered diff had nothing to render. Invented wording, per CLAUDE.md 5.6; the source
+# is Italian so the remnant block runs, and the English is clean so it stays quiet.
+# ---------------------------------------------------------------------------
+ZW = "​"
+ZWSP_SHAPES = [
+    ("Il presente contratto è stipulato tra le parti per la fornitura della turbina.",
+     "This agreement is entered into" + ZW + " between the parties for the supply of the turbine."),
+    ("Il Contratto di Fornitura prevale su ogni altro accordo che sia intervenuto tra le parti.",
+     "The Supply" + ZW + "Agreement prevails over every other arrangement made between the parties."),
+    ("Ogni parte deve rispettare gli obblighi che sono previsti nel presente contratto.",
+     "Each party shall comply with the obligations provided for in this agreement" + ZW + "."),
+    ("Le parti sono tenute alla riservatezza delle informazioni per tutta la durata.",
+     "The parties shall keep the information confidential for the whole term." + ZW),
+]
+# AND ONE JUSTIFIED PARAGRAPH, added after the real-corpus render moved words by up to 9.35pt
+# on a page whose characters and line count were unchanged: a justified line distributes its
+# slack over its gaps, so this is where a U+200B that is not truly zero-width would show.
+ZWSP_JUSTIFIED = (
+    "Il Contratto di Fornitura disciplina la fornitura, il trasporto, l'installazione e la messa in "
+    "servizio delle turbine, nonché la manutenzione ordinaria e straordinaria per tutta la durata "
+    "del periodo di garanzia, secondo le condizioni tecniche allegate al presente contratto.",
+    "The Supply" + ZW + "Agreement governs the supply, transport, installation and commissioning "
+    "of the turbines," + ZW + " together with the routine and extraordinary maintenance for the "
+    "whole of the warranty period, on the technical" + ZW + " terms annexed to this agreement.")
+
+
+@fixture("zwsp-scaffolding.docx",
+         "U+200B in the English beside a space, INSIDE a defined term (D11's shape, which made "
+         "a term unsearchable), before a full stop and at a paragraph's end -- J1's shapes -- so "
+         "branch 11 slice 2b's scrub can be seen on a page: the old repack ships every one, the "
+         "new one removes them, and the page must not move. Ships its own "
+         "zwsp-scaffolding.notes.json")
+def _zwsp_scaffolding(path):
+    # ARIAL, because the real page that moved most is set in it (LiberationSans once LibreOffice
+    # substitutes it), and the fixture's default font did not move at all.
+    shapes = ZWSP_SHAPES + [ZWSP_JUSTIFIED]
+    arial = '<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr>'
+    docx(path, "".join(p(r(s, arial)) for s, _en in ZWSP_SHAPES)
+         + p(r(ZWSP_JUSTIFIED[0], arial), ppr='<w:pPr><w:jc w:val="both"/></w:pPr>'))
+    _write_notes(path, [_note(i, s, en, [(0, len(s))]) for i, (s, en) in enumerate(shapes)])
+
+
 @fixture("not-a-zip.docx",
          "a file with a .docx name that is not a ZIP — the delivered-document integrity "
          "test must FAIL on this, and today a failed integrity test exits 0")

@@ -450,12 +450,25 @@ if args.fixture:
     # apply + repack. In --post-process mode that hardwiring is the defect: the arm would
     # swap a script the run never executes, report the two arms as the same code, and
     # render an all-quiet page — indistinguishable from a fix that worked.
-    FX_SCRIPTS = ["post_process.py", "strip_noop_tracked_changes.py",
-                  "validate_apply.py"] if args.post_process else [SCRIPT]
+    #
+    # AND THE LIST WAS THE DEFECT, NOT ITS CONTENTS (branch 11 slice 2b, 2026-09-25). The fixture
+    # path runs apply AND repack, and repack runs lexicon_compliance, validate_apply and the
+    # marker module; a hand-kept list of "the scripts the run drives" named apply alone, so when
+    # repack changed, both arms ran the NEW repack and the render compared it with itself -- an
+    # all-quiet page, caught only because the old arm's .docx held no U+200B either. So the arm
+    # is now REF's WHOLE scripts tree: every script a run can execute is the baseline's, and no
+    # list has to be kept in step with what a run happens to call.
+    _names = subprocess.run(["git", "ls-tree", "--name-only", REF, f"{args.variant}/scripts/"],
+                            capture_output=True, text=True, cwd=ROOT).stdout.split()
+    FX_SCRIPTS = sorted(n.rsplit("/", 1)[-1] for n in _names if n.endswith(".py"))
+    if not FX_SCRIPTS:
+        print(f"\n  VOID — no scripts at {REF}; no baseline arm for the fixtures.")
+        sys.exit(1)
     _fxtmp = Path(tempfile.mkdtemp(prefix="fx-oldtree-"))
     FX_OLDTREE = _fxtmp / "old_scripts"
     shutil.copytree(ROOT / args.variant / "scripts", FX_OLDTREE)
     _any_diff = False
+    _differ = []
     for _name in FX_SCRIPTS:
         _blob = subprocess.run(["git", "show", f"{REF}:{args.variant}/scripts/{_name}"],
                                capture_output=True, cwd=ROOT)
@@ -471,9 +484,12 @@ if args.fixture:
             print(f"  VOID — the baseline copy of {_name} has no integrity sentinel; it "
                   f"would exit 3.")
             sys.exit(1)
-        if _blob.stdout != (ROOT / args.variant / "scripts" / _name).read_bytes():
+        _here = ROOT / args.variant / "scripts" / _name
+        if not _here.is_file() or _blob.stdout != _here.read_bytes():
             _any_diff = True
-    print(f"  fixture baseline arm: {REF}  ({', '.join(FX_SCRIPTS)})"
+            _differ.append(_name)
+    print(f"  fixture baseline arm: {REF}'s whole scripts tree ({len(FX_SCRIPTS)} scripts; "
+          f"differing from the working tree: {', '.join(_differ) or 'none'})"
           + ("" if _any_diff else
              "   NOTE: BYTE-IDENTICAL to the working tree, so old and new are the same code "
              "and an all-quiet render proves nothing"))
@@ -792,20 +808,31 @@ if args.doc:
     if not LOGS.exists():
         print(f"\n  logs folder not reachable at {LOGS}. SKIP, not a pass.")
         sys.exit(0 if not FAIL else 1)
-    blob = subprocess.run(["git", "show", f"{REF}:{args.variant}/scripts/{SCRIPT}"],
-                          capture_output=True, cwd=ROOT)
-    if blob.returncode != 0:
-        print(f"\n  VOID — cannot read {SCRIPT} at {REF}.")
-        sys.exit(1)
+    # REF's WHOLE scripts tree, as the fixture arm above and for the same reason (branch 11
+    # slice 2b): this arm runs apply AND repack, and a baseline that swapped apply alone ran the
+    # working tree's repack on both sides -- VOID for a repack change, never a comparison.
     TMP = Path(tempfile.mkdtemp(prefix="b6-render-"))
     OLDTREE = TMP / "old_scripts"
     shutil.copytree(ROOT / args.variant / "scripts", OLDTREE)
-    (OLDTREE / SCRIPT).write_bytes(blob.stdout)
-    if blob.stdout == (ROOT / args.variant / "scripts" / SCRIPT).read_bytes():
-        print(f"\n  VOID — {SCRIPT} is byte-identical to {REF}: old and new would be the")
+    _differ = []
+    for _n in subprocess.run(["git", "ls-tree", "--name-only", REF, f"{args.variant}/scripts/"],
+                             capture_output=True, text=True, cwd=ROOT).stdout.split():
+        if not _n.endswith(".py"):
+            continue
+        blob = subprocess.run(["git", "show", f"{REF}:{_n}"], capture_output=True, cwd=ROOT)
+        if blob.returncode != 0:
+            print(f"\n  VOID — cannot read {_n} at {REF}.")
+            sys.exit(1)
+        _name = _n.rsplit("/", 1)[-1]
+        if blob.stdout != (ROOT / args.variant / "scripts" / _name).read_bytes():
+            _differ.append(_name)
+        (OLDTREE / _name).write_bytes(blob.stdout)
+    if not _differ:
+        print(f"\n  VOID — every script is byte-identical to {REF}: old and new would be the")
         print("  same code, so every page would match for that reason alone.")
         shutil.rmtree(TMP, ignore_errors=True)
         sys.exit(1)
+    print(f"\n  baseline arm: {REF}'s whole scripts tree; differing: {', '.join(_differ)}")
     CORPUS = corpus_dirs()
     print(f"\n  corpus folder(s) reachable: {len(CORPUS)}")
     wds = [w for w in (sorted(LOGS.rglob("wd")) + sorted(LOGS.rglob("wd-*"))) if w.is_dir()]

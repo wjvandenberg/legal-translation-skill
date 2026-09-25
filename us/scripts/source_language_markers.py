@@ -1,7 +1,8 @@
 """Per-language marker word lists for detecting untranslated source-language
 remnants in translated output.
 
-Used by `apply_translations_textmatch.py` and `quality_check.py`.
+Used by `apply_translations_textmatch.py` and `quality_check.py`, which report
+remnants, and by `repack_docx.py`, whose `remnant_verdict` call REFUSES delivery.
 
 ============================================================================
 WHY THIS MODULE EXISTS
@@ -311,6 +312,94 @@ def scan_remnants(text, source_language):
                     continue
                 hits.append((pat, context))
     return hits
+
+# ──────────────────────────────────────────────────────────────────────
+# THE REMNANT VERDICT — which of scan_remnants' hits STOP a delivery and which
+# only warn. repack_docx.py refuses on a BLOCKING hit (register C22, branch 11
+# slice 2b, Wouter 2026-09-25); apply and quality_check do not call this and
+# are unchanged. A hit is ADVISORY only for a class the scan cannot rule on:
+#   * a CJK character marker — a kept name may stand in its own script;
+#   * a marker in REMNANT_ADVISORY, each with its reason;
+#   * a hit whose own span lies inside a LEXICON_KEPT_NAMES name, each citing
+#     the lexicon row that tells the operator to write it. Measured 2026-09-25:
+#     of 30,718 lexicon rendering cells in each tree, these six held a marker,
+#     and blocking them would refuse output the skill itself prescribes.
+# Everything else BLOCKS — the era-name pattern included, being Latin text.
+# tests/test_repack_scrub_and_block.py reads every lexicon rendering column in
+# both trees and fails on a collision this file does not declare.
+# ──────────────────────────────────────────────────────────────────────
+REMNANT_ADVISORY = {
+    r'\bconvention\b': 'an English word ("Aarhus Convention"): the one marker '
+                       'of 189 that collides with English, measured on 13 '
+                       'English deliveries',
+    r'\bSociété\b': 'a company form that sits inside a kept registered name',
+    r'\bSociedade\b': 'a company form that sits inside a kept registered name',
+    r'\bSpółka\b': 'a company form that sits inside a kept registered name',
+    r'\bUnternehmen\b': 'a company noun that sits inside a kept registered name',
+    r'\bWindpark\b': 'the word Dutch wind project companies carry in their '
+                     'registered names',
+}
+
+LEXICON_KEPT_NAMES = {
+    'Agenzia delle Entrate': 'sub-lexicons/italian-taxes.md, the revenue agency row',
+    'Società Italiana degli Autori ed Editori':
+        'sub-lexicons/italian-ip-it-technology.md, the SIAE row',
+    'Mercato Elettronico della Pubblica Amministrazione':
+        'sub-lexicons/italian-public-procurement.md, the MEPA row',
+    "Codice della Crisi d'Impresa e dell'Insolvenza":
+        'sub-lexicons/italian-general-legal.md, the judicial liquidation row',
+    'Codice delle Assicurazioni Private':
+        'sub-lexicons/italian-transport-and-insurance.md, the motor '
+        'third-party liability row',
+    'dupla conforme': 'sub-lexicons/portuguese-litigation-settlement.md, '
+                      '"dupla conforme (double concurrence)"',
+}
+
+
+def _kept_name_re(name):
+    # Case folded (a heading may be in capitals), any whitespace between words
+    # (a run boundary adds some), and either apostrophe (Word types the curly one).
+    words = [re.escape(w).replace("'", "['’]") for w in name.split()]
+    return re.compile(r'(?<!\w)' + r'\s+'.join(words) + r'(?!\w)', re.IGNORECASE)
+
+
+_KEPT_NAME_RES = [(n, _kept_name_re(n)) for n in LEXICON_KEPT_NAMES]
+
+
+def remnant_verdict(text, source_language):
+    """(blocking, advisory) — scan_remnants' own hits, split. Blocking items are
+    (marker, context); advisory items (marker, context, reason). The two lists
+    hold exactly scan_remnants' hits between them: the same patterns, flags,
+    order and WHITESPACE_OK_CONTEXTS suppression, re-read here with their spans
+    so a kept name covers its OWN span and never a word beside it."""
+    if not source_language:
+        return [], []
+    patterns = LANGUAGE_MARKERS.get(source_language.lower())
+    if not patterns:
+        return [], []
+    kept = [(m.span(), n) for n, rx in _KEPT_NAME_RES for m in rx.finditer(text)]
+    blocking, advisory = [], []
+    for pat in patterns:
+        cjk = isinstance(pat, str) and not pat.startswith(r'\b')
+        found = (re.finditer(re.escape(pat), text) if cjk
+                 else re.finditer(pat, text, flags=re.IGNORECASE))
+        for m in found:
+            start, end = m.span()
+            context = text[max(0, start - 30): end + 30]
+            if any(ok in context for ok in WHITESPACE_OK_CONTEXTS):
+                continue
+            if cjk:
+                why = 'CJK characters: a kept name may stand in its own script'
+            elif pat in REMNANT_ADVISORY:
+                why = REMNANT_ADVISORY[pat]
+            else:
+                why = next((f'inside the kept name "{n}" — {LEXICON_KEPT_NAMES[n]}'
+                            for (s, e), n in kept if s <= start and end <= e), None)
+            if why:
+                advisory.append((pat, context, why))
+            else:
+                blocking.append((pat, context))
+    return blocking, advisory
 
 SUPPORTED_LANGUAGES = sorted(LANGUAGE_MARKERS.keys())
 

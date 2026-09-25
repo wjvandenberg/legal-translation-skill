@@ -359,17 +359,19 @@ if xml5 is None:
     void("ARM 5", "apply produced nothing")
 else:
     rc, blob, art = repack("scan", src5, xml5, notes5, extra=["--glossary", orig_gloss])
+    # THIS ARM PASSED FOR THE WRONG REASON FROM 2026-09-09 TO 2026-09-25 (register I-30). The scan
+    # ran -- in Dutch, the language this fixture's body is detected as -- and found nothing, the
+    # glossary's text carrying no Dutch marker; the arm then found the glossary's path in repack's
+    # UNRELATED "Will replace word/glossary/document.xml" line and passed, so it never showed the
+    # scan READ the part. Branch 11 slice 2b renamed the scan the REMNANT BLOCK and made it refuse,
+    # and the reading claim moved to tests/test_repack_scrub_and_block.py arms 3l and 3m, where the
+    # glossary carries a marker and the block names the part in its refusal. What stays here is what
+    # THIS fixture can show: the keep-as-is route runs the block, and a clean part is delivered.
     ok("repack accepts the declared no-translation-needed route", rc == 0, f"rc={rc}")
-    scanned = "Post-repack remnant scan" in blob or "Post-repack scan" in blob
-    if not scanned:
-        # A SCAN THAT DID NOT RUN IS VOID, NEVER CLEAN. It is skipped silently when the
-        # source language cannot be detected from the original, which is a property of the
-        # fixture's prose and not of this slice.
-        void("the post-repack scan", "it did not run at all — language undetected, so a "
-                                     "quiet result here says nothing about _PROSE_PARTS")
-    else:
-        ok("the scan NAMES the delivered glossary part", GLOSSARY_ZIP_PATH in blob,
-           "_PROSE_PARTS excludes it, so the part ships unread — this is D03B's arm")
+    ok("and the remnant block RAN on it and reported clean — never a claim that it read the glossary, "
+       "which this fixture's marker-free text cannot show (test_repack_scrub_and_block 3l, 3m can)",
+       "Remnant block: language=" in blob and "Remnant block clean" in blob,
+       " / ".join(re.findall(r"Remnant block[^,\n]*", blob)) or "no remnant-block line at all")
 
 # =========================================================================================
 # ARM 6 — CROSS-TREE EQUALITY. `shared` has to mean something.
