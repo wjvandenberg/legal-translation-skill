@@ -1156,6 +1156,22 @@ def check_extraction_completeness(original_docx, paragraphs_json, strict=False):
 # paragraph apply had already changed an exact-text lookup misses it -- the
 # journal's edit is then REBASED onto the declaration where the two agree, and
 # what is left is apply's own change, judged like any other.
+#
+# SLICE 2a, 2026-09-25 -- U+200B (C8) AND BRACKETS (B3 and A15 on D08). A
+# U+200B the notes declare is operator scaffolding (J1: the device is right,
+# its survival the defect), so it is dropped from the declared side -- and from
+# the delivered readings too, for the TEXT comparison only, because every one a
+# delivered reading carries is its own finding, class zwsp. Kept in the text
+# comparison it would be reported twice, the second time as 'punctuation'. One
+# that replaced a visible space still shows as a lost space.
+# Brackets ( ) [ ] { }, full-width forms folded, per paired paragraph: the
+# declared readings the text comparison used against the delivered ones, a
+# FINDING; with --original, against the SOURCE paragraph found by extraction's
+# text: a delivered reading unbalanced where the same reading of the source
+# balances, a FINDING (a naive balance test raised 15 alarms on the corpus,
+# list markers among them, and this none); A15's signature -- accept as the
+# source's, reject not -- COUNTED, being a repair the notes declare (Wouter,
+# 2026-09-25); any other difference from the source, a count only.
 
 _DELIV_ANCHORS = ('footnoteReference', 'endnoteReference', 'commentReference',
                   'commentRangeStart', 'commentRangeEnd')
@@ -1166,6 +1182,18 @@ _DELIV_SIMILAR = 0.60
 _DELIV_REBASE = 0.90
 _DELIV_ZWSP = '​'
 _DELIV_DONE = object()                             # a pending entry the rebase settled
+_DELIV_FOLD = str.maketrans('（）［］｛｝【】〔〕', '()[]{}[][]')
+
+
+def _deliv_brackets(text):
+    """Counts of ( ) [ ] { } in `text`, full-width and CJK lenticular forms
+    folded, so a translation that swaps the form is no bracket change."""
+    t = (text or '').translate(_DELIV_FOLD)
+    return tuple(t.count(c) for c in '()[]{}')
+
+
+def _deliv_unbalanced(c):
+    return c[0] != c[1] or c[2] != c[3] or c[4] != c[5]
 
 
 def _deliv_readings(root):
@@ -1205,8 +1233,8 @@ def _deliv_segments(entry):
     """([(type, text)], reject_expressible) as the notes declare them, or
     (None, False) when the entry declares nothing. A plain `en` is one regular
     segment; an `en_deleted` beside it cannot express a reject reading."""
-    def clean(s):
-        return (s or '').replace('\t', '').replace('\n', '')
+    def clean(s):                                  # a declared U+200B is scaffolding
+        return (s or '').replace('\t', '').replace('\n', '').replace(_DELIV_ZWSP, '')
     segs = entry.get('en_segments')
     if isinstance(segs, list) and segs and all(isinstance(s, dict) for s in segs):
         return [(s.get('type'), clean(s.get('en'))) for s in segs], True
@@ -1319,7 +1347,8 @@ def _deliv_rebase(segs, before, after):
 
 
 def _deliv_journal_map(journal_path):
-    """before -> after for every paragraph record in the journal, or ({}, why)."""
+    """before -> after for every paragraph record in the journal, U+200B-free
+    as the text comparison is, or ({}, why)."""
     if not journal_path:
         return {}, 'no journal given'
     try:
@@ -1331,8 +1360,10 @@ def _deliv_journal_map(journal_path):
     for stage in data.get('stages', []):
         for rec in stage.get('paragraphs', []):
             b, a = rec.get('before'), rec.get('after')
-            if isinstance(b, str) and isinstance(a, str) and b != a:
-                mapping[b] = a
+            if isinstance(b, str) and isinstance(a, str):
+                b, a = b.replace(_DELIV_ZWSP, ''), a.replace(_DELIV_ZWSP, '')
+                if b != a:
+                    mapping[b] = a
     return mapping, f"read, schema {data.get('schema', '?')}, {len(mapping)} record(s)"
 
 
@@ -1460,7 +1491,9 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                               JOURNAL_NAME)
         journal = beside if os.path.isfile(beside) else None
     jmap, jnote = _deliv_journal_map(journal)
-    got = _deliv_readings(root)
+    raw, zw = _deliv_readings(root), _DELIV_ZWSP
+    got = [(i, m.replace(zw, ''), a.replace(zw, ''), r.replace(zw, '')) for i, m, a, r in raw]
+    got = [g for g in got if g[1].strip()]
     # ONE POOL, KEYED BY ALL THREE READINGS, so a match consumes exactly one
     # delivered paragraph. Two separate tallies -- one of texts, one of reading
     # pairs -- can each be satisfied by a DIFFERENT paragraph for one entry.
@@ -1473,11 +1506,14 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
         for key in by_mixed.get(mixed, ()):
             if remaining[key] > 0 and acc in (None, key[1]) and rej in (None, key[2]):
                 remaining[key] -= 1
-                return True
-        return False
+                return key
+        return None
 
     findings, counts, undeclared = [], Counter(), 0
     pending = []
+    # (idx, declared as the notes have it, source text, delivered readings,
+    # declared readings as compared) for every entry given a delivered partner.
+    paired = []
     for ji, entry in enumerate(entries if isinstance(entries, list) else []):
         segs, rej_ok = _deliv_segments(entry) if isinstance(entry, dict) else (None, False)
         decl = _deliv_join(segs, rej_ok) if segs is not None else None
@@ -1492,10 +1528,12 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
             mixed = jmap[mixed]
         if seen:
             acc = rej = None                       # the journal records mixed only
-        if take(mixed, acc, rej):
+        key = take(mixed, acc, rej)
+        if key:
             counts['exact'] += 1
+            paired.append((idx, decl, entry.get('text'), key, (mixed, acc, rej)))
         else:
-            pending.append([idx, mixed, acc, rej, entry.get('text'), segs, rej_ok, bool(seen)])
+            pending.append([idx, mixed, acc, rej, entry.get('text'), segs, rej_ok, bool(seen), decl])
     # THE JOURNAL, REBASED -- defect (b). A pending declaration the exact-text
     # lookup missed is tried against every journal chain whose last `after` is a
     # delivered paragraph still unclaimed and whose first `before` is within
@@ -1537,8 +1575,10 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
             continue
         rebased += 1
         m2, a2, r2 = _deliv_join(new, rej_ok)
-        if take(m2, a2, r2):
+        key = take(m2, a2, r2)
+        if key:
             counts['exact'] += 1
+            paired.append((p[0], p[8], p[4], key, (m2, a2, r2)))
             p[0] = _DELIV_DONE
         else:
             p[1], p[2], p[3], p[5] = m2, a2, r2, new
@@ -1547,7 +1587,7 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
         jnote += f'; rebased onto {rebased} declaration(s) apply had already changed'
     left = [list(key) for key, n in remaining.items() for _ in range(n)]
     ws = re.compile(r'\s+')
-    for idx, mixed, acc, rej, source, segs, _rej_ok, _j in pending:
+    for idx, mixed, acc, rej, source, segs, _rej_ok, _j, decl0 in pending:
         cls, shape, best = 'missing', '', None
         # THE COLLAPSE -- defect (a). Judged by the two readings, never the
         # mixed string, and only for a declaration apply's own criterion says
@@ -1559,6 +1599,7 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                     break
             if best is not None:
                 left.remove(best)
+                paired.append((idx, decl0, source, tuple(best), (mixed, acc, rej)))
                 counts['collapsed'] += 1
                 continue
         for cand in left:
@@ -1587,6 +1628,7 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                 best = None
         if best is not None:
             left.remove(best)
+            paired.append((idx, decl0, source, tuple(best), (mixed, acc, rej)))
             if cls == 'edge-space':
                 shape = _deliv_edge(mixed, best[0])
         counts[cls] += 1
@@ -1604,7 +1646,7 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                          'declared_len': len(mixed),
                          'delivered_len': len(best[0]) if best else 0,
                          'blocking': ruling is None, 'ruling': ruling})
-    anchors = []
+    anchors, oroot = [], None
     if original:
         try:
             oroot = body_root(original)
@@ -1623,6 +1665,53 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                                  'declared_len': o, 'delivered_len': d,
                                  'blocking': True, 'ruling': None})
                 counts['anchor-lost' if d < o else 'anchor-gained'] += 1
+    # U+200B (C8): one finding per delivered paragraph whose readings carry
+    # one, attributed to the declaration that claimed its text.
+    claim, ztot = {}, Counter()
+    for p in paired:
+        claim.setdefault(tuple(p[3]), []).append(p[0])
+    for _i, m, a, r in raw:
+        za, zr = a.count(zw), r.count(zw)
+        if za or zr:
+            ztot.update(accept=za, reject=zr, paragraphs=1)
+            key = (m.replace(zw, ''), a.replace(zw, ''), r.replace(zw, ''))
+            owners = claim.get(key)
+            findings.append({'idx': owners.pop(0) if owners else None, 'class': 'zwsp',
+                             'shape': '+'.join(n for n, c in (('acc', za), ('rej', zr)) if c),
+                             'declared_len': len(key[0]), 'delivered_len': len(m),
+                             'blocking': True, 'ruling': None,
+                             'note': f'U+200B accept {za} reject {zr}'})
+    # BRACKETS, per paired paragraph -- see the block comment above.
+    src, bk, bc, unb = {}, Counter(), _deliv_brackets, _deliv_unbalanced
+    if oroot is not None:
+        sread = {i: (a, r) for i, _m, a, r in _deliv_readings(oroot)}
+        for i, text in _completeness_para_texts(oroot):
+            if i in sread:
+                src.setdefault(text, sread[i])
+    for idx, (_dm, da, dr), source, (m, a, r), (pm, pa, pr) in paired:
+        base = {'idx': idx, 'class': 'bracket', 'declared_len': len(pm), 'delivered_len': len(m)}
+        sides = [(n, w, g) for n, w, g in (('acc', pa, a), ('rej', pr, r)) if w is not None]
+        diff = [n for n, w, g in (sides or [('mixed', pm, m)]) if bc(w) != bc(g)]
+        if diff:
+            bk['declared'] += 1
+            findings.append(dict(base, shape='declared:' + '+'.join(diff), blocking=True, ruling=None))
+        if oroot is None:
+            continue
+        s = src.get((source or '').strip())
+        if s is None:
+            bk['no_source'] += 1
+            continue
+        bk['paired'] += 1
+        sa, sr = s
+        lost = [n for n, g, v in (('acc', a, sa), ('rej', r, sr)) if unb(bc(g)) and not unb(bc(v))]
+        if lost:
+            bk['unbalanced'] += 1
+            findings.append(dict(base, shape='unbalanced:' + '+'.join(lost), blocking=True, ruling=None))
+        if bc(sa) == bc(da) and dr is not None and bc(sr) != bc(dr):
+            bk['a15'] += 1
+            findings.append(dict(base, shape='source:rej', blocking=False, ruling='a15-signature'))
+        elif bc(sa) != bc(da) or (dr is not None and bc(sr) != bc(dr)):
+            bk['other'] += 1
     examined = sum(counts[c] for c in counts if not c.startswith('anchor'))
     blockers = [f for f in findings if f['blocking']]
     counted = len(findings) - len(blockers)
@@ -1636,10 +1725,18 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
     print('  ' + '  '.join(f'{c}={counts[c]}' for c in
                            ('exact', 'collapsed', 'edge-space', 'inner-space', 'readings',
                             'changed', 'missing', 'anchor-lost', 'anchor-gained')))
+    print(f"  U+200B in a delivered reading: accept {ztot['accept']}, reject {ztot['reject']}, "
+          f"in {ztot['paragraphs']} paragraph(s) - each a finding (C8); a declared one is "
+          'scaffolding, dropped before the text comparison')
+    print(f"  brackets ( ) [ ] {{ }}, full-width folded: declared vs delivered {bk['declared']}"
+          + (f"; against the source ({bk['paired']} paired, {bk['no_source']} not found): "
+             f"unbalanced where it balances {bk['unbalanced']}, A15's signature {bk['a15']} "
+             f"(counted), other differences {bk['other']} (a count only)" if oroot is not None
+             else '; the original NOT GIVEN - the source-relative arms did not run'))
     print(f'  counted, never blocking: {counted}'
           + (' (' + '  '.join(f'{k}={v}' for k, v in sorted(by_ruling.items())) + ')'
              if counted else '')
-          + '  - edge whitespace under Wouter\'s rulings of 2026-09-24')
+          + '  - Wouter\'s rulings: edge whitespace 2026-09-24, A15\'s signature 2026-09-25')
     for a in anchors:
         mark = '' if a['original'] == a['delivered'] else '   <- differs'
         print(f"  anchor {a['anchor']:<18} original {a['original']:>4}  "
@@ -1649,13 +1746,18 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
         print(f"  {'FINDING' if f['blocking'] else 'COUNTED'}  {where:<10} "
               f"{f['class']:<13} {f['shape']:<17} "
               f"declared {f['declared_len']}  delivered {f['delivered_len']}"
-              + (f"  [{f['ruling']}]" if f['ruling'] else ''))
+              + (f"  [{f['ruling']}]" if f['ruling'] else '')
+              + (f"  {f['note']}" if f.get('note') else ''))
     if report_json:
         with open(report_json, 'wb') as fh:
             fh.write((json.dumps({'examined': examined, 'undeclared': undeclared,
                                   'delivered_paragraphs': len(got),
                                   'unclaimed_delivered': len(left), 'journal': jnote,
                                   'counts': dict(counts), 'anchors': anchors,
+                                  'zwsp': {k: ztot[k] for k in ('accept', 'reject', 'paragraphs')},
+                                  'brackets': dict({k: bk[k] for k in ('declared', 'paired', 'no_source',
+                                                                     'unbalanced', 'a15', 'other')},
+                                                   source_relative=oroot is not None),
                                   'blocking': len(blockers), 'counted': counted,
                                   'findings': findings}, indent=1) + '\n').encode('utf-8'))
     if examined == 0 or not got:
@@ -1705,10 +1807,12 @@ def main():
                     help='Compare the DELIVERED .docx (or its document.xml) '
                          'against what paragraphs.json declares, character for '
                          'character in both tracked-change readings, with the '
-                         'change journal applied. Registers C1 and C18.')
+                         'change journal applied, plus any U+200B and bracket '
+                         'changes. Registers C1, C18 and C8.')
     ap.add_argument('--original', metavar='ORIGINAL_DOCX', default=None,
                     help='With --delivered: count footnote, endnote and comment '
-                         'anchors against this original (A1, A2).')
+                         'anchors against this original (A1, A2), and judge '
+                         'brackets against its paragraphs.')
     ap.add_argument('--journal', metavar='JOURNAL_JSON', default=None,
                     help='With --delivered: the change journal to apply. '
                          'Default: post_process_journal.json beside the notes.')

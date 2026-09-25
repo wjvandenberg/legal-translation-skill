@@ -23,6 +23,16 @@ TWO ARMS, STATED BEFORE MEASURING (Wouter, 2026-09-24):
       matched source and the frozen notes, post_process with its journal, then the reorder --
       and every finding printed for a person to explain against a register row.
 
+SLICE 2a (2026-09-25) ADDS, STATED BEFORE MEASURING (PLAN-2-step-b.md section 3.2):
+  (a) J1's U+200B at the register's own counts, in the ACCEPT reading -- D01 7, D02 5, D10 11,
+      D11 48, D03B 1 -- and none on any other document; D03B 12 the one declared-vs-delivered
+      bracket finding; A15's signature at D08 29 and 39 alone, COUNTED; no delivered reading
+      unbalanced where its source's balances; 23 other differences from the source, a count.
+  (b) --ref REF: NO DELIVERED BYTE MOVES. The chain -- apply, post_process, reorder, repack --
+      runs with REF's scripts and with the working tree's, and every output (document.xml, the
+      journal, every member of the repacked .docx, by content) and every exit code is compared.
+      A REF whose scripts equal the working tree's is a self-comparison and VOID, never a pass.
+
 WHAT IT NEVER PRINTS: a filename, a path below the logs root, or any document text. Doc-ids,
 paragraph indices, classes and lengths only (CLAUDE.md 5.6). Nothing is written into the logs
 folder: every input is copied into a temporary directory first.
@@ -30,8 +40,10 @@ folder: every input is copied into a temporary directory first.
     uv run --with lxml python tools/delivered_corpus_arm.py              # both arms, uk
     uv run --with lxml python tools/delivered_corpus_arm.py --variant us
     uv run --with lxml python tools/delivered_corpus_arm.py --arm a      # one arm
+    uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref 3654842 --doc D02 --doc D03
 """
 import argparse
+import hashlib
 import io
 import json
 import os
@@ -59,6 +71,8 @@ ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1", PYTHONDONTWRITE
 ap = argparse.ArgumentParser()
 ap.add_argument("--variant", choices=("uk", "us"), default="uk")
 ap.add_argument("--arm", choices=("a", "b", "both"), default="both")
+ap.add_argument("--doc", action="append", help="limit to these corpus doc-ids (run in batches)")
+ap.add_argument("--ref", default=None, help="arm (b): also rebuild with this commit's scripts, compare bytes")
 args = ap.parse_args()
 SCRIPTS = ROOT / args.variant / "scripts"
 TMP = Path(tempfile.mkdtemp(prefix="b11-delivered-"))
@@ -145,8 +159,57 @@ NAMED = [
                 f"original/delivered {anchor(r, 'footnoteReference')}")),
 ]
 OUT_OF_REACH = [("B3 and A15", "D08", "repaired before delivery by moving the brackets out of the "
-                 "tracked change IN THE NOTES, so declared and delivered agree; slice 2's bracket "
-                 "inventory against the SOURCE owns it")]
+                 "tracked change IN THE NOTES, so declared and delivered agree; slice 2a's bracket "
+                 "inventory against the SOURCE owns it -- A15's signature, below")]
+
+# SLICE 2a's EXPECTATIONS. Each names the documents it needs and is VOID, never passed, when a
+# --doc subset leaves one out. J1's counts are the register's, in the accept reading.
+J1 = {"D01": 7, "D02": 5, "D10": 11, "D11": 48, "D03B": 1}
+ALL_DOCS = ("D01", "D02", "D03", "D03B", "D04", "D05", "D06", "D07", "D08", "D09", "D10", "D11")
+
+
+def did_of(key):
+    return key.split("#")[0]
+
+
+def per_doc(reports, fn):
+    out = defaultdict(list)
+    for key, (rep, _) in reports.items():
+        out[did_of(key)].append(fn(rep))
+    return dict(sorted(out.items()))
+
+
+def zacc(rep):
+    return (rep.get("zwsp") or {}).get("accept")
+
+
+def bidx(rep, prefix):
+    return sorted(f["idx"] for f in rep["findings"] if f["class"] == "bracket" and f["shape"].startswith(prefix))
+
+
+def brk(rep, k):
+    return (rep.get("brackets") or {}).get(k, 0)
+
+
+NAMED_2A = [
+    ("J1", tuple(J1), "U+200B at the register's counts, accept reading, on each of its five documents",
+     lambda R: (all(n in per_doc(R, zacc).get(d, []) for d, n in J1.items()), f"accept counts {per_doc(R, zacc)}")),
+    ("J1", ALL_DOCS, "TRUE NEGATIVE: no U+200B on any other document",
+     lambda R: (all(set(v) == {0} for d, v in per_doc(R, zacc).items() if d not in J1), f"{per_doc(R, zacc)}")),
+    ("D03B 12", ALL_DOCS, "the ONE declared-vs-delivered bracket finding in the corpus",
+     lambda R: ({d: v for d, v in per_doc(R, lambda r: bidx(r, "declared:")).items() if any(v)}
+                == {"D03B": [[12]]}, f"{per_doc(R, lambda r: bidx(r, 'declared:'))}")),
+    ("A15", ALL_DOCS, "A15's signature at D08 29 and 39 alone, COUNTED and never blocking",
+     lambda R: ({d: v for d, v in per_doc(R, lambda r: bidx(r, "source:")).items() if any(v)} == {"D08": [[29, 39]]}
+                and all(not f["blocking"] for rep, _ in R.values() for f in rep["findings"]
+                        if f["class"] == "bracket" and f["shape"].startswith("source:")),
+                f"{per_doc(R, lambda r: bidx(r, 'source:'))}")),
+    ("brackets", ALL_DOCS, "no delivered reading unbalanced where its source's balances (the naive test: 15)",
+     lambda R: (sum(brk(rep, "unbalanced") for rep, _ in R.values()) == 0,
+                f"{per_doc(R, lambda r: brk(r, 'unbalanced'))}")),
+    ("brackets", ALL_DOCS, "23 other differences from the source, a count only",
+     lambda R: (sum(brk(rep, "other") for rep, _ in R.values()) == 23, f"{per_doc(R, lambda r: brk(r, 'other'))}")),
+]
 
 
 def corpus_dirs():
@@ -254,6 +317,11 @@ def summarise(did, rep, rc):
     # predates the ruling has no such field, and says so rather than reading as zero.
     print(f"        blocking {rep.get('blocking', 'n/a — pre-ruling report')}  "
           f"counted {rep.get('counted', 'n/a — pre-ruling report')}")
+    z, b = rep.get("zwsp"), rep.get("brackets")
+    print(f"        U+200B accept {z['accept']} reject {z['reject']} in {z['paragraphs']} paragraph(s) · "
+          f"brackets declared {b['declared']} unbalanced {b['unbalanced']} a15 {b['a15']} other {b['other']} "
+          f"(paired {b['paired']}, no source {b['no_source']})" if z and b
+          else "        U+200B / brackets: n/a — a report written before slice 2a")
     if shapes:
         print("        " + "  ".join(f"{k}={v}" for k, v in sorted(shapes.items())))
     for a in rep.get("anchors", []):
@@ -276,13 +344,111 @@ if not LOGS.is_dir():
     sys.exit(2)
 workdirs = sorted({p.parent for p in LOGS.rglob("paragraphs.json")})
 CORPUS = corpus_dirs()
-print(f"  frozen workdirs enumerated: {len(workdirs)} · corpus folder(s) reachable: {len(CORPUS)}")
+print(f"  frozen workdirs enumerated: {len(workdirs)} · corpus folder(s) reachable: {len(CORPUS)}"
+      + (f" · limited to {' '.join(args.doc)}" if args.doc else ""))
+
+REFTREE, BYTES = None, {}
+# WHICH GATE STOPPED REPACK, by the fixed text of its own refusal -- a label is printed, never
+# repack's output, which can quote the document.
+REPACK_GATES = (("lexicon", "lexicon_compliance.py --stage pre-repack returned exit code"),
+                ("validate_apply", "validate_apply.py --strict (post-modification check) returned exit code"),
+                ("glossary", "and --glossary was not supplied"),
+                ("headers/footers", "original (untranslated) headers/footers"),
+                ("integrity", "failed its own integrity checks"))
+INPUTS = ("paragraphs.json", ".validate-state.json", "comments_translations.json",
+          "headers_footers.json", "_boldmap.json")
+if args.ref and args.arm in ("b", "both"):
+    REFTREE = TMP / "ref_scripts"
+    prefix = f"{args.variant}/scripts/"
+    names = run(["git", "ls-tree", "-r", "--name-only", args.ref, prefix]).stdout.split()
+    for name in names:
+        dest = REFTREE / name[len(prefix):]
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(subprocess.run(["git", "show", f"{args.ref}:{name}"], capture_output=True,
+                                        cwd=str(ROOT), check=True).stdout)
+    here = sorted(str(p.relative_to(SCRIPTS)).replace("\\", "/") for p in SCRIPTS.rglob("*.py"))
+    same = [r for r in here if (REFTREE / r).is_file() and (REFTREE / r).read_bytes() == (SCRIPTS / r).read_bytes()]
+    print(f"  --ref {args.ref}: {len(names)} file(s) at the ref · {len(here) - len(same)} of {len(here)} "
+          f"script(s) differ from the working tree")
+    if len(same) == len(here) and len(names) == len(here):
+        void("the byte comparison", f"{args.ref}'s scripts equal the working tree's — a self-comparison")
+        REFTREE = None
+
+
+def side_parts(wd, d):
+    """repack's side-part flags, from the translated parts the July run kept in final/word -- the
+    same bytes for both trees, so the chain reaches a .docx. A glossary part the original carries
+    and the run did not keep is passed AS THE ORIGINAL'S, the keep-as-is decision repack's own help
+    names. The body is today's; only the side parts are July's."""
+    fw, out = wd / "final" / "word", []
+    hf = sorted(p for p in fw.glob("*.xml") if re.match(r"(header|footer)\d+\.xml$", p.name)) if fw.is_dir() else []
+    if hf:
+        (d / "hf" / "word").mkdir(parents=True, exist_ok=True)     # repack reads <dir>/word/headerN.xml
+        for p in hf:
+            shutil.copyfile(p, d / "hf" / "word" / p.name)
+        out += ["--headers-footers-dir", str(d / "hf")]
+    for flag, name in (("--comments", "comments.xml"), ("--footnotes", "footnotes.xml"),
+                       ("--endnotes", "endnotes.xml"), ("--numbering", "numbering.xml")):
+        if (fw / name).is_file():
+            shutil.copyfile(fw / name, d / name)
+            out += [flag, str(d / name)]
+    gl = d / "glossary.xml"
+    if (fw / "glossary" / "document.xml").is_file():
+        shutil.copyfile(fw / "glossary" / "document.xml", gl)
+    else:
+        with zipfile.ZipFile(d / "src.docx") as z:
+            if "word/glossary/document.xml" in z.namelist():
+                gl.write_bytes(z.read("word/glossary/document.xml"))
+    return out + (["--glossary", str(gl)] if gl.is_file() else [])
+
+
+def chain(scripts_dir, d, src, wd):
+    """apply -> post_process -> reorder -> repack in d, inputs copied from wd. Keeps a copy of the
+    reordered XML (the check's input, as in slice 1) before repack runs. Returns (rcs, pp)."""
+    (d / "final" / "word").mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(src, d / "src.docx")
+    for name in INPUTS:
+        if (wd / name).is_file():
+            shutil.copyfile(wd / name, d / name)
+    xml, py = d / "final" / "word" / "document.xml", ["uv", "run", "--with", "lxml", "python"]
+    rcs = {"apply": run(py + [str(scripts_dir / "apply_translations_textmatch.py"), str(d / "src.docx"),
+                              str(d / "paragraphs.json"), str(xml)]).returncode}
+    if not xml.is_file():
+        return rcs, None
+    pp = run(py + [str(scripts_dir / "post_process.py"), str(xml), "--fix", "--variant", args.variant], timeout=900)
+    rcs["post_process"] = pp.returncode
+    rcs["reorder"] = run(py + [str(scripts_dir / "reorder_definitions.py"), "--doc", str(xml)], timeout=900).returncode
+    shutil.copyfile(xml, d / "checked.xml")
+    rp = run(py + [str(scripts_dir / "repack_docx.py"), str(d / "src.docx"), str(xml),
+                   str(d / "delivered.docx"), "--paragraphs", str(d / "paragraphs.json")]
+             + side_parts(wd, d), timeout=900)
+    out = (rp.stdout or "") + (rp.stderr or "")
+    rcs["repack"] = rp.returncode
+    rcs["repack_gate"] = next((label for label, marker in REPACK_GATES if marker in out),
+                              "none" if rp.returncode == 0 else "unrecognised")
+    return rcs, pp
+
+
+def digest(d):
+    """Every output by content: the XML, the journal, each member of the repacked .docx."""
+    out = {rel: (hashlib.sha256((d / rel).read_bytes()).hexdigest() if (d / rel).is_file() else None)
+           for rel in ("final/word/document.xml", "checked.xml", "post_process_journal.json")}
+    if (d / "delivered.docx").is_file():
+        with zipfile.ZipFile(d / "delivered.docx") as z:
+            for name in sorted(z.namelist()):
+                out["docx:" + name] = hashlib.sha256(z.read(name)).hexdigest()
+    else:
+        out["docx"] = None
+    return out
+
 
 reports_a, reports_b = {}, {}
 for n, wd in enumerate(workdirs, 1):
     ids = DOC_ID.findall(str(wd.relative_to(LOGS)))
     did = ids[-1] if ids else f"D??{n}"
     key = did if did not in reports_a and did not in reports_b else f"{did}#{n}"
+    if args.doc and did not in args.doc:
+        continue
     try:
         notes = json.loads((wd / "paragraphs.json").read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
@@ -310,31 +476,26 @@ for n, wd in enumerate(workdirs, 1):
             void(f"(b) {key}", f"no source matched (best {frac:.0%})")
             continue
         b = TMP / f"b{n:02d}"
-        (b / "final" / "word").mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(src, b / "src.docx")
-        for name in ("paragraphs.json", ".validate-state.json", "comments_translations.json",
-                     "headers_footers.json", "_boldmap.json"):
-            if (wd / name).is_file():
-                shutil.copyfile(wd / name, b / name)
-        xml = b / "final" / "word" / "document.xml"
-        r = run(["uv", "run", "--with", "lxml", "python", str(SCRIPTS / "apply_translations_textmatch.py"),
-                 str(b / "src.docx"), str(b / "paragraphs.json"), str(xml)])
-        if not xml.is_file():
-            void(f"(b) {key}", f"apply produced no output (rc={r.returncode})")
+        rcs, pp = chain(SCRIPTS, b, src, wd)
+        if pp is None:
+            void(f"(b) {key}", f"apply produced no output (rc={rcs['apply']})")
             continue
-        pp = run(["uv", "run", "--with", "lxml", "python", str(SCRIPTS / "post_process.py"),
-                  str(xml), "--fix", "--variant", args.variant], timeout=900)
         gate = pp.returncode != 0 and "SKILL GATE FIRED" in (pp.stdout or "") + (pp.stderr or "")
-        ro = run(["uv", "run", "--with", "lxml", "python", str(SCRIPTS / "reorder_definitions.py"),
-                  "--doc", str(xml)], timeout=900)
+        if REFTREE is not None:
+            rb = TMP / f"r{n:02d}"
+            rrcs, _ = chain(REFTREE, rb, src, wd)
+            dn, dr = digest(b), digest(rb)
+            BYTES[key] = (rrcs == rcs, sorted(k for k in set(dn) | set(dr) if dn.get(k) != dr.get(k)),
+                          len(dn), rcs, rrcs)
+            shutil.rmtree(rb, ignore_errors=True)
         journal = b / "post_process_journal.json"
-        rep, rc = delivered_check(b / "paragraphs.json", xml, b / "src.docx",
+        rep, rc = delivered_check(b / "paragraphs.json", b / "checked.xml", b / "src.docx",
                                   journal if journal.is_file() else None, f"b{n:02d}")
         if rep is None:
             void(f"(b) {key}", f"the check wrote no report (rc={rc})")
         else:
             rep["_steps"] = (f"post_process rc={pp.returncode}{' (drift gate fired)' if gate else ''}, "
-                             f"reorder rc={ro.returncode}")
+                             f"reorder rc={rcs['reorder']}, repack rc={rcs['repack']}")
             rep["_edges"] = edge_vs_source(rep, notes)
             reports_b[key] = (rep, rc)
 
@@ -357,6 +518,17 @@ if args.arm in ("a", "both"):
             print(f"        {detail}")
     for row, did, why in OUT_OF_REACH:
         print(f"  N/A  {row} on {did}: NOT VISIBLE TO SLICE 1 BY CONSTRUCTION — {why}")
+    print("\n  SLICE 2a — U+200B AND BRACKETS, pinned to documents:")
+    present = {did_of(k) for k in reports_a}
+    for row, needs, what, test in NAMED_2A:
+        missing = [d for d in needs if d not in present]
+        if missing:
+            void(f"{row}: {what}", f"needs {' '.join(missing)}, not in this run")
+            continue
+        passed, detail = test(reports_a)
+        ok(f"{row}: {what}", bool(passed), detail)
+        if passed:
+            print(f"        {detail}")
     print(f"\n  examined {len(reports_a)} of {len(workdirs)} workdirs")
 
 if args.arm in ("b", "both"):
@@ -385,6 +557,16 @@ if args.arm in ("b", "both"):
                            else f"{f['class']}/{f['shape']}")
     for key in by_doc:
         print(f"    {key:6} {' '.join(by_doc[key])}")
+    print("  U+200B / BRACKETS IN ALL: " + "  ".join(
+        f"{k}={sum((rep.get(g) or {}).get(k, 0) for rep, _ in reports_b.values())}"
+        for g, ks in (("zwsp", ("accept", "reject", "paragraphs")),
+                      ("brackets", ("declared", "unbalanced", "a15", "other"))) for k in ks))
+    if REFTREE is not None:
+        print(f"\n  NO DELIVERED BYTE MOVES — the chain run with {args.ref}'s scripts and the working tree's:")
+        for key, (same_rc, moved, nparts, rcs, rrcs) in BYTES.items():
+            ok(f"{key}: {nparts} output(s) identical by content, every exit code equal {rcs}",
+               same_rc and not moved, f"moved {moved}; exit codes now {rcs}, at the ref {rrcs}")
+        print(f"  compared {len(BYTES)} of {len(reports_b)} rebuilt workdirs")
 
 shutil.rmtree(TMP, ignore_errors=True)
 print("\n" + "=" * 96)

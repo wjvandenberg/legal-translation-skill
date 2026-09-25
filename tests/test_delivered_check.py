@@ -37,6 +37,16 @@ built in a temporary directory; nothing is read from the corpus. What each arm a
      changed is REBASED onto the declaration, so what is left is apply's own change, judged as
      usual -- counted when a ruling covers it, blocking when not -- and an edit that lands where
      apply changed the text cannot turn a real difference into a pass.
+ 19  SLICE 2a, U+200B (C8): a declared U+200B is scaffolding, so a delivery without it is EXACT;
+     any U+200B in either DELIVERED reading is one finding per paragraph, class zwsp, never a
+     text finding as well -- declared or not, in deleted text only, or in a paragraph nothing
+     else claims -- while one that REPLACED a visible space is still a lost space too.
+ 20  SLICE 2a, BRACKETS ( ) [ ] { }, full-width folded: declared against delivered in each
+     reading is a finding; a delivered reading unbalanced where the SAME reading of the SOURCE
+     balances is a finding, and quiet where the source is unbalanced too (the naive test's false
+     alarm); A15's signature -- accept as the source, the reject reading's brackets changed -- is
+     COUNTED; any other difference from the source is a count only; with no original the
+     source-relative arms say they did not run.
 
     uv run --with lxml python tests/test_delivered_check.py
     uv run --with lxml python tests/test_delivered_check.py --variant us
@@ -137,7 +147,7 @@ def en(i, s):
 
 A, B, C = "The Parties agree as follows.", "Each notice shall be in writing.", "That that is so."
 print("=" * 88)
-print(f"BRANCH 11 SLICE 1 — validate_apply --delivered on synthetic input  [{SCRIPT.parent.parent.name}]")
+print(f"BRANCH 11 SLICES 1 AND 2a — validate_apply --delivered on synthetic input  [{SCRIPT.parent.parent.name}]")
 print("=" * 88)
 
 print("\n1  clean")
@@ -352,8 +362,10 @@ ok("...but the same collapse with a space LOST still BLOCKS",
 noop_plain = dict(noop, en_segments=[dict(s, en=s["en"].replace(Z, "")) for s in noop["en_segments"]])
 r, rep = case("collapse-zwsp", [noop_plain, en(1, B)],
               [para("The Parties ", "agree" + Z, " as follows."), para(B)], strict=True)
-ok("...and a delivered reading that GAINS a U+200B still BLOCKS — J1 is not the collapse",
-   blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
+ok("...and a delivered reading that GAINS a U+200B still BLOCKS — J1 is not the collapse, and "
+   "since slice 2a the finding is the U+200B assertion's (C8), not the text comparison's",
+   blocks_once(rep, r) and [f["class"] for f in blocking(rep)] == ["zwsp"],
+   f"rc={r.returncode} {rep and rep['findings']}")
 
 swap = {"idx": 0, "text": "source 0", "en": "ab cd ef",
         "en_segments": [{"type": "regular", "en": "ab "}, {"type": "ins", "en": "cd"},
@@ -399,6 +411,134 @@ r, rep = case("rebase-overlap", [en(0, "The colour is red."), en(1, B)], [para("
               journal=jr("The colur is red.", "The color is red."), strict=True)
 ok("an edit landing where apply changed the text cannot turn a real difference into a pass — BLOCKS",
    blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
+
+print("\n19  slice 2a, U+200B (C8): a declared one is scaffolding; any in a DELIVERED reading is a finding")
+
+
+def zw(rep):
+    return (rep or {}).get("zwsp") or {}
+
+
+def shapes(rep):
+    return sorted((f["idx"] if f["idx"] is not None else -1, f["class"], f["shape"]) for f in findings(rep))
+
+
+zdecl = {"idx": 0, "text": "source 0", "en": "Sign" + Z + " here."}
+r, rep = case("zw-scaffold", [zdecl, en(1, B)], [para("Sign here."), para(B)], strict=True)
+ok("a declared U+200B the delivery drops is scaffolding — both EXACT, no finding, --strict exits 0",
+   rep is not None and not rep["findings"] and rep["counts"].get("exact") == 2 and r.returncode == 0,
+   f"rc={r.returncode} {rep and (rep['counts'], rep['findings'])}")
+
+r, rep = case("zw-survived", [zdecl, en(1, B)], [para("Sign" + Z + " here."), para(B)], strict=True)
+ok("a declared U+200B that SURVIVES is ONE finding, zwsp / acc+rej, and no text finding beside it",
+   shapes(rep) == [(0, "zwsp", "acc+rej")] and rep["counts"].get("exact") == 2, str(rep and rep["findings"]))
+ok("...counted per reading in the report — accept 1, reject 1, in 1 paragraph",
+   zw(rep) == {"accept": 1, "reject": 1, "paragraphs": 1}, str(zw(rep)))
+ok("...and --strict exits 1", r.returncode == 1, f"rc={r.returncode}")
+
+r, rep = case("zw-arrived", [en(0, "Sign here."), en(1, B)], [para("Sign" + Z + " here."), para(B)])
+ok("an UNDECLARED U+200B that arrives is the same one finding — J1's shape, not a text finding",
+   shapes(rep) == [(0, "zwsp", "acc+rej")], str(rep and rep["findings"]))
+
+r, rep = case("zw-glued", [en(0, "Sign here."), en(1, B)], [para("Sign" + Z + "here."), para(B)])
+ok("a U+200B that REPLACED a visible space is still a lost space — CHANGED / space beside the zwsp finding",
+   shapes(rep) == [(0, "changed", "space"), (0, "zwsp", "acc+rej")], str(rep and rep["findings"]))
+
+zdel = {"idx": 0, "text": "source 0", "en": "Sign here now",
+        "en_segments": [{"type": "regular", "en": "Sign here"}, {"type": "del", "en": " now"}]}
+r, rep = case("zw-deleted", [zdel, en(1, B)], [para("Sign here", ("del", " now" + Z)), para(B)])
+ok("a U+200B in DELETED text only is a finding in the reject reading alone — zwsp / rej",
+   shapes(rep) == [(0, "zwsp", "rej")] and zw(rep).get("accept") == 0 and zw(rep).get("reject") == 1,
+   str(rep and (rep["findings"], zw(rep))))
+
+r, rep = case("zw-alone", [en(0, A), en(1, B)], [para(A), para(Z), para(B)])
+ok("a delivered paragraph holding NOTHING BUT U+200B, which no declaration claims, is still a finding",
+   shapes(rep) == [(-1, "zwsp", "acc+rej")], str(rep and rep["findings"]))
+
+canary_z = "Quuxbarzan"
+r, rep = case("zw-canary", [en(0, canary_z + " here."), en(1, B)], [para(canary_z + Z + " here."), para(B)])
+ok("the U+200B finding is reported and none of its paragraph's text is printed",
+   shapes(rep) == [(0, "zwsp", "acc+rej")] and canary_z not in (r.stdout + r.stderr), r.stdout[-300:])
+
+print("\n20  slice 2a, brackets ( ) [ ] { }, full-width folded: against the declaration and the SOURCE")
+
+
+def br(rep):
+    return (rep or {}).get("brackets") or {}
+
+
+def src_en(i, src, s):
+    return {"idx": i, "text": src, "en": s}
+
+
+def brs(rep):
+    return [(f["idx"], f["shape"]) for f in findings(rep, "bracket")]
+
+
+r, rep = case("br-decl", [en(0, "Pay (the fee) now."), en(1, B)], [para("Pay (the fee now."), para(B)])
+ok("a bracket lost between declaration and delivery is a FINDING — bracket / declared:acc+rej",
+   brs(rep) == [(0, "declared:acc+rej")] and len(findings(rep, "changed", "punctuation")) == 1,
+   str(rep and rep["findings"]))
+ok("...and with no ORIGINAL the report says the source-relative arms did NOT run",
+   br(rep).get("source_relative") is False and "source-relative arms did not run" in r.stdout, str(br(rep)))
+
+tcb = {"idx": 0, "text": "source 0", "en": "Pay the fee now.",
+       "en_segments": [{"type": "regular", "en": "Pay "}, {"type": "del", "en": "[the fee]"},
+                       {"type": "ins", "en": "the fee"}, {"type": "regular", "en": " now."}]}
+r, rep = case("br-decl-rej", [tcb, en(1, B)], [para("Pay ", ("del", "the fee"), ("ins", "the fee"), " now."),
+                                               para(B)])
+ok("brackets lost from the DELETED text alone are bracket / declared:rej",
+   brs(rep) == [(0, "declared:rej")], str(rep and rep["findings"]))
+
+r, rep = case("br-fold", [en(0, "Pay （the fee） now."), en(1, B)], [para("Pay (the fee) now."), para(B)])
+ok("full-width brackets FOLD: （ ） delivered as ( ) is no bracket finding, only slice 1's text finding",
+   brs(rep) == [] and len(findings(rep, "changed")) == 1 and br(rep).get("declared") == 0,
+   str(rep and (rep["findings"], br(rep))))
+r, rep = case("br-fold-lost", [en(0, "Pay （the fee） now."), en(1, B)], [para("Pay （the fee now."), para(B)])
+ok("...while a full-width bracket LOST is one", brs(rep) == [(0, "declared:acc+rej")], str(rep and rep["findings"]))
+
+ORIG1 = para("source 1")
+r, rep = case("br-unbal", [src_en(0, "Zdroj (a)", "Source (a"), en(1, B)], [para("Source (a"), para(B)],
+              original=[para("Zdroj (a)"), ORIG1], strict=True)
+ok("a delivery unbalanced where its SOURCE balances is a FINDING — bracket / unbalanced:acc+rej — "
+   "though declared and delivered agree", brs(rep) == [(0, "unbalanced:acc+rej")] and r.returncode == 1,
+   f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("br-naive", [src_en(0, "Zdroj a) b", "Source a) b"), en(1, B)], [para("Source a) b"), para(B)],
+              original=[para("Zdroj a) b"), ORIG1], strict=True)
+ok("...and QUIET where the source is unbalanced the same way (a list marker a) — the naive test's alarm)",
+   rep is not None and not rep["findings"] and br(rep).get("paired") == 2 and r.returncode == 0,
+   f"rc={r.returncode} {rep and (rep['findings'], br(rep))}")
+
+r, rep = case("br-per-reading", [src_en(0, "Zdroj (a)", "Source (a"), en(1, B)], [para("Source (a"), para(B)],
+              original=[para("Zdroj (a", ("ins", ")")), ORIG1])
+ok("each reading is judged against the SAME reading of the source — unbalanced:acc alone, the source's "
+   "reject reading being unbalanced too", brs(rep) == [(0, "unbalanced:acc")], str(rep and rep["findings"]))
+
+A15_SRC = para("do ", ("del", "["), "1 maja", ("del", "]"), ".")
+r, rep = case("br-a15", [src_en(0, "do 1 maja.", "until 1 May."), en(1, B)], [para("until 1 May."), para(B)],
+              original=[A15_SRC, ORIG1], strict=True)
+ok("A15's signature — accept as the source, the REJECT reading's brackets gone — is COUNTED, never blocking",
+   [(f["idx"], f["shape"], f["blocking"], f["ruling"]) for f in findings(rep, "bracket")]
+   == [(0, "source:rej", False, "a15-signature")] and blocking(rep) == [] and rep.get("counted") == 1
+   and br(rep).get("a15") == 1 and r.returncode == 0, f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("br-other", [src_en(0, "do (1 maja).", "until 1 May."), en(1, B)], [para("until 1 May."), para(B)],
+              original=[para("do ", ("del", "["), "(1 maja)", ("del", "]"), "."), ORIG1], strict=True)
+ok("...but with the ACCEPT reading differing from the source too it is not A15's: a count only, no finding",
+   rep is not None and not rep["findings"] and br(rep).get("other") == 1 and br(rep).get("a15") == 0
+   and r.returncode == 0, f"rc={r.returncode} {rep and (rep['findings'], br(rep))}")
+
+r, rep = case("br-clean", [src_en(0, "Zdroj (a) [b] {c}", "Source (a) [b] {c}"), en(1, B)],
+              [para("Source (a) [b] {c}"), para(B)], original=[para("Zdroj (a) [b] {c}"), ORIG1], strict=True)
+ok("balanced brackets as the source has them are QUIET — and both paragraphs were paired with a source",
+   rep is not None and not rep["findings"] and br(rep).get("paired") == 2 and br(rep).get("other") == 0
+   and r.returncode == 0, f"rc={r.returncode} {rep and (rep['findings'], br(rep))}")
+
+r, rep = case("br-nosrc", [src_en(0, "Zdroj (a)", "Source (a"), en(1, B)], [para("Source (a"), para(B)],
+              original=[para("Inny tekst"), ORIG1])
+ok("a paragraph whose source text the ORIGINAL lacks is counted unpaired, never judged against another",
+   brs(rep) == [] and br(rep).get("no_source") == 1 and br(rep).get("paired") == 1, str(rep and br(rep)))
 
 shutil.rmtree(TMP, ignore_errors=True)
 print("\n" + "=" * 88)

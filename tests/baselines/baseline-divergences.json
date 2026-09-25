@@ -51,9 +51,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice1-widen-and-defects",
-   "commit_subject": "Branch 11 slice 1 - the widened ruling and the check's two defects: 17 blocking of 129, every one real, still report-only (I-27, I-28)",
-   "sha256_now": "d62570e9a85ab19613ba1c6367c03462cee5df95fc01904c6c421112a46c02ac"
+   "changed_by": "feature/branch11-slice2a-zwsp-brackets",
+   "commit_subject": "Branch 11 slice 2a - the delivered check sees U+200B and brackets, reading only: J1 at the register's counts, A15 counted, no delivered byte moved (C8)",
+   "sha256_now": "f0cec6d2f0c72ade725673796d436e31d191c27c21781b713fdaa1912ee3ef0b"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -141,9 +141,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice1-widen-and-defects",
-   "commit_subject": "Branch 11 slice 1 - the widened ruling and the check's two defects: 17 blocking of 129, every one real, still report-only (I-27, I-28)",
-   "sha256_now": "a39653b171e58bc16a23efc67310225918295c8628d0fb17bd1dd4948570a30c"
+   "changed_by": "feature/branch11-slice2a-zwsp-brackets",
+   "commit_subject": "Branch 11 slice 2a - the delivered check sees U+200B and brackets, reading only: J1 at the register's counts, A15 counted, no delivered byte moved (C8)",
+   "sha256_now": "63451ccb8f6deadbb99f9eab5d8df5659090fbba17b3bfa5e91ed586ccf992ad"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
