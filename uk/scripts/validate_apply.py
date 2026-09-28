@@ -1462,6 +1462,468 @@ def _deliv_lead_counted(source, shape, acc, rej, cand):
     return ((acc is None or trimmed(acc, a)) and (rej is None or trimmed(rej, r)))
 
 
+# SLICE 3a, 2026-09-28 -- THE SIDE PARTS: C6, C19's glossary, the reference half
+# of A1 and A2, B10's orphans, and how the side-part scripts treat a tracked
+# deletion. With --original and a delivered .docx, every part of the ORIGINAL
+# but the body that carries letters -- in a w:p, or in DrawingML text where no
+# w:p is -- is found by GLOB and paired with the delivery's part of that name.
+# C6 is why: an operator who skipped Step 8 shipped foreign side-part text with
+# exit 0 on seven deliveries, and quality_check --aux-dir, reading only the
+# files the operator produced, could see none of it.
+#
+# EACH KIND IS READ WITH THE READER OF THE SCRIPT THAT WRITES IT, so one text
+# contract serves both sides:
+#   headers and footers -- translate_headers_footers.py's own field-aware text,
+#     each scaffold entry at its p_idx (the key --apply writes by) and by text
+#     anywhere in the part, the two reported apart. A field placeholder such as
+#     <<PAGE>> is not prose, so the letter test strips it first: an earlier
+#     probe and this slice's own instrument both read a page-number footer as
+#     untranslated text before that was known.
+#   comments -- translate_comments.py's contract, per id: every w:t of the
+#     comment concatenated, as the reviewer reads it. Its own function is NOT
+#     used, deliberately: parse_source_comments is a regex over the raw XML and
+#     returns character data still escaped, so it misread the script's own
+#     correct output on D02's comment 150, whose English carries a '>'. And
+#     its --list shows the operator that escaped form -- so a declaration that
+#     IS the source once unescaped is a keep, copied as Step 8c says, and the
+#     script escaping it a second time is then a finding (moved).
+#   footnotes, endnotes, the glossary -- against the SOURCE only: no script
+#     writes them and no declaration exists for them yet (slice 3b adds one).
+# The header/footer reader is imported only when this arm runs, and a partial
+# install that lacks it is a NAMED finding, never a silent skip.
+#
+# THE RULE, Wouter's, 2026-09-25 (4): a letter-bearing side paragraph delivered
+# in the source's own words is a FINDING unless a declaration keeps it -- a
+# scaffold entry whose en is null, empty or the text; a comment whose en is the
+# text. BOTH READINGS: the accept reading against the declaration, the deleted
+# text against the source's -- kept in the source's words where nothing
+# declared the paragraph kept, or emptied, each a finding. References BY ID in
+# every part: a footnote, endnote or comment held and pointed at by nothing
+# (orphaned), or pointed at and held by nothing (dangling), is a finding where
+# the original has no such defect of its own. A multi-paragraph comment
+# delivered with fewer paragraphs is COUNTED, never blocking (Wouter, 2026-09-25
+# (4)); its fix is slice 4's. Like the body arm it prints part names, ids,
+# classes and lengths, never document text.
+
+_SIDE_FIELD = re.compile(r'<<[A-Z][A-Z0-9_]*>>')
+_SIDE_A = 'http://schemas.openxmlformats.org/drawingml/2006/main'
+_SIDE_SEP = ('separator', 'continuationSeparator', 'continuationNotice')
+_SIDE_KINDS = (('header', re.compile(r'word/header\d*\.xml$')),
+               ('footer', re.compile(r'word/footer\d*\.xml$')),
+               ('comments', re.compile(r'word/comments\.xml$')),
+               ('footnotes', re.compile(r'word/footnotes\.xml$')),
+               ('endnotes', re.compile(r'word/endnotes\.xml$')),
+               ('glossary', re.compile(r'word/glossary/document\.xml$')))
+_SIDE_REFS = (('footnote', 'footnoteReference', 'word/footnotes.xml'),
+              ('endnote', 'endnoteReference', 'word/endnotes.xml'),
+              ('comment', 'commentReference', 'word/comments.xml'))
+_SIDE_DECL = ('headers_footers.json', 'comments_translations.json')
+_SIDE_ENTITY = re.compile(r'&(amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);')
+_SIDE_NAMED = {'amp': '&', 'lt': '<', 'gt': '>', 'quot': '"', 'apos': "'"}
+
+
+def _side_unescape(text):
+    """XML character data as a regex over the raw XML leaves it -- the form
+    translate_comments.py --list shows the operator -- unescaped."""
+    def one(m):
+        e = m.group(1)
+        if e in _SIDE_NAMED:
+            return _SIDE_NAMED[e]
+        try:
+            return chr(int(e[2:], 16) if e[1] in 'xX' else int(e[1:]))
+        except (ValueError, OverflowError):
+            return m.group(0)
+    return _SIDE_ENTITY.sub(one, text)
+
+
+def _side_comment_text(el):
+    """translate_comments.py's contract: every w:t of the comment, in order."""
+    return ''.join(t.text or '' for t in el.iter(f'{{{W}}}t'))
+
+
+def _side_letters(text):
+    return bool(_COMPLETENESS_LETTER.search(text or ''))
+
+
+def _side_kind(name):
+    return next((k for k, rx in _SIDE_KINDS if rx.match(name)), None)
+
+
+def _side_id_key(x):
+    return (len(str(x)), str(x))
+
+
+def _side_readings(p):
+    """(accept, reject, deleted) of ONE paragraph, extraction's contract: text in
+    document order, a plain line break a newline, a tab nothing; its own text
+    only, never a nested paragraph's."""
+    p_tag, ins_tag, del_tag = f'{{{W}}}p', f'{{{W}}}ins', f'{{{W}}}del'
+    dt_tag, br_tag = f'{{{W}}}delText', f'{{{W}}}br'
+    acc, rej, dl = [], [], []
+    for el in p.iter(f'{{{W}}}t', dt_tag, br_tag):
+        up, ins, dele = el.getparent(), False, False
+        while up is not None and up is not p and up.tag != p_tag:
+            ins = ins or up.tag == ins_tag
+            dele = dele or up.tag == del_tag
+            up = up.getparent()
+        if up is not p:
+            continue
+        if el.tag == br_tag:
+            if el.get(f'{{{W}}}type', '') == 'page':
+                continue
+            text = '\n'
+        else:
+            text = el.text or ''
+        if el.tag == dt_tag or dele:
+            rej.append(text)
+            if el.tag == dt_tag:
+                dl.append(text)
+        else:
+            acc.append(text)
+            if not ins:
+                rej.append(text)
+    return ''.join(acc), ''.join(rej), ''.join(dl)
+
+
+def _side_box(el):
+    """(accept, reject, deleted, paragraphs carrying text) of a comment or a note."""
+    ps = [_side_readings(p) for p in el.iter(f'{{{W}}}p')]
+    return (''.join(a for a, _r, _d in ps), ''.join(r for _a, r, _d in ps),
+            ''.join(d for _a, _r, d in ps), sum(1 for a, r, _d in ps if a.strip() or r.strip()))
+
+
+def _side_members(path):
+    """{member: bytes} for every word/ XML part, plus the set of every name."""
+    with zipfile.ZipFile(path) as zf:
+        names = set(zf.namelist())
+        return {n: zf.read(n) for n in names if n.startswith('word/') and n.endswith('.xml')}, names
+
+
+def _side_parser(members):
+    cache = {}
+
+    def get(name):
+        if name not in cache:
+            try:
+                cache[name] = etree.fromstring(members[name]) if name in members else None
+            except etree.XMLSyntaxError:
+                cache[name] = 'unreadable'
+        return cache[name]
+    return get
+
+
+def _side_text_parts(members, parse):
+    """C6's population: {part: 'wp' | 'drawingml' | 'unreadable'} for every word/
+    part but the body that carries letters. Found by glob, never from a list."""
+    out = {}
+    for name in sorted(members):
+        if name == 'word/document.xml':
+            continue
+        root = parse(name)
+        if isinstance(root, str):
+            out[name] = 'unreadable'
+        elif root is None:
+            continue
+        elif any(_side_letters(''.join(_side_readings(p)[:2])) for p in root.iter(f'{{{W}}}p')):
+            out[name] = 'wp'
+        elif any(_side_letters(t.text) for t in root.iter(f'{{{_SIDE_A}}}t')):
+            out[name] = 'drawingml'
+    return out
+
+
+def _side_refs(members, parse):
+    """{kind: (held, orphaned, dangling)} by id, over every word/ part."""
+    referenced = defaultdict(set)
+    for name in members:
+        if b'Reference' not in members[name]:
+            continue
+        root = parse(name)
+        if isinstance(root, etree._Element):
+            for kind, tag, _part in _SIDE_REFS:
+                referenced[kind].update(el.get(f'{{{W}}}id') for el in root.iter(f'{{{W}}}{tag}'))
+    out = {}
+    for kind, _tag, part in _SIDE_REFS:
+        root = parse(part)
+        held = set()
+        if isinstance(root, etree._Element):
+            held = {el.get(f'{{{W}}}id') for el in root.iter(f'{{{W}}}{kind}')
+                    if el.get(f'{{{W}}}type', '') not in _SIDE_SEP}
+        out[kind] = (held, held - referenced[kind], referenced[kind] - held)
+    return out
+
+
+def _side_hf_reader():
+    """The header/footer script's own field-aware reader -- the text its
+    --extract writes into the scaffold -- or None. Imported here, when this arm
+    runs, and not at the top of the file, so no other mode depends on it."""
+    try:
+        import translate_headers_footers as thf
+    except ImportError:
+        return None
+
+    def read(p):
+        text, _fields, has_fields = thf._field_aware_text_and_fields(p)
+        return text if has_fields else thf._para_text(p)
+    return read
+
+
+def check_sides(delivered, original, notes_dir):
+    """The side-part arm: (summary, findings, lines to print)."""
+    from collections import Counter
+    summary, findings, lines = {'read': False}, [], []
+
+    def add(cls, shape, part, ident, want='', got='', blocking=True, ruling=None):
+        findings.append({'idx': None, 'class': cls, 'shape': shape, 'part': part, 'id': ident,
+                         'declared_len': len(want or ''), 'delivered_len': len(got or ''),
+                         'blocking': blocking, 'ruling': ruling})
+
+    if not original:
+        summary['why'] = 'no original given - the side parts need one'
+    elif str(delivered).lower().endswith('.xml'):
+        summary['why'] = 'the delivery given is a document.xml, not a .docx - it holds no side part'
+    if 'why' in summary:
+        lines.append(f"  side parts: NOT READ - {summary['why']}")
+        return summary, findings, lines
+    try:
+        om, onames = _side_members(original)
+        dm, dnames = _side_members(delivered)
+    except (OSError, KeyError, zipfile.BadZipFile) as exc:
+        summary['why'] = f'an archive member would not read ({type(exc).__name__})'
+        add('side-part', 'unreadable', None, None)
+        lines.append(f"  side parts: NOT READ - {summary['why']}")
+        return summary, findings, lines
+    op, dp = _side_parser(om), _side_parser(dm)
+    summary['read'] = True
+    decl = {}
+    for name, shape in zip(_SIDE_DECL, (list, dict)):
+        path = os.path.join(notes_dir, name)
+        if not os.path.isfile(path):
+            decl[name] = None
+            continue
+        try:
+            with open(path, 'r', encoding='utf-8') as fh:
+                decl[name] = json.load(fh)
+        except (OSError, ValueError):
+            decl[name] = 'unreadable'
+            add('side-decl', 'unreadable', None, name)
+            continue
+        if not isinstance(decl[name], shape):         # never read as no declaration
+            decl[name] = 'unreadable'
+            add('side-decl', 'wrong-shape', None, name)
+    summary['declarations'] = {n: (v if v in (None, 'unreadable') else len(v)) for n, v in decl.items()}
+    hf_read = _side_hf_reader()
+    if hf_read is None:
+        add('side-reader', 'unavailable', None, 'headers/footers')
+
+    # PARTS (C6). A part missing is reported here and nowhere else.
+    otp, dtp = _side_text_parts(om, op), _side_text_parts(dm, dp)
+    summary['parts'] = {n: _side_kind(n) or how for n, how in otp.items()}
+    missing = sorted(n for n in otp if n not in dnames)
+    summary['missing'] = missing
+    summary['added'] = sorted(n for n in dtp if n not in otp)
+    for name, how in otp.items():
+        if how == 'unreadable' or dtp.get(name) == 'unreadable':
+            add('side-part', 'unreadable', name, None)
+        elif name in missing:
+            add('side-part', 'missing', name, None)
+        elif _side_kind(name) is None and dm.get(name) == om.get(name):
+            add('side-part', 'kept-source', name, None)
+    counts = {k: Counter() for k in ('hf', 'comments', 'footnotes', 'endnotes', 'glossary')}
+
+    # HEADERS AND FOOTERS, every one the original has, at each entry's p_idx.
+    if hf_read is not None:
+        hfd = decl[_SIDE_DECL[0]]
+        entries = defaultdict(dict)
+        for e in hfd if isinstance(hfd, list) else ():
+            if (isinstance(e, dict) and e.get('kind') != 'graphic_metadata'
+                    and isinstance(e.get('source'), str)):
+                entries[e['source']][e.get('p_idx')] = e
+        tally, used = counts['hf'], set()
+        for name in sorted(n for n in om if _side_kind(n) in ('header', 'footer')):
+            o, d = op(name), dp(name)
+            if not isinstance(o, etree._Element) or not isinstance(d, etree._Element):
+                continue
+            ops, dps = list(o.iter(f'{{{W}}}p')), list(d.iter(f'{{{W}}}p'))
+            if len(ops) != len(dps):
+                add('side-hf', 'paragraphs', name, None, str(len(ops)), str(len(dps)))
+            dtexts = [hf_read(q) for q in dps]
+            for i, p in enumerate(ops):
+                src, (_sa, _sr, sdel) = hf_read(p), _side_readings(p)
+                got = dtexts[i] if i < len(dps) else None
+                gdel = _side_readings(dps[i])[2] if i < len(dps) else ''
+                e, before = entries.get(name, {}).get(i), len(findings)
+                if e is not None:
+                    used.add((name, i))
+                kept = False
+                if e is None:
+                    if not _side_letters(_SIDE_FIELD.sub('', src)):
+                        if src.strip():
+                            tally['undeclared, no letters'] += 1
+                    elif got == src:
+                        add('side-hf', 'undeclared-kept', name, i, src, got)
+                    else:
+                        tally['undeclared, changed'] += 1
+                else:
+                    if (e.get('text') or '') != src:
+                        add('side-hf', 'misaligned', name, i, e.get('text'), src)
+                    en = e.get('en')
+                    kept = en is None or not str(en).strip() or str(en) == e.get('text')
+                    if kept:
+                        tally['null kept' if en is None or not str(en).strip() else 'verbatim kept'] += 1
+                        if got != src:
+                            add('side-hf', 'moved', name, i, src, got)
+                    elif got == str(en):
+                        tally['filled exact'] += 1
+                    elif str(en) in dtexts:
+                        add('side-hf', 'elsewhere', name, i, str(en), got)
+                    elif got == src:
+                        add('side-hf', 'declared-source', name, i, str(en), got)
+                    else:
+                        add('side-hf', 'other', name, i, str(en), got)
+                if _side_letters(sdel) and len(findings) == before and not kept:
+                    if gdel == sdel:
+                        add('side-hf', 'deleted-kept', name, i, sdel, gdel)
+                    elif not _side_letters(gdel):
+                        add('side-hf', 'deleted-emptied', name, i, sdel, gdel)
+        # An entry that matched no paragraph -- a stale scaffold, a p_idx past the
+        # end, a part neither file holds -- is said, never dropped. A part already
+        # reported missing is not reported again.
+        for source, by_idx in sorted(entries.items()):
+            if source in missing:
+                continue
+            for pi in sorted(by_idx, key=str):
+                if (source, pi) not in used:
+                    add('side-hf', 'unmatched', source, pi)
+
+    # COMMENTS, per id, under the comment script's contract.
+    cname = 'word/comments.xml'
+    if isinstance(op(cname), etree._Element) and cname not in missing:
+        cmd = decl[_SIDE_DECL[1]]
+        cmd = {str(k): v for k, v in cmd.items()} if isinstance(cmd, dict) else {}
+        dr = dp(cname)
+        ocm = list(op(cname).iter(f'{{{W}}}comment'))
+        dcm = list(dr.iter(f'{{{W}}}comment')) if isinstance(dr, etree._Element) else []
+        osrc = {el.get(f'{{{W}}}id'): _side_comment_text(el) for el in ocm}
+        dsrc = {el.get(f'{{{W}}}id'): _side_comment_text(el) for el in dcm}
+        obox = {el.get(f'{{{W}}}id'): _side_box(el) for el in ocm}
+        dbox = {el.get(f'{{{W}}}id'): _side_box(el) for el in dcm}
+        tally = counts['comments']
+        for cid, text in osrc.items():
+            _oa, _or, odel, on = obox.get(cid, ('', '', '', 0))
+            if not _side_letters(text) and not _side_letters(odel):
+                tally['no letters'] += 1
+                continue
+            if cid not in dsrc:
+                add('side-comment', 'lost', cname, cid, text, '')
+                continue
+            got, (_da, _dr, ddel, dn) = dsrc[cid], dbox.get(cid, ('', '', '', 0))
+            en, before, kept = cmd.get(cid), len(findings), False
+            if isinstance(en, str):
+                kept = en == text or _side_unescape(en) == text
+                if kept:
+                    tally['declared kept'] += 1
+                    if got != text:
+                        add('side-comment', 'moved', cname, cid, text, got)
+                elif got == en:
+                    tally['declared exact'] += 1
+                elif got == text:
+                    add('side-comment', 'declared-source', cname, cid, en, got)
+                else:
+                    add('side-comment', 'other', cname, cid, en, got)
+            elif _side_letters(text):
+                if got == text:
+                    add('side-comment', 'undeclared-kept', cname, cid, text, got)
+                else:
+                    tally['undeclared, changed'] += 1
+            if _side_letters(odel) and len(findings) == before:
+                if not _side_letters(ddel):
+                    add('side-comment', 'deleted-emptied', cname, cid, odel, ddel)
+                elif ddel == odel and not kept:
+                    add('side-comment', 'deleted-kept', cname, cid, odel, ddel)
+            if on > 1 and dn < on:
+                add('side-comment', 'flattened', cname, cid, str(on), str(dn),
+                    blocking=False, ruling='flattened-comment')
+        tally['added'] += len(set(dsrc) - set(osrc))
+
+    # FOOTNOTES AND ENDNOTES, per id, against the SOURCE; the separators are
+    # structure, not text.
+    for kind, _tag, part in _SIDE_REFS[:2]:
+        o, d = op(part), dp(part)
+        if not isinstance(o, etree._Element) or part in missing:
+            continue
+        ob = {el.get(f'{{{W}}}id'): _side_box(el) for el in o.iter(f'{{{W}}}{kind}')
+              if el.get(f'{{{W}}}type', '') not in _SIDE_SEP}
+        db = ({el.get(f'{{{W}}}id'): _side_box(el) for el in d.iter(f'{{{W}}}{kind}')
+               if el.get(f'{{{W}}}type', '') not in _SIDE_SEP} if isinstance(d, etree._Element) else {})
+        tally = counts[kind + 's']
+        for nid, (oa, orr, odel, _n) in ob.items():
+            if not _side_letters(oa + orr):
+                tally['no letters'] += 1
+                continue
+            if nid not in db:
+                add(f'side-{kind}', 'lost', part, nid, oa, '')
+                continue
+            da, drr, ddel, _dn = db[nid]
+            if (da, drr) == (oa, orr):
+                add(f'side-{kind}', 'kept-source', part, nid, oa, da)
+            elif not _side_letters(da + drr):
+                add(f'side-{kind}', 'emptied', part, nid, oa, da)
+            else:
+                tally['changed'] += 1
+                if _side_letters(odel) and ddel == odel:
+                    add(f'side-{kind}', 'deleted-kept', part, nid, odel, ddel)
+                elif _side_letters(odel) and not _side_letters(ddel):
+                    add(f'side-{kind}', 'deleted-emptied', part, nid, odel, ddel)
+        tally['added'] += len(set(db) - set(ob))
+
+    # THE GLOSSARY, paragraph by paragraph, against the SOURCE.
+    gname = 'word/glossary/document.xml'
+    o, d = op(gname), dp(gname)
+    if isinstance(o, etree._Element) and isinstance(d, etree._Element):
+        ops = [_side_readings(p)[:2] for p in o.iter(f'{{{W}}}p')]
+        dps = [_side_readings(p)[:2] for p in d.iter(f'{{{W}}}p')]
+        if len(ops) != len(dps):
+            add('side-glossary', 'paragraphs', gname, None, str(len(ops)), str(len(dps)))
+        for i, (a, r) in enumerate(ops):
+            if not _side_letters(a + r):
+                continue
+            if i < len(dps) and dps[i] == (a, r):
+                add('side-glossary', 'kept-source', gname, i, a, dps[i][0])
+            else:
+                counts['glossary']['changed'] += 1
+
+    # REFERENCES BY ID, in the original and in the delivery.
+    oref, dref = _side_refs(om, op), _side_refs(dm, dp)
+    summary['refs'] = {}
+    for kind, _tag, _part in _SIDE_REFS:
+        (oh, oo, odg), (dh, do, ddg) = oref[kind], dref[kind]
+        summary['refs'][kind] = {'held': [len(oh), len(dh)],
+                                 'orphaned': [sorted(oo, key=_side_id_key), sorted(do, key=_side_id_key)],
+                                 'dangling': [sorted(odg, key=_side_id_key), sorted(ddg, key=_side_id_key)]}
+        for ident in sorted(do - oo, key=_side_id_key):
+            add('side-ref', f'{kind}:orphaned', None, ident)
+        for ident in sorted(ddg - odg, key=_side_id_key):
+            add('side-ref', f'{kind}:dangling', None, ident)
+    summary['counts'] = {k: dict(v) for k, v in counts.items()}
+
+    kinds = Counter(summary['parts'].values())
+    lines.append(f"  side parts: read against the original - {len(otp)} text-bearing "
+                 + (' '.join(f'{k} {v}' for k, v in sorted(kinds.items())) or 'none')
+                 + f"; missing {len(missing)}; declarations beside the notes: "
+                 + ', '.join(f"{n} {'absent' if v is None else v}"
+                             for n, v in summary['declarations'].items()))
+    for label, key in (('headers/footers', 'hf'), ('comments', 'comments'), ('footnotes', 'footnotes'),
+                       ('endnotes', 'endnotes'), ('glossary', 'glossary')):
+        if counts[key]:
+            lines.append(f'    {label}: ' + '  '.join(f'{k} {v}' for k, v in sorted(counts[key].items())))
+    for kind, r in summary['refs'].items():
+        if r['held'] != [0, 0] or r['dangling'] != [[], []]:
+            lines.append(f"    references {kind}: held {r['held'][0]} -> {r['held'][1]}, orphaned "
+                         f"{len(r['orphaned'][0])} -> {len(r['orphaned'][1])}, dangling "
+                         f"{len(r['dangling'][0])} -> {len(r['dangling'][1])}")
+    return summary, findings, lines
+
+
 def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                     strict=False, report_json=None):
     """Compare the DELIVERED document against what was declared, and its
@@ -1712,6 +2174,10 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
             findings.append(dict(base, shape='source:rej', blocking=False, ruling='a15-signature'))
         elif bc(sa) != bc(da) or (dr is not None and bc(sr) != bc(dr)):
             bk['other'] += 1
+    # THE SIDE PARTS (slice 3a) -- see the block comment above check_sides.
+    side_summary, side_findings, side_lines = check_sides(
+        delivered, original, os.path.dirname(os.path.abspath(paragraphs_json)))
+    findings.extend(side_findings)
     examined = sum(counts[c] for c in counts if not c.startswith('anchor'))
     blockers = [f for f in findings if f['blocking']]
     counted = len(findings) - len(blockers)
@@ -1736,13 +2202,18 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
     print(f'  counted, never blocking: {counted}'
           + (' (' + '  '.join(f'{k}={v}' for k, v in sorted(by_ruling.items())) + ')'
              if counted else '')
-          + '  - Wouter\'s rulings: edge whitespace 2026-09-24, A15\'s signature 2026-09-25')
+          + '  - Wouter\'s rulings: edge whitespace 2026-09-24, A15\'s signature 2026-09-25, '
+          'flattened comments 2026-09-25 (4)')
     for a in anchors:
         mark = '' if a['original'] == a['delivered'] else '   <- differs'
         print(f"  anchor {a['anchor']:<18} original {a['original']:>4}  "
               f"delivered {a['delivered']:>4}{mark}")
+    for line in side_lines:
+        print(line)
     for f in findings:
-        where = f"idx={f['idx']}" if f['idx'] is not None else 'document'
+        where = (f"idx={f['idx']}" if f['idx'] is not None else
+                 f"{f.get('part') or ''}#{f['id']}" if f.get('id') is not None else
+                 f.get('part') or 'document')
         print(f"  {'FINDING' if f['blocking'] else 'COUNTED'}  {where:<10} "
               f"{f['class']:<13} {f['shape']:<17} "
               f"declared {f['declared_len']}  delivered {f['delivered_len']}"
@@ -1759,7 +2230,7 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                                                                      'unbalanced', 'a15', 'other')},
                                                    source_relative=oroot is not None),
                                   'blocking': len(blockers), 'counted': counted,
-                                  'findings': findings}, indent=1) + '\n').encode('utf-8'))
+                                  'sides': side_summary, 'findings': findings}, indent=1) + '\n').encode('utf-8'))
     if examined == 0 or not got:
         print('  VOID - nothing was examined, which is never the same as clean')
         return 3
@@ -1770,8 +2241,8 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
         return 1 if strict else 0
     print('  PASSED: every declared paragraph is in the delivered document, '
           'and every anchor the original has'
-          + (f' - {counted} edge-whitespace difference(s) counted, not blocking'
-             if counted else ''))
+          + (', and every side part it has' if side_summary['read'] else '')
+          + (f' - {counted} difference(s) counted, not blocking' if counted else ''))
     return 0
 
 
@@ -1808,11 +2279,14 @@ def main():
                          'against what paragraphs.json declares, character for '
                          'character in both tracked-change readings, with the '
                          'change journal applied, plus any U+200B and bracket '
-                         'changes. Registers C1, C18 and C8.')
+                         'changes. Registers C1, C18, C8 and C6.')
     ap.add_argument('--original', metavar='ORIGINAL_DOCX', default=None,
                     help='With --delivered: count footnote, endnote and comment '
-                         'anchors against this original (A1, A2), and judge '
-                         'brackets against its paragraphs.')
+                         'anchors against this original (A1, A2), judge '
+                         'brackets against its paragraphs, and, when the '
+                         'delivery is a .docx, read every side part it has '
+                         'against the delivery and the declarations beside '
+                         'the notes (C6).')
     ap.add_argument('--journal', metavar='JOURNAL_JSON', default=None,
                     help='With --delivered: the change journal to apply. '
                          'Default: post_process_journal.json beside the notes.')

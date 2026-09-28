@@ -54,6 +54,24 @@ handed to repack but the glossary it refuses to go without, and no declaration r
 and their pinned assertions do not run. PLAN-2-step-b.md section 3.2 holds what it found and the
 acceptance the build pins here.
 
+SLICE 3a (2026-09-28) PINS IT. `validate_apply.py --delivered --original` now has a side-part arm,
+and --sides runs it beside the measurement -- arm (a) on the July delivery .docx, arm (b) on the
+repacked one, its declarations beside the notes and, under --skip-step8, none -- and asserts the
+acceptance Wouter approved before the build (PLAN-2-step-b.md section 3.2):
+  (a) the July deliveries: D03B's glossary its only kept-source finding; orphaned comments D02 14
+      and D08 4 and D05's one orphaned footnote, by id; D09 none; the 10 filled and 7 null
+      header/footer entries and the 41 comment declarations no finding; D02's three flattened
+      comments COUNTED, ids 110 116 150.
+  (b) today's output: the side findings exactly D03B's glossary and D08's orphans 3 4 12; D02's
+      three counted where D02 reaches repack; every stopped document named, its side parts NOT
+      READ, never a pass.
+  (c) --skip-step8: a kept-as-source finding on every letter-bearing side paragraph, per document,
+      at the counts measured before the build; none on a page-number-only footer; nothing else but
+      D08's three orphans.
+A side finding is kept apart from the body's numbers everywhere below, so slice 1's totals mean
+what they meant. And --ref now asks for NO movement when the pin already carries slice 2b's scrub
+(`git merge-base --is-ancestor`), which is 3a's sense: the check only reads.
+
 WHAT IT NEVER PRINTS: a filename, a path below the logs root, or any document text. Doc-ids,
 paragraph indices, classes and lengths only (CLAUDE.md 5.6). Nothing is written into the logs
 folder: every input is copied into a temporary directory first.
@@ -334,18 +352,32 @@ def edge_vs_source(rep, notes):
     return tally
 
 
+def body_only(rep):
+    """The body's findings. Slice 3a's side findings are reported by --sides and kept out of every
+    body total here, so slice 1's and 2's numbers mean what they meant."""
+    return [f for f in rep["findings"] if not str(f["class"]).startswith("side-")]
+
+
+def side_only(rep, blocking=None):
+    return [f for f in rep["findings"] if str(f["class"]).startswith("side-")
+            and (blocking is None or f.get("blocking", True) == blocking)]
+
+
 def summarise(did, rep, rc):
     c = Counter(rep["counts"])
     shapes = Counter(f"{f['class']}/{f['shape']}" if f["shape"] else f["class"]
-                     for f in rep["findings"])
+                     for f in body_only(rep))
     print(f"  {did:5} examined {rep['examined']:4d}  exact {c['exact']:4d}  rc={rc}  "
           f"unclaimed-delivered {rep['unclaimed_delivered']:3d}  journal: {rep['journal']}")
     # WOUTER'S RULING, 2026-09-24: a trailing-whitespace loss the source shares is COUNTED and
     # never blocks. Printed per document, because a report that folded it into one total would
     # hide which documents carry anything that still blocks. A report written by a check that
     # predates the ruling has no such field, and says so rather than reading as zero.
-    print(f"        blocking {rep.get('blocking', 'n/a — pre-ruling report')}  "
-          f"counted {rep.get('counted', 'n/a — pre-ruling report')}")
+    sb, sc = len(side_only(rep, True)), len(side_only(rep, False))
+    print(f"        blocking {rep['blocking'] - sb if 'blocking' in rep else 'n/a — pre-ruling report'}  "
+          f"counted {rep['counted'] - sc if 'counted' in rep else 'n/a — pre-ruling report'}"
+          + (f"  · side parts, kept apart: {sb} blocking, {sc} counted (slice 3a; --sides reports them)"
+             if sb or sc else ""))
     z, b = rep.get("zwsp"), rep.get("brackets")
     print(f"        U+200B accept {z['accept']} reject {z['reject']} in {z['paragraphs']} paragraph(s) · "
           f"brackets declared {b['declared']} unbalanced {b['unbalanced']} a15 {b['a15']} other {b['other']} "
@@ -391,6 +423,14 @@ REPACK_GATES = (("lexicon", "lexicon_compliance.py --stage pre-repack returned e
 MOVE_2B = {"uk": {"D01": 2, "D02": 1, "D03B": 1, "D10": 1, "D11": 1},
            "us": {"D01": 2, "D03B": 1, "D11": 1}}
 STOP_2B = {"uk": {"D04", "D05"}, "us": {"D02", "D06", "D09", "D10"}}
+# SLICE 3a's SENSE OF --ref: a pin that already carries slice 2b's scrub (4d3d247) delivers no
+# U+200B, so NOTHING may move -- the check added since only reads. Settled by ancestry, never by
+# assuming it: a pin before 2b still asks for 2b's plan.
+SCRUB_2B = "4d3d247"
+
+
+def is_ancestor(a, b):
+    return run(["git", "merge-base", "--is-ancestor", a, b]).returncode == 0
 ZW = "​".encode("utf-8")
 ZREF = re.compile(rb"&#(?:0*8203|[xX]0*200[bB]);")
 
@@ -527,7 +567,9 @@ def compare(new, ref):
             removed += zcount(b)
         else:
             other.append(k)
-    carried = any(zcount(v) for k, v in ref.items() if k.startswith("docx:"))
+    # WHICH members carried one, not only whether any did: a U+200B is three bytes, and three bytes
+    # can occur in a binary member (an image, a font) by chance -- said, never folded into a bool.
+    carried = sorted(k[5:] for k, v in ref.items() if k.startswith("docx:") and zcount(v))
     return moved, removed, other, carried
 
 
@@ -886,6 +928,172 @@ def read_json(p):
         return "unreadable"
 
 
+# ==========================================================================================
+# SLICE 3a's PINS (2026-09-28) -- the acceptance Wouter approved before the build, PLAN-2-step-b.md
+# section 3.2, each number measured by the exploration above before any code was written. Per
+# DOCUMENT, so a --doc batch asserts what its own documents owe and a missing one is VOID. A value
+# that is a list pins the ids; an int, the count (a glossary paragraph index is not an id anyone
+# declared). The keys are (class, shape) of the check's BLOCKING side findings; nothing else may
+# appear.
+# ==========================================================================================
+SIDE_DECL = ("headers_footers.json", "comments_translations.json")
+CHK = {"a": {}, "b": {}}
+PIN_A = {"D02": {("side-ref", "comment:orphaned"): ["55", "56", "72", "73", "94", "101", "115", "124", "126",
+                                                     "146", "147", "150", "151", "152"]},
+         "D08": {("side-ref", "comment:orphaned"): ["0", "3", "4", "12"]},
+         "D05": {("side-ref", "footnote:orphaned"): ["1"]},
+         "D03B": {("side-glossary", "kept-source"): 2}}
+PIN_A_HF = {"D02": {"filled exact": 8, "verbatim kept": 4}, "D03": {"filled exact": 1},
+            "D03B": {"filled exact": 1}, "D04": {"verbatim kept": 1}, "D05": {"null kept": 1, "verbatim kept": 2},
+            "D06": {"verbatim kept": 1}, "D07": {"null kept": 5}, "D09": {"verbatim kept": 1},
+            "D11": {"null kept": 1}}
+PIN_A_CM = {"D02": {"declared exact": 27, "declared kept": 1}, "D08": {"declared kept": 13}}
+PIN_B = {"D03B": {("side-glossary", "kept-source"): 2},
+         "D08": {("side-ref", "comment:orphaned"): ["3", "4", "12"]}}
+FLAT = {"D02": ["110", "116", "150"]}
+PIN_C = {"uk": {"D02": 38, "D03": 3, "D03B": 3, "D07": 3, "D08": 13, "D09": 2},
+         "us": {"D03": 3, "D03B": 3, "D05": 3, "D07": 3, "D08": 13}}
+KEPT = {("side-hf", "undeclared-kept"), ("side-comment", "undeclared-kept"), ("side-footnote", "kept-source"),
+        ("side-endnote", "kept-source"), ("side-glossary", "kept-source"), ("side-part", "kept-source")}
+HF_KEYS = ("filled exact", "null kept", "verbatim kept")
+CM_KEYS = ("declared exact", "declared kept")
+
+
+def idkey(x):
+    return (len(str(x)), str(x))
+
+
+def side_groups(rep, blocking=True):
+    """{(class, shape): [id, ...]} of the check's side findings."""
+    out = defaultdict(list)
+    for f in side_only(rep, blocking):
+        out[(f["class"], f["shape"])].append(f.get("id"))
+    return {k: sorted(v, key=idkey) for k, v in out.items()}
+
+
+def side_lines(key, rep):
+    s = rep.get("sides") or {}
+    if not s.get("read"):
+        print(f"        THE CHECK (slice 3a): side parts NOT READ — {s.get('why')}")
+        return
+    blk, cnt = side_groups(rep, True), side_groups(rep, False)
+    print(f"        THE CHECK (slice 3a): {sum(map(len, blk.values()))} side finding(s), "
+          f"{sum(map(len, cnt.values()))} counted")
+    for tag, groups in (("FINDING", blk), ("COUNTED", cnt)):
+        for (c, sh), ids in sorted(groups.items()):
+            shown = [i for i in ids if i is not None]
+            print(f"          {tag} {c}/{sh} x{len(ids)}" + (f" ids {[str(i) for i in shown[:16]]}" if shown else ""))
+    for arm in ("hf", "comments"):
+        t = (s.get("counts") or {}).get(arm) or {}
+        if t:
+            print(f"          tally {arm}: " + "  ".join(f"{k} {v}" for k, v in sorted(t.items())))
+
+
+def side_match(got, want):
+    if set(got) != set(want):
+        return False
+    return all(len(got[k]) == v if isinstance(v, int) else got[k] == sorted(v, key=idkey) for k, v in want.items())
+
+
+def by_doc(chk):
+    out = defaultdict(list)
+    for key, rep in chk.items():
+        out[did_of(key)].append(rep)
+    return dict(sorted(out.items()))
+
+
+def merged(reps, blocking=True):
+    out = defaultdict(list)
+    for rep in reps:
+        for k, v in side_groups(rep, blocking).items():
+            out[k] += v
+    return {k: sorted(v, key=idkey) for k, v in out.items()}
+
+
+def tallies(reps, arm, keys):
+    t = Counter()
+    for rep in reps:
+        t.update(((rep.get("sides") or {}).get("counts") or {}).get(arm) or {})
+    return {k: t[k] for k in keys if t[k]}
+
+
+def flattened(reps):
+    return merged(reps, blocking=False).get(("side-comment", "flattened"), [])
+
+
+def pin_sides():
+    v = args.variant
+    if CHK["a"]:
+        print(f"\n  SLICE 3a — ARM (a), THE JULY DELIVERIES, PINNED  [{v}]")
+        docs = by_doc(CHK["a"])
+        ok(f"(a) the side parts of all {len(CHK['a'])} July deliveries were READ",
+           all((r.get("sides") or {}).get("read") for r in CHK["a"].values()))
+        for did, reps in docs.items():
+            want = PIN_A.get(did, {})
+            ok(f"(a) {did}: the side findings are exactly {want or 'none'}", side_match(merged(reps), want),
+               f"got {merged(reps)}")
+            ok(f"(a) {did}: header/footer entries {PIN_A_HF.get(did) or 'none'}, comment declarations "
+               f"{PIN_A_CM.get(did) or 'none'} — no finding among them",
+               tallies(reps, "hf", HF_KEYS) == PIN_A_HF.get(did, {})
+               and tallies(reps, "comments", CM_KEYS) == PIN_A_CM.get(did, {}),
+               f"hf {tallies(reps, 'hf', HF_KEYS)} comments {tallies(reps, 'comments', CM_KEYS)}")
+            ok(f"(a) {did}: flattened comments COUNTED {FLAT.get(did) or 'none'}, never blocking",
+               flattened(reps) == FLAT.get(did, []), f"got {flattened(reps)}")
+        if set(ALL_DOCS) <= set(docs):
+            hf = Counter()
+            cm = Counter()
+            for reps in docs.values():
+                hf.update(tallies(reps, "hf", HF_KEYS))
+                cm.update(tallies(reps, "comments", CM_KEYS))
+            ok(f"(a) in all: the 10 filled and 7 null header/footer entries, the 41 comment declarations "
+               f"({cm['declared exact']} translated + {cm['declared kept']} kept)",
+               hf["filled exact"] == 10 and hf["null kept"] == 7 and cm["declared exact"] + cm["declared kept"] == 41,
+               f"hf {dict(hf)} comments {dict(cm)}")
+        else:
+            void("(a) the corpus totals 10 / 7 / 41", "a --doc subset; each document's own pin ran above")
+    if CHK["b"]:
+        label = "(c) --skip-step8" if args.skip_step8 else "(b) today's output"
+        print(f"\n  SLICE 3a — {label.upper()}, PINNED  [{v}]")
+        docs = by_doc(CHK["b"])
+        stopped = {d for d, reps in docs.items() if any(r.get("_stopped") for r in reps)}
+        ok(f"{label}: repack STOPPED exactly where the plan says, of the documents in this run "
+           f"({sorted(STOP_2B[v] & set(docs)) or 'none'})", stopped == STOP_2B[v] & set(docs), f"stopped {sorted(stopped)}")
+        for did in sorted(stopped):
+            reps = docs[did]
+            ok(f"{label} {did}: STOPPED, its side parts NOT READ — named, never counted as a pass",
+               all(not (r.get("sides") or {}).get("read") for r in reps))
+        quiet = 0
+        for did, reps in docs.items():
+            if did in stopped:
+                continue
+            ok(f"{label} {did}: its side parts READ from the repacked .docx",
+               all((r.get("sides") or {}).get("read") for r in reps))
+            got = merged(reps)
+            if args.skip_step8:
+                kept = sum(len(ids) for k, ids in got.items() if k in KEPT)
+                rest = {k: ids for k, ids in got.items() if k not in KEPT}
+                ok(f"{label} {did}: {PIN_C[v].get(did, 0)} kept-as-source finding(s), one per letter-bearing "
+                   f"side paragraph", kept == PIN_C[v].get(did, 0), f"got {kept}: {sorted(k for k in got if k in KEPT)}")
+                want_rest = {k: w for k, w in PIN_B.get(did, {}).items() if k[0] == "side-ref"}
+                ok(f"{label} {did}: nothing else {'but ' + str(want_rest) if want_rest else ''}",
+                   side_match(rest, want_rest), f"got {rest}")
+                quiet += sum(((r.get("sides") or {}).get("counts") or {}).get("hf", {}).get("undeclared, no letters", 0)
+                             for r in reps)
+            else:
+                want = PIN_B.get(did, {})
+                ok(f"{label} {did}: the side findings are exactly {want or 'none'}", side_match(got, want),
+                   f"got {got}")
+                ok(f"{label} {did}: flattened comments COUNTED {FLAT.get(did) or 'none'}",
+                   flattened(reps) == FLAT.get(did, []), f"got {flattened(reps)}")
+        if args.skip_step8 and quiet:
+            # Not an ok(): it cannot fail on its own. What asserts "none on a page-number-only footer"
+            # is each document's EXACT kept-as-source count above, which one such finding would break.
+            print(f"  INFO {label}: {quiet} page-number-only footer paragraph(s) examined and quiet — the "
+                  f"exact per-document counts above are what assert it")
+        elif args.skip_step8:
+            void(f"{label}: none on a page-number-only footer", "no such paragraph among the documents in this run")
+
+
 if args.sides:
     thf = script_module("translate_headers_footers")
     print(f"\nSLICE 3 EXPLORATION — THE SIDE PARTS, MEASURED, REPORT ONLY  [{args.variant}]")
@@ -921,6 +1129,19 @@ if args.sides:
                     key, "a", orig, members(dpath), hf_decl, cm_decl, thf,
                     f"July delivery — body {'IS final/word' if exact else f'matches the declared English at {dfrac:.0%}'}"
                     f" · original matched {frac:.0%} · {decl_note}")
+                # SLICE 3a: the check itself, on COPIES -- nothing is written into the logs folder.
+                w = TMP / f"sa{n:02d}"
+                w.mkdir(parents=True, exist_ok=True)
+                for name in ("paragraphs.json",) + SIDE_DECL:
+                    if (wd / name).is_file():
+                        shutil.copyfile(wd / name, w / name)
+                shutil.copyfile(dpath, w / "delivered.docx")
+                rep, rc = delivered_check(w / "paragraphs.json", w / "delivered.docx", src, None, f"sa{n:02d}")
+                if rep is None:
+                    void(f"(a) {key} the check", f"it wrote no report (rc={rc})")
+                else:
+                    CHK["a"][key] = rep
+                    side_lines(key, rep)
         if args.arm in ("b", "both"):
             b = TMP / f"s{n:02d}"
             today = b / "today"
@@ -956,6 +1177,22 @@ if args.sides:
                 f"rc={pp.returncode}{' (drift gate fired)' if gate else ''}, repack rc={rcs['repack']} "
                 f"[{rcs['repack_gate']}; remnant block language {BLOCK_NOTE.get(b.name, ('n/a',))[0]}, "
                 f"advisory {sum(BLOCK_NOTE.get(b.name, ('', Counter()))[1].values())}]; read {how} · {decl_note}")
+            # SLICE 3a: the check on the repacked .docx; a stopped document has none, so the check
+            # reads the XML, its side parts NOT READ, and it is named as stopped -- never a pass.
+            # An operator who skips Step 8 writes no declaration, so none is left beside the notes.
+            if args.skip_step8:
+                for name in SIDE_DECL:
+                    (b / name).unlink(missing_ok=True)
+            docx_out = b / "delivered.docx"
+            journal = b / "post_process_journal.json"
+            rep, rc = delivered_check(b / "paragraphs.json", docx_out if docx_out.is_file() else b / "checked.xml",
+                                      b / "src.docx", journal if journal.is_file() else None, f"sb{n:02d}")
+            if rep is None:
+                void(f"(b) {key} the check", f"it wrote no report (rc={rc})")
+            else:
+                rep["_stopped"] = not docx_out.is_file()
+                CHK["b"][key] = rep
+                side_lines(key, rep)
             shutil.rmtree(b, ignore_errors=True)
     for arm in ("a", "b"):
         if not S[arm]:
@@ -970,9 +1207,14 @@ if args.sides:
                 print(f"    {label}: " + " · ".join(f"{k} {v}" for k, v in sorted(c.items())))
         print(f"    PARTS byte-identical to the original's: "
               f"{ {k: r['ident'] for k, r in S[arm].items() if r['ident']} }")
+    pin_sides()
     shutil.rmtree(TMP, ignore_errors=True)
-    print(f"\n  {len(VOIDED)} void" + "".join(f"\n    VOID  {v}" for v in VOIDED))
-    sys.exit(0)
+    print("\n" + "=" * 96)
+    print(f"  {CHECKED} check(s), {len(FAIL)} failure(s), {len(VOIDED)} void")
+    for v in VOIDED:
+        print(f"    VOID  {v}")
+    print("=" * 96)
+    sys.exit(1 if FAIL or VOIDED else 0)
 
 reports_a, reports_b = {}, {}
 for n, wd in enumerate(workdirs, 1):
@@ -1078,12 +1320,12 @@ if args.arm in ("b", "both"):
     classes, edges = Counter(), Counter()
     for rep, _ in reports_b.values():
         classes.update(f"{f['class']}/{f['shape']}" if f["shape"] and f["class"] != "edge-space"
-                       else f["class"] for f in rep["findings"])
+                       else f["class"] for f in body_only(rep))
         edges.update(rep["_edges"])
     print("\n  ALL FINDINGS BY CLASS: " + "  ".join(f"{k}={v}" for k, v in sorted(classes.items())))
     print("  EDGE WHITESPACE AGAINST THE SOURCE: " + "  ".join(f"{k}={v}" for k, v in sorted(edges.items())))
-    total = sum(len(rep["findings"]) for rep, _ in reports_b.values())
-    blk = [(key, f) for key, (rep, _) in reports_b.items() for f in rep["findings"]
+    total = sum(len(body_only(rep)) for rep, _ in reports_b.values())
+    blk = [(key, f) for key, (rep, _) in reports_b.items() for f in body_only(rep)
            if f.get("blocking", True)]
     print(f"\n  examined {len(reports_b)} of {len(workdirs)} workdirs; findings in all: {total} — "
           f"{len(blk)} BLOCKING, {total - len(blk)} counted under Wouter's ruling (2026-09-24). "
@@ -1106,7 +1348,7 @@ if args.arm in ("b", "both"):
     print("\n  SLICE 2b — THE DELIVERED CHECK ON THE REPACKED .docx:")
     for key, (rep, _) in reports_b.items():
         z = rep.get("zwsp") or {}
-        txt = sorted((f['class'], f['shape'], f['idx']) for f in rep["findings"]
+        txt = sorted((f['class'], f['shape'], f['idx']) for f in body_only(rep)
                      if f.get("blocking", True) and f["class"] != "zwsp")
         if rep.get("_read") != "docx":
             print(f"    {key:6} STOPPED — {rep['_read']}; U+200B accept {z.get('accept')} reject {z.get('reject')} "
@@ -1130,17 +1372,28 @@ if args.arm in ("b", "both"):
         print(f"\n  SLICE 2b — BYTES MOVE BY U+200B REMOVAL ONLY, AND ONLY WHERE THE PIN'S DELIVERY "
               f"CARRIED ONE — the chain run with {args.ref}'s scripts and the working tree's:")
         moved_by_doc = defaultdict(int)
+        scrubbed = is_ancestor(SCRUB_2B, args.ref)
         for key, (same_rc, (moved, removed, other, carried), nparts, rcs, rrcs) in BYTES.items():
             ok(f"{key}: every exit code equal {rcs}", same_rc, f"now {rcs}, at the ref {rrcs}")
             ok(f"{key}: of {nparts} output(s), nothing moved but U+200B removals",
                not other, f"other movement in {other}")
-            ok(f"{key}: moved IFF the pin's delivery carried a U+200B "
-               f"({'carried' if carried else 'none'}; {len(moved)} member(s), {removed} U+200B removed"
-               + (f": {' '.join(moved)}" if moved else "") + ")", bool(moved) == carried)
+            if scrubbed:
+                # SLICE 3a's SENSE: the pin already scrubs, so NOTHING may move, whatever it carries.
+                ok(f"{key}: NOTHING moved — the pin carries 2b's scrub and the check added since only "
+                   f"reads", not moved, f"moved {moved}")
+                if carried:
+                    print(f"  INFO {key}: the pin's delivery still carries U+200B bytes in {carried} — "
+                          f"identical in both builds, so not a movement")
+            else:
+                ok(f"{key}: moved IFF the pin's delivery carried a U+200B "
+                   f"({carried or 'none'}; {len(moved)} member(s), {removed} U+200B removed"
+                   + (f": {' '.join(moved)}" if moved else "") + ")", bool(moved) == bool(carried))
             moved_by_doc[did_of(key)] += bool(moved)
-        want = {d: n for d, n in MOVE_2B[args.variant].items() if d in present}
+        plan = {} if scrubbed else MOVE_2B[args.variant]
+        want = {d: n for d, n in plan.items() if d in present}
         got = {d: n for d, n in moved_by_doc.items() if n}
-        ok(f"the workdirs that moved are exactly the plan's ({args.variant}, of the documents in this run)",
+        ok(f"the workdirs that moved are exactly the plan's ({args.variant}, of the documents in this run; "
+           + ("the pin carries 2b's scrub, so the plan is NONE" if scrubbed else "slice 2b's plan") + ")",
            got == want, f"moved {got}, plan {want}")
         print(f"  compared {len(BYTES)} of {len(reports_b)} rebuilt workdirs")
 
