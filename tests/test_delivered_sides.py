@@ -1,6 +1,7 @@
-"""test_delivered_sides.py - branch 11 slice 3a: the SIDE-PART arm of `validate_apply.py --delivered
---original`, on synthetic input. Every document here is invented and built in a temporary directory;
-nothing is read from the corpus.
+"""test_delivered_sides.py - branch 11 slices 3a and 3b: the SIDE-PART arm of `validate_apply.py
+--delivered --original`, and slice 3b's declaration route for footnotes, endnotes and the glossary, on
+synthetic input. Every document here is invented and built in a temporary directory; nothing is read
+from the corpus.
 
 ONE FAILING INPUT PER ARM, RED FIRST, AND A CLEAN DOCUMENT PROVED QUIET. What each arm asserts
 (PLAN-2-step-b.md section 3.2, block "SLICE 3's WRITTEN PLAN", acceptance (d)):
@@ -43,9 +44,35 @@ ONE FAILING INPUT PER ARM, RED FIRST, AND A CLEAN DOCUMENT PROVED QUIET. What ea
   20  a declaration file that will not parse, or is the wrong JSON shape, is a finding, never read
       as no declaration; a scaffold entry that matches no paragraph is unmatched, never dropped
   21  --strict turns a side finding into exit 1; without it the run exits 0
-  22  the check READS ONLY: every input file hashes the same before and after
-  23  no document text is printed, only part names, ids, classes and lengths
-  24  the side block is byte-identical in both trees
+
+SLICE 3b (PLAN-2-step-b.md section 3.2, block "SLICE 3b's WRITTEN PLAN"): Step 8d and 8e save
+footnotes_translations.json, endnotes_translations.json and glossary_translations.json beside the
+notes -- source w:t text to English, a text mapped to itself kept (Wouter, 2026-09-28 (2)):
+  22  footnotes and endnotes DECLARED KEPT -- every letter-bearing text mapped to itself -- delivered
+      as the source's are quiet, --strict exit 0
+  23  an UNDECLARED note is still kept-source, whatever else the file declares; a note with only one
+      of its two runs declared kept is too
+  24  a note declared with English and delivered as the source's is declared-source; delivered in
+      that English it is quiet
+  25  a note declared KEPT that changed in the delivery is moved
+  26  the glossary, paragraph by paragraph: declared kept quiet, undeclared kept-source, declared
+      with English and delivered as the source's declared-source, declared kept and changed moved
+  27  a key matches as the template's regex sees it -- ESCAPED -- and as Word shows it
+  28  both readings: a note's deleted text must be declared kept too, or the note is kept-source
+  29  a notes declaration that will not parse, or is not an object of strings, is side-decl, and is
+      never read as a declaration
+  30  a U+200B in the SOURCE, which repack's scrub removes from every side part, hides nothing: a
+      footnote, header, comment and glossary paragraph kept as the source's less it are still
+      findings, and declared kept each is quiet -- never moved (register I-32)
+  31  STEP 8d's AND 8e's OWN TEMPLATES, run from the step document on a synthetic document, write
+      what the check reads: the declared English and the declared keep quiet, a text left out of
+      the file shipped in the source's words and reported
+  32  Step 8's wording in both trees: 8b and 8d are MANDATORY whenever the part carries text, no
+      step document gates on source-language text (C7), and the three files are named
+
+  33  the check READS ONLY: every input file hashes the same before and after
+  34  no document text is printed, only part names, ids, classes and lengths
+  35  the side block is byte-identical in both trees
 
     uv run --with lxml python tests/test_delivered_sides.py
     uv run --with lxml python tests/test_delivered_sides.py --variant us
@@ -192,9 +219,10 @@ def write_docx(path, members):
 
 
 def case(name, orig=None, deliv=None, hf=ABSENT, cm=ABSENT, strict=False, deliv_xml=False,
-         original=True, script=None, raw_hf=None):
+         original=True, script=None, raw_hf=None, extra=None):
     """Build the case in its own directory and run the check. hf / cm: ABSENT writes the clean
-    declaration, None writes none at all, anything else is written as given."""
+    declaration, None writes none at all, anything else is written as given. extra: more files
+    beside the notes, {name: bytes written as they are, or anything else written as JSON}."""
     d = TMP / name
     d.mkdir(parents=True, exist_ok=True)
     (d / "paragraphs.json").write_bytes(json.dumps(NOTES).encode("utf-8"))
@@ -206,6 +234,9 @@ def case(name, orig=None, deliv=None, hf=ABSENT, cm=ABSENT, strict=False, deliv_
         (d / "headers_footers.json").write_bytes(json.dumps(hf, ensure_ascii=False).encode("utf-8"))
     if cm is not None:
         (d / "comments_translations.json").write_bytes(json.dumps(cm, ensure_ascii=False).encode("utf-8"))
+    for fname, content in (extra or {}).items():
+        (d / fname).write_bytes(content if isinstance(content, bytes)
+                                else json.dumps(content, ensure_ascii=False).encode("utf-8"))
     write_docx(d / "orig.docx", ORIG if orig is None else orig)
     dm = DELIV if deliv is None else deliv
     if deliv_xml:
@@ -281,9 +312,11 @@ def script_run(label, cmd):
 
 H1, F1, CMX, FNX, ENX, GLX = ("word/header1.xml", "word/footer1.xml", "word/comments.xml",
                               "word/footnotes.xml", "word/endnotes.xml", "word/glossary/document.xml")
+FN_DECL, EN_DECL, GL_DECL = ("footnotes_translations.json", "endnotes_translations.json",
+                             "glossary_translations.json")
 
 print("=" * 96)
-print(f"BRANCH 11 SLICE 3a — the side-part arm of validate_apply --delivered --original  "
+print(f"BRANCH 11 SLICES 3a AND 3b — the side-part arm of validate_apply --delivered --original  "
       f"[{SCRIPT.parent.parent.name}]")
 print("=" * 96)
 
@@ -540,12 +573,176 @@ ok("a side finding under --strict exits 1", rc_of(r) == 1 and len(sf(rep)) == 1,
 r, rep = case("advisory", deliv=swap(DELIV, word__header1_xml=ORIG[H1]))
 ok("the same finding without --strict exits 0", rc_of(r) == 0 and len(sf(rep)) == 1, f"rc={rc_of(r)} {sf(rep)}")
 
-print("\n22  the check READS ONLY")
+
+def srt(xs):
+    return sorted(xs, key=lambda t: tuple(str(x) for x in t))
+
+
+KEPT_FN_EN = swap(DELIV, word__footnotes_xml=ORIG[FNX], word__endnotes_xml=ORIG[ENX])
+
+print("\n22  SLICE 3b — footnotes and endnotes DECLARED KEPT are quiet")
+r, rep = case("notes-declared-kept", deliv=KEPT_FN_EN, strict=True,
+              extra={FN_DECL: {"Przypis jeden": "Przypis jeden"}, EN_DECL: {"Uwaga końcowa": "Uwaga końcowa"}})
+ok("footnote 1 and endnote 1, every letter-bearing text mapped to itself, delivered as the source's: no "
+   "finding, --strict exits 0", sf(rep) == [] and rc_of(r) == 0, f"rc={rc_of(r)} {sf(rep)}")
+ok("...each counted as declared kept",
+   tally(rep, "footnotes").get("declared kept") == 1 and tally(rep, "endnotes").get("declared kept") == 1,
+   str({k: tally(rep, k) for k in ("footnotes", "endnotes")}))
+decls = sides(rep).get("declarations") or {}
+ok("...and the report says which declarations it read: the two notes files, one entry each, no glossary file",
+   decls.get(FN_DECL) == 1 and decls.get(EN_DECL) == 1 and GL_DECL in decls and decls[GL_DECL] is None, str(decls))
+
+print("\n23  an UNDECLARED note is still a finding, whatever else the file declares")
+r, rep = case("notes-partly-declared", deliv=KEPT_FN_EN,
+              extra={FN_DECL: {"Przypis jeden": "Przypis jeden"}, EN_DECL: {"Inny tekst": "Inny tekst"}})
+ok("the footnote declared kept is quiet; the endnote, its text in no key, is kept-source",
+   sf(rep) == [("side-endnote", "kept-source", ENX, "1")], str(sf(rep)))
+two_runs = notes("footnote", {1: [P("Przypis ", "jeden")]})
+r, rep = case("notes-one-run-declared", orig=swap(ORIG, word__footnotes_xml=two_runs),
+              deliv=swap(DELIV, word__footnotes_xml=two_runs), extra={FN_DECL: {"Przypis ": "Przypis "}})
+ok("a note of two runs with only one declared kept is kept-source — EVERY letter-bearing text must be",
+   sf(rep) == [("side-footnote", "kept-source", FNX, "1")], str(sf(rep)))
+
+print("\n24  a note DECLARED with English")
+r, rep = case("notes-declared-source", deliv=swap(DELIV, word__footnotes_xml=ORIG[FNX]),
+              extra={FN_DECL: {"Przypis jeden": "Footnote one"}})
+ok("delivered as the source's, it is declared-source — the file was saved and the rewrite never ran",
+   sf(rep) == [("side-footnote", "declared-source", FNX, "1")], str(sf(rep)))
+r, rep = case("notes-declared-exact",
+              extra={FN_DECL: {"Przypis jeden": "Footnote one"}, EN_DECL: {"Uwaga końcowa": "Final remark"}})
+ok("delivered in that English, it is quiet", sf(rep) == [] and tally(rep, "footnotes").get("changed") == 1,
+   f"{sf(rep)} {tally(rep, 'footnotes')}")
+
+print("\n25  a note declared KEPT that changed")
+r, rep = case("notes-moved", extra={FN_DECL: {"Przypis jeden": "Przypis jeden"}})
+ok("is moved", sf(rep) == [("side-footnote", "moved", FNX, "1")], str(sf(rep)))
+
+print("\n26  the glossary, paragraph by paragraph")
+r, rep = case("gl-declared", orig=swap(ORIG, word__glossary__document_xml=g2),
+              deliv=swap(DELIV, word__glossary__document_xml=g2), extra={GL_DECL: {"Blok tekstu": "Blok tekstu"}})
+ok("paragraph 0 declared kept is quiet; paragraph 1, undeclared, is still kept-source",
+   sf(rep) == [("side-glossary", "kept-source", GLX, 1)] and tally(rep, "glossary").get("declared kept") == 1,
+   f"{sf(rep)} {tally(rep, 'glossary')}")
+r, rep = case("gl-declared-source", orig=swap(ORIG, word__glossary__document_xml=g2),
+              deliv=swap(DELIV, word__glossary__document_xml=g2),
+              extra={GL_DECL: {"Blok tekstu": "Text block", "Drugi blok": "Second block"}})
+ok("each declared with English and delivered as the source's is declared-source",
+   sf(rep) == [("side-glossary", "declared-source", GLX, 0), ("side-glossary", "declared-source", GLX, 1)],
+   str(sf(rep)))
+r, rep = case("gl-moved", extra={GL_DECL: {"Blok tekstu": "Blok tekstu"}})
+ok("a glossary paragraph declared kept that changed is moved", sf(rep) == [("side-glossary", "moved", GLX, 0)],
+   str(sf(rep)))
+
+print("\n27  a key as the template's regex sees it — ESCAPED — and as Word shows it")
+amp_fn = notes("footnote", {1: [P("Warunki &amp; zasady")]})
+for label, key in (("escaped", "Warunki &amp; zasady"), ("as-shown", "Warunki & zasady")):
+    r, rep = case(f"notes-key-{label}", orig=swap(ORIG, word__footnotes_xml=amp_fn),
+                  deliv=swap(DELIV, word__footnotes_xml=amp_fn), extra={FN_DECL: {key: key}})
+    ok(f"declared kept with the key {label}: quiet",
+       sf(rep) == [] and tally(rep, "footnotes").get("declared kept") == 1, f"{sf(rep)} {tally(rep, 'footnotes')}")
+
+print("\n28  both readings: a note's DELETED text must be declared too")
+tc_fn = notes("footnote", {1: [P("Przypis ", ("del", "stary"))]})
+r, rep = case("notes-tc-declared", orig=swap(ORIG, word__footnotes_xml=tc_fn),
+              deliv=swap(DELIV, word__footnotes_xml=tc_fn), extra={FN_DECL: {"Przypis ": "Przypis ", "stary": "stary"}})
+ok("its text and its deleted text both declared kept: quiet", sf(rep) == [], str(sf(rep)))
+r, rep = case("notes-tc-half", orig=swap(ORIG, word__footnotes_xml=tc_fn),
+              deliv=swap(DELIV, word__footnotes_xml=tc_fn), extra={FN_DECL: {"Przypis ": "Przypis "}})
+ok("its deleted text undeclared: kept-source", sf(rep) == [("side-footnote", "kept-source", FNX, "1")], str(sf(rep)))
+
+print("\n29  a notes declaration that will not parse, or is not an object of strings")
+r, rep = case("notes-decl-shape", deliv=swap(KEPT_FN_EN, word__glossary__document_xml=ORIG[GLX]),
+              extra={FN_DECL: ["Przypis jeden"], EN_DECL: {"Uwaga końcowa": None}, GL_DECL: b"{not json"})
+ok("a list and an object holding a null are wrong-shape, a file that will not parse is unreadable — and none "
+   "is read as a declaration, so all three parts kept as the source's are still findings",
+   sf(rep) == srt([("side-decl", "unreadable", None, GL_DECL), ("side-decl", "wrong-shape", None, EN_DECL),
+                   ("side-decl", "wrong-shape", None, FN_DECL), ("side-endnote", "kept-source", ENX, "1"),
+                   ("side-footnote", "kept-source", FNX, "1"), ("side-glossary", "kept-source", GLX, 0)]),
+   str(sf(rep)))
+
+print("\n30  a U+200B in the SOURCE, which repack's scrub removes from every side part, hides nothing")
+Z = "\u200b"
+z_orig = swap(ORIG, word__footnotes_xml=notes("footnote", {1: [P(f"Przypis{Z}jeden")]}),
+              word__header1_xml=hdr(P(f"Nagłówek{Z}umowy")),
+              word__comments_xml=comments({0: [P(f"Uwaga{Z}pierwsza")], 1: [P("Keep this note")]}),
+              word__glossary__document_xml=glossary(P(f"Blok{Z}tekstu")))
+z_deliv = swap(DELIV, word__footnotes_xml=notes("footnote", {1: [P("Przypisjeden")]}),
+               word__header1_xml=hdr(P("Nagłówekumowy")),
+               word__comments_xml=comments({0: [P("Uwagapierwsza")], 1: [P("Keep this note")]}),
+               word__glossary__document_xml=glossary(P("Bloktekstu")))
+r, rep = case("zwsp-undeclared", orig=z_orig, deliv=z_deliv, hf=None, cm=None)
+ok("the footnote, header, comment and glossary paragraph, each the source's less its U+200B, are each "
+   "reported as kept in the source's words",
+   sf(rep) == srt([("side-comment", "undeclared-kept", CMX, "0"), ("side-comment", "undeclared-kept", CMX, "1"),
+                   ("side-footnote", "kept-source", FNX, "1"), ("side-glossary", "kept-source", GLX, 0),
+                   ("side-hf", "undeclared-kept", H1, 0)]), str(sf(rep)))
+r, rep = case("zwsp-declared", orig=z_orig, deliv=z_deliv,
+              hf=[dict(HF[0], text=f"Nagłówek{Z}umowy", en=None), HF[1]],
+              cm={"0": f"Uwaga{Z}pierwsza", "1": "Keep this note"},
+              extra={FN_DECL: {f"Przypis{Z}jeden": f"Przypis{Z}jeden"}, GL_DECL: {f"Blok{Z}tekstu": f"Blok{Z}tekstu"}})
+ok("...and each, declared kept, is quiet — never moved", sf(rep) == [], str(sf(rep)))
+
+print("\n31  Step 8d's and 8e's OWN TEMPLATES, run from the step document, write what the check reads")
+doc8 = (ROOT / args.variant / "skill-docs" / "08-aux-and-quality.md").read_text(encoding="utf-8")
+
+
+def template(heading):
+    s = doc8.find(heading)
+    a = doc8.find("```python\n", s) if s >= 0 else -1
+    e = doc8.find("\n```", a + 1) if a >= 0 else -1
+    return doc8[a + len("```python\n"):e + 1] if s >= 0 and a >= 0 and e > a else ""
+
+
+t8d, t8e = template("#### Step 8d"), template("#### Step 8e")
+ok("Step 8d's template loads its part's translations file, and Step 8e's the glossary's",
+   "PART = 'footnotes'" in t8d and "_translations.json" in t8d and "glossary_translations.json" in t8e,
+   f"8d={len(t8d)} 8e={len(t8e)}")
+d31 = TMP / "templates-real"
+(d31 / "final" / "word").mkdir(parents=True, exist_ok=True)
+orig31 = swap(ORIG, word__document_xml=body(P("Zdroj jedna", *REFS, ("fref", 2))),
+              word__footnotes_xml=notes("footnote", {1: [P("Przypis jeden")], 2: [P("Keep as is")]}))
+write_docx(d31 / "orig.docx", orig31)
+decl31 = {FN_DECL: {"Przypis jeden": "Footnote one", "Keep as is": "Keep as is"},
+          EN_DECL: {"Inny tekst": "Other text"},                   # the endnote's own text LEFT OUT
+          GL_DECL: {"Blok tekstu": "Text block"}}
+for fname, content in decl31.items():
+    (d31 / fname).write_bytes(json.dumps(content, ensure_ascii=False).encode("utf-8"))
+for label, code in (("footnotes", t8d), ("endnotes", t8d.replace("PART = 'footnotes'", "PART = 'endnotes'")),
+                    ("glossary", t8e)):
+    src = code.replace("<original>.docx", (d31 / "orig.docx").as_posix()).replace("<workdir>", d31.as_posix())
+    (d31 / f"run_{label}.py").write_bytes(src.encode("utf-8"))
+    rr = script_run(f"the {label} template", [str(d31 / f"run_{label}.py")])
+    ok(f"...and exited 0 — a template that raised is not one that ran", rr.returncode == 0,
+       (rr.stdout + rr.stderr)[-300:])
+wrote = {n: (d31 / "final" / "word" / f).read_bytes() if (d31 / "final" / "word" / f).is_file() else b""
+         for n, f in ((FNX, "footnotes.xml"), (ENX, "endnotes.xml"), (GLX, "glossary-document.xml"))}
+ok("...each wrote its part", all(wrote.values()), str({k: len(v) for k, v in wrote.items()}))
+r, rep = case("templates", orig=orig31, extra=decl31,
+              deliv=with_members(swap(DELIV, word__document_xml=body(P("Source one", *REFS, ("fref", 2)))), wrote))
+ok("the declared English and the declared keep are quiet; the endnote whose text the file LEFT OUT shipped in "
+   "the source's words and is reported, kept-source, and nothing else",
+   sf(rep) == [("side-endnote", "kept-source", ENX, "1")], str(sf(rep)))
+ok("...footnote 1 changed, footnote 2 declared kept, the glossary changed",
+   tally(rep, "footnotes").get("changed") == 1 and tally(rep, "footnotes").get("declared kept") == 1
+   and tally(rep, "glossary").get("changed") == 1, str({k: tally(rep, k) for k in ("footnotes", "glossary")}))
+
+print("\n32  Step 8's wording, both trees")
+for v in ("uk", "us"):
+    s8 = (ROOT / v / "skill-docs" / "08-aux-and-quality.md").read_text(encoding="utf-8")
+    s10 = (ROOT / v / "skill-docs" / "10-repack-and-validate.md").read_text(encoding="utf-8")
+    ok(f"[{v}] 8b and 8d are MANDATORY whenever the part carries text, and no step document gates on "
+       "source-language text any more (C7)",
+       "#### Step 8b: Translate headers and footers — MANDATORY (whenever the part carries text)" in s8
+       and "#### Step 8d: Translate footnotes / endnotes — MANDATORY (whenever the part carries text)" in s8
+       and "if any source-language text" not in s8 and "contain source-language text)" not in s10)
+    ok(f"[{v}] Step 8 names the three translations files", all(n in s8 for n in (FN_DECL, EN_DECL, GL_DECL)))
+
+print("\n33  the check READS ONLY")
 ok(f"every input file hashes the same after the run as before it, on every one of the {len(UNCHANGED)} cases above",
    len(UNCHANGED) >= 30 and all(same for _c, same in UNCHANGED),
    str([c for c, same in UNCHANGED if not same]))
 
-print("\n23  no document text in the report")
+print("\n34  no document text in the report")
 canary_h, canary_c = "Zanzibarquux", "Quuxbarzan"
 r, rep = case("canary", orig=swap(ORIG, word__header1_xml=hdr(P(canary_h + " nagłówek")),
                                   word__comments_xml=comments({0: [P(canary_c + " uwaga")], 1: [P("Keep this note")]})),
@@ -556,7 +753,7 @@ ok("the run found both planted findings", len(sf(rep)) == 3, str(sf(rep)))
 ok("...and printed neither canary", canary_h not in (r.stdout + r.stderr) and canary_c not in (r.stdout + r.stderr),
    r.stdout[-300:])
 
-print("\n24  both trees")
+print("\n35  both trees")
 blocks = []
 for v in ("uk", "us"):
     t = (ROOT / v / "scripts" / "validate_apply.py").read_text(encoding="utf-8")

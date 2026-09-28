@@ -442,7 +442,9 @@ def zcount(b):
 def zstrip(b):
     return ZREF.sub(b"", b.replace(ZW, b""))
 INPUTS = ("paragraphs.json", ".validate-state.json", "comments_translations.json",
-          "headers_footers.json", "_boldmap.json")
+          "headers_footers.json", "_boldmap.json",
+          # slice 3b's notes declarations: copied when a workdir has one, as any declaration is
+          "footnotes_translations.json", "endnotes_translations.json", "glossary_translations.json")
 if args.ref and args.arm in ("b", "both"):
     REFTREE = TMP / "ref_scripts"
     prefix = f"{args.variant}/scripts/"
@@ -936,7 +938,8 @@ def read_json(p):
 # declared). The keys are (class, shape) of the check's BLOCKING side findings; nothing else may
 # appear.
 # ==========================================================================================
-SIDE_DECL = ("headers_footers.json", "comments_translations.json")
+NOTE_DECL = ("footnotes_translations.json", "endnotes_translations.json", "glossary_translations.json")
+SIDE_DECL = ("headers_footers.json", "comments_translations.json") + NOTE_DECL      # slice 3b adds three
 CHK = {"a": {}, "b": {}}
 PIN_A = {"D02": {("side-ref", "comment:orphaned"): ["55", "56", "72", "73", "94", "101", "115", "124", "126",
                                                      "146", "147", "150", "151", "152"]},
@@ -987,6 +990,12 @@ def side_lines(key, rep):
         t = (s.get("counts") or {}).get(arm) or {}
         if t:
             print(f"          tally {arm}: " + "  ".join(f"{k} {v}" for k, v in sorted(t.items())))
+    # SLICE 3b: a July run predates the notes declarations, so the corpus measures only the
+    # route WITHOUT one -- said per document, from what the check read, never assumed.
+    nd = {n: v for n, v in (s.get("declarations") or {}).items() if n in NOTE_DECL}
+    seen = {n: v for n, v in nd.items() if v is not None}
+    print(f"          notes declarations read: {seen if seen else 'none'}"
+          + ("" if len(nd) == len(NOTE_DECL) else f"  (the check reported {len(nd)} of {len(NOTE_DECL)})"))
 
 
 def side_match(got, want):

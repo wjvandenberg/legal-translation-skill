@@ -10,6 +10,14 @@ translation pipeline (Steps 2-7) only touches `document.xml` — every auxiliary
 translated separately in this step. Run all applicable sub-steps before Step 9 (quality
 check) so the QC pass scans the auxiliary files too.
 
+**A sub-step is MANDATORY whenever its part carries text** — not only when you judge that
+text to be in the source language. Step 11a's diligence audit checks every such part, and
+Step 10's delivered-document check reports any side-part text shipped in the source's words
+that no declaration keeps. Text you keep on purpose — already English, a name, a code — is
+**declared**, never silently left: `en == text` or `null` in 8b's scaffold, the English
+equal to the source in 8c's JSON, the text mapped to itself in 8d's and 8e's translations
+files.
+
 > **Step 2's AUX-FILE CONTENT SUMMARY lists exactly which of these the document actually
 > carries, with their translatable text.** Read it rather than guessing: `word/glossary/`
 > in particular is easy to miss because its part is *also* called `document.xml`, so any
@@ -54,7 +62,7 @@ line means your text uses both labels, and the fix is in `paragraphs.json`, not 
 is immediately visible. If the script reports "No word/numbering.xml found" or "No
 translatable format strings found", the document doesn't need this — exit cleanly.
 
-#### Step 8b: Translate headers and footers — MANDATORY (if any source-language text)
+#### Step 8b: Translate headers and footers — MANDATORY (whenever the part carries text)
 
 OOXML stores page headers/footers in separate `word/header1.xml`, `word/footer2.xml`,
 etc. They typically mix standard boilerplate (signature blocks, watermarks, role
@@ -237,22 +245,36 @@ English-passthrough reminder as 8b.1: if a comment is already in English, copy t
 source verbatim. Step 10 (repack) picks up the translated `comments.xml` via
 `--comments`.
 
-#### Step 8d: Translate footnotes / endnotes — MANDATORY (if present)
+#### Step 8d: Translate footnotes / endnotes — MANDATORY (whenever the part carries text)
 
 There is no bundled script (footnotes/endnotes are rare in legal drafts), but the
 same regex-only rule applies: do not use ElementTree. Use pure-regex text
-substitution inside `<w:t>` / `<w:delText>` elements, or `lxml`. Minimal template:
+substitution inside `<w:t>` / `<w:delText>` elements, or `lxml`.
+
+**First save the translations beside the notes** — `<workdir>/footnotes_translations.json`,
+and `<workdir>/endnotes_translations.json` if the document carries endnotes: a JSON object
+mapping EVERY exact source `w:t` / `w:delText` text that carries letters to its English.
+**A text you keep on purpose — already English, a name, a code — maps to itself.** A text
+left out ships in the source's words, and Step 10's delivered-document check reports it.
+A key is the text exactly as it stands between the tags in the XML, so `&amp;` stays
+`&amp;`; and an `&`, `<` or `>` in your English is written `&amp;`, `&lt;`, `&gt;`,
+because the template puts it straight into the XML. Then run the template once per part:
 
 ```python
-import re, zipfile
+import json, re, zipfile
+
+PART = 'footnotes'   # then again with 'endnotes' if the document carries endnotes
 
 _WT = re.compile(r'(<w:t(?:\s[^>]*)?>)([^<]*)(</w:t>)')
 _WDT = re.compile(r'(<w:delText(?:\s[^>]*)?>)([^<]*)(</w:delText>)')
 
 with zipfile.ZipFile('<original>.docx') as z:
-    xml = z.read('word/footnotes.xml').decode('utf-8')
+    xml = z.read(f'word/{PART}.xml').decode('utf-8')
 
-# translations: dict mapping exact source w:t text -> English
+# translations: exact source w:t text -> English, the file saved beside the notes above
+with open(f'<workdir>/{PART}_translations.json', encoding='utf-8') as f:
+    translations = json.load(f)
+
 def rewrite(m):
     op, txt, cl = m.group(1), m.group(2), m.group(3)
     return op + translations.get(txt, txt) + cl
@@ -260,7 +282,7 @@ def rewrite(m):
 xml = _WT.sub(rewrite, xml)
 xml = _WDT.sub(rewrite, xml)
 
-with open('<workdir>/final/word/footnotes.xml', 'w', encoding='utf-8') as f:
+with open(f'<workdir>/final/word/{PART}.xml', 'w', encoding='utf-8') as f:
     f.write(xml)
 ```
 
@@ -280,15 +302,20 @@ body merely points at. There is no bundled script, exactly as for footnotes and 
 the same regex-only rule applies — **do not use ElementTree**:
 
 ```python
-import re, zipfile
+import json, re, zipfile
 
 _WT = re.compile(r'(<w:t(?:\s[^>]*)?>)([^<]*)(</w:t>)')
 
 with zipfile.ZipFile('<original>.docx') as z:
     xml = z.read('word/glossary/document.xml').decode('utf-8')
 
-# translations: dict mapping exact source w:t text -> English.
-# Step 2's AUX-FILE CONTENT SUMMARY lists them, keyed by docPart NAME.
+# translations: exact source w:t text -> English, saved first beside the notes as
+# <workdir>/glossary_translations.json under Step 8d's rules -- every letter-bearing
+# text a key, a text kept on purpose mapped to itself. Step 2's AUX-FILE CONTENT
+# SUMMARY lists them, keyed by docPart NAME.
+with open('<workdir>/glossary_translations.json', encoding='utf-8') as f:
+    translations = json.load(f)
+
 def rewrite(m):
     op, txt, cl = m.group(1), m.group(2), m.group(3)
     return op + translations.get(txt, txt) + cl
@@ -308,8 +335,9 @@ OOXML name would overwrite it. Repack takes the path from `--glossary` and puts 
 back at `word/glossary/document.xml` inside the archive.
 
 **If you read the part and judge that it needs no translation** — the blocks are already in
-English, or hold only field codes — **pass the original part to `--glossary` anyway.** That
-records the decision instead of leaving it silent, and the post-repack remnant scan still
+English, or hold only field codes — **pass the original part to `--glossary` anyway**, and
+save `glossary_translations.json` with each of its letter-bearing texts mapped to itself.
+That records the decision instead of leaving it silent, and the post-repack remnant scan still
 reports any source-language text left in the part.
 
 **Do not skip auxiliary translation steps.** Source-language text in numbering,
