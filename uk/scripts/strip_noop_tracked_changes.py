@@ -52,6 +52,17 @@ For each `<w:p>` in the document:
    strike-through source-language text that no downstream scanner sees.
    Gated off by `--keep-phantom-tcs`.
 
+5. **B10 — NONE OF THE THREE REMOVING PASSES REMOVES A WRAPPER WHOLE WHILE IT
+   HOLDS ANYTHING BESIDES RUNS, RUN PROPERTIES AND TEXT** — the phantom pass's
+   own nested `<w:ins>`/`<w:del>` excepted. Rules 2, 3 and 4, and rule 1's
+   `<w:del>`, delete the wrapper together with everything inside it, and a
+   tracked change can carry more than its text: a comment reference, a comment
+   range end, a bookmark, a footnote reference, a tab. On D08 two empty
+   insertions went this way and took three comment references, two range ends
+   and Word's `_GoBack` bookmark with them, while every gate reported PASS.
+   Such a wrapper is kept whole, so accept and reject behave as the source's,
+   and it is COUNTED rather than silently kept.
+
 Non-trivial edits — where del and ins have genuinely different English (e.g.
 a date digit change, a defined-term substitution, or a real content edit) —
 are left completely untouched.
@@ -122,8 +133,53 @@ _TRANSPARENT_LOCALNAMES = {
     'proofErr',
 }
 
+# B10: what a removing pass may take with a wrapper, and nothing else. Matched
+# by full {namespace}name, because `r` and `t` are reused across OOXML (`m:r`,
+# `a:t`) and a localname is not an identity. Everything under a `w:rPr` is run
+# properties, so the walk does not descend into one.
+_RPR = f'{{{W}}}rPr'
+_TEXT_ONLY = frozenset({f'{{{W}}}r', _RPR, f'{{{W}}}t', f'{{{W}}}delText'})
+# The phantom pass exists to remove a nested tracked change, so it may take one.
+_NESTED_TC = frozenset({f'{{{W}}}ins', f'{{{W}}}del'})
+
 def _localname(element):
     return etree.QName(element).localname
+
+def _holds_more_than_text(wrapper, also=frozenset()):
+    """True when `wrapper` holds anything besides runs, run properties and text
+    (and `also`). Branch 6's rule, delete only what can be proved redundant:
+    a wrapper holding more cannot be proved redundant by its text alone."""
+    allowed = _TEXT_ONLY | also
+    stack = list(wrapper)
+    while stack:
+        node = stack.pop()
+        if not isinstance(node.tag, str):
+            continue  # an XML comment or processing instruction: not content
+        if node.tag not in allowed:
+            return True
+        if node.tag != _RPR:
+            stack.extend(node)
+    return False
+
+def _keep_whole(wrapper, kept, also=frozenset()):
+    """B10's guard, shared by the three removing passes. Returns True, and
+    notes the wrapper in `kept` once, when it must be kept whole."""
+    if not _holds_more_than_text(wrapper, also):
+        return False
+    if not any(k is wrapper for k in kept):
+        kept.append(wrapper)
+    return True
+
+def _still_in(element, paragraph):
+    """True when `element` is still inside `paragraph`: a wrapper one pass kept
+    can be removed by a later one that is allowed to take it (the phantom pass
+    takes a nested tracked change), and only what survives is counted."""
+    node = element.getparent()
+    while node is not None:
+        if node is paragraph:
+            return True
+        node = node.getparent()
+    return False
 
 def _element_text(element):
     """Return the concatenated text of every <w:t> and <w:delText> descendant."""
@@ -225,7 +281,7 @@ def _has_content_bearing_tc_neighbour(paragraph, element, max_skip=8):
                     return True
     return False
 
-def _strip_empty_wrappers(paragraph):
+def _strip_empty_wrappers(paragraph, kept=None):
     """Pass 1: strip any <w:del> or <w:ins> whose text content is empty, all
     whitespace, or all punctuation after normalisation.
 
@@ -272,7 +328,14 @@ def _strip_empty_wrappers(paragraph):
     A preserved insertion is COUNTED and reported rather than silently kept,
     because a pass that quietly stops doing something reads as a pass that had
     nothing to do.
+
+    **B10 — A WRAPPER WITH NO TEXT CAN STILL HOLD SOMETHING.** An empty `w:ins`
+    carrying a comment reference, a range end or a bookmark is not empty: the
+    text test above cannot see them, and removing the wrapper removes them. So
+    it is kept whole and noted in `kept`.
     """
+    if kept is None:
+        kept = []
     removed = 0
     insertions_preserved = 0
     for element in list(paragraph):
@@ -293,16 +356,25 @@ def _strip_empty_wrappers(paragraph):
         # content-bearing insertion/deletion.
         if _is_bracket_only(text) and _has_content_bearing_tc_neighbour(paragraph, element):
             continue
+        # B10: nothing besides runs, run properties and text goes with it.
+        if _keep_whole(element, kept):
+            continue
         element.getparent().remove(element)
         removed += 1
     return removed, insertions_preserved
 
-def _strip_matching_pairs(paragraph):
+def _strip_matching_pairs(paragraph, kept=None):
     """Pass 2: strip adjacent (w:del, w:ins) and (w:ins, w:del) pairs whose
     normalised text is equal. Iterates until a pass produces no change.
 
+    The `w:ins` is unwrapped, so everything inside it stays where it was; the
+    `w:del` is removed whole, so B10 applies to it: one holding anything besides
+    runs, run properties and text leaves the pair as it is, noted in `kept`.
+
     Returns count stripped.
     """
+    if kept is None:
+        kept = []
     total = 0
     while True:
         changed = False
@@ -322,6 +394,8 @@ def _strip_matching_pairs(paragraph):
             # No-op substitution: remove the del, unwrap the ins.
             ins_el = el if tag == 'ins' else neighbour
             del_el = el if tag == 'del' else neighbour
+            if _keep_whole(del_el, kept):
+                continue
             del_el.getparent().remove(del_el)
             _unwrap(ins_el)
             total += 1
@@ -331,7 +405,7 @@ def _strip_matching_pairs(paragraph):
             break
     return total
 
-def _strip_phantom_ins_wraps_del(paragraph):
+def _strip_phantom_ins_wraps_del(paragraph, kept=None):
     """Pass 3: remove <w:ins> elements whose only meaningful descendants are
     <w:del> / <w:delText>. By construction those "insert-then-delete" wrappers
     contribute nothing to either the accept-all or the reject-all view — the
@@ -339,9 +413,14 @@ def _strip_phantom_ins_wraps_del(paragraph):
     the insertion. Keeping them only pollutes the markup view with a
     strike-through source-language remnant that no downstream scanner sees.
 
-    Returns count stripped. Metadata-only descendants (w:rPr, w:proofErr,
-    bookmarkStart/End, commentRangeStart/End) do not disqualify the wrapper.
+    Returns count stripped. Until B10, metadata-only descendants (w:proofErr,
+    bookmarkStart/End, commentRangeStart/End) did not disqualify the wrapper,
+    and removing it removed them. Now only runs, run properties, text and the
+    nested w:ins/w:del the pass exists to remove may go with it; a wrapper
+    holding anything else is kept whole, noted in `kept`.
     """
+    if kept is None:
+        kept = []
     total = 0
     for element in list(paragraph.iter(f'{{{W}}}ins')):
         # Has any top-level <w:t> descendant with text? If so, this is a real
@@ -359,6 +438,8 @@ def _strip_phantom_ins_wraps_del(paragraph):
             continue
         if not has_nested_del:
             # Empty ins with no nested del — handled by _strip_empty_wrappers.
+            continue
+        if _keep_whole(element, kept, also=_NESTED_TC):
             continue
         # Remove the entire wrapper. The nested <w:del> disappears with it,
         # which is the desired behaviour — the phantom was the nested del.
@@ -393,16 +474,21 @@ def strip_noops(document_xml_path, keep_phantom_tcs=False):
     pairs = 0
     phantoms = 0
     preserved = 0
+    kept_whole = 0
     for paragraph in root.iter(f'{{{W}}}p'):
-        pairs += _strip_matching_pairs(paragraph)
-        stripped, kept = _strip_empty_wrappers(paragraph)
+        # B10: the wrappers this paragraph's passes kept whole, shared so one
+        # seen by two passes is counted once.
+        guarded = []
+        pairs += _strip_matching_pairs(paragraph, guarded)
+        stripped, kept = _strip_empty_wrappers(paragraph, guarded)
         empties += stripped
         preserved += kept
         # Run the pair pass once more because stripping empties may have
         # exposed new adjacencies.
-        pairs += _strip_matching_pairs(paragraph)
+        pairs += _strip_matching_pairs(paragraph, guarded)
         if not keep_phantom_tcs:
-            phantoms += _strip_phantom_ins_wraps_del(paragraph)
+            phantoms += _strip_phantom_ins_wraps_del(paragraph, guarded)
+        kept_whole += sum(1 for k in guarded if _still_in(k, paragraph))
 
     tree.write(
         document_xml_path,
@@ -432,6 +518,8 @@ def strip_noops(document_xml_path, keep_phantom_tcs=False):
         # as a pass that had nothing to do, so what it DECLINED to strip is
         # reported beside what it stripped.
         'insertions_preserved': preserved,
+        # B10's, for the same reason: a wrapper kept whole for what it holds.
+        'wrappers_kept_whole': kept_whole,
     }
 
 def main():
@@ -462,7 +550,9 @@ def main():
     print(
         'Stripped {pairs_stripped} no-op del/ins pair(s), '
         '{empty_wrappers_stripped} empty wrapper(s) and '
-        '{phantom_ins_del_stripped} phantom ins-wraps-del wrapper(s).'.format(**summary)
+        '{phantom_ins_del_stripped} phantom ins-wraps-del wrapper(s); '
+        'kept {wrappers_kept_whole} wrapper(s) whole for holding more than '
+        'text.'.format(**summary)
     )
     return 0
 
