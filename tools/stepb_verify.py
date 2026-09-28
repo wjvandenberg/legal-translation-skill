@@ -190,9 +190,13 @@ GROUPS = {
  # removes a tracked-change wrapper WHOLE because its text is a no-op, and the comment anchors
  # inside go with it -- three comments shipped unreachable on D08, which is A2's harm, so it
  # sits in A2's group and beside B3, the same pass's other defect.
+ # A24 AND A25 ADDED 2026-09-28 (branch 11 slice 3a, proved with the real scripts on synthetic
+ # input): a header or footer's deleted text is never offered for translation and ships in the
+ # source's words, and a comment's deleted text is emptied. C19's glossary is here for shipping
+ # source-language text, and A24 is that in the reject reading; A25 is the text itself gone.
  "1 loses content": """
    A1 A2 A3 A6 A8 A9 A16 A19 N1 C19 C17 C23 C28 C12 M1 B3 B8 A15 J1 C16 C13 C14 F16 F27 E4 S3 C2
-   B10
+   B10 A24 A25
    """,
  # A20 added 2026-09-02 (branch 6, fourth slice). Apply slices the STRIPPED `en` with offsets
  # authored against the UNSTRIPPED one, so leading whitespace shifts every declared span and
@@ -210,9 +214,11 @@ GROUPS = {
  # consequence; A9's placement is arguable and is not this branch's to move. The divergence
  # is recorded rather than resolved by quietly following the older row -- if A9 is ever
  # re-grouped, these two should move together.
+ # A23 ADDED 2026-09-28 (branch 11 slice 3a): a multi-paragraph comment arrives as one paragraph --
+ # every character there, the breaks gone, so the page is wrong and nothing is lost.
  "2 looks wrong on the page": """
    A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 A20 A21 A22 O1 D1 D2 D3 D4 D5 D6 B1 B7 F7 F13 F19
-   F22 C20 E9 E12 R1
+   F22 C20 E9 E12 R1 A23
    """,
  # G10 added 2026-08-12 (branch 5). THIS LIST IS THE SOURCE and §9.1's table is generated
  # from it — a hand-edit to the document alone leaves the two disagreeing, which is exactly
@@ -251,9 +257,12 @@ GROUPS = {
  # reference calls correct, and three lexicon-listed names corrupted by a rewrite; F45 is
  # F29's free choice overridden by a SECOND script; F46 is the lexicons contradicting
  # THEMSELVES, a sub-lexicon offering what its own reference lists under Avoid.
+ # F47 ADDED 2026-09-28 (branch 11 slice 3a): the comment script's --list tells the operator to copy
+ # an already-English comment verbatim and shows it ESCAPED, so obeying it escapes the copy twice --
+ # the shipped instruction is what is wrong, F15's shape.
  "5 the manual is wrong": """
    F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40
-   E7 E8 K1 K2 K3 H3 L5 B2 B4 B5 B6 X3 X5 Y2 Y3 Y4 F41 F42 C29 F43 F44 B9 F45 F46
+   E7 E8 K1 K2 K3 H3 L5 B2 B4 B5 B6 X3 X5 Y2 Y3 Y4 F41 F42 C29 F43 F44 B9 F45 F46 F47
    """,
 }
 # -------------------------------------------- options (a row may need more than one)
@@ -281,10 +290,15 @@ OPTIONS = {
  # G10 added 2026-08-12 (branch 5) — see the note on group 3 above.
  # B10 added 2026-09-24 beside B8, for B8's reason: this option's delivered-document check is
  # what saw it, and its fix is option 6's.
+ # A23 A24 A25 AND F47 ADDED 2026-09-28: branch 11 slice 3a's side-part arm is what sees all four.
+ # A23's fix is this option's too -- slice 4's fifth one-script fix, Wouter's, 2026-09-25 (4). The
+ # other three have NO decided fix, so they are placed here and nowhere else: option 1's
+ # preserve-by-default is the obvious home for A24 and A25, and assigning it would be a decision
+ # nobody has taken.
  "2 check against the original": """
    C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28
    G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
-   B10
+   B10 A23 A24 A25 F47
    """,
  # A3 AND A6 BOTH ARRIVED HERE 2026-09-02. A3 is deliberately in TWO options -- the header
  # above says a row may need more than one, and A3 genuinely does: option 1 closed the

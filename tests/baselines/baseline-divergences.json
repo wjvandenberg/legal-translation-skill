@@ -56,9 +56,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice2a-zwsp-brackets",
-   "commit_subject": "Branch 11 slice 2a - the delivered check sees U+200B and brackets, reading only: J1 at the register's counts, A15 counted, no delivered byte moved (C8)",
-   "sha256_now": "f0cec6d2f0c72ade725673796d436e31d191c27c21781b713fdaa1912ee3ef0b"
+   "changed_by": "feature/branch11-slice3a-side-check",
+   "commit_subject": "Branch 11 slice 3a - the side-part check, report-only: every approved number held on both variants, no delivered byte moved (C6 partial; A23 A24 A25 F47 I-31 filed)",
+   "sha256_now": "04c1cc617c111632d77a51f19b5f1575d2e7b4355fecde98c54088f6b6a3c871"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -151,9 +151,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice2a-zwsp-brackets",
-   "commit_subject": "Branch 11 slice 2a - the delivered check sees U+200B and brackets, reading only: J1 at the register's counts, A15 counted, no delivered byte moved (C8)",
-   "sha256_now": "63451ccb8f6deadbb99f9eab5d8df5659090fbba17b3bfa5e91ed586ccf992ad"
+   "changed_by": "feature/branch11-slice3a-side-check",
+   "commit_subject": "Branch 11 slice 3a - the side-part check, report-only: every approved number held on both variants, no delivered byte moved (C6 partial; A23 A24 A25 F47 I-31 filed)",
+   "sha256_now": "bce11f7520587a775555c5a22d5f2fe780095bf856bad85af581737f7b5a19fa"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
