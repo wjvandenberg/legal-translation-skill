@@ -76,12 +76,13 @@ checked.
    TC clusters coalesced in paragraphs.json (Step 3b, before translation).
 8. *(if numbering.xml exists)* `translate_numbering.py` — numbering format strings
    translated (Step 8a).
-9. *(if headers/footers contain source-language text)* `translate_headers_footers.py`
+9. *(whenever headers or footers carry text)* `translate_headers_footers.py`
    (Step 8b).
 10. *(if `word/comments.xml` exists)* `translate_comments.py` — comments translated
     (Step 8c).
-11. *(if source has footnotes / endnotes)* footnotes/endnotes translated (regex-only
-    approach; Step 8d).
+11. *(whenever footnotes or endnotes carry text)* footnotes/endnotes translated from
+    `footnotes_translations.json` / `endnotes_translations.json` (regex-only approach;
+    Step 8d).
 
 The skill enforces every applicable item. Steps 1, 2, 3, 4, 5, 6 run every time. Steps
 7-11 fire only when their trigger applies. **This is not opt-in.** The checks are

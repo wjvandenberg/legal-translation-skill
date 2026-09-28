@@ -1180,7 +1180,7 @@ _DELIV_SIMILAR = 0.60
 # close to it: apply's own change is a character or two, and a looser match
 # could replay one paragraph's edit onto another.
 _DELIV_REBASE = 0.90
-_DELIV_ZWSP = '​'
+_DELIV_ZWSP = '\u200b'
 _DELIV_DONE = object()                             # a pending entry the rebase settled
 _DELIV_FOLD = str.maketrans('（）［］｛｝【】〔〕', '()[]{}[][]')
 
@@ -1487,17 +1487,37 @@ def _deliv_lead_counted(source, shape, acc, rej, cand):
 #     its --list shows the operator that escaped form -- so a declaration that
 #     IS the source once unescaped is a keep, copied as Step 8c says, and the
 #     script escaping it a second time is then a finding (moved).
-#   footnotes, endnotes, the glossary -- against the SOURCE only: no script
-#     writes them and no declaration exists for them yet (slice 3b adds one).
+#   footnotes, endnotes, the glossary -- no script writes them: Step 8d's and
+#     8e's template does, from the file SLICE 3b has it save beside the notes
+#     (below), and without that file they are read against the SOURCE only.
 # The header/footer reader is imported only when this arm runs, and a partial
 # install that lacks it is a NAMED finding, never a silent skip.
+#
+# SLICE 3b, 2026-09-28 (2) -- THE DECLARATION ROUTE FOR NOTES AND THE GLOSSARY.
+# Step 8d and 8e save footnotes_translations.json, endnotes_translations.json
+# and glossary_translations.json beside the notes: the dict the template
+# already builds, exact source w:t text -> English, a text mapped to itself
+# kept on purpose (Wouter, one file per part). A note, or a glossary
+# paragraph, whose EVERY letter-bearing w:t and w:delText is declared kept is
+# quiet; one declared with other English and delivered as the source's is
+# declared-source; one declared kept that changed is moved; anything else
+# delivered as the source's is kept-source, as before. The template's regex
+# reads the raw XML, so its keys are ESCAPED character data -- F47's shape --
+# and a key is matched in that form and as Word shows it.
+# AND A U+200B IS DROPPED FROM BOTH SIDES OF EVERY TEXT COMPARISON IN THIS
+# ARM, as the body arm drops it (register I-32): repack scrubs every one from
+# every side part, so a paragraph kept in the source's words arrived without
+# the source's U+200B and read as changed -- a keep this arm could not see,
+# and, once a keep can be declared, a declared keep reported as moved.
 #
 # THE RULE, Wouter's, 2026-09-25 (4): a letter-bearing side paragraph delivered
 # in the source's own words is a FINDING unless a declaration keeps it -- a
 # scaffold entry whose en is null, empty or the text; a comment whose en is the
-# text. BOTH READINGS: the accept reading against the declaration, the deleted
-# text against the source's -- kept in the source's words where nothing
-# declared the paragraph kept, or emptied, each a finding. References BY ID in
+# text; a note or glossary paragraph whose every letter-bearing text its part's
+# file maps to itself (slice 3b). BOTH READINGS: the accept reading against
+# the declaration, the deleted text against the source's -- kept in the
+# source's words where nothing declared the paragraph kept, or emptied, each a
+# finding. References BY ID in
 # every part: a footnote, endnote or comment held and pointed at by nothing
 # (orphaned), or pointed at and held by nothing (dangling), is a finding where
 # the original has no such defect of its own. A multi-paragraph comment
@@ -1517,9 +1537,16 @@ _SIDE_KINDS = (('header', re.compile(r'word/header\d*\.xml$')),
 _SIDE_REFS = (('footnote', 'footnoteReference', 'word/footnotes.xml'),
               ('endnote', 'endnoteReference', 'word/endnotes.xml'),
               ('comment', 'commentReference', 'word/comments.xml'))
-_SIDE_DECL = ('headers_footers.json', 'comments_translations.json')
+_SIDE_DECL = ('headers_footers.json', 'comments_translations.json', 'footnotes_translations.json',
+              'endnotes_translations.json', 'glossary_translations.json')
+_SIDE_NOTE_DECL = dict(zip(('footnotes', 'endnotes', 'glossary'), _SIDE_DECL[2:]))
 _SIDE_ENTITY = re.compile(r'&(amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);')
 _SIDE_NAMED = {'amp': '&', 'lt': '<', 'gt': '>', 'quot': '"', 'apos': "'"}
+
+
+def _side_z(text):
+    """A reading without U+200B -- repack scrubs every one from every side part."""
+    return (text or '').replace(_DELIV_ZWSP, '')
 
 
 def _side_unescape(text):
@@ -1590,6 +1617,43 @@ def _side_box(el):
     ps = [_side_readings(p) for p in el.iter(f'{{{W}}}p')]
     return (''.join(a for a, _r, _d in ps), ''.join(r for _a, r, _d in ps),
             ''.join(d for _a, _r, d in ps), sum(1 for a, r, _d in ps if a.strip() or r.strip()))
+
+
+def _side_nodes(el, own=False):
+    """The letter-bearing w:t and w:delText texts Step 8d's and 8e's template
+    rewrites one by one -- of a whole note, or with own=True of ONE paragraph's
+    own text, never a nested paragraph's."""
+    p_tag, out = f'{{{W}}}p', []
+    for t in el.iter(f'{{{W}}}t', f'{{{W}}}delText'):
+        if own:
+            up = t.getparent()
+            while up is not None and up is not el and up.tag != p_tag:
+                up = up.getparent()
+            if up is not el:
+                continue
+        if _side_letters(t.text):
+            out.append(t.text)
+    return out
+
+
+def _side_table(table):
+    """(kept, translated) from one notes declaration, each key in both forms a
+    text can take -- as the template's regex sees it, escaped, and as Word
+    shows it: kept where it maps to itself, translated where to other English."""
+    kept, translated = set(), set()
+    for k, v in (table.items() if isinstance(table, dict) else ()):
+        uk = _side_unescape(k)
+        (kept if v == k or _side_unescape(v) == uk else translated).update((k, uk))
+    return kept, translated
+
+
+def _side_declared(texts, table):
+    """'kept' when every letter-bearing text is declared kept, 'translated'
+    when any is declared with other English, None when nothing declares it."""
+    kept, translated = table
+    if texts and all(t in kept for t in texts):
+        return 'kept'
+    return 'translated' if any(t in translated for t in texts) else None
 
 
 def _side_members(path):
@@ -1695,7 +1759,7 @@ def check_sides(delivered, original, notes_dir):
     op, dp = _side_parser(om), _side_parser(dm)
     summary['read'] = True
     decl = {}
-    for name, shape in zip(_SIDE_DECL, (list, dict)):
+    for name, shape in zip(_SIDE_DECL, (list, dict, dict, dict, dict)):
         path = os.path.join(notes_dir, name)
         if not os.path.isfile(path):
             decl[name] = None
@@ -1707,7 +1771,11 @@ def check_sides(delivered, original, notes_dir):
             decl[name] = 'unreadable'
             add('side-decl', 'unreadable', None, name)
             continue
-        if not isinstance(decl[name], shape):         # never read as no declaration
+        v = decl[name]
+        # never read as no declaration; a notes file is text -> text, which its
+        # template would otherwise meet as a crash or as the word None
+        if not isinstance(v, shape) or (name in _SIDE_NOTE_DECL.values() and not all(
+                isinstance(k, str) and isinstance(x, str) for k, x in v.items())):
             decl[name] = 'unreadable'
             add('side-decl', 'wrong-shape', None, name)
     summary['declarations'] = {n: (v if v in (None, 'unreadable') else len(v)) for n, v in decl.items()}
@@ -1746,11 +1814,11 @@ def check_sides(delivered, original, notes_dir):
             ops, dps = list(o.iter(f'{{{W}}}p')), list(d.iter(f'{{{W}}}p'))
             if len(ops) != len(dps):
                 add('side-hf', 'paragraphs', name, None, str(len(ops)), str(len(dps)))
-            dtexts = [hf_read(q) for q in dps]
+            dtexts = [_side_z(hf_read(q)) for q in dps]      # U+200B off both sides (I-32)
             for i, p in enumerate(ops):
-                src, (_sa, _sr, sdel) = hf_read(p), _side_readings(p)
+                src, sdel = _side_z(hf_read(p)), _side_z(_side_readings(p)[2])
                 got = dtexts[i] if i < len(dps) else None
-                gdel = _side_readings(dps[i])[2] if i < len(dps) else ''
+                gdel = _side_z(_side_readings(dps[i])[2]) if i < len(dps) else ''
                 e, before = entries.get(name, {}).get(i), len(findings)
                 if e is not None:
                     used.add((name, i))
@@ -1764,7 +1832,7 @@ def check_sides(delivered, original, notes_dir):
                     else:
                         tally['undeclared, changed'] += 1
                 else:
-                    if (e.get('text') or '') != src:
+                    if _side_z(e.get('text')) != src:
                         add('side-hf', 'misaligned', name, i, e.get('text'), src)
                     en = e.get('en')
                     kept = en is None or not str(en).strip() or str(en) == e.get('text')
@@ -1772,9 +1840,9 @@ def check_sides(delivered, original, notes_dir):
                         tally['null kept' if en is None or not str(en).strip() else 'verbatim kept'] += 1
                         if got != src:
                             add('side-hf', 'moved', name, i, src, got)
-                    elif got == str(en):
+                    elif got == _side_z(str(en)):
                         tally['filled exact'] += 1
-                    elif str(en) in dtexts:
+                    elif _side_z(str(en)) in dtexts:
                         add('side-hf', 'elsewhere', name, i, str(en), got)
                     elif got == src:
                         add('side-hf', 'declared-source', name, i, str(en), got)
@@ -1803,13 +1871,15 @@ def check_sides(delivered, original, notes_dir):
         dr = dp(cname)
         ocm = list(op(cname).iter(f'{{{W}}}comment'))
         dcm = list(dr.iter(f'{{{W}}}comment')) if isinstance(dr, etree._Element) else []
-        osrc = {el.get(f'{{{W}}}id'): _side_comment_text(el) for el in ocm}
-        dsrc = {el.get(f'{{{W}}}id'): _side_comment_text(el) for el in dcm}
+        # U+200B off both sides of every comparison (I-32)
+        osrc = {el.get(f'{{{W}}}id'): _side_z(_side_comment_text(el)) for el in ocm}
+        dsrc = {el.get(f'{{{W}}}id'): _side_z(_side_comment_text(el)) for el in dcm}
         obox = {el.get(f'{{{W}}}id'): _side_box(el) for el in ocm}
         dbox = {el.get(f'{{{W}}}id'): _side_box(el) for el in dcm}
         tally = counts['comments']
         for cid, text in osrc.items():
             _oa, _or, odel, on = obox.get(cid, ('', '', '', 0))
+            odel = _side_z(odel)
             if not _side_letters(text) and not _side_letters(odel):
                 tally['no letters'] += 1
                 continue
@@ -1817,14 +1887,15 @@ def check_sides(delivered, original, notes_dir):
                 add('side-comment', 'lost', cname, cid, text, '')
                 continue
             got, (_da, _dr, ddel, dn) = dsrc[cid], dbox.get(cid, ('', '', '', 0))
+            ddel = _side_z(ddel)
             en, before, kept = cmd.get(cid), len(findings), False
             if isinstance(en, str):
-                kept = en == text or _side_unescape(en) == text
+                kept = _side_z(en) == text or _side_z(_side_unescape(en)) == text
                 if kept:
                     tally['declared kept'] += 1
                     if got != text:
                         add('side-comment', 'moved', cname, cid, text, got)
-                elif got == en:
+                elif got == _side_z(en):
                     tally['declared exact'] += 1
                 elif got == text:
                     add('side-comment', 'declared-source', cname, cid, en, got)
@@ -1845,16 +1916,21 @@ def check_sides(delivered, original, notes_dir):
                     blocking=False, ruling='flattened-comment')
         tally['added'] += len(set(dsrc) - set(osrc))
 
-    # FOOTNOTES AND ENDNOTES, per id, against the SOURCE; the separators are
-    # structure, not text.
+    # FOOTNOTES AND ENDNOTES, per id, against the SOURCE and the part's
+    # declaration (slice 3b); the separators are structure, not text.
+    def zbox(box):
+        return tuple(_side_z(x) if isinstance(x, str) else x for x in box)
+
     for kind, _tag, part in _SIDE_REFS[:2]:
         o, d = op(part), dp(part)
         if not isinstance(o, etree._Element) or part in missing:
             continue
-        ob = {el.get(f'{{{W}}}id'): _side_box(el) for el in o.iter(f'{{{W}}}{kind}')
-              if el.get(f'{{{W}}}type', '') not in _SIDE_SEP}
-        db = ({el.get(f'{{{W}}}id'): _side_box(el) for el in d.iter(f'{{{W}}}{kind}')
+        onotes = {el.get(f'{{{W}}}id'): el for el in o.iter(f'{{{W}}}{kind}')
+                  if el.get(f'{{{W}}}type', '') not in _SIDE_SEP}
+        ob = {nid: zbox(_side_box(el)) for nid, el in onotes.items()}
+        db = ({el.get(f'{{{W}}}id'): zbox(_side_box(el)) for el in d.iter(f'{{{W}}}{kind}')
                if el.get(f'{{{W}}}type', '') not in _SIDE_SEP} if isinstance(d, etree._Element) else {})
+        table = _side_table(decl[_SIDE_NOTE_DECL[kind + 's']])
         tally = counts[kind + 's']
         for nid, (oa, orr, odel, _n) in ob.items():
             if not _side_letters(oa + orr):
@@ -1864,10 +1940,17 @@ def check_sides(delivered, original, notes_dir):
                 add(f'side-{kind}', 'lost', part, nid, oa, '')
                 continue
             da, drr, ddel, _dn = db[nid]
+            how = _side_declared(_side_nodes(onotes[nid]), table)
             if (da, drr) == (oa, orr):
-                add(f'side-{kind}', 'kept-source', part, nid, oa, da)
+                if how == 'kept':
+                    tally['declared kept'] += 1
+                else:
+                    add(f'side-{kind}', 'declared-source' if how == 'translated' else 'kept-source',
+                        part, nid, oa, da)
             elif not _side_letters(da + drr):
                 add(f'side-{kind}', 'emptied', part, nid, oa, da)
+            elif how == 'kept':
+                add(f'side-{kind}', 'moved', part, nid, oa, da)
             else:
                 tally['changed'] += 1
                 if _side_letters(odel) and ddel == odel:
@@ -1876,19 +1959,30 @@ def check_sides(delivered, original, notes_dir):
                     add(f'side-{kind}', 'deleted-emptied', part, nid, odel, ddel)
         tally['added'] += len(set(db) - set(ob))
 
-    # THE GLOSSARY, paragraph by paragraph, against the SOURCE.
+    # THE GLOSSARY, paragraph by paragraph, against the SOURCE and its
+    # declaration (slice 3b).
     gname = 'word/glossary/document.xml'
     o, d = op(gname), dp(gname)
     if isinstance(o, etree._Element) and isinstance(d, etree._Element):
-        ops = [_side_readings(p)[:2] for p in o.iter(f'{{{W}}}p')]
-        dps = [_side_readings(p)[:2] for p in d.iter(f'{{{W}}}p')]
+        oparas = list(o.iter(f'{{{W}}}p'))
+        ops = [zbox(_side_readings(p)[:2]) for p in oparas]
+        dps = [zbox(_side_readings(p)[:2]) for p in d.iter(f'{{{W}}}p')]
+        table = _side_table(decl[_SIDE_NOTE_DECL['glossary']])
         if len(ops) != len(dps):
             add('side-glossary', 'paragraphs', gname, None, str(len(ops)), str(len(dps)))
         for i, (a, r) in enumerate(ops):
             if not _side_letters(a + r):
                 continue
+            how = _side_declared(_side_nodes(oparas[i], own=True), table)
+            got = dps[i][0] if i < len(dps) else ''
             if i < len(dps) and dps[i] == (a, r):
-                add('side-glossary', 'kept-source', gname, i, a, dps[i][0])
+                if how == 'kept':
+                    counts['glossary']['declared kept'] += 1
+                else:
+                    add('side-glossary', 'declared-source' if how == 'translated' else 'kept-source',
+                        gname, i, a, got)
+            elif how == 'kept':
+                add('side-glossary', 'moved', gname, i, a, got)
             else:
                 counts['glossary']['changed'] += 1
 

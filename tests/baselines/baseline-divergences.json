@@ -56,9 +56,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice3a-side-check",
-   "commit_subject": "Branch 11 slice 3a - the side-part check, report-only: every approved number held on both variants, no delivered byte moved (C6 partial; A23 A24 A25 F47 I-31 filed)",
-   "sha256_now": "04c1cc617c111632d77a51f19b5f1575d2e7b4355fecde98c54088f6b6a3c871"
+   "changed_by": "feature/branch11-slice3b-declarations",
+   "commit_subject": "Branch 11 slice 3b - the declaration route for footnotes, endnotes and the glossary, report-only: a declared keep is quiet, an undeclared one a finding, no delivered byte moved (C7 closed; I-32 filed and fixed)",
+   "sha256_now": "1dc2f2c742065aa743115967748c60ec418ff8c67af62a920a2a4cc4b1943622"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -91,14 +91,14 @@
    "sha256_now": "2a5256931f4f6fafd4e916ce9a7e34d77d70cacdd01885dc183414e7a7a652fe"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch10-slice3b-lexicon-choice",
-   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
-   "sha256_now": "e44608dc3a9312c46e0e7778bd46c1ead679071aae0982b766ed9282b17a138c"
+   "changed_by": "feature/branch11-slice3b-declarations",
+   "commit_subject": "Branch 11 slice 3b - the declaration route for footnotes, endnotes and the glossary, report-only: a declared keep is quiet, an undeclared one a finding, no delivered byte moved (C7 closed; I-32 filed and fixed)",
+   "sha256_now": "4c4f3479b44eee9fd3dcecdc34e118bbd1222eda3c3614b7f5b1a24836a9f49e"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
-   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
-   "sha256_now": "a32e2ce5ebd31a0fc50258aae8a184fcf47fdc56a415379f8a104032043c54f9"
+   "changed_by": "feature/branch11-slice3b-declarations",
+   "commit_subject": "Branch 11 slice 3b - the declaration route for footnotes, endnotes and the glossary, report-only: a declared keep is quiet, an undeclared one a finding, no delivered byte moved (C7 closed; I-32 filed and fixed)",
+   "sha256_now": "fecfcad2d3dd5fab309acf4f7fdb0d4c94d663f07759aceefb16336a373e376b"
   },
   "us/SKILL.md": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -151,9 +151,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice3a-side-check",
-   "commit_subject": "Branch 11 slice 3a - the side-part check, report-only: every approved number held on both variants, no delivered byte moved (C6 partial; A23 A24 A25 F47 I-31 filed)",
-   "sha256_now": "bce11f7520587a775555c5a22d5f2fe780095bf856bad85af581737f7b5a19fa"
+   "changed_by": "feature/branch11-slice3b-declarations",
+   "commit_subject": "Branch 11 slice 3b - the declaration route for footnotes, endnotes and the glossary, report-only: a declared keep is quiet, an undeclared one a finding, no delivered byte moved (C7 closed; I-32 filed and fixed)",
+   "sha256_now": "cf9d096484fa11ae687bbc706d1f92681519c7e7dd5b03b2ece1e54699029d15"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -186,14 +186,14 @@
    "sha256_now": "1d00ae2484912d4351d876e5d320ed52d6d48e4c60f92f3844ea13ab32c19871"
   },
   "us/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch10-slice3b-lexicon-choice",
-   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
-   "sha256_now": "a2e07148c6e48ac889995b5e21df65157a07a15554c9eb7911430b6710375968"
+   "changed_by": "feature/branch11-slice3b-declarations",
+   "commit_subject": "Branch 11 slice 3b - the declaration route for footnotes, endnotes and the glossary, report-only: a declared keep is quiet, an undeclared one a finding, no delivered byte moved (C7 closed; I-32 filed and fixed)",
+   "sha256_now": "5194d5d4dffb52ba35ff3866082db327315cc7fa686242d8ce828114620b0a41"
   },
   "us/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
-   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
-   "sha256_now": "3e76fd94da035a97ee84b3b8245959ea6951985784632907428b0b2aff295e77"
+   "changed_by": "feature/branch11-slice3b-declarations",
+   "commit_subject": "Branch 11 slice 3b - the declaration route for footnotes, endnotes and the glossary, report-only: a declared keep is quiet, an undeclared one a finding, no delivered byte moved (C7 closed; I-32 filed and fixed)",
+   "sha256_now": "5617e546db8b4102fc63be2c4a305991302719fb37119ce102edc556222a5cc0"
   }
  }
 }
