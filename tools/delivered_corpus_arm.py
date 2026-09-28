@@ -68,6 +68,8 @@ acceptance Wouter approved before the build (PLAN-2-step-b.md section 3.2):
   (c) --skip-step8: a kept-as-source finding on every letter-bearing side paragraph, per document,
       at the counts measured before the build; none on a page-number-only footer; nothing else but
       D08's three orphans.
+  SINCE SLICE 4a, D08's THREE ORPHANS ARE GONE FROM (b) AND (c): they were B10's lost references,
+  and the guard keeps the wrappers holding them (re-pinned on an assumption put to Wouter -- PIN_B).
 A side finding is kept apart from the body's numbers everywhere below, so slice 1's totals mean
 what they meant. And --ref now asks for NO movement when the pin already carries slice 2b's scrub
 (`git merge-base --is-ancestor`), which is 3a's sense: the check only reads.
@@ -1052,8 +1054,13 @@ PIN_A_HF = {"D02": {"filled exact": 8, "verbatim kept": 4}, "D03": {"filled exac
             "D06": {"verbatim kept": 1}, "D07": {"null kept": 5}, "D09": {"verbatim kept": 1},
             "D11": {"null kept": 1}}
 PIN_A_CM = {"D02": {"declared exact": 27, "declared kept": 1}, "D08": {"declared kept": 13}}
-PIN_B = {"D03B": {("side-glossary", "kept-source"): 2},
-         "D08": {("side-ref", "comment:orphaned"): ["3", "4", "12"]}}
+# SLICE 4a RE-PINS (b) AND (c) FOR D08, ON AN ASSUMPTION PUT TO WOUTER (2026-09-28 (4)): comments 3, 4
+# and 12 were orphaned because strip_noop removed the two empty insertions holding their references
+# -- register B10 -- and the guard keeps those wrappers, so D08's anchors are 13, 13 and 13 and no
+# comment is orphaned. The approved acceptance said both "anchors 13 13 13" and "(a) to (c)
+# unchanged", which cannot both hold; this pin takes the first. (a) reads the July deliveries and
+# keeps its four.
+PIN_B = {"D03B": {("side-glossary", "kept-source"): 2}}
 FLAT = {"D02": ["110", "116", "150"]}
 PIN_C = {"uk": {"D02": 38, "D03": 3, "D03B": 3, "D07": 3, "D08": 13, "D09": 2},
          "us": {"D03": 3, "D03B": 3, "D05": 3, "D07": 3, "D08": 13}}
