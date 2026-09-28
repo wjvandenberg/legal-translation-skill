@@ -666,7 +666,7 @@ unconditionally — as is §5.6 entire.
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-09-25 (4). BRANCH 11 SLICE 3 EXPLORED AND PLANNED, CUT INTO 3a AND 3b; ITS PR OPEN
+### HANDOFF — 2026-09-25 (4). BRANCH 11 SLICE 3 EXPLORED AND PLANNED, CUT INTO 3a AND 3b; MERGED #115 `3404ab9`
 
 **PURPOSE: MET.** It was *so that slice 3 has a written, measured plan and the side parts of a delivered file can be checked as the body already is*: measured on the 13 July deliveries, today's output and C6's skip-Step-8 scenario, uk and us, every choice and the acceptance put to Wouter AFTER the measurement — section 3.2 of `PLAN-2-step-b.md`, block "SLICE 3's WRITTEN PLAN". **Documentation and an instrument only: nothing in either tree changed.**
 
@@ -676,7 +676,7 @@ unconditionally — as is §5.6 entire.
 
 **WHAT A NEW SESSION WOULD GET WRONG: A FIELD PLACEHOLDER IS NOT PROSE.** The header/footer reader writes a page number as `<<PAGE>>`, so a letter test on it reads a page-number footer as text — F43's probe did, and this slice's instrument did on its first run. And D05 reaches repack only on us, so acceptance (c)'s D05 3 is a us measurement, added after the question was put and said so.
 
-**SINGLE NEXT ACTION: if `gh pr list --head feature/branch11-slice3-plan` shows the PR OPEN, ask Wouter to merge it; then BUILD SLICE 3a**, red first, against the approved acceptance — section 3.2 of `PLAN-2-step-b.md`, block "SLICE 3's WRITTEN PLAN". **Ask Wouter at the open for the page read of 2b's changed pages of D02, D10 and D11 — still his.**
+**SINGLE NEXT ACTION: BUILD SLICE 3a** — #115 is merged, `3404ab9` — red first, against the approved acceptance — section 3.2 of `PLAN-2-step-b.md`, block "SLICE 3's WRITTEN PLAN". **Ask Wouter at the open for the page read of 2b's changed pages of D02, D10 and D11 — still his.**
 
 **Open, none blocking.** **(1)** I-26. **(2)** `PASS_CONDITIONS`' six NOT YET TESTED rows. **(3)** F46. **(4)** `claudemd_claims` check 2. **(5)** The name scan's pre-existing hit, pattern #46 — Wouter's. **(6)** `claudemd_disposal` 69 not 70. **(7)** `validate_apply.py` 91,664 bytes, past W1's 55,466 — D3's, and 3a grows it. **(8)** D02 101 and 168, a page read. **(9)** C16's fourteen. **(10)** G13, branch 14's. **(11)** The detection guesses — D03 and D03B scanned as Polish, D07, English, as Hungarian — branch 12's. **(12)** F44's refusals on D07, D08 and D11, still live today.
 
