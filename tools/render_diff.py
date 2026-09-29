@@ -259,7 +259,9 @@ ap.add_argument("--post-process", action="store_true",
                      "repack. Branch 10 changes post_process and nothing else, so without "
                      "this the fixture arms render the SAME apply code twice and an "
                      "all-quiet page is guaranteed — which is a limit of the instrument, "
-                     "not evidence about the branch. Section 5.2's gate needs this arm.")
+                     "not evidence about the branch. Section 5.2's gate needs this arm. "
+                     "BRANCH 11 SLICE 4a: with --doc, each arm runs apply, post_process, the "
+                     "reorder and repack, where without it the --doc arm skips post_process")
 ap.add_argument("--variant", default="uk", choices=("uk", "us"))
 ap.add_argument("--pages", type=int, action="append", default=[],
                 help="force these page numbers to be written even if they did not change "
@@ -418,6 +420,44 @@ def _glossary_passthrough(src_docx, workdir):
     out = Path(workdir) / "glossary-passthrough.xml"
     out.write_bytes(raw)
     return ["--glossary", str(out)]
+
+
+def run_post_process_doc(scripts_dir, adir, xml):
+    """--doc WITH --post-process (branch 11 slice 4a): the applied XML through post_process and
+    the definitions reorder before repack, as the pipeline runs them.
+
+    Without it the --doc arm runs apply and repack ONLY, so a change inside post_process --
+    strip_noop is one -- runs the same code on both arms and every page matches for that reason
+    alone: a check passing for the wrong reason. Staged in a real workdir layout for
+    run_post_process_arm's reason: post_process finds the notes by walking up from
+    <workdir>/final/word/document.xml. A fired drift gate is tolerated and the arm goes on, as the
+    corpus chain does; any other non-zero exit stops the arm.
+
+    Returns (document.xml path, completed post_process) or (None, process).
+    """
+    env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
+               PYTHONDONTWRITEBYTECODE="1")
+    wd = adir / "wd"
+    dest = wd / "final" / "word" / "document.xml"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(xml, dest)
+    for n in ("paragraphs.json", ".validate-state.json", "comments_translations.json",
+              "headers_footers.json", "_boldmap.json"):
+        if (adir / n).is_file():
+            shutil.copyfile(adir / n, wd / n)
+    py = ["uv", "run", "--with", "lxml", "python"]
+    proc = subprocess.run(py + [str(scripts_dir / "post_process.py"), str(dest), "--fix",
+                                "--variant", args.variant],
+                          capture_output=True, text=True, encoding="utf-8", errors="replace",
+                          cwd=str(ROOT), env=env, timeout=900)
+    if proc.returncode != 0 and "SKILL GATE FIRED" not in (proc.stdout or "") + (proc.stderr or ""):
+        return None, proc
+    ro = subprocess.run(py + [str(scripts_dir / "reorder_definitions.py"), "--doc", str(dest)],
+                        capture_output=True, text=True, encoding="utf-8", errors="replace",
+                        cwd=str(ROOT), env=env, timeout=900)
+    if ro.returncode != 0:
+        return None, ro
+    return (dest if dest.is_file() else None), proc
 
 
 def repack(scripts_dir, src_docx, doc_xml, out_docx, notes_json):
@@ -833,6 +873,9 @@ if args.doc:
         shutil.rmtree(TMP, ignore_errors=True)
         sys.exit(1)
     print(f"\n  baseline arm: {REF}'s whole scripts tree; differing: {', '.join(_differ)}")
+    print("  each arm runs: apply -> " + ("post_process -> reorder -> " if args.post_process else "")
+          + "repack" + ("" if args.post_process else
+                        "  (NO post_process: a change inside it cannot show here; pass --post-process)"))
     CORPUS = corpus_dirs()
     print(f"\n  corpus folder(s) reachable: {len(CORPUS)}")
     wds = [w for w in (sorted(LOGS.rglob("wd")) + sorted(LOGS.rglob("wd-*"))) if w.is_dir()]
@@ -873,6 +916,11 @@ if args.doc:
             if xml is None:
                 ok(f"{label} {arm}: apply produced document.xml", False)
                 break
+            if args.post_process:
+                xml, pp = run_post_process_doc(scripts_dir, adir, xml)
+                if xml is None:
+                    ok(f"{label} {arm}: post_process and the reorder ran", False, _gate_line(pp))
+                    break
             deliv, rp = repack(scripts_dir, adir / "source.docx", xml,
                                adir / f"{arm}.docx", adir / "paragraphs.json")
             if deliv is None:

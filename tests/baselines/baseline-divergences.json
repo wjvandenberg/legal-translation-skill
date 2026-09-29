@@ -46,9 +46,9 @@
    "sha256_now": "33fead97409512d999b9429434e6f4a0e8bf7f524b7441617282b077a32510a8"
   },
   "uk/scripts/strip_noop_tracked_changes.py": {
-   "changed_by": "feature/branch10-slice2-conditional-passes",
-   "commit_subject": "Branch 10 slice 2 - the conditional passes: every pass tests the condition it assumes, and the validator reads the record instead of predicting it (B4, B3, B2, B8, C15)",
-   "sha256_now": "0b6d8560b9c02fe286ede9968283e44dce9f0e1b6ddd0e68c70d5e7165cad931"
+   "changed_by": "feature/branch11-slice4a",
+   "commit_subject": "Branch 11 slice 4a - strip_noop keeps a tracked-change wrapper whole while it holds anything besides runs, run properties and text (B10)",
+   "sha256_now": "0ce03126e0eec32a4acaa6bff7f77971c7871ce8de5ec921fa655faae01e235d"
   },
   "uk/scripts/translate_headers_footers.py": {
    "changed_by": "feature/branch7-slice3-a19",
@@ -146,9 +146,9 @@
    "sha256_now": "f8a80b486039743046fda9758382ea7d6ecbad2fa40ee46cd850ded3879f942e"
   },
   "us/scripts/strip_noop_tracked_changes.py": {
-   "changed_by": "feature/branch10-slice2-conditional-passes",
-   "commit_subject": "Branch 10 slice 2 - the conditional passes: every pass tests the condition it assumes, and the validator reads the record instead of predicting it (B4, B3, B2, B8, C15)",
-   "sha256_now": "f1d5a2a84aeeae5df6ff6be838e3d10eb452ad90abf4b9f930ca3bd8f22698f3"
+   "changed_by": "feature/branch11-slice4a",
+   "commit_subject": "Branch 11 slice 4a - strip_noop keeps a tracked-change wrapper whole while it holds anything besides runs, run properties and text (B10)",
+   "sha256_now": "5f18c14d5a8c1191efb310bdea9b933f425e4cbc2b5da5106917f9f2f9822ab3"
   },
   "us/scripts/translate_headers_footers.py": {
    "changed_by": "feature/branch7-slice3-a19",

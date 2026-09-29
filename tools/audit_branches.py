@@ -474,7 +474,10 @@ def audit_b1():
     # 33 SINCE 2026-09-25, branch 11 slice 2b: +2, zwsp-scaffolding.docx and its shipped
     # zwsp-scaffolding.notes.json. No fixture carried a U+200B (0 in every member and every
     # notes file), so the scrub had no synthetic page -- and the real ones are client text.
-    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 33)
+    # 35 SINCE 2026-09-28 (4), branch 11 slice 4a: +2, noop-wrappers.docx and its shipped
+    # noop-wrappers.notes.json. B10's visible half -- a tab and a line break inside an empty tracked
+    # insertion -- has no corpus page anyone but Wouter may look at, so this is its only render.
+    claim("B1.fixtures", "committed synthetic fixtures", len(fx), 35)
 
     hits = 0
     for nm in fx:

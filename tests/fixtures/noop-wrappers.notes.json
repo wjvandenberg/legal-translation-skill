@@ -1,0 +1,98 @@
+[
+  {
+    "idx": 0,
+    "text": "NOOP-WRAPPERS FIXTURE. Each row says what its empty tracked insertion holds.",
+    "en": "NOOP-WRAPPERS FIXTURE. Each row says what its empty tracked insertion holds.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 76,
+        "text": "NOOP-WRAPPERS FIXTURE. Each row says what its empty tracked insertion holds.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 1,
+    "text": "TAB KEPT — NameValue",
+    "en": "TAB KEPT — NameValue",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 20,
+        "text": "TAB KEPT — NameValue",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 2,
+    "text": "BREAK KEPT — Line oneLine two",
+    "en": "BREAK KEPT — Line oneLine two",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 29,
+        "text": "BREAK KEPT — Line oneLine two",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 3,
+    "text": "BOOKMARK KEPT — the insertion holds the _GoBack bookmark and no text",
+    "en": "BOOKMARK KEPT — the insertion holds the _GoBack bookmark and no text",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 68,
+        "text": "BOOKMARK KEPT — the insertion holds the _GoBack bookmark and no text",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 4,
+    "text": "CONTROL — an empty insertion holding only an empty run, removed on both arms",
+    "en": "CONTROL — an empty insertion holding only an empty run, removed on both arms",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 76,
+        "text": "CONTROL — an empty insertion holding only an empty run, removed on both arms",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 5,
+    "text": "CONTROL — a no-op pair, collapsed on both arms: solar energy",
+    "en": "CONTROL — a no-op pair, collapsed on both arms: solar energy",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 60,
+        "text": "CONTROL — a no-op pair, collapsed on both arms: solar energy",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  }
+]

@@ -68,9 +68,24 @@ acceptance Wouter approved before the build (PLAN-2-step-b.md section 3.2):
   (c) --skip-step8: a kept-as-source finding on every letter-bearing side paragraph, per document,
       at the counts measured before the build; none on a page-number-only footer; nothing else but
       D08's three orphans.
+  SINCE SLICE 4a, D08's THREE ORPHANS ARE GONE FROM (b) AND (c): they were B10's lost references,
+  and the guard keeps the wrappers holding them (re-pinned on an assumption put to Wouter -- PIN_B).
 A side finding is kept apart from the body's numbers everywhere below, so slice 1's totals mean
 what they meant. And --ref now asks for NO movement when the pin already carries slice 2b's scrub
 (`git merge-base --is-ancestor`), which is 3a's sense: the check only reads.
+
+SLICE 4a (2026-09-28 (4)) CHANGES WHAT --ref ASSERTS AGAIN, for branch 10's reason: strip_noop now
+keeps a tracked-change wrapper whole while it holds anything besides runs, run properties and text
+(register B10), so against a pin from before that guard the bytes MUST move -- on D08 alone, both
+variants, by restored wrappers and nothing else. An XML member moved that way is OURS WITH THE PIN'S
+MISSING WRAPPERS PUT BACK: remove from ours whole w:ins/w:del elements, each holding more than text,
+and what is left must be the pin's, byte for byte per element. A wrapper the pin UNWRAPPED rather
+than removed -- a no-op pair whose deletion held an anchor -- is not recognised and reads as other
+movement for a person to explain; the corpus has none. Whether the pin carries the guard is settled
+by ancestry against the branch's start AND by the pin's own strip_noop, and a pin where the two
+disagree is VOID. Beside the bytes: D08's comment anchors equal the original's, by kind, in today's
+build; and with --ref the delivered check also reads the PIN's build, so the text-and-anchor
+blocking findings are compared per document -- B10's two gone on D08, nothing gained anywhere.
 
 WHAT IT NEVER PRINTS: a filename, a path below the logs root, or any document text. Doc-ids,
 paragraph indices, classes and lengths only (CLAUDE.md 5.6). Nothing is written into the logs
@@ -80,6 +95,7 @@ folder: every input is copied into a temporary directory first.
     uv run --with lxml python tools/delivered_corpus_arm.py --variant us
     uv run --with lxml python tools/delivered_corpus_arm.py --arm a      # one arm
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref 3654842 --doc D02 --doc D03
+    uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref bc9c5d8 --doc D08   # slice 4a
     uv run --with lxml python tools/delivered_corpus_arm.py --sides --arm a       # slice 3, measured
     uv run --with lxml python tools/delivered_corpus_arm.py --sides --arm b --skip-step8 --doc D02
 """
@@ -427,10 +443,72 @@ STOP_2B = {"uk": {"D04", "D05"}, "us": {"D02", "D06", "D09", "D10"}}
 # U+200B, so NOTHING may move -- the check added since only reads. Settled by ancestry, never by
 # assuming it: a pin before 2b still asks for 2b's plan.
 SCRUB_2B = "4d3d247"
+# SLICE 4a's PINNED PLAN (PLAN-2-step-b.md section 3.2, block "4a — B10"): a pin at or before the
+# branch's start lacks strip_noop's guard, so D08's two empty insertions come back with the three
+# comment references, two range ends and the bookmark they hold, and nowhere else moves. The
+# findings that go are B10's two; D08's anchors then equal the original's.
+START_4A = "bc9c5d8"
+GUARD_4A = b"def _holds_more_than_text("
+MOVE_4A = {"uk": {"D08": 1}, "us": {"D08": 1}}
+RESTORED_4A = {"D08": 2}
+LOST_4A = {"D08": [("anchor-lost", "commentRangeEnd", None), ("anchor-lost", "commentReference", None)]}
+ANCHORS_4A = {"D08": {"commentReference": 13, "commentRangeStart": 13, "commentRangeEnd": 13}}
+XML_MEMBERS = ("final/word/document.xml", "checked.xml", "docx:word/document.xml")
+_TEXT_4A = frozenset(f"{{{W}}}{n}" for n in ("r", "rPr", "t", "delText"))
+_TC_4A = frozenset((f"{{{W}}}ins", f"{{{W}}}del"))
 
 
 def is_ancestor(a, b):
     return run(["git", "merge-base", "--is-ancestor", a, b]).returncode == 0
+
+
+def more_than_text(el):
+    """Slice 4a's condition, read here independently of strip_noop: `el` holds anything besides
+    runs, run properties and text -- a w:rPr's own children being run properties."""
+    stack = list(el)
+    while stack:
+        node = stack.pop()
+        if not isinstance(node.tag, str):
+            continue
+        if node.tag not in _TEXT_4A:
+            return True
+        if node.tag != f"{{{W}}}rPr":
+            stack.extend(node)
+    return False
+
+
+def restored(new_b, ref_b):
+    """How many wrappers ours carries that the pin's lacks, when the pin's XML is ours with exactly
+    those removed whole -- each a w:ins or w:del holding more than text -- and None otherwise. The
+    alignment is per element, so a difference anywhere else fails it rather than being absorbed."""
+    try:
+        new_root, ref_root = etree.fromstring(new_b), etree.fromstring(ref_b)
+    except etree.XMLSyntaxError:
+        return None
+    count = [0]
+
+    def same_node(a, b):
+        return (a.tag == b.tag and dict(a.attrib) == dict(b.attrib) and (a.text or "") == (b.text or "")
+                and (a.tail or "") == (b.tail or ""))
+
+    def align(a, b):
+        if not same_node(a, b):
+            return False
+        ac, bc = list(a), list(b)
+        i = j = 0
+        while i < len(ac):
+            if j < len(bc) and etree.tostring(ac[i]) == etree.tostring(bc[j]):
+                i, j = i + 1, j + 1
+            elif ac[i].tag in _TC_4A and more_than_text(ac[i]):
+                count[0] += 1
+                i += 1
+            elif j < len(bc) and align(ac[i], bc[j]):
+                i, j = i + 1, j + 1
+            else:
+                return False
+        return j == len(bc)
+
+    return count[0] if align(new_root, ref_root) and count[0] else None
 ZW = "​".encode("utf-8")
 ZREF = re.compile(rb"&#(?:0*8203|[xX]0*200[bB]);")
 
@@ -461,6 +539,21 @@ if args.ref and args.arm in ("b", "both"):
     if len(same) == len(here) and len(names) == len(here):
         void("the byte comparison", f"{args.ref}'s scripts equal the working tree's — a self-comparison")
         REFTREE = None
+# SLICE 4a's SENSE OF --ref: does the pin carry strip_noop's guard? Asked two ways, and a pin where
+# they disagree -- after the branch's start yet without the guard -- answers neither question.
+PRE_4A, REFREP = None, {}
+if REFTREE is not None:
+    pin_sn = REFTREE / "strip_noop_tracked_changes.py"
+    by_ancestry = is_ancestor(args.ref, START_4A)
+    by_content = pin_sn.is_file() and GUARD_4A not in pin_sn.read_bytes()
+    if by_ancestry != by_content:
+        void("the byte comparison", f"{args.ref} is {'at or before' if by_ancestry else 'after'} slice 4a's "
+             f"start {START_4A}, but its strip_noop {'lacks' if by_content else 'carries'} the guard")
+        REFTREE = None
+    else:
+        PRE_4A = by_ancestry
+        print(f"  --ref {args.ref}: {'predates' if PRE_4A else 'carries'} slice 4a's guard "
+              f"(by ancestry against {START_4A} and by its own strip_noop, agreeing)")
 
 
 def side_parts(wd, d, today=None):
@@ -556,10 +649,11 @@ def outputs(d):
 
 
 def compare(new, ref):
-    """Slice 2b's sense: each output identical, or a .docx member that is the PINNED bytes with
-    every U+200B removed and none left. Returns (moved members, U+200B removed, other movement,
-    whether the pin's delivery carried any U+200B at all)."""
-    moved, removed, other = [], 0, []
+    """Slice 2b's sense and slice 4a's: each output identical; or a .docx member that is the PINNED
+    bytes with every U+200B removed and none left; or an XML member that is the pin's with wrappers
+    the guard kept restored (`restored`). Returns (U+200B-moved members, U+200B removed, {XML member:
+    wrappers restored}, other movement, the members whose pin carried a U+200B)."""
+    moved, removed, wmoved, other = [], 0, {}, []
     for k in sorted(set(new) | set(ref)):
         a, b = new.get(k), ref.get(k)
         if a == b:
@@ -567,12 +661,21 @@ def compare(new, ref):
         if k.startswith("docx:") and a is not None and b is not None and zstrip(b) == a and not zcount(a):
             moved.append(k[5:])
             removed += zcount(b)
+        elif k in XML_MEMBERS and a is not None and b is not None and restored(a, b):
+            wmoved[k] = restored(a, b)
         else:
             other.append(k)
     # WHICH members carried one, not only whether any did: a U+200B is three bytes, and three bytes
     # can occur in a binary member (an image, a font) by chance -- said, never folded into a bool.
     carried = sorted(k[5:] for k, v in ref.items() if k.startswith("docx:") and zcount(v))
-    return moved, removed, other, carried
+    return moved, removed, wmoved, other, carried
+
+
+def txt_blocking(rep):
+    """The delivered check's blocking body findings other than U+200B -- slice 2b's text-and-anchor
+    count -- as (class, shape, idx), in a stable order."""
+    return sorted(((f["class"], f["shape"], f["idx"]) for f in body_only(rep)
+                   if f.get("blocking", True) and f["class"] != "zwsp"), key=str)
 
 
 # ==========================================================================================
@@ -951,8 +1054,13 @@ PIN_A_HF = {"D02": {"filled exact": 8, "verbatim kept": 4}, "D03": {"filled exac
             "D06": {"verbatim kept": 1}, "D07": {"null kept": 5}, "D09": {"verbatim kept": 1},
             "D11": {"null kept": 1}}
 PIN_A_CM = {"D02": {"declared exact": 27, "declared kept": 1}, "D08": {"declared kept": 13}}
-PIN_B = {"D03B": {("side-glossary", "kept-source"): 2},
-         "D08": {("side-ref", "comment:orphaned"): ["3", "4", "12"]}}
+# SLICE 4a RE-PINS (b) AND (c) FOR D08, ON AN ASSUMPTION PUT TO WOUTER (2026-09-28 (4)): comments 3, 4
+# and 12 were orphaned because strip_noop removed the two empty insertions holding their references
+# -- register B10 -- and the guard keeps those wrappers, so D08's anchors are 13, 13 and 13 and no
+# comment is orphaned. The approved acceptance said both "anchors 13 13 13" and "(a) to (c)
+# unchanged", which cannot both hold; this pin takes the first. (a) reads the July deliveries and
+# keeps its four.
+PIN_B = {"D03B": {("side-glossary", "kept-source"): 2}}
 FLAT = {"D02": ["110", "116", "150"]}
 PIN_C = {"uk": {"D02": 38, "D03": 3, "D03B": 3, "D07": 3, "D08": 13, "D09": 2},
          "us": {"D03": 3, "D03B": 3, "D05": 3, "D07": 3, "D08": 13}}
@@ -1269,6 +1377,12 @@ for n, wd in enumerate(workdirs, 1):
             rrcs, _ = chain(REFTREE, rb, src, wd)
             dn, dr = outputs(b), outputs(rb)
             BYTES[key] = (rrcs == rcs, compare(dn, dr), len(dn), rcs, rrcs)
+            # SLICE 4a: the SAME check, today's, reads the pin's build too, so what a change to the
+            # pipeline does to the findings is measured, never inferred from the bytes.
+            rtarget = rb / "delivered.docx" if (rb / "delivered.docx").is_file() else rb / "checked.xml"
+            rjournal = rb / "post_process_journal.json"
+            REFREP[key] = delivered_check(rb / "paragraphs.json", rtarget, rb / "src.docx",
+                                          rjournal if rjournal.is_file() else None, f"r{n:02d}")[0]
             shutil.rmtree(rb, ignore_errors=True)
         journal = b / "post_process_journal.json"
         # THE REPACKED .docx WHERE REPACK PRODUCED ONE (slice 2b): the reordered XML predates
@@ -1377,19 +1491,34 @@ if args.arm in ("b", "both"):
     present = {did_of(k) for k in reports_b}
     ok(f"repack STOPPED exactly where the plan says ({args.variant}, of the documents in this run)",
        set(stopped) == STOP_2B[args.variant] & present, f"stopped {stopped}")
+    # SLICE 4a, today's build whatever the pin: D08's comment anchors equal the original's.
+    for d, want in ANCHORS_4A.items():
+        for key, (rep, _) in reports_b.items():
+            if did_of(key) != d:
+                continue
+            got = {a["anchor"]: (a["original"], a["delivered"]) for a in rep.get("anchors") or []}
+            ok(f"{key}: comment anchors delivered equal the original's, "
+               + " ".join(f"{k} {v}" for k, v in want.items()),
+               all(got.get(k) == (v, v) for k, v in want.items()), f"original/delivered {got}")
     if REFTREE is not None:
-        print(f"\n  SLICE 2b — BYTES MOVE BY U+200B REMOVAL ONLY, AND ONLY WHERE THE PIN'S DELIVERY "
-              f"CARRIED ONE — the chain run with {args.ref}'s scripts and the working tree's:")
-        moved_by_doc = defaultdict(int)
+        print(f"\n  SLICES 2b AND 4a — BYTES MOVE BY U+200B REMOVAL WHERE THE PIN PREDATES 2b's SCRUB AND ITS "
+              f"DELIVERY CARRIED ONE, AND BY A WRAPPER THE GUARD KEPT WHERE THE PIN PREDATES 4a's GUARD; "
+              f"NOTHING ELSE — the chain run with {args.ref}'s scripts and the working tree's:")
+        moved_by_doc, wmoved_by_doc = defaultdict(int), defaultdict(list)
         scrubbed = is_ancestor(SCRUB_2B, args.ref)
-        for key, (same_rc, (moved, removed, other, carried), nparts, rcs, rrcs) in BYTES.items():
+        for key, (same_rc, (moved, removed, wmoved, other, carried), nparts, rcs, rrcs) in BYTES.items():
             ok(f"{key}: every exit code equal {rcs}", same_rc, f"now {rcs}, at the ref {rrcs}")
-            ok(f"{key}: of {nparts} output(s), nothing moved but U+200B removals",
+            ok(f"{key}: of {nparts} output(s), nothing moved but U+200B removals and wrappers the guard kept",
                not other, f"other movement in {other}")
+            if wmoved:
+                print(f"        wrapper(s) restored, per XML member: {wmoved}")
+                wmoved_by_doc[did_of(key)].append(wmoved)
+            if not PRE_4A:
+                ok(f"{key}: no wrapper restored — the pin carries 4a's guard", not wmoved, f"restored {wmoved}")
             if scrubbed:
                 # SLICE 3a's SENSE: the pin already scrubs, so NOTHING may move, whatever it carries.
-                ok(f"{key}: NOTHING moved — the pin carries 2b's scrub and the check added since only "
-                   f"reads", not moved, f"moved {moved}")
+                ok(f"{key}: no U+200B removal moved anything — the pin carries 2b's scrub, and the "
+                   f"check added since only reads", not moved, f"moved {moved}")
                 if carried:
                     print(f"  INFO {key}: the pin's delivery still carries U+200B bytes in {carried} — "
                           f"identical in both builds, so not a movement")
@@ -1401,9 +1530,39 @@ if args.arm in ("b", "both"):
         plan = {} if scrubbed else MOVE_2B[args.variant]
         want = {d: n for d, n in plan.items() if d in present}
         got = {d: n for d, n in moved_by_doc.items() if n}
-        ok(f"the workdirs that moved are exactly the plan's ({args.variant}, of the documents in this run; "
-           + ("the pin carries 2b's scrub, so the plan is NONE" if scrubbed else "slice 2b's plan") + ")",
-           got == want, f"moved {got}, plan {want}")
+        ok(f"the workdirs a U+200B removal moved are exactly the plan's ({args.variant}, of the documents in "
+           f"this run; " + ("the pin carries 2b's scrub, so the plan is NONE" if scrubbed else "slice 2b's plan")
+           + ")", got == want, f"moved {got}, plan {want}")
+        want4 = {d: k for d, k in (MOVE_4A[args.variant] if PRE_4A else {}).items() if d in present}
+        got4 = {d: len(v) for d, v in wmoved_by_doc.items()}
+        ok(f"the workdirs where a wrapper came back are exactly slice 4a's plan ({args.variant}, of the "
+           f"documents in this run; " + ("the pin predates the guard" if PRE_4A else
+                                          "the pin carries the guard, so the plan is NONE") + ")",
+           got4 == want4, f"restored in {got4}, plan {want4}")
+        for d, k in (RESTORED_4A.items() if PRE_4A else ()):
+            if d not in present:
+                continue
+            per = wmoved_by_doc.get(d, [])
+            ok(f"{d}: {k} wrapper(s) restored, the same in every XML member the chain wrote",
+               bool(per) and all(set(m) == set(XML_MEMBERS) and set(m.values()) == {k} for m in per),
+               f"restored {per}")
+        # THE FINDINGS, the pin's build against ours, both read by today's check: what the change did.
+        print(f"\n  SLICE 4a — TEXT-AND-ANCHOR BLOCKING FINDINGS, {args.ref}'s build against the working tree's:")
+        tot_ref = tot_now = 0
+        for key in BYTES:
+            rrep, now = REFREP.get(key), reports_b.get(key, (None, None))[0]
+            if rrep is None or now is None:
+                void(f"{key}: the findings, pin against ours", "a report is missing")
+                continue
+            a, b = Counter(txt_blocking(rrep)), Counter(txt_blocking(now))
+            tot_ref, tot_now = tot_ref + sum(a.values()), tot_now + sum(b.values())
+            lost, gained = sorted((a - b).elements(), key=str), sorted((b - a).elements(), key=str)
+            want_lost = sorted(LOST_4A.get(did_of(key), []) if PRE_4A else [], key=str)
+            print(f"    {key:6} pin {sum(a.values())} → ours {sum(b.values())}"
+                  + (f"; gone {lost}" if lost else "") + (f"; new {gained}" if gained else ""))
+            ok(f"{key}: the findings gone are exactly the plan's ({want_lost or 'none'}) and none is new",
+               lost == want_lost and not gained, f"gone {lost}, new {gained}")
+        print(f"    text-and-anchor blocking over the {len(BYTES)} workdir(s) compared: pin {tot_ref} → ours {tot_now}")
         print(f"  compared {len(BYTES)} of {len(reports_b)} rebuilt workdirs")
 
 shutil.rmtree(TMP, ignore_errors=True)
