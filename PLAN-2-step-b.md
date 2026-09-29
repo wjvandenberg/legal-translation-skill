@@ -3321,10 +3321,10 @@ rewriting stage at all. By construction that addresses options 1, 2, 3 and 6.
 **What it would not touch, and this is the decisive part of the arithmetic.** It does nothing for the
 furniture and dictionary work (content, not architecture), nothing for the instruction substrate (the
 instructions still have to be written, and they are 50 findings), nothing for the two-tree problem, nothing
-for truncation, and nothing for the false claims. **On the measured numbers a rebuild addresses at most 108 of
-the 187 findings and leaves 79 exactly where they are** *(re-derived 2026-09-28 (4) from the option map in
+for truncation, and nothing for the false claims. **On the measured numbers a rebuild addresses at most 109 of
+the 188 findings and leaves 79 exactly where they are** *(re-derived 2026-09-29 (3) from the option map in
 `tools/stepb_verify.py`, which is what generates §9's appendix: the union of what options 1, 2, 3 and 6
-close is **108** — A23, A24, A25 and F47, filed that day, are in option 2, and B10, filed 2026-09-24, is in options 2 and 6; W5, filed 2026-09-28 (4), is in option 8, which a rebuild does not touch. **It read 98 of 177, and 177 minus 98 is 79, not the 77 beside it**: the union had reached
+close is **109** — A23, A24, A25 and F47, filed 2026-09-28, are in option 2, and B10, filed 2026-09-24, is in options 2 and 6; W5, filed 2026-09-28 (4), is in option 8, which a rebuild does not touch; C30, filed 2026-09-29 (3), is in option 2. **It read 98 of 177, and 177 minus 98 is 79, not the 77 beside it**: the union had reached
 100 and the first figure was never re-derived, because `tools/stepb_audit.py`'s check 6 searched for the
 literal "the 160 findings", never found it, and reported the arithmetic as reproducing — fixed in the
 same commit to find the claim by its shape, to fail when it cannot, and to fail on a second live copy. This
@@ -3622,7 +3622,7 @@ call** rather than twice.
 | rank | option | why here |
 |---|---|---|
 | **1** | **Stop deleting what you do not recognise** (option 1) | Every argument points the same way and none points away. Four of the six worst content losses, closed outright rather than detected. One file. No data-format change. Provable by comparing bytes. Nothing depends on it. **The cheapest high-severity work in the project**, and the register's own headline is that this is a content-loss project |
-| **2** | **Check against the original** (option 2) | Highest total value — 60 findings, seven of them worst-grade — and the only option that changes what we can find next time. Ranked second rather than first for one reason: it **detects** rather than repairs, and the deadlock finding means its discerning half cannot land before rank 3. Its instrument half (one failing input per check) belongs with the harness and should go first |
+| **2** | **Check against the original** (option 2) | Highest total value — 61 findings, seven of them worst-grade — and the only option that changes what we can find next time. Ranked second rather than first for one reason: it **detects** rather than repairs, and the deadlock finding means its discerning half cannot land before rank 3. Its instrument half (one failing input per check) belongs with the harness and should go first |
 | **3** | **One authority, one way out, more than one gear** (option 5, cheap half first) | Promoted from A3's fifth place, on a fact A3 did not have: **it is a precondition for rank 2.** Eighteen findings have no compliant repair, so a discerning check without an escape hatch stops the pipeline permanently. It also contains the cheapest fix in the project and the only sanctioned speed lever. Do the scope rule and the exception channel **before** the checks get teeth |
 | **4** | **Take the tidy-up script's authority** (option 6) | The strongest single piece of evidence in the register, and — newly — **option 2's character-exact check cannot be built until this stage declares its changes.** The journal is small and should land early even if the shape decision takes longer |
 | **5** | **Say what the formatting is** (option 3) | The biggest quality gain on the page: 24 findings, 17 visible. Ranked fifth only because it is the most expensive and the riskiest, it needs rank 2 underneath it to be believed, and its own claim on the layout group is refuted. **This is the leap.** It is fifth in *order*, not in importance |
