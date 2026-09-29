@@ -677,11 +677,11 @@ unconditionally — as is §5.6 entire.
 
 **PURPOSE: MET.** It was *so that a run can no longer deliver a paragraph whose formatting pieces do not cover its English, or a leftover scaffold placeholder, and two notes-side reports say truthfully what they counted, without moving one delivered byte*: all four gates are built in both trees, each red first against `0bacc51`, every number Wouter approved held on the corpus and no delivered byte moved, 13 of 13, both variants.
 
-**WHAT LANDED, COMMITTED ON THE BRANCH:** #121 recorded as merged and the slice's written plan; C13, `validate_en_runs` tiling; C4, `verify_diligence` by declaration; C14, the glued stem, with C30 filed and closed, `validate_translations` refusing a leftover `<<TRANSLATE:`. Register C13 C4 C14 closed, C30 filed; section 3.2 of `PLAN-2-step-b.md` owns every number. **Pushing it and opening its PR are Wouter's word, asked at the close**; the next-session prompt names the PR if he gave it.
+**WHAT LANDED, COMMITTED ON THE BRANCH:** #121 recorded as merged and the slice's written plan; C13, `validate_en_runs` tiling; C4, `verify_diligence` by declaration; C14, the glued stem, with C30 filed and closed, `validate_translations` refusing a leftover `<<TRANSLATE:`. Register C13 C4 C14 closed, C30 filed; section 3.2 of `PLAN-2-step-b.md` owns every number. **Pushed and its PR opened at Wouter's word at the close**, not merged; the two stale checkers are re-copied at the next session's open, his ruling too *(`DECISIONS-LOG.md`, 2026-09-29 (3))*.
 
 **WHAT THE MEASUREMENT MOVED:** `tests/test_notes_gates.py` 30 of 30, 21 red at `0bacc51`, both variants; `tools/notes_corpus_arm.py`, new, 8 of 8 on both — 729 of 729 tiling, 13 of 13 PASS by declaration with D07 at 52, 11 and 41, clusters D04 3, D02 2, D11 1; the byte arm 176 checks, nothing moved.
 
-**ONE JUDGEMENT TAKEN ALONE, CARRIED TO WOUTER:** C30's segment half counts only once a paragraph has `en` — the written plan said any segment, which would refuse batch 1 on a paragraph due in a later batch; apply skips an `en`-less paragraph, so none reaches the document. Arm 29 pins it.
+**ONE JUDGEMENT TAKEN ALONE, KEPT BY WOUTER AT THE CLOSE:** C30's segment half counts only once a paragraph has `en` — the written plan said any segment, which would refuse batch 1 on a paragraph due in a later batch; apply skips an `en`-less paragraph, so none reaches the document. Arm 29 pins it.
 
 **WHAT A NEW SESSION WOULD GET WRONG:** the new suite and tool need `uv run --with lxml`; and two typed counts C30 moved — option 2's 60 and the rebuild's 108 of 187 — sat behind `stepb_audit`'s standing red and surfaced only in the gate compared by content, never by rc.
 

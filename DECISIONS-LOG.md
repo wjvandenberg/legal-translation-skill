@@ -963,3 +963,25 @@ text that is read for the same reason, before a script is run.
 document instruments and its commit gate the confidentiality controls, and `verify_md` is in neither. **Slice
 4a's gate comparison, run by content against its base, is what saw it** — a standing red compared by content
 and never by its exit code, the house rule that caught it.
+
+## 2026-09-29 (3) — C30's refusal kept narrow, slice 4b pushed, and the stale checkers deferred to the next open
+
+**THREE RULINGS AT THE CLOSING INPUT POINT, EACH ON THE RECOMMENDED OPTION** *(Wouter, 2026-09-29 (3))*.
+
+**(1) C30's SEGMENT HALF COUNTS ONLY ONCE A PARAGRAPH HAS `en`.** His choice (5) on 2026-09-28 (3) said
+`validate_translations.py` refuses a `<<TRANSLATE:` placeholder left in `en` or a segment, and slice 4b's
+written plan read *any `en_segments` entry*. The in-context review of the diff found that form wrong in
+scope: Step 3b writes the placeholders BEFORE translation, and this script runs after every batch of 35,
+so it would refuse batch 1 on a paragraph not due until batch 3 — a gate whose only compliant way out
+fights the batch discipline. **Apply skips a paragraph with no `en`, so none of its segments can reach
+the document either way**; a placeholder in `en` itself is refused whatever the paragraph. The broad form
+was declined for that reason. `tests/test_notes_gates.py` arm 29 pins the rule as kept.
+
+**(2) THE BRANCH PUSHED AND ITS PULL REQUEST OPENED**, the repository being public, so pushing publishes
+it; the merge stays his.
+
+**(3) `verify_code.py` v10 AND `check_checkers.py` v17 ARE RE-COPIED AT THE NEXT SESSION'S OPEN**, a
+commit of their own with the gate re-baselined after it. They were found a version behind the shared
+folder at this session's open and left, so the gate measured with one set of instruments throughout.
+Re-copying on this branch was declined because it mixes an instrument change into a slice's evidence;
+leaving them stale again was declined because the house rule for a STALE checker is to re-copy it.
