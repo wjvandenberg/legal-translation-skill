@@ -943,3 +943,23 @@ and the detections reach the change journal at schema 3 — **are owned, with th
 on, by section 3.8 of `PLAN-2-step-b.md`**, and are not summarised here. **What was DECLINED, and why it is
 recorded:** reading the original through a new `--original` input at Step 6, the slice's literal shape. On
 this corpus it would have restored **0 of 11** breaks, and it would have added the flag decision 2c forbids.
+
+## 2026-09-29 — section 4 re-capped at its measured 30, and why the signed-Python rule was not relocated
+
+**§4 OF `CLAUDE.md` IS RE-CAPPED FROM 23 TO 30 IN `verify.config.json`** *(Wouter, 2026-09-29 (2), at the
+closing input point, on the recommended option)*. The seven lines are the signed-Python rule he put in §4 on
+2026-09-28 (4) — no Python process moves or renames a Word, email or PDF file, and the project runs on the
+signed system Python 3.14 — **so that it is read before any code touches a file.** A filled section's cap is
+its measured size, so this is a re-measurement and not slack; every other section keeps its margin.
+
+**THE TWO ALTERNATIVES, AND WHY EACH WAS DECLINED.** *(1)* **Moving the rule to `.claude/rules/`** behind a
+`paths:` glob over the Python files: a scoped rule loads once per session, when a matching file is first read,
+and is not put back after a compact — which defeats the reason the rule is in the charter at all. *(2)*
+**Moving §4's dev-host toolchain paragraph** to a companion document: it would pay for the rule by relocating
+text that is read for the same reason, before a script is run.
+
+**HOW IT WAS CAUGHT, AND WHY THAT IS RECORDED.** `feature/signed-python-no-doc-moves` merged `66af307`
+(PR #119) with `verify_md`'s *section length* row newly RED, and nothing said so: its verify ran the eight
+document instruments and its commit gate the confidentiality controls, and `verify_md` is in neither. **Slice
+4a's gate comparison, run by content against its base, is what saw it** — a standing red compared by content
+and never by its exit code, the house rule that caught it.
