@@ -81,9 +81,9 @@ stale 500 and 35 until 2026-09-22 — a restated cap is a second place to go sta
 this project has run far past eight sessions, the observable test. **Every cap is enforced, not
 aspirational**, and `check_checkers.py` reports whether the copy you run is the current one.
 
-> **OVER-CAP, RE-DERIVED 2026-09-24 AFTER BRANCH 10 SLICE 4: 685 lines against a cap of 619 — 66 OVER**, the
+> **OVER-CAP, RE-DERIVED 2026-09-28 (4) AFTER THE SIGNED-PYTHON RULE: 692 lines against a cap of 619 — 73 OVER**, the
 > cap being this archetype's emit *(`rebuild`/L, counted at 499)* plus the measured **120** for a project's own
-> content. Ladder **1,241 → 815 → 776 → 760 → 691 → 686 → 687 → 683 → 687 → 685**, the +4 a §3.1 status row recording a slice; slice 4 moved it by −2, its sentence sitting inside one §3.1 row and §7 replaced two lines shorter. *(Re-derived LAST: editing this block moves it.)*
+> content. Ladder **1,241 → 815 → 776 → 760 → 691 → 686 → 687 → 683 → 687 → 685 → 692**, the +7 §4's signed-Python pin and its no-move rule, put in the charter at Wouter's word so that it is read before any code touches a file *(2026-09-28 (4))*. *(Re-derived LAST: editing this block moves it.)*
 >
 > **REASON — EVERY ROUTE IS NOW MEASURED, AND THE PER-HEADING INVENTORY IS WHAT MEASURED THEM.** Pass one
 > collapsed 27 blocks for **−49**, bulletised route-1 §5.6 for **−7 out of 77 prose lines** *(so route 1 was
@@ -275,11 +275,18 @@ only.
 manipulated as text**, the hard rules in §5.7 · lexicons and step documents split small · **`uv run`**.
 
 **Dev-host toolchain, every element load-bearing — VERSIONS DELIBERATELY NOT LISTED: run the tool**, a typed
-table having been measured wrong in four of seven rows. **ALWAYS `uv run python`, NEVER bare `python`:** they
-are *different interpreters*, nothing pins a version, and register I-25 is the cost — bare python links a
-different zlib and silently rewrites all eighteen fixtures' bytes. **Word (COM)** gives reference-fidelity
-`.doc → .docx`, the evidence baseline; **LibreOffice** the user-reality conversion and `docx → pdf`;
-`pandoc` the grader's `docx → markdown`; **PyMuPDF** the `pdf → png` render.
+table having been measured wrong in four of seven rows. **ALWAYS `uv run python`, NEVER bare `python`, AND THE
+PROJECT RUNS ON THE SIGNED SYSTEM PYTHON 3.14** — `.python-version` and `uv.toml` pin it *(Wouter, 2026-09-28 (4))*,
+because this machine's security agent silently ends an UNSIGNED process that moves or renames a Word or email
+file, and a run it ends can still look finished; **the fixtures were REBUILT on 3.14 when it was pinned,**
+**every member identical in content**, because the smoke suite rebuilds them on every run and 3.14's zlib
+writes other bytes *(register I-25's mechanism; Wouter, 2026-09-29)*. **Word (COM)** gives reference-fidelity `.doc → .docx`, the evidence baseline;
+**LibreOffice** the user-reality conversion and `docx → pdf`; `pandoc` the grader's `docx → markdown`;
+**PyMuPDF** the `pdf → png` render.
+
+**NO PYTHON PROCESS MAY MOVE OR RENAME A WORD, EMAIL OR PDF FILE** *(Wouter, 2026-09-28 (4))* — never
+`os.replace`, `os.rename`, `shutil.move` or `Path.rename`/`replace`: build it in memory and write it once, after
+every check has passed. `tests/test_no_document_moves.py` refuses every move call in tracked Python.
 
 **The rendered visual diff is the highest-yield defect detector and is available on this host** — convert
 legacy `.doc` with Word for evidence and LibreOffice for user reality; the comparison between the two IS the

@@ -157,21 +157,22 @@ The script also automatically:
 - Removes `<w:trackRevisions>` from `word/settings.xml` (disabling track changes mode)
 - Skips ZIP directory entries (which cause case-sensitivity problems on Windows)
 - Verifies ZIP integrity and checks for case conflicts — **both of these now BLOCK.**
-  The archive is built under `<output>.docx.tmp` and moved into place only if both
-  pass; if either fails, the temporary file is **deleted** and the repack exits 1. A
-  file Word cannot open is therefore never left at the delivery path, and a run that
-  produced one can no longer report success
+  The archive is built in memory and written to the delivery path once, only if both
+  pass; if either fails, nothing is written and the repack exits 1. A file Word cannot
+  open is therefore never left at the delivery path, and a run that produced one can
+  no longer report success. It is never renamed into place: a security agent that ends
+  any process renaming a Word file is common on managed machines
 - **Scrubs every U+200B** (zero-width space) from the character data of every prose
   part — `word/document.xml`, comments, footnotes, endnotes, the glossary, every
   `header*.xml` / `footer*.xml` — whichever source the part came from. The ZWSP device
   is right while the pipeline runs and a defect in the deliverable, so it is removed
   here and never forbidden earlier. A U+200B inside an attribute value is in no reading
   and is left alone.
-- **Blocks on a source-language remnant, BEFORE the file is moved into place.** The
+- **Blocks on a source-language remnant, BEFORE the file is written.** The
   source language is auto-detected from the ORIGINAL `word/document.xml`, and every
   prose part of the archive is scanned with the marker lists
-  `apply_translations_textmatch.py` uses. A hit REFUSES delivery — exit 1, the
-  temporary file deleted — unless its class is declared advisory in
+  `apply_translations_textmatch.py` uses. A hit REFUSES delivery — exit 1, nothing
+  written — unless its class is declared advisory in
   `source_language_markers.py`, where it prints a WARNING instead: `convention` (an
   English word), five company-form nouns that sit inside kept registered names, CJK
   characters, and six kept names the lexicons tell you to write (e.g. "Agenzia delle

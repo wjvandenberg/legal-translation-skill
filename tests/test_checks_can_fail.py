@@ -437,9 +437,11 @@ head("7. BOTH TREES CARRY EVERY CHANGE — no fix may land in one variant only")
 # the other. A per-tree assertion is cheap and it is the whole point of the layout.
 MARKERS = [
     ("scripts/quality_check.py", "sys.exit(2 if total else 0)"),
-    ("scripts/repack_docx.py", "tmp_docx = output_docx + '.tmp'"),
+    # C23's fix is built in memory and written once since 2026-09-28 (4): it was a temporary name
+    # renamed into place, and this machine's security agent ends a process that renames a Word file.
+    ("scripts/repack_docx.py", "archive = io.BytesIO()"),
     ("scripts/repack_docx.py", "SKILL GATE FIRED"),
-    ("scripts/repack_docx.py", "shutil.move(tmp_docx, output_docx)"),
+    ("scripts/repack_docx.py", "fh.write(archive.getvalue())"),
     ("scripts/apply_translations_textmatch.py", "if rc == _INTEGRITY_EXIT:"),
     ("scripts/verify_diligence.py", "return 2 if args.strict else 1"),
     ("skill-docs/10-repack-and-validate.md", "`--paragraphs` is **REQUIRED**"),

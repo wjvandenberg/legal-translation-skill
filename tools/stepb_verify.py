@@ -229,9 +229,11 @@ GROUPS = {
  # every other G row does — the check says something about the document that may not be so.
  # G13 ADDED 2026-09-25 (branch 11 slice 2b's exploration): quality_check fails Step 9 on six
  # renderings the lexicons prescribe -- a finding about the document that is not so, G12's group.
+ # W5 ADDED 2026-09-28 (4): the delivery step renamed a Word file into place, and a security agent that
+ # ends any process doing so ends the run while it can still look finished -- a run that says it worked.
  "3 says it worked when it did not": """
    C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9
-   G10 G11 G12 G13 S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6
+   G10 G11 G12 G13 S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6 W5
    """,
  "4 hard to keep correct": """
    U1 V1 V2 W1 W2 T1 T2 T3 T4 T5 T6 F21 F23 F32 F36 F37 F38 L2 L3 E1 E2 E3 E5 E6 E10 E11 E13 E14 Q1 Y1
@@ -344,8 +346,10 @@ OPTIONS = {
  # C29 added 2026-09-02: the other half of its fix is that a shipped script must write UTF-8
  # whatever the console code page is. That is a packaging property of the whole tree, not a
  # property of the one script that happened to print an arrow.
+ # W5 ADDED 2026-09-28 (4): whether the package's delivery step survives the machine it runs on is a
+ # property of the whole package, beside W1 to W4's install truncation.
  "8 protect the whole package": """
-   W1 W2 W3 W4 C29 F35 Y1 Q1
+   W1 W2 W3 W4 C29 F35 Y1 Q1 W5
    """,
  # F43 and F44 added 2026-09-10. Both are a CLAIM being wrong rather than code: --extract
  # promises that leaving `en` null preserves an already-English header verbatim, --apply

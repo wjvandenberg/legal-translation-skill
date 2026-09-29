@@ -143,9 +143,9 @@ MUTATIONS = [
  # (G12), 44 -> 45 on branch 11 slice 2b (G13). It reports INERT rather than passing, which is the only reason the drift is visible
  # at all -- a probe whose mutation silently stops applying is a test that has become a
  # decoration. Re-anchor it in the same commit that moves the count.
- ("state a group heading count the map contradicts (group 3: 45 -> 44)",
-  lambda t: t.replace("### 5.3 Things that say it worked when it did not — 45 findings",
-                      "### 5.3 Things that say it worked when it did not — 44 findings", 1),
+ ("state a group heading count the map contradicts (group 3: 46 -> 45)",
+  lambda t: t.replace("### 5.3 Things that say it worked when it did not — 46 findings",
+                      "### 5.3 Things that say it worked when it did not — 45 findings", 1),
   "stepb_audit.py",
   "NEW GUARD: check 5d compares EACH group heading to the map, not only their sum"),
 ]
