@@ -1,0 +1,5 @@
+# The project runs on a SYSTEM Python, never uv's own download (Wouter, 2026-09-28): here that is the
+# SIGNED C:\Python314, and this machine's security agent ends an UNSIGNED process that moves or renames
+# a Word, email or PDF file, while the run it ends can still look finished. .python-version says which
+# version; this says where it may come from. CLAUDE.md section 4.
+python-preference = "system"

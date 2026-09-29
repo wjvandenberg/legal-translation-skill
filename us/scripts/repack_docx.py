@@ -14,7 +14,7 @@ Every prose part (body, comments, footnotes, endnotes, glossary, headers,
 footers) has every U+200B removed from its character data as it is written,
 whatever the part's source: the operator's zero-width scaffolding is right
 while the pipeline runs and a defect in the deliverable (register J1). The
-archive is then read back BEFORE it is moved into place: a U+200B that
+archive is then read back BEFORE it is written: a U+200B that
 survived refuses delivery, and so does a positive source-language remnant in
 any prose part (register C22) — the language auto-detected from the ORIGINAL's
 word/document.xml, the verdict source_language_markers.remnant_verdict's.
@@ -29,22 +29,25 @@ Exit codes:
       word/glossary/document.xml and --glossary was not supplied, or the
       finished archive failed its own ZIP integrity or case-conflict check,
       kept a U+200B, or carried a blocking source-language remnant, and was
-      deleted.
+      never written.
   3 — script-integrity check failed (re-install the skill)
 
-The archive is built under `<output>.docx.tmp` and moved into place only after
-both post-write checks pass, so a failure never leaves a partial or unopenable
-file where a deliverable should be.
+The archive is built IN MEMORY and written to the delivery path once, only
+after every check on it has passed, so a failure never leaves a partial or
+unopenable file where a deliverable should be. It is never built under a
+temporary name and renamed into place: a security agent that ends any process
+renaming a Word file is common on managed machines, and a run it ends can
+still look finished.
 
 Usage:
     python repack_docx.py <original.docx> <translated_document.xml> <output.docx> [--numbering <translated_numbering.xml>] [--headers-footers-dir <dir>] [--clean-track-revisions]
 """
 import sys
+import io
 import os
 import re
 import tempfile
 import zipfile
-import shutil
 
 def _check_self_integrity():
     """Detect install-time truncation. Whole-file scan tolerates null-padding."""
@@ -154,16 +157,16 @@ def _scrub_zwsp(data):
     return _CHARDATA_RE.sub(one, data), n
 
 
-def _remnant_gate(orig_docx, tmp_docx):
+def _remnant_gate(orig_docx, archive):
     """THE REMNANT BLOCK — register C22: the one check that reads the finished
     archive with the original in hand was advisory by design. Every prose part
-    of the archive ABOUT TO BE DELIVERED is scanned; a BLOCKING hit deletes it
-    and refuses, an advisory one warns (the classes are source_language_markers'
+    of the archive ABOUT TO BE DELIVERED -- `archive`, held in memory -- is
+    scanned; a BLOCKING hit refuses it, so it is never written, and an advisory
+    one warns (the classes are source_language_markers'
     REMNANT_ADVISORY and LEXICON_KEPT_NAMES, each with its reason). The language
     comes from the ORIGINAL, C9's source of truth; making that detection SAY it
     is guessing, and reusing it for C9, are branch 12's."""
     if _detect_lang is None or _remnant_verdict is None:
-        os.remove(tmp_docx)
         raise RuntimeError(
             "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. "
             "source_language_markers.py could not be imported, so the remnant "
@@ -180,7 +183,7 @@ def _remnant_gate(orig_docx, tmp_docx):
     print(f"  Remnant block: language={src_lang}, reading every prose part of "
           "the archive BEFORE it is delivered...")
     blocking, advisory = [], []
-    with zipfile.ZipFile(tmp_docx) as z:
+    with zipfile.ZipFile(archive) as z:
         for part in z.namelist():
             if _is_prose_part(part):
                 # Tags stripped so only reader-visible text is scanned, never
@@ -198,13 +201,12 @@ def _remnant_gate(orig_docx, tmp_docx):
         if not advisory:
             print(f"  Remnant block clean: no {src_lang} remnants in any prose part.")
         return
-    os.remove(tmp_docx)
-    shown = "\n".join(f"  - {part}: {pat}: ...{' '.join(ctx.split())[:100]}..."
+    shown ="\n".join(f"  - {part}: {pat}: ...{' '.join(ctx.split())[:100]}..."
                       for part, pat, ctx in blocking[:10])
     raise RuntimeError(
         "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. SOURCE-LANGUAGE "
         f"REMNANT: {len(blocking)} {src_lang} remnant(s) in the repacked archive, "
-        f"so it was DELETED instead of delivered:\n{shown}\n"
+        f"so it was NEVER WRITTEN to the delivery path:\n{shown}\n"
         "Nothing was written to the delivery path. Translate the text and re-run. "
         "A remnant in a part you did not pass (comments, footnotes, a header) means "
         "that part was not wired into this repack: pass its flag. If the text is "
@@ -721,16 +723,18 @@ def repack(orig_docx, translated_doc_xml, output_docx,
                 if new_content != content:
                     rels_fixups[item.filename] = new_content.encode('utf-8')
 
-        # WRITE TO A TEMPORARY NAME, NEVER STRAIGHT TO THE DELIVERY PATH.
+        # BUILD IN MEMORY, NEVER STRAIGHT TO THE DELIVERY PATH.
         # This loop used to write output_docx in place, so an exception part-way
         # through left a partial .docx exactly where a good one should be — while
         # the completion invariant in SKILL.md says a delivered file exists only if
         # all 11 steps completed, and a reader cannot tell a finished document from
-        # an unfinished one by looking at it. The temp-then-move idiom is already
-        # used in this tree by clean_conversion_artifacts.py; this is that pattern.
-        tmp_docx = output_docx + '.tmp'
+        # an unfinished one by looking at it. It then wrote a temporary name and
+        # renamed it into place, and a security agent that ends any process
+        # renaming a Word file ended that run while it could still look finished.
+        # So the archive is held in memory, checked there, and written once.
+        archive = io.BytesIO()
         scrubbed = {}
-        with zipfile.ZipFile(tmp_docx, 'w', zipfile.ZIP_DEFLATED) as zout:
+        with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as zout:
             seen_normalized = set()  # track normalized paths to skip duplicates
             for item in zin.infolist():
                 if item.is_dir():
@@ -788,7 +792,7 @@ def repack(orig_docx, translated_doc_xml, output_docx,
         for _part, _n in sorted(scrubbed.items()):
             print(f"  U+200B scrubbed: {_n} from {_part}")
 
-    # --- VERIFY THE TEMPORARY FILE, AND PROMOTE IT ONLY IF BOTH CHECKS PASS ---
+    # --- VERIFY THE ARCHIVE IN MEMORY, AND WRITE IT ONLY IF EVERY CHECK PASSES ---
     #
     # BOTH CONDITIONS NOW BLOCK. Each used to print a WARNING and continue;
     # repack() returned None, and __main__ set no exit code at all — so a run that
@@ -804,7 +808,7 @@ def repack(orig_docx, translated_doc_xml, output_docx,
     # indistinguishable from a gate that passed. Making it block costs nothing the
     # corpus ever did and closes the one path that ships a broken file silently.
     problems = []
-    with zipfile.ZipFile(tmp_docx) as z:
+    with zipfile.ZipFile(archive) as z:
         bad = z.testzip()
         if bad:
             problems.append(f"ZIP integrity check failed on: {bad}")
@@ -820,11 +824,10 @@ def repack(orig_docx, translated_doc_xml, output_docx,
             lower_map[ln] = name
 
     if problems:
-        os.remove(tmp_docx)
         raise RuntimeError(
             "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. "
             "The repacked archive failed its own integrity checks, so it was "
-            "DELETED instead of delivered:\n  - "
+            "NEVER WRITTEN:\n  - "
             + "\n  - ".join(problems)
             + "\nNothing was written to the delivery path. A file Word cannot "
               "open is not a deliverable, and shipping one silently is worse "
@@ -836,22 +839,23 @@ def repack(orig_docx, translated_doc_xml, output_docx,
     # --- READ THE ARCHIVE BACK: NO U+200B MAY SURVIVE THE SCRUB (J1) ---
     # Asserted on the archive itself, never on the scrub's own count: a count
     # proves the pattern matched, not what was written.
-    with zipfile.ZipFile(tmp_docx) as z:
+    with zipfile.ZipFile(archive) as z:
         survived = {n: k for n in z.namelist() if _is_prose_part(n)
                     for k in [sum(_zwsp_count(c) for c in _CHARDATA_RE.findall(z.read(n)))] if k}
     if survived:
-        os.remove(tmp_docx)
         raise RuntimeError(
             "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. U+200B SURVIVED "
             "THE SCRUB in " + ", ".join(f"{n} ({k})" for n, k in sorted(survived.items()))
-            + ", so the archive was DELETED instead of delivered. Nothing was written "
+            + ", so the archive was NEVER WRITTEN. Nothing was written "
             "to the delivery path. This is a defect in repack itself: re-install the "
             "skill from the .skill / .zip archive.")
 
-    # --- THE REMNANT BLOCK (C22), on the archive BEFORE it is moved into place ---
-    _remnant_gate(orig_docx, tmp_docx)
+    # --- THE REMNANT BLOCK (C22), on the archive BEFORE it is written ---
+    _remnant_gate(orig_docx, archive)
 
-    shutil.move(tmp_docx, output_docx)
+    # WRITTEN ONCE, after every check: a create-and-write, never a rename.
+    with open(output_docx, 'wb') as fh:
+        fh.write(archive.getvalue())
     print(f"Repacked: {output_docx}")
 
 if __name__ == '__main__':
