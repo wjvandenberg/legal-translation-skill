@@ -71,9 +71,9 @@
    "sha256_now": "d36afd7da2d703dde74202bcc293335fe31d0317d2ab4aca2d19f4fd787597e2"
   },
   "uk/scripts/verify_diligence.py": {
-   "changed_by": "feature/checks-can-fail",
-   "commit_subject": "Branch 5 - checks can fail: the mandatory quality check gets an exit code, a corrupt deliverable stops the run and is written to a temporary name first, omitting --paragraphs refuses instead of warning, a validator's exit 3 blocks unconditionally, the truncation guard moves above __main__, and WARN stops being indistinguishable from PASS (register rows C3 C23 C25 W3 W4 L4)",
-   "sha256_now": "b5bbddac8c4c6d83a04157cefe756bb6309356987ff48756893bab981af79175"
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C4: verify_diligence's Step 4 + 4b counts what was declared, and says how many changed and how many were kept as the source",
+   "sha256_now": "db4a883f41e932dee2ed210008d5ac2f8e8bab2f232d5f701052c2bf5169c17f"
   },
   "uk/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/branch8-extraction-completeness",
@@ -171,9 +171,9 @@
    "sha256_now": "14167da617e929d80bbe294a51ebd4673379662e258c45d61edf6d470104a770"
   },
   "us/scripts/verify_diligence.py": {
-   "changed_by": "feature/checks-can-fail",
-   "commit_subject": "Branch 5 - checks can fail: the mandatory quality check gets an exit code, a corrupt deliverable stops the run and is written to a temporary name first, omitting --paragraphs refuses instead of warning, a validator's exit 3 blocks unconditionally, the truncation guard moves above __main__, and WARN stops being indistinguishable from PASS (register rows C3 C23 C25 W3 W4 L4)",
-   "sha256_now": "1ef1eb2ced2bc24ee1aa8932c3e510a0d05335a9493d322d0ea8904344e4eec7"
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C4: verify_diligence's Step 4 + 4b counts what was declared, and says how many changed and how many were kept as the source",
+   "sha256_now": "d93191b55b1b13575585424a795364fec9ffce1b7782699a428811b2f6fdda93"
   },
   "us/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/branch8-extraction-completeness",

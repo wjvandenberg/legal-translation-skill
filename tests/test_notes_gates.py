@@ -21,6 +21,12 @@ working tree's has its arms reported VOID, never passed: that is a self-comparis
   11  the definitions presence test: missing en_runs 2, with the flag 1, with tiling runs 0  (unchanged)
   12  a definitions section missing en_runs AND a gap elsewhere, with the flag: still 2
 
+  C4, verify_diligence.py - Step 4 + 4b counts what was DECLARED, validate_translations' own population
+  13  a declared paragraph kept as the source and missing from the state FAILs
+  14  a complete state PASSes and says how many were declared, changed and kept as the source
+  15  a changed declared paragraph missing from the state still FAILs                       (unchanged)
+  16  English with no source text is outside the validator's population, so it is not counted
+
     uv run --with lxml python tests/test_notes_gates.py
     uv run --with lxml python tests/test_notes_gates.py --variant us
     uv run --with lxml python tests/test_notes_gates.py --ref 0bacc51    # RED
@@ -176,6 +182,44 @@ if section("validate_en_runs.py", "C13 - validate_en_runs.py: the spans must TIL
     rc, _ = run("validate_en_runs.py", write("ver_defs_gap.json", defs(False, gap)), "--allow-bold-loss")
     ok(" 12 a definitions section missing en_runs AND a gap elsewhere, with the flag: still exit 2",
        rc == 2, f"rc={rc}")
+
+# =====================================================================================================
+if section("verify_diligence.py", "C4 - verify_diligence.py: Step 4 + 4b counts what was DECLARED"):
+    import re as _re
+    COVER = _re.compile(r"^\s+(PASS|FAIL|WARN) — (.*(?:translated|declared) paragraphs.*)$", _re.M)
+
+    def audit(rows, validated, name):
+        wd = TMP / name
+        wd.mkdir(parents=True, exist_ok=True)
+        (wd / "paragraphs.json").write_text(json.dumps(rows, ensure_ascii=False), encoding="utf-8")
+        (wd / ".validate-state.json").write_text(json.dumps(
+            {"validated_indices": validated,
+             "history": [{"timestamp": "2020-01-01T00:00:00Z", "count": len(validated),
+                          "indices": validated}]}), encoding="utf-8")
+        rc, out = run("verify_diligence.py", wd, "--report-only")
+        m = COVER.search(out)
+        return (m.group(1), m.group(2)) if m else (None, f"no coverage line (rc={rc})")
+
+    # Five declared: 0 and 1 changed, 2 3 4 kept as the source (a party name, a date, a code).
+    ROWS = [para(0, "De huurder betaalt.", "The Lessee pays."),
+            para(1, "De verhuurder levert.", "The Lessor delivers."),
+            para(2, "Acme Holding B.V.", "Acme Holding B.V."),
+            para(3, "12.03.2020", "12.03.2020"),
+            para(4, "NL-7788", "NL-7788"),
+            para(5, "", ""),
+            para(6, "Niet vertaald.")]
+    sev, line = audit(ROWS, [0, 1, 3, 4], "vd_kept_missing")
+    ok(" 13 a declared paragraph KEPT as the source and missing from the state FAILs", sev == "FAIL",
+       f"{sev}: {line}")
+    sev, line = audit(ROWS, [0, 1, 2, 3, 4], "vd_complete")
+    ok(" 14 a complete state PASSes, saying 5 declared, 2 changed, 3 kept as the source",
+       sev == "PASS" and "5 declared" in line and "2 changed" in line and "3 kept as the source" in line,
+       f"{sev}: {line}")
+    sev, line = audit(ROWS, [1, 2, 3, 4], "vd_changed_missing")
+    ok(" 15 a CHANGED declared paragraph missing from the state still FAILs", sev == "FAIL", f"{sev}: {line}")
+    sev, line = audit(ROWS + [para(7, "", "An inserted English line.")], [0, 1, 2, 3, 4], "vd_no_source")
+    ok(" 16 English with no source text is outside the validator's population, so it is not counted",
+       sev == "PASS" and "5 declared" in line, f"{sev}: {line}")
 
 # =====================================================================================================
 shutil.rmtree(TMP, ignore_errors=True)
