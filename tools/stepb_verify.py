@@ -231,9 +231,11 @@ GROUPS = {
  # renderings the lexicons prescribe -- a finding about the document that is not so, G12's group.
  # W5 ADDED 2026-09-28 (4): the delivery step renamed a Word file into place, and a security agent that
  # ends any process doing so ends the run while it can still look finished -- a run that says it worked.
+# C30 ADDED 2026-09-29 (3) (branch 11 slice 4b): no gate refused a scaffold placeholder left in `en` or
+# a segment, so one would have printed as literal text past every check reporting clean.
  "3 says it worked when it did not": """
    C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9
-   G10 G11 G12 G13 S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6 W5
+   G10 G11 G12 G13 S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6 W5 C30
    """,
  "4 hard to keep correct": """
    U1 V1 V2 W1 W2 T1 T2 T3 T4 T5 T6 F21 F23 F32 F36 F37 F38 L2 L3 E1 E2 E3 E5 E6 E10 E11 E13 E14 Q1 Y1
@@ -297,10 +299,12 @@ OPTIONS = {
  # other three have NO decided fix, so they are placed here and nowhere else: option 1's
  # preserve-by-default is the obvious home for A24 and A25, and assigning it would be a decision
  # nobody has taken.
+# C30 ADDED 2026-09-29 (3): filed and closed by branch 11 slice 4b beside C4, C13 and C14, the
+# notes-side gates this option's branch 11 carried.
  "2 check against the original": """
    C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28
    G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
-   B10 A23 A24 A25 F47
+   B10 A23 A24 A25 F47 C30
    """,
  # A3 AND A6 BOTH ARRIVED HERE 2026-09-02. A3 is deliberately in TWO options -- the header
  # above says a row may need more than one, and A3 genuinely does: option 1 closed the

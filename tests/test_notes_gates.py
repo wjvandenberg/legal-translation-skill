@@ -27,6 +27,23 @@ working tree's has its arms reported VOID, never passed: that is a self-comparis
   15  a changed declared paragraph missing from the state still FAILs                       (unchanged)
   16  English with no source text is outside the validator's population, so it is not counted
 
+  C14, coalesce_fragmented_tcs.py - regular text glued letter to letter counts, a CJK junction does not
+  17  the D04-113 shape, its stem AFTER the edit, is scaffolded, the stem's segment its own placeholder
+  18  the D04-125 shape, its stem BEFORE the edit, is scaffolded the same way
+  19  a whole-word replacement followed by punctuation is not scaffolded                     (unchanged)
+  20  a CJK junction is not scaffolded                                                         (unchanged)
+  21  regular text glued INSIDE the run counts as a piece
+  22  the canonical letter-by-letter cluster is scaffolded as the step document shows       (unchanged)
+  23  every run prints tracked-change paragraphs examined against scaffolded, a clean one too
+  24  direct fill is unchanged                                                                 (unchanged)
+
+  C30, validate_translations.py - a <<TRANSLATE: placeholder left in en or a segment is refused, exit 2
+  25  one left in en is refused, the paragraph named, no text printed, no state written
+  26  one left in an en_segments entry is refused, naming the segment
+  27  one on a paragraph with no source text is still refused
+  28  the same scaffold filled in passes and records its state                               (unchanged)
+  29  a scaffolded paragraph not yet translated (no en) is not refused: batch 1 still validates (unchanged)
+
     uv run --with lxml python tests/test_notes_gates.py
     uv run --with lxml python tests/test_notes_gates.py --variant us
     uv run --with lxml python tests/test_notes_gates.py --ref 0bacc51    # RED
@@ -220,6 +237,104 @@ if section("verify_diligence.py", "C4 - verify_diligence.py: Step 4 + 4b counts 
     sev, line = audit(ROWS + [para(7, "", "An inserted English line.")], [0, 1, 2, 3, 4], "vd_no_source")
     ok(" 16 English with no source text is outside the validator's population, so it is not counted",
        sev == "PASS" and "5 declared" in line, f"{sev}: {line}")
+
+# =====================================================================================================
+if section("coalesce_fragmented_tcs.py", "C14 - coalesce_fragmented_tcs.py: the glued stem counts, a CJK junction does not"):
+    PH = "<<TRANSLATE: "
+
+    def tcp(idx, segs):
+        text = "".join(t for k, t in segs if k != "del")
+        return {"idx": idx, "text": text, "style": "Normal", "has_track_changes": True,
+                "tc_segments": [{"type": k, "text": t} for k, t in segs]}
+
+    def scaffold(rows, name, *flags):
+        p = write(name, rows)
+        rc, out = run("coalesce_fragmented_tcs.py", p, *flags)
+        return rc, out, {e["idx"]: e.get("en_segments") for e in json.loads(p.read_text(encoding="utf-8"))}
+
+    AFTER = [("regular", "Clausula "), ("del", "Duod"), ("ins", "Tr"), ("regular", "ecima.- Datos personales")]
+    BEFORE = [("regular", "Seccion Vige"), ("del", "simo"), ("ins", "sima"), ("regular", ". Plazo")]
+    WHOLE = [("regular", "Artikel "), ("del", "twee"), ("ins", "drie"), ("regular", ". De partij stemt in")]
+    CJK = [("regular", "第十"), ("del", "二"), ("ins", "三"), ("regular", "条 本契約")]
+    INRUN = [("regular", "de "), ("del", "ka"), ("regular", "t"), ("ins", "s"), ("regular", " zit hier")]
+    CANON = [("ins", "D"), ("del", "Duod"), ("ins", "e"), ("del", "é"), ("regular", "cim"),
+             ("ins", "otercera"), ("del", "a"), ("regular", ".- Legislacion y fuero")]
+    rc, out, got = scaffold([tcp(1, AFTER), tcp(2, BEFORE), tcp(3, WHOLE), tcp(4, CJK), tcp(5, INRUN),
+                             tcp(6, CANON)], "cft_shapes.json")
+    a = got.get(1) or []
+    ok(" 17 the D04-113 shape - its stem AFTER the edit - is scaffolded, the whole word on the ins and del, "
+       "the stem's segment its own placeholder",
+       len(a) == 4 and a[1]["en"] == f"{PH}del='Duodecima.-' (rejected)>>"
+       and a[2]["en"] == f"{PH}ins='Trecima.-' (accepted)>>" and a[3]["en"].startswith(f"{PH}regular=")
+       and "'ecima.-' belongs to the edited word" in a[3]["en"] and a[0]["en"] == "",
+       f"en_segments {[s.get('en') for s in a]}")
+    b = got.get(2) or []
+    ok(" 18 the D04-125 shape - its stem BEFORE the edit - is scaffolded the same way",
+       len(b) == 4 and b[1]["en"] == f"{PH}del='Vigesimo' (rejected)>>"
+       and b[2]["en"] == f"{PH}ins='Vigesima' (accepted)>>" and b[0]["en"].startswith(f"{PH}regular=")
+       and "'Vige' belongs to the edited word" in b[0]["en"] and b[3]["en"] == "",
+       f"en_segments {[s.get('en') for s in b]}")
+    ok(" 19 a whole-word replacement followed by punctuation is NOT scaffolded", got.get(3) is None,
+       f"en_segments {got.get(3)}")
+    ok(" 20 a CJK junction is NOT scaffolded", got.get(4) is None, f"en_segments {got.get(4)}")
+    c = got.get(5) or []
+    ok(" 21 regular text glued inside the run counts as a piece: scaffolded, its own slot left empty",
+       len(c) == 5 and c[1]["en"] == f"{PH}del='kat' (rejected)>>" and c[3]["en"] == f"{PH}ins='ts' (accepted)>>"
+       and c[2]["en"] == "" and c[0]["en"] == "" and c[4]["en"] == "", f"en_segments {[s.get('en') for s in c]}")
+    d = got.get(6) or []
+    ok(" 22 the canonical letter-by-letter cluster is scaffolded exactly as the step document shows",
+       [s.get("en") for s in d] == [f"{PH}ins='Decimotercera' (accepted)>>", f"{PH}del='Duodécima' (rejected)>>",
+                                     "", "", "", "", "", ""], f"en_segments {[s.get('en') for s in d]}")
+    ok(" 23 every run prints tracked-change paragraphs examined against scaffolded: 6 and 4 here",
+       rc == 0 and "Examined 6 tracked-change paragraph(s); scaffolded 4." in out, f"rc={rc}")
+    rc, out, _ = scaffold([tcp(1, WHOLE), tcp(2, CJK), para(3, "Gewone tekst.")], "cft_none.json")
+    ok("    ... and on a document with no cluster: 2 and 0, and still nothing to do",
+       rc == 0 and "Examined 2 tracked-change paragraph(s); scaffolded 0." in out
+       and "Nothing to do." in out, f"rc={rc}")
+    rc, out, got = scaffold([tcp(6, CANON)], "cft_direct.json", "--idx", "6", "--ins-en", "Clause 13",
+                            "--del-en", "Clause 12")
+    ok(" 24 direct fill is unchanged: the English lands on the first ins and del, the rest empty",
+       rc == 0 and [s.get("en") for s in got.get(6) or []] == ["Clause 13", "Clause 12", "", "", "", "", "", ""],
+       f"rc={rc}, en_segments {[s.get('en') for s in got.get(6) or []]}")
+
+# =====================================================================================================
+if section("validate_translations.py", "C30 - validate_translations.py: a leftover <<TRANSLATE: placeholder is refused"):
+    PH = "<<TRANSLATE: "
+    MARK = "Quillwort"                               # a word that must never be printed
+
+    def validate(rows, name):
+        p = write(f"{name}/paragraphs.json", rows)
+        rc, out = run("validate_translations.py", p)
+        return rc, out, (p.parent / ".validate-state.json").is_file()
+
+    seg_para = {"idx": 2, "text": "Clausula Duodecima", "style": "Normal", "has_track_changes": True,
+                "en": "Clause 13", "en_segments": [{"type": "regular", "en": "Clause "},
+                                                   {"type": "ins", "en": f"{PH}ins='x' (accepted)>>"},
+                                                   {"type": "del", "en": "12"}]}
+    base = [para(0, "De huurder betaalt.", "The Lessee pays."), para(1, "Acme B.V.", "Acme B.V.")]
+    rc, out, state = validate(base + [para(3, "Een zin.", f"A {MARK} {PH}del='y' (rejected)>> sentence.")],
+                              "vt_en")
+    ok(" 25 a placeholder left in en is refused, exit 2, the paragraph named, no text printed, no state written",
+       rc == 2 and "idx 3: en" in out and MARK not in out and not state, f"rc={rc}, state written={state}")
+    rc, out, state = validate(base + [seg_para], "vt_seg")
+    ok(" 26 a placeholder left in an en_segments entry is refused, exit 2, naming the segment",
+       rc == 2 and "idx 2: en_segments[1]" in out and not state, f"rc={rc}, state written={state}")
+    rc, out, state = validate(base + [para(4, "", f"{PH}ins='z' (accepted)>>")], "vt_notext")
+    ok(" 27 a placeholder on a paragraph with no source text is still refused", rc == 2, f"rc={rc}")
+    filled = dict(seg_para, en_segments=[{"type": "regular", "en": "Clause "}, {"type": "ins", "en": "13"},
+                                         {"type": "del", "en": "12"}])
+    rc, out, state = validate(base + [filled], "vt_filled")
+    ok(" 28 the same scaffold filled in passes and records its state                              (unchanged)",
+       rc == 0 and state, f"rc={rc}, state written={state}")
+    # Step 3b scaffolds BEFORE translation and this script runs after every batch, so a tracked-change
+    # paragraph due in a later batch still carries its placeholders -- and apply skips a paragraph with no
+    # `en`, so none of its segments can reach the document. Refusing it would block batch 1's validation.
+    pending = dict(seg_para, idx=5)
+    del pending["en"]
+    rc, out, state = validate(base + [pending], "vt_pending")
+    ok(" 29 a scaffolded paragraph NOT YET TRANSLATED - placeholders in its segments, no en - is not refused, "
+       "so a mid-translation batch still validates                                              (unchanged)",
+       rc != 2 and "is still in paragraphs.json" not in out and state, f"rc={rc}, state written={state}")
 
 # =====================================================================================================
 shutil.rmtree(TMP, ignore_errors=True)
