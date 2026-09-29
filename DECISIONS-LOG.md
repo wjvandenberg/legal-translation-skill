@@ -1008,3 +1008,32 @@ every file in `tools/hooks/`, `evidence_guard.py` included — a Claude Code hoo
 `.claude/settings.json`, which Git never runs — so it reported that file "not installed" and exited 1 on
 a correctly installed repository. A git hook is named for its event and has no extension; a file with one
 is now skipped and said so.
+
+## 2026-09-29 (4), at the close — C16's class counted, the wiring its own slice, arm 9's re-pin kept
+
+**FOUR RULINGS AT THE CLOSING INPUT POINT, EACH ON THE RECOMMENDED OPTION** *(Wouter, 2026-09-29 (4))*,
+put with what each would do measured first, from this session's own corpus runs.
+
+**(1) C16's CLASS IS COUNTED, NEVER BLOCKING** — his choice (8)'s first question. After slice 4, today's
+output blocks on 14 findings in the delivered check's text-and-anchor arm, every one C16's — 3
+`changed/space` and 11 `inner-space`, on six documents — a spacing apply itself creates, which no operator
+can repair. **Declined:** keeping them blocking until a C16 fix exists, which would stop those six documents
+with no way out; and deciding only after his page read of D02's paragraphs 101 and 168, which can still
+promote those two if they split a word. **One assumption, stated at the close:** implementing the ruling in
+`validate_apply.py` belongs to the wiring slice, which acts on that very count, so it is built there with
+its own acceptance rather than here.
+
+**(2) STEP 10's WIRING IS ITS OWN SLICE**, explored and planned next session, its acceptance measured before
+any choice. Measured today, a wired Step 10 would block on C16's 14 unless counted and on D03B's glossary —
+2 findings an operator CAN clear — and six document-variants never reach Step 10, stopped earlier by
+post_process's drift gate. **Declined:** wiring it next session without a planning round; and leaving Step 10
+report-only to move on to branch 12.
+
+**(3) ARM 9's RE-PIN IS KEPT**, a judgement slice 4c took alone: its declaration carried a line break, which
+4c splits, so it was moved onto a declaration with NO break, keeping its claim that a flattened comment is
+counted and never blocks. **Declined:** restoring it repointed at the split, with a new arm for the no-break
+case — two arms where one already pins it.
+
+**(4) SLICE 4c's BRANCH PUSHED, ITS PULL REQUEST OPENED, AND SQUASH-MERGED** once `verify_md` and the eight
+document instruments pass on its head, as #122 and #123 were; the repository being public, pushing
+publishes it.
