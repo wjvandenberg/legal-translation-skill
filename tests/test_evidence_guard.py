@@ -2,7 +2,7 @@
 """ACCEPTANCE TEST — does the evidence guard block the leak, and let the work through?
 
 THE FAILURE THIS IS BUILT AGAINST is not "the guard returns the wrong code". It is "the guard
-is never invoked at all". tools/install_hooks.py already records the git-hook version of that
+is never invoked at all". tools/install_project_hooks.py records the git-hook version of that
 trap in as many words: an un-executable hook is silently ignored, it does not warn, it just
 does nothing. A PreToolUse hook has the identical failure mode plus one more -- it can be
 wired in settings.json under a path or a matcher that never matches, and nothing says so.

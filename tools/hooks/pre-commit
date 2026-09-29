@@ -11,7 +11,7 @@
 # The gate exits 2 -- CANNOT CERTIFY -- when a pattern list is unreadable, and that blocks
 # too. A control that could not run has not passed.
 #
-# Install:  uv run python tools/install_hooks.py
+# Install:  uv run python tools/install_project_hooks.py
 # Override, deliberately and rarely:  LT_SKIP_GATE=1 git commit
 
 if [ "$LT_SKIP_GATE" = "1" ]; then

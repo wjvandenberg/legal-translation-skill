@@ -371,7 +371,7 @@ check is being written or run; the worked examples are `EVIDENCE-measurement.md`
 
 **`check_checkers.py` PRINTS the roster and the verdict on every run, so NO FIGURE IS TYPED HERE** — name the
 instrument, never the number; each declared absence carries its reason in `verify.config.json`, blank refused.
-**Three things that verdict cannot hold:** its population is not the whole one (`install_hooks.py` is this
+**Three things that verdict cannot hold:** its population is not the whole one (`install_project_hooks.py` is this
 project's own); **most of `tools/` is PROJECT-SPECIFIC** — OOXML, the corpus, the register, leakage, parity,
 the Step-B audit family; and **one is a deliberate TWIN**, `xref_check.py`, green where the house
 `verify_refs` misfires over files whose content IS quoted terminology.

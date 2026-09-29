@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 """INSTALL THE GIT HOOKS, and check they actually bite.
 
-NOT THE HOUSE SCRIPT OF THE SAME NAME, AND NOT A FORK OF IT (declared 2026-09-09). The house
-`standard-scripts/install_hooks.py` installs the HOUSE hooks -- the `pre-push` accident guard
-and the AUTO MODE guard. This one installs THIS project's hooks from `tools/hooks/`: the
-pre-commit confidentiality gate and the cycle gate. They share a name and nothing else, so a
-byte comparison against the shared folder reports a difference that is not drift.
+NOT THE HOUSE `standard-scripts/install_hooks.py`, AND NOT A FORK OF IT (declared 2026-09-09).
+The house script installs the HOUSE hooks -- the `pre-push` accident guard and the AUTO MODE
+guard. This one installs THIS project's git hooks from `tools/hooks/`: the pre-commit
+confidentiality gate and the cycle gate, and this project's own `pre-push`.
 
-WHY THAT MATTERS RATHER THAN BEING A CURIOSITY. `check_checkers.py` tracks THIRTEEN scripts
-and this is not one of them, so its `0 needing a decision` is true of the thirteen and silent
-about this file. Anyone diffing `tools/` against `standard-scripts/` will find two mismatches
--- this and nothing else, since `trace_instructions.py` was brought to house v5 on the same
-day -- and both of them should stop at this paragraph rather than turn into a repair.
+RENAMED FROM `install_hooks.py` ON 2026-09-29 (Wouter). It shared the house script's name and
+nothing else, and `check_checkers.py` v18 began tracking that name, so it read this file as an
+UNKNOWN copy of the house installer -- a comparison of two different programs. The rename
+removes the clash itself; `verify.config.json` declares the house installer absent, with why.
+
+ONLY GIT HOOKS ARE INSTALLED. `tools/hooks/` also holds `evidence_guard.py`, a Claude Code
+PreToolUse hook wired through `.claude/settings.json`, which Git never runs. A hook Git runs is
+named for its event and has no extension, so a file WITH one is skipped and said so -- until
+2026-09-29 it was swept in, and `--check` reported it "not installed" on every correctly
+installed repository, a red nobody could clear.
 
 Hooks live in `.git/hooks/`, which is not tracked, so they do not travel with a clone. That
 makes them easy to believe in and easy to not have. This installer copies them from
@@ -19,8 +23,8 @@ makes them easy to believe in and easy to not have. This installer copies them f
 un-executable hook is silently ignored by Git -- it does not warn, it just does nothing,
 which is the worst behaviour a control can have.
 
-    uv run python tools/install_hooks.py
-    uv run python tools/install_hooks.py --check    # verify only, install nothing
+    uv run python tools/install_project_hooks.py
+    uv run python tools/install_project_hooks.py --check    # verify only, install nothing
 """
 import io
 import os
@@ -50,6 +54,9 @@ print(f"  from {SRC.relative_to(ROOT)}  ->  {DST}")
 problems = []
 for src in sorted(SRC.iterdir()):
     if src.name.startswith("."):
+        continue
+    if src.suffix:                      # not a git hook -- see the docstring
+        print(f"  {src.name:<14} skipped: not a git hook (Git runs none with an extension)")
         continue
     dst = DST / src.name
     if not CHECK:
