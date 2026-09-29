@@ -242,8 +242,18 @@ python <skill-path>/scripts/translate_comments.py \
 `word/comments.xml` holds Word's margin annotations. Highly visible, frequently left
 untranslated. The script uses pure regex so no namespace prefix is touched. Same
 English-passthrough reminder as 8b.1: if a comment is already in English, copy the
-source verbatim. Step 10 (repack) picks up the translated `comments.xml` via
+source verbatim — `--list` shows the text as Word shows it (`&`, never `&amp;`), so copy
+it exactly as printed. Step 10 (repack) picks up the translated `comments.xml` via
 `--comments`.
+
+**A comment of several paragraphs.** `--list` shows where its paragraphs break: it
+prints each comment's text paragraphs one per line, with their count.
+Declare its English with one line break (`\n` in the JSON) between paragraphs — one
+piece per text paragraph, in order; an empty paragraph is not counted and is left as it
+is. A declaration whose pieces do not match is
+refused, naming the comment and both counts, and nothing is written: fix the JSON and
+re-run. A declaration with no line break is written into the comment's first paragraph,
+and Step 10's check counts the comment as `flattened`.
 
 #### Step 8d: Translate footnotes / endnotes — MANDATORY (whenever the part carries text)
 

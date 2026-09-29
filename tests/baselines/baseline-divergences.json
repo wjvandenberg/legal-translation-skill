@@ -3,7 +3,7 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 50,
+ "count": 52,
  "divergences": {
   "uk/SKILL.md": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -61,9 +61,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice3b-declarations",
-   "commit_subject": "Branch 11 slice 3b - the declaration route for footnotes, endnotes and the glossary, report-only: a declared keep is quiet, an undeclared one a finding, no delivered byte moved (C7 closed; I-32 filed and fixed)",
-   "sha256_now": "1dc2f2c742065aa743115967748c60ec418ff8c67af62a920a2a4cc4b1943622"
+   "changed_by": "feature/branch11-slice4c",
+   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
+   "sha256_now": "a0058143722d990a3ab60c6401d87c6e6b68996dedda9870ab7db13997e1d0c2"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -96,9 +96,9 @@
    "sha256_now": "2a5256931f4f6fafd4e916ce9a7e34d77d70cacdd01885dc183414e7a7a652fe"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch11-slice3b-declarations",
-   "commit_subject": "Branch 11 slice 3b - the declaration route for footnotes, endnotes and the glossary, report-only: a declared keep is quiet, an undeclared one a finding, no delivered byte moved (C7 closed; I-32 filed and fixed)",
-   "sha256_now": "4c4f3479b44eee9fd3dcecdc34e118bbd1222eda3c3614b7f5b1a24836a9f49e"
+   "changed_by": "feature/branch11-slice4c",
+   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
+   "sha256_now": "3e989afbfe471ef55e14eb60c6aee0924984ef6f71f56ceb0bd48b8fafba6d4b"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/signed-python-no-doc-moves",
@@ -161,9 +161,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice3b-declarations",
-   "commit_subject": "Branch 11 slice 3b - the declaration route for footnotes, endnotes and the glossary, report-only: a declared keep is quiet, an undeclared one a finding, no delivered byte moved (C7 closed; I-32 filed and fixed)",
-   "sha256_now": "cf9d096484fa11ae687bbc706d1f92681519c7e7dd5b03b2ece1e54699029d15"
+   "changed_by": "feature/branch11-slice4c",
+   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
+   "sha256_now": "1be8cc27bf81f08ac641a83f97f663973f41f19d2daf9d90a08ac95282b12977"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -196,9 +196,9 @@
    "sha256_now": "1d00ae2484912d4351d876e5d320ed52d6d48e4c60f92f3844ea13ab32c19871"
   },
   "us/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch11-slice3b-declarations",
-   "commit_subject": "Branch 11 slice 3b - the declaration route for footnotes, endnotes and the glossary, report-only: a declared keep is quiet, an undeclared one a finding, no delivered byte moved (C7 closed; I-32 filed and fixed)",
-   "sha256_now": "5194d5d4dffb52ba35ff3866082db327315cc7fa686242d8ce828114620b0a41"
+   "changed_by": "feature/branch11-slice4c",
+   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
+   "sha256_now": "1a7adfcf0b35194464b6f8afd309f88d17dda3ea5e67a1762758eb4608677638"
   },
   "us/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/signed-python-no-doc-moves",
@@ -254,6 +254,16 @@
    "changed_by": "feature/branch11-slice4b",
    "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
    "sha256_now": "7deb5a59ab57e5b322211714fb62105de644e9e78b64eec5f0c1e640cb1cbd1c"
+  },
+  "uk/scripts/translate_comments.py": {
+   "changed_by": "feature/branch11-slice4c",
+   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
+   "sha256_now": "99522376e7f485158a6120d05306839aea261da4696bbcb259b503057e21a457"
+  },
+  "us/scripts/translate_comments.py": {
+   "changed_by": "feature/branch11-slice4c",
+   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
+   "sha256_now": "e7097b54478ed167c87565d264d61f2e3148a605ec962ee6ddb0dd0a2defada9"
   }
  }
 }
