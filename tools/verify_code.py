@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""verify_code.py - the code checker.  CHECKER VERSION 10 (2026-09-02)
+"""verify_code.py - the code checker.  CHECKER VERSION 11 (2026-09-28)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -187,12 +187,33 @@ SECRET_VECTORS = [
 
 # ------------------------------------------------------------------------- utilities
 
+def glob_files(root: Path, pattern: str):
+    """The FILES a glob pattern means - the same answer on every Python.
+
+    BEFORE PYTHON 3.13, A PATTERN ENDING IN `**` MATCHES FOLDERS ONLY. Measured 2026-09-28:
+    `**/tests/**` returned the two folders and neither file on 3.12.12, and all four on
+    3.13.13 - so on 3.12 every file under tests/ fell out of debug_allow_globs and was reported
+    as a debug leftover. WHICH PYTHON RUNS IS A PROPERTY OF THE PROJECT, not the machine: uv
+    picked 3.12 in one folder and 3.13 in a scratch folder beside it. Every glob in this file
+    goes through here, so a pattern added later cannot reopen it.
+    """
+    expand = pattern.rstrip("/").endswith("**")
+    walked: set[Path] = set()
+    for p in sorted(root.glob(pattern), key=lambda q: len(q.parts)):   # parents before children
+        if p.is_file():
+            yield p
+        elif expand and p.is_dir() and not any(a in walked for a in p.parents):
+            # A `**` pattern returns every nested folder too; walking each one would list a file
+            # once per level of depth (measured: 1,800 paths for 240 files, 12 deep). Walk only
+            # the outermost matched folder - rglob already reaches everything beneath it.
+            walked.add(p)
+            yield from (q for q in p.rglob("*") if q.is_file())
+
+
 def iter_files(root: Path, globs, exclude_dirs):
     seen = set()
     for g in globs:
-        for p in root.glob(g):
-            if not p.is_file():
-                continue
+        for p in glob_files(root, g):
             if any(part in exclude_dirs for part in p.parts):
                 continue
             if p in seen:
@@ -218,7 +239,7 @@ def apply_exclusions(files, root: Path, globs):
     """
     excluded = set()
     for g in globs:
-        excluded |= set(root.glob(g))
+        excluded |= set(glob_files(root, g))
     kept = [p for p in files if p not in excluded]
     return kept, len(files) - len(kept)
 
@@ -397,7 +418,7 @@ def check_debug(rep, root, cfg):
         return
     allow = set()
     for g in cfg["debug_allow_globs"]:
-        allow |= set(root.glob(g))
+        allow |= set(glob_files(root, g))
     files = [p for p in iter_files(root, cfg["source_globs"], cfg["exclude_dirs"]) if p not in allow]
     files, skipped = apply_exclusions(files, root, cfg.get("scan_exclude_globs", []))
     pats = [re.compile(p) for p in cfg["debug_patterns"]]
@@ -671,6 +692,16 @@ def cases(cfg):
         Case("planted debug statement", runs(check_debug),
              tree("dbg_bad", {"app.js": "console.log('x');\n"}, cfg),
              tree("dbg_good", {"app.js": "export const x = 1;\n"}, cfg)),
+        # v11: `**/tests/**` IN debug_allow_globs MATCHED FOLDERS ONLY BEFORE PYTHON 3.13, so on
+        # 3.12 every file under tests/ fell out of the allow set and was reported. The pair is
+        # the SAME line - only its folder differs - so it is the allow set under test, nothing else.
+        # Both trees carry one clean source file, or the good arm examines nothing and reads VOID
+        # - which is what the first draft of this case did, the VOID guard catching the test.
+        Case("a debug line under tests/ is allowed", runs(check_debug),
+             tree("dbg_src", {"src/helpers.py": "def h():\n    breakpoint()\n",
+                              "src/app.py": "X = 1\n"}, cfg),
+             tree("dbg_tests", {"tests/sub/helpers.py": "def h():\n    breakpoint()\n",
+                                "src/app.py": "X = 1\n"}, cfg)),
         Case("missing .gitignore entry", runs(check_gitignore),
              tree("gi_bad", {".gitignore": "*.pyc\n"}, gi),
              tree("gi_good", {".gitignore": "temp/\n"}, gi)),
