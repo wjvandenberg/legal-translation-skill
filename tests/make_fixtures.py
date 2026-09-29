@@ -1533,6 +1533,59 @@ def _schedule_breaks(path):
     _write_notes(path, notes)
 
 
+@fixture("noop-wrappers.docx",
+         "BRANCH 11 SLICE 4a — register B10: empty tracked insertions holding a tab, a line "
+         "break and Word's _GoBack bookmark, which strip_noop used to remove with everything "
+         "inside them and now keeps whole, beside two controls it still removes. Ships its "
+         "own noop-wrappers.notes.json")
+def _noop_wrappers(path):
+    """The page B10 is judged on. Its register row is about comment anchors, which a printed
+    page does not show, so the page carries what the guard ALSO keeps and a reader CAN see: a
+    tab and a line break inside an empty insertion. The old arm glues "Name" to "Value" and
+    "Line one" to "Line two"; the new one keeps the tab and the break. The bookmark row reads
+    the same on both arms -- a bookmark is not painted -- and is proved in bytes by
+    tests/test_strip_noop_guard.py arm 2, as the anchors are.
+
+    THE CONTROLS MUST READ THE SAME ON BOTH ARMS: an empty insertion holding only an empty run
+    is removed by both, and a no-op pair collapses on both. EVERY ROW BEGINS WITH ITS OWN
+    LABEL, so none starts with Annex or Schedule and the page-break pass stays out of it.
+
+    The notes carry `en` equal to `text`, as the other notes-bearing fixtures do, so the drift
+    gate agrees with the document on both arms: strip_noop changes no w:t text.
+    """
+    def ins(inner, i):
+        return f'<w:ins w:id="{i}" w:author="A" w:date="2020-01-01T00:00:00Z">{inner}</w:ins>'
+
+    def dele(inner, i):
+        return f'<w:del w:id="{i}" w:author="A" w:date="2020-01-01T00:00:00Z">{inner}</w:del>'
+
+    rows = [
+        [r("NOOP-WRAPPERS FIXTURE. Each row says what its empty tracked insertion holds.")],
+        [r("TAB KEPT — Name"), ins("<w:r><w:tab/></w:r>", 1), r("Value")],
+        [r("BREAK KEPT — Line one"), ins("<w:r><w:br/></w:r>", 2), r("Line two")],
+        [r("BOOKMARK KEPT — the insertion holds the _GoBack bookmark and no text"),
+         ins('<w:bookmarkStart w:id="0" w:name="_GoBack"/><w:bookmarkEnd w:id="0"/>', 3)],
+        [r("CONTROL — an empty insertion holding only an empty run, removed on both arms"),
+         ins("<w:r><w:t></w:t></w:r>", 4)],
+        [r("CONTROL — a no-op pair, collapsed on both arms: "),
+         dele('<w:r><w:delText xml:space="preserve">solar energy</w:delText></w:r>', 5),
+         ins(r("solar energy"), 6)],
+    ]
+    docx(path, "".join(p(*parts) for parts in rows))
+
+    texts = ["NOOP-WRAPPERS FIXTURE. Each row says what its empty tracked insertion holds.",
+             "TAB KEPT — NameValue",
+             "BREAK KEPT — Line oneLine two",
+             "BOOKMARK KEPT — the insertion holds the _GoBack bookmark and no text",
+             "CONTROL — an empty insertion holding only an empty run, removed on both arms",
+             "CONTROL — a no-op pair, collapsed on both arms: solar energy"]
+    notes = [{"idx": i, "text": t, "en": t, "style": "Normal",
+              "runs": [{"start": 0, "end": len(t), "text": t, "bold": False,
+                        "italic": False}],
+              "en_runs": None} for i, t in enumerate(texts)]
+    _write_notes(path, notes)
+
+
 @fixture("tracked-changes.docx",
          "an insertion, a deletion, and a deletion whose text is in the source language — "
          "the document must read correctly both when accepted and when rejected")
