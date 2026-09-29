@@ -23,8 +23,10 @@ ONE FAILING INPUT PER ARM, RED FIRST, AND A CLEAN DOCUMENT PROVED QUIET. What ea
    8  THE COMMENT SCRIPT'S, PROVED WITH THE REAL SCRIPT: it empties a comment's deleted text, and
       the check reports deleted-emptied -- a comment declared kept included, since the script
       rewrites it too
-   9  A MULTI-PARAGRAPH COMMENT, THROUGH THE REAL SCRIPT, ARRIVES AS ONE PARAGRAPH: COUNTED, never
-      blocking (Wouter, 2026-09-25 (4)), so --strict still exits 0
+   9  A MULTI-PARAGRAPH COMMENT DECLARED WITH NO LINE BREAK, THROUGH THE REAL SCRIPT, ARRIVES AS ONE
+      PARAGRAPH: COUNTED, never blocking (Wouter, 2026-09-25 (4)), so --strict still exits 0.
+      RE-PINNED 2026-09-29 (4): its declaration carried a line break, which slice 4c now splits,
+      so it keeps its claim on the case choice (6) says stays counted -- a declaration with none
   10  comments with no declaration kept as the source's are undeclared-kept, one per id
   11  a declared comment delivered as the source's is declared-source; one declared kept is quiet
   12  a comment absent from the delivery is lost, and the reference left behind is dangling
@@ -37,10 +39,10 @@ ONE FAILING INPUT PER ARM, RED FIRST, AND A CLEAN DOCUMENT PROVED QUIET. What ea
   18  NOT READ, never a pass: a delivery given as document.xml, and no original
   19  a partial install -- the header/footer script's reader absent -- is a NAMED gap and a
       finding, never a silent skip
- 19b  THE COMMENT SCRIPT'S OWN READER RETURNS ESCAPED TEXT, PROVED WITH THE REAL SCRIPT: --list
-      shows '&amp;' where Word shows '&', the verbatim copy Step 8c asks for is escaped a second
-      time, and the check -- reading the comment as Word does -- reports it as moved; the same
-      comment declared as Word shows it is quiet
+ 19b  F47, PROVED WITH THE REAL SCRIPT: --list shows the comment as Word shows it, '&' and never
+      '&amp;', so the verbatim copy Step 8c asks for is escaped ONCE and the check is quiet; an
+      escaped copy, what --list showed before slice 4c, is still escaped twice and reported moved.
+      (Until 2026-09-29 (4) this arm pinned the defect itself: --list showed '&amp;'.)
   20  a declaration file that will not parse, or is the wrong JSON shape, is a finding, never read
       as no declaration; a scaffold entry that matches no paragraph is unmatched, never dropped
   21  --strict turns a side finding into exit 1; without it the run exits 0
@@ -69,6 +71,22 @@ notes -- source w:t text to English, a text mapped to itself kept (Wouter, 2026-
       the file shipped in the source's words and reported
   32  Step 8's wording in both trees: 8b and 8d are MANDATORY whenever the part carries text, no
       step document gates on source-language text (C7), and the three files are named
+
+SLICE 4c (PLAN-2-step-b.md section 3.2, block "SLICE 4c's WRITTEN PLAN"): A23, a multi-paragraph
+comment, and F47, the reader's escaping (Wouter, 2026-09-28 (3), choices (6) and (7)). A comment's TEXT
+PARAGRAPH is a w:p whose own w:t text holds anything but whitespace:
+  36  comments of 2, 3 and 4 text paragraphs, the 4 with an empty paragraph between, declared with line
+      breaks, through the real script: that many text paragraphs, the empty one untouched, the check
+      quiet under --strict
+  37  a piece count that does not match -- too many, too few -- and a comment holding a nested
+      paragraph, each refused, exit 2, naming the id and both counts, comments.xml not written; the
+      nested one declared with no break is written as before
+  38  a break declaration delivered FLATTENED into one run is declared exact and COUNTED flattened,
+      never other
+  39  --list prints each comment's text paragraphs one per line with their count, the empty paragraph
+      not printed, and the counts are the ones the check reads
+  40  a multi-paragraph KEEP copied from --list is quiet; the same keep delivered changed is moved
+  41  Step 8c's wording, both trees
 
   33  the check READS ONLY: every input file hashes the same before and after
   34  no document text is printed, only part names, ids, classes and lengths
@@ -428,12 +446,12 @@ for label, decl in (("translated", {"0": "Remark ", "1": "Keep this note"}),
     ok(f"the check reports deleted-emptied on comment 0, declared {label}, and nothing else",
        sf(rep) == [("side-comment", "deleted-emptied", CMX, "0")], str(sf(rep)))
 
-print("\n9  a multi-paragraph comment through the real script — COUNTED, never blocking")
+print("\n9  a multi-paragraph comment declared with NO line break, through the real script — COUNTED, never blocking")
 d9 = TMP / "cm-flat-real"
 d9.mkdir(parents=True, exist_ok=True)
 multi = comments({0: [P("Akapit pierwszy"), P("Akapit drugi")], 1: [P("Keep this note")]})
 write_docx(d9 / "orig.docx", swap(ORIG, word__comments_xml=multi))
-flat_decl = {"0": "Paragraph one\nParagraph two", "1": "Keep this note"}
+flat_decl = {"0": "Paragraph one Paragraph two", "1": "Keep this note"}      # re-pinned 2026-09-29 (4)
 (d9 / "t.json").write_bytes(json.dumps(flat_decl).encode("utf-8"))
 script_run("translate_comments (two paragraphs)", [str(SCRIPTS / "translate_comments.py"), str(d9 / "orig.docx"),
                                                   str(d9 / "out"), "--translations", str(d9 / "t.json")])
@@ -529,29 +547,34 @@ ok("...while the arms that need no reader still ran", all(tally(rep, k).get("cha
    and tally(rep, "comments").get("declared exact") == 1,
    str({k: tally(rep, k) for k in ("comments", "footnotes", "endnotes", "glossary")}))
 
-print("\n19b  the comment script's own reader returns ESCAPED text — proved with the real script")
+print("\n19b  F47: the comment script's own reader shows Word's text — proved with the real script")
 d19 = TMP / "cm-escape-real"
 d19.mkdir(parents=True, exist_ok=True)
 amp = comments({0: [P("Uwaga pierwsza")], 1: [P("Terms &amp; conditions")]})
 write_docx(d19 / "orig.docx", swap(ORIG, word__comments_xml=amp))
 lst = script_run("translate_comments --list", [str(SCRIPTS / "translate_comments.py"), str(d19 / "orig.docx"),
                                                "--list"])
-ok("--list shows the operator the comment ESCAPED — '&amp;', not the '&' Word displays",
-   "[1] Terms &amp; conditions" in lst.stdout, lst.stdout[-200:])
-esc = {"0": "First remark", "1": "Terms &amp; conditions"}          # copied from --list, as Step 8c says
-(d19 / "t.json").write_bytes(json.dumps(esc).encode("utf-8"))
+ok("--list shows the operator the comment as Word shows it — '&', never '&amp;'",
+   "    Terms & conditions" in lst.stdout.splitlines() and "&amp;" not in lst.stdout, lst.stdout[-200:])
+shown = {"0": "First remark", "1": "Terms & conditions"}            # copied from --list, as Step 8c says
+(d19 / "t.json").write_bytes(json.dumps(shown).encode("utf-8"))
 script_run("translate_comments (the copy)", [str(SCRIPTS / "translate_comments.py"), str(d19 / "orig.docx"),
                                             str(d19 / "out"), "--translations", str(d19 / "t.json")])
-dbl = (d19 / "out" / "word" / "comments.xml").read_bytes() if (d19 / "out" / "word" / "comments.xml").is_file() else b""
-ok("...and the script escapes that copy AGAIN", b"&amp;amp;" in dbl, dbl[:200])
-r, rep = case("cm-escape", orig=swap(ORIG, word__comments_xml=amp), deliv=with_members(DELIV, {CMX: dbl}), cm=esc)
-ok("the check reads the copy as a KEEP and reports the double escape as moved on comment 1, and nothing else",
-   sf(rep) == [("side-comment", "moved", CMX, "1")], str(sf(rep)))
-good = comments({0: [P("First remark")], 1: [P("Terms &amp; conditions")]})
-r, rep = case("cm-amp-ok", orig=swap(ORIG, word__comments_xml=amp), deliv=swap(DELIV, word__comments_xml=good),
-              cm={"0": "First remark", "1": "Terms & conditions"})
-ok("while the same comment declared as Word shows it, and delivered once-escaped, is quiet — kept",
+once = (d19 / "out" / "word" / "comments.xml").read_bytes() if (d19 / "out" / "word" / "comments.xml").is_file() else b""
+ok("...and the script escapes that copy ONCE", b"Terms &amp; conditions" in once and b"&amp;amp;" not in once,
+   once[:200])
+r, rep = case("cm-escape", orig=swap(ORIG, word__comments_xml=amp), deliv=with_members(DELIV, {CMX: once}), cm=shown)
+ok("the check reads the copy as a KEEP delivered as the source's, and is quiet",
    sf(rep) == [] and tally(rep, "comments").get("declared kept") == 1, f"{sf(rep)} {tally(rep, 'comments')}")
+esc = {"0": "First remark", "1": "Terms &amp; conditions"}          # what --list showed before slice 4c
+(d19 / "t-esc.json").write_bytes(json.dumps(esc).encode("utf-8"))
+script_run("translate_comments (an escaped copy)", [str(SCRIPTS / "translate_comments.py"), str(d19 / "orig.docx"),
+                                                   str(d19 / "out-esc"), "--translations", str(d19 / "t-esc.json")])
+dbl = (d19 / "out-esc" / "word" / "comments.xml").read_bytes() \
+    if (d19 / "out-esc" / "word" / "comments.xml").is_file() else b""
+r, rep = case("cm-escape-dbl", orig=swap(ORIG, word__comments_xml=amp), deliv=with_members(DELIV, {CMX: dbl}), cm=esc)
+ok("while an ESCAPED copy is still escaped twice, and the check still reports it moved on comment 1, and nothing else",
+   b"&amp;amp;" in dbl and sf(rep) == [("side-comment", "moved", CMX, "1")], str(sf(rep)))
 
 print("\n20  a declaration that will not parse, or is the wrong shape; an entry that matches nothing")
 r, rep = case("decl-unreadable", raw_hf=b"{not json")
@@ -736,6 +759,154 @@ for v in ("uk", "us"):
        and "#### Step 8d: Translate footnotes / endnotes — MANDATORY (whenever the part carries text)" in s8
        and "if any source-language text" not in s8 and "contain source-language text)" not in s10)
     ok(f"[{v}] Step 8 names the three translations files", all(n in s8 for n in (FN_DECL, EN_DECL, GL_DECL)))
+
+# ---------------------------------------------------------------------------------------------
+# SLICE 4c. A line break is built with chr(10), never typed as an escape an editing tool could decode.
+# ---------------------------------------------------------------------------------------------
+NLC = chr(10)
+REFS3 = (("cref", 0), ("cref", 1), ("cref", 2), ("fref", 1), ("eref", 1))
+EMPTY_P = '<w:p><w:pPr><w:pStyle w:val="CommentText"/></w:pPr></w:p>'
+MULTI = comments({0: [P("Akapit pierwszy"), P("Akapit drugi")],
+                  1: [P("Jeden"), P("Dwa"), P("Trzy")],
+                  2: [P("Raz"), P("Dwa razy"), EMPTY_P, P("Trzy razy"), P("Cztery razy")]})
+PIECES36 = {"0": ["Paragraph one", "Paragraph two"], "1": ["One", "Two", "Three"],
+            "2": ["Once", "Twice", "Three times", "Four times"]}
+DECL36 = {k: NLC.join(v) for k, v in PIECES36.items()}
+ORIG36 = swap(ORIG, word__document_xml=body(P("Zdroj jedna", *REFS3)), word__comments_xml=MULTI)
+DELIV36 = swap(DELIV, word__document_xml=body(P("Source one", *REFS3)))
+
+
+def tc(label, members, decl):
+    """The real comment script over a synthetic original: (the run, comments.xml written or None)."""
+    d = TMP / f"tc-{label}"
+    d.mkdir(parents=True, exist_ok=True)
+    write_docx(d / "orig.docx", members)
+    (d / "t.json").write_bytes(json.dumps(decl, ensure_ascii=False).encode("utf-8"))
+    r = subprocess.run(PY + [str(SCRIPTS / "translate_comments.py"), str(d / "orig.docx"), str(d / "out"),
+                             "--translations", str(d / "t.json")],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace", env=ENV, cwd=str(ROOT))
+    out = d / "out" / "word" / "comments.xml"
+    return r, (out.read_bytes() if out.is_file() else None)
+
+
+def tc_list(label, members):
+    d = TMP / f"tcl-{label}"
+    d.mkdir(parents=True, exist_ok=True)
+    write_docx(d / "orig.docx", members)
+    return subprocess.run(PY + [str(SCRIPTS / "translate_comments.py"), str(d / "orig.docx"), "--list"],
+                          capture_output=True, text=True, encoding="utf-8", errors="replace", env=ENV, cwd=str(ROOT))
+
+
+def text_paras(xml_bytes):
+    """{id: [each TEXT paragraph's own w:t text]} and {id: every w:p}, read with lxml -- a second reader
+    beside the script's regex, so the test can assert the two agree."""
+    from lxml import etree
+    root = etree.fromstring(xml_bytes)
+    paras, allp = {}, {}
+    for c in root.iter(f"{{{W}}}comment"):
+        cid, texts, ps = c.get(f"{{{W}}}id"), [], list(c.iter(f"{{{W}}}p"))
+        for p in ps:
+            own = []
+            for t in p.iter(f"{{{W}}}t"):
+                up = t.getparent()
+                while up is not None and up.tag != f"{{{W}}}p":
+                    up = up.getparent()
+                if up is p:
+                    own.append(t.text or "")
+            if "".join(own).strip():
+                texts.append("".join(own))
+        paras[cid], allp[cid] = texts, len(ps)
+    return paras, allp
+
+
+print("\n36  SLICE 4c — comments of 2, 3 and 4 text paragraphs, declared with line breaks, through the real script")
+r36, out36 = tc("split", ORIG36, DECL36)
+ok("the script exits 0 and writes comments.xml", r36.returncode == 0 and out36 is not None,
+   (r36.stdout + r36.stderr)[-300:])
+got36, allp36 = text_paras(out36) if out36 else ({}, {})
+ok("each comment arrives as one text paragraph per piece, in order — 2, 3 and 4",
+   got36 == PIECES36, str({k: len(v) for k, v in got36.items()}))
+ok("...the empty paragraph between comment 2's text left exactly as it was, so it still has 5 paragraphs",
+   out36 is not None and out36.count(EMPTY_P.encode("utf-8")) == 1 and allp36.get("2") == 5, str(allp36))
+ok("...and the script says how many it wrote paragraph by paragraph",
+   "3 written paragraph by paragraph" in r36.stdout, r36.stdout[-300:])
+r, rep = case("cm-split", orig=ORIG36, deliv=with_members(DELIV36, {CMX: out36 or b""}), cm=DECL36, strict=True)
+ok("the check is quiet under --strict: every declared English arrived exact, nothing flattened",
+   sf(rep) == [] and rc_of(r) == 0 and tally(rep, "comments").get("declared exact") == 3,
+   f"rc={rc_of(r)} {sf(rep)} {tally(rep, 'comments')}")
+
+print("\n37  a piece count that does not match, and a nested paragraph — refused, nothing written")
+bad37 = dict(DECL36, **{"0": NLC.join(["a", "b", "c"]), "1": NLC.join(["One", "Two"])})
+r, out = tc("mismatch", ORIG36, bad37)
+ok("too many pieces on comment 0 and too few on comment 1: exit 2, comments.xml NOT written",
+   r.returncode == 2 and out is None, f"rc={r.returncode}")
+ok("...naming each id with both counts, in one run",
+   "comment 0: the declaration has 3 piece(s)" in r.stdout and "the source comment has 2 text paragraph(s)" in r.stdout
+   and "comment 1: the declaration has 2 piece(s)" in r.stdout
+   and "the source comment has 3 text paragraph(s)" in r.stdout, r.stdout[-500:])
+NESTED = comments({0: [P("Akapit pierwszy"),
+                       '<w:p><w:r><w:t xml:space="preserve">Tekst</w:t></w:r><w:r><w:pict><w:txbxContent><w:p><w:r>'
+                       '<w:t xml:space="preserve">Wewnątrz</w:t></w:r></w:p></w:txbxContent></w:pict></w:r></w:p>'],
+                   1: [P("Keep this note")]})
+r, out = tc("nested", swap(ORIG, word__comments_xml=NESTED), {"0": NLC.join(["Paragraph one", "Paragraph two"]),
+                                                             "1": "Keep this note"})
+ok("a break declaration on a comment whose paragraph holds a nested paragraph: exit 2, named, nothing written",
+   r.returncode == 2 and out is None and "comment 0" in r.stdout and "nested" in r.stdout, r.stdout[-300:])
+r, out = tc("nested-flat", swap(ORIG, word__comments_xml=NESTED), {"0": "Paragraph one Paragraph two",
+                                                                  "1": "Keep this note"})
+ok("...while the same comment declared with no break is written as before", r.returncode == 0 and out is not None,
+   f"rc={r.returncode}")
+
+print("\n38  a break declaration delivered FLATTENED into one run — declared exact, COUNTED, never other")
+# A PIN, green before slice 4c as after it: what the script at 5e0a08e wrote for a break declaration --
+# the whole English, break included, in the first w:t -- is read the same way by the new reading.
+flat38 = comments({0: [P(DECL36["0"]), P("")], 1: [P("Keep this note")]})
+decl38 = {"0": DECL36["0"], "1": "Keep this note"}
+r, rep = case("cm-break-flat", orig=swap(ORIG, word__comments_xml=multi), deliv=swap(DELIV, word__comments_xml=flat38),
+              cm=decl38, strict=True)
+ok("comment 0 is flattened, counted and not blocking, and nothing else is reported",
+   sf(rep, blocking=False) == [("side-comment", "flattened", CMX, "0")] and sf(rep, blocking=True) == [],
+   str(sf(rep)))
+ok("...its English still declared exact, never other", tally(rep, "comments").get("declared exact") == 1
+   and tally(rep, "comments").get("declared kept") == 1, str(tally(rep, "comments")))
+
+print("\n39  --list prints each comment's text paragraphs one per line, with their count")
+r = tc_list("multi", ORIG36)
+lines = r.stdout.splitlines()
+want = ["[0] 2 text paragraphs", "    Akapit pierwszy", "    Akapit drugi",
+        "[1] 3 text paragraphs", "    Jeden", "    Dwa", "    Trzy",
+        "[2] 4 text paragraphs", "    Raz", "    Dwa razy", "    Trzy razy", "    Cztery razy"]
+at = lines.index(want[0]) if want[0] in lines else -1
+ok("the listing is exactly each id, its count, then its text paragraphs, the empty paragraph not printed",
+   r.returncode == 0 and at >= 0 and lines[at:at + len(want)] == want, str(lines[at:at + len(want)] if at >= 0 else lines[-14:]))
+src36, _ = text_paras(MULTI.encode("utf-8"))
+ok("...and the counts it prints are the ones the check's reader finds", {k: len(v) for k, v in src36.items()}
+   == {"0": 2, "1": 3, "2": 4}, str({k: len(v) for k, v in src36.items()}))
+
+print("\n40  a multi-paragraph KEEP, copied from --list")
+KEEP2 = comments({0: [P("Uwaga pierwsza")], 1: [P("Check clause two"), P("and clause three")]})
+decl40 = {"0": "First remark", "1": NLC.join(["Check clause two", "and clause three"])}
+r, out = tc("keep", swap(ORIG, word__comments_xml=KEEP2), decl40)
+r, rep = case("cm-keep-multi", orig=swap(ORIG, word__comments_xml=KEEP2), deliv=with_members(DELIV, {CMX: out or b""}),
+              cm=decl40, strict=True)
+ok("through the real script it is quiet, declared kept, nothing flattened",
+   sf(rep) == [] and tally(rep, "comments").get("declared kept") == 1, f"{sf(rep)} {tally(rep, 'comments')}")
+changed = comments({0: [P("First remark")], 1: [P("Check clause two"), P("and clause four")]})
+r, rep = case("cm-keep-moved", orig=swap(ORIG, word__comments_xml=KEEP2), deliv=swap(DELIV, word__comments_xml=changed),
+              cm=decl40)
+ok("...and delivered changed it is moved, and nothing else", sf(rep) == [("side-comment", "moved", CMX, "1")],
+   str(sf(rep)))
+
+print("\n41  Step 8c's wording, both trees")
+for v in ("uk", "us"):
+    s8 = (ROOT / v / "skill-docs" / "08-aux-and-quality.md").read_text(encoding="utf-8")
+    a8, b8 = s8.find("#### Step 8c"), s8.find("#### Step 8d")
+    c8 = s8[a8:b8] if 0 <= a8 < b8 else ""
+    ok(f"[{v}] Step 8c: --list by paragraph with the count, one line break between paragraphs, a mismatch "
+       "refused, a no-break declaration counted flattened, Word's text shown",
+       all(x in c8 for x in ("prints each comment's text paragraphs one per line, with their count",
+                             "one line break", "refused, naming the comment and both counts",
+                             "counts the comment as `flattened`", "as Word shows it")), f"8c={len(c8)}")
 
 print("\n33  the check READS ONLY")
 ok(f"every input file hashes the same after the run as before it, on every one of the {len(UNCHANGED)} cases above",

@@ -1487,6 +1487,12 @@ def _deliv_lead_counted(source, shape, acc, rej, cand):
 #     its --list shows the operator that escaped form -- so a declaration that
 #     IS the source once unescaped is a keep, copied as Step 8c says, and the
 #     script escaping it a second time is then a finding (moved).
+#     SLICE 4c, 2026-09-29 (4) -- A23: wherever a comment's declaration carries
+#     a line break, the script writes one piece per TEXT PARAGRAPH, a w:p whose
+#     own w:t text holds anything but whitespace, so BOTH readings are then
+#     those paragraphs joined by a line break; everywhere else as above. And
+#     F47: the script's --list now shows Word's text, so a keep is copied
+#     unescaped -- the escaped form is still read, and still a finding.
 #   footnotes, endnotes, the glossary -- no script writes them: Step 8d's and
 #     8e's template does, from the file SLICE 3b has it save beside the notes
 #     (below), and without that file they are read against the SOURCE only.
@@ -1522,7 +1528,8 @@ def _deliv_lead_counted(source, shape, acc, rej, cand):
 # (orphaned), or pointed at and held by nothing (dangling), is a finding where
 # the original has no such defect of its own. A multi-paragraph comment
 # delivered with fewer paragraphs is COUNTED, never blocking (Wouter, 2026-09-25
-# (4)); its fix is slice 4's. Like the body arm it prints part names, ids,
+# (4)); slice 4c's fix is the line break above, and a declaration with none is
+# still counted. Like the body arm it prints part names, ids,
 # classes and lengths, never document text.
 
 _SIDE_FIELD = re.compile(r'<<[A-Z][A-Z0-9_]*>>')
@@ -1566,6 +1573,27 @@ def _side_unescape(text):
 def _side_comment_text(el):
     """translate_comments.py's contract: every w:t of the comment, in order."""
     return ''.join(t.text or '' for t in el.iter(f'{{{W}}}t'))
+
+
+_SIDE_BREAK = chr(10)
+
+
+def _side_comment_paras(el):
+    """SLICE 4c (A23): a comment read paragraph by paragraph -- the own w:t text of
+    each paragraph holding anything but whitespace, joined by a line break -- the
+    contract translate_comments.py writes to when the declaration carries one."""
+    p_tag, out = f'{{{W}}}p', []
+    for p in el.iter(p_tag):
+        own = []
+        for t in p.iter(f'{{{W}}}t'):
+            up = t.getparent()
+            while up is not None and up.tag != p_tag:
+                up = up.getparent()
+            if up is p:
+                own.append(t.text or '')
+        if ''.join(own).strip():
+            out.append(''.join(own))
+    return _SIDE_BREAK.join(out)
 
 
 def _side_letters(text):
@@ -1876,6 +1904,8 @@ def check_sides(delivered, original, notes_dir):
         dsrc = {el.get(f'{{{W}}}id'): _side_z(_side_comment_text(el)) for el in dcm}
         obox = {el.get(f'{{{W}}}id'): _side_box(el) for el in ocm}
         dbox = {el.get(f'{{{W}}}id'): _side_box(el) for el in dcm}
+        oel = {el.get(f'{{{W}}}id'): el for el in ocm}
+        del_ = {el.get(f'{{{W}}}id'): el for el in dcm}
         tally = counts['comments']
         for cid, text in osrc.items():
             _oa, _or, odel, on = obox.get(cid, ('', '', '', 0))
@@ -1890,6 +1920,10 @@ def check_sides(delivered, original, notes_dir):
             ddel = _side_z(ddel)
             en, before, kept = cmd.get(cid), len(findings), False
             if isinstance(en, str):
+                if _SIDE_BREAK in en:
+                    # SLICE 4c: read as the declaration was written, paragraph by paragraph
+                    text = _side_z(_side_comment_paras(oel[cid]))
+                    got = _side_z(_side_comment_paras(del_[cid]))
                 kept = _side_z(en) == text or _side_z(_side_unescape(en)) == text
                 if kept:
                     tally['declared kept'] += 1
