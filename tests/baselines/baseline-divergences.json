@@ -3,7 +3,7 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 40,
+ "count": 42,
  "divergences": {
   "uk/SKILL.md": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -204,6 +204,16 @@
    "changed_by": "feature/signed-python-no-doc-moves",
    "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
    "sha256_now": "913054fc0f0c81127c09fee0cb510c0093a6cc71d4c9cb6f2e82e4ec475aabd5"
+  },
+  "uk/scripts/validate_en_runs.py": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - record #121 as merged, the slice's written plan, and C13: validate_en_runs refuses en_runs that do not tile en, on every paragraph",
+   "sha256_now": "2cc34e3525a9befefd1f5d2c36de0b9d58f8b3664a40eeab67ef9c5b57fc42e5"
+  },
+  "us/scripts/validate_en_runs.py": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - record #121 as merged, the slice's written plan, and C13: validate_en_runs refuses en_runs that do not tile en, on every paragraph",
+   "sha256_now": "2cc34e3525a9befefd1f5d2c36de0b9d58f8b3664a40eeab67ef9c5b57fc42e5"
   }
  }
 }

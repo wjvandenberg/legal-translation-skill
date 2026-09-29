@@ -677,7 +677,7 @@ unconditionally — as is §5.6 entire.
 
 **PURPOSE: MET.** It was *so that no run on this machine is silently ended by its security agent while looking finished, and slice 4a's proof is taken on a pipeline that is not cut short*: `main` pins the signed system Python 3.14 and no shipped script renames a Word file, and slice 4a's whole proof was re-taken on that pin, every run passing only on its own closing line.
 
-**WHAT LANDED.** `feature/signed-python-no-doc-moves` **MERGED `66af307` (PR #119)** — register W5, §4's rule, the 22 fixtures rebuilt on 3.14. Slice 4a — B10 CLOSED, A2's D08 remainder with it — rebased onto it and **MERGED `7ce1a8f` (PR #120)**, both at Wouter's word; the session's closing PR records both, and his §4 ruling.
+**WHAT LANDED.** `feature/signed-python-no-doc-moves` **MERGED `66af307` (PR #119)** — register W5, §4's rule, the 22 fixtures rebuilt on 3.14. Slice 4a — B10 CLOSED, A2's D08 remainder with it — rebased onto it and **MERGED `7ce1a8f` (PR #120)**, both at Wouter's word; the session's closing PR, **MERGED `0bacc51` (PR #121)**, records both, and his §4 ruling.
 
 **WHAT THE MEASUREMENT MOVED:** #119 held 14 of 14 code runs and 8 of 8 document instruments, no delivered byte moving against `bc9c5d8`, 13 of 13, both variants — its publication check first firing on three absolute-path lines the write-up had added, reworded before commit. Slice 4a: 24 of 24 runs with a 2026-09-28 counterpart held, 14 identical and 10 differing only in the list of scripts that differ from `bc9c5d8`; section 3.2 of `PLAN-2-step-b.md` owns the rest.
 
