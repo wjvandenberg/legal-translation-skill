@@ -602,7 +602,11 @@ even though Accept/Reject land the right clause number.
 **Detection — do this in Step 3b before drafting `en_segments`.** A fragmented
 whole-word cluster is a maximal run of contiguous `tc_segments` that:
 
-1. contains at least 3 ins/del pieces with at least one of each;
+1. contains at least 3 pieces with at least one ins and one del — a piece being
+   an ins, a del, or regular text glued **letter to letter** to one, inside the
+   run or as the **stem** of the neighbouring regular segment up to its
+   whitespace (the unchanged half of a renumbered ordinal); a junction between
+   two CJK characters never counts, since those scripts put no space between words;
 2. has no whitespace inside any segment's text;
 3. concatenates to a coherent single word / ordinal on each of the Accept and
    Reject sides (e.g. `Decimotercera` vs `Duodécima`).
@@ -622,9 +626,14 @@ character-level run. What it does is **write a pre-filled `en_segments`
 skeleton** into each flagged paragraph, one entry for every `tc_segments`
 entry, with a `<<TRANSLATE: …>>` placeholder on the first ins and first del
 of each detected cluster and the empty string `""` on every other cluster
-segment. The translator only fills in the placeholders and the non-cluster
+segment. Where the edited word's stem sits in a neighbouring regular segment,
+that segment gets a `<<TRANSLATE: regular=…>>` placeholder naming the stem: the
+ins/del placeholders carry the whole word, so its English is written without
+the stem. The translator only fills in the placeholders and the non-cluster
 slots; the empty strings inside the cluster are the deliberate "clear this
-run" instructions for the apply step. Use `--dry-run` first to preview.
+run" instructions for the apply step. Every run prints how many tracked-change
+paragraphs it examined and how many it scaffolded — read the second against the
+first. Use `--dry-run` first to preview.
 
 For the road-use idx 117 example above, the script writes this skeleton
 (one entry per tc_segments entry, in the original order — 8 entries for 8

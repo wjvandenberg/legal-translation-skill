@@ -3,7 +3,7 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 40,
+ "count": 50,
  "divergences": {
   "uk/SKILL.md": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -71,9 +71,9 @@
    "sha256_now": "d36afd7da2d703dde74202bcc293335fe31d0317d2ab4aca2d19f4fd787597e2"
   },
   "uk/scripts/verify_diligence.py": {
-   "changed_by": "feature/checks-can-fail",
-   "commit_subject": "Branch 5 - checks can fail: the mandatory quality check gets an exit code, a corrupt deliverable stops the run and is written to a temporary name first, omitting --paragraphs refuses instead of warning, a validator's exit 3 blocks unconditionally, the truncation guard moves above __main__, and WARN stops being indistinguishable from PASS (register rows C3 C23 C25 W3 W4 L4)",
-   "sha256_now": "b5bbddac8c4c6d83a04157cefe756bb6309356987ff48756893bab981af79175"
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C4: verify_diligence's Step 4 + 4b counts what was declared, and says how many changed and how many were kept as the source",
+   "sha256_now": "db4a883f41e932dee2ed210008d5ac2f8e8bab2f232d5f701052c2bf5169c17f"
   },
   "uk/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/branch8-extraction-completeness",
@@ -171,9 +171,9 @@
    "sha256_now": "14167da617e929d80bbe294a51ebd4673379662e258c45d61edf6d470104a770"
   },
   "us/scripts/verify_diligence.py": {
-   "changed_by": "feature/checks-can-fail",
-   "commit_subject": "Branch 5 - checks can fail: the mandatory quality check gets an exit code, a corrupt deliverable stops the run and is written to a temporary name first, omitting --paragraphs refuses instead of warning, a validator's exit 3 blocks unconditionally, the truncation guard moves above __main__, and WARN stops being indistinguishable from PASS (register rows C3 C23 C25 W3 W4 L4)",
-   "sha256_now": "1ef1eb2ced2bc24ee1aa8932c3e510a0d05335a9493d322d0ea8904344e4eec7"
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C4: verify_diligence's Step 4 + 4b counts what was declared, and says how many changed and how many were kept as the source",
+   "sha256_now": "d93191b55b1b13575585424a795364fec9ffce1b7782699a428811b2f6fdda93"
   },
   "us/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/branch8-extraction-completeness",
@@ -204,6 +204,56 @@
    "changed_by": "feature/signed-python-no-doc-moves",
    "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
    "sha256_now": "913054fc0f0c81127c09fee0cb510c0093a6cc71d4c9cb6f2e82e4ec475aabd5"
+  },
+  "uk/scripts/validate_en_runs.py": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - record #121 as merged, the slice's written plan, and C13: validate_en_runs refuses en_runs that do not tile en, on every paragraph",
+   "sha256_now": "2cc34e3525a9befefd1f5d2c36de0b9d58f8b3664a40eeab67ef9c5b57fc42e5"
+  },
+  "us/scripts/validate_en_runs.py": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - record #121 as merged, the slice's written plan, and C13: validate_en_runs refuses en_runs that do not tile en, on every paragraph",
+   "sha256_now": "2cc34e3525a9befefd1f5d2c36de0b9d58f8b3664a40eeab67ef9c5b57fc42e5"
+  },
+  "uk/scripts/coalesce_fragmented_tcs.py": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
+   "sha256_now": "a26044f1fbf2df0c89ab4af4af6c844c97fa2792b2ea130a62e42628704aac74"
+  },
+  "uk/scripts/validate_translations.py": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
+   "sha256_now": "928360fe9d98dcc5ee63745677166f6080cbaa2a2c720e04bb36e31a57886183"
+  },
+  "uk/skill-docs/03-lexicons-and-segments.md": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
+   "sha256_now": "d359048a8468f4716a0514eea4cef493d70285a46df8583994c3d7b134582dbd"
+  },
+  "uk/skill-docs/04-translate.md": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
+   "sha256_now": "755e7a40f257325eebe8ce4625d7191e0ccc49454ac0f26d917d0a0f725d8134"
+  },
+  "us/scripts/coalesce_fragmented_tcs.py": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
+   "sha256_now": "b1e10bf5b6cf4ebd990ada6df0cc082876be8af72df64221373de342a619ab94"
+  },
+  "us/scripts/validate_translations.py": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
+   "sha256_now": "928360fe9d98dcc5ee63745677166f6080cbaa2a2c720e04bb36e31a57886183"
+  },
+  "us/skill-docs/03-lexicons-and-segments.md": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
+   "sha256_now": "51a15723041edb962a829036cdb02827b9b295d4fd8352f20ee3f38f941aa1c2"
+  },
+  "us/skill-docs/04-translate.md": {
+   "changed_by": "feature/branch11-slice4b",
+   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
+   "sha256_now": "7deb5a59ab57e5b322211714fb62105de644e9e78b64eec5f0c1e640cb1cbd1c"
   }
  }
 }

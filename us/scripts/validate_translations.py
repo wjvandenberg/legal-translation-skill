@@ -15,13 +15,20 @@ validation are checked against the per-batch cap. To override (e.g.,
 bulk re-validation after a regex fix that touches all paragraphs),
 pass ``--accept-large-batch``.
 
+And it refuses a Step 3b scaffold placeholder (``<<TRANSLATE: …>>``) still
+in any paragraph's ``en``, or in an ``en_segments`` entry of a paragraph that
+has ``en``: apply writes whatever it finds, so a placeholder left in place
+ships as literal text. A paragraph not yet translated keeps its scaffold —
+apply skips it, and a later batch fills it.
+
 Usage:
     python validate_translations.py <paragraphs.json> [--accept-large-batch]
 
 Exit codes:
     0 — PASS (all ratios acceptable)
     1 — WARN (some paragraphs flagged but none critical)
-    2 — BLOCK (critically short translations OR per-batch cap exceeded)
+    2 — BLOCK (critically short translations, per-batch cap exceeded, OR a
+        scaffold placeholder left in place)
 """
 import os
 import re
@@ -56,6 +63,7 @@ WARN_RATIO = 0.6       # EN/IT ratio below this triggers a warning
 BLOCK_RATIO = 0.3      # EN/IT ratio below this blocks application
 MIN_IT_LENGTH = 150    # Only check paragraphs with IT text longer than this
 BATCH_CAP = 35         # Hard cap on newly-translated paragraphs per call
+PLACEHOLDER = "<<TRANSLATE:"   # Step 3b's scaffold marker; never allowed to reach apply
 
 # Rev41: quoted-phrase retention thresholds.
 # Single quotes (' ' / ' '): typically wrap project names, brand names,
@@ -244,6 +252,51 @@ def validate(json_path, accept_large_batch=False):
             f"To override (only when re-validating after a bulk fix that\n"
             f"touches every paragraph at once), pass --accept-large-batch.\n"
             f"Doing so leaves an audit-trail entry in .validate-state.json.\n"
+            + "=" * 60 + "\n",
+            file=sys.stderr,
+        )
+        return 2
+
+    # C30: a scaffold placeholder left in `en` or in a segment. Step 3b's
+    # coalesce_fragmented_tcs.py writes `<<TRANSLATE: …>>` for the translator to
+    # replace, and apply writes whatever it finds, so one left in place ships
+    # as literal text. Every paragraph, whatever its source text; the state is
+    # left unwritten so the re-run re-validates the same indices.
+    #
+    # A SEGMENT COUNTS ONLY ONCE ITS PARAGRAPH HAS `en`. Step 3b scaffolds
+    # BEFORE translation and this script runs after every batch, so a paragraph
+    # due in a later batch legitimately still carries its placeholders — and
+    # apply skips a paragraph with no `en`, so none of its segments can reach
+    # the document. Refusing it would block the first batch's validation.
+    placeholders = []
+    for p in paras:
+        if not isinstance(p, dict):
+            continue
+        where = []
+        if PLACEHOLDER in (p.get('en') or ''):
+            where.append('en')
+        segs = p.get('en_segments') if (p.get('en') or '').strip() else None
+        for k, s in enumerate(segs if isinstance(segs, list) else []):
+            if isinstance(s, dict) and PLACEHOLDER in (s.get('en') or ''):
+                where.append(f'en_segments[{k}]')
+        if where:
+            placeholders.append((p.get('idx', '?'), where))
+    if placeholders:
+        print(
+            "\n" + "=" * 60 + "\n"
+            f"[validate_translations] SKILL GATE FIRED — INTENTIONAL BLOCK,\n"
+            f"NOT A SCRIPT ERROR. The script is working as designed.\n"
+            + "=" * 60 + "\n"
+            f"[validate_translations] BLOCK — a `{PLACEHOLDER}…>>` placeholder\n"
+            f"is still in paragraphs.json.\n"
+            f"\n"
+            f"Step 3b's scaffold writes these for you to replace with the final\n"
+            f"English. Apply writes whatever it finds, so one left in place ships\n"
+            f"into the document as literal text. {len(placeholders)} paragraph(s):\n"
+            + "".join(f"  idx {i}: {', '.join(w)}\n" for i, w in placeholders)
+            + f"\n"
+            f"Replace each one as Step 4 describes, then run\n"
+            f"validate_translations again.\n"
             + "=" * 60 + "\n",
             file=sys.stderr,
         )

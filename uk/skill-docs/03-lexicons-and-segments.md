@@ -129,7 +129,11 @@ python <skill-path>/scripts/coalesce_fragmented_tcs.py <workdir>/paragraphs.json
 
 The script scans every paragraph with `has_track_changes: true`, detects
 contiguous character-level ins/del clusters that reassemble to a coherent single
-word/ordinal on each of the Accept and Reject sides, and **writes a pre-filled
+word/ordinal on each of the Accept and Reject sides — counting as a piece not
+only each ins and del but any regular text glued **letter to letter** to one,
+including the **stem** of the neighbouring regular segment (the unchanged half of
+a renumbered ordinal, up to its whitespace), and never a junction between two
+CJK characters, since those scripts put no space between words — and **writes a pre-filled
 `en_segments` skeleton** into each flagged paragraph. It does **not** modify
 `tc_segments` — the source XML structure still has all its character-level runs,
 so the skeleton has one `en_segments` entry for every `tc_segments` entry. Inside
@@ -140,7 +144,11 @@ each detected cluster the skeleton contains:
 - a `<<TRANSLATE: del='<rejected-word>' (rejected)>>` placeholder on the first
   `del` segment,
 - the empty string `""` on every other segment (intermediate ins, del, and
-  regular runs that collectively make up the fragmented cluster).
+  regular runs that collectively make up the fragmented cluster),
+- and, where the edited word's stem sits in a neighbouring regular segment, a
+  `<<TRANSLATE: regular='<segment text>' (its '<stem>' belongs to the edited word, …)>>`
+  placeholder on that segment. The ins and del placeholders already carry the
+  whole word, stem included, so that segment's English is written **without** it.
 
 Outside the cluster the skeleton leaves `en: ""` so the translator still fills in
 the normal paragraph text.
@@ -148,13 +156,19 @@ the normal paragraph text.
 At translation time (Step 4) the translator:
 
 1. replaces each `<<TRANSLATE: …>>` placeholder with the final English
-   (e.g. `"Clause 13"` on the ins side, `"Clause 12"` on the del side);
+   (e.g. `"Clause 13"` on the ins side, `"Clause 12"` on the del side, and a
+   `regular=` one with that segment's English minus the stem) — none may be left,
+   and `validate_translations.py` refuses one that is;
 2. fills in the surrounding non-cluster `en_segments` entries with normal
    translations;
 3. leaves the empty-string slots inside the cluster **as `""`** — these are the
    deliberate "clear this run" markers that `apply_translations_textmatch.py`
    uses to empty the matching source runs so no orphan source letters leak into
    the English redline.
+
+Every run prints `Examined N tracked-change paragraph(s); scaffolded M.` first.
+**Read M against N**: one scaffolded paragraph among eleven tracked-change
+paragraphs is a reason to look at the other ten, not a clean result.
 
 Idempotent: re-running the script on an already-scaffolded paragraphs.json
 re-detects the same clusters and writes the same skeleton. Exits cleanly with

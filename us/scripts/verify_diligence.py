@@ -4,8 +4,9 @@ Runs at the end of the pipeline and produces a single PASS/WARN/FAIL summary
 across the 11 skill steps. Catches *skipped-step* failure modes that the
 earlier auto-invoked gates do not surface as a single end-of-pipeline report:
 
-  - Step 4 + 4b   per-batch validation actually invoked, every translated
-                  paragraph is in `validated_indices`, no batch exceeded 35
+  - Step 4 + 4b   per-batch validation actually invoked, every DECLARED
+                  paragraph (source text and English, changed or kept as
+                  the source) is in `validated_indices`, no batch exceeded 35
   - Step 5        apply ran (final/word/document.xml exists and non-empty)
   - Step 6        post-process ran (heuristic: document.xml has been modified
                   since paragraphs.json — i.e. apply or post-process touched it)
@@ -198,20 +199,30 @@ def check_step_4_4b(report, workdir):
         report.add(label, FAIL, f'paragraphs.json unreadable: {e}')
         return
 
-    translated = [p for p in paras
-                  if isinstance(p, dict)
-                  and (p.get('en') or '').strip()
-                  and (p.get('en') or '').strip()
-                      != (p.get('text') or '').strip()]
-    translated_idx = sorted(p['idx'] for p in translated if 'idx' in p)
+    # C4: count what was DECLARED - source text and a non-empty `en`, with an
+    # idx - which is the population validate_translations records in
+    # `validated_indices`. Counting only paragraphs whose string changed left
+    # every paragraph correctly kept as the source unaudited: D07 read "all 11
+    # validated" where 52 were declared.
+    declared = [p for p in paras
+                if isinstance(p, dict)
+                and (p.get('text') or '').strip()
+                and (p.get('en') or '').strip()
+                and p.get('idx') is not None]
+    kept = [p for p in declared
+            if (p.get('en') or '').strip() == (p.get('text') or '').strip()]
+    translated_idx = sorted(p['idx'] for p in declared)
     n_translated = len(translated_idx)
+    n_kept = len(kept)
+    n_changed = n_translated - n_kept
 
     if not os.path.isfile(state_path):
         report.add(label, FAIL,
                    f'.validate-state.json missing — '
                    f'validate_translations.py was never run',
                    f'expected: {state_path}\n'
-                   f'translated paragraphs in JSON: {n_translated}')
+                   f'declared paragraphs in JSON: {n_translated} '
+                   f'({n_changed} changed, {n_kept} kept as the source)')
         return
     try:
         with open(state_path, encoding='utf-8') as f:
@@ -229,12 +240,14 @@ def check_step_4_4b(report, workdir):
         more = (f' (+{len(missing_idx) - 10} more)'
                 if len(missing_idx) > 10 else '')
         report.add(label, FAIL,
-                   f'{len(missing_idx)} translated paragraphs missing from '
-                   f'.validate-state.json (skipped per-batch validation)',
+                   f'{len(missing_idx)} of {n_translated} declared paragraphs '
+                   f'missing from .validate-state.json (skipped per-batch '
+                   f'validation)',
                    f'first missing idx: {sample}{more}')
     else:
         report.add(label, PASS,
-                   f'all {n_translated} translated paragraphs validated')
+                   f'all {n_translated} declared paragraphs validated — '
+                   f'{n_changed} changed, {n_kept} kept as the source')
 
     # Batch-cap audit
     if not history:

@@ -25,9 +25,15 @@ What this script does
 ---------------------
 For each paragraph with `has_track_changes: true`, it scans `tc_segments`
 looking for contiguous clusters of ins/del/regular entries that (a) contain at
-least 3 ins+del pieces and at least one of each, (b) have no whitespace in any
+least 3 pieces and at least one ins and one del, (b) have no whitespace in any
 piece, and (c) reassemble on each of the Accept and Reject sides into a
-coherent single word (different on each side).
+coherent single word (different on each side). A piece is an ins or a del, or
+regular text glued LETTER TO LETTER to one — inside the run, or the stem of the
+neighbouring regular segment up to its whitespace, which then joins the word
+(C14: a renumbered ordinal whose unchanged half sits in a regular run). A
+junction between two CJK characters never counts: those scripts put no space
+between words. Every run prints how many tracked-change paragraphs it examined
+and how many it scaffolded.
 
 When a cluster is found, the script writes a pre-filled `en_segments` skeleton
 into the paragraph, matching the original tc_segments type pattern 1-for-1
@@ -38,6 +44,10 @@ into the paragraph, matching the original tc_segments type pattern 1-for-1
   - on the **first `del` segment**: a placeholder like
         `<<TRANSLATE: del='Duodécima' (rejected)>>`
   - on **every other cluster segment**: the empty string `""`.
+  - on a **neighbouring regular segment holding a stem** of the edited word:
+        `<<TRANSLATE: regular='<segment text>' (its '<stem>' belongs to the
+        edited word, written whole on the ins/del: write this segment's
+        English without it)>>`
 
 Outside the cluster, the script leaves `en` fields empty (so the translator
 still writes them) — but each tc_segment that carries non-cluster text is
@@ -71,6 +81,7 @@ import json
 import re
 import sys
 import os
+import unicodedata
 
 def _check_self_integrity():
     """Detect install-time truncation. Whole-file scan tolerates null-padding."""
@@ -110,55 +121,104 @@ def _is_wordlike(s: str) -> bool:
         return False
     return True
 
-def _find_clusters(tc_segments: list[dict], min_pieces: int) -> list[tuple[int, int]]:
-    """Return (start_idx, end_idx_inclusive) ranges of fragmented clusters.
+def _is_cjk(ch: str) -> bool:
+    name = unicodedata.name(ch, "")
+    return any(k in name for k in ("CJK", "HIRAGANA", "KATAKANA", "HANGUL"))
+
+
+def _glued(before: str, after: str) -> bool:
+    """True when the character `before` meets `after` LETTER TO LETTER, so the
+    edit changes part of a word rather than a whole one. A junction between two
+    CJK characters never counts: those scripts put no whitespace between words,
+    so every junction there is letter to letter and none says a word was split."""
+    if not (before.isalpha() and after.isalpha()):
+        return False
+    return not (_is_cjk(before) or _is_cjk(after))
+
+
+def _find_cluster_detail(tc_segments: list[dict], min_pieces: int) -> list[dict]:
+    """Every fragmented cluster, as {start, end, pre, post, accepted, rejected}.
 
     A cluster is a maximal run of adjacent segments whose individual texts
     have no whitespace, and whose concatenations by side (Accept = non-del,
     Reject = non-ins) both read as coherent single words — different from
-    each other — and which contains at least `min_pieces` ins+del entries
-    with at least one ins and one del."""
-    clusters: list[tuple[int, int]] = []
+    each other — and which contains at least `min_pieces` pieces with at least
+    one ins and one del.
+
+    A PIECE is an ins or a del, AND (C14) a stretch of regular text glued
+    letter to letter to an ins or del: a regular segment inside the run, or the
+    STEM of the neighbouring whitespace-bearing regular segment — its letters up
+    to the nearest whitespace — which then joins both words. That is how a
+    renumbered ordinal whose unchanged half sits in a regular run (`ins 'Duo'` /
+    `del 'Un'` / regular `'décima.- …'`) reaches the threshold with two edits.
+    `pre` and `post` are those stems ('' where there is none). A run the rule
+    without stems would flag is never lost to them: where the stems break the
+    single-word test, the cluster is kept without them."""
+    clusters: list[dict] = []
     n = len(tc_segments)
+    txt = [(s.get("text") or "") for s in tc_segments]
+    typ = [s.get("type") for s in tc_segments]
+    edit = ("ins", "del")
     i = 0
     while i < n:
-        seg = tc_segments[i]
-        text = seg.get("text", "") or ""
-        if re.search(r"\s", text) or len(text) > 60:
+        if re.search(r"\s", txt[i]) or len(txt[i]) > 60:
             i += 1
             continue
         j = i
-        ins_count = del_count = 0
-        while j < n:
-            s = tc_segments[j]
-            t = s.get("text", "") or ""
-            if re.search(r"\s", t) or len(t) > 60:
-                break
-            if s.get("type") == "ins":
-                ins_count += 1
-            elif s.get("type") == "del":
-                del_count += 1
+        while j < n and not re.search(r"\s", txt[j]) and len(txt[j]) <= 60:
             j += 1
-        if (
-            j - i >= 2
-            and ins_count + del_count >= min_pieces
-            and ins_count >= 1
-            and del_count >= 1
-        ):
-            accepted = "".join((s.get("text") or "") for s in tc_segments[i:j]
-                               if s.get("type") != "del")
-            rejected = "".join((s.get("text") or "") for s in tc_segments[i:j]
-                               if s.get("type") != "ins")
-            if (_is_wordlike(accepted) and _is_wordlike(rejected)
-                    and accepted != rejected):
-                clusters.append((i, j - 1))
+        ins_count = sum(1 for k in range(i, j) if typ[k] == "ins")
+        del_count = sum(1 for k in range(i, j) if typ[k] == "del")
+        if ins_count and del_count:
+            glued_in = 0
+            for k in range(i, j):
+                if typ[k] in edit or not txt[k]:
+                    continue
+                left = (k - 1 >= i and typ[k - 1] in edit and txt[k - 1]
+                        and _glued(txt[k - 1][-1], txt[k][0]))
+                right = (k + 1 < j and typ[k + 1] in edit and txt[k + 1]
+                         and _glued(txt[k][-1], txt[k + 1][0]))
+                if left or right:
+                    glued_in += 1
+            pre = post = ""
+            if (i > 0 and typ[i - 1] not in edit and txt[i - 1] and txt[i]
+                    and typ[i] in edit and _glued(txt[i - 1][-1], txt[i][0])):
+                m = re.search(r"\S+$", txt[i - 1])
+                pre = m.group(0) if m else ""
+            if (j < n and typ[j] not in edit and txt[j] and txt[j - 1]
+                    and typ[j - 1] in edit and _glued(txt[j - 1][-1], txt[j][0])):
+                m = re.match(r"\S+", txt[j])
+                post = m.group(0) if m else ""
+            core_acc = "".join(txt[k] for k in range(i, j) if typ[k] != "del")
+            core_rej = "".join(txt[k] for k in range(i, j) if typ[k] != "ins")
+            pieces = ins_count + del_count + glued_in + bool(pre) + bool(post)
+            accepted, rejected = pre + core_acc + post, pre + core_rej + post
+            found = None
+            if (pieces >= min_pieces and _is_wordlike(accepted)
+                    and _is_wordlike(rejected) and accepted != rejected):
+                found = {"pre": pre, "post": post,
+                         "accepted": accepted, "rejected": rejected}
+            elif (j - i >= 2 and ins_count + del_count >= min_pieces
+                  and _is_wordlike(core_acc) and _is_wordlike(core_rej)
+                  and core_acc != core_rej):
+                found = {"pre": "", "post": "",
+                         "accepted": core_acc, "rejected": core_rej}
+            if found is not None:
+                clusters.append(dict(found, start=i, end=j - 1))
                 i = j
                 continue
         i = j if j > i else i + 1
     return clusters
 
+
+def _find_clusters(tc_segments: list[dict], min_pieces: int) -> list[tuple[int, int]]:
+    """Return (start_idx, end_idx_inclusive) ranges of fragmented clusters —
+    `_find_cluster_detail`'s, without the stems."""
+    return [(c["start"], c["end"])
+            for c in _find_cluster_detail(tc_segments, min_pieces)]
+
 def _build_en_segments_skeleton(tc_segments: list[dict],
-                                clusters: list[tuple[int, int]],
+                                clusters: list,
                                 direct_ins_en: str | None = None,
                                 direct_del_en: str | None = None) -> list[dict]:
     """Generate an en_segments array of the SAME length and type pattern as
@@ -167,7 +227,14 @@ def _build_en_segments_skeleton(tc_segments: list[dict],
       - on the first ins / first del of each cluster: either a TRANSLATE
         placeholder (default) or, if direct_ins_en/direct_del_en are given
         AND there is exactly ONE cluster, the final English text directly.
-      - '' (empty) for non-cluster segments (translator fills these)
+      - on a neighbouring regular segment whose STEM belongs to the edited
+        word (C14): a TRANSLATE placeholder naming that stem, because the
+        word is written whole on the ins / del and the rest of the segment
+        is still the translator's to fill.
+      - '' (empty) for every other non-cluster segment (translator fills these)
+
+    `clusters` holds `_find_cluster_detail` dicts, or (start, end) pairs,
+    which carry no stems.
     """
     en_segs: list[dict] = [
         {"type": s.get("type"), "en": ""} for s in tc_segments
@@ -179,13 +246,23 @@ def _build_en_segments_skeleton(tc_segments: list[dict],
         and len(clusters) == 1
     )
 
-    for start, end in clusters:
-        accepted = "".join((tc_segments[k].get("text") or "")
-                           for k in range(start, end + 1)
-                           if tc_segments[k].get("type") != "del")
-        rejected = "".join((tc_segments[k].get("text") or "")
-                           for k in range(start, end + 1)
-                           if tc_segments[k].get("type") != "ins")
+    stems: dict[int, list[str]] = {}
+    for c in clusters:
+        if isinstance(c, dict):
+            start, end = c["start"], c["end"]
+            accepted, rejected = c["accepted"], c["rejected"]
+            if c.get("pre"):
+                stems.setdefault(start - 1, []).append(c["pre"])
+            if c.get("post"):
+                stems.setdefault(end + 1, []).append(c["post"])
+        else:
+            start, end = c
+            accepted = "".join((tc_segments[k].get("text") or "")
+                               for k in range(start, end + 1)
+                               if tc_segments[k].get("type") != "del")
+            rejected = "".join((tc_segments[k].get("text") or "")
+                               for k in range(start, end + 1)
+                               if tc_segments[k].get("type") != "ins")
         first_ins = next(
             (k for k in range(start, end + 1)
              if tc_segments[k].get("type") == "ins"),
@@ -213,6 +290,14 @@ def _build_en_segments_skeleton(tc_segments: list[dict],
         # All other cluster segments keep en='' so apply will clear the
         # corresponding runs. This is the whole point.
 
+    for k, found in sorted(stems.items()):
+        named = " and ".join(f"'{s}'" for s in found)
+        en_segs[k]["en"] = (
+            f"{PLACEHOLDER_PREFIX}regular='{tc_segments[k].get('text') or ''}' "
+            f"(its {named} belongs to the edited word, written whole on the "
+            f"ins/del: write this segment's English without it)>>"
+        )
+
     return en_segs
 
 def process_paragraph(p: dict, min_pieces: int,
@@ -224,7 +309,7 @@ def process_paragraph(p: dict, min_pieces: int,
     tcs = p.get("tc_segments")
     if not tcs or not isinstance(tcs, list):
         return False
-    clusters = _find_clusters(tcs, min_pieces)
+    clusters = _find_cluster_detail(tcs, min_pieces)
     if not clusters:
         return False
     skeleton = _build_en_segments_skeleton(
@@ -233,16 +318,13 @@ def process_paragraph(p: dict, min_pieces: int,
         direct_del_en=direct_del_en,
     )
     p["en_segments"] = skeleton
-    for (start, end) in clusters:
-        accepted = "".join((tcs[k].get("text") or "")
-                           for k in range(start, end + 1)
-                           if tcs[k].get("type") != "del")
-        rejected = "".join((tcs[k].get("text") or "")
-                           for k in range(start, end + 1)
-                           if tcs[k].get("type") != "ins")
+    for c in clusters:
+        start, end = c["start"], c["end"]
+        stem = "".join(
+            f" + stem in segment {k}" for k, s in ((start - 1, c["pre"]), (end + 1, c["post"])) if s)
         report.append(
-            f"  idx={p.get('idx')}: fragmented cluster segments[{start}..{end}] "
-            f"=> rejected='{rejected}' / accepted='{accepted}'"
+            f"  idx={p.get('idx')}: fragmented cluster segments[{start}..{end}]{stem} "
+            f"=> rejected='{c['rejected']}' / accepted='{c['accepted']}'"
         )
     return True
 
@@ -288,8 +370,12 @@ def main(argv: list[str]) -> int:
 
     report: list[str] = []
     touched = 0
+    examined = 0
     direct_applied = False
     for p in data:
+        if (p.get("has_track_changes") and isinstance(p.get("tc_segments"), list)
+                and p.get("tc_segments")):
+            examined += 1
         # Route direct-fill args only to the targeted paragraph idx. Every
         # other paragraph still gets the placeholder scaffold.
         if (args.idx is not None and args.ins_en is not None
@@ -321,6 +407,10 @@ def main(argv: list[str]) -> int:
         )
         return 2
 
+    # C14: on EVERY run, so a count of one cluster can be read against how
+    # many tracked-change paragraphs there were to look at.
+    print(f"Examined {examined} tracked-change paragraph(s); scaffolded {touched}.")
+
     if not report:
         print("No character-fragmented TC clusters detected. Nothing to do.")
         return 0
@@ -337,6 +427,9 @@ def main(argv: list[str]) -> int:
     print("     normal English translations — but do NOT populate the empty-string")
     print("     slots inside the cluster; those must stay as '' so apply_translations_")
     print("     textmatch.py can clear the matching source runs.")
+    print(f"  3. A '{PLACEHOLDER_PREFIX}regular=…>>' placeholder names a stem that belongs")
+    print("     to the edited word: replace it with that segment's English WITHOUT the")
+    print("     stem, which the ins/del English already carries.")
 
     if args.dry_run:
         print()
