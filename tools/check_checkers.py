@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """check_checkers.py - is this project's copy of each standard script current?
-CHECKER VERSION 17 (2026-09-23)
+CHECKER VERSION 18 (2026-09-28)
 
 Every project gets its OWN COPY of the standard scripts in its tools\\ folder. Copies drift:
 the shared one gets fixed and yours does not hear about it, or yours gets edited and the fix
@@ -177,10 +177,17 @@ if hasattr(sys.stdout, "reconfigure"):
 # session after a day's first inherited the first one's line), and a project on v1 kept that hole
 # while this report printed nothing about it: a stale guard is the one drift that reads as a
 # working control. Its selftest and --probe run under run_tests, so the recorded test puts it in.
+# install_hooks.py JOINS ON THAT SAME SENTENCE, 2026-09-28 (v18). Its --check exits 1 when a guard is
+# missing or no longer bites, so it gates; a project holds its copy in tools/; and its own header says
+# a lower CHECKER VERSION there means STALE - a claim this list never checked. Found when a project's
+# copy could not pass its own selftest (install_hooks v5) and nothing here would have said so.
+# auto_mode_headless.py (v5) is in the same state - versioned, untracked, unexplained - and is LEFT
+# for Wouter's decision, since each entry gives every project one more line to decide.
 TRACKED = ["house_common.py", "verify_md.py", "verify_code.py", "verify_deliverable.py",
            "verify_crossdoc.py", "verify_refs.py", "verify_expected.py",
            "verify_confidential.py", "cycle_evidence.py", "check_checkers.py",
-           "run_tests.py", "auto_mode.py", "auto_mode_guard.py", "purpose_guard.py"]
+           "run_tests.py", "auto_mode.py", "auto_mode_guard.py", "purpose_guard.py",
+           "install_hooks.py"]
 
 
 def default_shared() -> Path:

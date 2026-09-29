@@ -17,7 +17,7 @@
 # control. Merges are meant to happen through a reviewed pull request, which is a server-side
 # operation and is unaffected by this.
 #
-# Install:  uv run python tools/install_hooks.py
+# Install:  uv run python tools/install_project_hooks.py
 # Override, deliberately and rarely:  LT_ALLOW_MAIN_PUSH=1 git push
 
 remote="$1"

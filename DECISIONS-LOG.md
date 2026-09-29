@@ -985,3 +985,26 @@ commit of their own with the gate re-baselined after it. They were found a versi
 folder at this session's open and left, so the gate measured with one set of instruments throughout.
 Re-copying on this branch was declined because it mixes an instrument change into a slice's evidence;
 leaving them stale again was declined because the house rule for a STALE checker is to re-copy it.
+
+## 2026-09-29 (4) — the project's own installer renamed, rather than declared around
+
+**ONE RULING AT THIS SESSION'S OPEN, ON THE RECOMMENDED OPTION** *(Wouter, 2026-09-29 (4))*.
+
+**`tools/install_hooks.py` IS NOW `tools/install_project_hooks.py`.** `check_checkers.py` v18, re-copied
+at this open under ruling (3) above, began tracking the house installer by name, and read this project's
+file of that name UNKNOWN: it differs from the house script and carries no `CHECKER VERSION`, because it
+is a different program — it installs this project's git hooks from `tools/hooks/`, where the house one
+installs the house's. **The house's four questions put the fix in this project:** the checker's logic is
+right to say a file under a house name is not the house's file, so question 1 fails; the project-only
+route the house offers is a `FORKED FROM` header, which would state something false, the file's own
+docstring having said since 2026-09-09 that it is not a fork. **Declined:** a general "own script"
+declaration added to the house checker, a change to every project for one name clash; leaving the row
+UNKNOWN to the close; and the fork header. The house installer is declared absent in
+`verify.config.json` with its reason and a trigger, and the name is left free should this project ever
+want it.
+
+**AND THE RENAME FOUND A DEFECT IN THE INSTALLER ITSELF, FIXED IN THE SAME COMMIT.** Its `--check` swept
+every file in `tools/hooks/`, `evidence_guard.py` included — a Claude Code hook wired through
+`.claude/settings.json`, which Git never runs — so it reported that file "not installed" and exited 1 on
+a correctly installed repository. A git hook is named for its event and has no extension; a file with one
+is now skipped and said so.
