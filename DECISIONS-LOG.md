@@ -1157,3 +1157,17 @@ whatever the answer.
 same worktree hash*: `cycle_evidence.py` hashes `git diff HEAD` and keeps one record per phase per branch, so
 once sub-step 2 commits, HEAD moves and that evidence is stale for the record — the hop re-records before it.
 And the launch command it gave, `--run --max-budget-usd`, names an option the runner does not have.
+
+## 2026-09-30 (4) — wiring-hop1 hop 1: the judgements taken alone building sub-steps 2 to 4
+
+**ONE UNATTENDED HOP, NOBODY TO ASK** *(the run armed 2026-09-30 (3); every question the hop would have put is in `temp/auto-closing-questions.md`, answered on its recommended option, for Wouter to confirm or overturn)*. Each judgement below changed a test's input or a design detail the approved plan left open — **none changed a gate, an approved number or a delivered byte for a run without the new file.**
+
+- **J-B1** test_glossary_route arm 5 given slice 3b's glossary keep declaration. The arm passed the ORIGINAL glossary to --glossary (the keep-as-is route) with no glossary_translations.json; the wired delivered check refuses that as side-glossary / kept-source, rc=1 on both variants. Case 1c's shape exactly: the check right in scope, the test's operator non-compliant since slice 3b. The input changed, never the gate. Reversible by one revert of the sub-step 2 commit's test hunk.
+- **J-B1b** tests/test_no_delivered_byte_moves.py's repack harness declared a tab as a space (its own declared_text) and left the fixture's comment and footnote undeclared; the wired check reads the body as extraction does (a tab contributes nothing) and refused 4 findings. The harness now declares extraction's own text, en equal to it, plus slice 3b's keeps for the comment and the footnote. The gate unchanged; byte identity to the pin held on both fixtures, 12 of 12.
+- **J-B1c** tests/test_checks_can_fail.py C25 fed repack an empty paragraphs.json, which the wired check reads as VOID (exit 3) and refuses, rightly. Its claim is only that repack completes when --paragraphs is given, so the notes are now extraction's text with en equal to it. The gate unchanged.
+- **J-B2a** Sub-step 3 lives in repack's _delivered_gate, not in validate_apply. The check keeps reporting every finding and exiting 1; repack reads its report and the declaration. So "no flag switches the check off" holds literally - the check has no new input at all - and the decision sits where the refusal already lives.
+- **J-B2b** The file's shape: {"accepted": [ {idx | part (+ id), class, shape, attempts 1-5, check, consequence, where, "reader must"} ]} - the five ACCEPTED CONSEQUENCE lines as verbatim keys, so the printed block is the file read back. Identity is the check's own report fields.
+- **J-B2c** A document-level finding (an anchor count, which has neither idx nor part) is named "part": "document" - the label the check itself prints for it.
+- **J-B2d** Sub-step 3's TEST: the full s0930b set; the corpus arm not re-run, declared - no workdir holds the file, so the corpus path is sub-step 2's, proved at 75a4e54.
+- **J-B3a** render_diff's kept folder stays under the logs folder's branch6-render/, where Wouter already looks, named <document>-<variant>; only the leaf changes.
+- **J-B3b** Sub-step 4's TEST declared narrow - smoke, test_render_keep, test_parity_check - since no other suite drives render_diff (it needs LibreOffice and the logs folder); a real --doc render was not run, because nothing it renders or compares changed and the hop may not read a page.
