@@ -61,9 +61,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice4c",
-   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
-   "sha256_now": "a0058143722d990a3ab60c6401d87c6e6b68996dedda9870ab7db13997e1d0c2"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 1: C16's class COUNTED, an added space in the three measured places, a lost space and a split word still blocking",
+   "sha256_now": "5ef6f8cac2971c205c326ec82993f40ab4ef777c465f8bc42f0470fc1fedb201"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -161,9 +161,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice4c",
-   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
-   "sha256_now": "1be8cc27bf81f08ac641a83f97f663973f41f19d2daf9d90a08ac95282b12977"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 1: C16's class COUNTED, an added space in the three measured places, a lost space and a split word still blocking",
+   "sha256_now": "9f452e4a626c2c0293e30dba45928d430fe9516077b269a89dd3e984de1052cc"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",

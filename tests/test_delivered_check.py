@@ -47,6 +47,15 @@ built in a temporary directory; nothing is read from the corpus. What each arm a
      alarm); A15's signature -- accept as the source, the reject reading's brackets changed -- is
      COUNTED; any other difference from the source is a count only; with no original the
      source-relative arms say they did not run.
+ 21  WOUTER'S RULING, 2026-09-30, C16's class: a finding whose every difference is a plain space
+     ADDED is COUNTED when each added space (a) joins whitespace already there, (b) sits at a
+     tracked-change boundary where the SOURCE has whitespace, whatever its neighbours, or (c) sits
+     at the paragraph's end where the source paragraph ends in whitespace. Just outside, still
+     blocking: a space between two letters at a boundary the source does not space, a split word
+     inside a segment, the end addition the source does not share, a space LOST beside a doubled
+     one, an added no-break space, and a reading that differs by more than the added space.
+     Arms 16 (gain-inner) and 18 (rebase-inner) were RE-PINNED for it: each delivers a doubled
+     space, now counted.
 
     uv run --with lxml python tests/test_delivered_check.py
     uv run --with lxml python tests/test_delivered_check.py --variant us
@@ -325,8 +334,12 @@ ok("a space REASSIGNED MID-paragraph between the readings still BLOCKS",
 
 r, rep = case("gain-inner", [{"idx": 0, "text": "source 0 ", "en": A}, en(1, B)],
               [para(A.replace("agree", "agree ")), para(B)], strict=True)
-ok("a space GAINED mid-reading still BLOCKS — C16's shape, not the ruling's",
-   blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
+# RE-PINNED 2026-09-30 (2), DELIBERATELY. This arm read "a space GAINED mid-reading still BLOCKS - C16's
+# shape, not the ruling's". Its delivery is a DOUBLED space, the shape Wouter's ruling of 2026-09-30 counts,
+# so the boundary it guarded moved to arm 21's pins: a split word, a space where the source has none.
+ok("a space GAINED mid-reading beside one already there is COUNTED since Wouter's 2026-09-30 ruling (arm 21)",
+   counted_only(rep, r, "inner-space") and findings(rep, "inner-space")[0].get("ruling") == "c16-space",
+   f"rc={r.returncode} {rep and rep['findings']}")
 
 r, rep = case("lead", [{"idx": 0, "text": " source 0 ", "en": " " + A + " "}, en(1, B)],
               [para(A), para(B)], strict=True)
@@ -395,9 +408,14 @@ r, rep = case("rebase-inner", [en(0, "The colour of each notice shall be red."),
               [para("The color of each notice  shall be red."), para(B)],
               journal=jr("The colour of each notice  shall be red.",
                          "The color of each notice  shall be red."), strict=True)
-ok("apply's inner space plus a journalled edit: rebased, and apply's space still BLOCKS as inner-space",
-   [f["idx"] for f in findings(rep, "inner-space")] == [0] and blocks_once(rep, r),
-   f"rc={r.returncode} {rep and rep['findings']}")
+# RE-PINNED 2026-09-30 (2), DELIBERATELY: apply's space here is a DOUBLED one, which Wouter's ruling of
+# 2026-09-30 counts. What the arm is for stays asserted - the journal's edit is REBASED and what is left is
+# apply's own change, judged like any other.
+ok("apply's inner space plus a journalled edit: rebased, and apply's doubled space is COUNTED as inner-space "
+   "since 2026-09-30 (arm 21)",
+   [f["idx"] for f in findings(rep, "inner-space")] == [0] and counted_only(rep, r, "inner-space")
+   and findings(rep, "inner-space")[0].get("ruling") == "c16-space" and "rebased onto 1" in rep.get("journal", ""),
+   f"rc={r.returncode} {rep and (rep['findings'], rep.get('journal'))}")
 
 segd = {"idx": 0, "text": "source 0 ", "en": "Sign here .....",
         "en_segments": [{"type": "ins", "en": "Sign here "}, {"type": "del", "en": "....."}]}
@@ -539,6 +557,77 @@ r, rep = case("br-nosrc", [src_en(0, "Zdroj (a)", "Source (a"), en(1, B)], [para
               original=[para("Inny tekst"), ORIG1])
 ok("a paragraph whose source text the ORIGINAL lacks is counted unpaired, never judged against another",
    brs(rep) == [] and br(rep).get("no_source") == 1 and br(rep).get("paired") == 1, str(rep and br(rep)))
+
+print("\n21  WOUTER'S RULING, 2026-09-30: an ADDED space is COUNTED in three measured places (C16's class)")
+
+
+def c16(rep, r, cls, shape):
+    """Exactly one finding, of this class and shape, COUNTED under ruling c16-space; --strict exits 0."""
+    f = findings(rep, cls, shape)
+    return (rep is not None and len(f) == 1 and f[0].get("ruling") == "c16-space" and not f[0]["blocking"]
+            and blocking(rep) == [] and r.returncode == 0)
+
+
+def tcp(segs, srcs, text="source 0"):
+    """A declaration with tracked-change segments: segs [(type, English)], srcs the source text per segment."""
+    return {"idx": 0, "text": text, "en": "".join(e for _, e in segs),
+            "en_segments": [{"type": k, "en": e} for k, e in segs],
+            "tc_segments": [{"type": k, "text": s} for (k, _), s in zip(segs, srcs)]}
+
+
+NBSP = chr(0xA0)
+r, rep = case("c16-boundary-double", [tcp([("regular", "Sign here "), ("ins", "now"), ("regular", ".")],
+                                          ["Firma qui ", "ora", "."]), en(1, B)],
+              [para("Sign here  ", ("ins", "now"), "."), para(B)], strict=True)
+ok("(a) a space added beside one already there, at a tracked-change boundary, is COUNTED — inner-space",
+   c16(rep, r, "inner-space", ""), f"rc={r.returncode} {rep and rep['findings']}")
+
+LL = [("regular", "Sign"), ("ins", "here"), ("regular", " now.")]
+r, rep = case("c16-boundary-letters", [tcp(LL, ["Firma ", "qui", " ora."]), en(1, B)],
+              [para("Sign ", ("ins", "here"), " now."), para(B)], strict=True)
+ok("(b) a space added between two letters at a boundary where the SOURCE has whitespace is COUNTED — "
+   "changed / space, D02 101's shape", c16(rep, r, "changed", "space"), f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("c16-boundary-punct", [tcp([("regular", "Sign here,"), ("ins", "now"), ("regular", ".")],
+                                         ["Firma qui, ", "ora", "."]), en(1, B)],
+              [para("Sign here, ", ("ins", "now"), "."), para(B)], strict=True)
+ok("(b) ...and between punctuation and a letter there, whatever its neighbours — D02 168's and D08 40's shape",
+   c16(rep, r, "changed", "space"), f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("c16-end", [src_en(0, "source 0 ", A), en(1, B)], [para(A.replace("agree", "agree ") + " "), para(B)],
+              strict=True)
+ok("(c) a space added at the paragraph's END, the source paragraph ending in whitespace, beside an inner doubled "
+   "one, is COUNTED — D08 28's shape", c16(rep, r, "inner-space", ""), f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("c16-nosrc-boundary", [tcp(LL, ["Firma", "qui", " ora."]), en(1, B)],
+              [para("Sign ", ("ins", "here"), " now."), para(B)], strict=True)
+ok("a space between two letters at a boundary the source does NOT space still BLOCKS", blocks_once(rep, r),
+   f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("c16-split", [en(0, "Sign here now."), en(1, B)], [para("Sign he re now."), para(B)], strict=True)
+ok("a space added between two letters INSIDE a segment — a split word — still BLOCKS", blocks_once(rep, r),
+   f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("c16-end-nosrc", [src_en(0, "source 0", A), en(1, B)],
+              [para(A.replace("agree", "agree ") + " "), para(B)], strict=True)
+ok("the end addition where the source does NOT end in whitespace still BLOCKS", blocks_once(rep, r),
+   f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("c16-lost", [en(0, A), en(1, B)],
+              [para(A.replace("agree", "agree ").replace("as follows", "asfollows")), para(B)], strict=True)
+ok("a doubled space beside a LOST one still BLOCKS — no space lost is ever counted", blocks_once(rep, r),
+   f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("c16-nbsp", [en(0, A), en(1, B)], [para(A.replace("agree ", "agree" + NBSP + " ")), para(B)],
+              strict=True)
+ok("an added NO-BREAK space still BLOCKS — only U+0020 was measured", blocks_once(rep, r),
+   f"rc={r.returncode} {rep and rep['findings']}")
+
+r, rep = case("c16-readings", [tcp([("regular", "Sign here"), ("ins", " now"), ("regular", ".")],
+                                   ["Firma qui", " ora", "."]), en(1, B)],
+              [para("Sign here  now."), para(B)], strict=True)
+ok("a reading that differs by MORE than the added space still BLOCKS — the insertion delivered as plain text",
+   blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
 
 shutil.rmtree(TMP, ignore_errors=True)
 print("\n" + "=" * 88)

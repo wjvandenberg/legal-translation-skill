@@ -454,6 +454,13 @@ RESTORED_4A = {"D08": 2}
 LOST_4A = {"D08": [("anchor-lost", "commentRangeEnd", None), ("anchor-lost", "commentReference", None)]}
 ANCHORS_4A = {"D08": {"commentReference": 13, "commentRangeStart": 13, "commentRangeEnd": 13}}
 XML_MEMBERS = ("final/word/document.xml", "checked.xml", "docx:word/document.xml")
+# STEP 10's WIRING SLICE, SUB-STEP 1 (2026-09-30 (2)): Wouter's ruling COUNTS C16's class -- a space ADDED
+# beside whitespace already there, at a tracked-change boundary the source spaces, or at a paragraph end the
+# source shares -- so on every document repack reaches the text-and-anchor blocking is NONE, and the
+# findings the ruling counts are exactly these per document, measured before it was built
+# (temp/s0930b_c16_view.py): uk 13 and us 9. Until then this arm only PRINTED those counts.
+C16_COUNTED = {"uk": {"D02": 5, "D03": 1, "D03B": 1, "D07": 4, "D08": 2},
+               "us": {"D03": 1, "D03B": 1, "D04": 1, "D07": 4, "D08": 2}}
 _TEXT_4A = frozenset(f"{{{W}}}{n}" for n in ("r", "rPr", "t", "delText"))
 _TC_4A = frozenset((f"{{{W}}}ins", f"{{{W}}}del"))
 
@@ -1491,6 +1498,19 @@ if args.arm in ("b", "both"):
     present = {did_of(k) for k in reports_b}
     ok(f"repack STOPPED exactly where the plan says ({args.variant}, of the documents in this run)",
        set(stopped) == STOP_2B[args.variant] & present, f"stopped {stopped}")
+    print("\n  THE WIRING SLICE, SUB-STEP 1 — C16's CLASS COUNTED, ON EVERY DOCUMENT REPACK REACHES:")
+    c16_got = defaultdict(int)
+    for key, (rep, _) in reports_b.items():
+        if rep.get("_read") != "docx":
+            continue
+        n = sum(1 for f in body_only(rep) if f.get("ruling") == "c16-space" and not f.get("blocking", True))
+        c16_got[did_of(key)] += n
+        ok(f"{key}: text-and-anchor blocking NONE; {n} counted as c16-space", not txt_blocking(rep),
+           f"still blocking {txt_blocking(rep)}")
+    want16 = {d: k for d, k in C16_COUNTED[args.variant].items() if d in present and d not in stopped}
+    got16 = {d: k for d, k in c16_got.items() if k}
+    ok(f"the findings counted as c16-space are exactly the measured ones ({args.variant}, of the documents "
+       f"in this run: {sum(want16.values())})", got16 == want16, f"counted {dict(got16)}, measured {want16}")
     # SLICE 4a, today's build whatever the pin: D08's comment anchors equal the original's.
     for d, want in ANCHORS_4A.items():
         for key, (rep, _) in reports_b.items():
