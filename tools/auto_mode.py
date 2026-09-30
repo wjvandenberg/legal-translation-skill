@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""auto_mode.py - the counter an unattended chain of sessions runs on.  CHECKER VERSION 2 (2026-09-01)
+"""auto_mode.py - the counter an unattended chain of sessions runs on.  CHECKER VERSION 3 (2026-09-30)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -34,13 +34,21 @@ hop halts on arrival and says so instead of racing.
     uv run python tools/auto_mode.py --status     # what a hop needs to know, read-only
     uv run python tools/auto_mode.py --claim      # THE HOP'S FIRST ACT: take the next number
     uv run python tools/auto_mode.py --release    # the hop's last act: let the next one in
-    uv run python tools/auto_mode.py --arm --run-id X --hops 4 --branch session/y
+    uv run python tools/auto_mode.py --arm --run-id X --hops 4 --branch session/y --effort xhigh
     uv run python tools/auto_mode.py --stop       # the off switch, same as editing the file
     uv run python tools/auto_mode.py --blocked    # THE HOP'S own halt: a question it may
                                                  # not answer alone. STOPPED is a person
                                                  # intervening; BLOCKED is the chain saying
                                                  # it will not guess. Kept apart on purpose.
     uv run python tools/auto_mode.py --selftest   # every refusal proved BOTH ways
+
+THE EFFORT A HOP RUNS AT (v3), AND WHY ARMING REFUSES WITHOUT IT. Measured 2026-09-30: a
+desktop session at `xhigh` armed a run, the runner was started from a plain terminal, and the
+hop's own log recorded `medium` - the CLI's default - on every message. Nothing reported it;
+it was found because somebody asked. So --arm records EFFORT in the block, from --effort or
+CLAUDE_EFFORT, and REFUSES when neither is there, when the two disagree, or when the runner
+beside it is too old to pass it on. EFFORT is an OPTIONAL field - a block without it still
+reads - and the runner is what refuses to START a run that names none.
 
 K COUNTS HOPS AND SO DOES N. The attended session that sets the run up is not a hop and is
 not counted; K = 0 means no hop has run yet, K = 2 means hop 2 is the one now running. The
@@ -72,6 +80,24 @@ FENCE_INFO = "auto-mode"
 #: two runs of this script produce byte-identical blocks, so a diff shows the change and
 #: nothing else.
 FIELDS = ("RUN_ID", "N", "K", "STATUS", "BRANCH", "HOP_ACTIVE", "WOKE")
+
+#: FIELDS A BLOCK MAY LACK, written back only when present. EFFORT is here and not in FIELDS
+#: for the reason BLOCKED is a status value: read_state refuses a block missing any REQUIRED
+#: field, so a new required one would make every state file armed before v3 VOID. It is
+#: required where it matters instead - the runner refuses to START a run that names none.
+OPTIONAL_FIELDS = ("EFFORT",)
+
+#: WHAT `claude --effort` ACCEPTS, copied off CLI 2.1.283's own help rather than typed from
+#: memory: "(low, medium, high, xhigh, max)". A level outside it is refused at --arm, where a
+#: person is still there to correct it, instead of at a hop's launch, where nobody is.
+EFFORT_LEVELS = ("low", "medium", "high", "xhigh", "max")
+
+#: THE FIRST RUNNER THAT PASSES EFFORT ON. auto_mode_headless.py is not in check_checkers'
+#: tracked list, so a project re-copying this counter is told nothing about the runner beside
+#: it - and a v5 runner ignores EFFORT, launching every hop at the CLI default. --arm is the
+#: one place that sees both files, so it refuses there. The fix for caller N+1, not a note.
+RUNNER_NAME = "auto_mode_headless.py"
+RUNNER_MIN_VERSION = 6
 
 RUNNING, STOPPED, COMPLETE = "RUNNING", "STOPPED", "COMPLETE"
 
@@ -157,10 +183,15 @@ def read_state(f: Path) -> tuple[dict, bytes, str]:
 
 
 def write_state(f: Path, fields: dict, raw: bytes, term: str) -> None:
-    """Rewrite the block body and NOTHING else. Bytes in, bytes out."""
+    """Rewrite the block body and NOTHING else. Bytes in, bytes out.
+
+    An optional field is written only when the fields carry it, so a claim on a state file
+    armed before v3 changes exactly what a v2 claim changed and adds no line.
+    """
     text = raw.decode("utf-8-sig")
-    width = max(len(k) for k in FIELDS) + 1
-    body = "".join(f"{k + ':':<{width}} {fields[k]}{term}" for k in FIELDS)
+    width = max(len(k) for k in (*FIELDS, *OPTIONAL_FIELDS)) + 1
+    keys = [*FIELDS, *(k for k in OPTIONAL_FIELDS if fields.get(k))]
+    body = "".join(f"{k + ':':<{width}} {fields[k]}{term}" for k in keys)
     new = _FENCE.sub(lambda m: m.group("open") + body + m.group("close"), text, count=1)
     f.write_bytes(new.encode("utf-8"))
 
@@ -185,7 +216,8 @@ def act_status(fields: dict) -> tuple[int, list[str]]:
            f"  STATUS     {fields['STATUS']}",
            f"  HOPS       {k} of {n} have started",
            f"  HOP_ACTIVE {fields['HOP_ACTIVE']}   (woke: {fields['WOKE']})",
-           f"  BRANCH     {fields['BRANCH']}"]
+           f"  BRANCH     {fields['BRANCH']}",
+           f"  EFFORT     {fields.get('EFFORT') or 'NOT RECORDED - armed before v3, so the runner will refuse it'}"]
     if fields["STATUS"] != RUNNING:
         out.append(f"  -> the run is {fields['STATUS']}. A hop waking now must halt.")
     elif fields["HOP_ACTIVE"].lower() == "yes":
@@ -295,18 +327,84 @@ def act_blocked(fields: dict) -> tuple[int, list[str], bool]:
                    "  reason. Any hop waking after this is refused."], True
 
 
-def act_arm(fields: dict, run_id: str, hops: int, branch: str) -> tuple[int, list[str], bool]:
+def normal_effort(value: str | None) -> str:
+    """An effort as both scripts compare it: stripped and lower-cased, '' for none."""
+    return (value or "").strip().lower()
+
+
+def effort_level_error(level: str) -> str | None:
+    """Why `level` is not one the CLI accepts, or None. THE ONE VALIDATOR: the counter and the
+    runner both call it, so the two cannot come to disagree about what a level is."""
+    if level not in EFFORT_LEVELS:
+        return f"{level!r} is not a level the CLI accepts ({', '.join(EFFORT_LEVELS)})."
+    return None
+
+
+def resolve_effort(explicit: str | None, env: str | None) -> tuple[str | None, str]:
+    """(level, where it came from) - or (None, why the arm is refused). Never a default.
+
+    TWO SOURCES AND NEITHER IS TRUSTED ALONE. CLAUDE_EFFORT is what the desktop app sets for
+    its own sessions, and it is a SOMETIMES-source: measured 2026-09-30, one desktop session
+    showed `xhigh` to its Bash tool and NOTHING to its PowerShell tool. An explicit --effort is
+    what a person states. Either will do; both must agree, because the whole point is that
+    the hops run at THE SAME effort as the session arming them, and two sources that disagree
+    is exactly the mistake to catch while somebody is still there to read it.
+    """
+    e, v = normal_effort(explicit), normal_effort(env)
+    if e and v and e != v:
+        return None, (f"--effort says {e!r} but CLAUDE_EFFORT says {v!r}. The hops are meant "
+                      f"to run at the arming session's effort, and the two disagree.")
+    level = e or v
+    if not level:
+        return None, ("no effort stated. Pass --effort <level> - the level THIS session runs "
+                      "at (the desktop app shows it; in its Bash tool `echo $CLAUDE_EFFORT`). "
+                      "A hop launched without one runs at the CLI's default, and nothing says so.")
+    bad = effort_level_error(level)
+    if bad:
+        return None, bad
+    return level, ("--effort and CLAUDE_EFFORT, agreeing" if e and v
+                   else "--effort" if e else "CLAUDE_EFFORT")
+
+
+def runner_version(folder: Path = HERE) -> int | None:
+    """The CHECKER VERSION of the runner beside this counter, None when there is none, 0 when
+    it names none. Read off its header, the same line check_checkers compares."""
+    f = folder / RUNNER_NAME
+    if not f.is_file():
+        return None
+    m = re.search(rb"CHECKER VERSION (\d+)", f.read_bytes()[:600])
+    return int(m.group(1)) if m else 0
+
+
+def act_arm(fields: dict, run_id: str, hops: int, branch: str, effort: str | None = None,
+            env_effort: str | None = None,
+            runner: int | None = None) -> tuple[int, list[str], bool]:
     """Set the run up. THE ATTENDED SESSION'S LAST ACT, and the order matters.
 
     Commit first, create the scheduled tasks second, arm third. The guard that refuses an
     unattended session's irreversible acts is live from the moment STATUS reads RUNNING, so
     arming before committing locks the arming session out of its own commit.
+
+    AND IT RECORDS THE EFFORT (v3), refusing to arm without one - see resolve_effort. `runner`
+    is the version of the runner beside this file (runner_version), None when there is none.
     """
     if hops < 1:
         return RC_REFUSED, [f"REFUSED: --hops is {hops}. A run with no hops is not a run."], False
+    level, source = resolve_effort(effort, env_effort)
+    if level is None:
+        return RC_REFUSED, [f"REFUSED: {source}"], False
+    if runner is not None and runner < RUNNER_MIN_VERSION:
+        return RC_REFUSED, [f"REFUSED: the {RUNNER_NAME} beside this counter is v{runner}, and "
+                            f"only v{RUNNER_MIN_VERSION}+ passes the effort to its hops - a",
+                            "         stale one would launch every hop at the CLI default. "
+                            "Re-copy it from the shared folder."], False
     fields.update({"RUN_ID": run_id, "N": str(hops), "K": "0", "STATUS": RUNNING,
-                   "BRANCH": branch, "HOP_ACTIVE": "no", "WOKE": "-"})
+                   "BRANCH": branch, "HOP_ACTIVE": "no", "WOKE": "-", "EFFORT": level})
     return RC_OK, [f"  ARMED: run {run_id}, {hops} hop(s), on branch {branch}.",
+                   f"  EFFORT: {level} (from {source}) - every hop is launched at it, and the "
+                   "runner reads back what each one ran at.",
+                   f"  BEFORE HANDING OVER THE LAUNCH COMMAND: confirm the runner's flags line "
+                   f"shows --effort {level}.",
                    "  K = 0: no hop has run yet. The first to claim becomes hop 1.",
                    "  Every hop must be scheduled ALREADY - a hop may not create a task."], True
 
@@ -326,6 +424,8 @@ def main(argv) -> int:
     ap.add_argument("--run-id")
     ap.add_argument("--hops", type=int)
     ap.add_argument("--branch")
+    ap.add_argument("--effort", help="--arm: the effort THIS session runs at; else "
+                                     "CLAUDE_EFFORT; refused when neither")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args(argv)
 
@@ -358,7 +458,8 @@ def main(argv) -> int:
             if not (a.run_id and a.hops is not None and a.branch):
                 print("  --arm needs --run-id, --hops and --branch")
                 return RC_COULD_NOT_RUN
-            rc, lines, dirty = act_arm(fields, a.run_id, a.hops, a.branch)
+            rc, lines, dirty = act_arm(fields, a.run_id, a.hops, a.branch, a.effort,
+                                       os.environ.get("CLAUDE_EFFORT"), runner_version())
         elif a.claim:
             rc, lines, dirty = act_claim(fields)
         elif a.release:
@@ -480,6 +581,35 @@ def selftest() -> int:
              bad=lambda d: _bad_block(d, "RUN_ID: r\nN: 1\nK: 0\nSTATUS: RUNNING\n"),
              good=lambda d: _state(d),
              want="VOID", good_want="READ"),
+        # EFFORT IS OPTIONAL, AND THE PAIR IS WHAT PROVES IT: a block missing a REQUIRED field
+        # is still VOID, and one missing only EFFORT - every state file armed before v3 - reads.
+        Case("a missing OPTIONAL field still reads", _probe_void,
+             bad=lambda d: _bad_block(d, _ALL_BUT("BRANCH")),
+             good=lambda d: _bad_block(d, _ALL_BUT("EFFORT")),
+             want="VOID", good_want="READ"),
+        # THE EFFORT, v3. Each refusal is paired with the nearest arm that must go through.
+        Case("an arm with NO effort stated is refused", _probe_arm,
+             bad=lambda d: (_state(d), None, None, 6),
+             good=lambda d: (_state(d), None, "xhigh", 6),
+             want="REFUSED", good_want="ARMED xhigh"),
+        Case("...and an explicit --effort alone arms", _probe_arm,
+             bad=lambda d: (_state(d), "", "", 6),
+             good=lambda d: (_state(d), "high", None, 6),
+             want="REFUSED", good_want="ARMED high"),
+        Case("an arm whose two sources DISAGREE is refused", _probe_arm,
+             bad=lambda d: (_state(d), "medium", "xhigh", 6),
+             good=lambda d: (_state(d), "xhigh", "XHIGH", 6),
+             want="REFUSED", good_want="ARMED xhigh"),
+        Case("a level the CLI does not list is refused", _probe_arm,
+             bad=lambda d: (_state(d), "xhig", None, 6),
+             good=lambda d: (_state(d), "max", None, 6),
+             want="REFUSED", good_want="ARMED max"),
+        # THE RUNNER BESIDE THE COUNTER IS UNTRACKED BY check_checkers, so a stale one is
+        # reported here or nowhere - and a v5 runner silently ignores the field.
+        Case("a STALE runner beside the counter refuses", _probe_arm,
+             bad=lambda d: (_state(d), "xhigh", None, 5),
+             good=lambda d: (_state(d), "xhigh", None, None),
+             want="REFUSED", good_want="ARMED xhigh"),
     ]
     ok_cases, paired, unpaired = run_cases(cases, tmp)
     ok &= ok_cases
@@ -542,6 +672,50 @@ def selftest() -> int:
           f"{'LF' if lf_only else 'CRLF INTRODUCED'}, "
           f"{len(before)} -> {len(after)} bytes")
 
+    # 4. THE ARM WRITES THE EFFORT INTO THE BLOCK, AND A CLAIM KEEPS IT. A field an arm prints
+    #    and never writes is a field the runner reads as absent - and refuses on, correctly,
+    #    for the wrong reason.
+    (tmp / "eff").mkdir(exist_ok=True)
+    f4 = _state(tmp / "eff")
+    fields, raw, term = read_state(f4)
+    act_arm(fields, "r-eff", 2, "session/e", None, "xhigh", None)
+    write_state(f4, fields, raw, term)
+    claim(f4)
+    kept = read_state(f4)[0].get("EFFORT")
+    good = kept == "xhigh" and b"EFFORT:     xhigh" in f4.read_bytes()
+    ok &= good
+    print(f"  {'OK  ' if good else 'MISS'} the arm writes EFFORT, a claim keeps it -> {kept!r}")
+
+    # 4b. main() READS CLAUDE_EFFORT, the wiring the cases above bypass by calling act_arm
+    #     directly: armed from the variable when it is set, refused when it is not.
+    import contextlib                                               # noqa: PLC0415
+    import io                                                       # noqa: PLC0415
+
+    from house_common import isolated_env                           # noqa: PLC0415
+    seen4 = []
+    for env in ("high", None):
+        (tmp / f"main-{env}").mkdir(exist_ok=True)
+        f6 = _state(tmp / f"main-{env}")
+        with isolated_env("CLAUDE_EFFORT"), contextlib.redirect_stdout(io.StringIO()):
+            if env:
+                os.environ["CLAUDE_EFFORT"] = env
+            rc6 = main(["--file", str(f6), "--arm", "--run-id", "r", "--hops", "1",
+                        "--branch", "session/m"])
+        seen4.append(read_state(f6)[0].get("EFFORT") if rc6 == RC_OK else "REFUSED")
+    good = seen4 == ["high", "REFUSED"]
+    ok &= good
+    print(f"  {'OK  ' if good else 'MISS'} main() arms from CLAUDE_EFFORT, else refuses -> {seen4}")
+
+    # 5. ...AND AN OLD FILE STAYS OLD. A claim on a state file armed before v3 changes the
+    #    fields a claim changes and adds nothing, so its diff is exactly what v2's was.
+    (tmp / "oldfile").mkdir(exist_ok=True)
+    f5 = _state(tmp / "oldfile")
+    claim(f5)
+    good = b"EFFORT" not in f5.read_bytes() and read_state(f5)[0]["K"] == "1"
+    ok &= good
+    print(f"  {'OK  ' if good else 'MISS'} a pre-v3 file is claimed and gains no field"
+          f" -> {'no EFFORT line' if b'EFFORT' not in f5.read_bytes() else 'EFFORT ADDED'}")
+
     print()
     report_pairing(paired, unpaired)
     shutil.rmtree(tmp, ignore_errors=True)
@@ -559,6 +733,26 @@ def _no_block(d: Path) -> Path:
     f = d / STATE_NAME
     f.write_bytes(b"# no fenced block anywhere in this file\n")
     return f
+
+
+def _ALL_BUT(name: str) -> str:
+    """A block body carrying every field, required and optional, except one."""
+    vals = {"RUN_ID": "r", "N": "1", "K": "0", "STATUS": RUNNING, "BRANCH": "session/x",
+            "HOP_ACTIVE": "no", "WOKE": "-", "EFFORT": "xhigh"}
+    return "".join(f"{k}: {v}\n" for k, v in vals.items() if k != name)
+
+
+def _probe_arm(args) -> str:
+    """--arm driven through the real action: (state file, --effort, CLAUDE_EFFORT, runner
+    version). Reads the EFFORT back off the FILE, never off the returned fields."""
+    f, effort, env, runner = args
+    fields, raw, term = read_state(f)
+    rc, _lines, dirty = act_arm(fields, "r-test", 2, "session/x", effort, env, runner)
+    if dirty:
+        write_state(f, fields, raw, term)
+    if rc == RC_REFUSED:
+        return "REFUSED"
+    return f"ARMED {read_state(f)[0].get('EFFORT')}"
 
 
 def _probe_block(f: Path) -> str:

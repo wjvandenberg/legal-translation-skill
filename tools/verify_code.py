@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""verify_code.py - the code checker.  CHECKER VERSION 11 (2026-09-28)
+"""verify_code.py - the code checker.  CHECKER VERSION 12 (2026-09-30)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -210,11 +210,23 @@ def glob_files(root: Path, pattern: str):
             yield from (q for q in p.rglob("*") if q.is_file())
 
 
+def parts_below(p: Path, root: Path) -> tuple[str, ...]:
+    """The components of p BELOW root - never the root's own ancestors (v12). A path outside
+    root - a glob or ship path reaching up with '..' - keeps its own parts rather than raising,
+    which is what every such path was judged by before."""
+    try:
+        return p.relative_to(root).parts
+    except ValueError:
+        return p.parts
+
+
 def iter_files(root: Path, globs, exclude_dirs):
     seen = set()
     for g in globs:
         for p in glob_files(root, g):
-            if any(part in exclude_dirs for part in p.parts):
+            # BELOW THE ROOT, NEVER THE ABSOLUTE PATH (v12): a root that itself sits under
+            # an excluded name - a git worktree under .claude/worktrees - excluded every file.
+            if any(part in exclude_dirs for part in parts_below(p, root)):
                 continue
             if p in seen:
                 continue
@@ -285,8 +297,9 @@ def check_ship_clean(rep, root, cfg):
             scanned += 1
             name = p.name
             for bad in forbidden:
-                if name == bad or name.endswith(bad) or bad in p.parts:
-                    problems.append(f"{p.relative_to(root)} - forbidden in a shipped tree ({bad})")
+                if name == bad or name.endswith(bad) or bad in parts_below(p, root):
+                    problems.append(f"{Path(*parts_below(p, root))} - forbidden in a shipped "
+                                    f"tree ({bad})")
                     break
     rep.record("shipped tree clean", scanned, problems)
 
@@ -672,6 +685,15 @@ def cases(cfg):
         Case("planted secret", runs(check_secrets),
              tree("sec_bad", {"leak.py": 'api_key = "abcd1234efgh5678ijkl"\n'}, cfg),
              tree("sec_good", {"clean.py": 'api_key = os.environ["API_KEY"]\n'}, cfg)),
+        # A ROOT BELOW A FOLDER THE EXCLUDE LIST NAMES MUST STILL BE SCANNED - a git worktree
+        # under .claude/worktrees is the everyday case. The exclusion tested the ABSOLUTE
+        # path, so there every file was excluded and every source scan examined nothing,
+        # the secrets scan included (measured 2026-09-30).
+        Case("a root below an excluded folder is scanned", runs(check_secrets),
+             tree(".claude/worktrees/sec_bad",
+                  {"leak.py": 'api_key = "abcd1234efgh5678ijkl"\n'}, cfg),
+             tree(".claude/worktrees/sec_good",
+                  {"clean.py": 'api_key = os.environ["API_KEY"]\n'}, cfg)),
         # THE JUDGE CASE. The bad arm's token matches none of the nine shapes - no
         # 'api_key =' beside it, no sk- or ghp_ prefix - so check_secrets is blind to it and
         # only entropy sees it at all. The good arm is the half that keeps this honest: an
@@ -726,6 +748,11 @@ def cases(cfg):
         Case("bytecode in shipped tree", runs(check_ship_clean),
              tree("ship_bad", {"dist/__pycache__/x.pyc": ""}, ship),
              tree("ship_good", {"dist/app.py": "x = 1\n"}, ship)),
+        # ...AND A ROOT BELOW A FOLDER THE FORBIDDEN LIST NAMES IS NOT ITSELF A FINDING. The
+        # same absolute-path test flagged every shipped file there as forbidden.
+        Case("a root below a forbidden name is judged", runs(check_ship_clean),
+             tree("node_modules/ship_bad", {"dist/__pycache__/x.pyc": ""}, ship),
+             tree("node_modules/ship_good", {"dist/app.py": "x = 1\n"}, ship)),
         Case("failing test command", runs(check_tests, False),
              tree("cmd_bad", {"x.py": "\n"}, failing),
              tree("cmd_good", {"x.py": "\n"}, passing)),
