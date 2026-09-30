@@ -6,9 +6,9 @@
  "count": 52,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
-   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
-   "sha256_now": "3f63b538064538a92c836f22455c52a9c9478890363f7c9ae85e1a6a41eac248"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
+   "sha256_now": "6f1cbc0dd52e514a2fe1eccdf0c313dd8f8783d3e03357842aa388eee1ef7c2d"
   },
   "uk/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -36,9 +36,9 @@
    "sha256_now": "efbb157c8dcad6d7d80f8d9e4e41e76b6b8790d7c802a3a63cd523878e1b51f0"
   },
   "uk/scripts/repack_docx.py": {
-   "changed_by": "feature/signed-python-no-doc-moves",
-   "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
-   "sha256_now": "fe494dac1fe333dd895064fa610b213be68e8035589299f1173e9dc394c582ab"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
+   "sha256_now": "7011eee3d3b910f366a32beb0c2c343a0ad824e4ce84f6a761c3ac98c98b9668"
   },
   "uk/scripts/source_language_markers.py": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -101,14 +101,14 @@
    "sha256_now": "3e989afbfe471ef55e14eb60c6aee0924984ef6f71f56ceb0bd48b8fafba6d4b"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/signed-python-no-doc-moves",
-   "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
-   "sha256_now": "e77e7efb1570b151d1642ad13ecb8c67933de35bd034c73d6738b75c2c02ca07"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
+   "sha256_now": "107065fe833c314b532ef22816995ba9c6c20c2e4554964ecd0a45e367c7489f"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
-   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
-   "sha256_now": "6f6a7ccfb8efc094fd5f3c8fa535fe15d625695daeb6eb26573fe3413be5cbfb"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
+   "sha256_now": "0bc7887f9ca8c69004fb65b83edfc52107253cb0085bde7626d4353133ca4256"
   },
   "us/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -136,9 +136,9 @@
    "sha256_now": "359524280ee216a947502a3a00ac571a1639fa63e7672b73d5d776080e2a2b9f"
   },
   "us/scripts/repack_docx.py": {
-   "changed_by": "feature/signed-python-no-doc-moves",
-   "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
-   "sha256_now": "fe494dac1fe333dd895064fa610b213be68e8035589299f1173e9dc394c582ab"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
+   "sha256_now": "7011eee3d3b910f366a32beb0c2c343a0ad824e4ce84f6a761c3ac98c98b9668"
   },
   "us/scripts/source_language_markers.py": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -201,9 +201,9 @@
    "sha256_now": "1a7adfcf0b35194464b6f8afd309f88d17dda3ea5e67a1762758eb4608677638"
   },
   "us/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/signed-python-no-doc-moves",
-   "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
-   "sha256_now": "913054fc0f0c81127c09fee0cb510c0093a6cc71d4c9cb6f2e82e4ec475aabd5"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
+   "sha256_now": "f9a1b540de75712ad8f407259076551fccf8023bb78e69a5d3954389d8fe65f7"
   },
   "uk/scripts/validate_en_runs.py": {
    "changed_by": "feature/branch11-slice4b",

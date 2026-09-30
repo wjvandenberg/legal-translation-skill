@@ -234,7 +234,15 @@ orig = make_docx(rtmp / "source.docx", CLEAN)
 translated = rtmp / "document.xml"
 translated.write_text(doc_xml(CLEAN), encoding="utf-8")
 paras_json = rtmp / "paragraphs.json"
-paras_json.write_text("[]", encoding="utf-8")
+# NOT "[]" SINCE STEP 10's WIRING (branch 11, 2026-09-30): repack now runs the delivered-document
+# check, and an empty declaration is a check that examined NOTHING -- exit 3, VOID, which refuses,
+# rightly. This arm's claim is only that repack completes when the flag is given, so the notes are
+# what a compliant run writes: extraction's own text, `en` equal to it. The gate is unchanged; hop 1
+# of run wiring-hop1, a judgement taken alone and logged in DECISIONS-LOG.md.
+_ext = run("extract_paragraphs.py", orig, rtmp / "extracted.json")
+import json as _json  # noqa: E402
+paras_json.write_text(_json.dumps([dict(n, en=n["text"]) for n in _json.loads(
+    (rtmp / "extracted.json").read_text(encoding="utf-8"))]), encoding="utf-8")
 
 out_no = rtmp / "no_flag.docx"
 r = run("repack_docx.py", orig, translated, out_no)

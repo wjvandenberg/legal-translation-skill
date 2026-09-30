@@ -136,6 +136,11 @@ ap.add_argument("--skip-step8", action="store_true",
                 help="with --sides --arm b: C6's scenario -- the operator skips Step 8 entirely, so "
                      "repack gets NO side part but the glossary it refuses to go without, passed "
                      "as the original's (its keep-as-is route)")
+ap.add_argument("--declare-glossary-kept", action="store_true",
+                help="STEP 10's WIRING, sub-step 2: where the original carries a text-bearing glossary "
+                     "and the workdir declares none, write glossary_translations.json beside the notes "
+                     "with every letter-bearing text mapped to itself -- slice 3b's keep route -- so the "
+                     "delivered check reads the glossary as DECLARED kept. Counts only are printed")
 args = ap.parse_args()
 SCRIPTS = ROOT / args.variant / "scripts"
 TMP = Path(tempfile.mkdtemp(prefix="b11-delivered-"))
@@ -433,7 +438,8 @@ REPACK_GATES = (("lexicon", "lexicon_compliance.py --stage pre-repack returned e
                 ("headers/footers", "original (untranslated) headers/footers"),
                 ("integrity", "failed its own integrity checks"),
                 ("zwsp-survived", "U+200B SURVIVED THE SCRUB"),
-                ("remnant", "SOURCE-LANGUAGE REMNANT"))
+                ("remnant", "SOURCE-LANGUAGE REMNANT"),
+                ("delivered", "THE DELIVERED-DOCUMENT CHECK REFUSED THIS DELIVERY"))
 # SLICE 2b's PINNED PLAN (PLAN-2-step-b.md section 3.2): the workdirs per document whose delivery
 # must move, and the documents repack never reaches because post_process's drift gate stops them.
 MOVE_2B = {"uk": {"D01": 2, "D02": 1, "D03B": 1, "D10": 1, "D11": 1},
@@ -461,6 +467,13 @@ XML_MEMBERS = ("final/word/document.xml", "checked.xml", "docx:word/document.xml
 # (temp/s0930b_c16_view.py): uk 13 and us 9. Until then this arm only PRINTED those counts.
 C16_COUNTED = {"uk": {"D02": 5, "D03": 1, "D03B": 1, "D07": 4, "D08": 2},
                "us": {"D03": 1, "D03B": 1, "D04": 1, "D07": 4, "D08": 2}}
+# SUB-STEP 2 (2026-09-30 (2)): repack runs the delivered check on a check copy before its one write. On today's
+# corpus it refuses exactly D03B on both variants -- its glossary delivered as the source's, undeclared -- and
+# D03B delivers once --declare-glossary-kept declares it. A pin at or before START_WIRING lacks the gate, so
+# under --ref its repack delivers what ours refuses: those exit codes may differ there and nowhere else.
+START_WIRING = "59981dd"
+GATE_WIRING = b"def _delivered_gate("
+WIRING_STOP = {"uk": {"D03B"}, "us": {"D03B"}}
 _TEXT_4A = frozenset(f"{{{W}}}{n}" for n in ("r", "rPr", "t", "delText"))
 _TC_4A = frozenset((f"{{{W}}}ins", f"{{{W}}}del"))
 
@@ -561,6 +574,22 @@ if REFTREE is not None:
         PRE_4A = by_ancestry
         print(f"  --ref {args.ref}: {'predates' if PRE_4A else 'carries'} slice 4a's guard "
               f"(by ancestry against {START_4A} and by its own strip_noop, agreeing)")
+# SUB-STEP 2's SENSE OF --ref, asked the same two ways: does the pin's repack carry the delivered gate?
+PRE_WIRING = None
+if REFTREE is not None:
+    pin_rp = REFTREE / "repack_docx.py"
+    w_ancestry = is_ancestor(args.ref, START_WIRING)
+    w_content = pin_rp.is_file() and GATE_WIRING not in pin_rp.read_bytes()
+    if w_ancestry != w_content:
+        void("the byte comparison", f"{args.ref} is {'at or before' if w_ancestry else 'after'} the wiring's "
+             f"start {START_WIRING}, but its repack {'lacks' if w_content else 'carries'} the delivered gate")
+        REFTREE = None
+    else:
+        PRE_WIRING = w_ancestry
+        print(f"  --ref {args.ref}: {'predates' if PRE_WIRING else 'carries'} the delivered gate "
+              f"(by ancestry against {START_WIRING} and by its own repack, agreeing)")
+OURS_WIRED = GATE_WIRING in (SCRIPTS / "repack_docx.py").read_bytes()
+GLOSSARY_DECLARED, WIRED_REFUSED = {}, set()
 
 
 def side_parts(wd, d, today=None):
@@ -623,6 +652,18 @@ def chain(scripts_dir, d, src, wd, today=None):
     rcs["post_process"] = pp.returncode
     rcs["reorder"] = run(py + [str(scripts_dir / "reorder_definitions.py"), "--doc", str(xml)], timeout=900).returncode
     shutil.copyfile(xml, d / "checked.xml")
+    # SUB-STEP 2: slice 3b's keep route for a glossary nobody translated -- every letter-bearing text mapped
+    # to itself, beside the notes, as Step 8e says. Written only where the workdir declares none.
+    if args.declare_glossary_kept and not (d / "glossary_translations.json").is_file():
+        with zipfile.ZipFile(d / "src.docx") as z:
+            gx = (z.read("word/glossary/document.xml").decode("utf-8")
+                  if "word/glossary/document.xml" in z.namelist() else "")
+        texts = sorted({t for t in re.findall(r"<w:(?:t|delText)(?:\s[^>]*)?>([^<]*)</w:(?:t|delText)>", gx)
+                        if any(c.isalpha() for c in t)})
+        if texts:
+            (d / "glossary_translations.json").write_bytes(
+                json.dumps({t: t for t in texts}, ensure_ascii=False).encode("utf-8"))
+            GLOSSARY_DECLARED[d.name] = len(texts)
     rp = run(py + [str(scripts_dir / "repack_docx.py"), str(d / "src.docx"), str(xml),
                    str(d / "delivered.docx"), "--paragraphs", str(d / "paragraphs.json")]
              + side_parts(wd, d, today), timeout=900)
@@ -1383,7 +1424,17 @@ for n, wd in enumerate(workdirs, 1):
             rb = TMP / f"r{n:02d}"
             rrcs, _ = chain(REFTREE, rb, src, wd)
             dn, dr = outputs(b), outputs(rb)
-            BYTES[key] = (rrcs == rcs, compare(dn, dr), len(dn), rcs, rrcs)
+            same_rc = rrcs == rcs
+            # SUB-STEP 2: a pin without the delivered gate delivers what ours refuses. Then, and only then,
+            # repack's exit code and gate may differ, and the XML members and the journal are compared -- the
+            # .docx the pin wrote and ours never did is not a movement.
+            if PRE_WIRING and rcs.get("repack_gate") == "delivered" and rrcs.get("repack") == 0:
+                WIRED_REFUSED.add(key)
+                same_rc = ({k: v for k, v in rcs.items() if not k.startswith("repack")}
+                           == {k: v for k, v in rrcs.items() if not k.startswith("repack")})
+                dn = {k: v for k, v in dn.items() if not k.startswith("docx")}
+                dr = {k: v for k, v in dr.items() if not k.startswith("docx")}
+            BYTES[key] = (same_rc, compare(dn, dr), len(dn), rcs, rrcs)
             # SLICE 4a: the SAME check, today's, reads the pin's build too, so what a change to the
             # pipeline does to the findings is measured, never inferred from the bytes.
             rtarget = rb / "delivered.docx" if (rb / "delivered.docx").is_file() else rb / "checked.xml"
@@ -1494,10 +1545,20 @@ if args.arm in ("b", "both"):
     refused = [k for k, (rep, _) in reports_b.items() if rep.get("_gate") in ("remnant", "zwsp-survived")]
     ok(f"no delivery refused by the remnant block or the U+200B survival check "
        f"({len(reports_b)} examined)", not refused, f"refused: {refused}")
-    stopped = sorted({did_of(k) for k, (rep, _) in reports_b.items() if rep.get("_read") != "docx"})
+    by_wiring = sorted({did_of(k) for k, (rep, _) in reports_b.items() if rep.get("_gate") == "delivered"})
+    stopped = sorted({did_of(k) for k, (rep, _) in reports_b.items() if rep.get("_read") != "docx"}
+                     - set(by_wiring))
     present = {did_of(k) for k in reports_b}
     ok(f"repack STOPPED exactly where the plan says ({args.variant}, of the documents in this run)",
        set(stopped) == STOP_2B[args.variant] & present, f"stopped {stopped}")
+    # SUB-STEP 2: the delivered gate refuses exactly D03B -- or nothing, once its glossary is declared kept.
+    want_w = WIRING_STOP[args.variant] & present if OURS_WIRED and not args.declare_glossary_kept else set()
+    if args.declare_glossary_kept:
+        print(f"  glossary declared kept, letter-bearing texts per build: {GLOSSARY_DECLARED or 'none'}")
+    ok(f"the delivered gate refused exactly {sorted(want_w) or 'nothing'} ({args.variant}, of the documents "
+       f"in this run; our repack {'carries' if OURS_WIRED else 'lacks'} the gate"
+       + ("; the glossary declared kept" if args.declare_glossary_kept else "") + ")",
+       set(by_wiring) == want_w, f"refused by it {by_wiring}")
     print("\n  THE WIRING SLICE, SUB-STEP 1 — C16's CLASS COUNTED, ON EVERY DOCUMENT REPACK REACHES:")
     c16_got = defaultdict(int)
     for key, (rep, _) in reports_b.items():
@@ -1507,7 +1568,8 @@ if args.arm in ("b", "both"):
         c16_got[did_of(key)] += n
         ok(f"{key}: text-and-anchor blocking NONE; {n} counted as c16-space", not txt_blocking(rep),
            f"still blocking {txt_blocking(rep)}")
-    want16 = {d: k for d, k in C16_COUNTED[args.variant].items() if d in present and d not in stopped}
+    want16 = {d: k for d, k in C16_COUNTED[args.variant].items()
+              if d in present and d not in stopped and d not in by_wiring}
     got16 = {d: k for d, k in c16_got.items() if k}
     ok(f"the findings counted as c16-space are exactly the measured ones ({args.variant}, of the documents "
        f"in this run: {sum(want16.values())})", got16 == want16, f"counted {dict(got16)}, measured {want16}")

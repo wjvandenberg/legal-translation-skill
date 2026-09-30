@@ -127,7 +127,7 @@ CT_EXTRA = ('<Override PartName="/word/header1.xml" ContentType="application/vnd
             'officedocument.wordprocessingml.footnotes+xml"/>')
 
 
-def case(name, lang, en, *, body_xml=None, orig_parts=None, hf=None, comments=None, glossary=None):
+def case(name, lang, en, *, body_xml=None, orig_parts=None, hf=None, comments=None, glossary=None, decls=None):
     """Build the original, a hand-built translated document.xml and notes, and run the REAL
     repack from SCRIPTS. Returns a dict: rc, blob, out (members or None), tmp_left, xml_in."""
     d = TMP / name
@@ -144,6 +144,8 @@ def case(name, lang, en, *, body_xml=None, orig_parts=None, hf=None, comments=No
              for i, (s, e) in enumerate(zip(src, en))]
     nj = d / "paragraphs.json"
     nj.write_bytes(json.dumps(notes, ensure_ascii=False, indent=1).encode("utf-8"))
+    for fname, obj in (decls or {}).items():                # declarations beside the notes (slice 3b)
+        (d / fname).write_bytes(json.dumps(obj, ensure_ascii=False).encode("utf-8"))
     flags = []
     if hf is not None:
         (d / "hf" / "word").mkdir(parents=True, exist_ok=True)
@@ -242,7 +244,11 @@ c = case("1c-parts", "italian", CLEAN,
          orig_parts={"word/header1.xml": part_xml("hdr", p(r("Riservato"))),
                      "word/comments.xml": part_xml("comments", f'<w:comment w:id="0" w:author="A">{p(r("Verifica"))}</w:comment>'),
                      "word/footnotes.xml": FN_ZW, "docProps/core.xml": CORE_ZW},
-         hf=HDR_ZW, comments=COM_ZW)
+         hf=HDR_ZW, comments=COM_ZW,
+         # THE FOOTNOTE IS COPIED IN THE ORIGINAL'S WORDS, SO IT IS DECLARED KEPT (slice 3b's route), as a
+         # compliant run declares it. Added 2026-09-30 (2) when repack gained the delivered-document check:
+         # without it that check rightly refuses the delivery, side-footnote / kept-source -- C6's shape.
+         decls={"footnotes_translations.json": {"A" + ZW + " note": "A" + ZW + " note"}})
 delivered(c, "1c side parts")
 if c["out"] is not None:
     for part, why in (("word/header1.xml", "a TRANSLATED header"), ("word/comments.xml", "the translated comments"),

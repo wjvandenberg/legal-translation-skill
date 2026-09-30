@@ -21,6 +21,14 @@ word/document.xml, the verdict source_language_markers.remnant_verdict's.
 Marker classes the scan cannot rule on only WARN; with no language detected
 the block says so and does not run.
 
+The delivered-document check
+----------------------------
+Last, and still BEFORE the write, `validate_apply.py --delivered` reads a
+check copy of the finished archive against the notes and the ORIGINAL: every
+declared body paragraph, character for character in both readings, the
+anchors and every text-bearing side part. A blocking finding, or a check that
+examined nothing, refuses delivery (branch 11, Step 10's wiring).
+
 Exit codes:
   0 — the .docx was written to the delivery path
   1 — a gate blocked; NOTHING was written to the delivery path. Either a
@@ -28,8 +36,8 @@ Exit codes:
       so one could not run, or the ORIGINAL carries a text-bearing
       word/glossary/document.xml and --glossary was not supplied, or the
       finished archive failed its own ZIP integrity or case-conflict check,
-      kept a U+200B, or carried a blocking source-language remnant, and was
-      never written.
+      kept a U+200B, carried a blocking source-language remnant, or failed the
+      delivered-document check, and was never written.
   3 — script-integrity check failed (re-install the skill)
 
 The archive is built IN MEMORY and written to the delivery path once, only
@@ -346,6 +354,91 @@ def _run_pre_repack_validator(label, args):
             f"{label} returned exit code {result.returncode}. Repack "
             f"aborted; no .docx written. Fix the issues above and re-run."
         )
+
+# THE DELIVERED-DOCUMENT CHECK'S REPAIRS, by the class of a blocking finding -- what each asks of the
+# operator. Printed with the refusal; the document's text never is.
+_DELIVERED_REPAIRS = (
+    (('changed', 'missing', 'readings', 'edge-space', 'inner-space', 'collapsed'),
+     "a declared body paragraph is not in the delivery as declared: correct its `en` / "
+     "`en_segments` in paragraphs.json and re-run from Step 5 through every mandatory step"),
+    (('anchor-lost', 'anchor-gained'),
+     "a footnote, endnote or comment anchor differs from the ORIGINAL's count: re-run from "
+     "Step 5; if it persists, it is a pipeline defect and SKILL.md rule 5b's case"),
+    (('bracket',),
+     "a bracket differs from the declaration, or is unbalanced where the source balances: "
+     "correct the entry's `en` and re-run from Step 5"),
+    (('zwsp',),
+     "a U+200B survived into a delivered reading: a defect in repack itself - re-install the skill"),
+    (('side-',),
+     "a side part - header, footer, comment, footnote, endnote or glossary - is untranslated or "
+     "does not match its declaration: run its Step 8 script, or declare it kept as Step 8 says, "
+     "and re-run the repack"),
+)
+
+
+def _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir):
+    """STEP 10's WIRING, branch 11 (2026-09-30) -- the one check that reads the FINISHED document:
+    `validate_apply.py --delivered`, every declared body paragraph looked for character for
+    character in both readings, the anchors and every text-bearing side part against the
+    ORIGINAL. It runs on the archive BEFORE it is written, like every check above it.
+
+    THE CHECK READS A PATH AND THE ARCHIVE IS IN MEMORY, so a CHECK COPY is written once to a fresh
+    temporary folder, read, and deleted with its folder in `finally` -- a create-and-write and a
+    delete, never a rename: a security agent that ends any process renaming a Word file is
+    common on managed machines, and a run it ends can still look finished.
+
+    Exit 1 (blocking findings), 3 (VOID: nothing examined, which is never the same as clean), any
+    other exit, or no report written REFUSES delivery, and nothing is written to the delivery
+    path. The refusal counts the blocking findings by class with what repairs each; the check
+    itself prints indices, classes and lengths, never document text. A finding that is RIGHT
+    with no compliant repair left is SKILL.md rule 5b's case, never a reason to bypass this."""
+    import json
+    import shutil
+    import subprocess
+    from collections import Counter
+    tmpdir = tempfile.mkdtemp(prefix='repack-delivered-check-')
+    try:
+        copy = os.path.join(tmpdir, 'check-copy.docx')
+        with open(copy, 'wb') as fh:
+            fh.write(archive.getvalue())
+        report = os.path.join(tmpdir, 'report.json')
+        print(f"\n{'=' * 60}\n[repack] auto-running validate_apply.py --delivered "
+              f"(the delivered-document check, on a check copy)\n{'=' * 60}")
+        res = subprocess.run([sys.executable, os.path.join(scripts_dir, 'validate_apply.py'),
+                              paragraphs_json, '--delivered', copy, '--original', orig_docx,
+                              '--strict', '--report-json', report],
+                             capture_output=True, text=True, encoding='utf-8', errors='replace')
+        print((res.stdout or '') + (res.stderr or ''), end='')
+        rep = None
+        if os.path.isfile(report):
+            with open(report, 'r', encoding='utf-8') as fh:
+                rep = json.load(fh)
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+    if res.returncode == 0 and rep is not None:
+        return
+    blocking = [f for f in (rep or {}).get('findings', []) if f.get('blocking', True)]
+    by_class = Counter(f"{f['class']}/{f['shape']}" if f.get('shape') else f['class']
+                       for f in blocking)
+    if res.returncode == 3:
+        why = 'the check examined NOTHING (exit 3, VOID) - never the same as clean'
+    elif res.returncode == 1 and rep is not None:
+        why = f'{len(blocking)} blocking finding(s)'
+    else:
+        why = (f'the check could not run (exit {res.returncode}'
+               + (', no report written' if rep is None else '') + ')')
+    repairs = [text for prefixes, text in _DELIVERED_REPAIRS
+               if any(k.split('/')[0] in prefixes or any(p.endswith('-') and k.startswith(p)
+                                                         for p in prefixes) for k in by_class)]
+    raise RuntimeError(
+        "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. THE DELIVERED-DOCUMENT CHECK "
+        f"REFUSED THIS DELIVERY: {why}, so the archive was NEVER WRITTEN. Nothing was written to "
+        "the delivery path.\n"
+        + "".join(f"  {k}: {n}\n" for k, n in sorted(by_class.items()))
+        + ("  What repairs each:\n" + "".join(f"  - {t}\n" for t in repairs) if repairs else "")
+        + "  Fix the input and re-run; do NOT work around this gate. A finding that is RIGHT, with "
+          "no compliant repair left, is SKILL.md rule 5b's case.")
+
 
 def repack(orig_docx, translated_doc_xml, output_docx,
            translated_numbering_xml=None, headers_footers_dir=None,
@@ -852,6 +945,9 @@ def repack(orig_docx, translated_doc_xml, output_docx,
 
     # --- THE REMNANT BLOCK (C22), on the archive BEFORE it is written ---
     _remnant_gate(orig_docx, archive)
+
+    # --- THE DELIVERED-DOCUMENT CHECK (branch 11), on a CHECK COPY, BEFORE the write ---
+    _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir)
 
     # WRITTEN ONCE, after every check: a create-and-write, never a rename.
     with open(output_docx, 'wb') as fh:
