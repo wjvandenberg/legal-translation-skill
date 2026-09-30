@@ -683,7 +683,7 @@ unconditionally — as is §5.6 entire.
 
 **SINGLE NEXT ACTION: put every question in `temp/auto-closing-questions.md` to Wouter through the question tool, to confirm or overturn** — then the merge question: the slice is whole.
 
-**THE BRANCH:** five commits on `main`'s `052987d`, local only — the hop may not push; pushing is Q1.
+**THE BRANCH:** every commit since `main`'s `052987d` — `git log 052987d..` lists them — local only — the hop may not push; pushing is Q1.
 
 **WHAT A NEW SESSION WOULD GET WRONG:** `temp/s0930d_verify.py` holds this hop's phases on top of `temp/s0930b_verify.py`; `temp/wiring-hop1-boards.md` its four boards; the hop's headless run had no usage tool, so no context figure exists for it; `tests/test_render_keep.py` needs `--with lxml`.
 
