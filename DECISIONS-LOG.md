@@ -1037,3 +1037,68 @@ case — two arms where one already pins it.
 **(4) SLICE 4c's BRANCH PUSHED, ITS PULL REQUEST OPENED, AND SQUASH-MERGED** once `verify_md` and the eight
 document instruments pass on its head, as #122 and #123 were; the repository being public, pushing
 publishes it.
+
+## 2026-09-29 (5) — slice 2b's page read, and four rulings on what it found
+
+**RECORDED 2026-09-30, BECAUSE SESSION (5) STOPPED AT WOUTER'S WORD WITH NOTHING COMMITTED**, so until
+this entry the rulings below lived only in a handoff prompt — including (c), the one that says WHEN.
+
+**THE PAGE READ.** At the session's open Wouter read slice 2b's changed pages of D02, D10 and D11, the
+item carried since 2026-09-25 (3). What it found is in section 3.2 of `PLAN-2-step-b.md` and in register
+rows J2, D2, D4 and I-33, measured before filing; it is not restated here.
+
+**FOUR RULINGS, EACH ON THE RECOMMENDED OPTION** *(Wouter, 2026-09-29 (5))*. **(a)** The words-touching
+finding is a new row, **J2**, in cluster J beside J1 — not an amendment of J1 alone, because J1's claim
+and J2's cause are different things. **(b)** The stale note beside the rendered pages is filed as
+**I-33**, and its CLASS is fixed inside Step 10's wiring slice: the tool refuses to write pages for a
+person to read unless the run states, in its own command, what change is under review — a note typed
+once into a tool cannot be kept current by remembering to. **(c)** D08's page 2 and D02's paragraphs
+101 and 168, his other two page reads, are rendered for him in the NEXT session. **(d)** Pace: each
+sub-step opens with the board and its purpose and then carries straight on; questions wait for an input
+point and always go through the question tool, never as prose.
+
+**AND WHAT THE FILING CHANGED, 2026-09-30, WHICH IS A MEASUREMENT RATHER THAN A RULING.** Session (5)
+read J2 as glue the scrub introduced. Measured seam by seam from the notes, every one of the 18 declared
+insertion/deletion seams the operator separated by U+200B alone, with the English meeting letter to
+letter, meets letter to letter in the SOURCE at the same boundary — so the delivered redline is the
+source's own, and what is wrong is the reason Step 4's Rule 1 gives, not what it prescribes. J2 was
+filed LOW on that basis; which branch corrects the reason, and whether to, is put to Wouter at the
+2026-09-30 input point.
+
+## 2026-09-30 — Step 10's wiring planned as one slice, and seven answers at one input point
+
+**SEVEN ANSWERS, EACH ON THE RECOMMENDED OPTION** *(Wouter, 2026-09-30)*, put after the wiring was measured
+on both variants — section 3.2 of `PLAN-2-step-b.md` owns the measurement and the plan, not restated here.
+
+**(1) C16's CLASS IS COUNTED IN BOTH MEASURED SHAPES.** Every one of the 14 findings adds a space and none
+loses one: 12 add it beside a space already there, 2 add it between two letters at a tracked-change boundary
+where the source has whitespace. Both shapes are counted, a lost space and a space added inside a segment
+still block — the narrowing the trailing-space ruling set, one exemption per measured population.
+**Declined:** doubled spaces only, which would stop D02 at Step 10 on two findings no input can repair; and
+the whole class, which would let a glued word through unblocked.
+
+**(2) THE CHECK IS CALLED BY REPACK, ON A CHECK COPY, BEFORE ITS ONE WRITE**, as its other delivery gates
+are, so a blocking finding leaves nothing at the delivery path. **Declined:** reading the archive in memory,
+a larger change to a script already past W1's observed size; and Step 11a, after the write, where a failed
+file already sits at the delivery path.
+
+**(3) RULE 5b's WAY OUT IS A DECLARED `accepted_consequences.json`** beside the notes — each accepted
+finding by identity, with its attempts and the five ACCEPTED CONSEQUENCE lines; a stale entry refused, an
+undeclared finding still blocking, no flag switching the check off. **Declined:** no way out, which leaves
+a right check with no repair ending undelivered where rule 5b expects a disclosed delivery; and deciding it
+at the build.
+
+**(4) J2: RULE 1's STATED REASON IS CORRECTED INSIDE THE WIRING SLICE**, both trees, the prescription kept,
+so branch 11 owns J2. **Declined:** leaving it to D2's claim audit; adding a space on each side, measured to
+put a gap the source's redline lacks at 18 of 18 seams; and recording it only.
+
+**(5) ONE SLICE, SUB-STEPS 1 TO 4 IN ORDER**, one branch and one pull request. **Declined:** two slices with
+I-33 apart, and I-33 first.
+
+**(6) THE PURPOSE GUARD — "the house fix is done, continue and start using the new files".** Read at the
+answer: the house withdrew `purpose_guard.py` v3 and `install_hooks.py` v6 on 2026-09-30 and restored v2
+and v5 byte-identical, with the board rule cut back to four moments. This project holds v2, and
+`check_checkers.py` reads 15 tracked, 0 needing a decision, so nothing is copied.
+
+**(7) THIS SESSION's DOCUMENTATION IS PUSHED AND ITS PULL REQUEST OPENED**, once `verify_md` and the eight
+document instruments pass on its head; the repository being public, pushing publishes it. His to merge.

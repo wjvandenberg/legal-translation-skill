@@ -264,9 +264,13 @@ GROUPS = {
  # F47 ADDED 2026-09-28 (branch 11 slice 3a): the comment script's --list tells the operator to copy
  # an already-English comment verbatim and shows it ESCAPED, so obeying it escapes the copy twice --
  # the shipped instruction is what is wrong, F15's shape.
+ # J2 ADDED 2026-09-30 (session 2026-09-29 (5)'s page read, filed the next session): in the redline view a
+ # deletion and the insertion beside it touch once the scrub removes the U+200B between them -- and at 18 of
+ # 18 such seams the SOURCE's redline touches there too, so no delivery differs from its source. What is
+ # wrong is the reason Step 4's Rule 1 gives for the device, which is this group's shape, F15's and F47's.
  "5 the manual is wrong": """
    F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40
-   E7 E8 K1 K2 K3 H3 L5 B2 B4 B5 B6 X3 X5 Y2 Y3 Y4 F41 F42 C29 F43 F44 B9 F45 F46 F47
+   E7 E8 K1 K2 K3 H3 L5 B2 B4 B5 B6 X3 X5 Y2 Y3 Y4 F41 F42 C29 F43 F44 B9 F45 F46 F47 J2
    """,
 }
 # -------------------------------------------- options (a row may need more than one)
@@ -360,8 +364,10 @@ OPTIONS = {
  # refuses exactly that, and the two shipped sentences have to be reconciled before either
  # side is touched. Option 5 is NOT their home -- a compliant way out exists (write
  # `en == text` instead of null), so this is a contradiction to resolve, not a closed loop.
+ # J2 ADDED 2026-09-30 beside J1: the fix it needs is to a stated reason, not to code. Branch 11's wiring
+ # slice carries it (Wouter, 2026-09-30), so 9.3's branch-11 row names it as option 9's.
  "9 fix the claim, not only the code": """
-   X1 X2 X3 X4 X5 X6 C5 C11 K1 J1 L6 F12 C10 F39 F40 F42 Y1 Y2 Y3 Y4 F43 F44
+   X1 X2 X3 X4 X5 X6 C5 C11 K1 J1 L6 F12 C10 F39 F40 F42 Y1 Y2 Y3 Y4 F43 F44 J2
    """,
  # Added 2026-08-05: pass B refuted option 3's claim to FIX the layout findings, so the
  # layout group needs an option of its own -- it is where decision 4 lives.
