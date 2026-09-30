@@ -37,8 +37,8 @@
   },
   "uk/scripts/repack_docx.py": {
    "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
-   "sha256_now": "bb09a16a92dd1c19086d9e8daa56e550e9f3ef1373dc9721ccf13fcd1b134f74"
+   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
+   "sha256_now": "d4c4719920f9e39a28b13eb007c8a6d8a561b508fef3b90ec4b04d0127c94ae3"
   },
   "uk/scripts/source_language_markers.py": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -102,8 +102,8 @@
   },
   "uk/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
-   "sha256_now": "ebd04defca90eef70796dc89ddbf8c9935043b67ea04a8997575784e0b908152"
+   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
+   "sha256_now": "a7dfbd2a371a8ad645e604e82c9a3c01f424291d2b3fd5ae45a1c527ac59193e"
   },
   "us/SKILL.md": {
    "changed_by": "feature/branch11-wiring",
@@ -137,8 +137,8 @@
   },
   "us/scripts/repack_docx.py": {
    "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
-   "sha256_now": "bb09a16a92dd1c19086d9e8daa56e550e9f3ef1373dc9721ccf13fcd1b134f74"
+   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
+   "sha256_now": "d4c4719920f9e39a28b13eb007c8a6d8a561b508fef3b90ec4b04d0127c94ae3"
   },
   "us/scripts/source_language_markers.py": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -202,8 +202,8 @@
   },
   "us/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
-   "sha256_now": "1da4a038f900c847d45cfe038843a6ca57f11cb03ab0ee12684c10f15ab7bc88"
+   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
+   "sha256_now": "11a3b4935fe69d751a15bbaeede7f61b484c2d7862c0da8308d7901a6d692532"
   },
   "uk/scripts/validate_en_runs.py": {
    "changed_by": "feature/branch11-slice4b",

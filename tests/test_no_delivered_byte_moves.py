@@ -252,8 +252,12 @@ for fixture in ("definitions.docx", "anchors-and-tabs.docx"):
     # stays for its record; the gate is unchanged. Hop 1 of run wiring-hop1, a judgement taken
     # alone and logged in DECISIONS-LOG.md.
     ext = RW / "extracted.json"
-    subprocess.run([sys.executable, str(ROOT / "uk" / "scripts" / "extract_paragraphs.py"), str(orig), str(ext)],
-                   capture_output=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+    xr = subprocess.run([sys.executable, str(ROOT / "uk" / "scripts" / "extract_paragraphs.py"), str(orig),
+                         str(ext)], capture_output=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+    # REVIEW FIX (2026-09-30): a failed extraction is a NAMED void, never a traceback from reading its output.
+    if xr.returncode != 0 or not ext.is_file():
+        print(f"VOID — extraction failed on {fixture} (exit {xr.returncode}). Nothing compared, nothing passed.")
+        sys.exit(1)
     paras = [dict(n, en=n["text"]) for n in json.loads(ext.read_text(encoding="utf-8"))]
     (RW / "paragraphs.json").write_text(json.dumps(paras), encoding="utf-8")
     with zipfile.ZipFile(orig) as z:

@@ -148,6 +148,7 @@ def pin_scripts():
                           capture_output=True).stdout
     if not blob:
         print(f"  VOID — git archive of {REF} returned nothing; the pin comparison cannot run")
+        shutil.rmtree(TMP, ignore_errors=True)      # REVIEW FIX 8: the failing path cleans up too
         sys.exit(3)
     with zipfile.ZipFile(io.BytesIO(blob)) as z:
         for info in z.infolist():
@@ -250,6 +251,38 @@ for v in ("uk", "us"):
                               "prints its ACCEPTED CONSEQUENCE block")))
     ok(f"[{v}] SKILL.md rule 5b names accepted_consequences.json",
        re.search(r"\*\*5b\..{0,6000}accepted_consequences\.json", sk) is not None)
+    # REVIEW FIX 4 (2026-09-30 (3)): rule 5b (b) asks that repair was ATTEMPTED, bounded at five, and repack
+    # accepts attempts 1 to 5 -- so Step 10 must not say five attempts are required.
+    ok(f"[{v}] Step 10 states rule 5b's attempts as SKILL.md and repack do  attempted, at most five",
+       "five attempts have found no compliant repair" not in s10
+       and "your attempts at repair, at most five, have found no compliant one" in s10)
+
+print("\nW10 a report the check wrote but that cannot be read REFUSES with the gate's marker, never a traceback")
+# REVIEW FIX 3 (2026-09-30 (3)): a stub validate_apply.py that writes a truncated report and exits 1, called
+# through repack's own _delivered_gate -- loaded from the tree, not run as repack, so nothing else fires first.
+import importlib.util  # noqa: E402
+stub = TMP / "stub-scripts"
+stub.mkdir()
+(stub / "validate_apply.py").write_bytes(
+    b"import sys\nout = sys.argv[sys.argv.index('--report-json') + 1]\n"
+    b"open(out, 'w', encoding='utf-8').write('{')\nsys.exit(1)\n")
+spec = importlib.util.spec_from_file_location("s10_repack_under_test", SCRIPTS / "repack_docx.py")
+rpk = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(rpk)
+w10 = TMP / "w10"
+w10.mkdir()
+docx(w10 / "orig.docx", "".join(p(r(t)) for t in SRC))
+(w10 / "paragraphs.json").write_bytes(b"[]")
+try:
+    rpk._delivered_gate(str(w10 / "orig.docx"), io.BytesIO(b"not a docx"), str(w10 / "paragraphs.json"),
+                        str(stub))
+    raised = None
+except Exception as exc:                            # noqa: BLE001 -- the TYPE is what is asserted
+    raised = exc
+ok("an unreadable report raises the gate's own refusal, not a parse error",
+   isinstance(raised, RuntimeError) and MARKER in str(raised), repr(raised)[:300])
+ok("...saying the report could not be read", raised is not None and "report unreadable" in str(raised),
+   repr(raised)[:300])
 
 shutil.rmtree(TMP, ignore_errors=True)
 print()

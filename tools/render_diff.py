@@ -268,7 +268,10 @@ def keep_note(stamp, label, variant, ref, post_process, under_review, written, c
         "               review', never 'before the branch'",
         f"chain run:     {chain}  (each arm, the same chain)",
         f"written:       {stamp}",
-        f"pages written: {sorted(written) or 'NONE'}",
+        # PER ARM, THE PAGES ACTUALLY WRITTEN -- never the pages asked for: an arm that renders fewer pages
+        # writes fewer, and a note naming a page that is not there sends the reader after nothing (review
+        # fix, 2026-09-30).
+        "pages written: " + "  ".join(f"{arm} {sorted(pages) or 'NONE'}" for arm, pages in written.items()),
         f"pages changed: {sorted(changed) or 'NONE'}  (old against new)",
         "",
         "One PNG per page written, three arms:",
@@ -1048,6 +1051,7 @@ if args.doc:
             wanted = {pg for pg, _ in changed} | {
                 p for p in args.pages if 1 <= p <= max(len(po), len(pn))}
             written = 0
+            by_arm = {"old": [], "new": [], "source": []}
             for arm, pdf in (("old", pdfs["old"]), ("new", pdfs["new"]),
                              ("source", spdf)):
                 if pdf is None:
@@ -1059,9 +1063,10 @@ if args.doc:
                         page.get_pixmap(dpi=150).save(
                             str(dest / f"p{i + 1:03d}-{arm}.png"))
                         written += 1
+                        by_arm[arm].append(i + 1)
             (dest / "READ-ME.txt").write_bytes(keep_note(
                 STAMP, label, args.variant, REF, args.post_process, args.under_review,
-                wanted, [pg for pg, _ in changed]).encode("utf-8"))
+                by_arm, [pg for pg, _ in changed]).encode("utf-8"))
             # A MANIFEST, SO ABSENCE IS NEVER AMBIGUOUS. Without it, "no page 2 here" reads
             # identically as "page 2 is unchanged" and "this document was never rendered".
             man = [f"run written: {STAMP}",
@@ -1076,7 +1081,8 @@ if args.doc:
                    "A page number absent below is a page this run did NOT write. The",
                    "directory was CLEARED before writing, so nothing here is from an",
                    "earlier run.",
-                   f"written pages: {sorted(wanted) or 'NONE'}"]
+                   "written pages, per arm: " + "  ".join(
+                       f"{arm} {pages or 'NONE'}" for arm, pages in by_arm.items())]
             (dest / "MANIFEST.txt").write_text("\n".join(man) + "\n", encoding="utf-8")
             print(f"       {written} PNG(s) for a HUMAN to read: "
                   f"{LOGS.name}/branch6-render/{dest.name}/  (not displayed here)")

@@ -198,7 +198,7 @@ The script also automatically:
   and deleted with its folder — never renamed. Only if it passes is the `.docx`
   written to the delivery path.
 - **Rule 5b's way out, and the only one: `accepted_consequences.json` beside the notes.**
-  Where a blocking finding is RIGHT and five attempts have found no compliant repair
+  Where a blocking finding is RIGHT and your attempts at repair, at most five, have found no compliant one
   (`SKILL.md` rule 5b, all four conditions), write `{"accepted": [ ... ]}` in the folder
   holding `paragraphs.json`, one entry per finding: `idx` for a body finding, or `part`
   with `id` for a side part (`part` `document` for an anchor finding), its `class` and

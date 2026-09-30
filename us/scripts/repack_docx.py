@@ -503,10 +503,17 @@ def _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir):
                               '--strict', '--report-json', report],
                              capture_output=True, text=True, encoding='utf-8', errors='replace')
         print((res.stdout or '') + (res.stderr or ''), end='')
-        rep = None
+        rep, unreadable = None, False
         if os.path.isfile(report):
-            with open(report, 'r', encoding='utf-8') as fh:
-                rep = json.load(fh)
+            # A REPORT WRITTEN BUT NOT READABLE IS NO REPORT -- this gate's own refusal below, never a
+            # traceback that reads as a script error (review fix, 2026-09-30).
+            try:
+                with open(report, 'r', encoding='utf-8') as fh:
+                    rep = json.load(fh)
+            except (OSError, ValueError):
+                rep = None
+            if not isinstance(rep, dict):
+                rep, unreadable = None, True
     finally:
         shutil.rmtree(tmpdir, ignore_errors=True)
     apath, problems, entries = _read_accepted(paragraphs_json)
@@ -548,6 +555,8 @@ def _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir):
     elif res.returncode == 1 and rep is not None:
         why = (f'{len(blocking)} blocking finding(s)'
                + (f' no rule 5b entry names ({len(accepted)} accepted)' if accepted else ''))
+    elif unreadable:
+        why = f"the check's report could not be read (exit {res.returncode}, report unreadable)"
     else:
         why = (f'the check could not run (exit {res.returncode}'
                + (', no report written' if rep is None else '') + ')')
