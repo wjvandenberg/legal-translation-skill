@@ -51,6 +51,14 @@ temp/
 # which returned rc=1 (NOT ignored) on exactly this filename.
 NEXT-SESSION-PROMPT.md
 
+# THE AUTO MODE STATE FILE — one file, at the root, IGNORED BY NAME, for the same reason as the prompt
+# above. Added 2026-09-30 (3), when tools/auto_mode.py was installed for one unattended hop. It names
+# branch state, paths and the hop's instructions, and auto_mode.py rewrites its fenced block at every
+# claim and release: tracked, it would dirty the tree mid-hop and move the content hash the cycle gate
+# binds evidence to. The guard and the runner find it ON DISK by walking up, so ignoring it changes
+# nothing they read. Measured before this entry: `git check-ignore` rc=1, NOT ignored.
+AUTO-MODE-RUN.md
+
 # Packaged skills are BUILD OUTPUT — `tools/package.py` regenerates them at release time.
 # What you see in `uk/` and `us/` is what ships; the archive is derived from it.
 *.skill

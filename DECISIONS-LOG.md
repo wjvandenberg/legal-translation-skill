@@ -1102,3 +1102,33 @@ and v5 byte-identical, with the board rule cut back to four moments. This projec
 
 **(7) THIS SESSION's DOCUMENTATION IS PUSHED AND ITS PULL REQUEST OPENED**, once `verify_md` and the eight
 document instruments pass on its head; the repository being public, pushing publishes it. His to merge.
+
+## 2026-09-30 (3) — the auto-mode tools installed, one unattended hop armed, and how it stops
+
+**THE HOUSE AUTO-MODE TOOLS ARE INSTALLED, AND THE SETUP RIDES ON THE SLICE'S BRANCH** *(Wouter,
+2026-09-30 (2): install the house guard and counter, then run N = 1 hop)*. `tools/auto_mode.py`,
+`auto_mode_guard.py`, `auto_mode_headless.py` and `install_hooks.py` are byte-identical to the house copies,
+each selftest passing; `install_hooks.py --only auto,purpose` wired the guard beside the purpose guard, fired a
+real forbidden call at each and left this project's own git hooks alone; the evidence guard was proved still
+biting. **The setup is committed on `feature/branch11-wiring`, not on `main`**, because the hop and its guard
+run from the checked-out tree: a guard on `main` is not the one the hop loads. `AUTO-MODE-RUN.md` is
+gitignored by name — this repository is public, and the counter rewrites the file at every claim and release.
+The three declared absences in `verify.config.json` came OUT rather than being reworded: the first said this
+project runs no unattended chain, which Wouter's choice made false. **Its TEST is scoped to what it touches**
+— the smoke suite and the four selftests — because sub-step 2's uncommitted wiring shares the working tree
+and fails `tests/test_glossary_route.py` on both variants, which is the hop's first task.
+
+**THREE RULINGS ON HOW THE HOP STOPS, EACH REPLACING A MECHANISM MEASURED NOT TO WORK HERE** *(Wouter,
+2026-09-30 (3))*. **(1) No dollar ceiling.** **(2) Three hours of work, or all of branch 11's remaining work,
+whichever comes first.** He asked first for *context full or the weekly limit at 93%*, and a headless probe
+measured that such a session has NO usage tool, so it can read neither figure. The runner's own time limit,
+which defaults to one hour and kills the hop when it runs out, is raised to a backstop just above three hours.
+**(3) The hop still asks its questions, answers each itself on the recommended option and carries on**,
+recording what it built on every answer, and the next attended session tests each one with him. This replaces
+the house's stop-on-a-blocking-question for this hop only; an irreversible act stays refused by the guard
+whatever the answer.
+
+**AND TWO CORRECTIONS TO THE HANDOFF PROMPT.** It said the record commit reuses sub-step 2's evidence, *the
+same worktree hash*: `cycle_evidence.py` hashes `git diff HEAD` and keeps one record per phase per branch, so
+once sub-step 2 commits, HEAD moves and that evidence is stale for the record — the hop re-records before it.
+And the launch command it gave, `--run --max-budget-usd`, names an option the runner does not have.
