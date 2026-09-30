@@ -1103,6 +1103,31 @@ and v5 byte-identical, with the board rule cut back to four moments. This projec
 **(7) THIS SESSION's DOCUMENTATION IS PUSHED AND ITS PULL REQUEST OPENED**, once `verify_md` and the eight
 document instruments pass on its head; the repository being public, pushing publishes it. His to merge.
 
+## 2026-09-30 (2) — C16 counted in the three places measured, and two judgements taken building the wiring
+
+**THE APPROVED NUMBER DID NOT HOLD, SO IT WENT BACK** *(Wouter, 2026-09-30 (2), on the recommended
+option)*. Measured as the check itself sees them (`temp/s0930b_c16_view.py`, a patched copy of the check,
+classes only), every one of the 14 blocking C16 findings is plain spaces ADDED and none lost — but three
+add one in a place neither shape of choice (1) named: next to punctuation at a tracked-change boundary
+where the source has whitespace (D02 168, D08 40), and at a paragraph's end where the source paragraph
+ends in whitespace (D08 28). Built literally, choice (1) left uk 3 and us 2 blocking, not 0. **Ruling:
+count all three places** — beside whitespace already there, at a boundary the source spaces whatever the
+neighbours, at an end the source shares; a lost space, a split word, a space where the source has none, a
+no-break space and a reading that differs by more still block. **Declined:** exactly the two shapes, which
+would stop uk D02 and D08 on both variants at Step 10 on findings no input can repair; and the boundary
+without the paragraph end, which would stop D08.
+
+**TWO JUDGEMENTS TAKEN ALONE, CARRIED TO THE CLOSE.** **(a)** `tests/test_delivered_check.py` arm 16's
+`gain-inner`, which the plan did not name, re-pinned beside arm 18's `rebase-inner`, which it did: both
+deliver a doubled space, the shape the ruling counts. **(b)** `tests/test_repack_scrub_and_block.py` case
+1c given the footnote declaration a compliant run makes: its synthetic original's footnote shipped in the
+original's words, undeclared, which the wired check rightly refuses — C6's shape — so the test's input
+changed and the gate did not.
+
+**AND A MEASUREMENT FOR J2.** The notes of all 13 workdirs declare 0 ins|ins and 0 del|del seams
+(`temp/s0930b_seam_same.py`), so Rule 1's ins-ins half has never been exercised; the corrected reason
+describes it and prescribes nothing new.
+
 ## 2026-09-30 (3) — the auto-mode tools installed, one unattended hop armed, and how it stops
 
 **THE HOUSE AUTO-MODE TOOLS ARE INSTALLED, AND THE SETUP RIDES ON THE SLICE'S BRANCH** *(Wouter,
