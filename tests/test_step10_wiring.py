@@ -16,8 +16,17 @@ arm asserts:
   W3  a clean delivery still delivers, byte-identical to the pin's repack (59981dd, before the
       wiring) on the same input.
   W4  Step 10's document and SKILL.md say so, both trees.
+  W5  SUB-STEP 3, RULE 5b's WAY OUT: a blocked finding with a matching `accepted_consequences.json`
+      entry beside the notes DELIVERS, and repack prints its ACCEPTED CONSEQUENCE block, all five
+      lines, for the delivery notes -- accepted, never silent.
+  W6  a STALE entry refuses: one on a clean delivery, and one naming the right idx with the wrong
+      class; nothing is written.
+  W7  a second, UNDECLARED finding still blocks when the first is declared; nothing is written.
+  W8  a malformed entry refuses: attempts 6 (rule 5b's bound is five), and an empty line.
+  W9  Step 10's document and SKILL.md rule 5b name the file and say repack prints the block.
 
-RED FIRST: run this file from a clean copy of 59981dd (its tests/ folder), where W1 fails.
+RED FIRST: run this file from a clean copy of 59981dd (its tests/ folder), where W1 fails -- and W5's
+block, W6, W7, W8 and W9, the pin having no gate at all.
 
     uv run --with lxml python tests/test_step10_wiring.py
     uv run --with lxml python tests/test_step10_wiring.py --variant us
@@ -100,7 +109,7 @@ def wrap(body):
             f'<w:sectPr><w:pgSz w:w="11906" w:h="16838"/></w:sectPr></w:body></w:document>')
 
 
-def repack_case(name, delivered_en, scripts=SCRIPTS):
+def repack_case(name, delivered_en, scripts=SCRIPTS, accepted=None):
     """The original, a hand-built translated document.xml and the notes, through the REAL repack, run by
     this interpreter so nothing else writes into the temporary folder it is given."""
     d = TMP / name
@@ -114,6 +123,9 @@ def repack_case(name, delivered_en, scripts=SCRIPTS):
              for i, (s, e) in enumerate(zip(SRC, EN))]
     nj = d / "paragraphs.json"
     nj.write_bytes(json.dumps(notes, ensure_ascii=False, indent=1).encode("utf-8"))
+    if accepted is not None:
+        (d / "accepted_consequences.json").write_bytes(
+            json.dumps({"accepted": accepted}, ensure_ascii=False, indent=1).encode("utf-8"))
     tmpd = d / "tmp"
     tmpd.mkdir()
     env = dict(ENV, TMP=str(tmpd), TEMP=str(tmpd), TMPDIR=str(tmpd))
@@ -175,6 +187,69 @@ for v in ("uk", "us"):
                               "the delivered-document check")))
     ok(f"[{v}] SKILL.md's script table: repack runs validate_apply.py --delivered before it writes",
        re.search(r"\| `repack_docx\.py` \|[^|]*validate_apply\.py --delivered", sk) is not None)
+
+
+
+def entry(idx, cls="changed", shape="punctuation", **over):
+    e = {"idx": idx, "class": cls, "shape": shape, "attempts": 5,
+         "check": "repack_docx.py (validate_apply.py --delivered --strict)",
+         "consequence": "a full stop is missing at the end of a paragraph",
+         "where": "the second paragraph of the body",
+         "reader must": "read the paragraph against the source before relying on it"}
+    e.update(over)
+    return e
+
+
+BLOCK_LINES = ("ACCEPTED CONSEQUENCE (SKILL.md rule 5b)", "  check:        repack_docx.py",
+               "  attempts:     5", "  consequence:  a full stop is missing",
+               "  where:        the second paragraph", "  reader must:  read the paragraph")
+DECL_MARKER = "THE RULE 5b DECLARATION WAS REFUSED"
+
+print("\nW5  a blocked finding with a matching entry DELIVERS, and its block is printed")
+acc = repack_case("accepted", [EN[0], EN[1][:-1]], accepted=[entry(1)])
+ok("repack exits 0 with a file at the delivery path", acc["rc"] == 0 and acc["out"] is not None,
+   f"rc={acc['rc']} {acc['blob'][-500:]}")
+ok("...and prints the ACCEPTED CONSEQUENCE block, all five lines, verbatim keys",
+   all(x in acc["blob"] for x in BLOCK_LINES), acc["blob"][-700:])
+ok("...and says it is ACCEPTED, NOT SATISFIED, with the count",
+   "ACCEPTED, NOT SATISFIED" in acc["blob"] and "ACCEPTED under rule 5b: 1" in acc["blob"])
+ok("...and the check copy's folder is empty", acc["left"] == [], str(acc["left"]))
+
+print("\nW6  a STALE entry refuses, and nothing is written")
+st1 = repack_case("stale-clean", EN, accepted=[entry(1)])
+ok("an entry on a CLEAN delivery refuses — exit 1, the declaration marker, STALE, nothing written",
+   st1["rc"] == 1 and DECL_MARKER in st1["blob"] and "STALE" in st1["blob"] and st1["out"] is None,
+   f"rc={st1['rc']} {st1['blob'][-400:]}")
+st2 = repack_case("stale-class", [EN[0], EN[1][:-1]], accepted=[entry(1, cls="missing")])
+ok("an entry with the right idx and the WRONG class refuses the same way",
+   st2["rc"] == 1 and DECL_MARKER in st2["blob"] and "STALE" in st2["blob"] and st2["out"] is None,
+   f"rc={st2['rc']} {st2['blob'][-400:]}")
+ok("...naming the entry by its identity, never by text", "idx=1 missing/punctuation" in st2["blob"]
+   and EN[1][:-1] not in st2["blob"])
+
+print("\nW7  a second, UNDECLARED finding still blocks")
+two = repack_case("undeclared", [EN[0][:-1], EN[1][:-1]], accepted=[entry(1)])
+ok("repack exits 1 with the gate's marker, nothing written",
+   two["rc"] == 1 and MARKER in two["blob"] and two["out"] is None, f"rc={two['rc']} {two['blob'][-400:]}")
+ok("...counting the one no entry names, and the one accepted",
+   "1 blocking finding(s) no rule 5b entry names (1 accepted)" in two["blob"], two["blob"][-600:])
+
+print("\nW8  a malformed entry refuses")
+for name, bad_e in (("attempts 6", entry(1, attempts=6)), ("an empty line", entry(1, **{"reader must": " "}))):
+    mal = repack_case("malformed-" + name.replace(" ", "-"), [EN[0], EN[1][:-1]], accepted=[bad_e])
+    ok(f"{name}: exit 1, the declaration marker, 'malformed', nothing written",
+       mal["rc"] == 1 and DECL_MARKER in mal["blob"] and "malformed" in mal["blob"] and mal["out"] is None,
+       f"rc={mal['rc']} {mal['blob'][-400:]}")
+
+print("\nW9  Step 10's document and SKILL.md rule 5b name the file and the printed block, both trees")
+for v in ("uk", "us"):
+    s10 = joined(ROOT / v / "skill-docs" / "10-repack-and-validate.md")
+    sk = joined(ROOT / v / "SKILL.md")
+    ok(f"[{v}] Step 10: accepted_consequences.json beside the notes, a stale entry refused, the block printed",
+       all(x in s10 for x in ("accepted_consequences.json", "beside the notes", "stale",
+                              "prints its ACCEPTED CONSEQUENCE block")))
+    ok(f"[{v}] SKILL.md rule 5b names accepted_consequences.json",
+       re.search(r"\*\*5b\..{0,6000}accepted_consequences\.json", sk) is not None)
 
 shutil.rmtree(TMP, ignore_errors=True)
 print()

@@ -7,8 +7,8 @@
  "divergences": {
   "uk/SKILL.md": {
    "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
-   "sha256_now": "6f1cbc0dd52e514a2fe1eccdf0c313dd8f8783d3e03357842aa388eee1ef7c2d"
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
+   "sha256_now": "d82d092062ef4f6ee99a62a6c1c3db3b00682640a9624915b16f3fb70239c42e"
   },
   "uk/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -37,8 +37,8 @@
   },
   "uk/scripts/repack_docx.py": {
    "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
-   "sha256_now": "7011eee3d3b910f366a32beb0c2c343a0ad824e4ce84f6a761c3ac98c98b9668"
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
+   "sha256_now": "bb09a16a92dd1c19086d9e8daa56e550e9f3ef1373dc9721ccf13fcd1b134f74"
   },
   "uk/scripts/source_language_markers.py": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -102,13 +102,13 @@
   },
   "uk/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
-   "sha256_now": "107065fe833c314b532ef22816995ba9c6c20c2e4554964ecd0a45e367c7489f"
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
+   "sha256_now": "ebd04defca90eef70796dc89ddbf8c9935043b67ea04a8997575784e0b908152"
   },
   "us/SKILL.md": {
    "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
-   "sha256_now": "0bc7887f9ca8c69004fb65b83edfc52107253cb0085bde7626d4353133ca4256"
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
+   "sha256_now": "07cd4abc8317d9ff9148d086e13d0b51cec9203120be357b71973f785e105160"
   },
   "us/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -137,8 +137,8 @@
   },
   "us/scripts/repack_docx.py": {
    "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
-   "sha256_now": "7011eee3d3b910f366a32beb0c2c343a0ad824e4ce84f6a761c3ac98c98b9668"
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
+   "sha256_now": "bb09a16a92dd1c19086d9e8daa56e550e9f3ef1373dc9721ccf13fcd1b134f74"
   },
   "us/scripts/source_language_markers.py": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -202,8 +202,8 @@
   },
   "us/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 2: repack runs the delivered-document check on a check copy before its one write, and refuses",
-   "sha256_now": "f9a1b540de75712ad8f407259076551fccf8023bb78e69a5d3954389d8fe65f7"
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
+   "sha256_now": "1da4a038f900c847d45cfe038843a6ca57f11cb03ab0ee12684c10f15ab7bc88"
   },
   "uk/scripts/validate_en_runs.py": {
    "changed_by": "feature/branch11-slice4b",

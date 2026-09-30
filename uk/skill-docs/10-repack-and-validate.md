@@ -32,7 +32,8 @@ the output `.docx`. There is no separate command for them and no flag to skip.
   full stop or a lost space. A blocking finding, or a check that examined nothing,
   refuses delivery — exit 1, nothing written — and the refusal counts the findings by
   class with what repairs each. Fix the input and re-run; a finding that is right with
-  no compliant repair left is `SKILL.md` rule 5b's case.
+  no compliant repair left is `SKILL.md` rule 5b's case, and its one way out is
+  `accepted_consequences.json`, below.
 
 For a manual pre-flight before Step 10 (optional — all three gates fire automatically):
 
@@ -196,6 +197,18 @@ The script also automatically:
   read by `validate_apply.py --delivered` against `paragraphs.json` and the original,
   and deleted with its folder — never renamed. Only if it passes is the `.docx`
   written to the delivery path.
+- **Rule 5b's way out, and the only one: `accepted_consequences.json` beside the notes.**
+  Where a blocking finding is RIGHT and five attempts have found no compliant repair
+  (`SKILL.md` rule 5b, all four conditions), write `{"accepted": [ ... ]}` in the folder
+  holding `paragraphs.json`, one entry per finding: `idx` for a body finding, or `part`
+  with `id` for a side part (`part` `document` for an anchor finding), its `class` and
+  `shape` exactly as the check prints them, `attempts` from 1 to 5, and the block's other
+  four lines as the keys `check`, `consequence`, `where` and `reader must`. Repack then
+  delivers and prints its ACCEPTED CONSEQUENCE block for each entry — copy every block
+  into the delivery notes, item 4. **Accepted is never satisfied.** An entry naming no
+  blocking finding is stale and refused, on a clean delivery too; a finding no entry
+  names still blocks; a malformed entry, or a check that examined nothing, refuses; and
+  no flag switches the check off.
 
 > **Do not append aux files to the .docx after repacking with a hand-rolled `zipfile.writestr`.**
 > Earlier versions of the skill recommended doing that. It works *only* if the source XML was

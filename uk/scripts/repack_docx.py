@@ -376,6 +376,92 @@ _DELIVERED_REPAIRS = (
 )
 
 
+_ACCEPTED_FILE = 'accepted_consequences.json'
+_ACCEPTED_LINES = ('check', 'attempts', 'consequence', 'where', 'reader must')
+
+
+def _finding_identity(f):
+    """A finding of the delivered check by what names it: its idx, or its part and id, or its part
+    alone (`document` for an anchor finding, which has neither) -- plus its class and shape."""
+    if f.get('idx') is not None:
+        ident = ('idx', f['idx'])
+    elif f.get('id') is not None:
+        ident = ('part', f.get('part') or 'document', str(f['id']))
+    else:
+        ident = ('part', f.get('part') or 'document')
+    return ident + (f.get('class') or '', f.get('shape') or '')
+
+
+def _entry_identity(e):
+    if 'idx' in e:
+        ident = ('idx', e['idx'])
+    elif e.get('id') is not None:
+        ident = ('part', e['part'], str(e['id']))
+    else:
+        ident = ('part', e['part'])
+    return ident + (e.get('class') or '', e.get('shape') or '')
+
+
+def _identity_label(key):
+    where = f"idx={key[1]}" if key[0] == 'idx' else '#'.join(str(x) for x in key[1:-2])
+    return f"{where} {key[-2]}/{key[-1]}" if key[-1] else f"{where} {key[-2]}"
+
+
+def _read_accepted(paragraphs_json):
+    """SKILL.md rule 5b's declaration, `accepted_consequences.json` beside the notes: (path or None,
+    problems, entries). Each entry names ONE finding by identity and carries the five lines of the
+    ACCEPTED CONSEQUENCE block, `attempts` a whole number from 1 to 5 -- rule 5b's bound."""
+    import json
+    if not paragraphs_json:
+        return None, [], []
+    path = os.path.join(os.path.dirname(os.path.abspath(paragraphs_json)), _ACCEPTED_FILE)
+    if not os.path.isfile(path):
+        return None, [], []
+    try:
+        with open(path, 'r', encoding='utf-8') as fh:
+            data = json.load(fh)
+    except (OSError, ValueError) as exc:
+        return path, [f'it cannot be read as JSON ({exc.__class__.__name__})'], []
+    entries = data.get('accepted') if isinstance(data, dict) else None
+    if not isinstance(entries, list) or not entries:
+        return path, ['it holds no "accepted" list of entries'], []
+    problems = []
+    for n, e in enumerate(entries, 1):
+        if not isinstance(e, dict):
+            problems.append(f'entry {n}: not an object')
+            continue
+        idx = e.get('idx')
+        has_idx = 'idx' in e and isinstance(idx, int) and not isinstance(idx, bool)
+        has_part = isinstance(e.get('part'), str) and bool(e['part'].strip())
+        if has_idx == has_part or ('idx' in e and not has_idx):
+            problems.append(f'entry {n}: give "idx" (a whole number), or "part" with "id" where '
+                            'the finding has one - one or the other')
+        if not isinstance(e.get('class'), str) or not e['class'].strip():
+            problems.append(f'entry {n}: "class" is missing or empty')
+        if not isinstance(e.get('shape', ''), str):
+            problems.append(f'entry {n}: "shape" is not text')
+        a = e.get('attempts')
+        if not (isinstance(a, int) and not isinstance(a, bool) and 1 <= a <= 5):
+            problems.append(f'entry {n}: "attempts" must be a whole number from 1 to 5 - '
+                            "rule 5b's bound; after the fifth, do not make a sixth")
+        for k in ('check', 'consequence', 'where', 'reader must'):
+            if not isinstance(e.get(k), str) or not e[k].strip():
+                problems.append(f'entry {n}: "{k}" is missing or empty - an empty line is not '
+                                'a filled one')
+    return path, problems, entries
+
+
+def _refuse_declaration(why, lines):
+    raise RuntimeError(
+        "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. THE RULE 5b DECLARATION WAS "
+        f"REFUSED: {why}, so the archive was NEVER WRITTEN. Nothing was written to the delivery "
+        "path.\n" + "".join(f"  {x}\n" for x in lines)
+        + f"  {_ACCEPTED_FILE} names each finding it accepts by idx, or part and id, with its class "
+          "and shape, as the check prints them, and carries the five ACCEPTED CONSEQUENCE lines "
+          "(SKILL.md rule 5b). Correct the file or remove the entry and re-run; do NOT work around "
+          "this gate.")
+
+
 def _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir):
     """STEP 10's WIRING, branch 11 (2026-09-30) -- the one check that reads the FINISHED document:
     `validate_apply.py --delivered`, every declared body paragraph looked for character for
@@ -391,7 +477,15 @@ def _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir):
     other exit, or no report written REFUSES delivery, and nothing is written to the delivery
     path. The refusal counts the blocking findings by class with what repairs each; the check
     itself prints indices, classes and lengths, never document text. A finding that is RIGHT
-    with no compliant repair left is SKILL.md rule 5b's case, never a reason to bypass this."""
+    with no compliant repair left is SKILL.md rule 5b's case, never a reason to bypass this.
+
+    RULE 5b's WAY OUT, AND THE ONLY ONE (sub-step 3): `accepted_consequences.json` beside the
+    notes. The check is not told about it and still reports every finding; repack reads its
+    report. Every entry must match exactly one BLOCKING finding by identity, class and shape,
+    or it is STALE and refused -- on a clean delivery too; a blocking finding no entry names
+    still refuses; VOID, any other exit, or no report refuses whatever the file says; and a
+    matched finding is ACCEPTED, never silent: its block is printed for the delivery notes.
+    No flag switches this off."""
     import json
     import shutil
     import subprocess
@@ -415,15 +509,45 @@ def _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir):
                 rep = json.load(fh)
     finally:
         shutil.rmtree(tmpdir, ignore_errors=True)
-    if res.returncode == 0 and rep is not None:
+    apath, problems, entries = _read_accepted(paragraphs_json)
+    if res.returncode == 0 and rep is not None and apath is None:
         return
     blocking = [f for f in (rep or {}).get('findings', []) if f.get('blocking', True)]
+    accepted = []
+    if apath is not None and res.returncode in (0, 1) and rep is not None:
+        if problems:
+            _refuse_declaration(f'{_ACCEPTED_FILE} is malformed', problems)
+        left, stale = list(blocking), []
+        for n, e in enumerate(entries, 1):
+            key = _entry_identity(e)
+            hit = next((f for f in left if _finding_identity(f) == key), None)
+            if hit is None:
+                stale.append(f'entry {n}: {_identity_label(key)} - no blocking finding of the '
+                             'check has this identity')
+            else:
+                left.remove(hit)
+                accepted.append(e)
+        if stale:
+            _refuse_declaration(f'{len(stale)} STALE entr' + ('y' if len(stale) == 1 else 'ies')
+                                + f' in {_ACCEPTED_FILE}', stale)
+        if not left:
+            print(f"\n[repack] RULE 5b: {len(accepted)} blocking finding(s) ACCEPTED by "
+                  f"{_ACCEPTED_FILE} - ACCEPTED, NOT SATISFIED, AND NEVER SILENT. Copy each "
+                  "block below into the delivery notes, item 4 (Anything you know to be "
+                  "WRONG in the deliverable):")
+            for e in accepted:
+                print('\nACCEPTED CONSEQUENCE (SKILL.md rule 5b)\n' + ''.join(
+                    f"  {k + ':':<14}{e[k]}\n" for k in _ACCEPTED_LINES), end='')
+            print(f'\n[repack] ACCEPTED under rule 5b: {len(accepted)}')
+            return
+        blocking = left
     by_class = Counter(f"{f['class']}/{f['shape']}" if f.get('shape') else f['class']
                        for f in blocking)
     if res.returncode == 3:
         why = 'the check examined NOTHING (exit 3, VOID) - never the same as clean'
     elif res.returncode == 1 and rep is not None:
-        why = f'{len(blocking)} blocking finding(s)'
+        why = (f'{len(blocking)} blocking finding(s)'
+               + (f' no rule 5b entry names ({len(accepted)} accepted)' if accepted else ''))
     else:
         why = (f'the check could not run (exit {res.returncode}'
                + (', no report written' if rep is None else '') + ')')
