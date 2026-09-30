@@ -1462,6 +1462,73 @@ def _deliv_lead_counted(source, shape, acc, rej, cand):
     return ((acc is None or trimmed(acc, a)) and (rej is None or trimmed(rej, r)))
 
 
+def _deliv_c16_counted(source, mixed, acc, rej, cand, segs, tcs):
+    """WOUTER'S RULING, 2026-09-30, IN THE THREE PLACES HE COUNTED: COUNTED, NEVER
+    BLOCKING. Asked only of an inner-space or changed / space finding no earlier
+    ruling took -- register C16's class. True when every difference between the
+    declared and the delivered string is plain spaces ADDED, and each added space
+    sits in one of the three places measured on the corpus rebuilt through today's
+    pipeline, where all fourteen of the class's findings fall:
+      (a) beside whitespace already there -- a doubled space;
+      (b) at a tracked-change segment boundary where the SOURCE has whitespace --
+          the source's own space, whatever its neighbours;
+      (c) at the paragraph's end, where the SOURCE paragraph ends in whitespace.
+    Each reading the declaration expresses must differ from its delivered reading
+    by added plain spaces alone. An added space never glues two words; one between
+    two letters can split a word, which is why (b) asks the source.
+
+    Just outside, and still blocking, each boundary a test: a space LOST anywhere;
+    a space added between two letters inside a segment; one at a boundary the
+    source does not space; the end addition the source does not share; any
+    whitespace but U+0020; a reading that differs by more. POSITION IS JUDGED ON
+    THE WHITESPACE RUN the added space joins, never on difflib's index: difflib
+    puts a space added beside another on either side of it. The boundaries are
+    read only where the segments join to the compared string and the notes carry
+    one source segment per segment; otherwise (b) cannot hold."""
+    import difflib
+
+    def added(want, have):
+        ops = [o for o in difflib.SequenceMatcher(None, want, have, autojunk=False).get_opcodes()
+               if o[0] != 'equal']
+        for _op, i1, i2, j1, j2 in ops:
+            a, b = want[i1:i2], have[j1:j2]
+            if set(a + b) - {' '} or len(b) <= len(a):
+                return None
+        return ops or None
+
+    ops = added(mixed, cand[0])
+    if ops is None:
+        return False
+    for want, have in ((acc, cand[1]), (rej, cand[2])):
+        if want is not None and want != have and added(want, have) is None:
+            return False
+    bounds = set()
+    if (segs and len(segs) > 1 and ''.join(t for _, t in segs) == mixed
+            and isinstance(tcs, list) and len(tcs) == len(segs)
+            and all(isinstance(s, dict) for s in tcs)):
+        pos = 0
+        for k in range(len(segs) - 1):
+            pos += len(segs[k][1])
+            a, b = tcs[k].get('text') or '', tcs[k + 1].get('text') or ''
+            if a[-1:].isspace() or b[:1].isspace():
+                bounds.add(pos)
+    src_end = isinstance(source, str) and source[-1:].isspace()
+    for _op, i1, i2, _j1, _j2 in ops:
+        s, e = i1, i2
+        while s > 0 and mixed[s - 1].isspace():
+            s -= 1
+        while e < len(mixed) and mixed[e].isspace():
+            e += 1
+        if e > s:                                  # (a) whitespace already there
+            continue
+        if any(s <= p <= e for p in bounds):       # (b) a boundary the source spaces
+            continue
+        if e == len(mixed) and src_end:            # (c) the end, the source's own
+            continue
+        return False
+    return True
+
+
 # SLICE 3a, 2026-09-28 -- THE SIDE PARTS: C6, C19's glossary, the reference half
 # of A1 and A2, B10's orphans, and how the side-part scripts treat a tracked
 # deletion. With --original and a delivered .docx, every part of the ORIGINAL
@@ -2123,7 +2190,8 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
             counts['exact'] += 1
             paired.append((idx, decl, entry.get('text'), key, (mixed, acc, rej)))
         else:
-            pending.append([idx, mixed, acc, rej, entry.get('text'), segs, rej_ok, bool(seen), decl])
+            pending.append([idx, mixed, acc, rej, entry.get('text'), segs, rej_ok, bool(seen), decl,
+                            entry.get('tc_segments')])
     # THE JOURNAL, REBASED -- defect (b). A pending declaration the exact-text
     # lookup missed is tried against every journal chain whose last `after` is a
     # delivered paragraph still unclaimed and whose first `before` is within
@@ -2177,7 +2245,7 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
         jnote += f'; rebased onto {rebased} declaration(s) apply had already changed'
     left = [list(key) for key, n in remaining.items() for _ in range(n)]
     ws = re.compile(r'\s+')
-    for idx, mixed, acc, rej, source, segs, _rej_ok, _j, decl0 in pending:
+    for idx, mixed, acc, rej, source, segs, _rej_ok, _j, decl0, tcs in pending:
         cls, shape, best = 'missing', '', None
         # THE COLLAPSE -- defect (a). Judged by the two readings, never the
         # mixed string, and only for a declaration apply's own criterion says
@@ -2232,6 +2300,10 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
         if (ruling is None and best is not None and cls in ('edge-space', 'inner-space', 'readings')
                 and _deliv_gain_counted(source, mixed, acc, rej, best)):
             ruling = 'trail-gained'
+        if (ruling is None and best is not None
+                and (cls == 'inner-space' or (cls == 'changed' and shape == 'space'))
+                and _deliv_c16_counted(source, mixed, acc, rej, best, segs, tcs)):
+            ruling = 'c16-space'
         findings.append({'idx': idx, 'class': cls, 'shape': shape,
                          'declared_len': len(mixed),
                          'delivered_len': len(best[0]) if best else 0,
@@ -2331,7 +2403,7 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
           + (' (' + '  '.join(f'{k}={v}' for k, v in sorted(by_ruling.items())) + ')'
              if counted else '')
           + '  - Wouter\'s rulings: edge whitespace 2026-09-24, A15\'s signature 2026-09-25, '
-          'flattened comments 2026-09-25 (4)')
+          'flattened comments 2026-09-25 (4), an added space 2026-09-30')
     for a in anchors:
         mark = '' if a['original'] == a['delivered'] else '   <- differs'
         print(f"  anchor {a['anchor']:<18} original {a['original']:>4}  "

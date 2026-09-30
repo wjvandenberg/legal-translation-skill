@@ -777,10 +777,18 @@ Four rules, applied to every `en_segments` array:
    — the regular sides handle the separator. For ins/del segments containing
    alpha text that abut another ins/del directly (no regular between them,
    e.g., `ins("Loan")` immediately followed by `del("Investment")`),
-   bookend the inner edges with `"​"` (ZWSP only) — there is no rendered
-   reader between two consecutive ins/del segments, so the visible-space
-   half is unnecessary, and adding it would produce a double space when both
-   sides accept- or reject-render. The recipe in one line: **regular sides
+   bookend the inner edges with `"​"` (ZWSP only). **The reason
+   is NOT that no view shows the two side by side — the markup view shows
+   both.** Accepting keeps an insertion and drops a deletion, rejecting does
+   the reverse, so at an insertion beside a deletion only one of the two is
+   ever read as text, and its regular neighbours already carry the separator:
+   a visible space here would double it. In the markup view the two touch,
+   which is how Word shows one word typed over another and how the source's
+   own redline shows such a seam; repack scrubs the ZWSP, so the delivered
+   redline matches the source's. Two insertions in a row are both kept on
+   accepting, so they touch in the accepted text as well — which is what the
+   source shows when its two insertions are one word typed across two
+   revisions. The recipe in one line: **regular sides
    carry visible-space + ZWSP; ins↔ins or ins↔del seams carry ZWSP only.**
 
    Worked example (verified on a Japanese sponsor-guarantee MOU re-run,

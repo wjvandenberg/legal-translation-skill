@@ -1102,3 +1102,103 @@ and v5 byte-identical, with the board rule cut back to four moments. This projec
 
 **(7) THIS SESSION's DOCUMENTATION IS PUSHED AND ITS PULL REQUEST OPENED**, once `verify_md` and the eight
 document instruments pass on its head; the repository being public, pushing publishes it. His to merge.
+
+## 2026-09-30 (2) — C16 counted in the three places measured, and two judgements taken building the wiring
+
+**THE APPROVED NUMBER DID NOT HOLD, SO IT WENT BACK** *(Wouter, 2026-09-30 (2), on the recommended
+option)*. Measured as the check itself sees them (`temp/s0930b_c16_view.py`, a patched copy of the check,
+classes only), every one of the 14 blocking C16 findings is plain spaces ADDED and none lost — but three
+add one in a place neither shape of choice (1) named: next to punctuation at a tracked-change boundary
+where the source has whitespace (D02 168, D08 40), and at a paragraph's end where the source paragraph
+ends in whitespace (D08 28). Built literally, choice (1) left uk 3 and us 2 blocking, not 0. **Ruling:
+count all three places** — beside whitespace already there, at a boundary the source spaces whatever the
+neighbours, at an end the source shares; a lost space, a split word, a space where the source has none, a
+no-break space and a reading that differs by more still block. **Declined:** exactly the two shapes, which
+would stop uk D02 and D08 on both variants at Step 10 on findings no input can repair; and the boundary
+without the paragraph end, which would stop D08.
+
+**TWO JUDGEMENTS TAKEN ALONE, CARRIED TO THE CLOSE.** **(a)** `tests/test_delivered_check.py` arm 16's
+`gain-inner`, which the plan did not name, re-pinned beside arm 18's `rebase-inner`, which it did: both
+deliver a doubled space, the shape the ruling counts. **(b)** `tests/test_repack_scrub_and_block.py` case
+1c given the footnote declaration a compliant run makes: its synthetic original's footnote shipped in the
+original's words, undeclared, which the wired check rightly refuses — C6's shape — so the test's input
+changed and the gate did not.
+
+**AND A MEASUREMENT FOR J2.** The notes of all 13 workdirs declare 0 ins|ins and 0 del|del seams
+(`temp/s0930b_seam_same.py`), so Rule 1's ins-ins half has never been exercised; the corrected reason
+describes it and prescribes nothing new.
+
+## 2026-09-30 (3) — the auto-mode tools installed, one unattended hop armed, and how it stops
+
+**THE HOUSE AUTO-MODE TOOLS ARE INSTALLED, AND THE SETUP RIDES ON THE SLICE'S BRANCH** *(Wouter,
+2026-09-30 (2): install the house guard and counter, then run N = 1 hop)*. `tools/auto_mode.py`,
+`auto_mode_guard.py`, `auto_mode_headless.py` and `install_hooks.py` are byte-identical to the house copies,
+each selftest passing; `install_hooks.py --only auto,purpose` wired the guard beside the purpose guard, fired a
+real forbidden call at each and left this project's own git hooks alone; the evidence guard was proved still
+biting. **The setup is committed on `feature/branch11-wiring`, not on `main`**, because the hop and its guard
+run from the checked-out tree: a guard on `main` is not the one the hop loads. `AUTO-MODE-RUN.md` is
+gitignored by name — this repository is public, and the counter rewrites the file at every claim and release.
+The three declared absences in `verify.config.json` came OUT rather than being reworded: the first said this
+project runs no unattended chain, which Wouter's choice made false. **Its TEST is scoped to what it touches**
+— the smoke suite and the four selftests — because sub-step 2's uncommitted wiring shares the working tree
+and fails `tests/test_glossary_route.py` on both variants, which is the hop's first task.
+
+**THREE RULINGS ON HOW THE HOP STOPS, EACH REPLACING A MECHANISM MEASURED NOT TO WORK HERE** *(Wouter,
+2026-09-30 (3))*. **(1) No dollar ceiling.** **(2) Three hours of work, or all of branch 11's remaining work,
+whichever comes first.** He asked first for *context full or the weekly limit at 93%*, and a headless probe
+measured that such a session has NO usage tool, so it can read neither figure. The runner's own time limit,
+which defaults to one hour and kills the hop when it runs out, is raised to a backstop just above three hours.
+**(3) The hop still asks its questions, answers each itself on the recommended option and carries on**,
+recording what it built on every answer, and the next attended session tests each one with him. This replaces
+the house's stop-on-a-blocking-question for this hop only; an irreversible act stays refused by the guard
+whatever the answer.
+
+**AND TWO CORRECTIONS TO THE HANDOFF PROMPT.** It said the record commit reuses sub-step 2's evidence, *the
+same worktree hash*: `cycle_evidence.py` hashes `git diff HEAD` and keeps one record per phase per branch, so
+once sub-step 2 commits, HEAD moves and that evidence is stale for the record — the hop re-records before it.
+And the launch command it gave, `--run --max-budget-usd`, names an option the runner does not have.
+
+## 2026-09-30 (4) — wiring-hop1 hop 1: the judgements taken alone building sub-steps 2 to 4
+
+**ONE UNATTENDED HOP, NOBODY TO ASK** *(the run armed 2026-09-30 (3); every question the hop would have put is in `temp/auto-closing-questions.md`, answered on its recommended option, for Wouter to confirm or overturn)*. Each judgement below changed a test's input or a design detail the approved plan left open — **none changed a gate, an approved number or a delivered byte for a run without the new file.**
+
+- **J-B1** test_glossary_route arm 5 given slice 3b's glossary keep declaration. The arm passed the ORIGINAL glossary to --glossary (the keep-as-is route) with no glossary_translations.json; the wired delivered check refuses that as side-glossary / kept-source, rc=1 on both variants. Case 1c's shape exactly: the check right in scope, the test's operator non-compliant since slice 3b. The input changed, never the gate. Reversible by one revert of the sub-step 2 commit's test hunk.
+- **J-B1b** tests/test_no_delivered_byte_moves.py's repack harness declared a tab as a space (its own declared_text) and left the fixture's comment and footnote undeclared; the wired check reads the body as extraction does (a tab contributes nothing) and refused 4 findings. The harness now declares extraction's own text, en equal to it, plus slice 3b's keeps for the comment and the footnote. The gate unchanged; byte identity to the pin held on both fixtures, 12 of 12.
+- **J-B1c** tests/test_checks_can_fail.py C25 fed repack an empty paragraphs.json, which the wired check reads as VOID (exit 3) and refuses, rightly. Its claim is only that repack completes when --paragraphs is given, so the notes are now extraction's text with en equal to it. The gate unchanged.
+- **J-B2a** Sub-step 3 lives in repack's _delivered_gate, not in validate_apply. The check keeps reporting every finding and exiting 1; repack reads its report and the declaration. So "no flag switches the check off" holds literally - the check has no new input at all - and the decision sits where the refusal already lives.
+- **J-B2b** The file's shape: {"accepted": [ {idx | part (+ id), class, shape, attempts 1-5, check, consequence, where, "reader must"} ]} - the five ACCEPTED CONSEQUENCE lines as verbatim keys, so the printed block is the file read back. Identity is the check's own report fields.
+- **J-B2c** A document-level finding (an anchor count, which has neither idx nor part) is named "part": "document" - the label the check itself prints for it.
+- **J-B2d** Sub-step 3's TEST: the full s0930b set; the corpus arm not re-run, declared - no workdir holds the file, so the corpus path is sub-step 2's, proved at 75a4e54.
+- **J-B3a** render_diff's kept folder stays under the logs folder's branch6-render/, where Wouter already looks, named <document>-<variant>; only the leaf changes.
+- **J-B3b** Sub-step 4's TEST declared narrow - smoke, test_render_keep, test_parity_check - since no other suite drives render_diff (it needs LibreOffice and the logs folder); a real --doc render was not run, because nothing it renders or compares changed and the hop may not read a page.
+
+## 2026-09-30 (3), after the hop — the hop's six answers confirmed, its effort kept, five review findings fixed
+
+**THE HOP'S SIX ANSWERS, EACH CONFIRMED ON ITS RECOMMENDED OPTION** *(Wouter, 2026-09-30 (3), through the
+question tool, after the attended session re-measured the hop's work: 17 of 17 suites re-run green, and the
+13-command gate identical to the hop's close but for three lines its last commit and two later commits explain)*.
+**Q2** keep arm 16's re-pin and case 1c's footnote declaration. **Q3** no register row for Rule 1's ins-ins
+half until a document declares such a seam. **Q4** keep the hop's three test-input fixes. **Q6** measure
+render_diff's repack arm on a real document next session — mechanically, no page kept — then give it the keep
+declarations a compliant run writes, and file a register row with the measurement. **Q5 with Q1** review the
+slice's diff first, then push and open ONE pull request, #126; he then approved the push and the squash merge in
+chat before the tests had finished, the merge to follow the record. Nothing the hop built was undone.
+
+**THE HOP RAN AT MEDIUM EFFORT, AND IT WAS KEPT** *(Wouter)*. The arming session ran at xhigh; a runner
+launched from a plain terminal gets the CLI default, measured as medium on 66 of 66 of the hop's messages.
+Offered a relaunch at xhigh fourteen minutes in, nothing committed, he let it run. **The fix is the house's,
+not this project's** — *"confirm next time that we use the same effort as we are using in the session which
+started the auto-run ... across all projects"* — and it is re-copied here in `86dc767`: `auto_mode.py` v3
+records the arming session's effort and refuses to arm without one, `auto_mode_headless.py` v6 passes it on
+and reports a hop that ran at another.
+
+**THE REVIEW: EIGHT FINDINGS, NONE LETTING A WRONG DOCUMENT THROUGH, FIVE FIXED NOW** *(Wouter's choice)*. A
+`/code-review` at xhigh over `052987d..HEAD`, in the attended session. **Fixed in `a5ec030`:** an unreadable check
+report refuses with the gate's own marker; Step 10 states rule 5b's attempts as SKILL.md does, at most five; the
+render_diff note and manifest name the pages actually written, per arm; a failed extraction is a named VOID in
+the byte-moves suite; two teardowns hold on the failing path. **Carried to the Q6 work, which touches the same
+code:** render_diff's repack arm itself; rule 5b's side-part and anchor identities, untested through repack; and
+the keep-declaration builder, hand-built separately in three harnesses.
+
+**AND THE FIRST MEASURED WORKING HOP:** 160 turns in 1 h 50 min; its cost is in the runner's own usage line in
+`temp/auto-mode-transcripts/`, never in a committed file, whose confidentiality gate refuses any amount.

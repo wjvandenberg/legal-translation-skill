@@ -354,6 +354,13 @@ print("-" * 96)
 src5, notes5 = stage("scan", FIX, NOTES)
 orig_gloss = TMP / "scan" / "final" / "word" / "glossary-original.xml"
 orig_gloss.write_bytes(gloss.encode("utf-8"))          # deliberately NOT translated
+# SINCE STEP 10's WIRING (branch 11, 2026-09-30) repack runs the delivered check, which reads a glossary
+# paragraph delivered in the source's words as a finding unless a declaration keeps it. A compliant
+# keep-as-is operator declares it as Step 8e says -- glossary_translations.json beside the notes, every
+# letter-bearing text mapped to itself (slice 3b's route) -- so this arm does too. The gate is unchanged.
+(notes5.parent / "glossary_translations.json").write_bytes(json.dumps(
+    {t: t for t in re.findall(r"<w:(?:t|delText)(?:\s[^>]*)?>([^<]*)</w:(?:t|delText)>", gloss)
+     if any(c.isalpha() for c in t)}, ensure_ascii=False).encode("utf-8"))
 xml5 = apply_and_get_xml("scan", src5, notes5)
 if xml5 is None:
     void("ARM 5", "apply produced nothing")

@@ -243,11 +243,35 @@ for fixture in ("definitions.docx", "anchors-and-tabs.docx"):
 
     # A paragraphs.json that matches the body, so validate_apply --strict is satisfied:
     # every declared token is present because `en` IS the body text.
-    root = etree.fromstring(doc_xml)
-    paras = [{"idx": i, "text": declared_text(p), "en": declared_text(p),
-              "style": "Normal"}
-             for i, p in enumerate(root.iter(f"{{{W}}}p"))]
+    #
+    # SINCE STEP 10's WIRING (branch 11, 2026-09-30) repack also runs the delivered-document
+    # check, which reads the body the way EXTRACTION does -- a w:tab contributes nothing -- and
+    # reads a side part delivered in the source's words as a finding unless declared kept. So
+    # the declaration is now what a compliant run writes: the text extraction itself produced,
+    # `en` equal to it, and slice 3b's keeps for the comment and the footnote. declared_text
+    # stays for its record; the gate is unchanged. Hop 1 of run wiring-hop1, a judgement taken
+    # alone and logged in DECISIONS-LOG.md.
+    ext = RW / "extracted.json"
+    xr = subprocess.run([sys.executable, str(ROOT / "uk" / "scripts" / "extract_paragraphs.py"), str(orig),
+                         str(ext)], capture_output=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
+    # REVIEW FIX (2026-09-30): a failed extraction is a NAMED void, never a traceback from reading its output.
+    if xr.returncode != 0 or not ext.is_file():
+        print(f"VOID — extraction failed on {fixture} (exit {xr.returncode}). Nothing compared, nothing passed.")
+        sys.exit(1)
+    paras = [dict(n, en=n["text"]) for n in json.loads(ext.read_text(encoding="utf-8"))]
     (RW / "paragraphs.json").write_text(json.dumps(paras), encoding="utf-8")
+    with zipfile.ZipFile(orig) as z:
+        names = set(z.namelist())
+        if "word/comments.xml" in names:
+            cx = etree.fromstring(z.read("word/comments.xml"))
+            (RW / "comments_translations.json").write_text(json.dumps(
+                {c.get(f"{{{W}}}id"): "".join(t.text or "" for t in c.iter(f"{{{W}}}t"))
+                 for c in cx.iter(f"{{{W}}}comment")}), encoding="utf-8")
+        if "word/footnotes.xml" in names:
+            fx = etree.fromstring(z.read("word/footnotes.xml"))
+            (RW / "footnotes_translations.json").write_text(json.dumps(
+                {t.text: t.text for t in fx.iter(f"{{{W}}}t") if t.text and any(c.isalpha() for c in t.text)}),
+                encoding="utf-8")
 
     produced = {}
     for label, mod in (("old", OLD_RPK), ("new", NEW_RPK)):

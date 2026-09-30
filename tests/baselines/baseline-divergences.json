@@ -6,9 +6,9 @@
  "count": 52,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
-   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
-   "sha256_now": "3f63b538064538a92c836f22455c52a9c9478890363f7c9ae85e1a6a41eac248"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
+   "sha256_now": "d82d092062ef4f6ee99a62a6c1c3db3b00682640a9624915b16f3fb70239c42e"
   },
   "uk/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -36,9 +36,9 @@
    "sha256_now": "efbb157c8dcad6d7d80f8d9e4e41e76b6b8790d7c802a3a63cd523878e1b51f0"
   },
   "uk/scripts/repack_docx.py": {
-   "changed_by": "feature/signed-python-no-doc-moves",
-   "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
-   "sha256_now": "fe494dac1fe333dd895064fa610b213be68e8035589299f1173e9dc394c582ab"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
+   "sha256_now": "d4c4719920f9e39a28b13eb007c8a6d8a561b508fef3b90ec4b04d0127c94ae3"
   },
   "uk/scripts/source_language_markers.py": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -61,9 +61,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice4c",
-   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
-   "sha256_now": "a0058143722d990a3ab60c6401d87c6e6b68996dedda9870ab7db13997e1d0c2"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 1: C16's class COUNTED, an added space in the three measured places, a lost space and a split word still blocking",
+   "sha256_now": "5ef6f8cac2971c205c326ec82993f40ab4ef777c465f8bc42f0470fc1fedb201"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -101,14 +101,14 @@
    "sha256_now": "3e989afbfe471ef55e14eb60c6aee0924984ef6f71f56ceb0bd48b8fafba6d4b"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/signed-python-no-doc-moves",
-   "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
-   "sha256_now": "e77e7efb1570b151d1642ad13ecb8c67933de35bd034c73d6738b75c2c02ca07"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
+   "sha256_now": "a7dfbd2a371a8ad645e604e82c9a3c01f424291d2b3fd5ae45a1c527ac59193e"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
-   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
-   "sha256_now": "6f6a7ccfb8efc094fd5f3c8fa535fe15d625695daeb6eb26573fe3413be5cbfb"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
+   "sha256_now": "07cd4abc8317d9ff9148d086e13d0b51cec9203120be357b71973f785e105160"
   },
   "us/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/no-bytecode-in-shipped-tree",
@@ -136,9 +136,9 @@
    "sha256_now": "359524280ee216a947502a3a00ac571a1639fa63e7672b73d5d776080e2a2b9f"
   },
   "us/scripts/repack_docx.py": {
-   "changed_by": "feature/signed-python-no-doc-moves",
-   "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
-   "sha256_now": "fe494dac1fe333dd895064fa610b213be68e8035589299f1173e9dc394c582ab"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
+   "sha256_now": "d4c4719920f9e39a28b13eb007c8a6d8a561b508fef3b90ec4b04d0127c94ae3"
   },
   "us/scripts/source_language_markers.py": {
    "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
@@ -161,9 +161,9 @@
    "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-slice4c",
-   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
-   "sha256_now": "1be8cc27bf81f08ac641a83f97f663973f41f19d2daf9d90a08ac95282b12977"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - sub-step 1: C16's class COUNTED, an added space in the three measured places, a lost space and a split word still blocking",
+   "sha256_now": "9f452e4a626c2c0293e30dba45928d430fe9516077b269a89dd3e984de1052cc"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -201,9 +201,9 @@
    "sha256_now": "1a7adfcf0b35194464b6f8afd309f88d17dda3ea5e67a1762758eb4608677638"
   },
   "us/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/signed-python-no-doc-moves",
-   "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
-   "sha256_now": "913054fc0f0c81127c09fee0cb510c0093a6cc71d4c9cb6f2e82e4ec475aabd5"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
+   "sha256_now": "11a3b4935fe69d751a15bbaeede7f61b484c2d7862c0da8308d7901a6d692532"
   },
   "uk/scripts/validate_en_runs.py": {
    "changed_by": "feature/branch11-slice4b",
@@ -231,9 +231,9 @@
    "sha256_now": "d359048a8468f4716a0514eea4cef493d70285a46df8583994c3d7b134582dbd"
   },
   "uk/skill-docs/04-translate.md": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
-   "sha256_now": "755e7a40f257325eebe8ce4625d7191e0ccc49454ac0f26d917d0a0f725d8134"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - J2: Step 4's Rule 1 gives the true reason for a U+200B-only seam between two tracked segments, the prescription kept",
+   "sha256_now": "43211c0decf67afbbd06af24f21c02c9a33fe673dbe7a14573fdd252bc8533f6"
   },
   "us/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/branch11-slice4b",
@@ -251,9 +251,9 @@
    "sha256_now": "51a15723041edb962a829036cdb02827b9b295d4fd8352f20ee3f38f941aa1c2"
   },
   "us/skill-docs/04-translate.md": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
-   "sha256_now": "7deb5a59ab57e5b322211714fb62105de644e9e78b64eec5f0c1e640cb1cbd1c"
+   "changed_by": "feature/branch11-wiring",
+   "commit_subject": "Branch 11 Step 10 wiring - J2: Step 4's Rule 1 gives the true reason for a U+200B-only seam between two tracked segments, the prescription kept",
+   "sha256_now": "141a6dd160b790e4f8fa030fad5d98652bab1be53ce7a58b9efbd0fefab315c6"
   },
   "uk/scripts/translate_comments.py": {
    "changed_by": "feature/branch11-slice4c",

@@ -2,8 +2,8 @@
 
 ### Pre-repack lexicon compliance + lost-content validation — auto-runs in Step 10
 
-Two pre-repack mandatory gates auto-run as part of `repack_docx.py` (Step 10). The
-operator runs Step 10 and both gates fire automatically before any byte is written to
+Three pre-repack mandatory gates auto-run as part of `repack_docx.py` (Step 10). The
+operator runs Step 10 and all three fire automatically before any byte is written to
 the output `.docx`. There is no separate command for them and no flag to skip.
 
 * **Lexicon compliance scan (pre-repack)** — re-runs `lexicon_compliance.py
@@ -24,8 +24,18 @@ the output `.docx`. There is no separate command for them and no flag to skip.
   `strip_noop` (auto-invoked from post_process on TC docs), `reorder_definitions`,
   `translate_numbering`, and `translate_headers_footers`. The pre-repack run
   confirms none of those steps dropped a token.
+* **The delivered-document check** — `validate_apply.py --delivered` runs last, on a
+  check copy of the finished archive, BEFORE the file is written: every declared body
+  paragraph looked for character for character in both readings of the delivered
+  document, and the footnote, endnote and comment anchors and every text-bearing side
+  part against the ORIGINAL. Unlike the token check above it sees a lost word, a lost
+  full stop or a lost space. A blocking finding, or a check that examined nothing,
+  refuses delivery — exit 1, nothing written — and the refusal counts the findings by
+  class with what repairs each. Fix the input and re-run; a finding that is right with
+  no compliant repair left is `SKILL.md` rule 5b's case, and its one way out is
+  `accepted_consequences.json`, below.
 
-For a manual pre-flight before Step 10 (optional — both gates fire automatically):
+For a manual pre-flight before Step 10 (optional — all three gates fire automatically):
 
 ```bash
 python <skill-path>/scripts/lexicon_compliance.py \
@@ -67,7 +77,8 @@ checked.
 5. `repack_docx.py --paragraphs <paragraphs.json>` — bundles output. **Auto-runs
    `lexicon_compliance.py --stage pre-repack` and `validate_apply.py --strict` before
    bundling**, scrubs every U+200B from the prose parts, and reads the archive back BEFORE
-   delivery: a surviving U+200B or a source-language remnant refuses it.
+   delivery: a surviving U+200B or a source-language remnant refuses it, and so does a
+   blocking finding of the delivered-document check (`validate_apply.py --delivered`).
 6. Any document-specific patches re-applied (e.g. numbering suff fixes).
 
 **Conditional — run only if the trigger applies:**
@@ -181,6 +192,23 @@ The script also automatically:
   source language cannot be detected the block says so and does not run. A faithful
   text refused by a wrongly scoped marker is `SKILL.md` rule 5a's case — never alter
   the translation to satisfy it.
+- **Runs the delivered-document check on a check copy, BEFORE the file is written.**
+  The archive is built in memory, so it is written once to a fresh temporary folder,
+  read by `validate_apply.py --delivered` against `paragraphs.json` and the original,
+  and deleted with its folder — never renamed. Only if it passes is the `.docx`
+  written to the delivery path.
+- **Rule 5b's way out, and the only one: `accepted_consequences.json` beside the notes.**
+  Where a blocking finding is RIGHT and your attempts at repair, at most five, have found no compliant one
+  (`SKILL.md` rule 5b, all four conditions), write `{"accepted": [ ... ]}` in the folder
+  holding `paragraphs.json`, one entry per finding: `idx` for a body finding, or `part`
+  with `id` for a side part (`part` `document` for an anchor finding), its `class` and
+  `shape` exactly as the check prints them, `attempts` from 1 to 5, and the block's other
+  four lines as the keys `check`, `consequence`, `where` and `reader must`. Repack then
+  delivers and prints its ACCEPTED CONSEQUENCE block for each entry — copy every block
+  into the delivery notes, item 4. **Accepted is never satisfied.** An entry naming no
+  blocking finding is stale and refused, on a clean delivery too; a finding no entry
+  names still blocks; a malformed entry, or a check that examined nothing, refuses; and
+  no flag switches the check off.
 
 > **Do not append aux files to the .docx after repacking with a hand-rolled `zipfile.writestr`.**
 > Earlier versions of the skill recommended doing that. It works *only* if the source XML was
@@ -243,7 +271,7 @@ Verify:
 Before moving to the next step, confirm:
 
 - [ ] You completed the MANDATORY PRE-REPACK CHECKLIST in full
-- [ ] You ran `repack_docx.py` and let it auto-invoke validate_apply --strict
+- [ ] You ran `repack_docx.py` and let it auto-invoke validate_apply --strict and the delivered-document check
 - [ ] You ran `verify_diligence.py` at Step 11a and it reported OVERALL: PASS (or WARN with all warnings reviewed and intentional)
 - [ ] You ran Step 11b visual validation and reviewed any token-mismatch findings
 - [ ] No remnant scan, no validate_apply drift, was suppressed by overriding flags

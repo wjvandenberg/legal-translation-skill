@@ -200,7 +200,7 @@ High-level summary of what each step does. Detail in the step files.
 | 7 | Reorder | `reorder_definitions.py` for documents with definitions | `skill-docs/06-postprocess-and-reorder.md` |
 | 8 | Aux files | Translate headers/footers/comments/footnotes/endnotes | `skill-docs/08-aux-and-quality.md` |
 | 9 | Quality check | `quality_check.py` for source-language remnants | `skill-docs/08-aux-and-quality.md` |
-| 10 | Repack | `repack_docx.py` (auto-invokes validate_apply --strict) | `skill-docs/10-repack-and-validate.md` |
+| 10 | Repack | `repack_docx.py` (auto-invokes validate_apply --strict, then --delivered) | `skill-docs/10-repack-and-validate.md` |
 | 11 | Validate | Final integrity check on the .docx | `skill-docs/10-repack-and-validate.md` |
 
 ## Anti-drift safeguards
@@ -213,7 +213,7 @@ The defences are layered and they are non-optional:
 
 2. **Hard Rules apply skill-wide.** The 5 Hard Rules above are not just for Step 4. Every step's compliance check asks you to re-confirm them.
 
-3. **Auto-invoked gates.** `apply_translations_textmatch.py` auto-runs four pre-apply validators (`validate_en_runs`, `validate_segment_shapes`, `validate_reject_all`, then `validate_apply --strict` after applying). `repack_docx.py` auto-runs `validate_apply --strict` again. `post_process.py` auto-runs `strip_noop_tracked_changes.py`. None of these can be skipped from the CLI.
+3. **Auto-invoked gates.** `apply_translations_textmatch.py` auto-runs four pre-apply validators (`validate_en_runs`, `validate_segment_shapes`, `validate_reject_all`, then `validate_apply --strict` after applying). `repack_docx.py` auto-runs `validate_apply --strict` again, and last `validate_apply --delivered` on a check copy of the finished archive. `post_process.py` auto-runs `strip_noop_tracked_changes.py`. None of these can be skipped from the CLI.
 
 4. **Per-batch validation.** `validate_translations.py` enforces a hard cap of 35 newly-translated paragraphs per invocation. The state file `.validate-state.json` makes batch coverage auditable.
 
@@ -244,7 +244,7 @@ The defences are layered and they are non-optional:
    **All four conditions must hold. If any one of them fails this rule does not apply, and rule 5 governs.**
    - **(a) The check has actually fired.** Never pre-emptively, never on the expectation that it would fire, never for a check you did not run.
    - **(b) You attempted repair, and you can say what you tried.** A conclusion that no repair exists is worth nothing until you have looked for one.
-   - **(c) You name the specific consequence in the delivery notes**, under "Anything you know to be WRONG in the deliverable", **in the fixed ACCEPTED CONSEQUENCE block set out there** — check, attempts, consequence, where, and what the reader must do. Free prose does not discharge this condition. **A known defect that is disclosed is a repair instruction; the same defect undisclosed is a trap.**
+   - **(c) You name the specific consequence in the delivery notes**, under "Anything you know to be WRONG in the deliverable", **in the fixed ACCEPTED CONSEQUENCE block set out there** — check, attempts, consequence, where, and what the reader must do. Free prose does not discharge this condition. **Where the check is repack's delivered-document check, you declare the finding in `accepted_consequences.json` beside the notes** (`skill-docs/10-repack-and-validate.md` sets out its entries); repack then delivers and prints the block to copy, and refuses a stale entry. **A known defect that is disclosed is a repair instruction; the same defect undisclosed is a trap.**
    - **(d) You did not alter the translation to get here.** Changing correct English so a check stops firing is prohibited by rule 5a and that prohibition is absolute. If you have done it, you have not earned this channel — you have broken a different rule.
 
    **THE BOUND — five attempts, then stop.** An attempt is one change followed by one re-run of the check; re-running without changing anything is the same attempt, not a new one. **If the check is still firing after the fifth attempt, do not make a sixth.** Stop, and satisfy (a) to (d) above. **Five is measured, not chosen:** across the twelve forensic runs behind this skill, every repair that ever succeeded did so within five attempts, and the deepest loop that never succeeded ran to eighteen. **The bound is what makes this channel mandatory rather than optional** — without it, "re-run until it passes" has no end, and an unwinnable loop is indistinguishable from a slow one.
@@ -386,7 +386,7 @@ jurisdiction-specific terms is a more serious error than leaving register slight
 | `validate_reject_all.py` | **MANDATORY if source has TCs** — Reconstruct accept-all and reject-all views from `en_segments` and scan for readability defects (double article, repeated word, stranded preposition, run-together words, double space, empty brackets, forbidden collocations). **Auto-runs from `apply_translations_textmatch.py` on TC documents.** |
 | `lexicon_compliance.py` | **MANDATORY (pre-apply AND pre-repack)** — Scan JSON or document.xml for calques and hard-rule violations drawn from lexicon Avoid columns. Pre-apply run is manual (Step 4d); pre-repack run **auto-fires from inside `repack_docx.py`** before bundling. |
 | `apply_translations_textmatch.py` | **PRIMARY** — Apply translations by text matching onto original. Auto-runs `validate_translations.py` (BLOCK code 2 only), plus `validate_segment_shapes.py` and `validate_reject_all.py` on TC docs, all pre-apply, plus `validate_apply.py --strict` post-apply. |
-| `repack_docx.py` | **MANDATORY** — Repack translated XML back into .docx (replaces shell zip). Auto-runs `lexicon_compliance.py --stage pre-repack` and (when `--paragraphs` supplied) `validate_apply.py --strict` before bundling. Scrubs every U+200B from every prose part, then reads the archive back BEFORE delivery and REFUSES if one survives or if a prose part carries a source-language remnant; the classes declared advisory in `source_language_markers.py` only warn. |
+| `repack_docx.py` | **MANDATORY** — Repack translated XML back into .docx (replaces shell zip). Auto-runs `lexicon_compliance.py --stage pre-repack` and (when `--paragraphs` supplied) `validate_apply.py --strict` before bundling. Scrubs every U+200B from every prose part, then reads the archive back BEFORE delivery and REFUSES if one survives or if a prose part carries a source-language remnant; the classes declared advisory in `source_language_markers.py` only warn. Last, still before the write, it runs `validate_apply.py --delivered` on a check copy of the finished archive against the notes and the original, and REFUSES on a blocking finding or a check that examined nothing. |
 | `translate_numbering.py` | Translate numbering format strings in word/numbering.xml |
 | `translate_headers_footers.py` | Translate text in word/headerN.xml and word/footerN.xml |
 | `translate_comments.py` | **MANDATORY if the document has comments** — namespace-safe translation of word/comments.xml |

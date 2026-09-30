@@ -21,6 +21,14 @@ word/document.xml, the verdict source_language_markers.remnant_verdict's.
 Marker classes the scan cannot rule on only WARN; with no language detected
 the block says so and does not run.
 
+The delivered-document check
+----------------------------
+Last, and still BEFORE the write, `validate_apply.py --delivered` reads a
+check copy of the finished archive against the notes and the ORIGINAL: every
+declared body paragraph, character for character in both readings, the
+anchors and every text-bearing side part. A blocking finding, or a check that
+examined nothing, refuses delivery (branch 11, Step 10's wiring).
+
 Exit codes:
   0 — the .docx was written to the delivery path
   1 — a gate blocked; NOTHING was written to the delivery path. Either a
@@ -28,8 +36,8 @@ Exit codes:
       so one could not run, or the ORIGINAL carries a text-bearing
       word/glossary/document.xml and --glossary was not supplied, or the
       finished archive failed its own ZIP integrity or case-conflict check,
-      kept a U+200B, or carried a blocking source-language remnant, and was
-      never written.
+      kept a U+200B, carried a blocking source-language remnant, or failed the
+      delivered-document check, and was never written.
   3 — script-integrity check failed (re-install the skill)
 
 The archive is built IN MEMORY and written to the delivery path once, only
@@ -346,6 +354,224 @@ def _run_pre_repack_validator(label, args):
             f"{label} returned exit code {result.returncode}. Repack "
             f"aborted; no .docx written. Fix the issues above and re-run."
         )
+
+# THE DELIVERED-DOCUMENT CHECK'S REPAIRS, by the class of a blocking finding -- what each asks of the
+# operator. Printed with the refusal; the document's text never is.
+_DELIVERED_REPAIRS = (
+    (('changed', 'missing', 'readings', 'edge-space', 'inner-space', 'collapsed'),
+     "a declared body paragraph is not in the delivery as declared: correct its `en` / "
+     "`en_segments` in paragraphs.json and re-run from Step 5 through every mandatory step"),
+    (('anchor-lost', 'anchor-gained'),
+     "a footnote, endnote or comment anchor differs from the ORIGINAL's count: re-run from "
+     "Step 5; if it persists, it is a pipeline defect and SKILL.md rule 5b's case"),
+    (('bracket',),
+     "a bracket differs from the declaration, or is unbalanced where the source balances: "
+     "correct the entry's `en` and re-run from Step 5"),
+    (('zwsp',),
+     "a U+200B survived into a delivered reading: a defect in repack itself - re-install the skill"),
+    (('side-',),
+     "a side part - header, footer, comment, footnote, endnote or glossary - is untranslated or "
+     "does not match its declaration: run its Step 8 script, or declare it kept as Step 8 says, "
+     "and re-run the repack"),
+)
+
+
+_ACCEPTED_FILE = 'accepted_consequences.json'
+_ACCEPTED_LINES = ('check', 'attempts', 'consequence', 'where', 'reader must')
+
+
+def _finding_identity(f):
+    """A finding of the delivered check by what names it: its idx, or its part and id, or its part
+    alone (`document` for an anchor finding, which has neither) -- plus its class and shape."""
+    if f.get('idx') is not None:
+        ident = ('idx', f['idx'])
+    elif f.get('id') is not None:
+        ident = ('part', f.get('part') or 'document', str(f['id']))
+    else:
+        ident = ('part', f.get('part') or 'document')
+    return ident + (f.get('class') or '', f.get('shape') or '')
+
+
+def _entry_identity(e):
+    if 'idx' in e:
+        ident = ('idx', e['idx'])
+    elif e.get('id') is not None:
+        ident = ('part', e['part'], str(e['id']))
+    else:
+        ident = ('part', e['part'])
+    return ident + (e.get('class') or '', e.get('shape') or '')
+
+
+def _identity_label(key):
+    where = f"idx={key[1]}" if key[0] == 'idx' else '#'.join(str(x) for x in key[1:-2])
+    return f"{where} {key[-2]}/{key[-1]}" if key[-1] else f"{where} {key[-2]}"
+
+
+def _read_accepted(paragraphs_json):
+    """SKILL.md rule 5b's declaration, `accepted_consequences.json` beside the notes: (path or None,
+    problems, entries). Each entry names ONE finding by identity and carries the five lines of the
+    ACCEPTED CONSEQUENCE block, `attempts` a whole number from 1 to 5 -- rule 5b's bound."""
+    import json
+    if not paragraphs_json:
+        return None, [], []
+    path = os.path.join(os.path.dirname(os.path.abspath(paragraphs_json)), _ACCEPTED_FILE)
+    if not os.path.isfile(path):
+        return None, [], []
+    try:
+        with open(path, 'r', encoding='utf-8') as fh:
+            data = json.load(fh)
+    except (OSError, ValueError) as exc:
+        return path, [f'it cannot be read as JSON ({exc.__class__.__name__})'], []
+    entries = data.get('accepted') if isinstance(data, dict) else None
+    if not isinstance(entries, list) or not entries:
+        return path, ['it holds no "accepted" list of entries'], []
+    problems = []
+    for n, e in enumerate(entries, 1):
+        if not isinstance(e, dict):
+            problems.append(f'entry {n}: not an object')
+            continue
+        idx = e.get('idx')
+        has_idx = 'idx' in e and isinstance(idx, int) and not isinstance(idx, bool)
+        has_part = isinstance(e.get('part'), str) and bool(e['part'].strip())
+        if has_idx == has_part or ('idx' in e and not has_idx):
+            problems.append(f'entry {n}: give "idx" (a whole number), or "part" with "id" where '
+                            'the finding has one - one or the other')
+        if not isinstance(e.get('class'), str) or not e['class'].strip():
+            problems.append(f'entry {n}: "class" is missing or empty')
+        if not isinstance(e.get('shape', ''), str):
+            problems.append(f'entry {n}: "shape" is not text')
+        a = e.get('attempts')
+        if not (isinstance(a, int) and not isinstance(a, bool) and 1 <= a <= 5):
+            problems.append(f'entry {n}: "attempts" must be a whole number from 1 to 5 - '
+                            "rule 5b's bound; after the fifth, do not make a sixth")
+        for k in ('check', 'consequence', 'where', 'reader must'):
+            if not isinstance(e.get(k), str) or not e[k].strip():
+                problems.append(f'entry {n}: "{k}" is missing or empty - an empty line is not '
+                                'a filled one')
+    return path, problems, entries
+
+
+def _refuse_declaration(why, lines):
+    raise RuntimeError(
+        "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. THE RULE 5b DECLARATION WAS "
+        f"REFUSED: {why}, so the archive was NEVER WRITTEN. Nothing was written to the delivery "
+        "path.\n" + "".join(f"  {x}\n" for x in lines)
+        + f"  {_ACCEPTED_FILE} names each finding it accepts by idx, or part and id, with its class "
+          "and shape, as the check prints them, and carries the five ACCEPTED CONSEQUENCE lines "
+          "(SKILL.md rule 5b). Correct the file or remove the entry and re-run; do NOT work around "
+          "this gate.")
+
+
+def _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir):
+    """STEP 10's WIRING, branch 11 (2026-09-30) -- the one check that reads the FINISHED document:
+    `validate_apply.py --delivered`, every declared body paragraph looked for character for
+    character in both readings, the anchors and every text-bearing side part against the
+    ORIGINAL. It runs on the archive BEFORE it is written, like every check above it.
+
+    THE CHECK READS A PATH AND THE ARCHIVE IS IN MEMORY, so a CHECK COPY is written once to a fresh
+    temporary folder, read, and deleted with its folder in `finally` -- a create-and-write and a
+    delete, never a rename: a security agent that ends any process renaming a Word file is
+    common on managed machines, and a run it ends can still look finished.
+
+    Exit 1 (blocking findings), 3 (VOID: nothing examined, which is never the same as clean), any
+    other exit, or no report written REFUSES delivery, and nothing is written to the delivery
+    path. The refusal counts the blocking findings by class with what repairs each; the check
+    itself prints indices, classes and lengths, never document text. A finding that is RIGHT
+    with no compliant repair left is SKILL.md rule 5b's case, never a reason to bypass this.
+
+    RULE 5b's WAY OUT, AND THE ONLY ONE (sub-step 3): `accepted_consequences.json` beside the
+    notes. The check is not told about it and still reports every finding; repack reads its
+    report. Every entry must match exactly one BLOCKING finding by identity, class and shape,
+    or it is STALE and refused -- on a clean delivery too; a blocking finding no entry names
+    still refuses; VOID, any other exit, or no report refuses whatever the file says; and a
+    matched finding is ACCEPTED, never silent: its block is printed for the delivery notes.
+    No flag switches this off."""
+    import json
+    import shutil
+    import subprocess
+    from collections import Counter
+    tmpdir = tempfile.mkdtemp(prefix='repack-delivered-check-')
+    try:
+        copy = os.path.join(tmpdir, 'check-copy.docx')
+        with open(copy, 'wb') as fh:
+            fh.write(archive.getvalue())
+        report = os.path.join(tmpdir, 'report.json')
+        print(f"\n{'=' * 60}\n[repack] auto-running validate_apply.py --delivered "
+              f"(the delivered-document check, on a check copy)\n{'=' * 60}")
+        res = subprocess.run([sys.executable, os.path.join(scripts_dir, 'validate_apply.py'),
+                              paragraphs_json, '--delivered', copy, '--original', orig_docx,
+                              '--strict', '--report-json', report],
+                             capture_output=True, text=True, encoding='utf-8', errors='replace')
+        print((res.stdout or '') + (res.stderr or ''), end='')
+        rep, unreadable = None, False
+        if os.path.isfile(report):
+            # A REPORT WRITTEN BUT NOT READABLE IS NO REPORT -- this gate's own refusal below, never a
+            # traceback that reads as a script error (review fix, 2026-09-30).
+            try:
+                with open(report, 'r', encoding='utf-8') as fh:
+                    rep = json.load(fh)
+            except (OSError, ValueError):
+                rep = None
+            if not isinstance(rep, dict):
+                rep, unreadable = None, True
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+    apath, problems, entries = _read_accepted(paragraphs_json)
+    if res.returncode == 0 and rep is not None and apath is None:
+        return
+    blocking = [f for f in (rep or {}).get('findings', []) if f.get('blocking', True)]
+    accepted = []
+    if apath is not None and res.returncode in (0, 1) and rep is not None:
+        if problems:
+            _refuse_declaration(f'{_ACCEPTED_FILE} is malformed', problems)
+        left, stale = list(blocking), []
+        for n, e in enumerate(entries, 1):
+            key = _entry_identity(e)
+            hit = next((f for f in left if _finding_identity(f) == key), None)
+            if hit is None:
+                stale.append(f'entry {n}: {_identity_label(key)} - no blocking finding of the '
+                             'check has this identity')
+            else:
+                left.remove(hit)
+                accepted.append(e)
+        if stale:
+            _refuse_declaration(f'{len(stale)} STALE entr' + ('y' if len(stale) == 1 else 'ies')
+                                + f' in {_ACCEPTED_FILE}', stale)
+        if not left:
+            print(f"\n[repack] RULE 5b: {len(accepted)} blocking finding(s) ACCEPTED by "
+                  f"{_ACCEPTED_FILE} - ACCEPTED, NOT SATISFIED, AND NEVER SILENT. Copy each "
+                  "block below into the delivery notes, item 4 (Anything you know to be "
+                  "WRONG in the deliverable):")
+            for e in accepted:
+                print('\nACCEPTED CONSEQUENCE (SKILL.md rule 5b)\n' + ''.join(
+                    f"  {k + ':':<14}{e[k]}\n" for k in _ACCEPTED_LINES), end='')
+            print(f'\n[repack] ACCEPTED under rule 5b: {len(accepted)}')
+            return
+        blocking = left
+    by_class = Counter(f"{f['class']}/{f['shape']}" if f.get('shape') else f['class']
+                       for f in blocking)
+    if res.returncode == 3:
+        why = 'the check examined NOTHING (exit 3, VOID) - never the same as clean'
+    elif res.returncode == 1 and rep is not None:
+        why = (f'{len(blocking)} blocking finding(s)'
+               + (f' no rule 5b entry names ({len(accepted)} accepted)' if accepted else ''))
+    elif unreadable:
+        why = f"the check's report could not be read (exit {res.returncode}, report unreadable)"
+    else:
+        why = (f'the check could not run (exit {res.returncode}'
+               + (', no report written' if rep is None else '') + ')')
+    repairs = [text for prefixes, text in _DELIVERED_REPAIRS
+               if any(k.split('/')[0] in prefixes or any(p.endswith('-') and k.startswith(p)
+                                                         for p in prefixes) for k in by_class)]
+    raise RuntimeError(
+        "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. THE DELIVERED-DOCUMENT CHECK "
+        f"REFUSED THIS DELIVERY: {why}, so the archive was NEVER WRITTEN. Nothing was written to "
+        "the delivery path.\n"
+        + "".join(f"  {k}: {n}\n" for k, n in sorted(by_class.items()))
+        + ("  What repairs each:\n" + "".join(f"  - {t}\n" for t in repairs) if repairs else "")
+        + "  Fix the input and re-run; do NOT work around this gate. A finding that is RIGHT, with "
+          "no compliant repair left, is SKILL.md rule 5b's case.")
+
 
 def repack(orig_docx, translated_doc_xml, output_docx,
            translated_numbering_xml=None, headers_footers_dir=None,
@@ -852,6 +1078,9 @@ def repack(orig_docx, translated_doc_xml, output_docx,
 
     # --- THE REMNANT BLOCK (C22), on the archive BEFORE it is written ---
     _remnant_gate(orig_docx, archive)
+
+    # --- THE DELIVERED-DOCUMENT CHECK (branch 11), on a CHECK COPY, BEFORE the write ---
+    _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir)
 
     # WRITTEN ONCE, after every check: a create-and-write, never a rename.
     with open(output_docx, 'wb') as fh:
