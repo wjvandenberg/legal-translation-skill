@@ -1171,3 +1171,34 @@ And the launch command it gave, `--run --max-budget-usd`, names an option the ru
 - **J-B2d** Sub-step 3's TEST: the full s0930b set; the corpus arm not re-run, declared - no workdir holds the file, so the corpus path is sub-step 2's, proved at 75a4e54.
 - **J-B3a** render_diff's kept folder stays under the logs folder's branch6-render/, where Wouter already looks, named <document>-<variant>; only the leaf changes.
 - **J-B3b** Sub-step 4's TEST declared narrow - smoke, test_render_keep, test_parity_check - since no other suite drives render_diff (it needs LibreOffice and the logs folder); a real --doc render was not run, because nothing it renders or compares changed and the hop may not read a page.
+
+## 2026-09-30 (3), after the hop — the hop's six answers confirmed, its effort kept, five review findings fixed
+
+**THE HOP'S SIX ANSWERS, EACH CONFIRMED ON ITS RECOMMENDED OPTION** *(Wouter, 2026-09-30 (3), through the
+question tool, after the attended session re-measured the hop's work: 17 of 17 suites re-run green, and the
+13-command gate identical to the hop's close but for three lines its last commit and two later commits explain)*.
+**Q2** keep arm 16's re-pin and case 1c's footnote declaration. **Q3** no register row for Rule 1's ins-ins
+half until a document declares such a seam. **Q4** keep the hop's three test-input fixes. **Q6** measure
+render_diff's repack arm on a real document next session — mechanically, no page kept — then give it the keep
+declarations a compliant run writes, and file a register row with the measurement. **Q5 with Q1** review the
+slice's diff first, then push and open ONE pull request, #126; he then approved the push and the squash merge in
+chat before the tests had finished, the merge to follow the record. Nothing the hop built was undone.
+
+**THE HOP RAN AT MEDIUM EFFORT, AND IT WAS KEPT** *(Wouter)*. The arming session ran at xhigh; a runner
+launched from a plain terminal gets the CLI default, measured as medium on 66 of 66 of the hop's messages.
+Offered a relaunch at xhigh fourteen minutes in, nothing committed, he let it run. **The fix is the house's,
+not this project's** — *"confirm next time that we use the same effort as we are using in the session which
+started the auto-run ... across all projects"* — and it is re-copied here in `86dc767`: `auto_mode.py` v3
+records the arming session's effort and refuses to arm without one, `auto_mode_headless.py` v6 passes it on
+and reports a hop that ran at another.
+
+**THE REVIEW: EIGHT FINDINGS, NONE LETTING A WRONG DOCUMENT THROUGH, FIVE FIXED NOW** *(Wouter's choice)*. A
+`/code-review` at xhigh over `052987d..HEAD`, in the attended session. **Fixed in `a5ec030`:** an unreadable check
+report refuses with the gate's own marker; Step 10 states rule 5b's attempts as SKILL.md does, at most five; the
+render_diff note and manifest name the pages actually written, per arm; a failed extraction is a named VOID in
+the byte-moves suite; two teardowns hold on the failing path. **Carried to the Q6 work, which touches the same
+code:** render_diff's repack arm itself; rule 5b's side-part and anchor identities, untested through repack; and
+the keep-declaration builder, hand-built separately in three harnesses.
+
+**AND THE FIRST MEASURED WORKING HOP:** 160 turns in 1 h 50 min; its cost is in the runner's own usage line in
+`temp/auto-mode-transcripts/`, never in a committed file, whose confidentiality gate refuses any amount.
