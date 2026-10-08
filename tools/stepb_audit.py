@@ -272,12 +272,16 @@ print(f"  DEFENSIBLE TOTAL          : {len(own)} self-asserting rows + "
       f"{len([l for l in loops if l not in [f for f,_,_ in own]])} closed loops = {true_total}")
 claims14 = len(re.findall(r"\bfourteen\b(?=[^.]{0,80}(?:findings|no compliant|currently-silent))", doc, re.I))
 print(f"  occurrences of 'fourteen' tied to this count in the document: {claims14}")
-EXPECT = 18
-claimed = "eighteen" in doc.lower() and "eighteen findings state" in doc.lower()
+# RE-DERIVED 2026-10-08, Wouter's: 18 -> 20. A24 and A25 joined on Step 10's wiring (#126) -- each now refused
+# at Step 10 with rule 5b the only exit -- so the pattern counts them, and the plan states TWENTY beside the
+# eighteen it was written on, which stays as dated history. The figure moves with a measurement, never to
+# make a count come out.
+EXPECT = 20
+claimed = "twenty" in doc.lower() and "twenty findings state" in doc.lower()
 if true_total != EXPECT:
     fail("3a", f"the wide pattern now gives {true_total}; the document is written against {EXPECT}")
 elif not claimed:
-    fail("3b", "the document does not state the eighteen-row figure")
+    fail("3b", "the document does not state the twenty-row figure")
 else:
     ok(f"the deadlock set is {true_total} rows and the document says so, with the set enumerated")
 

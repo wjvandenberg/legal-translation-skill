@@ -101,7 +101,7 @@ MUTATIONS = [
   "check 10 verifies all source quotations verbatim; this is the misquote it already caught once"),
 
  ("break the deadlock count back to the invented figure",
-  lambda t: re.sub(r"\*\*eighteen findings state, in their own", "**fourteen findings state, in their own", t, 1),
+  lambda t: re.sub(r"TWENTY findings state, in their own", "FOURTEEN findings state, in their own", t, 1),
   "stepb_audit.py",
   "the figure that was asserted with the confidence of a measurement and was neither measurement"),
 
