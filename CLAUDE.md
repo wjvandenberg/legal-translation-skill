@@ -681,7 +681,7 @@ unconditionally — as is §5.6 entire.
 
 **WOUTER'S RULINGS:** both items, one branch, one pull request; the glossary-kept arm measured and pinned; the gate's narrow scope fix; C6 amended to eleven refusals, still CLOSED; branch 12 declared then cross-checked, NOT SUPPORTED never CLEAN, three slices, 12a's acceptance as measured; squash-merge once green.
 
-**SINGLE NEXT ACTION: BRANCH 12 SLICE 12a** — the declared source language and every check that reads it; write its sub-step plan first, and measure before choosing whether a declared language can make repack's remnant block refuse a delivery it skips today, since 12a's acceptance promises unchanged delivered bytes.
+**SINGLE NEXT ACTION: BRANCH 12 SLICE 12a** — the declared source language and every check that reads it; write its sub-step plan first. Its one open question is ANSWERED, measured the same session: a declared language adds no block on the corpus, so 12a's acceptance of unchanged delivered bytes stands on evidence — section 3.2 of `PLAN-2-step-b.md` holds it.
 
 **THE BRANCH:** `feature/i36-sides-wiring-pins`, pull request #128, squash-merged on Wouter's approval once the record commit's document checks were green.
 
