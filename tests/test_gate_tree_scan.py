@@ -30,6 +30,9 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
+sys.dont_write_bytecode = True  # importing from tools/ must leave no bytecode there
+sys.path.insert(0, str(ROOT / "tools"))
+import inplace_guard as guard  # noqa: E402  (register I-37: a repository file changes only through it)
 GATE = ROOT / "tools" / "precommit_gate.py"
 TARGET = ROOT / "uk" / "SKILL.md"
 
@@ -115,6 +118,7 @@ def check(name, ok, detail=""):
 def gate(env_extra=None):
     """Run the gate and return (section-7 text, exit code)."""
     env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
+    env["PRECOMMIT_GATE_EXEMPT_PID"] = str(os.getpid())   # this run's own guard records (I-37)
     env.update(env_extra or {})
     r = subprocess.run([sys.executable, str(GATE)], capture_output=True, text=True,
                        encoding="utf-8", errors="replace", cwd=ROOT, env=env)
@@ -124,13 +128,11 @@ def gate(env_extra=None):
 
 
 def with_planted(text_to_add, probe):
-    """Append a line to a tree file, run probe, restore the exact original bytes."""
+    """Append a line to a tree file, run probe, restore the exact original bytes - through the
+    guard (register I-37), so a run killed mid-probe cannot leave the shipped SKILL.md planted."""
     original = TARGET.read_bytes()
-    try:
-        TARGET.write_bytes(original + ("\n" + text_to_add + "\n").encode("utf-8"))
+    with guard.mutated(TARGET, original + ("\n" + text_to_add + "\n").encode("utf-8")):
         return probe()
-    finally:
-        TARGET.write_bytes(original)
 
 
 print("=" * 92)
