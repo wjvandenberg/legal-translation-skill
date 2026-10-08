@@ -87,6 +87,17 @@ disagree is VOID. Beside the bytes: D08's comment anchors equal the original's, 
 build; and with --ref the delivered check also reads the PIN's build, so the text-and-anchor
 blocking findings are compared per document -- B10's two gone on D08, nothing gained anywhere.
 
+REGISTER I-36 (2026-10-08 (2)) TEACHES --sides STEP 10's WIRING, which its pins predated. Repack now refuses a
+delivery its check finds wrong, so a document stops in one of two places: an EARLIER gate (post_process's drift
+gate, slice 2b's STOP_2B, as before) or the DELIVERED gate, by design -- in (b) D03B, its glossary undeclared, or
+nothing once --declare-glossary-kept declares it; in (c) every document whose side parts carry letters (PIN_C),
+because an operator who skips Step 8 declares nothing, and since this change the chain hands repack no declaration
+either (it had been copying July's beside the notes before repack and deleting them only after). Whether our repack
+carries that gate is settled by ancestry against START_WIRING and by its own source, a disagreement VOID. A refused
+document's findings are read from the REFUSAL -- one line per blocking class, checked against the total it states --
+so PIN_B and PIN_C keep their per-document coverage, compared by count; the flattened-comment pin, never blocking,
+cannot travel in a refusal and is said to be NOT ASSERTED there. --skip-step8 with --declare-glossary-kept is refused.
+
 WHAT IT NEVER PRINTS: a filename, a path below the logs root, or any document text. Doc-ids,
 paragraph indices, classes and lengths only (CLAUDE.md 5.6). Nothing is written into the logs
 folder: every input is copied into a temporary directory first.
@@ -145,6 +156,10 @@ ap.add_argument("--declare-glossary-kept", action="store_true",
                      "with every letter-bearing text mapped to itself -- slice 3b's keep route -- so the "
                      "delivered check reads the glossary as DECLARED kept. Counts only are printed")
 args = ap.parse_args()
+if args.skip_step8 and args.declare_glossary_kept:
+    # I-36: skipping Step 8 is declaring nothing, so a flag that writes a declaration contradicts the scenario.
+    ap.error("--skip-step8 simulates an operator who declares nothing; --declare-glossary-kept writes a "
+             "declaration. Run them separately.")
 SCRIPTS = ROOT / args.variant / "scripts"
 TMP = Path(tempfile.mkdtemp(prefix="b11-delivered-"))
 FAIL, CHECKED, VOIDED = [], 0, []
@@ -477,6 +492,35 @@ C16_COUNTED = {"uk": {"D02": 5, "D03": 1, "D03B": 1, "D07": 4, "D08": 2},
 START_WIRING = "59981dd"
 GATE_WIRING = b"def _delivered_gate("
 WIRING_STOP = {"uk": {"D03B"}, "us": {"D03B"}}
+# REGISTER I-36 (2026-10-08 (2)): --sides --declare-glossary-kept, measured before it was pinned
+# (temp/s1008b_flag_b_*.txt): the glossary is declared kept on D03B alone, both variants, and D03B then delivers with
+# no side finding.
+GLOSSARY_KEPT = {"D03B"}
+# A delivery the wired check refuses writes no .docx, so --sides reads that document's findings from the REFUSAL --
+# one line per blocking class, "  <class>/<shape>: <n>" -- checked against the total the refusal states, so a line the
+# reader missed is a failure and never a smaller count. Class names and counts only; no other line is kept.
+REFUSAL_LINE = re.compile(r"^  ([a-z0-9-]+)(?:/(\S+))?: (\d+)$")
+REFUSAL_TOTAL = re.compile(r"REFUSED THIS DELIVERY: (\d+) blocking finding")
+REFUSAL = {}
+
+
+def refusal_classes(out):
+    """{"counts": {(class, shape): n}, "total": n or None} from repack's delivered-gate refusal; None where that
+    gate did not refuse. Kept apart from `rcs`, whose equality the body arm's --ref comparison asserts."""
+    at = out.find(dict(REPACK_GATES)["delivered"])
+    if at < 0:
+        return None
+    total = REFUSAL_TOTAL.search(out, at)
+    counts = {}
+    for line in out[at:].splitlines()[1:]:
+        m = REFUSAL_LINE.match(line)
+        if not m:
+            break
+        key = (m.group(1), m.group(2))
+        counts[key] = counts.get(key, 0) + int(m.group(3))
+    return {"counts": counts, "total": int(total.group(1)) if total else None}
+
+
 _TEXT_4A = frozenset(f"{{{W}}}{n}" for n in ("r", "rPr", "t", "delText"))
 _TC_4A = frozenset((f"{{{W}}}ins", f"{{{W}}}del"))
 
@@ -654,8 +698,11 @@ def chain(scripts_dir, d, src, wd, today=None):
     `today` is side_parts' (--sides only)."""
     (d / "final" / "word").mkdir(parents=True, exist_ok=True)
     shutil.copyfile(src, d / "src.docx")
+    # I-36: an operator who skips Step 8 declares nothing, and since the wiring REPACK reads the declarations beside
+    # the notes -- so under --skip-step8 none is copied at all, rather than copied for repack and deleted after it.
+    undeclared = set(SIDE_DECL) if (today is not None and args.skip_step8) else set()
     for name in INPUTS:
-        if (wd / name).is_file():
+        if name not in undeclared and (wd / name).is_file():
             shutil.copyfile(wd / name, d / name)
     xml, py = d / "final" / "word" / "document.xml", ["uv", "run", "--with", "lxml", "python"]
     rcs = {"apply": run(py + [str(scripts_dir / "apply_translations_textmatch.py"), str(d / "src.docx"),
@@ -686,6 +733,7 @@ def chain(scripts_dir, d, src, wd, today=None):
     rcs["repack"] = rp.returncode
     rcs["repack_gate"] = next((label for label, marker in REPACK_GATES if marker in out),
                               "none" if rp.returncode == 0 else "unrecognised")
+    REFUSAL[d.name] = refusal_classes(out) if rcs["repack_gate"] == "delivered" else None
     # What the remnant block ran in and which ADVISORY markers it warned on: a language name,
     # zip member names and the skill's own marker patterns -- never repack's context snippets.
     lang = re.search(r"Remnant block: language=(\w+)", out)
@@ -1175,6 +1223,24 @@ def side_match(got, want):
     return all(len(got[k]) == v if isinstance(v, int) else got[k] == sorted(v, key=idkey) for k, v in want.items())
 
 
+def size(x):
+    return x if isinstance(x, int) else len(x)
+
+
+def count_match(got, want):
+    """side_match for a REFUSED document (I-36): `got` holds counts, a refusal carrying no ids, so a pin's id list
+    is compared by its length."""
+    return set(got) == set(want) and all(got[k] == size(w) for k, w in want.items())
+
+
+def refused_counts(refs):
+    """{(class, shape): n} over a document's refusals, one per workdir."""
+    out = Counter()
+    for f in refs:
+        out.update((f or {}).get("counts") or {})
+    return dict(out)
+
+
 def by_doc(chk):
     out = defaultdict(list)
     for key, rep in chk.items():
@@ -1235,43 +1301,97 @@ def pin_sides():
         label = "(c) --skip-step8" if args.skip_step8 else "(b) today's output"
         print(f"\n  SLICE 3a — {label.upper()}, PINNED  [{v}]")
         docs = by_doc(CHK["b"])
-        stopped = {d for d, reps in docs.items() if any(r.get("_stopped") for r in reps)}
-        ok(f"{label}: repack STOPPED exactly where the plan says, of the documents in this run "
-           f"({sorted(STOP_2B[v] & set(docs)) or 'none'})", stopped == STOP_2B[v] & set(docs), f"stopped {sorted(stopped)}")
-        for did in sorted(stopped):
-            reps = docs[did]
-            ok(f"{label} {did}: STOPPED, its side parts NOT READ — named, never counted as a pass",
-               all(not (r.get("sides") or {}).get("read") for r in reps))
+        present = set(docs)
+        # REGISTER I-36: a document stops at an EARLIER gate (slice 2b's STOP_2B, as before) or at the DELIVERED gate,
+        # by design since the wiring -- (b) WIRING_STOP, or nothing once the glossary is declared kept; (c) every
+        # document whose side parts carry letters, PIN_C, no declaration being written. Whether our repack carries
+        # that gate is settled by ancestry AND by its own source, as --ref settles a pin; a disagreement is VOID.
+        def where(r):
+            return ("delivered" if not r.get("_stopped") else "refused" if r.get("_gate") == "delivered"
+                    else "early")
+        # A document is classed only when every one of its workdirs stopped in the same place; a mixed one is a
+        # failure of its own and goes through the read path, where its stopped workdir fails too -- never reclassed.
+        mixed = {d for d, reps in docs.items() if len({where(r) for r in reps}) > 1}
+        early = {d for d, reps in docs.items() if d not in mixed and where(reps[0]) == "early"}
+        refused = {d for d, reps in docs.items() if d not in mixed and where(reps[0]) == "refused"}
+        ok(f"{label}: every document's workdirs stopped in the same place", not mixed, f"mixed {sorted(mixed)}")
+        ok(f"{label}: repack STOPPED by an earlier gate exactly where slice 2b's plan says, of the documents in this "
+           f"run ({sorted(STOP_2B[v] & present) or 'none'})", early == STOP_2B[v] & present, f"stopped {sorted(early)}")
+        anc = run(["git", "merge-base", "--is-ancestor", "HEAD", START_WIRING]).returncode
+        if anc not in (0, 1):
+            void(f"{label}: the documents the delivered gate refuses",
+                 f"git could not settle HEAD's ancestry against the wiring's start {START_WIRING} (exit {anc})")
+        elif (anc == 1) != OURS_WIRED:
+            void(f"{label}: the documents the delivered gate refuses",
+                 f"HEAD is {'after' if anc == 1 else 'at or before'} the wiring's start {START_WIRING}, but our "
+                 f"repack {'lacks' if anc == 1 else 'carries'} the delivered gate")
+        else:
+            if not OURS_WIRED:
+                want_r = set()
+            elif args.skip_step8:
+                want_r = {d for d, n in PIN_C[v].items() if n} - STOP_2B[v]
+            elif args.declare_glossary_kept:
+                want_r = set()
+            else:
+                want_r = set(WIRING_STOP[v])
+            want_r &= present
+            ok(f"{label}: the delivered gate refused exactly {sorted(want_r) or 'nothing'}, of the documents in this "
+               f"run (our repack {'carries' if OURS_WIRED else 'lacks'} it, by ancestry against {START_WIRING} and by "
+               f"its own source, agreeing)", refused == want_r, f"refused {sorted(refused)}")
+        declared_g = {d for d, reps in docs.items() if any(r.get("_glossary_declared") for r in reps)}
+        if args.declare_glossary_kept:
+            ok(f"{label}: the glossary declared kept on exactly {sorted(GLOSSARY_KEPT & present) or 'none'}",
+               declared_g == GLOSSARY_KEPT & present, f"declared on {sorted(declared_g)}")
+        for did in sorted(early | refused):
+            ok(f"{label} {did}: STOPPED, its side parts NOT READ from a .docx — named, never counted as a pass",
+               all(not (r.get("sides") or {}).get("read") for r in docs[did]))
         quiet = 0
         for did, reps in docs.items():
-            if did in stopped:
+            if did in early:
                 continue
-            ok(f"{label} {did}: its side parts READ from the repacked .docx",
-               all((r.get("sides") or {}).get("read") for r in reps))
-            got = merged(reps)
+            if did in refused:
+                refs = [r.get("_refusal") for r in reps]
+                ok(f"{label} {did}: its findings READ from repack's refusal, the class lines summing to the "
+                   f"{sum((f or {}).get('total') or 0 for f in refs)} blocking finding(s) it states",
+                   all(f and f["total"] is not None and sum(f["counts"].values()) == f["total"] for f in refs),
+                   f"refusal {refs}")
+                got, match = refused_counts(refs), count_match
+            else:
+                ok(f"{label} {did}: its side parts READ from the repacked .docx",
+                   all((r.get("sides") or {}).get("read") for r in reps))
+                got, match = merged(reps), side_match
             if args.skip_step8:
-                kept = sum(len(ids) for k, ids in got.items() if k in KEPT)
-                rest = {k: ids for k, ids in got.items() if k not in KEPT}
+                kept = sum(size(x) for k, x in got.items() if k in KEPT)
+                rest = {k: x for k, x in got.items() if k not in KEPT}
                 ok(f"{label} {did}: {PIN_C[v].get(did, 0)} kept-as-source finding(s), one per letter-bearing "
                    f"side paragraph", kept == PIN_C[v].get(did, 0), f"got {kept}: {sorted(k for k in got if k in KEPT)}")
                 want_rest = {k: w for k, w in PIN_B.get(did, {}).items() if k[0] == "side-ref"}
                 ok(f"{label} {did}: nothing else {'but ' + str(want_rest) if want_rest else ''}",
-                   side_match(rest, want_rest), f"got {rest}")
+                   match(rest, want_rest), f"got {rest}")
                 quiet += sum(((r.get("sides") or {}).get("counts") or {}).get("hf", {}).get("undeclared, no letters", 0)
                              for r in reps)
             else:
-                want = PIN_B.get(did, {})
-                ok(f"{label} {did}: the side findings are exactly {want or 'none'}", side_match(got, want),
-                   f"got {got}")
-                ok(f"{label} {did}: flattened comments COUNTED {FLAT.get(did) or 'none'}",
-                   flattened(reps) == FLAT.get(did, []), f"got {flattened(reps)}")
+                want = {k: w for k, w in PIN_B.get(did, {}).items()
+                        if not (did in declared_g and k == ("side-glossary", "kept-source"))}
+                what = "the refusal's blocking classes" if did in refused else "the side findings"
+                ok(f"{label} {did}: {what} are exactly {want or 'none'}", match(got, want), f"got {got}")
+                if did in refused:
+                    print(f"  NOT ASSERTED {label} {did}: flattened comments COUNTED {FLAT.get(did) or 'none'} — a "
+                          f"counted finding never blocks, so a refusal cannot carry it (I-36)")
+                else:
+                    ok(f"{label} {did}: flattened comments COUNTED {FLAT.get(did) or 'none'}",
+                       flattened(reps) == FLAT.get(did, []), f"got {flattened(reps)}")
+        # I-36: a refused document reports no tally -- its parts are not read -- though its EXACT refusal count still
+        # asserts the rule, so the tally names the documents it covers and the VOID never claims what it cannot see.
+        unread = f"; {len(refused)} refused document(s) report no tally" if refused else ""
         if args.skip_step8 and quiet:
             # Not an ok(): it cannot fail on its own. What asserts "none on a page-number-only footer"
             # is each document's EXACT kept-as-source count above, which one such finding would break.
-            print(f"  INFO {label}: {quiet} page-number-only footer paragraph(s) examined and quiet — the "
-                  f"exact per-document counts above are what assert it")
+            print(f"  INFO {label}: {quiet} page-number-only footer paragraph(s) examined and quiet in the documents "
+                  f"read from a .docx{unread} — the exact per-document counts above are what assert it")
         elif args.skip_step8:
-            void(f"{label}: none on a page-number-only footer", "no such paragraph among the documents in this run")
+            void(f"{label}: none on a page-number-only footer",
+                 f"no such paragraph among the documents read from a .docx in this run{unread}")
 
 
 if args.sides:
@@ -1359,10 +1479,7 @@ if args.sides:
                 f"advisory {sum(BLOCK_NOTE.get(b.name, ('', Counter()))[1].values())}]; read {how} · {decl_note}")
             # SLICE 3a: the check on the repacked .docx; a stopped document has none, so the check
             # reads the XML, its side parts NOT READ, and it is named as stopped -- never a pass.
-            # An operator who skips Step 8 writes no declaration, so none is left beside the notes.
-            if args.skip_step8:
-                for name in SIDE_DECL:
-                    (b / name).unlink(missing_ok=True)
+            # An operator who skips Step 8 writes no declaration, and chain() copied none (I-36).
             docx_out = b / "delivered.docx"
             journal = b / "post_process_journal.json"
             rep, rc = delivered_check(b / "paragraphs.json", docx_out if docx_out.is_file() else b / "checked.xml",
@@ -1371,8 +1488,16 @@ if args.sides:
                 void(f"(b) {key} the check", f"it wrote no report (rc={rc})")
             else:
                 rep["_stopped"] = not docx_out.is_file()
+                rep["_gate"] = rcs["repack_gate"]
+                rep["_refusal"] = REFUSAL.get(b.name)
+                rep["_glossary_declared"] = GLOSSARY_DECLARED.get(b.name)
                 CHK["b"][key] = rep
                 side_lines(key, rep)
+                if rep["_refusal"] is not None:
+                    f = rep["_refusal"]
+                    print(f"        THE REFUSAL (I-36): {f['total']} blocking finding(s) stated; "
+                          + ("  ".join(f"{c}/{s} x{n}" if s else f"{c} x{n}" for (c, s), n in sorted(
+                              f["counts"].items(), key=lambda kv: (kv[0][0], kv[0][1] or ""))) or "no class line"))
             shutil.rmtree(b, ignore_errors=True)
     for arm in ("a", "b"):
         if not S[arm]:
