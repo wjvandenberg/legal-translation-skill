@@ -24,9 +24,22 @@ arm asserts:
   W7  a second, UNDECLARED finding still blocks when the first is declared; nothing is written.
   W8  a malformed entry refuses: attempts 6 (rule 5b's bound is five), and an empty line.
   W9  Step 10's document and SKILL.md rule 5b name the file and say repack prints the block.
+  W10 a report the check wrote but that cannot be read refuses with the gate's marker, never a traceback.
+  REVIEW FINDING 2 (branch 11's follow-up, 2026-10-08) -- rule 5b's two other identities, through repack:
+  W11 a SIDE-PART finding, named by PART AND ID: an undeclared comment kept in its own words is one blocking
+      side-comment/undeclared-kept finding of word/comments.xml, id 1; an entry naming it by part and id
+      DELIVERS and prints its block, an id given as a number delivers too, and an entry naming id 2 is STALE.
+  W12 an ANCHOR finding, named by PART "document": the comment's reference lost from the body is
+      anchor-lost/commentReference with no part and no id, beside side-ref/comment:orphaned, id 1, with no part;
+      two entries naming them as "document" -- the second with its id -- DELIVER with two blocks, and an anchor
+      entry naming footnoteReference is STALE.
+  W13 a declaration beside a check that examined NOTHING (exit 3, VOID) is refused for the VOID, neither
+      STALE nor ACCEPTED, and nothing is written.
 
 RED FIRST: run this file from a clean copy of 59981dd (its tests/ folder), where W1 fails -- and W5's
-block, W6, W7, W8 and W9, the pin having no gate at all.
+block, W6, W7, W8 and W9, the pin having no gate at all. W11-W13 are red there too, and each against its
+own planted mutant of repack -- the identity ignoring the id, the anchor's label changed, VOID matched
+against the entries -- in a clean copy (temp/s1008_w11_mutants.py).
 
     uv run --with lxml python tests/test_step10_wiring.py
     uv run --with lxml python tests/test_step10_wiring.py --variant us
@@ -283,6 +296,124 @@ ok("an unreadable report raises the gate's own refusal, not a parse error",
    isinstance(raised, RuntimeError) and MARKER in str(raised), repr(raised)[:300])
 ok("...saying the report could not be read", raised is not None and "report unreadable" in str(raised),
    repr(raised)[:300])
+
+# ---------------------------------------------------------------------------------------------------
+# REVIEW FINDING 2 -- rule 5b's side-part and anchor identities, and VOID, through the REAL repack.
+# The original carries one comment on its first paragraph. Its text has letters and no German marker -- a
+# reference and a name, the kind of text an operator keeps in its own words -- so the remnant block, which
+# runs first and reads comments too, passes it and the delivered check is the one that judges it.
+# ---------------------------------------------------------------------------------------------------
+sys.path.insert(0, str(ROOT / "tools"))
+from keep_declarations import write_keep_declarations  # noqa: E402
+
+COMMENT = "Ref. XQ-2020 Halvorsen Trust"                     # invented
+C_CT = ('<Override PartName="/word/comments.xml" ContentType="application/vnd.openxmlformats-officedocument.'
+        'wordprocessingml.comments+xml"/>\n')
+C_RELS = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+          '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+          '<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/'
+          'comments" Target="comments.xml"/></Relationships>')
+C_XML = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:comments {W}>'
+         f'<w:comment w:id="1" w:author="Reviewer" w:date="2020-01-01T00:00:00Z">{p(r(COMMENT))}</w:comment>'
+         '</w:comments>')
+COMMENT_REF_RUN = '<w:r><w:commentReference w:id="1"/></w:r>'     # never `REF`: that name is the pin
+
+
+def anchored(text, ref=True):
+    return (f'<w:p><w:commentRangeStart w:id="1"/>{r(text)}<w:commentRangeEnd w:id="1"/>'
+            + (COMMENT_REF_RUN if ref else "") + '</w:p>')
+
+
+def side_case(name, *, ref=True, keep_comment=False, accepted=None, notes=None):
+    """The original with its comment, the body delivered in English -- the comment's reference kept or lost
+    -- and the comments part delivered as the original's, through the REAL repack, as repack_case."""
+    d = TMP / name
+    (d / "final" / "word").mkdir(parents=True, exist_ok=True)
+    orig = d / "orig.docx"
+    docx(orig, anchored(SRC[0]) + p(r(SRC[1])), {"word/comments.xml": C_XML, "word/_rels/document.xml.rels": C_RELS},
+         C_CT)
+    xml = d / "final" / "word" / "document.xml"
+    xml.write_bytes(wrap(anchored(EN[0], ref) + p(r(EN[1]))).encode("utf-8"))
+    if notes is None:
+        notes = [{"idx": i, "text": s, "en": e, "style": "Normal",
+                  "runs": [{"start": 0, "end": len(s), "text": s, "bold": False, "italic": False}]}
+                 for i, (s, e) in enumerate(zip(SRC, EN))]
+    nj = d / "paragraphs.json"
+    nj.write_bytes(json.dumps(notes, ensure_ascii=False, indent=1).encode("utf-8"))
+    if keep_comment:
+        write_keep_declarations(orig, d, SCRIPTS, kinds={"comments"})
+    if accepted is not None:
+        (d / "accepted_consequences.json").write_bytes(
+            json.dumps({"accepted": accepted}, ensure_ascii=False, indent=1).encode("utf-8"))
+    tmpd = d / "tmp"
+    tmpd.mkdir()
+    env = dict(ENV, TMP=str(tmpd), TEMP=str(tmpd), TMPDIR=str(tmpd))
+    out = d / "out.docx"
+    res = subprocess.run([sys.executable, str(SCRIPTS / "repack_docx.py"), str(orig), str(xml), str(out),
+                          "--paragraphs", str(nj)], capture_output=True, text=True, encoding="utf-8",
+                         errors="replace", cwd=str(ROOT), env=env, timeout=600)
+    return {"rc": res.returncode, "blob": (res.stdout or "") + (res.stderr or ""),
+            "out": out.read_bytes() if out.exists() else None, "left": sorted(x.name for x in tmpd.iterdir())}
+
+
+def side_entry(**ident):
+    e = dict(ident, attempts=2, check="repack_docx.py (validate_apply.py --delivered --strict)",
+             consequence="a reviewer's note is delivered in its own words", where="the first paragraph's note",
+             **{"reader must": "read the note as the source's, not as a translation"})
+    return e
+
+
+def refused_as(case, marker):
+    return case["rc"] == 1 and marker in case["blob"] and case["out"] is None
+
+
+print("\nW11 a SIDE-PART finding, named by part and id, through repack")
+w11 = side_case("side-none")
+ok("the original's comment delivered undeclared refuses -- exactly one finding, side-comment/undeclared-kept",
+   refused_as(w11, MARKER) and "1 blocking finding(s)" in w11["blob"]
+   and "side-comment/undeclared-kept: 1" in w11["blob"], f"rc={w11['rc']} {w11['blob'][-500:]}")
+W11_ID = dict(part="word/comments.xml", id="1", **{"class": "side-comment"}, shape="undeclared-kept")
+acc11 = side_case("side-accepted", accepted=[side_entry(**W11_ID)])
+ok("an entry naming it by PART AND ID delivers, its block printed",
+   acc11["rc"] == 0 and acc11["out"] is not None and "ACCEPTED under rule 5b: 1" in acc11["blob"]
+   and "ACCEPTED CONSEQUENCE (SKILL.md rule 5b)" in acc11["blob"], f"rc={acc11['rc']} {acc11['blob'][-500:]}")
+ok("...and the comment's text is never printed", COMMENT not in acc11["blob"] and COMMENT not in w11["blob"])
+num11 = side_case("side-number", accepted=[side_entry(**dict(W11_ID, id=1))])
+ok("an id given as a NUMBER names the same finding -- repack compares it as text",
+   num11["rc"] == 0 and num11["out"] is not None, f"rc={num11['rc']} {num11['blob'][-400:]}")
+st11 = side_case("side-stale", accepted=[side_entry(**dict(W11_ID, id="2"))])
+ok("an entry naming id 2 is STALE and refused, nothing written",
+   refused_as(st11, DECL_MARKER) and "STALE" in st11["blob"], f"rc={st11['rc']} {st11['blob'][-400:]}")
+ok("...naming the entry by part and id", "word/comments.xml#2 side-comment/undeclared-kept" in st11["blob"],
+   st11["blob"][-400:])
+
+print("\nW12 an ANCHOR finding, named by part \"document\", through repack")
+w12 = side_case("anchor-none", ref=False, keep_comment=True)
+ok("the comment's reference lost, the comment declared kept: refused on exactly two findings -- "
+   "anchor-lost/commentReference and side-ref/comment:orphaned",
+   refused_as(w12, MARKER) and "2 blocking finding(s)" in w12["blob"]
+   and "anchor-lost/commentReference: 1" in w12["blob"] and "side-ref/comment:orphaned: 1" in w12["blob"],
+   f"rc={w12['rc']} {w12['blob'][-600:]}")
+ANCHOR = dict(part="document", **{"class": "anchor-lost"}, shape="commentReference")
+ORPHAN = dict(part="document", id="1", **{"class": "side-ref"}, shape="comment:orphaned")
+acc12 = side_case("anchor-accepted", ref=False, keep_comment=True,
+                  accepted=[side_entry(**ANCHOR), side_entry(**ORPHAN)])
+ok("two entries naming them as \"document\" -- the orphan with its id -- deliver with two blocks",
+   acc12["rc"] == 0 and acc12["out"] is not None and "ACCEPTED under rule 5b: 2" in acc12["blob"]
+   and acc12["blob"].count("ACCEPTED CONSEQUENCE (SKILL.md rule 5b)") == 2, f"rc={acc12['rc']} {acc12['blob'][-600:]}")
+st12 = side_case("anchor-stale", ref=False, keep_comment=True,
+                 accepted=[side_entry(**dict(ANCHOR, shape="footnoteReference")), side_entry(**ORPHAN)])
+ok("an anchor entry naming footnoteReference is STALE and refused, nothing written",
+   refused_as(st12, DECL_MARKER) and "document anchor-lost/footnoteReference" in st12["blob"],
+   f"rc={st12['rc']} {st12['blob'][-400:]}")
+
+print("\nW13 a declaration beside a check that examined NOTHING (VOID) is refused for the VOID")
+w13 = side_case("void", notes=[], keep_comment=True, accepted=[side_entry(**W11_ID)])
+ok("refused with the gate's marker and the VOID reason, nothing written",
+   refused_as(w13, MARKER) and "examined NOTHING (exit 3, VOID)" in w13["blob"], f"rc={w13['rc']} {w13['blob'][-500:]}")
+ok("...neither STALE nor ACCEPTED", "STALE" not in w13["blob"] and "ACCEPTED under rule 5b" not in w13["blob"])
+ok("...and every check copy's folder empty after W11-W13",
+   all(c["left"] == [] for c in (w11, acc11, num11, st11, w12, acc12, st12, w13)))
 
 shutil.rmtree(TMP, ignore_errors=True)
 print()
