@@ -84,6 +84,27 @@ case("a Word document outside tests/fixtures/ is caught",
      lambda: stray.write_bytes(b""),
      lambda: stray.exists() and stray.unlink())
 
+# 1b. A WORKING COPY UNDER .claude/worktrees (a parallel session's git worktree) carries its own tests/fixtures, and
+#     those synthetic documents are allowed -- 2026-10-08 (2), when 24 of them blocked a commit here -- while a Word
+#     document anywhere else in a working copy is still caught. A planted copy, removed after.
+wcopy = ROOT / ".claude" / "worktrees" / "zz-gate-test"
+
+
+def _plant(rel):
+    p = wcopy.joinpath(*rel)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_bytes(b"")
+
+
+case("a Word document in a working copy's own tests/fixtures/ is allowed",
+     0, "Word documents outside tests/fixtures/: 0",
+     lambda: _plant(("tests", "fixtures", "synthetic.docx")),
+     lambda: shutil.rmtree(wcopy, ignore_errors=True))
+case("a Word document elsewhere in a working copy is caught",
+     1, "Word document sits outside",
+     lambda: _plant(("uk", "meeting-notes.docx")),
+     lambda: shutil.rmtree(wcopy, ignore_errors=True))
+
 # ---------------------------------------------------------------------------
 # 2. A forbidden corpus descriptor appears in a committable document.
 #    The descriptor is NOT written here: it is read from the private list at run time, so
