@@ -8,8 +8,18 @@ What each arm asserts, on synthetic facts only -- nothing is rendered and no pag
       called on synthetic facts, names the change under review, the pin, the chain actually run -- both
       chains -- and the variant; the hand-written branch-7 body is gone from the file.
   K3  keep_dir names the document AND the variant: a uk and a us run of one document land in two folders.
+  K4  REGISTER I-34 (branch 11's follow-up, 2026-10-08): a refused repack is reported from its FIXED text alone --
+      refusal() names the gate by its own marker and, for the delivered check, the blocking classes, and never
+      prints the context snippet repack's output can carry; repack() declares every side part KEPT through
+      tools/keep_declarations.py before it runs repack; the --doc arm no longer copies July's
+      comments_translations.json and headers_footers.json beside the notes; and no raw tail of repack's output
+      is printed anywhere in the tool. And the code review's fixes: a real document's failed post_process or
+      reorder is reported by exit code and gate marker, never a line of its output; a keep declaration that
+      cannot be written is the arm's reported refusal, never a crash; and the --doc arm's temporary folder of
+      real-document files is removed at exit whatever ends the run.
 
-RED FIRST: run this file from a clean copy of 59981dd (temp/red_wiring), where every arm fails.
+RED FIRST: run this file from a clean copy of 59981dd (temp/red_wiring), where every arm fails; K4 is red at
+fa0a110, the last commit before it.
 
     uv run --with lxml python tests/test_render_keep.py
 """
@@ -103,6 +113,83 @@ else:
     ok("two different folders", a != b, f"{a} {b}")
     ok("each names the document and the variant", a.name == "D08n2-uk" and b.name == "D08n2-us", f"{a.name} {b.name}")
     ok("the folders are made by keep_dir where the pages are written", "dest = keep_dir(LOGS, label, args.variant)" in src)
+
+print("\nK4  register I-34: a refusal reported from its fixed text, the side parts declared kept")
+tree = ast.parse(src)
+nodes = [n for n in tree.body
+         if (isinstance(n, ast.FunctionDef) and n.name in ("refusal", "step_failure", "repack"))
+         or (isinstance(n, ast.Assign) and any(isinstance(t, ast.Name)
+                                               and t.id in ("_REPACK_GATES", "_CLASS_LINE", "_KEEP_FAILED")
+                                               for t in n.targets))]
+
+
+def _declare_fails(*_a, **_k):
+    raise UnicodeDecodeError("utf-8", b"\xff", 0, 1, "a side part that is not UTF-8")
+
+
+ns4 = {"re": __import__("re"), "subprocess": subprocess, "os": os, "Path": Path, "ROOT": ROOT,
+       "args": type("Args", (), {"variant": "uk"})(), "write_keep_declarations": _declare_fails}
+exec(compile(ast.Module(body=nodes, type_ignores=[]), str(TOOL), "exec"), ns4)
+refusal = ns4.get("refusal")
+SNIPPET = "Die geheime Klausel zur Vertragsstrafe"         # invented; stands in for a quoted line of a document
+
+
+class Proc:
+    def __init__(self, rc, out, err):
+        self.returncode, self.stdout, self.stderr = rc, out, err
+
+
+if refusal is None:
+    ok("render_diff.py defines refusal()", False)
+else:
+    delivered = Proc(1, f"  WARNING (ADVISORY, not blocking): word/document.xml: x — '{SNIPPET}'\n"
+                        "  side parts: read against the original - 2 text-bearing comments 1 header 1\n",
+                     "RuntimeError: SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. THE DELIVERED-DOCUMENT "
+                     "CHECK REFUSED THIS DELIVERY: 3 blocking finding(s), so the archive was NEVER WRITTEN.\n"
+                     "  side-comment/undeclared-kept: 2\n  side-hf/declared-source: 1\n  What repairs each:\n")
+    said = refusal(delivered)
+    ok("the delivered gate named, with its blocking classes",
+       said == "refused by the delivered gate - side-comment/undeclared-kept 2, side-hf/declared-source 1", said)
+    ok("...and the snippet repack's output carried is NOT in what is printed", SNIPPET not in said, said)
+    remnant = Proc(1, f"  remnant: '{SNIPPET}'\n", "SOURCE-LANGUAGE REMNANT: 1 de remnant(s) in the repacked archive")
+    ok("the remnant gate named by its marker, no class lines, no snippet",
+       refusal(remnant) == "refused by the remnant gate", refusal(remnant))
+    bare = Proc(1, f"some output\n{SNIPPET}", "")
+    ok("no marker and an EMPTY stderr: the exit code, never the tail of stdout -- the shape that leaked",
+       refusal(bare) == "exit 1, no gate marker recognised", refusal(bare))
+rp = next((n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "repack"), None)
+calls = [c.func.id for c in ast.walk(rp) if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)] if rp else []
+ok("repack() declares the side parts kept through tools/keep_declarations.py BEFORE it runs repack",
+   "write_keep_declarations" in calls and rp is not None
+   and ast.get_source_segment(src, rp).index("write_keep_declarations(")
+   < ast.get_source_segment(src, rp).index("subprocess.run("), str(calls))
+ok("...imported from the shared helper, never a copy of its own",
+   "from keep_declarations import write_keep_declarations" in src and "def write_keep_declarations" not in src)
+ok("the --doc arm no longer copies July's comments_translations.json and headers_footers.json",
+   'for n in ("paragraphs.json", ".validate-state.json", "_boldmap.json"):' in src
+   and '"comments_translations.json", "headers_footers.json",\n                      "_boldmap.json"' not in src)
+ok("no raw tail of repack's output is printed anywhere in the tool",
+   "(rp.stderr or rp.stdout" not in src, "a slice of rp.stderr/rp.stdout is still printed")
+# REVIEW FIXES, 2026-10-08: the same leak class one call earlier, and a new step's crash path.
+step_failure = ns4.get("step_failure")
+ok("a real document's failed post_process or reorder is reported by exit code and gate marker, never a line "
+   "of its output",
+   step_failure is not None
+   and step_failure(Proc(1, f"x\n{SNIPPET}", "")) == "exit 1"
+   and step_failure(Proc(1, SNIPPET, "SKILL GATE FIRED")) == "exit 1, a SKILL GATE fired"
+   and "step_failure(pp)" in src and "_gate_line(pp)" not in src)
+repack_fn = ns4.get("repack")
+try:
+    got = repack_fn(Path("s"), Path("src.docx"), Path("d.xml"), Path("o.docx"), Path("n/paragraphs.json")) \
+        if repack_fn else None
+except Exception as exc:                            # noqa: BLE001 -- a raise IS the failure asserted against
+    got = exc
+ok("a keep declaration that cannot be written is THIS ARM's reported refusal, by type, never a crash",
+   isinstance(got, tuple) and got[0] is None and refusal is not None
+   and refusal(got[1]) == "refused by the keep declarations gate"
+   and "UnicodeDecodeError" in got[1].stderr and "not UTF-8" not in got[1].stderr, repr(got)[:300])
+ok("the --doc arm's temporary folder of real-document files is removed at interpreter exit, whatever ends the run",
+   "atexit.register(shutil.rmtree, TMP, ignore_errors=True)" in src)
 
 print()
 print("=" * 88)

@@ -46,6 +46,7 @@ re-verifying a committed and green instrument.
     uv run --with pymupdf --with lxml python tools/render_diff.py --doc D06 --doc D05
 """
 import argparse
+import atexit
 import hashlib
 import io
 import json
@@ -64,6 +65,8 @@ sys.dont_write_bytecode = True
 os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 
 from lxml import etree
+
+from keep_declarations import write_keep_declarations
 
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -281,8 +284,10 @@ def keep_note(stamp, label, variant, ref, post_process, under_review, written, c
         "",
         "WHAT THE CHAIN IS NOT: only the steps named above ran"
         + ("" if post_process else " -- post_process and the definitions reorder did NOT")
-        + ", and headers, footers, comments and footnotes were not translated by this run. Do not",
-        "read an effect of a step that did not run as a defect.",
+        + ", and headers, footers, comments, footnotes and the glossary were not translated by this run:",
+        "they are delivered as the original's, DECLARED KEPT beside the notes as a compliant keep-as-is run",
+        "declares them (tools/keep_declarations.py). Do not read an effect of a step that did not run as a",
+        "defect.",
         "",
         "These are renders of a real client document. They live here, outside the repository, and must",
         "never be committed or pasted anywhere.",
@@ -478,6 +483,48 @@ def _glossary_passthrough(src_docx, workdir):
     return ["--glossary", str(out)]
 
 
+# WHICH GATE REFUSED A REPACK, by the FIXED text of its own refusal, and for the delivered-document check its
+# blocking findings by class -- the class lines it prints between its marker and its repairs. A COPY of
+# tools/delivered_corpus_arm.py's REPACK_GATES, which runs its work at import and so cannot be imported --
+# change one, change both; this one adds the rule 5b refusal and this tool's own keep-declaration failure,
+# and leaves out --headers-footers-dir's misconfiguration, a flag this tool never passes.
+_KEEP_FAILED = "KEEP DECLARATIONS COULD NOT BE WRITTEN"
+_REPACK_GATES = (("keep declarations", _KEEP_FAILED),
+                 ("lexicon", "lexicon_compliance.py --stage pre-repack returned exit code"),
+                 ("validate_apply", "validate_apply.py --strict (post-modification check) returned exit code"),
+                 ("glossary", "and --glossary was not supplied"),
+                 ("integrity", "failed its own integrity checks"),
+                 ("zwsp-survived", "U+200B SURVIVED THE SCRUB"),
+                 ("remnant", "SOURCE-LANGUAGE REMNANT"),
+                 ("delivered", "THE DELIVERED-DOCUMENT CHECK REFUSED THIS DELIVERY"),
+                 ("rule 5b declaration", "THE RULE 5b DECLARATION WAS REFUSED"))
+_CLASS_LINE = re.compile(r"^  ((?:side-[a-z]+|changed|missing|readings|edge-space|inner-space|collapsed|"
+                         r"anchor-lost|anchor-gained|bracket|zwsp)(?:/[A-Za-z:-]+)?): (\d+)$")
+
+
+def refusal(proc):
+    """What a refused repack says, from its FIXED text alone: the gate, named by its own refusal marker, and
+    the delivered check's blocking findings by class.
+
+    REGISTER I-34. This tool printed the last 160 characters of repack's raw output -- stderr's, or stdout's
+    where stderr was empty -- and repack's lexicon pass and remnant block quote the document in context
+    snippets, so on a real document that tail could carry client text. It also hid what this tool most needs
+    to say: WHICH check refused and on what. Both are answered here, and nothing else is printed."""
+    blob = (proc.stdout or "") + (proc.stderr or "")
+    gate = next((g for g, m in _REPACK_GATES if m in blob), None)
+    classes = [m.groups() for m in map(_CLASS_LINE.match, blob.splitlines()) if m] if gate == "delivered" else []
+    return (f"refused by the {gate} gate" if gate else f"exit {proc.returncode}, no gate marker recognised") + (
+        " - " + ", ".join(f"{k} {n}" for k, n in classes) if classes else "")
+
+
+def step_failure(proc):
+    """A real document's post_process or reorder that failed, from its FIXED text alone: whether a skill gate
+    fired, and the exit code -- never a line of its output, which can carry the document's text (review fix,
+    2026-10-08: _gate_line's fallback, the LAST line of the output, was printed here for a real document)."""
+    blob = (proc.stdout or "") + (proc.stderr or "")
+    return f"exit {proc.returncode}" + (", a SKILL GATE fired" if "SKILL GATE FIRED" in blob else "")
+
+
 def run_post_process_doc(scripts_dir, adir, xml):
     """--doc WITH --post-process (branch 11 slice 4a): the applied XML through post_process and
     the definitions reorder before repack, as the pipeline runs them.
@@ -517,6 +564,25 @@ def run_post_process_doc(scripts_dir, adir, xml):
 
 
 def repack(scripts_dir, src_docx, doc_xml, out_docx, notes_json):
+    """repack, with every side part the ORIGINAL carries DECLARED KEPT beside the notes first.
+
+    REGISTER I-34. Since Step 10's wiring (branch 11, 2026-09-30) repack runs the delivered-document check,
+    which reads each text-bearing header, footer, comment, footnote, endnote and glossary part of the original
+    against a declaration beside the notes. This tool renders the BODY: every side part is delivered as the
+    original's. With no declaration the check rightly refused the NEW arm -- measured 2026-10-08 on 5 of 12 real
+    documents, uk and us alike, while the OLD arm, whose repack predates the check, delivered: a render with
+    no new arm. So the side parts are declared KEPT, as a compliant keep-as-is run declares them under Step 8,
+    by tools/keep_declarations.py -- the one helper every harness uses -- here, in the one place both arms and
+    both paths go through, as _glossary_passthrough is. From the WORKING TREE's variant scripts on both arms,
+    so the two arms get the same input and the code stays the one variable; the old arm's repack never reads
+    them.
+
+    A FAILURE TO DECLARE IS THIS ARM'S FAILURE, NEVER A CRASH: it is returned as a refusal carrying a fixed
+    marker and the exception's TYPE only, so the run reports it and goes on to the next document."""
+    try:
+        write_keep_declarations(src_docx, Path(notes_json).parent, ROOT / args.variant / "scripts")
+    except Exception as exc:                            # noqa: BLE001 -- reported, by type, as a refusal
+        return None, subprocess.CompletedProcess([], 1, "", f"{_KEEP_FAILED} ({type(exc).__name__})")
     env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
                PYTHONDONTWRITEBYTECODE="1")
     p = subprocess.run(
@@ -708,8 +774,9 @@ for stem in args.fixture:
                 ok(f"{stem}: old arm assembled for rendering", False)
                 continue
         elif deliv is None:
-            ok(f"{stem}: repack produced a .docx ({arm} arm)", False,
-               (rp.stderr or rp.stdout or "")[-200:])
+            # A SYNTHETIC fixture holds no client text, so its refusal also shows the line that names it --
+            # for a crash rather than a gate, the only diagnostic there is. Never on the --doc path.
+            ok(f"{stem}: repack produced a .docx ({arm} arm)", False, f"{refusal(rp)} | {_gate_line(rp)}")
             continue
         built[arm] = deliv
     if expect_block and "new" in built:
@@ -895,7 +962,12 @@ for stem in args.fixture:
         "post_process's seam repair has NOT run — which is deliberate, because it would",
         "have masked one of the two ARM 1 lines and hidden what apply actually delivered.",
         "",
-    ])) + "\n").encode("utf-8"))
+    ]) + [
+        "AND NO SIDE PART IS TRANSLATED: headers, footers, comments, footnotes and the glossary are",
+        "the fixture's own, DECLARED KEPT beside the notes as a compliant keep-as-is run declares them",
+        "(tools/keep_declarations.py), so the delivered check inside repack reads them as kept.",
+        "",
+    ]) + "\n").encode("utf-8"))
 
 # =========================================================================================
 # REAL CORPUS — MECHANICAL ONLY. Renders are made outside the repository and DELETED.
@@ -908,6 +980,10 @@ if args.doc:
     # slice 2b): this arm runs apply AND repack, and a baseline that swapped apply alone ran the
     # working tree's repack on both sides -- VOID for a repack change, never a comparison.
     TMP = Path(tempfile.mkdtemp(prefix="b6-render-"))
+    # WHATEVER ENDS THE RUN, the converted .docx and .pdf files of a real document go with it: the rmtree at
+    # the end is never reached on a crash, so the folder is also removed at interpreter exit (review fix,
+    # 2026-10-08 -- a new step in the loop, the keep declarations, was a new way to crash).
+    atexit.register(shutil.rmtree, TMP, ignore_errors=True)
     OLDTREE = TMP / "old_scripts"
     shutil.copytree(ROOT / args.variant / "scripts", OLDTREE)
     _differ = []
@@ -962,9 +1038,11 @@ if args.doc:
             adir = work / arm
             adir.mkdir()
             shutil.copyfile(src, adir / "source.docx")
-            for n in ("paragraphs.json", ".validate-state.json",
-                      "comments_translations.json", "headers_footers.json",
-                      "_boldmap.json"):
+            # NOT July's comments_translations.json and headers_footers.json (register I-34): beside the notes
+            # they declare ENGLISH for side parts this run delivers in the source's words, which the delivered
+            # check inside repack rightly reads as declared-source. No step before repack reads either file;
+            # repack() declares every side part KEPT instead, as this run delivers it.
+            for n in ("paragraphs.json", ".validate-state.json", "_boldmap.json"):
                 if (wd / n).is_file():
                     shutil.copyfile(wd / n, adir / n)
             xml, _ = run_apply(scripts_dir, adir / "source.docx", adir / "paragraphs.json",
@@ -975,13 +1053,12 @@ if args.doc:
             if args.post_process:
                 xml, pp = run_post_process_doc(scripts_dir, adir, xml)
                 if xml is None:
-                    ok(f"{label} {arm}: post_process and the reorder ran", False, _gate_line(pp))
+                    ok(f"{label} {arm}: post_process and the reorder ran", False, step_failure(pp))
                     break
             deliv, rp = repack(scripts_dir, adir / "source.docx", xml,
                                adir / f"{arm}.docx", adir / "paragraphs.json")
             if deliv is None:
-                ok(f"{label} {arm}: repack produced a .docx", False,
-                   (rp.stderr or rp.stdout or "")[-160:])
+                ok(f"{label} {arm}: repack produced a .docx", False, refusal(rp))
                 break
             made[arm] = deliv
         if len(made) != 2:

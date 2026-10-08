@@ -48,6 +48,8 @@ sys.dont_write_bytecode = True
 # the ENV VAR is the only form of this guard that reaches a grandchild. Register I-18.
 os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "tools"))
+from keep_declarations import write_keep_declarations  # noqa: E402  (review finding 6: the one keep builder)
 # PINNED TO A COMMIT, NOT A BRANCH NAME — and this file is the reason to state the rule as
 # "ask what else does the same thing" rather than as three separate fixes. The pin was
 # corrected in test_check_scoping.py and test_check_scoping_properties.py and MISSED HERE,
@@ -57,7 +59,6 @@ ROOT = Path(__file__).resolve().parent.parent
 # the vacuous case looks exactly like the passing case. §5.1's second failure shape, in the
 # same session that recorded it twice.
 REF = os.environ.get("LT_BASELINE_REF", "2178cce")
-W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 FIX = ROOT / "tests" / "fixtures"
 FAIL, CHECKED = [], 0
 
@@ -248,9 +249,10 @@ for fixture in ("definitions.docx", "anchors-and-tabs.docx"):
     # check, which reads the body the way EXTRACTION does -- a w:tab contributes nothing -- and
     # reads a side part delivered in the source's words as a finding unless declared kept. So
     # the declaration is now what a compliant run writes: the text extraction itself produced,
-    # `en` equal to it, and slice 3b's keeps for the comment and the footnote. declared_text
-    # stays for its record; the gate is unchanged. Hop 1 of run wiring-hop1, a judgement taken
-    # alone and logged in DECISIONS-LOG.md.
+    # `en` equal to it, and every side part declared kept. declared_text stays for its record;
+    # the gate is unchanged. Hop 1 of run wiring-hop1, a judgement taken alone and logged in
+    # DECISIONS-LOG.md; the keeps since 2026-10-08 through the ONE helper every harness uses,
+    # tools/keep_declarations.py (review finding 6), where this harness had built its own.
     ext = RW / "extracted.json"
     xr = subprocess.run([sys.executable, str(ROOT / "uk" / "scripts" / "extract_paragraphs.py"), str(orig),
                          str(ext)], capture_output=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1"))
@@ -260,18 +262,7 @@ for fixture in ("definitions.docx", "anchors-and-tabs.docx"):
         sys.exit(1)
     paras = [dict(n, en=n["text"]) for n in json.loads(ext.read_text(encoding="utf-8"))]
     (RW / "paragraphs.json").write_text(json.dumps(paras), encoding="utf-8")
-    with zipfile.ZipFile(orig) as z:
-        names = set(z.namelist())
-        if "word/comments.xml" in names:
-            cx = etree.fromstring(z.read("word/comments.xml"))
-            (RW / "comments_translations.json").write_text(json.dumps(
-                {c.get(f"{{{W}}}id"): "".join(t.text or "" for t in c.iter(f"{{{W}}}t"))
-                 for c in cx.iter(f"{{{W}}}comment")}), encoding="utf-8")
-        if "word/footnotes.xml" in names:
-            fx = etree.fromstring(z.read("word/footnotes.xml"))
-            (RW / "footnotes_translations.json").write_text(json.dumps(
-                {t.text: t.text for t in fx.iter(f"{{{W}}}t") if t.text and any(c.isalpha() for c in t.text)}),
-                encoding="utf-8")
+    write_keep_declarations(orig, RW, ROOT / "uk" / "scripts")
 
     produced = {}
     for label, mod in (("old", OLD_RPK), ("new", NEW_RPK)):

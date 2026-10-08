@@ -118,6 +118,8 @@ os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 
 from lxml import etree  # noqa: E402
 
+from keep_declarations import write_keep_declarations  # noqa: E402  (review finding 6: the one keep builder)
+
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"))
@@ -137,8 +139,9 @@ ap.add_argument("--skip-step8", action="store_true",
                      "repack gets NO side part but the glossary it refuses to go without, passed "
                      "as the original's (its keep-as-is route)")
 ap.add_argument("--declare-glossary-kept", action="store_true",
-                help="STEP 10's WIRING, sub-step 2: where the original carries a text-bearing glossary "
-                     "and the workdir declares none, write glossary_translations.json beside the notes "
+                help="STEP 10's WIRING, sub-step 2: where the original carries a text-bearing glossary, "
+                     "the workdir declares none, and repack is given the ORIGINAL's own glossary rather "
+                     "than July's translation (register I-35), write glossary_translations.json beside the notes "
                      "with every letter-bearing text mapped to itself -- slice 3b's keep route -- so the "
                      "delivered check reads the glossary as DECLARED kept. Counts only are printed")
 args = ap.parse_args()
@@ -634,6 +637,17 @@ def side_parts(wd, d, today=None):
     return out + (["--glossary", str(gl)] if gl.is_file() else [])
 
 
+def gives_original_glossary(d):
+    """True where the glossary side_parts wrote for repack, d/glossary.xml, is BYTE-IDENTICAL to the original's
+    own part -- the keep-as-is route -- and False where it is July's translation or there is none (I-35)."""
+    gl = d / "glossary.xml"
+    if not gl.is_file():
+        return False
+    with zipfile.ZipFile(d / "src.docx") as z:
+        return ("word/glossary/document.xml" in z.namelist()
+                and z.read("word/glossary/document.xml") == gl.read_bytes())
+
+
 def chain(scripts_dir, d, src, wd, today=None):
     """apply -> post_process -> reorder -> repack in d, inputs copied from wd. Keeps a copy of the
     reordered XML (the check's input, as in slice 1) before repack runs. Returns (rcs, pp).
@@ -652,21 +666,22 @@ def chain(scripts_dir, d, src, wd, today=None):
     rcs["post_process"] = pp.returncode
     rcs["reorder"] = run(py + [str(scripts_dir / "reorder_definitions.py"), "--doc", str(xml)], timeout=900).returncode
     shutil.copyfile(xml, d / "checked.xml")
+    sides = side_parts(wd, d, today)
     # SUB-STEP 2: slice 3b's keep route for a glossary nobody translated -- every letter-bearing text mapped
-    # to itself, beside the notes, as Step 8e says. Written only where the workdir declares none.
-    if args.declare_glossary_kept and not (d / "glossary_translations.json").is_file():
-        with zipfile.ZipFile(d / "src.docx") as z:
-            gx = (z.read("word/glossary/document.xml").decode("utf-8")
-                  if "word/glossary/document.xml" in z.namelist() else "")
-        texts = sorted({t for t in re.findall(r"<w:(?:t|delText)(?:\s[^>]*)?>([^<]*)</w:(?:t|delText)>", gx)
-                        if any(c.isalpha() for c in t)})
-        if texts:
-            (d / "glossary_translations.json").write_bytes(
-                json.dumps({t: t for t in texts}, ensure_ascii=False).encode("utf-8"))
-            GLOSSARY_DECLARED[d.name] = len(texts)
+    # to itself, beside the notes, as Step 8e says. Written only where the workdir declares none, and since
+    # 2026-10-08 by the ONE helper every harness uses (tools/keep_declarations.py, review finding 6).
+    # AND ONLY WHERE THE GLOSSARY REPACK IS GIVEN IS THE ORIGINAL'S OWN (register I-35, 2026-10-08): side_parts
+    # hands repack July's TRANSLATED glossary where the run kept one, and declaring a translation "kept" is a
+    # contradiction the wired check rightly refuses -- D03's, the first time this flag ran over the whole corpus
+    # rather than over D03B alone.
+    if (args.declare_glossary_kept and not (d / "glossary_translations.json").is_file()
+            and gives_original_glossary(d)):
+        wrote = write_keep_declarations(d / "src.docx", d, SCRIPTS, kinds={"glossary"})
+        if wrote:
+            GLOSSARY_DECLARED[d.name] = wrote["glossary_translations.json"]
     rp = run(py + [str(scripts_dir / "repack_docx.py"), str(d / "src.docx"), str(xml),
                    str(d / "delivered.docx"), "--paragraphs", str(d / "paragraphs.json")]
-             + side_parts(wd, d, today), timeout=900)
+             + sides, timeout=900)
     out = (rp.stdout or "") + (rp.stderr or "")
     rcs["repack"] = rp.returncode
     rcs["repack_gate"] = next((label for label, marker in REPACK_GATES if marker in out),
