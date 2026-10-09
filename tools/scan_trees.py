@@ -19,7 +19,7 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-from sibling_dirs import private_dir  # noqa: E402  (register I-39)
+from sibling_dirs import private_dir  # noqa: E402  (register I-40)
 PRIV = private_dir()
 SHOW = "--show" in sys.argv
 

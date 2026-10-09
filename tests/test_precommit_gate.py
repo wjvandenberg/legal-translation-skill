@@ -23,14 +23,18 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
+sys.dont_write_bytecode = True  # importing from tools/ must leave no bytecode there
+sys.path.insert(0, str(ROOT / "tools"))
+import inplace_guard as guard  # noqa: E402  (register I-37: a repository file changes only through it)
 GATE = ROOT / "tools" / "precommit_gate.py"
 sys.path.insert(0, str(ROOT / "tools"))
-from sibling_dirs import private_dir  # noqa: E402  (register I-39)
+from sibling_dirs import private_dir  # noqa: E402  (register I-40)
 PRIV = private_dir()
 
 
 def gate(env=None):
     e = dict(os.environ)
+    e["PRECOMMIT_GATE_EXEMPT_PID"] = str(os.getpid())   # this run's own guard records (I-37)
     if env:
         e.update(env)
     r = subprocess.run([sys.executable, str(GATE)], capture_output=True, text=True,
@@ -45,22 +49,18 @@ def sha(p):
 results = []
 
 
-def case(name, expect_rc, expect_text, mutate, restore, baseline=None):
-    """Run one negative test. `mutate` makes the violation; `restore` undoes it."""
-    try:
-        mutate()
+def case(name, expect_rc, expect_text, change):
+    """Run one negative test. `change` returns a guard from tools/inplace_guard.py that makes the
+    violation inside it and undoes it after - RECORDED FIRST, so a run killed mid-test leaves a
+    record the next guarded run settles and this gate refuses, never a planted violation in a
+    committable file (register I-37). The gate is told apart from the plant by its text."""
+    with change():
         out, rc = gate()
-        caught = rc == expect_rc and expect_text.lower() in out.lower()
-        results.append((name, caught, rc, expect_rc))
-        print(f"  {'PASS' if caught else 'FAIL'}  {name}")
-        if not caught:
-            print(f"          expected exit {expect_rc} and {expect_text!r}; got exit {rc}")
-    finally:
-        restore()
-        if baseline:
-            for p, want in baseline.items():
-                got = sha(p)
-                assert got == want, f"RESTORE FAILED for {p}: {got} != {want}"
+    caught = rc == expect_rc and expect_text.lower() in out.lower()
+    results.append((name, caught, rc, expect_rc))
+    print(f"  {'PASS' if caught else 'FAIL'}  {name}")
+    if not caught:
+        print(f"          expected exit {expect_rc} and {expect_text!r}; got exit {rc}")
 
 
 print("=" * 92)
@@ -83,29 +83,20 @@ if rc != 0:
 stray = ROOT / "uk" / "meeting-notes.docx"
 case("a Word document outside tests/fixtures/ is caught",
      1, "Word document sits outside",
-     lambda: stray.write_bytes(b""),
-     lambda: stray.exists() and stray.unlink())
+     lambda: guard.planted(stray, b""))
 
 # 1b. A WORKING COPY UNDER .claude/worktrees (a parallel session's git worktree) carries its own tests/fixtures, and
 #     those synthetic documents are allowed -- 2026-10-08 (2), when 24 of them blocked a commit here -- while a Word
-#     document anywhere else in a working copy is still caught. A planted copy, removed after.
+#     document anywhere else in a working copy is still caught. A planted copy, through the guard (register I-37), so a
+#     kill leaves a record the next guarded run settles, never a stray working copy for the next commit to scan.
 wcopy = ROOT / ".claude" / "worktrees" / "zz-gate-test"
-
-
-def _plant(rel):
-    p = wcopy.joinpath(*rel)
-    p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_bytes(b"")
-
 
 case("a Word document in a working copy's own tests/fixtures/ is allowed",
      0, "Word documents outside tests/fixtures/: 0",
-     lambda: _plant(("tests", "fixtures", "synthetic.docx")),
-     lambda: shutil.rmtree(wcopy, ignore_errors=True))
+     lambda: guard.planted(wcopy / "tests" / "fixtures" / "synthetic.docx", b""))
 case("a Word document elsewhere in a working copy is caught",
      1, "Word document sits outside",
-     lambda: _plant(("uk", "meeting-notes.docx")),
-     lambda: shutil.rmtree(wcopy, ignore_errors=True))
+     lambda: guard.planted(wcopy / "uk" / "meeting-notes.docx", b""))
 
 # ---------------------------------------------------------------------------
 # 2. A forbidden corpus descriptor appears in a committable document.
@@ -126,9 +117,8 @@ if desc_file.exists():
                     pats[0]).strip()
     case("a forbidden corpus descriptor in a committable document is caught",
          1, "descriptor",
-         lambda: target.write_bytes(base + f"\n\nA {probe} matter.\n".encode("utf-8")),
-         lambda: target.write_bytes(base),
-         baseline={target: base_sha})
+         lambda: guard.mutated(target, base + f"\n\nA {probe} matter.\n".encode("utf-8")))
+    assert sha(target) == base_sha, "RESTORE FAILED for DECISIONS-LOG.md"
 else:
     print("  SKIP  descriptor case — private list not available")
     results.append(("descriptor case", False, 0, 0))
@@ -160,11 +150,10 @@ shutil.rmtree(empty, ignore_errors=True)
 # ---------------------------------------------------------------------------
 # 5. A committed script holds a real string — the rule that decides `tools/`.
 # ---------------------------------------------------------------------------
-planted = ROOT / "tools" / "_negative_test_scratch.py"
+scratch = ROOT / "tools" / "_negative_test_scratch.py"
 case("a tools/ script holding an absolute home path is caught",
      1, "hold a real string",
-     lambda: planted.write_text('P = r"C:\\Users\\someone\\Desktop\\thing"\n', encoding="utf-8"),
-     lambda: planted.exists() and planted.unlink())
+     lambda: guard.planted(scratch, 'P = r"C:\\Users\\someone\\Desktop\\thing"\n'.encode("utf-8")))
 
 # ---------------------------------------------------------------------------
 # 6. A development-only file sits inside a SHIPPED tree.
@@ -183,26 +172,44 @@ pycache = ROOT / "uk" / "scripts" / "__pycache__"
 planted_pyc = pycache / "negative_test.cpython-000.pyc"
 
 
-def _plant_pyc():
-    pycache.mkdir(parents=True, exist_ok=True)
-    planted_pyc.write_bytes(b"\x00not real bytecode\x00")
-
-
-def _remove_pyc():
-    if planted_pyc.exists():
-        planted_pyc.unlink()
-    if pycache.is_dir() and not any(pycache.iterdir()):
-        pycache.rmdir()
-
-
 case("a .pyc inside uk/scripts is caught", 1, "development-only file",
-     _plant_pyc, _remove_pyc)
+     lambda: guard.planted(planted_pyc, b"\x00not real bytecode\x00"))
 
 # And an editor backup, so the check is not narrowly about Python bytecode.
 planted_bak = ROOT / "us" / "scripts" / "quality_check.py.orig"
 case("an editor backup inside us/scripts is caught", 1, "development-only file",
-     lambda: planted_bak.write_text("stale copy\n", encoding="utf-8"),
-     lambda: planted_bak.exists() and planted_bak.unlink())
+     lambda: guard.planted(planted_bak, b"stale copy\n"))
+
+# ---------------------------------------------------------------------------
+# 7. A RUN THAT CHANGED A REPOSITORY FILE AND WAS KILLED BEFORE PUTTING IT BACK (register I-37).
+#    Every case above runs inside the guard, so a kill there leaves a record, not a planted
+#    violation - and this proves the gate then REFUSES. A child enters the guard and ends itself
+#    with os._exit, which skips every finally exactly as a kill does. The plant is in gitignored
+#    temp/: what is under test is the RECORD, since a content scan reads a planted defect - a
+#    dropped id, a wrong count - as ordinary text.
+# ---------------------------------------------------------------------------
+killed_plant = ROOT / "temp" / "_gate_killed_run_probe.txt"
+CHILD = chr(10).join([
+    "import os, sys",
+    "sys.dont_write_bytecode = True",
+    "sys.path.insert(0, sys.argv[1])",
+    "import inplace_guard as g",
+    "from pathlib import Path",
+    "with g.planted(Path(sys.argv[2]), b'left by a killed run'):",
+    "    os._exit(137)",
+])
+k = subprocess.run([sys.executable, "-c", CHILD, str(ROOT / "tools"), str(killed_plant)],
+                   capture_output=True)
+out, rc = gate()
+caught = k.returncode == 137 and rc == 1 and "left a repository file changed" in out
+results.append(("a killed run's unfinished change BLOCKS the commit", caught, rc, 1))
+print(f"  {'PASS' if caught else 'FAIL'}  a killed run's unfinished change BLOCKS the commit")
+if not caught:
+    print(f"          child exit {k.returncode} (137 wanted); gate exit {rc} (1 wanted)")
+guard.settle_dead(ROOT)
+settled = not killed_plant.exists() and not guard.records(ROOT)
+results.append(("...and settling it removes the plant and the record", settled, 0, 0))
+print(f"  {'PASS' if settled else 'FAIL'}  ...and settling it removes the plant and the record")
 
 # ---------------------------------------------------------------------------
 print()

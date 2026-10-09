@@ -13,7 +13,7 @@ Exit 0 only if everything passes.
 import re, sys, os
 from pathlib import Path
 
-# EVERY PATH IS ANCHORED TO THIS SCRIPT, NEVER TO THE CURRENT FOLDER (register I-39). Relative paths
+# EVERY PATH IS ANCHORED TO THIS SCRIPT, NEVER TO THE CURRENT FOLDER (register I-40). Relative paths
 # read whatever sat where the script was STARTED: run from the main checkout's folder, a worktree's
 # copy validated the MAIN checkout's register and reported on it with full confidence, and from a
 # worktree's own folder '../' found neither the logs nor the private folder. The labels stay
@@ -223,7 +223,7 @@ else:
 # ---------- 6. leakage ----------
 # LEAKAGE_LIST_PATH first, as every other control reads it (CI supplies it as a secret), then the
 # private folder. A list that cannot be read is VOID, exit 2 - never a traceback that exits 1 and
-# reads exactly like a register that failed validation (register I-39).
+# reads exactly like a register that failed validation (register I-40).
 LIST = os.environ.get('LEAKAGE_LIST_PATH', '').strip() or str(private_dir() / 'leakage-names.txt')
 if not os.path.isfile(LIST):
     print('  CONTROL VOID: the leakage list could not be read, so the register was NOT scanned.')

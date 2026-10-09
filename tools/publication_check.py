@@ -111,7 +111,7 @@ PROBES = [
 # probe working.
 import os
 
-from sibling_dirs import private_dir  # noqa: E402  (register I-39: LT_PRIVATE_DIR was ignored here)
+from sibling_dirs import private_dir  # noqa: E402  (register I-40: LT_PRIVATE_DIR was ignored here)
 
 _desc = Path(os.environ.get("CORPUS_DESCRIPTORS_FILE", private_dir() / "corpus-descriptors.txt"))
 if _desc.exists():

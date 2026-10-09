@@ -82,7 +82,7 @@ def strip_comments(text):
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-from sibling_dirs import logs_dir, private_dir, publication_versions  # noqa: E402  (register I-39)
+from sibling_dirs import logs_dir, private_dir, publication_versions  # noqa: E402  (register I-40)
 PRIV = private_dir()
 ARCH = publication_versions()
 ONLY = None

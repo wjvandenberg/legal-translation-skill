@@ -33,7 +33,7 @@ _DIV = ROOT / "tests" / "baselines" / "baseline-divergences.json"
 DIVERGENCES = (json.loads(_DIV.read_text(encoding="utf-8"))["divergences"]
                if _DIV.exists() else {})
 # Found by tools/sibling_dirs.py, which finds them from a git worktree too - where this test
-# SKIPPED before (register I-39).
+# SKIPPED before (register I-40).
 sys.path.insert(0, str(ROOT / "tools"))
 from sibling_dirs import publication_versions  # noqa: E402
 ARCHIVES = publication_versions()

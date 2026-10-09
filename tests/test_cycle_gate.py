@@ -5,8 +5,12 @@ The gate exists because §5.1 was read and skipped past three times in one sessi
 that has never been seen to refuse is worth exactly as much as the prose it replaced, so
 every case here makes the violation and asserts the refusal.
 
-It runs against a THROWAWAY evidence store, never the real one, so running the tests cannot
-create the evidence that lets you commit.
+It runs against the REAL evidence store, which it empties first and puts back byte-exact after,
+through tools/inplace_guard.py. (This said "a THROWAWAY evidence store, never the real one" until
+2026-10-08, which was never true.) A run killed half-way used to leave this test's own evidence -
+a "verify" for `python -c pass`, bound to the current tree - where the commit gate would accept
+it; now it leaves a guard record, and tools/precommit_gate.py refuses every commit until it is
+settled (register I-37).
 
     uv run python tests/test_cycle_gate.py
 """
@@ -19,6 +23,9 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
+sys.dont_write_bytecode = True  # importing from tools/ must leave no bytecode there
+sys.path.insert(0, str(ROOT / "tools"))
+import inplace_guard as guard  # noqa: E402  (register I-37: a repository file changes only through it)
 GATE = ROOT / "tools" / "cycle_evidence.py"
 STORE = ROOT / "temp" / ".cycle-evidence.json"
 
@@ -43,9 +50,9 @@ print("=" * 92)
 print("NEGATIVE TESTS — can the cycle gate actually refuse?")
 print("=" * 92)
 
-# Preserve the real store; these tests must never leave evidence behind.
-saved = STORE.read_text(encoding="utf-8") if STORE.exists() else None
-try:
+# Preserve the real store; these tests must never leave evidence behind - through the guard, so a
+# kill cannot either (register I-37). protecting() records the store before anything touches it.
+with guard.protecting(STORE):
     if STORE.exists():
         STORE.unlink()
 
@@ -73,21 +80,10 @@ try:
     # THE ONE THAT MATTERS: evidence must die when the content moves under it. Without this
     # the gate is a trailer you type, and a trailer proves nothing.
     probe = ROOT / "temp" / "_cycle_probe.txt"
-    probe.write_text("changed after the evidence was recorded\n", encoding="utf-8")
-    subprocess.run(["git", "add", "-f", str(probe)], capture_output=True, cwd=ROOT)
-    try:
+    with guard.planted(probe, b"changed after the evidence was recorded\n"), guard.staged(probe):
         rc, out = run("check")
         case("evidence goes STALE when content changes after it was recorded",
              (rc, "STALE" in out), (1, True))
-    finally:
-        subprocess.run(["git", "reset", "-q", str(probe)], capture_output=True, cwd=ROOT)
-        probe.unlink(missing_ok=True)
-
-finally:
-    if saved is not None:
-        STORE.write_text(saved, encoding="utf-8")
-    elif STORE.exists():
-        STORE.unlink()
 
 print()
 print("=" * 92)

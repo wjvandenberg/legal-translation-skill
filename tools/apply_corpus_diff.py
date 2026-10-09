@@ -55,7 +55,7 @@ from docx_census import census, delta  # noqa: E402
 from lxml import etree  # noqa: E402
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-39)
+from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
 SCRIPT = "apply_translations_textmatch.py"
 

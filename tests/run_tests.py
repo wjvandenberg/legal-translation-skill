@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """THE SUITE. Run this on every change.
 
-Three things, in order:
+Four things, in order:
 
   1. FIXTURES        the synthetic documents build, and every one that should be a valid
                      .docx is one.
@@ -13,6 +13,8 @@ Three things, in order:
                      same input twice must produce identical bytes. This is what makes
                      `git bisect` possible: it is cheap, it is deterministic, and
                      "translate a document and grade it" is neither.
+  4. SHIPPED TABLES every Markdown table in BOTH shipped trees has rows that match its
+                     header -- tests/test_shipped_tables.py, register E15.
 
 WHAT IT DELIBERATELY DOES NOT DO. It makes no quality judgement. No check here asks whether
 the English reads well. The moment it does, it stops being repeatable and cannot serve as
@@ -196,6 +198,27 @@ try:
     say("  This is the property `git bisect` rides on: cheap, deterministic, no model.")
 finally:
     shutil.rmtree(tmp, ignore_errors=True)
+
+# ===========================================================================
+say()
+say("=" * 100)
+say("4. SHIPPED TABLES — every Markdown table in both trees matches its header (register E15)")
+say("=" * 100)
+# BOTH TREES, whichever --variant was asked for: a lexicon row that breaks its table breaks it in
+# the tree an edit forgot as easily as in the one it touched. The suite is its own file so it can
+# be run alone, and it is called HERE so that it runs on every change -- which is E15's lesson: two
+# shipped sub-lexicons carried broken tables since rev44 because no check that RAN read them.
+r = subprocess.run([sys.executable, str(ROOT / "tests" / "test_shipped_tables.py")],
+                   capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT,
+                   env=dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
+                            PYTHONDONTWRITEBYTECODE="1"))
+verdict = [l for l in (r.stdout or "").splitlines() if l.startswith(("PASS", "FAIL", "VOID"))]
+say(f"  {verdict[-1] if verdict else '(no verdict line)'}")
+if r.returncode != 0:
+    failures.append(f"shipped tables: tests/test_shipped_tables.py exited {r.returncode}")
+    for l in (r.stdout or "").splitlines():
+        if l.startswith("    ") or "[FAIL]" in l or "VOID" in l:
+            say(f"    {l.strip()[:110]}")
 
 # ===========================================================================
 print()

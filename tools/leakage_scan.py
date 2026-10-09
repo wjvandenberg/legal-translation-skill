@@ -37,7 +37,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # private folder. The copy of this scanner that still sits in that folder finds it one level
 # up, so both locations work and neither hardcodes a path.
 # The private folder itself comes from tools/sibling_dirs.py, which finds it from a git worktree
-# too (register I-39). The copy kept IN that folder has no helper beside it, and finds the list
+# too (register I-40). The copy kept IN that folder has no helper beside it, and finds the list
 # one level up, in the first branch below.
 try:
     sys.path.insert(0, HERE)

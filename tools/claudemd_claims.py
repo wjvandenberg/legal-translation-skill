@@ -36,7 +36,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 
 ROOT = Path(__file__).resolve().parent.parent
 # The sibling folders, and the inputs kept in a gitignored temp/, are found by tools/sibling_dirs.py,
-# which finds them from a git worktree too (register I-39).
+# which finds them from a git worktree too (register I-40).
 from sibling_dirs import main_checkout, main_temp, private_dir, publication_versions  # noqa: E402
 PRIV = private_dir()
 PUB = publication_versions()

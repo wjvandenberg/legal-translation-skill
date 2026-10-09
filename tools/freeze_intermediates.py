@@ -33,7 +33,7 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-from sibling_dirs import logs_dir  # noqa: E402  (register I-39)
+from sibling_dirs import logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
 CATALOGUE = LOGS / "frozen-intermediates.json"
 

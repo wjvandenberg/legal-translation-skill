@@ -40,7 +40,7 @@ sys.dont_write_bytecode = True
 os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 
 ROOT = Path(__file__).resolve().parent.parent
-from sibling_dirs import logs_dir  # noqa: E402  (register I-39)
+from sibling_dirs import logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
 DOC_ID = re.compile(r"\bD\d{2}B?\b")
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1", PYTHONDONTWRITEBYTECODE="1")

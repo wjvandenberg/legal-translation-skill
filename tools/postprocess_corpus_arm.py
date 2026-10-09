@@ -68,7 +68,7 @@ from lxml import etree  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-39)
+from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
 
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. A before-and-after check in this

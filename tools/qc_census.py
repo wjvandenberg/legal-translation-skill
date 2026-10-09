@@ -53,7 +53,7 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parent.parent
-from sibling_dirs import logs_dir  # noqa: E402  (register I-39: LT_LOGS_DIR is read here too now)
+from sibling_dirs import logs_dir  # noqa: E402  (register I-40: LT_LOGS_DIR is read here too now)
 LOGS = logs_dir()
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
            PYTHONDONTWRITEBYTECODE="1")

@@ -42,7 +42,7 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-from sibling_dirs import private_dir  # noqa: E402  (register I-39)
+from sibling_dirs import private_dir  # noqa: E402  (register I-40)
 PRIV = private_dir()
 
 # THE FOURTH CONTROL FOUND WITH A HARD-CODED SIX-FILE LIST ON 2026-08-24, and the most serious of
@@ -128,6 +128,40 @@ for v in ("uk", "us"):
 print(f"  docs/history/             {'PRESENT — IT SHOULD NOT BE' if (ROOT / 'docs').exists() else 'absent, as decided 2026-08-06'}")
 if (ROOT / "docs").exists():
     FAIL.append("docs/history exists")
+
+# A PLANTED DEFECT IS ORDINARY TEXT TO EVERY SCAN BELOW (register I-37). A tool or test that
+# changes a repository file goes through tools/inplace_guard.py, which writes a record BEFORE the
+# change and deletes it only after the original is back and its hash checked. A record still
+# here means a run is mid-probe, or was killed there, and the tree may hold its planted bytes - a
+# dropped finding id, a wrong count, a line of fake evidence - which nothing below calls a leak.
+# ONE EXEMPTION, AND IT MUST BE ASKED FOR: a test that plants a leak inside the guard and asks
+# this gate whether it bites holds a live record on purpose, so it names its own process id in
+# PRECOMMIT_GATE_EXEMPT_PID on that one call, and only that LIVE process's records are set aside.
+# The pre-commit hook never sets it. (This first matched os.getppid(), which never matches here:
+# a uv virtual environment's python.exe is a launcher that starts the interpreter as its child,
+# so the gate's parent is the launcher - measured, 30600 against the test's own 7700.)
+head("0. NOTHING A TOOL OR TEST PLANTED IS STILL IN THE TREE")
+try:
+    sys.dont_write_bytecode = True
+    sys.path.insert(0, str(ROOT / "tools"))
+    import inplace_guard as _guard
+    _recs = _guard.records(ROOT)
+except Exception as e:  # noqa: BLE001 - a guard that will not load is a control that did not run
+    print(f"  could not read the guard's records: {type(e).__name__}: {e}")
+    VOID.append("unfinished in-place changes (tools/inplace_guard.py would not load)")
+else:
+    _ask = os.environ.get("PRECOMMIT_GATE_EXEMPT_PID", "").strip()
+    _mine = [r for r in _recs if _ask.isdigit() and str(r.get("pid")) == _ask
+             and _guard.pid_alive(int(_ask))]
+    _recs = [r for r in _recs if r not in _mine]
+    print(f"  {len(_recs)} unfinished record(s) in temp/.inplace-journal"
+          + (f"  (+{len(_mine)} held by live process {_ask}, which ran this gate inside its own "
+             f"guard and asked for the exemption)" if _mine else ""))
+    for r in _recs:
+        print(f"    {r.get('kind')}  {r.get('path')}  - process {r.get('pid')}, started {r.get('started')}")
+    if _recs:
+        print("  Settle them first:  uv run python tools/inplace_guard.py --recover")
+        FAIL.append("a tool or test left a repository file changed - inplace_guard --recover")
 
 head("1. PUBLICATION CHECK — the forbidden classes, blocking")
 out, rc = run(ROOT / "tools" / "publication_check.py")

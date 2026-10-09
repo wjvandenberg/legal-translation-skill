@@ -43,11 +43,23 @@ def _a4(*parts):
 
 
 ROOT = Path(__file__).resolve().parent.parent
-from sibling_dirs import main_temp, private_dir  # noqa: E402  (register I-39)
-DOC = ROOT / "PLAN-2-step-b.md"
+from sibling_dirs import main_temp, private_dir  # noqa: E402  (register I-40)
+# THE PLAN CAN BE A COPY, AND THAT IS WHAT KEEPS THE TRACKED FILE SAFE (register I-37).
+# tools/stepb_metacheck.py plants each of its defects in a copy and points the audits at it
+# through STEPB_PLAN_DOC, so a run killed mid-probe leaves the damage in a temporary folder,
+# never in PLAN-2-step-b.md. SAID ON STDERR WHENEVER IT IS SET: a stray value would otherwise
+# audit the wrong document and report on it with full confidence. The same lines are in
+# stepb_harvest.py, stepb_verify.py and stepb_audit3.py.
+DOC = Path(_os.environ.get("STEPB_PLAN_DOC") or ROOT / "PLAN-2-step-b.md")
+if _os.environ.get("STEPB_PLAN_DOC"):
+    print(f"NOTE: STEPB_PLAN_DOC is set - reading the plan from {DOC}", file=_sys.stderr)
 doc = DOC.read_text(encoding="utf-8")
 reg = (ROOT / "evidence/REGISTER-findings.md").read_text(encoding="utf-8")
 a3 = (ROOT / "evidence/EVIDENCE-a3-structure.md").read_text(encoding="utf-8")
+# THE PRIVATE FOLDER SITS BESIDE THE MAIN CHECKOUT, so from a git worktree ROOT.parent is the
+# wrong place and this line crashed before the plan was ever read - which the metacheck then
+# counted as a check that FIRED (register I-38). tools/sibling_dirs.py finds it from a worktree
+# too, LT_PRIVATE_DIR still winning when it is set (register I-40).
 cmp_ = (private_dir() / "A4-A3-COMPARISON.md").read_text(encoding="utf-8")
 cmd = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 # CHARTER SOURCE, 2026-08-06. `CLAUDE.md` was rewritten on 2026-08-06 and several sentences
@@ -62,7 +74,7 @@ cmd = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 # archive becomes an excuse and the check stops noticing real loss.
 for _extra in ("PLAN-3-opus5-migration.md", "DECISIONS-LOG.md",
                "temp/CLAUDE.md.pre-overhaul"):
-    # a temp/ input is the main checkout's when this checkout lacks it (register I-39): from a
+    # a temp/ input is the main checkout's when this checkout lacks it (register I-40): from a
     # worktree this source was silently absent and seven quotations failed for want of it
     _p = main_temp(_extra[len("temp/"):]) if _extra.startswith("temp/") else ROOT / _extra
     if _p.exists():

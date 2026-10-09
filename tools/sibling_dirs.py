@@ -5,7 +5,7 @@ THE FOLDERS. The private folder, the logs folder, the published skill archives a
 folder all sit OUTSIDE this repository, BESIDE it (CLAUDE.md 6.4), so nothing in them can be committed
 by accident. Every tool that reads one used to find it as `ROOT.parent / <name>`.
 
-WHY THAT WAS WRONG (register I-39). From a git WORKTREE - a second working copy under
+WHY THAT WAS WRONG (register I-40). From a git WORKTREE - a second working copy under
 .claude/worktrees/<name>, where a parallel session works - ROOT.parent is .claude/worktrees, so every
 such default pointed nowhere. Tools crashed, or skipped, or answered a different question without
 saying so: audit_register read its paths relative to the CURRENT folder, so run from the main

@@ -53,7 +53,7 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-from sibling_dirs import logs_dir  # noqa: E402  (register I-39: LT_LOGS_DIR is read here too now)
+from sibling_dirs import logs_dir  # noqa: E402  (register I-40: LT_LOGS_DIR is read here too now)
 LOGS = logs_dir()
 
 # The five artefact kinds that are actually LOGS. Everything else under A1 is the skill tree

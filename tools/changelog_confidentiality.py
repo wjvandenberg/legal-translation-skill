@@ -29,7 +29,7 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-from sibling_dirs import archives_dir, private_dir  # noqa: E402  (register I-39)
+from sibling_dirs import archives_dir, private_dir  # noqa: E402  (register I-40)
 PRIV = private_dir()
 ARCH = archives_dir()
 

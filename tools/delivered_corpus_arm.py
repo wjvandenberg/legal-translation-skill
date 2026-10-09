@@ -133,7 +133,7 @@ from keep_declarations import write_keep_declarations  # noqa: E402  (review fin
 
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-39)
+from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
 DOC_ID = re.compile(r"\bD\d{2}B?\b")
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1", PYTHONDONTWRITEBYTECODE="1")

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""THE SIBLING FOLDERS ARE FOUND IN ONE PLACE, AND FROM A WORKTREE TOO - register I-39.
+"""THE SIBLING FOLDERS ARE FOUND IN ONE PLACE, AND FROM A WORKTREE TOO - register I-40.
 
 Twenty-three tools and tests found the private folder, the logs folder or the published archives as
 `ROOT.parent / <name>`, or by a path relative to the CURRENT folder. From a git worktree
@@ -90,7 +90,7 @@ def offences(source):
 
 
 print("=" * 88)
-print("I-39 — the sibling folders are found in one place, and from a worktree too")
+print("I-40 — the sibling folders are found in one place, and from a worktree too")
 print("=" * 88)
 
 # ------------------------------------------------------------------------------------------ 1

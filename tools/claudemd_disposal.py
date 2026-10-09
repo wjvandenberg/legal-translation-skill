@@ -28,7 +28,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 
 ROOT = Path(__file__).resolve().parent.parent
 # The pre-overhaul copy is a gitignored temp/ file the main checkout holds and a worktree does
-# not; tools/sibling_dirs.py looks in both (register I-39).
+# not; tools/sibling_dirs.py looks in both (register I-40).
 from sibling_dirs import main_temp  # noqa: E402
 
 

@@ -174,15 +174,15 @@ agreements, and related instruments.
 | Codice della Navigazione | Maritime Code | Italian statute governing maritime matters |
 | privilegio marittimo (Art. 552 Codice della Navigazione) | maritime lien | Italian Navigation Code provision |
 | avaria comune | general average | Shared loss governed by the York-Antwerp Rules as adopted in Italian practice |
-| vettore marittimo | maritime carrier / ocean carrier (specific to maritime carriage; cf. vettore generico in Part 1) |
+| vettore marittimo | maritime carrier / ocean carrier (specific to maritime carriage; cf. vettore generico in Part 1) | |
 
 ## BIMCO and Industry Standard Forms
 
 | BIMCO form | English designation | Notes |
 |---|---|---|
-| GENCON | General Purpose Time Charter | Standard time charter form |
+| GENCON | General-purpose voyage charter | Standard voyage charter form |
 | NYPE | New York Produce Exchange | Standard time charter form |
-| BALTIME | Baltic Exchange | Standard time charter form |
+| BALTIME | Uniform Time-Charter | Standard time charter form |
 | WORLDSCALE | Worldscale® | Tanker voyage charter rate basis |
 
 ## Notes for Translators
