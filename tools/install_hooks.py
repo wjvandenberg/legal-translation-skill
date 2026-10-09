@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 5 (2026-09-28)
+"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 7 (2026-10-09)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -42,6 +42,11 @@ absent - see parse_selection() below. With neither flag, behaviour is exactly v3
 v5 (2026-09-28) FIXED THE SELFTEST IN EXACTLY THOSE PROJECTS: its cases 8 and 10 need purpose_guard.py
 beside this copy, so where the guard is declared absent v4 reported case 8 as a MISS and crashed in case 10
 - the selftest could never pass there. Both now print a DECLARED SKIP with the reason. Installing is unchanged.
+
+v7 (2026-10-09) - EVERY BITE SENDS WHAT CLAUDE CODE SENDS: raw UTF-8, carrying a name no code-page read survives -
+see fire(). Until then each bite sent json.dumps's ASCII escapes, the one input a hook reading its stdin as TEXT
+survives, and every hook in the house read it that way. v6 was issued and withdrawn on 2026-09-30, so that number
+already names other content.
 
 WHERE THE SOURCES COME FROM. A directory named 'hooks' beside this file. In a project that
 is tools/hooks/; in the shared folder it is standard-scripts/hooks/. Discovered rather
@@ -124,6 +129,29 @@ GUARD_MATCHER = r"Bash|PowerShell|Artifact|Cron\w*|ScheduleWakeup|mcp__.*"
 PURPOSE = HERE / "purpose_guard.py"
 PURPOSE_MATCHER = r"Write|Edit|NotebookEdit|MultiEdit"
 
+#: v7: A NAME NO CODE-PAGE READ SURVIVES - cp1252 mangles the 'é', and cannot decode the second
+#: byte of the 'Ł' at all. Every bite's folder or command carries it.
+NON_ASCII = "Łódź-café"
+
+#: v7: the stdin read every hook here uses - the selftest's case 11 swaps it back to text mode.
+FIXED_READ = b'sys.stdin.buffer.read().decode("utf-8", errors="replace")'
+
+
+def fire(script: Path, payload: dict, env: dict) -> subprocess.CompletedProcess:
+    """RUN A HOOK THE WAY CLAUDE CODE RUNS IT - v7, because every hook in the house failed this.
+
+    Claude Code writes the payload as raw UTF-8 and escapes nothing, and Python reads a PIPE in
+    the machine's code page - cp1252 here, measured 2026-10-08. Until v7 each bite sent
+    json.dumps's ASCII escapes, the one input a hook reading its stdin as TEXT survives, so every
+    hook read it that way and every bite passed. So the payload goes raw, and the child is GIVEN
+    cp1252, so the bite reproduces the defect on any machine. A bite written on this helper
+    catches the NEXT hook with the defect - the reason it is a helper, not only a fix per hook."""
+    env = {k: v for k, v in env.items() if k not in ("PYTHONUTF8", "PYTHONIOENCODING")}
+    env["PYTHONIOENCODING"] = "cp1252"
+    return subprocess.run([sys.executable, str(script)],
+                          input=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+                          capture_output=True, env=env, timeout=60)
+
 
 def guard_command(root: Path, script: Path = None) -> str:
     """The command string the settings entry runs. AN ABSOLUTE PATH, and both halves of that
@@ -204,24 +232,29 @@ def purpose_bites(root: Path) -> tuple[bool, str]:
     """
     if not PURPOSE.exists():
         return False, f"{PURPOSE.name}: the settings entry names it and it is not there"
-    tmp = Path(tempfile.mkdtemp(prefix="purpose_bite_"))
+    tmp = Path(tempfile.mkdtemp(prefix=f"purpose_bite_{NON_ASCII}_"))
     try:
         plan = tmp / "PLAN-0-bite.md"
         plan.write_bytes(b"# PLAN\n\nno purpose recorded here\n")
         env = dict(os.environ, CLAUDE_PROJECT_DIR=str(tmp))
-        edit = json.dumps({"tool_name": "Edit",
-                           "tool_input": {"file_path": str(tmp / "src.py")}})
-        r = subprocess.run([sys.executable, str(PURPOSE)], input=edit, capture_output=True,
-                           text=True, encoding="utf-8", errors="replace", env=env, timeout=60)
+        edit = {"tool_name": "Edit", "tool_input": {"file_path": str(tmp / "src.py")}}
+        r = fire(PURPOSE, edit, env)
         if r.returncode != 2:
             return False, (f"{PURPOSE.name}: an edit with NO purpose recorded was not "
                            f"refused (exit {r.returncode}, expected 2)")
+        # v7: THE BOOTSTRAP, the arm a MANGLED path breaks - a path that cannot be decoded at all
+        # already failed the arm above. Writing the plan file itself must be allowed, and is
+        # only if its path arrived intact.
+        r0 = fire(PURPOSE, {"tool_name": "Edit", "tool_input": {"file_path": str(plan)}}, env)
+        if r0.returncode != 0:
+            return False, (f"{PURPOSE.name}: writing the plan file itself was not allowed (exit "
+                           f"{r0.returncode}, expected 0) - its path, sent as Claude Code sends "
+                           f"it, did not arrive intact")
         today = _dt.date.today().isoformat()
         plan.write_bytes(
             f"# PLAN\n\n**SESSION PURPOSE {today}** - WHAT: bite - HOW: bite - "
             f"PURPOSE: bite\n".encode("utf-8"))
-        r2 = subprocess.run([sys.executable, str(PURPOSE)], input=edit, capture_output=True,
-                            text=True, encoding="utf-8", errors="replace", env=env, timeout=60)
+        r2 = fire(PURPOSE, edit, env)
         if r2.returncode != 0:
             return False, (f"{PURPOSE.name}: it refused an edit even WITH the purpose "
                            f"recorded (exit {r2.returncode}). That is an outage, not a guard")
@@ -242,29 +275,39 @@ def guard_bites(root: Path) -> tuple[bool, str]:
     """
     if not GUARD.exists():
         return False, f"{GUARD.name}: the settings entry names it and it is not there"
-    tmp = Path(tempfile.mkdtemp(prefix="guard_bite_"))
+    tmp = Path(tempfile.mkdtemp(prefix=f"guard_bite_{NON_ASCII}_"))
     try:
         (tmp / "AUTO-MODE-RUN.md").write_bytes(
             b"```auto-mode\nRUN_ID: bite\nN: 1\nK: 0\nSTATUS: RUNNING\n"
             b"BRANCH: session/nowhere\nHOP_ACTIVE: no\nWOKE: -\n```\n")
         env = dict(os.environ, AUTO_MODE_RUN_FILE=str(tmp / "AUTO-MODE-RUN.md"))
-        payload = json.dumps({"tool_name": "Bash",
-                              "tool_input": {"command": "git push --force origin main"},
-                              "cwd": str(root)})
-        r = subprocess.run([sys.executable, str(GUARD)], input=payload,
-                           capture_output=True, text=True, encoding="utf-8", errors="replace", env=env, timeout=60)
+        # v7: the push carries NON_ASCII, so a guard that cannot decode it exits 1 - which the
+        # hook contract reads as NOT blocking, and the push goes through.
+        r = fire(GUARD, {"tool_name": "Bash",
+                         "tool_input": {"command": f"git push --force origin main  # {NON_ASCII}"},
+                         "cwd": str(root)}, env)
         if r.returncode != 2:
             return False, (f"{GUARD.name}: a forced push was NOT refused "
                            f"(exit {r.returncode}, expected 2). The entry is configured and "
                            f"the guard does not bite")
         # ...and it must NOT refuse everything, or it is not a guard, it is an outage.
-        payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": "git status"},
-                              "cwd": str(root)})
-        r2 = subprocess.run([sys.executable, str(GUARD)], input=payload,
-                            capture_output=True, text=True, encoding="utf-8", errors="replace", env=env, timeout=60)
+        r2 = fire(GUARD, {"tool_name": "Bash", "tool_input": {"command": "git status"},
+                          "cwd": str(root)}, env)
         if r2.returncode != 0:
             return False, (f"{GUARD.name}: it refused `git status` too (exit "
                            f"{r2.returncode}). A guard that refuses everything is an outage")
+        # v7: ...and a commit ON THE RUN'S BRANCH, from a folder carrying NON_ASCII, must be
+        # ALLOWED - the arm a mangled-but-decodable read breaks, the branch then unreadable. The
+        # push above catches only a read that cannot decode at all.
+        repo = tmp / "repo"
+        subprocess.run(["git", "init", "-q", "-b", "session/nowhere", str(repo)], capture_output=True,
+                       stdin=subprocess.DEVNULL, timeout=60)
+        r3 = fire(GUARD, {"tool_name": "Bash", "tool_input": {"command": "git commit -m bite"},
+                          "cwd": str(repo)}, env)
+        if r3.returncode != 0:
+            return False, (f"{GUARD.name}: a commit on the run's branch was refused (exit "
+                           f"{r3.returncode}, expected 0) - its folder's path, sent as Claude "
+                           f"Code sends it, did not arrive intact")
     except (OSError, subprocess.SubprocessError) as e:
         return False, f"{GUARD.name}: could not be run at all - {e}"
     finally:
@@ -640,6 +683,47 @@ def selftest() -> int:
         ok &= good
         print(f"    {'OK  ' if good else 'MISS'} --guard-dir wires THAT copy, and reports a missing one"
               f" -> named:{named}, empty dir exit {code3}, wired anyway:{not unwired}")
+
+    # 11. v7: THE BITES SEND WHAT CLAUDE CODE SENDS, so they must FAIL a hook reading its stdin
+    #     as text - the defect every hook in the house had until 2026-10-09. Two copies of each
+    #     real guard sit side by side with the module it imports: one untouched, which must
+    #     PASS (else the bite is an outage, or the copy cannot start), and one with its read
+    #     swapped back to text mode, which must FAIL. That line is the only difference between
+    #     them, so a failure can have no other cause. TWO text-mode shapes: STRICT, which cannot
+    #     decode a 'Ł' at all, and the code page with errors REPLACED, which decodes everything
+    #     wrongly - the shape only an arm judging a PATH can catch.
+    text_modes = {"strict": b"sys.stdin.read()",
+                  "replaced": b'(sys.stdin.reconfigure(errors="replace") or sys.stdin.read())'}
+    for real, bite in ((saved_purpose, purpose_bites), (saved_guard, guard_bites)):
+        if not real.exists():
+            print(f"    N/A  the {real.stem} bite fails a text-mode reader -> DECLARED SKIP:"
+                  f" {real.name} is not beside this copy")
+            continue
+        src_bytes = real.read_bytes()
+        if FIXED_READ not in src_bytes:
+            ok = False
+            print(f"    MISS the {real.stem} bite fails a text-mode reader -> VOID: no UTF-8 read"
+                  f" in it to swap")
+            continue
+        verdicts = {}
+        bodies = {"as-is": src_bytes, **{k: src_bytes.replace(FIXED_READ, v) for k, v in text_modes.items()}}
+        for kind, body in bodies.items():
+            d = tmp / f"bite-{kind}-{real.stem}"
+            d.mkdir()
+            if (real.parent / "auto_mode.py").exists():
+                shutil.copyfile(real.parent / "auto_mode.py", d / "auto_mode.py")
+            (d / real.name).write_bytes(body)
+            if real == saved_purpose:
+                PURPOSE = d / real.name
+            else:
+                GUARD = d / real.name
+            verdicts[kind] = bite(tmp)[0]
+            GUARD, PURPOSE = saved_guard, saved_purpose
+        good = verdicts["as-is"] and not any(verdicts[k] for k in text_modes)
+        ok &= good
+        print(f"    {'OK  ' if good else 'MISS'} the {real.stem} bite fails a text-mode reader"
+              f" -> as-is {'bites' if verdicts['as-is'] else 'DOES NOT BITE'}, "
+              + ", ".join(f"{k} {'CAUGHT' if not verdicts[k] else 'PASSED'}" for k in text_modes))
 
     shutil.rmtree(tmp, ignore_errors=True)
     print("\nSELFTEST: " + ("PASS" if ok else "FAIL"))

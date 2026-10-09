@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """purpose_guard.py - refuse a session's edits until it has written down what it is FOR.
 
-CHECKER VERSION 4 (2026-10-08)
+CHECKER VERSION 5 (2026-10-09)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -282,7 +282,13 @@ def decide(payload: dict, root: Path, when: str | None = None) -> tuple[int, str
 
 
 def read_payload() -> dict:
-    raw = sys.stdin.read()
+    # RAW BYTES, DECODED AS UTF-8 - v5. Claude Code writes the payload in UTF-8 and escapes
+    # nothing, and Python reads a PIPE in the machine's code page, cp1252 here: so a text-mode
+    # read mangled every accented character in a path - the bootstrap then refusing the plan
+    # file itself - and RAISED on a byte cp1252 leaves undefined (the second of 'Ł'), a crash
+    # that blocks nothing. 'replace', never strict, for that reason. ASCII arrives unchanged.
+    # install_hooks.py's case 11 finds this read by its EXACT text - keep it whole and spelled so.
+    raw = sys.stdin.buffer.read().decode("utf-8", errors="replace")
     if not raw.strip():
         return {}
     try:
@@ -450,6 +456,19 @@ def selftest() -> int:
                       root_for(out, main_r) == main_r))
         cases.append(("no target keeps the hook's root", root_for({}, main_r) == main_r))
 
+    # 10. v5: THE PAYLOAD AS CLAUDE CODE SENDS IT, through the REAL entry point. Claude Code
+    #     writes raw UTF-8 and escapes nothing, and every case above built its dict in-process,
+    #     so none ever crossed a pipe - where Python reads in the machine's code page, cp1252
+    #     here (measured 2026-10-08). The child is GIVEN that code page, so the case reproduces
+    #     on any machine and under any override the caller set. The arm a mangled path breaks is
+    #     the bootstrap: writing the plan file itself must be ALLOWED, and is only if its path
+    #     arrived intact. The ASCII folder is the control - it passes before the fix and after.
+    for label, folder in (("an ASCII folder (the control)", "plain"),
+                          ("an accented folder, which cp1252 MANGLES", "café"),
+                          ("a folder cp1252 cannot decode at all", "Łódź")):
+        cases.append((f"piped raw UTF-8, {label}: the plan's own path arrives intact,"
+                      f" so writing it is ALLOWED", _piped_bootstrap(folder) == ALLOW))
+
     print("purpose_guard selftest")
     for name, good in cases:
         ok &= good
@@ -457,6 +476,24 @@ def selftest() -> int:
     print(f"\n  {len(cases)} cases, {sum(1 for _, g in cases if g)} passed")
     print("SELFTEST: " + ("PASS" if ok else "FAIL"))
     return 0 if ok else 1
+
+
+def _piped_bootstrap(folder: str) -> int:
+    """The REAL hook's exit code, asked as Claude Code asks it to write a plan file in a
+    repository named `folder`, with no purpose recorded - so only the bootstrap can allow it."""
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+        root = Path(td) / f"pg-{folder}"
+        root.mkdir()
+        subprocess.run(["git", "init", "-q", str(root)], capture_output=True)
+        plan = root / "PLAN-1-x.md"
+        plan.write_bytes(b"# PLAN\n\nno purpose recorded here\n")
+        env = {k: v for k, v in os.environ.items() if k not in ("PYTHONUTF8", "PYTHONIOENCODING")}
+        env.update(PYTHONIOENCODING="cp1252", CLAUDE_PROJECT_DIR=str(root))
+        payload = {"tool_name": "Edit", "tool_input": {"file_path": str(plan)}}
+        r = subprocess.run([sys.executable, str(Path(__file__).resolve())],
+                           input=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+                           capture_output=True, env=env, timeout=60)
+        return r.returncode
 
 
 if __name__ == "__main__":
