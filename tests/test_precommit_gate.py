@@ -27,7 +27,9 @@ sys.dont_write_bytecode = True  # importing from tools/ must leave no bytecode t
 sys.path.insert(0, str(ROOT / "tools"))
 import inplace_guard as guard  # noqa: E402  (register I-37: a repository file changes only through it)
 GATE = ROOT / "tools" / "precommit_gate.py"
-PRIV = Path(os.environ.get("LT_PRIVATE_DIR", ROOT.parent / "legal-translation-private"))
+sys.path.insert(0, str(ROOT / "tools"))
+from sibling_dirs import private_dir  # noqa: E402  (register I-40)
+PRIV = private_dir()
 
 
 def gate(env=None):

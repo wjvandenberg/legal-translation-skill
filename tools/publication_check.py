@@ -111,8 +111,9 @@ PROBES = [
 # probe working.
 import os
 
-_desc = Path(os.environ.get("CORPUS_DESCRIPTORS_FILE",
-                            ROOT.parent / "legal-translation-private" / "corpus-descriptors.txt"))
+from sibling_dirs import private_dir  # noqa: E402  (register I-40: LT_PRIVATE_DIR was ignored here)
+
+_desc = Path(os.environ.get("CORPUS_DESCRIPTORS_FILE", private_dir() / "corpus-descriptors.txt"))
 if _desc.exists():
     _pats = [l.strip() for l in _desc.read_text(encoding="utf-8").splitlines()
              if l.strip() and not l.lstrip().startswith("#")]

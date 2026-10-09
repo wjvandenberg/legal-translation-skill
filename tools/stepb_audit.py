@@ -43,6 +43,7 @@ def _a4(*parts):
 
 
 ROOT = Path(__file__).resolve().parent.parent
+from sibling_dirs import main_temp, private_dir  # noqa: E402  (register I-40)
 # THE PLAN CAN BE A COPY, AND THAT IS WHAT KEEPS THE TRACKED FILE SAFE (register I-37).
 # tools/stepb_metacheck.py plants each of its defects in a copy and points the audits at it
 # through STEPB_PLAN_DOC, so a run killed mid-probe leaves the damage in a temporary folder,
@@ -57,10 +58,9 @@ reg = (ROOT / "evidence/REGISTER-findings.md").read_text(encoding="utf-8")
 a3 = (ROOT / "evidence/EVIDENCE-a3-structure.md").read_text(encoding="utf-8")
 # THE PRIVATE FOLDER SITS BESIDE THE MAIN CHECKOUT, so from a git worktree ROOT.parent is the
 # wrong place and this line crashed before the plan was ever read - which the metacheck then
-# counted as a check that FIRED (register I-38). LT_PRIVATE_DIR names it, as LT_LOGS_DIR does
-# for the logs folder; unset, the default is unchanged.
-PRIVATE = Path(_os.environ.get("LT_PRIVATE_DIR") or ROOT.parent / "legal-translation-private")
-cmp_ = (PRIVATE / "A4-A3-COMPARISON.md").read_text(encoding="utf-8")
+# counted as a check that FIRED (register I-38). tools/sibling_dirs.py finds it from a worktree
+# too, LT_PRIVATE_DIR still winning when it is set (register I-40).
+cmp_ = (private_dir() / "A4-A3-COMPARISON.md").read_text(encoding="utf-8")
 cmd = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 # CHARTER SOURCE, 2026-08-06. `CLAUDE.md` was rewritten on 2026-08-06 and several sentences
 # this document quotes verbatim are now superseded wording -- the public-flip gate, the
@@ -74,7 +74,9 @@ cmd = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 # archive becomes an excuse and the check stops noticing real loss.
 for _extra in ("PLAN-3-opus5-migration.md", "DECISIONS-LOG.md",
                "temp/CLAUDE.md.pre-overhaul"):
-    _p = ROOT / _extra
+    # a temp/ input is the main checkout's when this checkout lacks it (register I-40): from a
+    # worktree this source was silently absent and seven quotations failed for want of it
+    _p = main_temp(_extra[len("temp/"):]) if _extra.startswith("temp/") else ROOT / _extra
     if _p.exists():
         cmd = cmd + "\n" + _p.read_text(encoding="utf-8")
 # the A4 REPORT is a FIFTH source, added 2026-08-05: this analysis now quotes it directly,
@@ -554,7 +556,7 @@ def norm(t):
     for a_, b_ in [("“", '"'), ("”", '"'), ("‘", "'"), ("’", "'")]:
         t = t.replace(a_, b_)
     return re.sub(r"\s+", " ", t).strip()
-BACKUP = ROOT / "temp" / "PLAN-2-step-b.md.pre-deepaudit"
+BACKUP = main_temp("PLAN-2-step-b.md.pre-deepaudit")
 prev = norm(BACKUP.read_text(encoding="utf-8")) if BACKUP.exists() else ""
 hay = norm(ALLSRC)
 # A quotation ATTRIBUTED to Wouter is his spoken instruction: it lives in no file and is

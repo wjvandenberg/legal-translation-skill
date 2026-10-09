@@ -36,7 +36,9 @@ if hasattr(_sys.stdout, "reconfigure"):
 
 
 ROOT = Path(__file__).resolve().parent.parent
-# STEPB_PLAN_DOC and LT_PRIVATE_DIR: see the same lines in stepb_audit.py (registers I-37, I-38).
+from sibling_dirs import private_dir  # noqa: E402  (register I-40)
+# STEPB_PLAN_DOC: see the same lines in stepb_audit.py (register I-37); the private folder comes
+# from tools/sibling_dirs.py (registers I-38, I-40).
 import os as _os  # noqa: E402
 DOC = Path(_os.environ.get("STEPB_PLAN_DOC") or ROOT / "PLAN-2-step-b.md")
 if _os.environ.get("STEPB_PLAN_DOC"):
@@ -44,8 +46,7 @@ if _os.environ.get("STEPB_PLAN_DOC"):
 doc = DOC.read_text(encoding="utf-8")
 reg = (ROOT / "evidence/REGISTER-findings.md").read_text(encoding="utf-8")
 a3 = (ROOT / "evidence/EVIDENCE-a3-structure.md").read_text(encoding="utf-8")
-PRIVATE = Path(_os.environ.get("LT_PRIVATE_DIR") or ROOT.parent / "legal-translation-private")
-cmp_ = (PRIVATE / "A4-A3-COMPARISON.md").read_text(encoding="utf-8")
+cmp_ = (private_dir() / "A4-A3-COMPARISON.md").read_text(encoding="utf-8")
 cmd = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 ALL = "\n".join([reg, a3, cmp_, cmd])
 

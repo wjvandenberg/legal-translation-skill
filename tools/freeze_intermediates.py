@@ -33,7 +33,8 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"))
+from sibling_dirs import logs_dir  # noqa: E402  (register I-40)
+LOGS = logs_dir()
 CATALOGUE = LOGS / "frozen-intermediates.json"
 
 # The artefacts that make a run's mechanical half reproducible. `paragraphs.json` is the one

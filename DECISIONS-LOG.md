@@ -1255,3 +1255,34 @@ the keep-declaration builder, hand-built separately in three harnesses.
 
 **FOUR ANSWERS AT THE CLOSE, EACH ON THE RECOMMENDED OPTION** *(Wouter, 2026-10-09, through the question tool)*. **(1)** Judgement (a) CONFIRMED: a run that declared nothing keeps blocking and reporting on its guess, as today, and a guess never says CLEAN or PASSED — the literal reading, a guess ruling on nothing, and a refusal at repack until a language is declared, both declined. **(2)** The mid-session re-copy of `purpose_guard` v5, `auto_mode_guard` v3 and `install_hooks` v7, `6f4255a`, kept. **(3)** The branch pushed and its pull request opened, his to merge. **(4)** The diligence audit's missing check for a skipped Step 1c carried into slice 12b's plan, nothing filed now.
 
+## 2026-10-09 (4) — I-40: the sibling folders found in one place, and from a worktree too
+
+**FOUR ANSWERS, EACH ON THE RECOMMENDED OPTION** *(Wouter, 2026-10-09 (4), through the question tool, at the
+open)*. **(1)** One helper that finds the main checkout from git's own pointer file, rather than an
+environment variable at each site — decision 6's written rule, *a shared capability lives in one place*,
+read as governing `tools/` too. **(2)** Built from `main` while pull request #130 is open, `stepb_audit.py` and
+`stepb_audit3.py` converted here as well so the new test can be strict; whichever merges second takes `main`
+and is recounted — this one, the same day, after #130, #131, #132 and #133. **(3)** A register row — filed as I-40, because #131's `md_tables` fix took I-39 the same day and merged
+first; it was I-39 on this branch until the merge, and nothing outside it had cited that id. **(4)** The nine corpus tools proved at start-up — nothing set, and a folder that does
+not exist — with full runs only for the quick tools and the suites.
+
+**JUDGEMENTS TAKEN ALONE, EACH CARRIED TO THE CLOSE.** **(a)** The scope widened from the brief's seven files
+to 24, by census: every `ROOT.parent` and current-folder sibling path in `tools/` and `tests/`, and the
+gitignored `temp/` INPUTS a worktree lacks — `claudemd_claims`, `claudemd_disposal`, `stepb_audit`, the last
+found only when the after-pass disagreed with the main checkout. **(b)** `LEGAL_TRANSLATION_LOGS` kept as a
+second name for the logs folder, `LT_LOGS_DIR` winning when both are set. **(c)** A variable set but empty
+counts as unset. **(d)** `LEAKAGE_LIST_PATH`, `CORPUS_DESCRIPTORS_FILE` and `LT_CORPUS_DIR` left in the tools
+that read them, their own empty-value behaviour unchanged. **(e)** `claudemd_claims` still reads
+`temp/stepb_harvest.py`, now from the main checkout when a worktree lacks it, never the tracked `tools/` copy,
+which differs in content: changing what a check reads is not this fix. **(f)** `leakage_scan` keeps an import
+fallback for its copy kept in the private folder. **(g)** Every pass run with `uv run --with lxml`: the shared
+environment `uv` finds from either checkout has no `lxml`, so every test reading Word XML died at import
+without it. **(h)** Outputs stay in their own checkout's `temp/`; only INPUTS are looked for in the main one.
+
+**THE REVIEW, `/code-review` at high: eight findings.** **Four fixed** — `audit_register` reads
+`LEAKAGE_LIST_PATH` first, and is VOID, exit 2, on an unreadable list rather than a traceback exiting 1;
+`gate_replay`'s message names the variable that now wins; a `temp/` folder walked twice. **One needs no
+change** — the fall-back from a separate git folder is declared in the helper and asserted from a real worktree
+by the test. **Three carried to Wouter:** the test-document folder's NAME is still read only from this
+checkout's gitignored `.claude/evidence-dirs.local`; `corpus_dirs()` is implemented seven times, against
+decision 6's rule; and the test's shape (a) catches only the name `ROOT.parent`.

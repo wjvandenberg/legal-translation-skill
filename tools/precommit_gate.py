@@ -42,7 +42,8 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-PRIV = Path(os.environ.get("LT_PRIVATE_DIR", ROOT.parent / "legal-translation-private"))
+from sibling_dirs import private_dir  # noqa: E402  (register I-40)
+PRIV = private_dir()
 
 # THE FOURTH CONTROL FOUND WITH A HARD-CODED SIX-FILE LIST ON 2026-08-24, and the most serious of
 # the four because this one is the gate the pre-commit hook calls. The six names were written

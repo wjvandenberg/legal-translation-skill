@@ -11,6 +11,15 @@ Checks things eyeballing misses:
 Exit 0 only if everything passes.
 """
 import re, sys, os
+from pathlib import Path
+
+# EVERY PATH IS ANCHORED TO THIS SCRIPT, NEVER TO THE CURRENT FOLDER (register I-40). Relative paths
+# read whatever sat where the script was STARTED: run from the main checkout's folder, a worktree's
+# copy validated the MAIN checkout's register and reported on it with full confidence, and from a
+# worktree's own folder '../' found neither the logs nor the private folder. The labels stay
+# relative, so every message reads exactly as before.
+ROOT = Path(__file__).resolve().parent.parent
+from sibling_dirs import logs_dir, private_dir  # noqa: E402
 
 REG = 'evidence/REGISTER-findings.md'
 SEV = {'CRITICAL', 'HIGH', 'MED', 'LOW', 'POS', '—', '-'}
@@ -21,7 +30,7 @@ def fail(m): fails.append(m)
 def warn(m): warns.append(m)
 
 
-reg = open(REG, encoding='utf-8').read()
+reg = open(ROOT / REG, encoding='utf-8').read()
 lines = reg.split('\n')
 
 # ---------- 1. row structure ----------
@@ -167,7 +176,7 @@ else:
             fail('header %s: says %d, actual %d' % (lab, a, b))
 
 # ---------- 5. D03 vs D03B consistency ----------
-LOG = '../legal-translation-logs/A1'
+LOG = str(logs_dir() / 'A1')
 def scores(path):
     t = open(path, encoding='utf-8').read()
     out = {}
@@ -212,10 +221,17 @@ else:
     warn('grade reports not found; skipped the D03/D03B cross-check')
 
 # ---------- 6. leakage ----------
-pats = [l.strip() for l in open('../legal-translation-private/leakage-names.txt', encoding='utf-8')
+# LEAKAGE_LIST_PATH first, as every other control reads it (CI supplies it as a secret), then the
+# private folder. A list that cannot be read is VOID, exit 2 - never a traceback that exits 1 and
+# reads exactly like a register that failed validation (register I-40).
+LIST = os.environ.get('LEAKAGE_LIST_PATH', '').strip() or str(private_dir() / 'leakage-names.txt')
+if not os.path.isfile(LIST):
+    print('  CONTROL VOID: the leakage list could not be read, so the register was NOT scanned.')
+    sys.exit(2)
+pats = [l.strip() for l in open(LIST, encoding='utf-8')
         if l.strip() and not l.startswith('#')]
 for t in (REG, 'CLAUDE.md'):
-    txt = open(t, encoding='utf-8').read()
+    txt = open(ROOT / t, encoding='utf-8').read()
     for p in pats:
         if re.search(p, txt, re.I):
             fail('LEAKAGE %r in %s' % (p, t))
