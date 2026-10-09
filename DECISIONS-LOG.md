@@ -1286,3 +1286,31 @@ change** — the fall-back from a separate git folder is declared in the helper 
 by the test. **Three carried to Wouter:** the test-document folder's NAME is still read only from this
 checkout's gitignored `.claude/evidence-dirs.local`; `corpus_dirs()` is implemented seven times, against
 decision 6's rule; and the test's shape (a) catches only the name `ROOT.parent`.
+
+## 2026-10-09 (4), continued — I-40's follow-up and I-41, at Wouter's word after #134 merged
+
+**THREE ANSWERS, EACH ON THE RECOMMENDED OPTION** *(Wouter, 2026-10-09 (4), through the question tool, before
+any edit)*. **(1)** All four parts: one `corpus_dirs()` with the main checkout's config as its fallback; the
+guard following any path built from `__file__`; the gate's published-tree section measured from the branch
+point; `test_precommit_gate` naming the gate's verdict on any surprise. **(2)** I-40 amended for the first two,
+I-41 filed for the gate. **(3)** Built in this session, past the house's 75% carry-on line and well before
+compaction.
+
+**MEASURED BEFORE ANY CHOICE.** Six copies of `corpus_dirs()`, not the seven the review said — counted by
+listing; five identical in their parsed bodies, the sixth equivalent. One gate run writes nothing in the
+private folder (268 files before and after) and nothing at a fixed name in the system temp folder, so a shared
+file is not how two sessions' gates collide; the two failures that came while `main` moved without touching the
+trees stay unexplained, and the new diagnostic is what will name the next one.
+
+**JUDGEMENTS TAKEN ALONE.** **(a)** This checkout's `.claude/evidence-dirs.local` wins over the main checkout's
+when both exist — `main_temp`'s rule. **(b)** A folder named twice is not deduplicated — the six copies did not,
+and the counts the tools print must not move. **(c)** During a merge the section also measures from the
+merge-base, so `main`'s incoming lines are judged again; they passed their own commit's gate, so it costs
+nothing measured.
+
+**AND #130's GUARD, TESTED BY ACCIDENT.** A run stopped mid-test left `uk/SKILL.md` carrying a planted probe
+line; `tools/inplace_guard.py --recover` put it back byte-exact from its record, the hash then equal to
+HEAD's. And case 4b's first version was refused by `tests/test_no_unguarded_restore.py` for deleting its
+scratch index by hand; it now uses a self-cleaning folder outside the repository. The review: four
+findings, that one fixed, two needing no change, one carried (an annotated assignment escapes the climb
+tracker; no tool uses one).

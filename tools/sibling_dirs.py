@@ -108,6 +108,40 @@ def beside(name: str) -> Path:
     return p if p.is_absolute() else (SIBLINGS / p).resolve()
 
 
+def corpus_dirs(root: Path = ROOT) -> list[Path]:
+    """WHERE THE PRISTINE TEST DOCUMENTS LIVE - read from config, never hardcoded, never printed.
+
+    The run directories under the logs folder hold DELIVERABLES; CLAUDE.md 6.4 puts the 11-document corpus
+    in a separate sibling folder whose NAME is not committable. Measured 2026-09-01: matching only inside the
+    run directories reached 3 of 13 frozen intermediates, and the ten it missed include BOTH documents for
+    A2 - the fourteen unreachable comment anchors, a CRITICAL row. So the folder is named in the gitignored
+    .claude/evidence-dirs.local, plus LT_CORPUS_DIR, and used without ever being echoed.
+
+    ONE PLACE (register I-40's follow-up): six corpus tools each carried their own copy of this. And the
+    config is THIS checkout's file when it has one, else the MAIN checkout's - a worktree need not carry
+    a copy of a gitignored file to reach the corpus. A bare name sits beside the main checkout; a folder
+    counts only if it holds a Word document. IN A FRESH CLONE NEITHER FILE EXISTS, exactly as CLAUDE.md
+    5.6 says of the evidence guard: the corpus tools then say so rather than report a smaller clean run.
+    """
+    main = main_checkout(root)
+    names: list[str] = []
+    for cfg in (root / ".claude" / "evidence-dirs.local", main / ".claude" / "evidence-dirs.local"):
+        if cfg.is_file():
+            names += [ln.strip() for ln in cfg.read_text(encoding="utf-8", errors="replace").splitlines()
+                      if ln.strip() and not ln.strip().startswith("#")]
+            break
+    extra = os.environ.get("LT_CORPUS_DIR", "").strip()
+    if extra:
+        names.append(extra)
+    out = []
+    for name in names:
+        p = Path(name)
+        p = p if p.is_absolute() else (main.parent / p).resolve()
+        if p.is_dir() and any(p.glob("*.docx")):
+            out.append(p)
+    return out
+
+
 def main_temp(*parts: str) -> Path:
     """An INPUT kept in a gitignored temp/ folder - a backup or a pre-overhaul copy. This checkout's
     own temp/ if it has the file, else the main checkout's, which is where such files were made.

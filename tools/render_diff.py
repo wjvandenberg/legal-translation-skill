@@ -70,7 +70,7 @@ from keep_declarations import write_keep_declarations
 
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-40)
+from sibling_dirs import corpus_dirs, logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
 SCRIPT = "apply_translations_textmatch.py"
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD -- CLAUDE.md 5.3.
@@ -162,24 +162,6 @@ def para_texts(xml_bytes):
             elif tag == "br" and el.get(f"{{{W}}}type", "") != "page":
                 pieces.append("\n")
         out.append("".join(pieces).strip())
-    return out
-
-
-def corpus_dirs():
-    out, cfg = [], ROOT / ".claude" / "evidence-dirs.local"
-    names = []
-    if cfg.is_file():
-        names += [ln.strip() for ln in
-                  cfg.read_text(encoding="utf-8", errors="replace").splitlines()
-                  if ln.strip() and not ln.strip().startswith("#")]
-    if os.environ.get("LT_CORPUS_DIR"):
-        names.append(os.environ["LT_CORPUS_DIR"])
-    for name in names:
-        p = Path(name)
-        if not p.is_absolute():
-            p = beside(name)
-        if p.is_dir() and any(p.glob("*.docx")):
-            out.append(p)
     return out
 
 

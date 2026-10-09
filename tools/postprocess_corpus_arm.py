@@ -68,7 +68,7 @@ from lxml import etree  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-40)
+from sibling_dirs import corpus_dirs, logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
 
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. A before-and-after check in this
@@ -368,23 +368,6 @@ def gate_fired(result):
 APPLY = "apply_translations_textmatch.py"
 
 
-def _corpus_dirs():
-    out, cfg = [], ROOT / ".claude" / "evidence-dirs.local"
-    names = []
-    if cfg.is_file():
-        names += [ln.strip() for ln in cfg.read_text(encoding="utf-8", errors="replace")
-                  .splitlines() if ln.strip() and not ln.strip().startswith("#")]
-    if os.environ.get("LT_CORPUS_DIR"):
-        names.append(os.environ["LT_CORPUS_DIR"])
-    for name in names:
-        p = Path(name)
-        if not p.is_absolute():
-            p = beside(name)
-        if p.is_dir() and any(p.glob("*.docx")):
-            out.append(p)
-    return out
-
-
 _SRC_TEXTS = {}
 
 
@@ -453,7 +436,7 @@ print("=" * 96)
 print(f"BRANCH 9 CORPUS ARM — is the change journal complete on the real documents?  "
       f"[{args.variant}]{'  --from-apply' if args.from_apply else ''}")
 print("=" * 96)
-CORPUS = _corpus_dirs() if args.from_apply else []
+CORPUS = corpus_dirs() if args.from_apply else []
 if args.from_apply:
     # SAY WHAT WAS SEARCHED WITHOUT SAYING WHERE: a reachable-corpus count of 0 is the
     # difference between "eleven documents were rebuilt" and "eleven were never opened".

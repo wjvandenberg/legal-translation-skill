@@ -63,7 +63,7 @@ from lxml import etree  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-40)
+from sibling_dirs import corpus_dirs, logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
 DOC_ID = re.compile(r"\bD\d{2}B?\b")
 
@@ -74,27 +74,6 @@ args = ap.parse_args()
 SCRIPT = ROOT / args.variant / "scripts" / "validate_apply.py"
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
            PYTHONDONTWRITEBYTECODE="1")
-
-
-def corpus_dirs():
-    """Read from gitignored config, never hardcoded, never printed. In a fresh clone the
-    file does not exist and the real arm is simply unavailable -- which this tool SAYS,
-    rather than reporting a smaller clean run."""
-    out, cfg = [], ROOT / ".claude" / "evidence-dirs.local"
-    names = []
-    if cfg.is_file():
-        names += [ln.strip() for ln in
-                  cfg.read_text(encoding="utf-8", errors="replace").splitlines()
-                  if ln.strip() and not ln.strip().startswith("#")]
-    if os.environ.get("LT_CORPUS_DIR"):
-        names.append(os.environ["LT_CORPUS_DIR"])
-    for name in names:
-        p = Path(name)
-        if not p.is_absolute():
-            p = beside(name)
-        if p.is_dir() and any(p.glob("*.docx")):
-            out.append(p)
-    return out
 
 
 _CACHE = {}
