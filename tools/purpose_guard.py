@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """purpose_guard.py - refuse a session's edits until it has written down what it is FOR.
 
-CHECKER VERSION 2 (2026-09-22)
+CHECKER VERSION 4 (2026-10-08)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -67,6 +67,7 @@ from __future__ import annotations
 import datetime as _dt
 import json
 import os
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -204,6 +205,33 @@ def inherited_purpose(root: Path, session: str, when: str) -> bool:
     return bool(st.get("session")) and st["session"] != session and st.get("purpose") == fp
 
 
+def root_for(payload: dict, fallback: Path) -> Path:
+    """THE CHECKOUT THE EDIT LANDS IN, NOT THE ONE THE SESSION WAS OPENED FROM (v4).
+
+    v2 took its root from CLAUDE_PROJECT_DIR, and in a git WORKTREE session that names the
+    MAIN checkout - so it judged the worktree's edits by another checkout's plan file and by
+    whichever session's purpose line stood there. Measured 2026-10-08: a session that had
+    written its own line in its worktree was REFUSED, because the main checkout's line and
+    state file belonged to a concurrent session - and the same mistake the other way round
+    lets a session through on a line it never wrote. The git top-level of the edited file's
+    folder is the plan that governs the edit. A target outside any repository, or none,
+    keeps the old root, so a project with no repository behaves exactly as before."""
+    t = target_of(payload)
+    if t is None:
+        return fallback
+    d = (t if t.is_absolute() else fallback / t).parent
+    while not d.exists() and d != d.parent:
+        d = d.parent
+    try:
+        r = subprocess.run(["git", "-C", str(d), "rev-parse", "--show-toplevel"], capture_output=True,
+                           text=True, encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL,
+                           timeout=15)
+    except (OSError, subprocess.SubprocessError):
+        return fallback
+    top = (r.stdout or "").strip()
+    return Path(top) if r.returncode == 0 and top else fallback
+
+
 def decide(payload: dict, root: Path, when: str | None = None) -> tuple[int, str]:
     # DEFAULTED HERE AS WELL AS IN purpose_recorded, and the omission is why: v1's first
     # BITE TEST against a real repository printed "SESSION PURPOSE None" as the line to
@@ -284,7 +312,8 @@ def main(argv) -> int:
         print(f"purpose_guard: live plan file(s) {names}; purpose for {today()} "
               f"{'RECORDED - edits allowed' if ok else 'NOT recorded - edits would be REFUSED'}")
         return 0
-    code, msg = decide(read_payload(), root)
+    payload = read_payload()
+    code, msg = decide(payload, root_for(payload, root))
     if msg:
         print(msg, file=sys.stderr)
     return code
@@ -395,6 +424,31 @@ def selftest() -> int:
         # 8. Malformed stdin is not a pass and not a brick.
         cases.append(("empty payload -> ALLOW (no tool named)",
                       decide({}, root)[0] == ALLOW))
+
+    # 9. v4: A WORKTREE IS JUDGED BY ITS OWN PLAN. Two real repositories: MAIN carries a purpose
+    #    line claimed by session A in its state file; WT carries session B's own line. B edits a
+    #    file in WT while the hook's root (CLAUDE_PROJECT_DIR) names MAIN.
+    with tempfile.TemporaryDirectory() as td2:
+        main_r, wt_r, loose = Path(td2) / "main", Path(td2) / "wt", Path(td2) / "loose"
+        for r_ in (main_r, wt_r):
+            r_.mkdir()
+            subprocess.run(["git", "init", "-q", str(r_)], capture_output=True)
+            (r_ / "PLAN-2-x.md").write_bytes(
+                f"| status | {MARKER} {today()} - {r_.name}'s own purpose |\n".encode("utf-8"))
+        loose.mkdir()
+        write_state(main_r, "session-A", purpose_fingerprint(main_r, today()))
+        edit_b = {"tool_name": "Edit", "session_id": "session-B",
+                  "tool_input": {"file_path": str(wt_r / "src" / "thing.py")}}
+        cases.append(("v2's root - the MAIN checkout - REFUSES session B (the defect, reproduced)",
+                      decide(edit_b, main_r)[0] == REFUSE))
+        cases.append(("an edit inside a worktree is judged by THAT checkout's plan",
+                      root_for(edit_b, main_r).resolve() == wt_r.resolve()))
+        cases.append(("...so session B, whose line is in its own checkout, is ALLOWED",
+                      decide(edit_b, root_for(edit_b, main_r))[0] == ALLOW))
+        out = {"tool_name": "Edit", "tool_input": {"file_path": str(loose / "x.py")}}
+        cases.append(("a target in no repository keeps the hook's root",
+                      root_for(out, main_r) == main_r))
+        cases.append(("no target keeps the hook's root", root_for({}, main_r) == main_r))
 
     print("purpose_guard selftest")
     for name, good in cases:
