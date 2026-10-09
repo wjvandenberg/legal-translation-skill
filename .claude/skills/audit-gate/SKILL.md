@@ -53,10 +53,12 @@ should be treated as evidence the audit was too shallow, not that the work was c
 > by listing, 2026-08-24, and the charter's 5.3 had been carrying the old paths since the promotion.
 > `temp/` is gitignored, so a path there is a command that works only on the machine that wrote it.
 
-Run these after editing any of the committable documents:
+Run these after editing any of the committable documents. **Run bare, `md_tables.py` reads the same
+documents the publication check reads and prints each one; it exits 2, VOID, if it read none or could not
+open one** *(register I-39 — this command used to name two of them by their pre-move paths, and crashed)*:
 
 ```bash
-uv run python tools/md_tables.py CLAUDE.md REGISTER-findings.md EVIDENCE-a3-structure.md PLAN-2-step-b.md DECISIONS-LOG.md PLAN-3-opus5-migration.md
+uv run python tools/md_tables.py
 ```
 
 ```bash
