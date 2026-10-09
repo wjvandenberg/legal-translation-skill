@@ -3,7 +3,7 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 54,
+ "count": 58,
  "divergences": {
   "uk/SKILL.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -264,6 +264,26 @@
    "changed_by": "feature/branch11-slice4c",
    "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
    "sha256_now": "e7097b54478ed167c87565d264d61f2e3148a605ec962ee6ddb0dd0a2defada9"
+  },
+  "uk/sub-lexicons/italian-finance-banking.md": {
+   "changed_by": "fix/lexicon-table-widths",
+   "commit_subject": "E15 and E16 - two shipped sub-lexicon tables match their headers, GENCON and BALTIME named as the forms they are, every shipped table now tested",
+   "sha256_now": "41313fa570550701bd6c9a840a4af72a0714b3d726776a318e4cdffb97828191"
+  },
+  "uk/sub-lexicons/italian-transport-and-insurance.md": {
+   "changed_by": "fix/lexicon-table-widths",
+   "commit_subject": "E15 and E16 - two shipped sub-lexicon tables match their headers, GENCON and BALTIME named as the forms they are, every shipped table now tested",
+   "sha256_now": "fcda752d60be096561dca5b934129dfffa56270ab7ec16ea6600c0117f92ce10"
+  },
+  "us/sub-lexicons/italian-finance-banking.md": {
+   "changed_by": "fix/lexicon-table-widths",
+   "commit_subject": "E15 and E16 - two shipped sub-lexicon tables match their headers, GENCON and BALTIME named as the forms they are, every shipped table now tested",
+   "sha256_now": "2ed920dc7b43d7d03bb840672813af22f55da7d97209c418ea49c7774b8d7a71"
+  },
+  "us/sub-lexicons/italian-transport-and-insurance.md": {
+   "changed_by": "fix/lexicon-table-widths",
+   "commit_subject": "E15 and E16 - two shipped sub-lexicon tables match their headers, GENCON and BALTIME named as the forms they are, every shipped table now tested",
+   "sha256_now": "e8dd91e2d4b4dd8dfd64efd26ae4b9aaebe365d191c92ac6dff7bf0eb525f344"
   },
   "uk/scripts/lexicon_compliance.py": {
    "changed_by": "feature/branch12-slice12a",

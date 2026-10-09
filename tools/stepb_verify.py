@@ -237,8 +237,12 @@ GROUPS = {
    C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9
    G10 G11 G12 G13 S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6 W5 C30
    """,
+ # E15 ADDED 2026-10-09 (fix/lexicon-table-widths): two shipped sub-lexicons carried table rows wider
+ # or narrower than their header, and nothing read the shipped trees' tables -- the dictionary data's
+ # shape differing from what its readers assume, E13's group.
  "4 hard to keep correct": """
    U1 V1 V2 W1 W2 T1 T2 T3 T4 T5 T6 F21 F23 F32 F36 F37 F38 L2 L3 E1 E2 E3 E5 E6 E10 E11 E13 E14 Q1 Y1
+   E15
    """,
  # C29 added 2026-09-02 (branch 6, fourth slice). A gate crashes printing its own finding and
  # apply announces the crash as "INTENTIONAL BLOCK ... the script is working as intended",
@@ -271,6 +275,7 @@ GROUPS = {
  "5 the manual is wrong": """
    F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40
    E7 E8 K1 K2 K3 H3 L5 B2 B4 B5 B6 X3 X5 Y2 Y3 Y4 F41 F42 C29 F43 F44 B9 F45 F46 F47 J2
+   E16
    """,
 }
 # -------------------------------------------- options (a row may need more than one)
@@ -325,8 +330,12 @@ OPTIONS = {
  "3 say what the formatting is": """
    A3 A4 A5 A6 A7 A10 A11 A12 A13 A14 A17 A18 A20 A21 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3
    """,
+ # E16 ADDED 2026-10-09 (fix/lexicon-table-widths): a lexicon row named GENCON a time charter and
+ # BALTIME an institution -- what a lexicon row SAYS, which is this option's lexicon family, E7's
+ # and E8's, beside the rows whose content had to be written.
  "4 a home for document furniture": """
    E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33
+   E16
    """,
  # C29 added 2026-09-02: half its fix is F36's exit-code class applied to the CALLER --
  # `_run_validator` maps every non-zero exit onto "intentional block", so a crash and a gate
@@ -356,8 +365,11 @@ OPTIONS = {
  # property of the one script that happened to print an arrow.
  # W5 ADDED 2026-09-28 (4): whether the package's delivery step survives the machine it runs on is a
  # property of the whole package, beside W1 to W4's install truncation.
+ # E15 ADDED 2026-10-09 (fix/lexicon-table-widths): its guard, tests/test_shipped_tables.py, reads
+ # every table of both shipped trees -- a property of the whole package, beside W2's sentinels.
  "8 protect the whole package": """
    W1 W2 W3 W4 C29 F35 Y1 Q1 W5
+   E15
    """,
  # F43 and F44 added 2026-09-10. Both are a CLAIM being wrong rather than code: --extract
  # promises that leaving `en` null preserves an already-English header verbatim, --apply
@@ -449,7 +461,12 @@ print("\n=== A3b. THE ARITHMETIC LINE UNDER §9.1 MUST MATCH THE TABLE ABOVE IT 
 # group 3 and 170 in total -- stale by two, in a line whose own severity-mix column
 # disagreed with it as well. This asserts the typed line against the generated groups, per
 # group and in total, so it cannot drift again.
-_doc = (ROOT / "PLAN-2-step-b.md").read_text(encoding="utf-8")
+# STEPB_PLAN_DOC: see the same lines in stepb_audit.py (register I-37).
+import os as _os  # noqa: E402
+_plan = Path(_os.environ.get("STEPB_PLAN_DOC") or ROOT / "PLAN-2-step-b.md")
+if _os.environ.get("STEPB_PLAN_DOC"):
+    print(f"NOTE: STEPB_PLAN_DOC is set - reading the plan from {_plan}", file=_sys.stderr)
+_doc = _plan.read_text(encoding="utf-8")
 _m = re.search(r"\*\*([\d]+(?:\s*\+\s*[\d]+)+)\s*=\s*(\d+)\s*.\*\*", _doc)
 if not _m:
     FAIL.append("A3b: no `a + b + ... = n` arithmetic line found under §9.1 — it is the "

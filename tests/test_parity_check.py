@@ -21,6 +21,9 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
+sys.dont_write_bytecode = True  # importing from tools/ must leave no bytecode there
+sys.path.insert(0, str(ROOT / "tools"))
+import inplace_guard as guard  # noqa: E402  (register I-37: a repository file changes only through it)
 CHECK = ROOT / "tools" / "parity_check.py"
 
 
@@ -32,11 +35,6 @@ def run():
 
 def sha(p):
     return hashlib.sha256(p.read_bytes()).hexdigest()
-
-
-def write(p, text):
-    with open(p, "w", encoding="utf-8", newline="") as fh:
-        fh.write(text)
 
 
 results = []
@@ -56,18 +54,16 @@ def case(name, path, mutate, needle):
     p = ROOT / path
     before = p.read_bytes()
     want = hashlib.sha256(before).hexdigest()
-    try:
-        write(p, mutate(before.decode("utf-8")))
+    # Through the guard (register I-37): a run killed mid-probe left a shipped script mutated.
+    with guard.mutated(p, mutate(before.decode("utf-8")).encode("utf-8")):
         rc, out = run()
         caught = rc == 1 and needle.lower() in out.lower()
         results.append((name, caught))
         print(f"  {'PASS' if caught else 'FAIL'}  {name}")
         if not caught:
             print(f"          exit {rc}; expected 1 and {needle!r} in the output")
-    finally:
-        p.write_bytes(before)
-        got = sha(p)
-        assert got == want, f"RESTORE FAILED for {path}"
+    got = sha(p)
+    assert got == want, f"RESTORE FAILED for {path}"
 
 
 # 1. A function gains a parameter in one tree only — the shape of the drift that is already

@@ -46,6 +46,9 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
+sys.dont_write_bytecode = True  # importing from tools/ must leave no bytecode there
+sys.path.insert(0, str(ROOT / "tools"))
+import inplace_guard as guard  # noqa: E402  (register I-37: a repository file changes only through it)
 PREFLIGHT = HERE / "preflight.py"
 MAKER = HERE / "make_probe_documents.py"
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
@@ -160,8 +163,8 @@ for label, target, original, replacement in MUTATIONS:
         print("  not read this as a pass.")
         results.append((label, None))
         continue
-    try:
-        target.write_bytes(before.replace(original, replacement, 1))
+    # Through the guard (register I-37): a run killed mid-probe left the rig's own source mutated.
+    with guard.mutated(target, before.replace(original, replacement, 1)):
         build_documents()
         rc, out = run_preflight()
         arm = ARM_OF[label.strip()[0]]
@@ -173,9 +176,7 @@ for label, target, original, replacement in MUTATIONS:
                                         "and it blocked")):
                 print(f"    {line.strip()}")
         results.append((label, detected))
-    finally:
-        target.write_bytes(before)
-        assert target.read_bytes() == before, f"RESTORATION FAILED for {target}"
+    assert target.read_bytes() == before, f"RESTORATION FAILED for {target}"
 
 build_documents()          # leave the correct documents on disk
 
