@@ -16,10 +16,13 @@ whatever the part's source: the operator's zero-width scaffolding is right
 while the pipeline runs and a defect in the deliverable (register J1). The
 archive is then read back BEFORE it is written: a U+200B that
 survived refuses delivery, and so does a positive source-language remnant in
-any prose part (register C22) — the language auto-detected from the ORIGINAL's
+any prose part (register C22) — the language the one DECLARED at Step 1c
+(source_language.json beside the notes), cross-checked against the ORIGINAL's
 word/document.xml, the verdict source_language_markers.remnant_verdict's.
-Marker classes the scan cannot rule on only WARN; with no language detected
-the block says so and does not run.
+Marker classes the scan cannot rule on only WARN. A declared language the skill
+does not support says NOT SUPPORTED and the block does not run; nothing
+declared, it scans the language detected from the original, refuses on what it
+finds, and never says clean on a guess.
 
 The delivered-document check
 ----------------------------
@@ -99,9 +102,17 @@ if _SCRIPTS_DIR not in sys.path:
 try:
     from source_language_markers import detect_language as _detect_lang
     from source_language_markers import remnant_verdict as _remnant_verdict
+    from source_language_markers import read_declared_language as _read_declared
+    from source_language_markers import not_supported as _not_supported
+    from source_language_markers import resolve_source_language as _resolve
+    from source_language_markers import is_supported_language as _is_supported
 except Exception:  # pragma: no cover — the remnant block then REFUSES, below.
     _detect_lang = None
     _remnant_verdict = None
+    _read_declared = None
+    _not_supported = None
+    _resolve = None
+    _is_supported = None
 try:
     from lexicon_compliance import _guess_language as _guess_lang
 except Exception:  # pragma: no cover — the agreement control is best-effort.
@@ -165,30 +176,46 @@ def _scrub_zwsp(data):
     return _CHARDATA_RE.sub(one, data), n
 
 
-def _remnant_gate(orig_docx, archive):
+def _guess_from_original(orig_docx):
+    """The remnant block's guess when nothing was declared: one detector on the
+    ORIGINAL's body, exactly as the block has always detected its language."""
+    try:
+        return _detect_lang(_original_body_text(orig_docx))
+    except Exception:
+        return None
+
+
+def _remnant_gate(orig_docx, archive, resolved):
     """THE REMNANT BLOCK — register C22: the one check that reads the finished
     archive with the original in hand was advisory by design. Every prose part
     of the archive ABOUT TO BE DELIVERED -- `archive`, held in memory -- is
     scanned; a BLOCKING hit refuses it, so it is never written, and an advisory
     one warns (the classes are source_language_markers'
-    REMNANT_ADVISORY and LEXICON_KEPT_NAMES, each with its reason). The language
-    comes from the ORIGINAL, C9's source of truth; making that detection SAY it
-    is guessing, and reusing it for C9, are branch 12's."""
-    if _detect_lang is None or _remnant_verdict is None:
+    REMNANT_ADVISORY and LEXICON_KEPT_NAMES, each with its reason).
+
+    THE LANGUAGE IS THE ONE DECLARED AT STEP 1c (branch 12 slice 12a, C22's
+    detection half): `resolved` is source_language_markers.resolve_source_language's,
+    the one policy, its guess `_guess_from_original`. A declared language with no
+    marker list cannot be scanned and says NOT SUPPORTED. Nothing declared, the
+    block scans the language detected from the ORIGINAL, exactly as before, and
+    still refuses on what it finds — no gate is softened — but a guess never
+    says clean."""
+    if (_detect_lang is None or _remnant_verdict is None or _not_supported is None
+            or resolved is None):
         raise RuntimeError(
             "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. "
             "source_language_markers.py could not be imported, so the remnant "
             "block cannot run. Nothing was written to the delivery path. "
             "Re-install the skill from the .skill / .zip archive.")
-    try:
-        src_lang = _detect_lang(_original_body_text(orig_docx))
-    except Exception:
-        src_lang = None
+    src_lang, guessed = resolved.language, resolved.cannot_rule
     if not src_lang:
-        print("  Remnant block skipped: source language could not be "
-              "auto-detected from the original .docx.")
+        print("  Remnant block skipped — " + _not_supported("the remnant block", guessed))
         return
-    print(f"  Remnant block: language={src_lang}, reading every prose part of "
+    if not _is_supported(src_lang):
+        print("  Remnant block: " + _not_supported("the remnant block", guessed))
+        return
+    origin = 'declared at Step 1c' if guessed is None else 'detected from the original, a guess'
+    print(f"  Remnant block: language={src_lang} ({origin}), reading every prose part of "
           "the archive BEFORE it is delivered...")
     blocking, advisory = [], []
     with zipfile.ZipFile(archive) as z:
@@ -206,7 +233,10 @@ def _remnant_gate(orig_docx, archive):
     if len(advisory) > 10:
         print(f"  ... {len(advisory) - 10} more advisory hit(s) (suppressed)")
     if not blocking:
-        if not advisory:
+        if guessed:
+            print("  Remnant block: " + _not_supported("the remnant block", guessed)
+                  + " It found nothing that blocks.")
+        elif not advisory:
             print(f"  Remnant block clean: no {src_lang} remnants in any prose part.")
         return
     shown ="\n".join(f"  - {part}: {pat}: ...{' '.join(ctx.split())[:100]}..."
@@ -215,7 +245,9 @@ def _remnant_gate(orig_docx, archive):
         "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. SOURCE-LANGUAGE "
         f"REMNANT: {len(blocking)} {src_lang} remnant(s) in the repacked archive, "
         f"so it was NEVER WRITTEN to the delivery path:\n{shown}\n"
-        "Nothing was written to the delivery path. Translate the text and re-run. "
+        + (f"The language was {origin} — {guessed}. Declare it at Step 1c and re-run.\n"
+           if guessed else "")
+        + "Nothing was written to the delivery path. Translate the text and re-run. "
         "A remnant in a part you did not pass (comments, footnotes, a header) means "
         "that part was not wired into this repack: pass its flag. If the text is "
         "faithful and the check wrongly scoped, SKILL.md rule 5a governs — never "
@@ -272,9 +304,16 @@ def _original_body_text(orig_docx):
     return _TAG_STRIP_RE.sub(' ', raw)
 
 
-def _detect_source_language(orig_docx):
+def _detect_source_language(orig_docx, announce=True):
     """Detect the source language from the ORIGINAL, and only when two
     independent detectors agree. Returns a language name, or None.
+
+    SINCE BRANCH 12 SLICE 12a IT IS THE CROSS-CHECK, NOT THE SOURCE OF TRUTH:
+    the language is the one declared at Step 1c, and this agreement is
+    compared with it (_cross_check_language). It decides the pre-repack
+    scan's language only when nothing was declared — as a guess, which the
+    scan then says. `announce=False` keeps its disagreement line out of a
+    declared run, where _cross_check_language reports instead.
 
     WHY THE ORIGINAL AND NOT THE TRANSLATION. Register C9. The pre-repack
     lexicon scan below is handed the TRANSLATED document.xml with no --language,
@@ -334,13 +373,37 @@ def _detect_source_language(orig_docx):
                 pass
     if second == primary:
         return primary
-    print(
-        f"  [repack] source-language detectors DISAGREE on the original "
-        f"({primary} vs {second}); passing no --language to the pre-repack "
-        f"lexicon scan, so it applies every language's rules rather than one "
-        f"chosen wrongly."
-    )
+    if announce:
+        print(
+            f"  [repack] source-language detectors DISAGREE on the original "
+            f"({primary} vs {second}); passing no language guess to the pre-repack "
+            f"lexicon scan, so it guesses for itself or applies every language's "
+            f"rules rather than one chosen wrongly."
+        )
     return None
+
+
+def _cross_check_language(declared, agreed):
+    """Repack's two-detector agreement on the ORIGINAL against the declaration —
+    one line, reported and never blocking (Wouter, 2026-10-08 (2)). Every check
+    uses the declaration; a MISMATCH names both so the operator can correct a
+    wrong one. Nothing declared, it says so, and the agreement stays a guess."""
+    lang, state, why = declared
+    if state not in ('supported', 'unsupported'):
+        print("  [repack] source language: " + _not_supported(
+            "the source-language checks", f"{why}; repack's checks run on a guess"))
+        return
+    if agreed == lang:
+        print(f"  [repack] source language: {lang}, declared at Step 1c — cross-check: the "
+              f"original reads as {agreed} by two detectors that agree, as declared.")
+    elif agreed:
+        print(f"  [repack] WARNING — SOURCE-LANGUAGE MISMATCH: declared {lang} at Step 1c, "
+              f"but two detectors that agree read the ORIGINAL as {agreed}. Every check uses "
+              "the declaration. If it is wrong, declare the right language (Step 1c) and "
+              "re-run from Step 4d.")
+    else:
+        print(f"  [repack] source language: {lang}, declared at Step 1c — the cross-check "
+              "could not rule: the two detectors do not agree on the original.")
 
 
 def _run_pre_repack_validator(label, args):
@@ -612,17 +675,28 @@ def repack(orig_docx, translated_doc_xml, output_docx,
     # Run before any byte is written to output_docx so failures abort
     # cleanly without producing a half-baked .docx.
     #
-    # The source language comes from the ORIGINAL, not from the translation the
-    # scan is about to read. Register C9 — see _detect_source_language.
+    # THE SOURCE LANGUAGE IS THE ONE DECLARED AT STEP 1c (branch 12 slice 12a),
+    # read once beside the notes, and every language-dependent check here reads
+    # that: the pre-repack scan through --notes, the remnant block through
+    # `_declared`. The ORIGINAL's two-detector agreement cross-checks it (C9's
+    # source of truth, now the second opinion), and only when nothing was
+    # declared is it handed to the scan — as a guess, which the scan says.
+    _declared = (_read_declared(paragraphs_json) if _read_declared is not None
+                 else (None, 'unreadable', 'source_language_markers.py could not be imported'))
+    _settled = _declared[1] in ('supported', 'unsupported')
+    _agreed = _detect_source_language(orig_docx, announce=not _settled)
+    if _not_supported is not None:
+        _cross_check_language(_declared, _agreed)
     _lex_args = [sys.executable,
                  os.path.join(scripts_dir, 'lexicon_compliance.py'),
                  translated_doc_xml,
                  '--stage', 'pre-repack']
-    _src_lang_for_scan = _detect_source_language(orig_docx)
-    if _src_lang_for_scan:
-        print(f"  [repack] source language from the ORIGINAL: {_src_lang_for_scan} "
-              "(two detectors agree) — passing it to the pre-repack lexicon scan")
-        _lex_args += ['--language', _src_lang_for_scan]
+    if paragraphs_json:
+        _lex_args += ['--notes', paragraphs_json]
+    if not _settled and _agreed:
+        print(f"  [repack] nothing declared: the ORIGINAL reads as {_agreed} (two detectors "
+              "agree) — passing it to the pre-repack lexicon scan as a guess")
+        _lex_args += ['--guessed', _agreed]
     _run_pre_repack_validator(
         'lexicon_compliance.py --stage pre-repack',
         _lex_args,
@@ -1077,7 +1151,9 @@ def repack(orig_docx, translated_doc_xml, output_docx,
             "skill from the .skill / .zip archive.")
 
     # --- THE REMNANT BLOCK (C22), on the archive BEFORE it is written ---
-    _remnant_gate(orig_docx, archive)
+    _remnant_gate(orig_docx, archive,
+                  _resolve(paragraphs_json, guess=lambda: _guess_from_original(orig_docx))
+                  if _resolve is not None else None)
 
     # --- THE DELIVERED-DOCUMENT CHECK (branch 11), on a CHECK COPY, BEFORE the write ---
     _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir)

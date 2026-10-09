@@ -507,8 +507,14 @@ got_args = recorded[0][1] if recorded else []
 ok("C9 the pre-repack lexicon scan is the FIRST gate invoked",
    bool(recorded) and "lexicon_compliance" in recorded[0][0],
    f"({recorded[0][0] if recorded else 'nothing recorded'})")
-ok("C9 --language IS passed, from the original",
-   "--language" in got_args and "dutch" in got_args,
+# BRANCH 12 SLICE 12a (2026-10-09): the language is now the one DECLARED at Step 1c, read by the scan
+# through --notes; this fixture declares nothing, so the original's agreement still REACHES the scan --
+# as --guessed, which the scan reports as a guess rather than PASSED. Same language, same rules.
+ok("C9 the original's agreement IS passed, from the original — as --guessed, nothing being declared",
+   "--guessed" in got_args and got_args[got_args.index("--guessed") + 1] == "dutch",
+   f"(args tail: {got_args[-4:] if got_args else []})")
+ok("C9 and the scan is told where the notes are, so it can read a declaration",
+   "--notes" in got_args and got_args[got_args.index("--notes") + 1] == str(WORK / "nope.json"),
    f"(args tail: {got_args[-4:] if got_args else []})")
 ok("C9 the scan still reads the TRANSLATED document, not the original",
    any(str(WORK / "nope.xml") == a for a in got_args))
@@ -525,8 +531,9 @@ try:
 finally:
     NEW_RPK._run_pre_repack_validator = _real
 got_args = recorded[0][1] if recorded else []
-ok("C9 on detector disagreement, no --language is passed",
-   "--language" not in got_args, f"(args tail: {got_args[-4:] if got_args else []})")
+ok("C9 on detector disagreement, no --language and no --guessed is passed",
+   "--language" not in got_args and "--guessed" not in got_args,
+   f"(args tail: {got_args[-4:] if got_args else []})")
 
 # =============================================================================
 shutil.rmtree(TMP, ignore_errors=True)

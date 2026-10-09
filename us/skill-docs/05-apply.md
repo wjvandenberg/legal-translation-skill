@@ -38,7 +38,9 @@ This is the single most important step. It does everything at once:
 9. **Scans for source-language remnants** — after applying all replacements, scans the
    entire output XML for common source-language words and reports any found with their
    surrounding context. This catches text in split-run paragraphs, structured document
-   tags, or nested elements that the paragraph-level replacement missed.
+   tags, or nested elements that the paragraph-level replacement missed. It scans for the
+   language declared at Step 1c; a language the skill does not support, or nothing
+   declared, prints NOT SUPPORTED instead of CLEAN.
 
 The script prints a summary showing exact vs offset matches and any unmatched entries. Target:
 zero style/numbering mismatches.

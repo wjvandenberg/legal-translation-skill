@@ -363,6 +363,10 @@ orig_gloss.write_bytes(gloss.encode("utf-8"))          # deliberately NOT transl
 sys.path.insert(0, str(ROOT / "tools"))
 from keep_declarations import write_keep_declarations  # noqa: E402
 write_keep_declarations(src5, notes5.parent, SCRIPTS, kinds={"glossary"})
+# AND SINCE BRANCH 12 SLICE 12a (2026-10-09) a compliant operator DECLARES the source language at Step 1c, and a
+# remnant block that ran on a guess never reports clean. This fixture's body is Dutch, the language the block
+# detected here before the declaration existed, so it declares Dutch -- what a compliant run writes.
+(notes5.parent / "source_language.json").write_bytes(json.dumps({"source_language": "dutch"}).encode("utf-8"))
 xml5 = apply_and_get_xml("scan", src5, notes5)
 if xml5 is None:
     void("ARM 5", "apply produced nothing")

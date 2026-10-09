@@ -303,11 +303,15 @@ def audit_b1():
     # and removes it from the mute list. The figures are not edited toward an expectation:
     # tools/check_coverage.py derives the same two independently, and B1.agree below is what
     # asserts the two agree.
-    claim("B1.verdict", "18 of 20 can block by exit or by raise",
-          sum(x["blocks"] for x in v.values()), 18)
-    claim("B1.mute", "the two that cannot block",
+    # BRANCH 12 SLICE 12a MOVED THEM AGAIN, for the same reason: source_language_markers.py
+    # gained Step 1c's `--declare` command, which exits 2 on a name or a workdir it refuses, so
+    # it is the nineteenth script able to block and leaves the mute list. Measured, not
+    # expected: this scan and check_coverage.py both re-derived 19 on 2026-10-09 (B1.agree).
+    claim("B1.verdict", "19 of 20 can block by exit or by raise",
+          sum(x["blocks"] for x in v.values()), 19)
+    claim("B1.mute", "the one that cannot block",
           sorted(n for n, x in v.items() if not x["blocks"]),
-          ["source_language_markers.py", "translate_numbering.py"])
+          ["translate_numbering.py"])
 
     # RUN THE TOOL FROM THE REF, not from the checkout. This is the bug listed as (1) at the
     # top of this file, and the first attempt at fixing it only covered files READ from a

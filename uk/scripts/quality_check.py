@@ -50,6 +50,8 @@ from source_language_markers import (  # noqa: E402
     scan_remnants,
     detect_language,
     SUPPORTED_LANGUAGES,
+    not_supported,
+    resolve_source_language,
 )
 
 
@@ -978,15 +980,19 @@ def _scan_aux_xml_for_remnants(xml_path, source_language, label):
     scan against every `<w:t>` element it contains. Returns a list of
     issue strings, prefixed with ``label`` (e.g. 'numbering.xml',
     'header1.xml')."""
+    # A PART THAT WILL NOT PARSE IS AN ISSUE, whatever the language: it used to return an
+    # empty list here, which the summary printed as CLEAN for a file nothing had read
+    # (register S1, the blind desk review's wider trigger).
+    try:
+        tree = etree.parse(xml_path)
+    except (OSError, etree.XMLSyntaxError) as exc:
+        return [f"{label} could not be parsed ({exc.__class__.__name__}) — nothing in it "
+                "was checked"]
     issues = []
     if not source_language:
         return issues
     lang = source_language.lower()
     if lang not in SUPPORTED_LANGUAGES:
-        return issues
-    try:
-        tree = etree.parse(xml_path)
-    except (OSError, etree.XMLSyntaxError):
         return issues
     root = tree.getroot()
     # numbering.xml uses <w:lvlText w:val="..."/> for level format strings.
@@ -1085,12 +1091,21 @@ def check(xml_path, verbose=False, source_json=None, variant='uk',
     if original_xml:
         source_root = etree.parse(original_xml).getroot()
 
-    # Auto-detect source language from paragraphs.json if not provided.
-    if not source_language and source_data:
-        sample = ' '.join(
-            (p.get('text') or '') for p in source_data[:60]
-        )
-        source_language = detect_language(sample)
+    # THE SOURCE LANGUAGE (branch 12 slice 12a): an explicit --language, else the one
+    # DECLARED at Step 1c beside --with-source, read through the shared reader. A language
+    # the skill does not support cannot be scanned; nothing declared, the check guesses as
+    # it always did and keeps every issue the guess finds — but neither may print CLEAN or
+    # PASSED (registers S1, H1), so `cannot_rule` turns those words into NOT SUPPORTED.
+    def _guess_from_notes():
+        if not source_data:
+            return None
+        return detect_language(' '.join((p.get('text') or '') for p in source_data[:60]))
+
+    _resolved = resolve_source_language(source_json, explicit=source_language,
+                                        guess=_guess_from_notes)
+    if _resolved.warning:
+        print(f"  WARNING — {_resolved.warning}")
+    source_language, cannot_rule = _resolved.language, _resolved.cannot_rule
 
     source_lang_label = (source_language or 'source').lower() + '_remnants'
 
@@ -1136,11 +1151,13 @@ def check(xml_path, verbose=False, source_json=None, variant='uk',
     # language text in headers/footers/numbering/comments that
     # previously slipped past quality_check entirely.
     aux_results = {}
+    language_rows = {source_lang_label}
     if aux_dir:
         aux_results = check_aux_files(aux_dir, source_language, verbose)
         for aux_label, aux_issues in aux_results.items():
             key = f'aux_{aux_label}'
             results[key] = aux_issues
+            language_rows.add(key)
             total += len(aux_issues)
 
     # Print summary
@@ -1148,6 +1165,8 @@ def check(xml_path, verbose=False, source_json=None, variant='uk',
     print(f"{'='*60}")
     for name, issues in results.items():
         status = 'CLEAN' if not issues else f'{len(issues)} issues'
+        if not issues and cannot_rule and name in language_rows:
+            status = 'NOT SUPPORTED'
         print(f"  {name:30s} {status}")
         if verbose and issues:
             for iss in issues[:5]:
@@ -1170,7 +1189,13 @@ def check(xml_path, verbose=False, source_json=None, variant='uk',
               "pipeline. Re-run with --original <original document.xml>\n        before "
               "treating these as ours.")
 
-    if total == 0:
+    if cannot_rule:
+        print("\n  " + not_supported("the source-language remnant check", cannot_rule))
+    if total == 0 and cannot_rule:
+        print("\n  *** NO ISSUES FOUND — but the source-language remnant check is NOT SUPPORTED "
+              "here: no script looked for source-language text left in this document. Read it "
+              "yourself before delivery. ***")
+    elif total == 0:
         print("\n  *** PASSED: Document is ready for delivery ***")
     else:
         print(f"\n  *** FAILED: {total} issues must be resolved ***")

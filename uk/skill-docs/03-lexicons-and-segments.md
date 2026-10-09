@@ -101,7 +101,13 @@ equivalents and are the single best source of terminology consistency for this s
 
 If the document is in a language not covered by the bundled sub-lexicons, proceed with
 translation using the English reference lexicons alone — no sub-lexicon is required to
-complete the translation.
+complete the translation. **But know what that costs.** The calque defences this skill
+describes — the sub-lexicons' Avoid columns, the lexicon scan's language rules, the remnant
+checks — exist only for the eleven supported languages. For any other, Step 1c reported NOT
+SUPPORTED: the lexicon scan runs every language's rules, none of them written for this one,
+every language-dependent check says NOT SUPPORTED, and nothing but your own reading stands
+between a calque or an untranslated phrase and the output. Read the output against the
+source for both before delivery.
 
 **Sub-lexicons are read-only during translation.** Do not create new sub-lexicon files, and
 do not edit existing ones, at runtime. This includes adding a missing term, "correcting" a

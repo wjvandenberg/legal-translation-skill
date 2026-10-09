@@ -11,8 +11,14 @@ Usage:
     # Scan paragraphs.json BEFORE applying translations (Step 4d)
     python scripts/lexicon_compliance.py paragraphs.json --stage pre-apply
 
-    # Scan the translated document.xml AFTER post-processing (Step 8d, pre-repack)
-    python scripts/lexicon_compliance.py final/word/document.xml --stage pre-repack
+    # Scan the translated document.xml AFTER post-processing (Step 8d, pre-repack);
+    # --notes names the paragraphs.json the Step 1c declaration sits beside
+    python scripts/lexicon_compliance.py final/word/document.xml --stage pre-repack --notes paragraphs.json
+
+    # The source language is the one DECLARED at Step 1c (source_language.json beside
+    # paragraphs.json). Nothing declared, the scan guesses, and says NOT SUPPORTED, never
+    # PASSED; a declared language the skill does not support runs every language's rules,
+    # as an unknown language always has, and says NOT SUPPORTED too.
 
     # Disable source-language hints (use only the language-agnostic ruleset)
     python scripts/lexicon_compliance.py paragraphs.json --language none
@@ -65,6 +71,19 @@ def _check_self_integrity():
 
 _check_self_integrity()
 
+# THE DECLARED SOURCE LANGUAGE (branch 12 slice 12a) is read through the one shared
+# reader in source_language_markers.py, beside this script.
+# NO .pyc INSIDE A SHIPPED TREE: the guard must precede the sibling import (register
+# I-18's family; tests/test_no_bytecode_in_tree.py discovers the importers).
+sys.dont_write_bytecode = True
+_SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+if _SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPTS_DIR)
+from source_language_markers import (  # noqa: E402
+    LANGUAGE_MARKERS,
+    not_supported,
+    resolve_source_language,
+)
 
 
 # --------------------------------------------------------------------------
@@ -383,8 +402,16 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("path", help="paragraphs.json, document.xml, or .docx to scan")
     ap.add_argument("--language", default="auto",
                     help="Source language (dutch, italian, etc.) — drives language-specific rules. "
-                         "Default: 'auto' tries to read a language hint from the input; "
+                         "Default: 'auto' reads the language DECLARED at Step 1c "
+                         "(source_language.json beside paragraphs.json); "
                          "'none' disables language-specific rules.")
+    ap.add_argument("--notes", default=None,
+                    help="paragraphs.json, beside which the Step 1c declaration sits. Needed only "
+                         "when PATH is the XML; a paragraphs.json PATH is its own notes.")
+    ap.add_argument("--guessed", default=None,
+                    help="Read only when NOTHING was declared: a language the caller has guessed "
+                         "(repack passes its two-detector agreement on the original). It is used "
+                         "as a guess, and the scan says so rather than PASSED.")
     ap.add_argument("--stage", default="pre-repack",
                     choices=["pre-apply", "pre-repack"],
                     help="Advisory label printed in output; does not change rule selection.")
@@ -403,11 +430,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(f"lexicon_compliance: failed to read {path}: {e}", file=sys.stderr)
         return 2
 
-    # Language detection: if 'auto' and the path is a JSON, peek at a few source
-    # paragraphs to guess. Very cheap — look for common Dutch/Italian markers.
-    language = args.language
-    if language == "auto":
-        language = _guess_language(path)
+    language, cannot_rule, warning = _resolve_language(args, path)
 
     blocks, warns = scan(entries, language)
     if args.warnings_are_errors:
@@ -415,6 +438,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         warns = []
 
     print(f"Lexicon compliance scan — stage={args.stage}, language={language}, input={path}")
+    if warning:
+        print(f"  WARNING — {warning}")
+    if cannot_rule:
+        print(f"  source language: {not_supported('this lexicon scan', cannot_rule)}"
+              + (" Every language's rules ran, none of them written for this document's language."
+                 if language == "*" else ""))
     print(f"  entries scanned: {len(entries)}")
     print(f"  blocking violations: {len(blocks)}")
     print(f"  warnings:            {len(warns)}")
@@ -431,8 +460,37 @@ def main(argv: Optional[List[str]] = None) -> int:
         print("")
         print("  *** BLOCKED: resolve all BLOCK-severity findings before proceeding. ***")
         return 1
+    if cannot_rule:
+        # S1 and S2: a pass from rules chosen by a guess, or from the language-agnostic
+        # rules alone, is not a pass on this document's language, and must not read as one.
+        print("  NO BLOCKING VIOLATION FOUND — but NOT SUPPORTED: see the source-language line "
+              "above. The run goes on.")
+        return 0
     print("  PASSED: no lexicon violations detected.")
     return 0
+
+def _resolve_language(args, path: str) -> Tuple[str, Optional[str], Optional[str]]:
+    """(the language the rules are chosen by, why this scan cannot rule or None, a warning or
+    None), by source_language_markers.resolve_source_language — the one policy: an explicit
+    --language, else the Step 1c declaration beside the notes, else a guess, which may never
+    say PASSED. `none` (any case) is the language-agnostic run the operator asked for.
+
+    A language no rules are written for — one the skill does not support, an explicit `*`,
+    or none guessed — runs EVERY language's rules, as an unknown language always has: never
+    a narrower scan than a guess would have run (CLAUDE.md 2.4 item 5), and NOT SUPPORTED."""
+    named = args.language.strip().lower()
+    if named == "none":
+        return "none", None, None
+    if named == "*":
+        return "*", "--language * names no source language", None
+
+    def guess():
+        g = (args.guessed or "").strip().lower() or _guess_language(path)
+        return None if g in ("", "*") else g
+
+    notes = args.notes or (path if path.lower().endswith(".json") else None)
+    r = resolve_source_language(notes, explicit=None if named == "auto" else named, guess=guess)
+    return (r.language if r.language in LANGUAGE_MARKERS else "*"), r.cannot_rule, r.warning
 
 def _guess_language(path: str) -> str:
     """Best-effort source-language detection from a paragraphs.json or document.xml.
