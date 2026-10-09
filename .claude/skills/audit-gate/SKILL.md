@@ -53,10 +53,12 @@ should be treated as evidence the audit was too shallow, not that the work was c
 > by listing, 2026-08-24, and the charter's 5.3 had been carrying the old paths since the promotion.
 > `temp/` is gitignored, so a path there is a command that works only on the machine that wrote it.
 
-Run these after editing any of the committable documents:
+Run these after editing any of the committable documents. **Run bare, `md_tables.py` reads the same
+documents the publication check reads and prints each one; it exits 2, VOID, if it read none or could not
+open one** *(register I-39 — this command used to name two of them by their pre-move paths, and crashed)*:
 
 ```bash
-uv run python tools/md_tables.py CLAUDE.md REGISTER-findings.md EVIDENCE-a3-structure.md PLAN-2-step-b.md DECISIONS-LOG.md PLAN-3-opus5-migration.md
+uv run python tools/md_tables.py
 ```
 
 ```bash
@@ -93,7 +95,7 @@ one of them survives the session that makes it.
 | `tools/stepb_verify.py` | 84 claims, and it generates the traceability appendix |
 | `tools/stepb_audit.py` | 15 checks — **needs `LEGAL_TRANSLATION_A4`, see below** |
 | `tools/stepb_audit3.py` | |
-| `tools/stepb_metacheck.py` | **eleven negative tests: it mutates the document to prove each check can fail, then restores it byte-identically** |
+| `tools/stepb_metacheck.py` | **eleven negative tests and a null control, each planted in a COPY of the document, never in it, and counted only when the check reports a failure the unmutated copy did not** *(I-37, I-38)*. From a worktree set `LT_PRIVATE_DIR`, or the audit's probes are VOID |
 | `tools/stepb_refute.py` | |
 
 ```bash

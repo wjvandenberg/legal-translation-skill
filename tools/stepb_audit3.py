@@ -36,10 +36,16 @@ if hasattr(_sys.stdout, "reconfigure"):
 
 
 ROOT = Path(__file__).resolve().parent.parent
-doc = (ROOT / "PLAN-2-step-b.md").read_text(encoding="utf-8")
+# STEPB_PLAN_DOC and LT_PRIVATE_DIR: see the same lines in stepb_audit.py (registers I-37, I-38).
+import os as _os  # noqa: E402
+DOC = Path(_os.environ.get("STEPB_PLAN_DOC") or ROOT / "PLAN-2-step-b.md")
+if _os.environ.get("STEPB_PLAN_DOC"):
+    print(f"NOTE: STEPB_PLAN_DOC is set - reading the plan from {DOC}", file=_sys.stderr)
+doc = DOC.read_text(encoding="utf-8")
 reg = (ROOT / "evidence/REGISTER-findings.md").read_text(encoding="utf-8")
 a3 = (ROOT / "evidence/EVIDENCE-a3-structure.md").read_text(encoding="utf-8")
-cmp_ = (ROOT.parent / "legal-translation-private" / "A4-A3-COMPARISON.md").read_text(encoding="utf-8")
+PRIVATE = Path(_os.environ.get("LT_PRIVATE_DIR") or ROOT.parent / "legal-translation-private")
+cmp_ = (PRIVATE / "A4-A3-COMPARISON.md").read_text(encoding="utf-8")
 cmd = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 ALL = "\n".join([reg, a3, cmp_, cmd])
 
