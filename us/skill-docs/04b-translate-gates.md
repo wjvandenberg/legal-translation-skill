@@ -97,10 +97,13 @@ calques or hard-rule violations that slipped into the `en` / `en_deleted` /
 python <skill-path>/scripts/lexicon_compliance.py <workdir>/paragraphs.json --stage pre-apply
 ```
 
-The script auto-detects the source language from the JSON; override with
-`--language <name>` if needed, or `--language none` to apply only the
-language-agnostic rules. Exit code 0 = clean, 1 = blocking violations, 2 = I/O
-error.
+The script reads the source language you declared at Step 1c (`source_language.json`
+beside `paragraphs.json`). A language the skill does not support runs every
+language's rules, none of them written for it, and the scan says NOT SUPPORTED
+instead of PASSED; with nothing declared it guesses, and says NOT SUPPORTED too —
+declare the language and re-run. `--language <name>` overrides the declaration; `--language none` applies only
+the language-agnostic rules. Exit code 0 = no blocking violation, 1 = blocking
+violations, 2 = I/O error.
 
 **Do not proceed to Step 5 while the script exits 1.** For every blocking
 finding:

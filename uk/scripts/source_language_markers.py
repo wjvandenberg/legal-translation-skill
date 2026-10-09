@@ -32,6 +32,14 @@ This module defines:
 
 * Helper functions `scan_remnants()` and `detect_language()`.
 
+* `read_declared_language()` — the ONE reader of the source language the
+  operator declared at Step 1c, `source_language.json` beside the notes —
+  `resolve_source_language()`, the one policy every language-dependent check
+  follows (an explicit language, else the declaration, else a guess that may
+  never say CLEAN), and `not_supported()`, the line a check prints when it
+  cannot rule. Run as a script, `--declare <language> <workdir>` writes the
+  declaration.
+
 ============================================================================
 DESIGN PRINCIPLES FOR MARKERS
 ============================================================================
@@ -56,9 +64,11 @@ Each list is hand-curated to minimise false positives against English:
 If a genuine remnant is missed, add to the relevant list. Never add entries
 with fewer than four Latin characters; always prefer multi-word phrases.
 """
+import json
 import re
 import os
 import sys
+from collections import namedtuple
 
 def _check_self_integrity():
     """Detect install-time truncation. Whole-file scan tolerates null-padding."""
@@ -413,5 +423,160 @@ def is_supported_language(language):
     if not language:
         return False
     return language.lower() in LANGUAGE_MARKERS
+
+# ──────────────────────────────────────────────────────────────────────
+# THE DECLARED SOURCE LANGUAGE — branch 12 slice 12a (registers S1, S2, C9,
+# H1 and C22's detection half). The operator declares the language ONCE, at
+# Step 1c, and every language-dependent check reads it through
+# read_declared_language and through nothing else. A detector's answer is a
+# GUESS: measured over the 13 recorded runs every detector in the skill was
+# wrong somewhere, and a wrong SPECIFIC language scans the wrong list and
+# prints CLEAN — worse than no check, because the operator is told the
+# document is clean. So a check that cannot rule says so, in one shared
+# form, not_supported(), and never CLEAN or PASSED.
+# ──────────────────────────────────────────────────────────────────────
+DECLARATION_FILE = 'source_language.json'
+TARGET_LANGUAGE = 'english'
+_LANGUAGE_NAME_RE = re.compile(r'^[a-z]+$')
+
+
+def _undeclared_why():
+    return (f"no source language was declared at Step 1c ({DECLARATION_FILE} "
+            "beside paragraphs.json)")
+
+
+def language_state(language, origin='declared'):
+    """('supported' | 'unsupported', why) for a language a check has been GIVEN —
+    declared at Step 1c, or stated with an explicit --language. Never for a guess."""
+    if language in LANGUAGE_MARKERS:
+        return 'supported', f"{origin} ({language})"
+    if language == TARGET_LANGUAGE:
+        return 'unsupported', (f"the {origin} source language is English, the TARGET "
+                               "language this skill translates into, so there is no "
+                               "source-language text for it to find")
+    return 'unsupported', (f"the {origin} source language, {language}, is not one of the "
+                           f"{len(SUPPORTED_LANGUAGES)} this skill supports "
+                           f"({', '.join(SUPPORTED_LANGUAGES)})")
+
+
+def read_declared_language(notes):
+    """THE ONE READER of the declaration: (language, state, why).
+
+    `notes` is paragraphs.json's path, or the folder it sits in; the
+    declaration is `source_language.json` beside it, written at Step 1c by
+    `--declare` below. `state` is one of:
+      'supported'   — declared, one of SUPPORTED_LANGUAGES: rule on it;
+      'unsupported' — declared, but no marker list or sub-lexicon exists for
+                      it (English, the target, among them): cannot rule;
+      'undeclared'  — nothing declared;
+      'unreadable'  — a declaration that cannot be read or names no language.
+    `language` is the declared name for the first two and None otherwise —
+    an unreadable declaration is never turned into a language. `why` is the
+    reason a check prints, never document text."""
+    if not notes:
+        return None, 'undeclared', _undeclared_why()
+    # A paragraphs.json path names its folder; anything else IS the folder, existing or not —
+    # never its parent, which would read another workdir's declaration.
+    folder = (os.path.dirname(os.path.abspath(notes))
+              if notes.lower().endswith('.json') and not os.path.isdir(notes) else notes)
+    path = os.path.join(folder, DECLARATION_FILE)
+    if not os.path.isfile(path):
+        return None, 'undeclared', _undeclared_why()
+    try:
+        # utf-8-sig: a declaration written by hand on Windows often carries a BOM.
+        with open(path, 'r', encoding='utf-8-sig') as fh:
+            data = json.load(fh)
+    except (OSError, ValueError) as exc:
+        return None, 'unreadable', (
+            f"{DECLARATION_FILE} beside paragraphs.json cannot be read as JSON "
+            f"({exc.__class__.__name__}): declare the language again at Step 1c")
+    name = data.get('source_language') if isinstance(data, dict) else None
+    language = name.strip().lower() if isinstance(name, str) else ''
+    if not _LANGUAGE_NAME_RE.match(language):
+        return None, 'unreadable', (
+            f"{DECLARATION_FILE} beside paragraphs.json names no language "
+            '(it must read {"source_language": "<name>"}, letters only): '
+            "declare the language again at Step 1c")
+    state, why = language_state(language)
+    return language, state, why
+
+
+def not_supported(check, why):
+    """The one line every language-dependent check prints when it cannot rule
+    — a distinct warning, never CLEAN or PASSED. The run goes on."""
+    return f"NOT SUPPORTED — {check} cannot rule: {why}."
+
+
+Resolved = namedtuple('Resolved', 'language cannot_rule warning')
+
+
+def resolve_source_language(notes, explicit=None, guess=None):
+    """THE ONE POLICY every language-dependent check follows, so it lives here
+    and nowhere else. Resolved(language, cannot_rule, warning):
+
+      language    — the language to check in, or None. One with no marker
+                    list (is_supported_language False) is returned as named;
+                    the caller then runs nothing written for that language.
+      cannot_rule — None when the check may say CLEAN or PASSED; otherwise
+                    the reason it says NOT SUPPORTED instead.
+      warning     — an explicit language that contradicts the declaration.
+
+    In order: `explicit` (a --language the operator or a caller stated); the
+    Step 1c declaration beside `notes`; and only when nothing was declared,
+    `guess()` — whose answer the check still ACTS on, blocking or reporting as
+    it always has, so no gate is softened, but never calls CLEAN or PASSED."""
+    declared, state, why = read_declared_language(notes)
+    settled = state in ('supported', 'unsupported')
+    if explicit:
+        named = explicit.strip().lower()
+        estate, ewhy = language_state(named, origin='--language')
+        warning = (f"--language {named} overrides the source language declared at "
+                   f"Step 1c, {declared}" if settled and declared != named else None)
+        return Resolved(named, None if estate == 'supported' else ewhy, warning)
+    if settled:
+        return Resolved(declared, None if state == 'supported' else why, None)
+    guessed = guess() if callable(guess) else guess
+    if guessed:
+        return Resolved(guessed, f"{why}, so it ran on a guess: {guessed}", None)
+    return Resolved(None, f"{why}, and no language could be guessed", None)
+
+
+def _declare(argv):
+    """Step 1c: python source_language_markers.py --declare <language> <workdir>"""
+    if len(argv) != 3 or argv[0] != '--declare':
+        print("usage: python source_language_markers.py --declare <language> <workdir>",
+              file=sys.stderr)
+        return 2
+    language, workdir = argv[1].strip().lower(), argv[2]
+    if not _LANGUAGE_NAME_RE.match(language):
+        print(f"REFUSED: {argv[1]!r} is not a language name. Name the source language in "
+              "English, letters only — for example: dutch. Nothing was written.",
+              file=sys.stderr)
+        return 2
+    if not os.path.isdir(workdir):
+        print(f"REFUSED: the workdir {workdir} does not exist. Create it at Step 1b, then "
+              "declare the language. Nothing was written.", file=sys.stderr)
+        return 2
+    earlier, _state, _why = read_declared_language(workdir)
+    with open(os.path.join(workdir, DECLARATION_FILE), 'w', encoding='utf-8',
+              newline='') as fh:
+        fh.write(json.dumps({'source_language': language}) + '\n')
+    if earlier and earlier != language:
+        print(f"Replaced the earlier declaration ({earlier}) with {language}.")
+    _lang, state, why = read_declared_language(workdir)
+    if state == 'supported':
+        print(f"Declared the source language: {language} — supported, one of the "
+              f"{len(SUPPORTED_LANGUAGES)}. Every language-dependent check will read it.")
+    else:
+        print(f"Declared the source language: {language}. "
+              + not_supported("every language-dependent check", why)
+              + " The run goes on: translate with the English reference lexicons alone, "
+              "and read the output yourself for text left untranslated — no script in "
+              "this skill can find it in this language.")
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(_declare(sys.argv[1:]))
 
 # === SKILL FILE COMPLETE ===

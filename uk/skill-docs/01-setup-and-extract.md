@@ -52,6 +52,30 @@ tracked changes (e.g., a redline), skip this step to preserve them in the transl
 **Do not** strip revision markup during the apply step (Step 5) — that would destroy
 intentional tracked changes in documents that have them.
 
+#### Step 1c — Declare the source language — MANDATORY
+
+Name the language the document is written in, once, before anything reads it:
+
+```bash
+python <skill-path>/scripts/source_language_markers.py --declare <language> <workdir>
+```
+
+`<language>` is the language's English name in lower case — `dutch`, `italian`, `norwegian`.
+Take it from the user's request or from the document itself, never from a script's guess. The
+command writes `<workdir>/source_language.json`, beside where `paragraphs.json` will be, and
+**every language-dependent check reads it**: the lexicon scan at Step 4d and before repack,
+the source-language scan at Step 5, the remnant checks at Step 9 and the remnant block at
+Step 10. Repack cross-checks it against the original and warns, naming both, on a mismatch.
+Declared the wrong language? Run the command again with the right one; it replaces the file.
+
+The command says whether the language is one of the eleven this skill supports. **If it says
+NOT SUPPORTED, the run goes on** — translate with the English reference lexicons alone
+(Step 3) — but every language-dependent check will say NOT SUPPORTED and cannot rule, so no
+script can find text left untranslated: read the output for it yourself. A source already in
+English is reported the same way. **Without a declaration every one of those checks falls
+back to a guess** — which has named Norwegian as Polish and English as Portuguese — and says
+NOT SUPPORTED rather than CLEAN or PASSED.
+
 ### Step 2: Extract paragraphs with formatting metadata
 
 *[Internal compliance check — do not echo or paraphrase to the user. Re-read every rule in this step before executing. Do not deviate from any line of the skill. Do not bundle work, skip checks, or "interpret for efficiency" — every prior deviation has produced output below the quality the skill is designed to deliver. The skill's hard gates block deviations anyway; complying upfront is always faster than running into a gate and re-authoring paragraphs.json.]*
@@ -157,6 +181,8 @@ Before moving to the next step, confirm:
 
 - [ ] You converted .doc → .docx (if needed) using soffice, NOT pandoc
 - [ ] You inspected `clean_conversion_artifacts.py`'s author/ratio output and did not run it on a redline
+- [ ] **You declared the source language at Step 1c** — `source_language.json` is in the workdir,
+      and you noted whether the command called it supported or NOT SUPPORTED
 - [ ] You produced `paragraphs.json` with `extract_paragraphs.py`
 - [ ] **You ran `validate_apply.py --extraction-completeness` and its BODY count is zero.**
       A non-zero body count means extraction did not read a paragraph, and nothing later in

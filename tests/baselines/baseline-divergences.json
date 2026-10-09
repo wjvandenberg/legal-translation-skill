@@ -3,17 +3,17 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 56,
+ "count": 58,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
-   "sha256_now": "d82d092062ef4f6ee99a62a6c1c3db3b00682640a9624915b16f3fb70239c42e"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "9a94c77e42e005f84da08ff5055da09fd504acba44b317da85a04ccf4bf4a52c"
   },
   "uk/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/no-bytecode-in-shipped-tree",
-   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
-   "sha256_now": "86a4a6b0f422be5f526a32b6485873f4b359c5089ae361ac150544789d60b160"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "dbd67de313c3de08eaced28daf06a819deeb8a61dadef354dbf7b68fa5eb2583"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/signed-python-no-doc-moves",
@@ -31,19 +31,19 @@
    "sha256_now": "7a4064265a13db83d9bc9dd00319cc3df278ce5704f1ca52996d7fc1c9d6b8c1"
   },
   "uk/scripts/quality_check.py": {
-   "changed_by": "feature/no-bytecode-in-shipped-tree",
-   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
-   "sha256_now": "efbb157c8dcad6d7d80f8d9e4e41e76b6b8790d7c802a3a63cd523878e1b51f0"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "3f8acb9b0276745b4bb0dca65e50392f3f31a41684a38a0f36857172d258ff61"
   },
   "uk/scripts/repack_docx.py": {
-   "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
-   "sha256_now": "d4c4719920f9e39a28b13eb007c8a6d8a561b508fef3b90ec4b04d0127c94ae3"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "15356d432325ecc710bda9de734d53f397a6ab4691d9154222c37fa5320a7de0"
   },
   "uk/scripts/source_language_markers.py": {
-   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
-   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
-   "sha256_now": "33fead97409512d999b9429434e6f4a0e8bf7f524b7441617282b077a32510a8"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "093ed03604b6f9ea501296733474e09bab3fad305afdbf29591e284a938ac5c3"
   },
   "uk/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch11-slice4a",
@@ -76,19 +76,19 @@
    "sha256_now": "db4a883f41e932dee2ed210008d5ac2f8e8bab2f232d5f701052c2bf5169c17f"
   },
   "uk/skill-docs/01-setup-and-extract.md": {
-   "changed_by": "feature/branch8-extraction-completeness",
-   "commit_subject": "Branch 8 - extraction completeness: the one check that reads the original, and the reader contract no fixture pinned",
-   "sha256_now": "718736deffa8fcd3cb3010d4838faaac3b9a4b907eb0490e7fb6140d937b5ff0"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "24a0a322a6cdcd7bc27cb335b1f577a9d36ddf7cacb936165013a9e9ba1f05a2"
   },
   "uk/skill-docs/04b-translate-gates.md": {
-   "changed_by": "d3c7f19",
-   "commit_subject": "Branch 6 slice 4 — a space is not an empty string, and two of the three rows did not mean what their titles said (#62)",
-   "sha256_now": "4f301418363b6d592da21fdcb4b5d482f8c2ef6834bc2b6bdeabb2c7abbc3bf0"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "40971e01ee359200e65ad2927758bdbcd5d3556a85450de594bc8d038a6f478e"
   },
   "uk/skill-docs/05-apply.md": {
-   "changed_by": "feature/scope-rule",
-   "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
-   "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "3a722f4f09f5520431a1b6c8604a435a80328394116fc8adae1ea2d523df160b"
   },
   "uk/skill-docs/06-postprocess-and-reorder.md": {
    "changed_by": "feature/branch10-slice4-page-break-detector",
@@ -96,24 +96,24 @@
    "sha256_now": "2a5256931f4f6fafd4e916ce9a7e34d77d70cacdd01885dc183414e7a7a652fe"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch11-slice4c",
-   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
-   "sha256_now": "3e989afbfe471ef55e14eb60c6aee0924984ef6f71f56ceb0bd48b8fafba6d4b"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "1fefed4958237e50297b743c0066a78b96e75f4dce299f68e503073b9688e4fe"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
-   "sha256_now": "a7dfbd2a371a8ad645e604e82c9a3c01f424291d2b3fd5ae45a1c527ac59193e"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "d465fda4965298afdf6d5453714d99691c9ebbe482788e6878dc35e4e7a49b92"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 3: rule 5b's one way out, accepted_consequences.json beside the notes, a matched finding accepted and its block printed, a stale entry refused",
-   "sha256_now": "07cd4abc8317d9ff9148d086e13d0b51cec9203120be357b71973f785e105160"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "468c9aa705d2218913e853b15d164ef7b8e07369baf77cfd45444fcd58de470d"
   },
   "us/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/no-bytecode-in-shipped-tree",
-   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
-   "sha256_now": "14554470c1a83606449b63a4994dad34191a1fcf198763ef6f96d2bc8e5b2f5b"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "fe9d4987f4d6e1fb96b6f3ee7fa0454bad2722251c67804985e6dbe31a6ca848"
   },
   "us/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/signed-python-no-doc-moves",
@@ -131,19 +131,19 @@
    "sha256_now": "1211578c21f75a42ea81489889142b68d0932871202f4df6ab4f2f1040a011ba"
   },
   "us/scripts/quality_check.py": {
-   "changed_by": "feature/no-bytecode-in-shipped-tree",
-   "commit_subject": "Branch 7 slice 3 follow-up — no .pyc inside a shipped tree: the guard goes next to the import, and the check discovers the importers rather than listing them",
-   "sha256_now": "359524280ee216a947502a3a00ac571a1639fa63e7672b73d5d776080e2a2b9f"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "57720e668eaf6d75b6ab4c4d0725b91afe9ddf4d2b682f5224b4ed249fe3660e"
   },
   "us/scripts/repack_docx.py": {
-   "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
-   "sha256_now": "d4c4719920f9e39a28b13eb007c8a6d8a561b508fef3b90ec4b04d0127c94ae3"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "15356d432325ecc710bda9de734d53f397a6ab4691d9154222c37fa5320a7de0"
   },
   "us/scripts/source_language_markers.py": {
-   "changed_by": "feature/branch11-slice2b-scrub-remnant-block",
-   "commit_subject": "Branch 11 slice 2b - repack scrubs U+200B and blocks on a source-language remnant: bytes move by U+200B removal only, on exactly the planned workdirs (J1, C8, C22)",
-   "sha256_now": "f8a80b486039743046fda9758382ea7d6ecbad2fa40ee46cd850ded3879f942e"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "1fb34d93850327000873e50a50340cedb5c39d130e0787fc6ba57346c1cfb905"
   },
   "us/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch11-slice4a",
@@ -176,19 +176,19 @@
    "sha256_now": "d93191b55b1b13575585424a795364fec9ffce1b7782699a428811b2f6fdda93"
   },
   "us/skill-docs/01-setup-and-extract.md": {
-   "changed_by": "feature/branch8-extraction-completeness",
-   "commit_subject": "Branch 8 - extraction completeness: the one check that reads the original, and the reader contract no fixture pinned",
-   "sha256_now": "718736deffa8fcd3cb3010d4838faaac3b9a4b907eb0490e7fb6140d937b5ff0"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "24a0a322a6cdcd7bc27cb335b1f577a9d36ddf7cacb936165013a9e9ba1f05a2"
   },
   "us/skill-docs/04b-translate-gates.md": {
-   "changed_by": "d3c7f19",
-   "commit_subject": "Branch 6 slice 4 — a space is not an empty string, and two of the three rows did not mean what their titles said (#62)",
-   "sha256_now": "f5d34644df58de0c1ab0c3ea87dd33368abb3aa2f0405ab79aaa953399c33aba"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "e98e8b023d74ec63b88ed87434210451d66d39d6c5b1820bc0a057762a620226"
   },
   "us/skill-docs/05-apply.md": {
-   "changed_by": "feature/scope-rule",
-   "commit_subject": "Branch 3 - the scope rule: a check can be wrong in scope; the two colliding truncation instructions reconciled; what the delivery notes must contain",
-   "sha256_now": "996a8f282cacd7fd0183d87fc7908114ca9116de13162f854cb863be9c875508"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "3a722f4f09f5520431a1b6c8604a435a80328394116fc8adae1ea2d523df160b"
   },
   "us/skill-docs/06-postprocess-and-reorder.md": {
    "changed_by": "feature/branch10-slice4-page-break-detector",
@@ -196,14 +196,14 @@
    "sha256_now": "1d00ae2484912d4351d876e5d320ed52d6d48e4c60f92f3844ea13ab32c19871"
   },
   "us/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch11-slice4c",
-   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
-   "sha256_now": "1a7adfcf0b35194464b6f8afd309f88d17dda3ea5e67a1762758eb4608677638"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "949dd92e913e350f86f544f334828e071bcba5cec5e08b8cf0db2c900ad45338"
   },
   "us/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - review fixes: an unreadable check report refuses cleanly, Step 10 states rule 5b's attempts as SKILL.md does, render_diff's note names the pages it wrote",
-   "sha256_now": "11a3b4935fe69d751a15bbaeede7f61b484c2d7862c0da8308d7901a6d692532"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "de9ba29b520e7a7b9914665a9724adb59b440d9930226a9bab8c6c035d423a7d"
   },
   "uk/scripts/validate_en_runs.py": {
    "changed_by": "feature/branch11-slice4b",
@@ -226,9 +226,9 @@
    "sha256_now": "928360fe9d98dcc5ee63745677166f6080cbaa2a2c720e04bb36e31a57886183"
   },
   "uk/skill-docs/03-lexicons-and-segments.md": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
-   "sha256_now": "d359048a8468f4716a0514eea4cef493d70285a46df8583994c3d7b134582dbd"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "f748ac9760b7b4984e3ce57cd870068f3a0e6481bd4c030afcb7aafd53e8fd3b"
   },
   "uk/skill-docs/04-translate.md": {
    "changed_by": "feature/branch11-wiring",
@@ -246,9 +246,9 @@
    "sha256_now": "928360fe9d98dcc5ee63745677166f6080cbaa2a2c720e04bb36e31a57886183"
   },
   "us/skill-docs/03-lexicons-and-segments.md": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
-   "sha256_now": "51a15723041edb962a829036cdb02827b9b295d4fd8352f20ee3f38f941aa1c2"
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "bfff58e9d7ace0b694e2fb20d3a0de8ada435e87a0d4d34bea9bf01ad594df5d"
   },
   "us/skill-docs/04-translate.md": {
    "changed_by": "feature/branch11-wiring",
@@ -284,6 +284,16 @@
    "changed_by": "fix/lexicon-table-widths",
    "commit_subject": "E15 and E16 - two shipped sub-lexicon tables match their headers, GENCON and BALTIME named as the forms they are, every shipped table now tested",
    "sha256_now": "e8dd91e2d4b4dd8dfd64efd26ae4b9aaebe365d191c92ac6dff7bf0eb525f344"
+  },
+  "uk/scripts/lexicon_compliance.py": {
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "47446c92f0ffc7db06b93043b33ddbbb6599ba30284c4bd39adb5689fc456c31"
+  },
+  "us/scripts/lexicon_compliance.py": {
+   "changed_by": "feature/branch12-slice12a",
+   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
+   "sha256_now": "0f0de51d5890071ed522687bc788483baa0e10f0494fd4faf3647262077680f2"
   }
  }
 }

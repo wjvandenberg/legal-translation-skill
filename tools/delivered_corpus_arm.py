@@ -109,6 +109,8 @@ folder: every input is copied into a temporary directory first.
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref bc9c5d8 --doc D08   # slice 4a
     uv run --with lxml python tools/delivered_corpus_arm.py --sides --arm a       # slice 3, measured
     uv run --with lxml python tools/delivered_corpus_arm.py --sides --arm b --skip-step8 --doc D02
+    uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref be50e12 --declare-glossary-kept \
+        --declare-language                                                                  # slice 12a
 """
 import argparse
 import io
@@ -155,7 +157,14 @@ ap.add_argument("--declare-glossary-kept", action="store_true",
                      "than July's translation (register I-35), write glossary_translations.json beside the notes "
                      "with every letter-bearing text mapped to itself -- slice 3b's keep route -- so the "
                      "delivered check reads the glossary as DECLARED kept. Counts only are printed")
+ap.add_argument("--declare-language", action="store_true",
+                help="BRANCH 12 SLICE 12a, arm (b): write each workdir's TRUE source language beside the notes, as "
+                     "Step 1c now does (doc-id and language only), run Step 4d and Step 9 as well, and read what every "
+                     "language-dependent check says from its own lines. With --ref the pin's build is read the same "
+                     "way and must FAIL the acceptance it predates -- the acceptance's own red")
 args = ap.parse_args()
+if args.declare_language and args.sides:
+    ap.error("--declare-language reads the body arm's chain; it is not wired into --sides.")
 if args.skip_step8 and args.declare_glossary_kept:
     # I-36: skipping Step 8 is declaring nothing, so a flag that writes a declaration contradicts the scenario.
     ap.error("--skip-step8 simulates an operator who declares nothing; --declare-glossary-kept writes a "
@@ -163,6 +172,14 @@ if args.skip_step8 and args.declare_glossary_kept:
 SCRIPTS = ROOT / args.variant / "scripts"
 TMP = Path(tempfile.mkdtemp(prefix="b11-delivered-"))
 FAIL, CHECKED, VOIDED = [], 0, []
+# BRANCH 12 SLICE 12a: each corpus document's TRUE source language, by doc-id and language only
+# (EVIDENCE-measurement.md section 1). D07 is already English, the target. SUPPORTED is read from the tree's
+# sub-lexicon prefixes, independently of the marker module whose reader is under test.
+TRUE_LANGUAGE = {"D01": "hungarian", "D02": "dutch", "D03": "norwegian", "D03B": "norwegian", "D04": "spanish",
+                 "D05": "italian", "D06": "italian", "D07": "english", "D08": "finnish", "D09": "hungarian",
+                 "D10": "polish", "D11": "japanese"}
+SUPPORTED = sorted({p.name.split("-")[0] for p in (ROOT / args.variant / "sub-lexicons").glob("*.md")})
+LANG_OUT = {}
 
 
 def ok(label, cond, detail=""):
@@ -692,10 +709,13 @@ def gives_original_glossary(d):
                 and z.read("word/glossary/document.xml") == gl.read_bytes())
 
 
-def chain(scripts_dir, d, src, wd, today=None):
+def chain(scripts_dir, d, src, wd, today=None, language=None):
     """apply -> post_process -> reorder -> repack in d, inputs copied from wd. Keeps a copy of the
     reordered XML (the check's input, as in slice 1) before repack runs. Returns (rcs, pp).
-    `today` is side_parts' (--sides only)."""
+    `today` is side_parts' (--sides only). `language` (--declare-language, slice 12a) is written beside the
+    notes as Step 1c writes it, and Step 4d and Step 9 run too; their output and apply's and repack's are kept
+    in LANG_OUT, in memory only, for the language readings -- never printed, since they can quote the text.
+    Neither step writes anything, so the outputs compared under --ref are the same set as without it."""
     (d / "final" / "word").mkdir(parents=True, exist_ok=True)
     shutil.copyfile(src, d / "src.docx")
     # I-36: an operator who skips Step 8 declares nothing, and since the wiring REPACK reads the declarations beside
@@ -705,14 +725,27 @@ def chain(scripts_dir, d, src, wd, today=None):
         if name not in undeclared and (wd / name).is_file():
             shutil.copyfile(wd / name, d / name)
     xml, py = d / "final" / "word" / "document.xml", ["uv", "run", "--with", "lxml", "python"]
-    rcs = {"apply": run(py + [str(scripts_dir / "apply_translations_textmatch.py"), str(d / "src.docx"),
-                              str(d / "paragraphs.json"), str(xml)]).returncode}
+    said = {}
+    if language is not None:
+        (d / "source_language.json").write_bytes(json.dumps({"source_language": language}).encode("utf-8"))
+        r4d = run(py + [str(scripts_dir / "lexicon_compliance.py"), str(d / "paragraphs.json"),
+                        "--stage", "pre-apply"])
+        said["4d"] = (r4d.stdout or "") + (r4d.stderr or "")
+        LANG_OUT[d.name] = said
+    rap = run(py + [str(scripts_dir / "apply_translations_textmatch.py"), str(d / "src.docx"),
+                    str(d / "paragraphs.json"), str(xml)])
+    rcs = {"apply": rap.returncode}
+    said["5"] = (rap.stdout or "") + (rap.stderr or "")
     if not xml.is_file():
         return rcs, None
     pp = run(py + [str(scripts_dir / "post_process.py"), str(xml), "--fix", "--variant", args.variant], timeout=900)
     rcs["post_process"] = pp.returncode
     rcs["reorder"] = run(py + [str(scripts_dir / "reorder_definitions.py"), "--doc", str(xml)], timeout=900).returncode
     shutil.copyfile(xml, d / "checked.xml")
+    if language is not None:
+        r9 = run(py + [str(scripts_dir / "quality_check.py"), str(xml), "--with-source", str(d / "paragraphs.json"),
+                       "--variant", args.variant], timeout=900)
+        said["9"] = (r9.stdout or "") + (r9.stderr or "")
     sides = side_parts(wd, d, today)
     # SUB-STEP 2: slice 3b's keep route for a glossary nobody translated -- every letter-bearing text mapped
     # to itself, beside the notes, as Step 8e says. Written only where the workdir declares none, and since
@@ -730,6 +763,7 @@ def chain(scripts_dir, d, src, wd, today=None):
                    str(d / "delivered.docx"), "--paragraphs", str(d / "paragraphs.json")]
              + sides, timeout=900)
     out = (rp.stdout or "") + (rp.stderr or "")
+    said["10"] = out
     rcs["repack"] = rp.returncode
     rcs["repack_gate"] = next((label for label, marker in REPACK_GATES if marker in out),
                               "none" if rp.returncode == 0 else "unrecognised")
@@ -737,7 +771,8 @@ def chain(scripts_dir, d, src, wd, today=None):
     # What the remnant block ran in and which ADVISORY markers it warned on: a language name,
     # zip member names and the skill's own marker patterns -- never repack's context snippets.
     lang = re.search(r"Remnant block: language=(\w+)", out)
-    BLOCK_NOTE[d.name] = (lang.group(1) if lang else ("skipped" if "Remnant block skipped" in out
+    BLOCK_NOTE[d.name] = (lang.group(1) if lang else ("NOT SUPPORTED" if "Remnant block: NOT SUPPORTED" in out
+                                                      else "skipped" if "Remnant block skipped" in out
                                                       else "not reached"),
                           Counter(f"{m.group(1)} {m.group(2)}" for m in re.finditer(
                               r"WARNING \(ADVISORY, not blocking\): (\S+): (\S+) —", out))
@@ -1521,7 +1556,118 @@ if args.sides:
     print("=" * 96)
     sys.exit(1 if FAIL or VOIDED else 0)
 
-reports_a, reports_b = {}, {}
+# ---------------------------------------------------------------------------------------------
+# SLICE 12a's READINGS -- what each language-dependent check SAID, from its own lines. Each returns a dict with
+# `lang` (the language the check names, or None), `verdict` (NOT SUPPORTED | CLEAN | HITS | not reached | ?) and
+# `said_clean` (the words CLEAN or PASSED appear in that check's own lines). Nothing here is ever printed but
+# these fields: the lines themselves can quote the document.
+# ---------------------------------------------------------------------------------------------
+LEX_HEAD = re.compile(r"Lexicon compliance scan — stage=(pre-apply|pre-repack), language=([^,\s]+)")
+
+
+def lex_reading(out):
+    lines = (out or "").splitlines()
+    i = next((k for k, ln in enumerate(lines) if LEX_HEAD.search(ln)), None)
+    if i is None:
+        return {"lang": None, "verdict": "not reached", "said_clean": False, "blocking": None}
+    block = []
+    for ln in lines[i:]:                 # its OWN block: repack's labels arrive out of order (buffered)
+        block.append(ln)
+        if "lexicon violations detected" in ln or "NO BLOCKING VIOLATION FOUND" in ln or "*** BLOCKED" in ln:
+            break
+    text = "\n".join(block)
+    nb = re.search(r"blocking violations:\s+(\d+)", text)
+    lang = LEX_HEAD.search(lines[i]).group(2)
+    named = re.search(r"source language, (\w+), is not one|source language is (English)", text)
+    return {"lang": (named.group(1) or named.group(2)).lower() if named else lang,
+            "verdict": ("NOT SUPPORTED" if "NOT SUPPORTED" in text else "CLEAN" if "PASSED" in text
+                        else "HITS" if "BLOCKED" in text else "?"),
+            "said_clean": "PASSED" in text, "blocking": int(nb.group(1)) if nb else None}
+
+
+def apply_reading(out):
+    lines = [ln for ln in (out or "").splitlines() if "Source-language scan:" in ln or "remnant(s) detected" in ln]
+    if not lines:
+        return {"lang": None, "verdict": "not reached", "said_clean": False}
+    blob = "\n".join(lines)
+    m = (re.search(r"no (\w+) remnants", blob) or re.search(r"possible (\w+) remnant", blob)
+         or re.search(r"source language, (\w+), is not one|source language is (English)", blob))
+    lang = next((g for g in m.groups() if g), None).lower() if m else None
+    return {"lang": lang,
+            "verdict": ("NOT SUPPORTED" if "NOT SUPPORTED" in blob else "CLEAN" if "CLEAN" in blob
+                        else "HITS" if "remnant(s) detected" in blob else "?"),
+            "said_clean": "CLEAN" in blob}
+
+
+def qc_reading(out):
+    m = re.search(r"(?m)^\s+(\S+)_remnants\s+(.+)$", out or "")
+    if not m:
+        return {"lang": None, "verdict": "not reached", "said_clean": False, "passed": False}
+    status = m.group(2).strip()
+    return {"lang": m.group(1).lower(),
+            "verdict": ("NOT SUPPORTED" if status.startswith("NOT SUPPORTED") else "CLEAN" if status == "CLEAN"
+                        else "HITS"),
+            "said_clean": status == "CLEAN" or "*** PASSED" in out, "passed": "*** PASSED" in out}
+
+
+def remnant_reading(out):
+    out = out or ""
+    m = re.search(r"Remnant block: language=(\w+)", out)
+    ns = "Remnant block: NOT SUPPORTED" in out
+    named = re.search(r"Remnant block: NOT SUPPORTED[^\n]*?source language, (\w+), is not one"
+                      r"|Remnant block: NOT SUPPORTED[^\n]*?source language is (English)", out)
+    lang = ((named.group(1) or named.group(2)).lower() if named else (m.group(1) if m else None))
+    if ns:
+        verdict = "NOT SUPPORTED"
+    elif "Remnant block clean" in out:
+        verdict = "CLEAN"
+    elif "SOURCE-LANGUAGE REMNANT" in out:
+        verdict = "HITS"
+    elif m:
+        verdict = "ADVISORY"
+    elif "Remnant block skipped" in out:
+        verdict = "SKIPPED"
+    else:
+        verdict = "not reached"
+    return {"lang": lang, "verdict": verdict, "said_clean": "Remnant block clean" in out}
+
+
+def cross_reading(out):
+    out = out or ""
+    return ("mismatch" if "SOURCE-LANGUAGE MISMATCH" in out else "agrees" if "as declared." in out
+            else "could not rule" if "cross-check could not rule" in out else "none")
+
+
+def readings(said):
+    return {"4d": lex_reading(said.get("4d")), "5": apply_reading(said.get("5")), "9": qc_reading(said.get("9")),
+            "10 lexicon": lex_reading(said.get("10")), "10 remnant": remnant_reading(said.get("10")),
+            "cross": cross_reading(said.get("10"))}
+
+
+def acceptance(did, rd):
+    """Slice 12a's acceptance, per document, as (label, passed, detail): a supported language read as itself by
+    every check that ran; an unsupported one NOT SUPPORTED, never CLEAN or PASSED, by every one; no mismatch."""
+    lang = TRUE_LANGUAGE.get(did)
+    sup = lang in SUPPORTED
+    out = []
+    for name in ("4d", "5", "9", "10 lexicon", "10 remnant"):
+        r = rd[name]
+        if r["verdict"] == "not reached":
+            continue
+        if sup:
+            out.append((f"{did} step {name}: reads {lang}", r["lang"] == lang and r["verdict"] != "NOT SUPPORTED",
+                        f"read {r['lang']}, {r['verdict']}"))
+        else:
+            out.append((f"{did} step {name}: NOT SUPPORTED, naming {lang}, never CLEAN or PASSED",
+                        r["verdict"] == "NOT SUPPORTED" and not r["said_clean"] and r["lang"] == lang,
+                        f"read {r['lang']}, {r['verdict']}, clean/passed {r['said_clean']}"))
+    if rd["9"]["verdict"] != "not reached" and not sup:
+        out.append((f"{did} step 9's closing line: never PASSED", not rd["9"]["passed"], "it said PASSED"))
+    out.append((f"{did} the cross-check: no mismatch", rd["cross"] != "mismatch", rd["cross"]))
+    return out
+
+
+reports_a, reports_b, LANG_KEY = {}, {}, {}
 for n, wd in enumerate(workdirs, 1):
     ids = DOC_ID.findall(str(wd.relative_to(LOGS)))
     did = ids[-1] if ids else f"D??{n}"
@@ -1555,14 +1701,18 @@ for n, wd in enumerate(workdirs, 1):
             void(f"(b) {key}", f"no source matched (best {frac:.0%})")
             continue
         b = TMP / f"b{n:02d}"
-        rcs, pp = chain(SCRIPTS, b, src, wd)
+        declared = TRUE_LANGUAGE.get(did) if args.declare_language else None
+        if args.declare_language and declared is None:
+            void(f"(b) {key} language", "no true language is recorded for this doc-id")
+        LANG_KEY[key] = (b.name, f"r{n:02d}" if REFTREE is not None else None, did)
+        rcs, pp = chain(SCRIPTS, b, src, wd, language=declared)
         if pp is None:
             void(f"(b) {key}", f"apply produced no output (rc={rcs['apply']})")
             continue
         gate = pp.returncode != 0 and "SKILL GATE FIRED" in (pp.stdout or "") + (pp.stderr or "")
         if REFTREE is not None:
             rb = TMP / f"r{n:02d}"
-            rrcs, _ = chain(REFTREE, rb, src, wd)
+            rrcs, _ = chain(REFTREE, rb, src, wd, language=declared)
             dn, dr = outputs(b), outputs(rb)
             same_rc = rrcs == rcs
             # SUB-STEP 2: a pin without the delivered gate delivers what ours refuses. Then, and only then,
@@ -1786,6 +1936,49 @@ if args.arm in ("b", "both"):
                lost == want_lost and not gained, f"gone {lost}, new {gained}")
         print(f"    text-and-anchor blocking over the {len(BYTES)} workdir(s) compared: pin {tot_ref} → ours {tot_now}")
         print(f"  compared {len(BYTES)} of {len(reports_b)} rebuilt workdirs")
+
+if args.declare_language and args.arm in ("b", "both"):
+    print(f"\n  SLICE 12a — THE DECLARED SOURCE LANGUAGE: what every language-dependent check SAID, from its own "
+          f"lines ({args.variant}; supported, from the tree's sub-lexicons: {len(SUPPORTED)})")
+    COLS = ("4d", "5", "9", "10 lexicon", "10 remnant")
+    pin_bad = pin_all = 0
+    for key, (bname, rname, did) in LANG_KEY.items():
+        said = LANG_OUT.get(bname)
+        if said is None:
+            void(f"{key}: the language readings", "the chain kept no output")
+            continue
+        rd = readings(said)
+        lang = TRUE_LANGUAGE.get(did, "?")
+        print(f"    {key:6} {lang:10} {'supported' if lang in SUPPORTED else 'NOT SUPPORTED':13} "
+              + "  ".join(f"{c}={rd[c]['lang'] or '-'}/{rd[c]['verdict']}" for c in COLS)
+              + f"  cross-check={rd['cross']}  lexicon blocking 4d={rd['4d'].get('blocking')}"
+              f" 10={rd['10 lexicon'].get('blocking')}")
+        for label, passed, detail in acceptance(did, rd):
+            ok(label, passed, detail)
+        if rd["10 remnant"]["verdict"] == "not reached":
+            # A reading the corpus cannot give is said, and must be explained: repack stops these documents at its
+            # EARLIER gate (slice 2b's STOP_2B), at the pin and today alike, so the remnant block never runs.
+            ok(f"{key} step 10 remnant: NOT REACHED, and only because repack stops it at its earlier gate "
+               f"(STOP_2B, {args.variant})", did in STOP_2B[args.variant],
+               f"{did} not in {sorted(STOP_2B[args.variant])}")
+        if rname is not None and rname in LANG_OUT:
+            for _label, passed, _detail in acceptance(did, readings(LANG_OUT[rname])):
+                pin_all += 1
+                pin_bad += not passed
+    # 12a's one open question, ANSWERED on 2026-10-08 (2) with July's final text standing in for the pre-repack
+    # input: re-measured here on today's build, D04 under its declared Spanish blocks nothing at either stage.
+    for key, (bname, _r, did) in LANG_KEY.items():
+        if did == "D04" and bname in LANG_OUT:
+            rd = readings(LANG_OUT[bname])
+            ok(f"{key}: under its declared Spanish the lexicon scan blocks nothing, before apply or before repack",
+               rd["4d"].get("blocking") == 0 and rd["10 lexicon"].get("blocking") == 0,
+               f"4d {rd['4d'].get('blocking')}, 10 {rd['10 lexicon'].get('blocking')}")
+    if REFTREE is not None:
+        ok(f"RED ON THE PIN: the same acceptance FAILS on {args.ref}'s build, which predates the declaration "
+           f"({pin_bad} of {pin_all} of its checks fail there)", pin_all > 0 and pin_bad > 0,
+           f"{pin_bad} of {pin_all}")
+    print(f"  read {sum(1 for b, _r, _d in LANG_KEY.values() if b in LANG_OUT)} of {len(LANG_KEY)} rebuilt "
+          f"workdirs' language readings")
 
 shutil.rmtree(TMP, ignore_errors=True)
 print("\n" + "=" * 96)
