@@ -14,7 +14,8 @@
       {"command": "uv run python tools/verify_expected.py"},
       {"command": "uv run python tools/verify_charter_continuity.py"},
       {"command": "uv run python tools/xdoc_signs.py"},
-      {"command": "uv run python tools/cycle_evidence.py status"}
+      {"command": "uv run python tools/cycle_evidence.py status"},
+      {"command": "uv run python tools/inplace_guard.py --status"}
     ],
     "entry_points_exempt": {
       "run_tests.py": "this IS the runner - an entry point invoking it would recurse. STRUCTURAL AND PERMANENT: no flag could change it.",

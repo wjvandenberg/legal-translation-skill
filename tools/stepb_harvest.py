@@ -38,7 +38,12 @@ if hasattr(_sys.stdout, "reconfigure"):
 
 
 ROOT = Path(__file__).resolve().parent.parent
-doc = (ROOT / "PLAN-2-step-b.md").read_text(encoding="utf-8")
+# STEPB_PLAN_DOC: see the same lines in stepb_audit.py (register I-37).
+import os as _os  # noqa: E402
+DOC = Path(_os.environ.get("STEPB_PLAN_DOC") or ROOT / "PLAN-2-step-b.md")
+if _os.environ.get("STEPB_PLAN_DOC"):
+    print(f"NOTE: STEPB_PLAN_DOC is set - reading the plan from {DOC}", file=_sys.stderr)
+doc = DOC.read_text(encoding="utf-8")
 # strip markdown emphasis before flattening: a needle like "auxiliary-part content" must
 # match "auxiliary-part *content*" in the source, or the check reports a false MISS.
 # NOT underscore in the strip class: it would break identifier needles like definitions_range

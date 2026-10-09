@@ -95,7 +95,7 @@ one of them survives the session that makes it.
 | `tools/stepb_verify.py` | 84 claims, and it generates the traceability appendix |
 | `tools/stepb_audit.py` | 15 checks — **needs `LEGAL_TRANSLATION_A4`, see below** |
 | `tools/stepb_audit3.py` | |
-| `tools/stepb_metacheck.py` | **eleven negative tests: it mutates the document to prove each check can fail, then restores it byte-identically** |
+| `tools/stepb_metacheck.py` | **eleven negative tests and a null control, each planted in a COPY of the document, never in it, and counted only when the check reports a failure the unmutated copy did not** *(I-37, I-38)*. From a worktree set `LT_PRIVATE_DIR`, or the audit's probes are VOID |
 | `tools/stepb_refute.py` | |
 
 ```bash
