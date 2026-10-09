@@ -449,7 +449,12 @@ print("\n=== A3b. THE ARITHMETIC LINE UNDER §9.1 MUST MATCH THE TABLE ABOVE IT 
 # group 3 and 170 in total -- stale by two, in a line whose own severity-mix column
 # disagreed with it as well. This asserts the typed line against the generated groups, per
 # group and in total, so it cannot drift again.
-_doc = (ROOT / "PLAN-2-step-b.md").read_text(encoding="utf-8")
+# STEPB_PLAN_DOC: see the same lines in stepb_audit.py (register I-37).
+import os as _os  # noqa: E402
+_plan = Path(_os.environ.get("STEPB_PLAN_DOC") or ROOT / "PLAN-2-step-b.md")
+if _os.environ.get("STEPB_PLAN_DOC"):
+    print(f"NOTE: STEPB_PLAN_DOC is set - reading the plan from {_plan}", file=_sys.stderr)
+_doc = _plan.read_text(encoding="utf-8")
 _m = re.search(r"\*\*([\d]+(?:\s*\+\s*[\d]+)+)\s*=\s*(\d+)\s*.\*\*", _doc)
 if not _m:
     FAIL.append("A3b: no `a + b + ... = n` arithmetic line found under §9.1 — it is the "

@@ -31,6 +31,9 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
+sys.dont_write_bytecode = True  # importing from tools/ must leave no bytecode there
+sys.path.insert(0, str(ROOT / "tools"))
+import inplace_guard as guard  # noqa: E402  (register I-37: a repository file changes only through it)
 TREES = ("uk", "us")
 
 # --------------------------------------------------------------------------------------
@@ -283,17 +286,14 @@ print("\n6. NEGATIVE TESTS — each check is shown to FAIL on a tree that violat
 
 
 def with_mutation(rel, mutate, probe, base="uk"):
-    """Apply a mutation, run `probe`, restore the original bytes. Never touches git."""
+    """Apply a mutation, run `probe`, restore the original bytes. Never touches git. Through the
+    guard (register I-37), so a run killed mid-probe cannot leave a shipped file mutated."""
     p = ROOT / base / rel if base else ROOT / rel
-    original = p.read_bytes()
-    try:
-        text = original.decode("utf-8")
-        changed = mutate(text)
-        assert changed != text, "the mutation did not change the file"
-        p.write_bytes(changed.encode("utf-8"))
+    text = p.read_bytes().decode("utf-8")
+    changed = mutate(text)
+    assert changed != text, "the mutation did not change the file"
+    with guard.mutated(p, changed.encode("utf-8")):
         return probe()
-    finally:
-        p.write_bytes(original)
 
 
 # (a) remove the scope rule -> section 1 must notice, and so must reachability

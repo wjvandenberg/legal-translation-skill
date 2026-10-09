@@ -31,6 +31,8 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "tools"))
+import inplace_guard as guard  # noqa: E402  (register I-37: a repository file changes only through it)
 CMD = ROOT / "CLAUDE.md"
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
            PYTHONDONTWRITEBYTECODE="1")
@@ -74,17 +76,20 @@ if check6_failed(out):
     sys.exit(1)
 
 results = []
-try:
-    for label, planted in MUTATIONS:
-        print("\n" + "=" * 96)
-        print(f"MUTATION {label}")
-        print("=" * 96)
-        eol = b"\r\n" if original.count(b"\r\n") else b"\n"
-        marker = ANCHOR.encode("utf-8")
-        mutated = original.replace(
-            marker, marker + eol + eol + planted.encode("utf-8"), 1)
-        assert mutated != original, "mutation planted nothing"
-        CMD.write_bytes(mutated)
+# THROUGH THE GUARD, NOT A try/finally (register I-37). A run killed between the write and the
+# restore used to leave CLAUDE.md mutated, a commit away from being carried; the guard records
+# each change before making it, so the next guarded run settles it and the commit gate refuses
+# meanwhile.
+for label, planted in MUTATIONS:
+    print("\n" + "=" * 96)
+    print(f"MUTATION {label}")
+    print("=" * 96)
+    eol = b"\r\n" if original.count(b"\r\n") else b"\n"
+    marker = ANCHOR.encode("utf-8")
+    mutated = original.replace(
+        marker, marker + eol + eol + planted.encode("utf-8"), 1)
+    assert mutated != original, "mutation planted nothing"
+    with guard.mutated(CMD, mutated):
         rc, out = run_claims()
         detected = check6_failed(out)
         print(f"  planted {planted}")
@@ -93,9 +98,7 @@ try:
             if "[FAIL] 6:" in line:
                 print(f"    {line.strip()}")
         results.append((label, detected))
-finally:
-    CMD.write_bytes(original)
-    assert CMD.read_bytes() == original, "RESTORATION FAILED — CLAUDE.md is not as it was"
+assert CMD.read_bytes() == original, "RESTORATION FAILED — CLAUDE.md is not as it was"
 
 print("\n" + "=" * 96)
 print("VERDICT")

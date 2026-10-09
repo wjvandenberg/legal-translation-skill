@@ -46,6 +46,8 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "tools"))
+import inplace_guard as guard  # noqa: E402  (register I-37: a repository file changes only through it)
 TREES = ("uk", "us")
 RESULTS = []
 
@@ -524,20 +526,18 @@ MUTATIONS = [
 for rel, mutate, why in MUTATIONS:
     target = ROOT / "uk" / rel
     original = target.read_bytes()
-    try:
-        text = original.decode("utf-8")
-        mutated = mutate(text)
-        if mutated == text:
-            record(f"negative: {why}", False, "the mutation changed nothing")
-            continue
-        target.write_bytes(mutated.encode("utf-8"))
+    text = original.decode("utf-8")
+    changed = mutate(text)
+    if changed == text:
+        record(f"negative: {why}", False, "the mutation changed nothing")
+        continue
+    # THROUGH THE GUARD, NOT A try/finally (register I-37): these are SHIPPED skill files, and a
+    # run killed between the write and the restore left one broken, a commit away from carried.
+    with guard.mutated(target, changed.encode("utf-8")):
         rc, _ = chains_exit()
         record(f"negative: {why} -> the tool FAILS", rc != 0, f"exit {rc}")
-    finally:
-        target.write_bytes(original)
     record(f"negative: {rel} restored byte-identically",
            target.read_bytes() == original)
-
 rc, _ = chains_exit()
 record("and the tool passes again once both mutations are reverted", rc == 0, f"exit {rc}")
 
