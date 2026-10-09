@@ -120,8 +120,12 @@ MUTATIONS = [
   "stepb_audit.py",
   "the appendix is emitted from the map; check 13 must catch a hand-edit"),
 
- ("claim a finding count that the map contradicts (option 4: 16 -> 19)",
-  lambda t: t.replace("Closes **16 findings**", "Closes **19 findings**", 1),
+ # THE FIGURE IS READ, NOT TYPED (2026-10-09). This probe anchored on a literal count, so it went
+ # INERT every time a finding joined option 4 -- it did at 16 -> 17, inside the change that moved
+ # it. Reading the current figure and adding 3 keeps it a real mutation whatever the count is.
+ ("claim a finding count that the map contradicts (option 4: N -> N + 3)",
+  lambda t: re.sub(r"Closes \*\*(\d+) findings\*\*",
+                   lambda m: f"Closes **{int(m.group(1)) + 3} findings**", t, count=1),
   "stepb_audit.py",
   "check 5 derives each option's size from the map rather than trusting the prose"),
 

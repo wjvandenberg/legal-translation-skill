@@ -79,16 +79,16 @@ their correct English equivalents.
 
 ## Section Headings
 
-| Italian | English |
-|---|---|
-| COSTITUZIONE DEL PEGNO / IPOTECA | CREATION OF THE PLEDGE / MORTGAGE |
-| IMPEGNI / OBBLIGHI | UNDERTAKINGS |
-| DISPOSIZIONI GENERALI | MISCELLANEOUS |
-| LEGGE APPLICABILE E FORO COMPETENTE | GOVERNING LAW AND JURISDICTION |
-| COMUNICAZIONI | NOTICES |
-| TASSE, IMPOSTE E SPESE | TAXES, DUTIES AND EXPENSES |
-| TRASPARENZA BANCARIA | BANKING TRANSPARENCY |
-| CAUSE DI ESCUSSIONE | ENFORCEMENT EVENTS |
+| Italian | English | Context |
+|---|---|---|
+| COSTITUZIONE DEL PEGNO / IPOTECA | CREATION OF THE PLEDGE / MORTGAGE | |
+| IMPEGNI / OBBLIGHI | UNDERTAKINGS | |
+| DISPOSIZIONI GENERALI | MISCELLANEOUS | |
+| LEGGE APPLICABILE E FORO COMPETENTE | GOVERNING LAW AND JURISDICTION | |
+| COMUNICAZIONI | NOTICES | |
+| TASSE, IMPOSTE E SPESE | TAXES, DUTIES AND EXPENSES | |
+| TRASPARENZA BANCARIA | BANKING TRANSPARENCY | |
+| CAUSE DI ESCUSSIONE | ENFORCEMENT EVENTS | |
 | DEFINIZIONI | DEFINITIONS | Standard definitions section |
 | CONCESSIONE DEL FINANZIAMENTO | FACILITY / LOAN | Facility grant provision |
 | UTILIZZO | UTILIZATION / DRAWDOWN | Borrowing mechanics |
@@ -158,10 +158,10 @@ their correct English equivalents.
 | credito documentario | documentary credit (typically governed by UCP 600) | Trade finance instrument |
 | garanzia bancaria | bank guarantee | Bank's undertaking to pay |
 | garanzia a prima richiesta / garanzia autonoma | on-demand guarantee / autonomous guarantee (detached from the underlying contract) | First-demand payment guarantee |
-| fideiussione | suretyship (Art. 1936 CC — accessory to the underlying obligation) |
+| fideiussione | suretyship (Art. 1936 CC — accessory to the underlying obligation) | |
 | fideiussione bancaria | bank suretyship | Bank's suretyship undertaking |
-| fideiussione omnibus | omnibus suretyship (covering all present and future debts of the principal debtor) |
-| lettera di patronage forte / debole | hard / soft letter of comfort |
+| fideiussione omnibus | omnibus suretyship (covering all present and future debts of the principal debtor) | |
+| lettera di patronage forte / debole | hard / soft letter of comfort | |
 | finanziamento sindacato | syndicated facility | Multi-lender facility |
 | club deal | club deal | Limited-lender facility |
 | pool bancario | banking pool / lending syndicate | Group of lenders |

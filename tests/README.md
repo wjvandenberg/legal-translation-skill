@@ -7,9 +7,10 @@ This folder is what changes that.
 uv run python tests/run_tests.py
 ```
 
-Three things, in order: the fixtures build; every executable check is given an input built to
-violate its own pass condition **and** a conforming one; and the pipeline's mechanical half is
-shown to be a deterministic function.
+Four things, in order: the fixtures build; every executable check is given an input built to
+violate its own pass condition **and** a conforming one; the pipeline's mechanical half is
+shown to be a deterministic function; and every Markdown table in both shipped trees is shown
+to have rows that match its header (`tests/test_shipped_tables.py`, register E15).
 
 **Every check is tested with a PAIR.** One-sided testing passes a check that fires on
 everything, and a check that cannot tell good from bad is not a check. Three of the fourteen
