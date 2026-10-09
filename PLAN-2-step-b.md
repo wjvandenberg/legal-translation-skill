@@ -12,6 +12,8 @@
 | **depends on** | `REGISTER-findings.md` for every claim · `EVIDENCE-a3-structure.md` for the measurements. **Nothing in the house templates** |
 | **size** | **BEYOND L — the overage is declared below** |
 
+**SESSION PURPOSE — 2026-10-09, the table checker and the F table, branch `feature/md-tables-void-f-table` — what · how · purpose:** make `tools/md_tables.py` check the project's documents when it is named no file, and say VOID rather than CLEAN when it opened none or cannot open one it was named; rejoin the register's F table and its instrument table by deleting the blank line that splits each, no row renumbered; file the false CLEAN as I-39 — red first, byte-exact on the CRLF register, VERIFY and TEST through `tools/cycle_evidence.py`, a pull request for Wouter — **so that every runner calling the checker bare really checks the documents and a broken table can no longer pass unseen** *(written immediately after the tag `rollback-2026-10-09-mdtables-start`; a line of its own, not the status row, so it merges beside the two sessions that rewrite that row — Wouter, 2026-10-09)*
+
 > **THIS DOCUMENT IS STEP 2'S PLAN FILE, AND IT WAS RENAMED FROM `STEP-B-ANALYSIS.md` ON 2026-09-10**
 > *(Wouter, choosing the rename over the grandfather rule with its cost named in front of him)*. The
 > grandfather rule had kept the old name since 2026-08-24 on the argument that **renaming was the risk and
