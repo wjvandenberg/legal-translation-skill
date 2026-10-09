@@ -83,6 +83,19 @@ case("a Word document outside tests/fixtures/ is caught",
      1, "Word document sits outside",
      lambda: guard.planted(stray, b""))
 
+# 1b. A WORKING COPY UNDER .claude/worktrees (a parallel session's git worktree) carries its own tests/fixtures, and
+#     those synthetic documents are allowed -- 2026-10-08 (2), when 24 of them blocked a commit here -- while a Word
+#     document anywhere else in a working copy is still caught. A planted copy, through the guard (register I-37), so a
+#     kill leaves a record the next guarded run settles, never a stray working copy for the next commit to scan.
+wcopy = ROOT / ".claude" / "worktrees" / "zz-gate-test"
+
+case("a Word document in a working copy's own tests/fixtures/ is allowed",
+     0, "Word documents outside tests/fixtures/: 0",
+     lambda: guard.planted(wcopy / "tests" / "fixtures" / "synthetic.docx", b""))
+case("a Word document elsewhere in a working copy is caught",
+     1, "Word document sits outside",
+     lambda: guard.planted(wcopy / "uk" / "meeting-notes.docx", b""))
+
 # ---------------------------------------------------------------------------
 # 2. A forbidden corpus descriptor appears in a committable document.
 #    The descriptor is NOT written here: it is read from the private list at run time, so

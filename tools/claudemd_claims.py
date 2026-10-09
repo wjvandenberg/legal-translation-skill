@@ -435,10 +435,13 @@ if present("the project folder contains `CLAUDE.md`, `REGISTER-findings.md`, "
 # tools/audit_branches.py, and must hit zero. The claim being made here is about PLACE; the
 # claim about CONTENT is made, and enforced, elsewhere.
 ALLOWED_DOC_DIRS = ("temp/", "tests/fixtures/")
+# A WORKING COPY UNDER .claude/worktrees -- a parallel session's git worktree, excluded from git here -- has its own
+# two sanctioned places and only those (2026-10-08 (2), the same narrow rule as the pre-commit gate's control 6).
+WORKING_COPY_DOC_DIRS = re.compile(r"^\.claude/worktrees/[^/]+/(?:temp|tests/fixtures)/")
 junk = sorted(p.relative_to(ROOT).as_posix() for ext in
               ("docx", "doc", "pdf", "png", "xml", "jsonl")
               for p in ROOT.rglob(f"*.{ext}"))
-stray = [j for j in junk if not j.startswith(ALLOWED_DOC_DIRS)]
+stray = [j for j in junk if not j.startswith(ALLOWED_DOC_DIRS) and not WORKING_COPY_DOC_DIRS.match(j)]
 if stray:
     fail("6", f"document-shaped file(s) outside {' and '.join(ALLOWED_DOC_DIRS)}: {stray}")
 else:

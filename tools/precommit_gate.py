@@ -271,10 +271,20 @@ head("6. NO REAL DOCUMENT HAS WANDERED IN")
 # charter says the scan is the actual control -- this is that control. Any Word document
 # outside the synthetic fixture folder is reported, whatever it is called.
 allowed = ROOT / "tests" / "fixtures"
+
+
+def _a_working_copys_fixtures(rel):
+    # A WORKING COPY UNDER .claude/worktrees -- the git worktree a parallel session works in, excluded from git here
+    # -- carries its own tests/fixtures, the same synthetic documents (2026-10-08 (2): 24 of them blocked a commit in
+    # this checkout). Allowed in that folder and NOWHERE ELSE in the working copy: the same rule as this checkout's.
+    return len(rel) > 5 and rel[:2] == (".claude", "worktrees") and rel[3:5] == ("tests", "fixtures")
+
+
 strays = [p for p in ROOT.rglob("*")
           if p.is_file() and p.suffix.lower() in {".docx", ".doc", ".dotx", ".rtf"}
           and "temp" not in p.relative_to(ROOT).parts
-          and allowed not in p.parents]
+          and allowed not in p.parents
+          and not _a_working_copys_fixtures(p.relative_to(ROOT).parts)]
 print(f"  Word documents outside tests/fixtures/: {len(strays)}")
 for s in strays[:10]:
     print(f"      {s.relative_to(ROOT)}")
