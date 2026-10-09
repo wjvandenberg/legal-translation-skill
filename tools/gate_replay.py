@@ -38,7 +38,7 @@ TWO DEFECTS IN THIS TOOL, FOUND ON BRANCH 4 BY RUNNING IT AND FIXED HERE:
       `run-D*.jsonl` forensic logs can -- every `type=step` record carries `step_id`,
       `invocation` and `rc`, so a repair sequence is a measurable object.
 
-    LEGAL_TRANSLATION_LOGS=../legal-translation-logs uv run python tools/gate_replay.py
+    uv run python tools/gate_replay.py     # LT_LOGS_DIR names the logs folder if it is elsewhere
 
 Exit codes:  0 = the replay ran · 2 = the logs are not reachable, or the population is
 empty, or the reconciliation below fails (all three are VOID, never a pass)
@@ -53,8 +53,8 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-LOGS = Path(os.environ.get("LEGAL_TRANSLATION_LOGS",
-                           str(ROOT.parent / "legal-translation-logs")))
+from sibling_dirs import logs_dir  # noqa: E402  (register I-39: LT_LOGS_DIR is read here too now)
+LOGS = logs_dir()
 
 # The five artefact kinds that are actually LOGS. Everything else under A1 is the skill tree
 # copied into a run workspace, or the source/deliverable itself. Being explicit about which
@@ -220,7 +220,8 @@ def repair_depth(selected):
 def main():
     if not LOGS.exists():
         print(f"  VOID — the forensic logs are not reachable at {LOGS}.")
-        print("  This is not a pass. Set LEGAL_TRANSLATION_LOGS to the sibling logs folder.")
+        print("  This is not a pass. Set LT_LOGS_DIR to the logs folder (LEGAL_TRANSLATION_LOGS is "
+              "still read, after it).")
         return 2
 
     a1 = LOGS / "A1"

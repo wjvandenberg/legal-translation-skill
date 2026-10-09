@@ -42,7 +42,8 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-PRIV = Path(os.environ.get("LT_PRIVATE_DIR", ROOT.parent / "legal-translation-private"))
+from sibling_dirs import private_dir  # noqa: E402  (register I-39)
+PRIV = private_dir()
 SHOW = "--show" in sys.argv
 
 

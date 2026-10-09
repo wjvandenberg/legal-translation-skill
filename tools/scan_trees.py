@@ -19,7 +19,8 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-PRIV = ROOT.parent / "legal-translation-private"
+from sibling_dirs import private_dir  # noqa: E402  (register I-39)
+PRIV = private_dir()
 SHOW = "--show" in sys.argv
 
 TEXT_EXT = {".md", ".py", ".txt", ".json", ".yaml", ".yml"}

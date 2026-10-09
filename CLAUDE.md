@@ -81,9 +81,9 @@ stale 500 and 35 until 2026-09-22 — a restated cap is a second place to go sta
 this project has run far past eight sessions, the observable test. **Every cap is enforced, not
 aspirational**, and `check_checkers.py` reports whether the copy you run is the current one.
 
-> **OVER-CAP, RE-DERIVED 2026-09-28 (4) AFTER THE SIGNED-PYTHON RULE: 692 lines against a cap of 619 — 73 OVER**, the
+> **OVER-CAP, RE-DERIVED 2026-10-09 (2) AFTER I-39's HANDOFF: 690 lines against a cap of 619 — 71 OVER**, the
 > cap being this archetype's emit *(`rebuild`/L, counted at 499)* plus the measured **120** for a project's own
-> content. Ladder **1,241 → 815 → 776 → 760 → 691 → 686 → 687 → 683 → 687 → 685 → 692**, the +7 §4's signed-Python pin and its no-move rule, put in the charter at Wouter's word so that it is read before any code touches a file *(2026-09-28 (4))*. *(Re-derived LAST: editing this block moves it.)*
+> content. Ladder **1,241 → 815 → 776 → 760 → 691 → 686 → 687 → 683 → 687 → 685 → 692 → 690**, the +7 §4's signed-Python pin and its no-move rule, put in the charter at Wouter's word so that it is read before any code touches a file *(2026-09-28 (4))*, the −2 a shorter handoff *(2026-10-09 (2))*. *(Re-derived LAST: editing this block moves it.)*
 >
 > **REASON — EVERY ROUTE IS NOW MEASURED, AND THE PER-HEADING INVENTORY IS WHAT MEASURED THEM.** Pass one
 > collapsed 27 blocks for **−49**, bulletised route-1 §5.6 for **−7 out of 77 prose lines** *(so route 1 was
@@ -673,20 +673,18 @@ unconditionally — as is §5.6 entire.
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-08 (2), I-36 FIXED AND BRANCH 12 PLANNED — CODE
+### HANDOFF — 2026-10-09 (2), I-39 FIXED: THE SIBLING FOLDERS FOUND IN ONE PLACE, FROM A WORKTREE TOO — CODE
 
-**PURPOSE: MET.** It was *so that the corpus arm's side measurement is green again for the right reason with no document's coverage lost, and branch 12 starts from a measured plan Wouter has chosen*: all four `--sides` arms green on both variants, every refused document checked at its pinned counts from repack's refusal, and branch 12's slices, source, behaviour and acceptance chosen on measurements.
+**PURPOSE: MET.** It was *so that every check gives the same answer from a worktree as from the main checkout, with no launcher and no folder name typed into a shell line*: from a worktree with nothing set the gate's verdicts equal the main checkout's last gate close on all 13 tools, two differing only in the counts they print, and all nine corpus tools find their folders.
 
-**BUILT THIS SESSION:** `404dd57` I-36 — `tools/delivered_corpus_arm.py --sides` learns Step 10's wiring, and the skip-Step-8 scenario hands repack no declaration; and, in the same commit, the pre-commit gate's control 6 allows Word files in a working copy's own `tests/fixtures`, nowhere else; and the record, which gives `tools/claudemd_claims.py` check 6 the same rule. Section 3.2 of `PLAN-2-step-b.md` owns the numbers; `DECISIONS-LOG.md`, 2026-10-08 (2), the answers and the judgements taken alone.
+**BUILT THIS SESSION:** register I-39 — `tools/sibling_dirs.py` finds the folder beside the MAIN checkout from git's own pointer file, each folder overridable (`LT_PRIVATE_DIR`, `LT_LOGS_DIR` then `LEGAL_TRANSLATION_LOGS`, the new `LT_ARCHIVES_DIR`) and a gitignored `temp/` input looked for in the main checkout; 24 files route through it, and `tests/test_sibling_dirs.py` fails on the old shape anywhere in `tools/` or `tests/`. Non-zero from a worktree: 22 with nothing set, 12 with the folders supplied by hand, 8 after. `DECISIONS-LOG.md`, 2026-10-09 (2), owns the answers, the judgements and the review.
 
-**WOUTER'S RULINGS:** both items, one branch, one pull request; the glossary-kept arm measured and pinned; the gate's narrow scope fix; C6 amended to eleven refusals, still CLOSED; branch 12 declared then cross-checked, NOT SUPPORTED never CLEAN, three slices, 12a's acceptance as measured; squash-merge once green.
+**WOUTER'S RULINGS:** one helper; built from `main` beside #130 and reconciled at merge; a register row; the corpus tools proved at start-up.
 
-**SINGLE NEXT ACTION: BRANCH 12 SLICE 12a** — the declared source language and every check that reads it; write its sub-step plan first. Its one open question is ANSWERED, measured the same session: a declared language adds no block on the corpus, so 12a's acceptance of unchanged delivered bytes stands on evidence — section 3.2 of `PLAN-2-step-b.md` holds it.
+**SINGLE NEXT ACTION: BRANCH 12 SLICE 12a**, unchanged — its sub-step plan first. **Merging beside #130:** the second to merge takes `main` and recounts — `stepb_audit.py`'s and `stepb_audit3.py`'s private-folder lines, the plan's status cell, this section and the register's two counts.
 
-**THE BRANCH:** `feature/i36-sides-wiring-pins`, pull request #128, squash-merged on Wouter's approval once the record commit's document checks were green.
+**WHAT A NEW SESSION WOULD GET WRONG:** a worktree needs no launcher now — `uv run python tools/sibling_dirs.py` says where each folder came from; a test reading Word XML needs `uv run --with lxml`, the shared environment having none; of the three suites carried as red, only `test_claims_contents_cut` was red for its own reason; Git Bash's `sed` and `cat` hide a CRLF, so measure line endings in Python; and until #130 merges, `tools/stepb_metacheck.py` can still leave a planted mutation in `PLAN-2-step-b.md` — read `git diff` on the plan before any commit.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** `--sides` arm (c) refuses ELEVEN documents, not C6's seven — July's declarations had leaked into repack; a `.claude/worktrees/` folder is a parallel session's working copy, its fixtures allowed by the gate; and `tools/stepb_metacheck.py` twice left a planted mutation in `PLAN-2-step-b.md` during VERIFY, cause not established — read `git diff` on the plan before any commit until its fix lands.
+**Open, none blocking.** **(1)** The review's three carried findings — the test-document folder's name read only from this checkout's `.claude/evidence-dirs.local`, `corpus_dirs()` seven times over, the test's shape (a) seeing only `ROOT.parent`. **(2)** `test_cycle_gate` and `test_evidence_guard` red from this worktree before and after alike, not examined; and `test_precommit_gate` fails intermittently inside a full pass — once at its working-copy-fixture control, once at its own clean baseline before anything was planted — while passing every time alone and the gate run directly stays clean: cause not established. **(3)** The metacheck fix, #130. **(4)** Wouter's page reads of D08 page 2 and D02 pages 4 and 6. **(5)** #119's three review findings, `tools/hooks/pre-push`'s header, I-26, F46, F44's live refusals and G13; A24 and A25 on their trigger.
 
-**Open, none blocking.** **(1)** The metacheck fix, in its own session. **(2)** Wouter's page reads of D08 page 2 and D02 pages 4 and 6. **(3)** Three suites red before this work, carried unrun. **(4)** #119's three review findings and `tools/hooks/pre-push`'s header. **(5)** I-26, F46, F44's live refusals and G13; A24 and A25 on their trigger.
-
-**GATE:** the thirteen commands compared by content against `temp/gate_close_s1008` — every moved line explained by this session's rows. **Context: 54% when this record was written, measured with the usage tool.**
+**GATE:** 57 commands from the worktree compared by content against the reference pass and the main checkout's last gate close — every moved line explained. **Context: 46% when this record was written, measured with the usage tool.**

@@ -39,7 +39,8 @@ paragraph's text, a filename or a path -- every finding string embeds 50-70 char
 client document, which is exactly what CLAUDE.md 6.4 says cannot be un-said once it reaches a
 transcript. There is no verbose flag.
 
-Location from LEGAL_TRANSLATION_LOGS, so nothing about this machine is baked in.
+Location from tools/sibling_dirs.py - LT_LOGS_DIR, then LEGAL_TRANSLATION_LOGS, then beside the main
+checkout - so nothing about this machine is baked in.
 """
 import json
 import os
@@ -52,8 +53,8 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parent.parent
-LOGS = Path(os.environ.get("LEGAL_TRANSLATION_LOGS",
-                           str(ROOT.parent / "legal-translation-logs")))
+from sibling_dirs import logs_dir  # noqa: E402  (register I-39: LT_LOGS_DIR is read here too now)
+LOGS = logs_dir()
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
            PYTHONDONTWRITEBYTECODE="1")
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"

@@ -82,8 +82,9 @@ def strip_comments(text):
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-PRIV = Path(os.environ.get("LT_PRIVATE_DIR", ROOT.parent / "legal-translation-private"))
-ARCH = ROOT.parent / "skills" / "legal-translation" / "PUBLICATION VERSIONS"
+from sibling_dirs import logs_dir, private_dir, publication_versions  # noqa: E402  (register I-39)
+PRIV = private_dir()
+ARCH = publication_versions()
 ONLY = None
 if "--branch" in sys.argv:
     ONLY = sys.argv[sys.argv.index("--branch") + 1]
@@ -495,8 +496,7 @@ def audit_b1():
         hits += sum(1 for r in RX if r.search(text))
     claim("B1.clean", f"fixtures hit 0 of {len(RX)} confidentiality patterns", hits, 0)
 
-    cat = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs")
-               ) / "frozen-intermediates.json"
+    cat = logs_dir() / "frozen-intermediates.json"
     if cat.exists():
         c = json.loads(cat.read_text(encoding="utf-8"))["runs"]
         # (12, 37) UNTIL 2026-09-01, AND THE AUDIT IS WHAT CAUGHT THE CORRECTION. The

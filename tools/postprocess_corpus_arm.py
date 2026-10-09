@@ -68,7 +68,8 @@ from lxml import etree  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-LOGS = Path(os.environ.get("LT_LOGS_DIR", ROOT.parent / "legal-translation-logs"))
+from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-39)
+LOGS = logs_dir()
 
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. A before-and-after check in this
 #
@@ -378,7 +379,7 @@ def _corpus_dirs():
     for name in names:
         p = Path(name)
         if not p.is_absolute():
-            p = (ROOT.parent / name).resolve()
+            p = beside(name)
         if p.is_dir() and any(p.glob("*.docx")):
             out.append(p)
     return out

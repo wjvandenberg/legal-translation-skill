@@ -29,8 +29,9 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
-PRIV = ROOT.parent / "legal-translation-private"
-ARCH = ROOT.parent / "skills" / "legal-translation"
+from sibling_dirs import archives_dir, private_dir  # noqa: E402  (register I-39)
+PRIV = private_dir()
+ARCH = archives_dir()
 
 names = [l.strip() for l in (PRIV / "leakage-names.txt").read_text(encoding="utf-8").splitlines()
          if l.strip() and not l.lstrip().startswith("#")]

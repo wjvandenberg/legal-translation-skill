@@ -1218,3 +1218,35 @@ the keep-declaration builder, hand-built separately in three harnesses.
 **SEVEN ANSWERS AND TWO MORE, EACH ON THE RECOMMENDED OPTION** *(Wouter, 2026-10-08 (2), through the question tool)*. **At the open:** both items this session, on one branch and one pull request; and `--sides` with `--declare-glossary-kept` measured and pinned in I-36's fix, refused beside `--skip-step8`, which it contradicts. **At the close:** **(1)** the pre-commit gate's control 6 given the narrow scope fix — a working copy's own fixtures allowed, a Word file anywhere else in it still caught — rather than waiting for the other session or excluding the whole folder; **(2)** C6 given a dated amendment, its closure standing; **(3)** the branch pushed and squash-merged once the record commit is green; and branch 12's four — **(4)** the language DECLARED at Step 1 and cross-checked by repack's agreement; **(5)** an unsupported or unsettled language reported NOT SUPPORTED, never CLEAN, the run continuing; **(6)** three slices; **(7)** 12a's acceptance as measured. `PLAN-2-step-b.md` section 3.2 holds the measurements each rests on.
 
 **JUDGEMENTS TAKEN ALONE, EACH CARRIED TO THE CLOSE.** **(a)** The skip-Step-8 scenario made faithful — the chain hands repack no declaration — on reading `chain()` against the red runs, the prediction written before the run; it is what the arm's own docstring said it measured, and it moved C6's record, which went to Wouter. **(b)** A refused document's flattened-comment pin printed NOT ASSERTED rather than VOID: a counted finding never blocks, so no refusal can carry it, and a VOID would fail every run on a structural gap. **(c)** The code review at xhigh raised eight findings. Six were fixed: the footer tally and its VOID naming the documents they cover, a mixed-stop document failing on its own, a git error read as VOID rather than as after the wiring, the refused document's label, expected refusals counting only non-zero pins, and a nested conditional written as if and elif. Two were declined: the refusal read from human-readable text, guarded by its stated total, a machine-readable one meaning a change to a shipped script; and the three-line count matcher beside `side_match`. **(d)** The metacheck incident repaired byte-exact twice and flagged as a separate task rather than fixed here; Wouter started that session. **(e)** The same scope gap found at the close in `tools/claudemd_claims.py` check 6 — a working copy's own `temp/` read as a stray — fixed under the same ruling rather than put to Wouter again, the house's fix-the-class rule applying: the same narrow rule, red first, a stray elsewhere still caught.
+
+## 2026-10-09 (2) — I-39: the sibling folders found in one place, and from a worktree too
+
+**FOUR ANSWERS, EACH ON THE RECOMMENDED OPTION** *(Wouter, 2026-10-09 (2), through the question tool, at the
+open)*. **(1)** One helper that finds the main checkout from git's own pointer file, rather than an
+environment variable at each site — decision 6's written rule, *a shared capability lives in one place*,
+read as governing `tools/` too. **(2)** Built from `main` while pull request #130 is open, `stepb_audit.py` and
+`stepb_audit3.py` converted here as well so the new test can be strict; whichever merges second takes `main`
+and is recounted. **(3)** A register row, I-39, leaving I-37 and I-38 to #130 and citing neither by id, which
+would dangle on `main`. **(4)** The nine corpus tools proved at start-up — nothing set, and a folder that does
+not exist — with full runs only for the quick tools and the suites.
+
+**JUDGEMENTS TAKEN ALONE, EACH CARRIED TO THE CLOSE.** **(a)** The scope widened from the brief's seven files
+to 24, by census: every `ROOT.parent` and current-folder sibling path in `tools/` and `tests/`, and the
+gitignored `temp/` INPUTS a worktree lacks — `claudemd_claims`, `claudemd_disposal`, `stepb_audit`, the last
+found only when the after-pass disagreed with the main checkout. **(b)** `LEGAL_TRANSLATION_LOGS` kept as a
+second name for the logs folder, `LT_LOGS_DIR` winning when both are set. **(c)** A variable set but empty
+counts as unset. **(d)** `LEAKAGE_LIST_PATH`, `CORPUS_DESCRIPTORS_FILE` and `LT_CORPUS_DIR` left in the tools
+that read them, their own empty-value behaviour unchanged. **(e)** `claudemd_claims` still reads
+`temp/stepb_harvest.py`, now from the main checkout when a worktree lacks it, never the tracked `tools/` copy,
+which differs in content: changing what a check reads is not this fix. **(f)** `leakage_scan` keeps an import
+fallback for its copy kept in the private folder. **(g)** Every pass run with `uv run --with lxml`: the shared
+environment `uv` finds from either checkout has no `lxml`, so every test reading Word XML died at import
+without it. **(h)** Outputs stay in their own checkout's `temp/`; only INPUTS are looked for in the main one.
+
+**THE REVIEW, `/code-review` at high: eight findings.** **Four fixed** — `audit_register` reads
+`LEAKAGE_LIST_PATH` first, and is VOID, exit 2, on an unreadable list rather than a traceback exiting 1;
+`gate_replay`'s message names the variable that now wins; a `temp/` folder walked twice. **One needs no
+change** — the fall-back from a separate git folder is declared in the helper and asserted from a real worktree
+by the test. **Three carried to Wouter:** the test-document folder's NAME is still read only from this
+checkout's gitignored `.claude/evidence-dirs.local`; `corpus_dirs()` is implemented seven times, against
+decision 6's rule; and the test's shape (a) catches only the name `ROOT.parent`.

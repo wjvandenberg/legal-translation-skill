@@ -27,6 +27,9 @@ from pathlib import Path
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 ROOT = Path(__file__).resolve().parent.parent
+# The pre-overhaul copy is a gitignored temp/ file the main checkout holds and a worktree does
+# not; tools/sibling_dirs.py looks in both (register I-39).
+from sibling_dirs import main_temp  # noqa: E402
 
 
 def norm(t):
@@ -35,7 +38,7 @@ def norm(t):
     return re.sub(r"\s+", " ", re.sub(r"[*`_]", "", t)).lower()
 
 
-OLD = norm((ROOT / "temp" / "CLAUDE.md.pre-overhaul").read_text(encoding="utf-8"))
+OLD = norm(main_temp("CLAUDE.md.pre-overhaul").read_text(encoding="utf-8"))
 DEST = {
     "CLAUDE": norm((ROOT / "CLAUDE.md").read_text(encoding="utf-8")),
     "OPUS5": norm((ROOT / "PLAN-3-opus5-migration.md").read_text(encoding="utf-8")),

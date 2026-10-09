@@ -35,8 +35,11 @@ from pathlib import Path
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
 ROOT = Path(__file__).resolve().parent.parent
-PRIV = ROOT.parent / "legal-translation-private"
-PUB = ROOT.parent / "skills" / "legal-translation" / "PUBLICATION VERSIONS"
+# The sibling folders, and the inputs kept in a gitignored temp/, are found by tools/sibling_dirs.py,
+# which finds them from a git worktree too (register I-39).
+from sibling_dirs import main_checkout, main_temp, private_dir, publication_versions  # noqa: E402
+PRIV = private_dir()
+PUB = publication_versions()
 
 CMD = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
 REG = (ROOT / "evidence/REGISTER-findings.md").read_text(encoding="utf-8")
@@ -479,7 +482,8 @@ skill_scripts = {n.split("/")[-1] for n in ARCH["UK"]["files"] if n.startswith("
 # shared hazard" failure §5.1 names. Instead: search each root RECURSIVELY, and let the pattern
 # understand ANY relative path prefix -- more than one segment, and hyphens, which `probe-5b`
 # has and which is precisely why the old pattern skipped it.
-SEARCH_ROOTS = [ROOT / "temp", ROOT / "tools", ROOT / "tests", PRIV / "tools"]
+SEARCH_ROOTS = list(dict.fromkeys([ROOT / "temp", main_checkout() / "temp", ROOT / "tools",
+                                   ROOT / "tests", PRIV / "tools"]))
 scripts_on_disk = set()
 for _root in SEARCH_ROOTS:
     if _root.exists():
@@ -560,7 +564,7 @@ for needle, still_true, why in STATUS:
 
 head(8, "SCOPING CAUTIONS — the overhaul brief said 'eleven of the fourteen' had been "
         "absorbed. How many were there, and is dropping them safe?")
-old = (ROOT / "temp" / "CLAUDE.md.pre-overhaul")
+old = main_temp("CLAUDE.md.pre-overhaul")
 if old.exists():
     m = re.search(r"\*\*Scoping cautions that survive whatever the branch list becomes:\*\*(.*?)\n## ",
                   old.read_text(encoding="utf-8"), re.S)
@@ -570,7 +574,7 @@ if old.exists():
         fail("8", "CLAUDE.md still says 'eleven of the fourteen scoping cautions'")
 # dropping them is only safe if the standing prescription check proves the analysis carries
 # them. It reports 63 carried / 0 missing, and eight of the 63 are these cautions.
-harv = (ROOT / "temp" / "stepb_harvest.py").read_text(encoding="utf-8")
+harv = main_temp("stepb_harvest.py").read_text(encoding="utf-8")
 sc = len(re.findall(r'\("SC\d+", "charter"', harv))
 if sc >= 8:
     ok(f"the standing prescription check carries {sc} charter scoping cautions into the "
