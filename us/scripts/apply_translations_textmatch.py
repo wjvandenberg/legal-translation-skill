@@ -35,6 +35,8 @@ from source_language_markers import (  # noqa: E402
     scan_remnants,
     detect_language,
     SUPPORTED_LANGUAGES,
+    not_supported,
+    resolve_source_language,
 )
 
 def _check_self_integrity():
@@ -2324,21 +2326,29 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
     # Scan translated text for source-language marker words via
     # source_language_markers. Whole-word matching avoids false
     # positives like "allocated"/"already".
-    source_lang = None
-    # Prefer the language stored on paragraphs.json, if the caller set one.
-    if hasattr(textmatch_apply, '_source_language_override'):
-        source_lang = textmatch_apply._source_language_override
-    if not source_lang:
-        # Auto-detect from the source-language text in paragraphs.json.
+    #
+    # THE LANGUAGE IS THE ONE DECLARED AT STEP 1c (branch 12 slice 12a), read through the
+    # shared reader beside paragraphs.json. A declared language with no marker list cannot
+    # be scanned, and says so. Nothing declared, the scan keeps today's guess for what it
+    # REPORTS, but a guess never says CLEAN: on the corpus it named Norwegian as Polish and
+    # English as Portuguese, and printed CLEAN both times (registers S1, H1).
+    def _guess_from_notes():
+        # Nothing declared: guess from the source-language text in paragraphs.json.
         try:
             with open(paragraphs_json_path, 'r', encoding='utf-8') as _f:
                 _data = json.load(_f)
-            sample = ' '.join(
-                (p.get('text') or '') for p in _data[:60]
-            )
-            source_lang = detect_language(sample)
+            return detect_language(' '.join((p.get('text') or '') for p in _data[:60]))
         except Exception:
-            source_lang = None
+            return None
+
+    # Prefer the language stored on paragraphs.json, if the caller set one.
+    _resolved = resolve_source_language(
+        paragraphs_json_path, explicit=getattr(textmatch_apply, '_source_language_override', None),
+        guess=_guess_from_notes)
+    if _resolved.warning:
+        print(f"  WARNING — {_resolved.warning}")
+    cannot_rule = _resolved.cannot_rule
+    source_lang = _resolved.language if _resolved.language in SUPPORTED_LANGUAGES else None
 
     # Scan both the accept-all view (<w:t>) and the reject-all / markup view
     # (<w:delText>). A nested <w:ins><w:del>SOURCE</w:del></w:ins> phantom
@@ -2382,9 +2392,8 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
         print(f"  Review these and fix manually if they are genuine {label} remnants.")
 
     if not source_lang:
-        # Unknown source language — we cannot scan reliably. Announce, don't fail.
-        print("  Source-language scan: SKIPPED "
-              "(could not auto-detect source language — pass --source-language)")
+        # No language to scan for. Announce, don't fail — the run goes on.
+        print("  Source-language scan: " + not_supported("the source-language scan", cannot_rule))
     else:
         any_hit = False
         if remnants_accept:
@@ -2393,7 +2402,12 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
         if remnants_reject:
             _print_hits('reject-all / markup view', remnants_reject)
             any_hit = True
-        if not any_hit:
+        if cannot_rule:
+            # Said whether or not it found anything: warnings that rest on a guess say so too.
+            print("  Source-language scan: " + not_supported("the source-language scan", cannot_rule)
+                  + (f" Its {label} warnings above rest on that guess." if any_hit
+                     else f" It found no {label} marker in either view."))
+        elif not any_hit:
             print(
                 f"  Source-language scan: CLEAN (no {label} remnants in "
                 f"accept-all or reject-all view)"

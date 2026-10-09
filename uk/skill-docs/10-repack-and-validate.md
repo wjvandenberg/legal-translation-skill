@@ -7,7 +7,8 @@ operator runs Step 10 and all three fire automatically before any byte is writte
 the output `.docx`. There is no separate command for them and no flag to skip.
 
 * **Lexicon compliance scan (pre-repack)** — re-runs `lexicon_compliance.py
-  --stage pre-repack` on the post-processed `document.xml`. Catches any calque
+  --stage pre-repack` on the post-processed `document.xml`, in the language declared
+  at Step 1c. Catches any calque
   that crept in through segment fallback distribution, comment translations, or
   header/footer boilerplate. Exit 1 = blocking; repack aborts. Fix the offending
   `en` / `en_segments` entries in `paragraphs.json`, re-run Step 5, then re-run
@@ -39,7 +40,7 @@ For a manual pre-flight before Step 10 (optional — all three gates fire automa
 
 ```bash
 python <skill-path>/scripts/lexicon_compliance.py \
-  <workdir>/final/word/document.xml --stage pre-repack
+  <workdir>/final/word/document.xml --stage pre-repack --notes <workdir>/paragraphs.json
 python <skill-path>/scripts/validate_apply.py \
   <workdir>/paragraphs.json <workdir>/final/word/document.xml --strict
 ```
@@ -180,16 +181,19 @@ The script also automatically:
   here and never forbidden earlier. A U+200B inside an attribute value is in no reading
   and is left alone.
 - **Blocks on a source-language remnant, BEFORE the file is written.** The
-  source language is auto-detected from the ORIGINAL `word/document.xml`, and every
-  prose part of the archive is scanned with the marker lists
+  source language is the one declared at Step 1c, cross-checked against the ORIGINAL
+  `word/document.xml` — a mismatch is a WARNING naming both, and the declaration is
+  used — and every prose part of the archive is scanned with the marker lists
   `apply_translations_textmatch.py` uses. A hit REFUSES delivery — exit 1, nothing
   written — unless its class is declared advisory in
   `source_language_markers.py`, where it prints a WARNING instead: `convention` (an
   English word), five company-form nouns that sit inside kept registered names, CJK
   characters, and six kept names the lexicons tell you to write (e.g. "Agenzia delle
   Entrate"), each citing its lexicon row. A remnant in comments, footnotes or a header
-  usually means that part was not wired into this repack: pass its flag. If the
-  source language cannot be detected the block says so and does not run. A faithful
+  usually means that part was not wired into this repack: pass its flag. A declared
+  language the skill does not support says NOT SUPPORTED and the block does not run;
+  with nothing declared the block scans the language it detects in the original, still
+  refuses on what it finds, and says NOT SUPPORTED instead of clean. A faithful
   text refused by a wrongly scoped marker is `SKILL.md` rule 5a's case — never alter
   the translation to satisfy it.
 - **Runs the delivered-document check on a check copy, BEFORE the file is written.**

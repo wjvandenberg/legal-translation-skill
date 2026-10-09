@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""auto_mode_guard.py - refuse an unattended session's irreversible acts.  CHECKER VERSION 2 (2026-08-25)
+"""auto_mode_guard.py - refuse an unattended session's irreversible acts.  CHECKER VERSION 3 (2026-10-09)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -286,8 +286,15 @@ def main(argv) -> int:
     if "--selftest" in argv:
         return selftest()
 
+    # RAW BYTES, DECODED AS UTF-8 - v3. Claude Code writes the payload in UTF-8 and escapes
+    # nothing, and Python reads a PIPE in the machine's code page, cp1252 here: a text-mode read
+    # mangled an accented folder - the branch unreadable, a legitimate commit refused - and
+    # RAISED on a byte cp1252 leaves undefined. That error is a ValueError, so the arm below
+    # took it for "not JSON" and ALLOWED: one 'Ł' in a forced push let it through, unattended.
+    # 'replace', never strict, for that reason. ASCII arrives unchanged. install_hooks.py's case
+    # 11 finds the read below by its EXACT text to swap it back - keep it whole and spelled so.
     try:
-        payload = json.loads(sys.stdin.read() or "{}")
+        payload = json.loads(sys.stdin.buffer.read().decode("utf-8", errors="replace") or "{}")
     except ValueError as e:
         print(f"auto_mode_guard: stdin is not JSON ({e}); allowing.", file=sys.stderr)
         return CANNOT_DECIDE
@@ -313,6 +320,10 @@ def main(argv) -> int:
     allowed, reason = decide(tool_name, tool_input, fields.get("BRANCH", ""),
                              load_cfg(f.parent), cwd)
     if probe:
+        # v3: the reason quotes the command, and stdout to a pipe is strict in the code page - a
+        # 'Ł' there crashed this diagnostic, exit 1 and nothing printed. Escaped, never lost.
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(errors="backslashreplace")
         print(("ALLOW" if allowed else "REFUSE") + (reason or ""))
         return ALLOW
     if allowed:
@@ -427,6 +438,30 @@ def selftest() -> int:
     print(f"  {'OK  ' if good else 'MISS'} live only while STATUS is RUNNING     -> "
           f"COMPLETE: exit {inert} (allow), RUNNING: exit {live} (refuse)")
 
+    # ---- v3: THE PAYLOAD AS CLAUDE CODE SENDS IT - raw UTF-8, nothing escaped - through the
+    #      REAL entry point, the child GIVEN the code page this machine reads a pipe in, cp1252,
+    #      so it reproduces anywhere. Every case above crossed no pipe, or sent json.dumps's
+    #      ASCII escapes, so none could see that a text-mode read MANGLES an accented folder -
+    #      the branch then unreadable, a legitimate commit refused - and RAISES on a byte cp1252
+    #      leaves undefined, which main()'s ValueError arm took for "not JSON" and ALLOWED.
+    for label, cmd, folder, want in (
+            ("a commit on the run's branch (ASCII control)", "git commit -m x", "plain", ALLOW),
+            ("...the same commit, in an ACCENTED folder", "git commit -m x", "café", ALLOW),
+            ("a forced push with an undecodable character", "git push --force origin main  # Łódź",
+             "plain", REFUSE)):
+        got = _piped_probe(tmp, cmd, folder).returncode
+        good = got == want
+        ok &= good
+        print(f"  {'OK  ' if good else 'MISS'} piped raw UTF-8: {label:<44} -> exit {got}, "
+              f"want {want}")
+    # --probe PRINTS its verdict and the reason, which quotes the command - and stdout to a
+    # pipe is strict cp1252, so a 'Ł' there crashed the diagnostic. Measured: exit 1, nothing.
+    pr = _piped_probe(tmp, "git push --force origin main  # Łódź", "plain", "--probe")
+    good = pr.returncode == 0 and pr.stdout.startswith(b"REFUSE")
+    ok &= good
+    print(f"  {'OK  ' if good else 'MISS'} piped raw UTF-8: --probe reports, never crashes"
+          f"          -> exit {pr.returncode}, stdout {ascii(pr.stdout[:6])}")
+
     print()
     report_pairing(paired, unpaired)
     shutil.rmtree(tmp, ignore_errors=True)
@@ -468,6 +503,24 @@ def _live_probe(tmp: Path, status: str, command: str) -> int:
     r = subprocess.run([sys.executable, str(Path(__file__).resolve())],
                        input=payload, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
     return r.returncode
+
+
+def _piped_probe(tmp: Path, command: str, folder: str, *flags: str) -> subprocess.CompletedProcess:
+    """The REAL entry point while a run is RUNNING, fed `command` exactly as Claude Code sends
+    it, from a repository on the run's branch inside a folder named `folder` - built once."""
+    d = tmp / f"piped-{folder}"
+    home = d / "repo"
+    if not (home / ".git").is_dir():
+        _repo(home, "session/the-run")
+    state = d / "AUTO-MODE-RUN.md"
+    state.write_bytes(b"```auto-mode\nRUN_ID: r\nN: 1\nK: 0\nSTATUS: RUNNING\n"
+                      b"BRANCH: session/the-run\nHOP_ACTIVE: no\nWOKE: -\n```\n")
+    env = {k: v for k, v in os.environ.items() if k not in ("PYTHONUTF8", "PYTHONIOENCODING")}
+    env.update(PYTHONIOENCODING="cp1252", AUTO_MODE_RUN_FILE=str(state))
+    payload = {"tool_name": "Bash", "tool_input": {"command": command}, "cwd": str(home)}
+    return subprocess.run([sys.executable, str(Path(__file__).resolve()), *flags],
+                          input=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+                          capture_output=True, env=env, timeout=60)
 
 
 if __name__ == "__main__":

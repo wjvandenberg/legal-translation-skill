@@ -384,6 +384,10 @@ variants between Step 6 and Step 9 produce false-positive "spelling violations".
 Review the output. Key checks:
 - `<source_language>_remnants` — source-language text in `document.xml`?
 - `aux_<filename>` — source-language text in auxiliary file ?
+- Both read the language declared at Step 1c, beside `--with-source`. **NOT SUPPORTED in
+  place of CLEAN means the check could not rule** — a language the skill does not support,
+  or nothing declared — and the closing line then says so instead of PASSED: read the
+  output for untranslated text yourself. An auxiliary file that will not parse is an issue.
 - `numbering`, `truncation`, `formatting`, `definition_order` — structural defects in
   `document.xml`.
 

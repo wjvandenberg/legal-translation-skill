@@ -187,7 +187,7 @@ High-level summary of what each step does. Detail in the step files.
 
 | # | Step | Action | File |
 |---|------|--------|------|
-| 1 | Set up | Convert .doc→.docx if needed, unpack to a workdir | `skill-docs/01-setup-and-extract.md` |
+| 1 | Set up | Convert .doc→.docx if needed, unpack to a workdir, **declare the source language** (1c) | `skill-docs/01-setup-and-extract.md` |
 | 2 | Extract | `extract_paragraphs.py` produces paragraphs.json with formatting metadata | `skill-docs/01-setup-and-extract.md` |
 | 3 | Lexicons | Identify document domain, load English references and per-language sub-lexicons | `skill-docs/03-lexicons-and-segments.md` |
 | 3b | Scaffold | (TC documents only) Build `en_segments` skeleton for fragmented TC | `skill-docs/03-lexicons-and-segments.md` |
@@ -199,7 +199,7 @@ High-level summary of what each step does. Detail in the step files.
 | 6 | Post-process | `post_process.py` (terminology, spacing, US English, etc.) | `skill-docs/06-postprocess-and-reorder.md` |
 | 7 | Reorder | `reorder_definitions.py` for documents with definitions | `skill-docs/06-postprocess-and-reorder.md` |
 | 8 | Aux files | Translate headers/footers/comments/footnotes/endnotes | `skill-docs/08-aux-and-quality.md` |
-| 9 | Quality check | `quality_check.py` for source-language remnants | `skill-docs/08-aux-and-quality.md` |
+| 9 | Quality check | `quality_check.py` for source-language remnants, in the language declared at 1c | `skill-docs/08-aux-and-quality.md` |
 | 10 | Repack | `repack_docx.py` (auto-invokes validate_apply --strict, then --delivered) | `skill-docs/10-repack-and-validate.md` |
 | 11 | Validate | Final integrity check on the .docx | `skill-docs/10-repack-and-validate.md` |
 
@@ -384,9 +384,10 @@ jurisdiction-specific terms is a more serious error than leaving register slight
 | `validate_translations.py` | Check translation completeness (character ratios). **Per-batch invocation in Step 4 is manual; the final pre-apply pass auto-runs from inside `apply_translations_textmatch.py`.** |
 | `validate_segment_shapes.py` | **MANDATORY if source has TCs** — Pre-apply shape linter: scans `en_segments` pair-wise for XML-boundary risk shapes (article collision, alpha-collision across a boundary with no whitespace — non-Latin script gotcha, digit-at-TC-boundary, double space straddling a boundary, bare-article TC segment, internal camelCase collision). **Auto-runs from `apply_translations_textmatch.py` on TC documents.** |
 | `validate_reject_all.py` | **MANDATORY if source has TCs** — Reconstruct accept-all and reject-all views from `en_segments` and scan for readability defects (double article, repeated word, stranded preposition, run-together words, double space, empty brackets, forbidden collocations). **Auto-runs from `apply_translations_textmatch.py` on TC documents.** |
-| `lexicon_compliance.py` | **MANDATORY (pre-apply AND pre-repack)** — Scan JSON or document.xml for calques and hard-rule violations drawn from lexicon Avoid columns. Pre-apply run is manual (Step 4d); pre-repack run **auto-fires from inside `repack_docx.py`** before bundling. |
+| `lexicon_compliance.py` | **MANDATORY (pre-apply AND pre-repack)** — Scan JSON or document.xml for calques and hard-rule violations drawn from lexicon Avoid columns. Pre-apply run is manual (Step 4d); pre-repack run **auto-fires from inside `repack_docx.py`** before bundling. Reads the source language declared at Step 1c; a language the skill does not support runs every language's rules, none written for it, and says NOT SUPPORTED, never PASSED. |
+| `source_language_markers.py` | **MANDATORY at Step 1c** — `--declare <language> <workdir>` writes `source_language.json`, the one source language every language-dependent check reads; also holds the remnant marker lists and their verdict. |
 | `apply_translations_textmatch.py` | **PRIMARY** — Apply translations by text matching onto original. Auto-runs `validate_translations.py` (BLOCK code 2 only), plus `validate_segment_shapes.py` and `validate_reject_all.py` on TC docs, all pre-apply, plus `validate_apply.py --strict` post-apply. |
-| `repack_docx.py` | **MANDATORY** — Repack translated XML back into .docx (replaces shell zip). Auto-runs `lexicon_compliance.py --stage pre-repack` and (when `--paragraphs` supplied) `validate_apply.py --strict` before bundling. Scrubs every U+200B from every prose part, then reads the archive back BEFORE delivery and REFUSES if one survives or if a prose part carries a source-language remnant; the classes declared advisory in `source_language_markers.py` only warn. Last, still before the write, it runs `validate_apply.py --delivered` on a check copy of the finished archive against the notes and the original, and REFUSES on a blocking finding or a check that examined nothing. |
+| `repack_docx.py` | **MANDATORY** — Repack translated XML back into .docx (replaces shell zip). Auto-runs `lexicon_compliance.py --stage pre-repack` and (when `--paragraphs` supplied) `validate_apply.py --strict` before bundling. Scrubs every U+200B from every prose part, then reads the archive back BEFORE delivery and REFUSES if one survives or if a prose part carries a source-language remnant — in the language declared at Step 1c, cross-checked against the original, a mismatch warned — and the classes declared advisory in `source_language_markers.py` only warn. Last, still before the write, it runs `validate_apply.py --delivered` on a check copy of the finished archive against the notes and the original, and REFUSES on a blocking finding or a check that examined nothing. |
 | `translate_numbering.py` | Translate numbering format strings in word/numbering.xml |
 | `translate_headers_footers.py` | Translate text in word/headerN.xml and word/footerN.xml |
 | `translate_comments.py` | **MANDATORY if the document has comments** — namespace-safe translation of word/comments.xml |
