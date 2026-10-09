@@ -60,6 +60,8 @@
 > of how each option was decided and audited, and rewriting a record is how a decision loses its reasoning.
 > **The status is replaced; the case is corrected, never truncated.**
 
+**SESSION PURPOSE — 2026-10-09, the two malformed sub-lexicon tables, branch `fix/lexicon-table-widths` — what · how · purpose:** make every row of the two Italian sub-lexicons' tables (finance-banking and transport-and-insurance) match its header, identically in both trees — a Context column on the section-headings table, an empty cell on the four short rows, no rendering reworded — and correct the transport file's GENCON and BALTIME rows, filing both findings in register cluster E and adding `tests/test_shipped_tables.py` so no shipped table can drift again — every choice Wouter's, spliced byte-exact on the LF files, the new test red first, `tools/md_tables.py` 0 on all four files, the parity check green, the register instruments compared by content against a baseline, VERIFY and TEST through `tools/cycle_evidence.py`, a pull request for Wouter — **so that the shipped lexicons render and read as their headers say, in both variants, say nothing false about the two charter forms, and the register records both defects and their fix** *(written immediately after the tag `rollback-2026-10-09-lexicon-tables-start`)*
+
 > **Phase 3, Step B. THE EXPLORATION IS COMPLETE AND EVERY OPTION IS DECIDED.** This document produced no
 > code; it is the basis on which the code gets written. Written to the shape agreed on 2026-08-04
 > (`CLAUDE.md` → *Roadmap → Phase 3 → THE AGREED SHAPE OF THE STEP B ANALYSIS*), reviewed option by option
@@ -2033,7 +2035,7 @@ register has 28 findings establishing that those same checks are blind to the lo
 **Unarguable and discerning are different properties, and the skill claims only the first while reading as
 though it had both.**
 
-### 5.4 Things that make the skill hard to keep correct — 30 findings
+### 5.4 Things that make the skill hard to keep correct — 31 findings
 
 **Two complete trees are maintained by hand, and the default one is the degraded one.** Not a spelling
 difference: the UK package — the one most users install — runs **37 spelling rules where the US package runs
@@ -2072,7 +2074,7 @@ third lost, it lost to defects the first run had noticed and repaired outside th
 **So the conclusion is an argument for fixing the defects, not for a rule about batching** — fix them and
 batch position stops mattering, because there is nothing left to rescue.
 
-### 5.5 Places where the manual is simply wrong — 51 findings, and it is now the largest
+### 5.5 Places where the manual is simply wrong — 52 findings, and it is now the largest
 
 **Three mandatory requirements cannot be met at all.** One requires a check to report zero issues while two
 other mandatory rules forbid both available ways to get there. One requires the operator to verify that no
@@ -2590,7 +2592,7 @@ the convention statements and cheaper.
 
 | pros | cons | what it would break | what it does NOT fix |
 |---|---|---|---|
-| Closes **16 findings** including the one worst-grade dictionary finding · **It is the only option that touches what your own review says actually matters.** Four consecutive reviewed documents each produced a furniture gap rather than a subject-matter one, and two of them shipped badly · The two renderings are already **decided** by you, with the governing principle stated — mirror whether the source carries a label — so the largest row needs no further judgement · Writing, not coding: it cannot break the pipeline · It also unlocks the calque defence, which currently covers **3 of 11 languages plus a language-agnostic set [measured]** | Cost **medium** *(inference)* — content authoring, the one option that cannot be closed by structure · Risk **low but easy to get wrong in a specific way:** written as a list of strings it fails on the next document. One reviewed document already proved a flat two-column row cannot express a place marked by a case ending, and another proved the rule must be about a *class* of text · **It cannot be verified by any automatic check.** Its instrument is a graded run plus your review | Nothing mechanical · If the prohibition question is answered by extending the sub-dictionaries, it touches 154 files and is the largest editing job in the plan · If it is answered by withdrawing the five instructions, it removes per-language prohibition, which is exactly what calque defence needs — so neither answer is free | **Everything in the code.** No check, no content loss, no formatting, no layout · It does not make the furniture *checkable* — no gate reachable from the current design can ever ask whether English should do something the source did not, because every check is differential |
+| Closes **17 findings** *(16 until 2026-10-09, when E16 arrived — a lexicon row naming a charter form as the wrong kind of charter)* including the one worst-grade dictionary finding · **It is the only option that touches what your own review says actually matters.** Four consecutive reviewed documents each produced a furniture gap rather than a subject-matter one, and two of them shipped badly · The two renderings are already **decided** by you, with the governing principle stated — mirror whether the source carries a label — so the largest row needs no further judgement · Writing, not coding: it cannot break the pipeline · It also unlocks the calque defence, which currently covers **3 of 11 languages plus a language-agnostic set [measured]** | Cost **medium** *(inference)* — content authoring, the one option that cannot be closed by structure · Risk **low but easy to get wrong in a specific way:** written as a list of strings it fails on the next document. One reviewed document already proved a flat two-column row cannot express a place marked by a case ending, and another proved the rule must be about a *class* of text · **It cannot be verified by any automatic check.** Its instrument is a graded run plus your review | Nothing mechanical · If the prohibition question is answered by extending the sub-dictionaries, it touches 154 files and is the largest editing job in the plan · If it is answered by withdrawing the five instructions, it removes per-language prohibition, which is exactly what calque defence needs — so neither answer is free | **Everything in the code.** No check, no content loss, no formatting, no layout · It does not make the furniture *checkable* — no gate reachable from the current design can ever ask whether English should do something the source did not, because every check is differential |
 
 ---
 
@@ -3352,9 +3354,9 @@ rewriting stage at all. By construction that addresses options 1, 2, 3 and 6.
 furniture and dictionary work (content, not architecture), nothing for the instruction substrate (the
 instructions still have to be written, and they are 50 findings), nothing for the two-tree problem, nothing
 for truncation, and nothing for the false claims. **On the measured numbers a rebuild addresses at most 109 of
-the 189 findings and leaves 80 exactly where they are** *(re-derived 2026-09-30 from the option map in
+the 191 findings and leaves 82 exactly where they are** *(re-derived 2026-09-30 from the option map in
 `tools/stepb_verify.py`, which is what generates §9's appendix: the union of what options 1, 2, 3 and 6
-close is **109** — A23, A24, A25 and F47, filed 2026-09-28, are in option 2, and B10, filed 2026-09-24, is in options 2 and 6; W5, filed 2026-09-28 (4), is in option 8, which a rebuild does not touch; C30, filed 2026-09-29 (3), is in option 2; J2, filed 2026-09-30, is in option 9 alone, so the union holds at 109 and what it leaves moves to 80. **It read 98 of 177, and 177 minus 98 is 79, not the 77 beside it**: the union had reached
+close is **109** — A23, A24, A25 and F47, filed 2026-09-28, are in option 2, and B10, filed 2026-09-24, is in options 2 and 6; W5, filed 2026-09-28 (4), is in option 8, which a rebuild does not touch; C30, filed 2026-09-29 (3), is in option 2; J2, filed 2026-09-30, is in option 9 alone, so the union holds at 109 and what it leaves moves to 80; E15 and E16, filed 2026-10-09, are in options 8 and 4, which a rebuild does not touch, so the union holds again and what it leaves moves to 82. **It read 98 of 177, and 177 minus 98 is 79, not the 77 beside it**: the union had reached
 100 and the first figure was never re-derived, because `tools/stepb_audit.py`'s check 6 searched for the
 literal "the 160 findings", never found it, and reported the arithmetic as reproducing — fixed in the
 same commit to find the claim by its shape, to fail when it cannot, and to fail on a second live copy. This
@@ -3502,10 +3504,10 @@ plain English above becoming hand-waving.**
 | 1 | loses content | A1 A2 A3 A6 A8 A9 A15 A16 A19 A24 A25 B3 B8 B10 C2 C12 C13 C14 C16 C17 C19 C23 C28 E4 F16 F27 J1 M1 N1 S3 | CRITICAL:7 HIGH:16 MED:6 LOW:1 |
 | 2 | looks wrong on the page | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 A20 A21 A22 A23 B1 B7 C20 D1 D2 D3 D4 D5 D6 E9 E12 F7 F13 F19 F22 O1 R1 | HIGH:16 MED:13 LOW:2 |
 | 3 | says it worked when it did not | C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 C30 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 H1 H2 H4 L1 L4 L6 S1 S2 W3 W4 W5 X1 X2 X4 X6 | CRITICAL:4 HIGH:23 MED:16 LOW:3 —:1 |
-| 4 | hard to keep correct | E1 E2 E3 E5 E6 E10 E11 E13 E14 F21 F23 F32 F36 F37 F38 L2 L3 Q1 T1 T2 T3 T4 T5 T6 U1 V1 V2 W1 W2 Y1 | CRITICAL:1 HIGH:8 MED:16 LOW:3 POS:2 |
-| 5 | the manual is wrong | B2 B4 B5 B6 B9 C29 E7 E8 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40 F41 F42 F43 F44 F45 F46 F47 H3 J2 K1 K2 K3 L5 X3 X5 Y2 Y3 Y4 | HIGH:18 MED:25 LOW:8 |
+| 4 | hard to keep correct | E1 E2 E3 E5 E6 E10 E11 E13 E14 E15 F21 F23 F32 F36 F37 F38 L2 L3 Q1 T1 T2 T3 T4 T5 T6 U1 V1 V2 W1 W2 Y1 | CRITICAL:1 HIGH:8 MED:16 LOW:4 POS:2 |
+| 5 | the manual is wrong | B2 B4 B5 B6 B9 C29 E7 E8 E16 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40 F41 F42 F43 F44 F45 F46 F47 H3 J2 K1 K2 K3 L5 X3 X5 Y2 Y3 Y4 | HIGH:18 MED:25 LOW:9 |
 
-**30 + 31 + 47 + 30 + 51 = 189 ✓**
+**30 + 31 + 47 + 31 + 52 = 191 ✓**
 
 > **THIS LINE WAS STALE BY TWO, AND IT HAD BEEN FOR SOME TIME.** *(Corrected 2026-08-21 on
 > branch 14.)* It read **27 + 27 + 41 + 30 + 43 = 168** while the table directly above it
@@ -3526,11 +3528,11 @@ plain English above becoming hand-waving.**
 | 1 | preserve-by-default in apply | A1 A2 A3 A8 A9 A16 A19 A21 A22 C16 C17 C19 D4 F16 F27 N1 T1 T6 | CRITICAL:4 HIGH:10 MED:3 POS:1 |
 | 2 | check against the original | A23 A24 A25 B8 B10 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28 C30 D2 D5 E4 F47 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 H1 H2 H4 J1 L1 L4 L6 M1 S1 S2 S3 U1 V1 | CRITICAL:7 HIGH:24 MED:25 LOW:4 —:1 |
 | 3 | say what the formatting is | A3 A4 A5 A6 A7 A10 A11 A12 A13 A14 A17 A18 A20 A21 C13 C20 D6 F7 F13 F19 F22 L2 L3 O1 | HIGH:17 MED:6 LOW:1 |
-| 4 | a home for document furniture | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 | CRITICAL:1 HIGH:5 MED:9 LOW:1 |
+| 4 | a home for document furniture | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 E16 F17 F31 F33 | CRITICAL:1 HIGH:5 MED:9 LOW:2 |
 | 5 | one authority, one way out, more than one gear | A15 C5 C7 C26 C29 D3 D5 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28 F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 F45 F46 H1 H2 H3 K1 K2 K3 L5 R1 | CRITICAL:1 HIGH:17 MED:24 LOW:6 |
 | 6 | take post_process's authority away | B1 B2 B3 B4 B5 B6 B7 B8 B9 B10 D5 F29 F45 T1 T6 | CRITICAL:1 HIGH:5 MED:7 LOW:1 POS:1 |
 | 7 | one tree instead of two | C21 F8 F34 Q1 U1 V1 V2 | MED:5 LOW:2 |
-| 8 | protect the whole package | C29 F35 Q1 W1 W2 W3 W4 W5 Y1 | HIGH:7 MED:1 LOW:1 |
+| 8 | protect the whole package | C29 E15 F35 Q1 W1 W2 W3 W4 W5 Y1 | HIGH:7 MED:1 LOW:2 |
 | 9 | fix the claim, not only the code | C5 C10 C11 F12 F39 F40 F42 F43 F44 J1 J2 K1 L6 X1 X2 X3 X4 X5 X6 Y1 Y2 Y3 Y4 | CRITICAL:2 HIGH:7 MED:11 LOW:3 |
 | 11 | layout: see it and say so | D1 D2 D3 D4 D5 D6 | HIGH:3 MED:2 LOW:1 |
 
@@ -3584,6 +3586,7 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 | 18 layout: detect and disclose | 2, 5 | D1 D2 D3 D4 D5 |
 | 19 furniture and prohibition | 4 | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 |
 | deferred: reconciliation · claim audit · coverage and manifest | 7, 9, 8 | U1 V1 C21 F34 F8 Q1 · X1 X2 X4 X5 X6 C5 C11 F12 · W1 W2 |
+| standalone · `fix/lexicon-table-widths` *(2026-10-09, not a numbered branch)* | 8, 4 | **E15 E16, both CLOSED by it** — E15 the two sub-lexicon tables whose rows did not match their header, with `tests/test_shipped_tables.py` reading every table of both shipped trees; E16 the GENCON and BALTIME rows naming each form as something it is not. *(A row of its own rather than branch 19's, which owns option 4's other rows: neither is branch 19's to fix, and both are closed — `DECISIONS-LOG.md`, 2026-10-09 (2).)* |
 
 ### 9.4 Positives a fix must not regress
 
