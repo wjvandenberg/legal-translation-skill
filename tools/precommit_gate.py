@@ -363,20 +363,31 @@ def git_out(*args):
 
 
 _, rc_base = git_out("rev-parse", "--verify", "--quiet", BASE)
+# MEASURED FROM THE BRANCH POINT, NEVER FROM THE BASELINE'S TIP (register I-41). What a branch INTRODUCES
+# is what it adds since it left main; diffed against main's tip, every line main changed afterwards reads
+# as added HERE. On 2026-10-09 a clean branch was BLOCKED on a lexicon line #132 had changed - fetched by
+# another session mid-run, worktrees sharing their refs - so the verdict depended on someone else's fetch.
+POINT, rc_point = ("", 1)
+if rc_base == 0:
+    POINT, rc_point = git_out("merge-base", "HEAD", BASE)
+    POINT = POINT.strip()
 if rc_base != 0:
     print(f"  CONTROL VOID — no baseline to diff against ({BASE} does not resolve).")
     VOID.append(f"tree diff (baseline {BASE} unresolvable)")
+elif rc_point != 0 or not POINT:
+    print(f"  CONTROL VOID — no branch point between this checkout and {BASE}.")
+    VOID.append(f"tree diff (no merge-base with {BASE})")
 else:
-    diff, rc_diff = git_out("diff", "--unified=0", BASE, "--", "uk/", "us/")
+    diff, rc_diff = git_out("diff", "--unified=0", POINT, "--", "uk/", "us/")
     if rc_diff != 0:
         print("  CONTROL VOID — git diff failed.")
         VOID.append("tree diff (git diff failed)")
     else:
         added = [l[1:] for l in diff.splitlines()
                  if l.startswith("+") and not l.startswith("+++")]
-        changed, _ = git_out("diff", "--name-only", BASE, "--", "uk/", "us/")
+        changed, _ = git_out("diff", "--name-only", POINT, "--", "uk/", "us/")
         n_files = len([f for f in changed.splitlines() if f.strip()])
-        print(f"  baseline {BASE} · {n_files} tree file(s) changed · "
+        print(f"  baseline {BASE} · branch point {POINT[:7]} · {n_files} tree file(s) changed · "
               f"{len(added)} line(s) added")
         if not added:
             print("  nothing added to either tree — nothing for this control to judge.")

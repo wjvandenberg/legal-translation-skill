@@ -55,7 +55,7 @@ from docx_census import census, delta  # noqa: E402
 from lxml import etree  # noqa: E402
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-40)
+from sibling_dirs import corpus_dirs, logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
 SCRIPT = "apply_translations_textmatch.py"
 
@@ -467,39 +467,6 @@ def predictors(notes):
             if m.end() < len(t):
                 declared += 1
     return c17, declared
-
-
-def corpus_dirs():
-    """WHERE THE PRISTINE SOURCES LIVE — read from config, never hardcoded, never printed.
-
-    The run directories under the logs folder hold DELIVERABLES; CLAUDE.md 6.4 puts the
-    11-document corpus in a separate sibling folder whose NAME is not committable. Measured
-    2026-09-01: matching only inside the run directories reached 3 of 13 frozen intermediates,
-    and the ten it missed include BOTH documents for A2 -- the fourteen unreachable comment
-    anchors, a CRITICAL row. So the search is widened to the configured folders, and the
-    folder name is read from gitignored .claude/evidence-dirs.local (plus LT_CORPUS_DIR) and
-    used without ever being echoed.
-
-    IN A FRESH CLONE THAT FILE DOES NOT EXIST, exactly as CLAUDE.md 5.6 says of the evidence
-    guard. The real arm is then unavailable and this tool says so rather than reporting a
-    smaller clean run.
-    """
-    out, cfg = [], ROOT / ".claude" / "evidence-dirs.local"
-    names = []
-    if cfg.is_file():
-        names += [ln.strip() for ln in
-                  cfg.read_text(encoding="utf-8", errors="replace").splitlines()
-                  if ln.strip() and not ln.strip().startswith("#")]
-    if os.environ.get("LT_CORPUS_DIR"):
-        names.append(os.environ["LT_CORPUS_DIR"])
-    for name in names:
-        p = Path(name)
-        if not p.is_absolute():
-            p = beside(name)
-        # Only a directory that actually holds Word documents is a corpus candidate.
-        if p.is_dir() and any(p.glob("*.docx")):
-            out.append(p)
-    return out
 
 
 _TEXT_CACHE = {}

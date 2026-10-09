@@ -62,9 +62,52 @@ def _callname(func):
     return func.id if isinstance(func, ast.Name) else (func.attr if isinstance(func, ast.Attribute) else "")
 
 
-def offences(source):
+def _level(node, names):
+    """How many folders above the FILE ITSELF a path expression built from __file__ points: the file is
+    0, its folder 1. None when the expression is not built from __file__. Follows Path(..), .resolve(),
+    .absolute(), .parent, .parents[k], os.path.dirname/abspath/realpath, and names bound to such a path."""
+    if isinstance(node, ast.Name):
+        return 0 if node.id == "__file__" else names.get(node.id)
+    if isinstance(node, ast.Attribute) and node.attr == "parent":
+        lv = _level(node.value, names)
+        return None if lv is None else lv + 1
+    if isinstance(node, ast.Subscript) and isinstance(node.value, ast.Attribute) and node.value.attr == "parents":
+        k = node.slice.value if isinstance(node.slice, ast.Constant) and isinstance(node.slice.value, int) else None
+        lv = _level(node.value.value, names)
+        return None if lv is None or k is None else lv + k + 1
+    if isinstance(node, ast.Call):
+        fn = _callname(node.func)
+        if fn in ("resolve", "absolute") and isinstance(node.func, ast.Attribute):
+            return _level(node.func.value, names)
+        if fn in ("Path", "PurePath", "abspath", "realpath") and node.args:
+            return _level(node.args[0], names)
+        if fn == "dirname" and node.args:
+            lv = _level(node.args[0], names)
+            return None if lv is None else lv + 1
+    return None
+
+
+def climbs(source, depth):
+    """(line, shape) wherever a path built from __file__ climbs ABOVE the repository root. `depth` is how
+    many folders the file sits below the root - tools/x.py is 1 - so the root is depth + 1 levels up and
+    anything higher is beside the checkout: exactly the lookup sibling_dirs.py owns (shape a, widened -
+    the first version saw only the name ROOT.parent)."""
+    tree, names, out = ast.parse(source), {}, set()
+    for n in sorted((n for n in ast.walk(tree) if isinstance(n, ast.Assign)), key=lambda n: n.lineno):
+        lv = _level(n.value, names)
+        for tgt in n.targets:
+            if isinstance(tgt, ast.Name) and lv is not None:
+                names[tgt.id] = lv
+    for n in ast.walk(tree):
+        lv = _level(n, names) if isinstance(n, (ast.Attribute, ast.Subscript, ast.Call)) else None
+        if lv is not None and lv >= depth + 2:
+            out.add((n.lineno, f"a: a path from __file__ climbing {lv - depth - 1} above the root"))
+    return sorted(out)
+
+
+def offences(source, depth=1):
     """(line, shape) for every sibling-folder lookup that does not go through the helper."""
-    out = set()
+    out = set(climbs(source, depth))
     for n in ast.walk(ast.parse(source)):
         if _s(n) and _s(n).lstrip().startswith(CLIMBS):
             out.add((n.lineno, 'c: "../<sibling name>"'))
@@ -104,11 +147,18 @@ PLANTS = [
     ("c", 'f = open("../legal-translation-private/leakage-names.txt")\n'),
     ("c", 'p = os.path.join(HERE, "..", "..")\n'),
     ("c", "LOG = '../legal-translation-logs/A1'\n"),
+    ("a", 'BASE = Path(__file__).resolve().parents[2]\n'),
+    ("a", 'R = Path(__file__).resolve().parent.parent\nX = R.parent / "x"\n'),
+    ("a", 'D = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))\n'),
 ]
 for shape, src in PLANTS:
     got = offences(src)
     ok(f"control: shape {shape} fires on {src.strip()!r}", any(g[1].startswith(shape) for g in got),
        f"got {got}")
+ok("control: the repository root itself, and a file two folders deep reaching it, fire nothing",
+   offences('ROOT = Path(__file__).resolve().parent.parent\nHERE = os.path.dirname(os.path.abspath(__file__))\n') == []
+   and offences('ROOT = Path(__file__).resolve().parent.parent.parent\n', depth=2) == [],
+   "a false climb")
 CLEAN = ('CMDS = [("ls", "ls ../legal-translation-logs/A1")]\n'
          'print("  ls ../legal-translation-logs/NO-SUCH-DIRECTORY-PROBE")\n'
          'DEFAULT_DIRS = ["legal-translation-logs", "legal-translation-private"]\n'
@@ -119,10 +169,14 @@ ok("control: a clean source — names inside command strings, .claude/skills —
    offences(CLEAN) == [], f"got {offences(CLEAN)}")
 
 listed = sorted({*ROOT.glob("tools/**/*.py"), *ROOT.glob("tests/**/*.py")})
-parsed, unreadable, hits = 0, [], {}
+parsed, unreadable, hits, copies = 0, [], {}, []
 for f in listed:
     try:
-        found = offences(f.read_text(encoding="utf-8"))
+        source = f.read_text(encoding="utf-8")
+        found = offences(source, depth=len(f.relative_to(ROOT).parts) - 1)
+        copies += [f"{f.relative_to(ROOT).as_posix()}:{n.lineno}" for n in ast.walk(ast.parse(source))
+                   if isinstance(n, ast.FunctionDef) and n.name.lstrip("_") == "corpus_dirs"
+                   and f != ROOT / "tools" / "sibling_dirs.py"]
     except (OSError, SyntaxError, UnicodeDecodeError) as e:
         unreadable.append(f"{f.relative_to(ROOT).as_posix()}: {type(e).__name__}")
         continue
@@ -136,6 +190,8 @@ ok("no file finds a sibling folder except through tools/sibling_dirs.py", not hi
 for name, found in hits.items():
     for line, shape in found:
         print(f"         {name}:{line}  {shape}")
+ok("the corpus folder is found by ONE function, sibling_dirs.corpus_dirs - no copy elsewhere",
+   not copies, f"{len(copies)} cop(ies): {', '.join(copies)}")
 
 # ------------------------------------------------------------------------------------------ 2
 print("\n2   THE LOOKUP — synthetic layouts, then the variables")
@@ -178,6 +234,35 @@ if sd is not None:
                                   (".git that is not a pointer is itself", junk, junk)):
             got = sd.main_checkout(root)
             ok(label, got.resolve() == want.resolve(), f"got {got}")
+
+        # THE TEST-DOCUMENT FOLDER, named in a gitignored .claude/evidence-dirs.local: this checkout's own
+        # file when it has one, else the main checkout's - a worktree need not carry a copy.
+        for folder, doc in (("corpus-x", True), ("corpus-y", True), ("corpus-empty", False)):
+            (tmp / folder).mkdir()
+            if doc:
+                (tmp / folder / "a.docx").write_bytes(b"")
+        (main / ".claude").mkdir(exist_ok=True)           # it holds the worktrees already
+        (main / ".claude" / "evidence-dirs.local").write_text("# names\ncorpus-x\ncorpus-empty\n", encoding="utf-8")
+        saved_corpus = os.environ.pop("LT_CORPUS_DIR", None)
+        try:
+            if hasattr(sd, "corpus_dirs"):
+                ok("corpus_dirs(): a worktree with no config of its own reads the main checkout's",
+                   sd.corpus_dirs(wt) == [(tmp / "corpus-x").resolve()], f"got {sd.corpus_dirs(wt)}")
+                (wt2 / ".claude").mkdir()
+                (wt2 / ".claude" / "evidence-dirs.local").write_text("corpus-y\n", encoding="utf-8")
+                ok("corpus_dirs(): a checkout's own config wins over the main checkout's",
+                   sd.corpus_dirs(wt2) == [(tmp / "corpus-y").resolve()], f"got {sd.corpus_dirs(wt2)}")
+                ok("corpus_dirs(): a named folder holding no Word document is not a corpus",
+                   (tmp / "corpus-empty").resolve() not in sd.corpus_dirs(main))
+                os.environ["LT_CORPUS_DIR"] = str(tmp / "corpus-y")
+                ok("corpus_dirs(): LT_CORPUS_DIR adds a folder",
+                   (tmp / "corpus-y").resolve() in [p.resolve() for p in sd.corpus_dirs(wt)])
+            else:
+                ok("tools/sibling_dirs.py offers corpus_dirs()", False, "no such function")
+        finally:
+            os.environ.pop("LT_CORPUS_DIR", None)
+            if saved_corpus is not None:
+                os.environ["LT_CORPUS_DIR"] = saved_corpus
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 

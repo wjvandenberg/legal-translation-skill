@@ -49,6 +49,17 @@ def sha(p):
 results = []
 
 
+def said(out, limit=10):
+    """Print the gate's own VERDICT block - which control failed - whenever a result surprises this test.
+    2026-10-09: two full passes failed here, once mid-test and once at the baseline, with nothing but an
+    exit code to show for it, and passed every time alone; the next one must name its control. The gate
+    prints control names and counts, never matched text, so this repeats nothing sensitive."""
+    tail = out.rsplit("VERDICT", 1)[-1] if "VERDICT" in out else out[-1200:]
+    lines = [ln.strip() for ln in tail.splitlines() if ln.strip() and not set(ln.strip()) <= {"="}]
+    for ln in lines[:limit]:
+        print(f"          gate said: {ln[:150]}")
+
+
 def case(name, expect_rc, expect_text, change):
     """Run one negative test. `change` returns a guard from tools/inplace_guard.py that makes the
     violation inside it and undoes it after - RECORDED FIRST, so a run killed mid-test leaves a
@@ -61,6 +72,7 @@ def case(name, expect_rc, expect_text, change):
     print(f"  {'PASS' if caught else 'FAIL'}  {name}")
     if not caught:
         print(f"          expected exit {expect_rc} and {expect_text!r}; got exit {rc}")
+        said(out)
 
 
 print("=" * 92)
@@ -72,6 +84,7 @@ print(f"\n  baseline: exit {rc}, "
       f"{'CLEAR' if 'CLEAR.' in out else 'NOT CLEAR — fix that before trusting these tests'}")
 if rc != 0:
     print("  The gate is not clean to begin with, so a failure below proves nothing.")
+    said(out)
     sys.exit(2)
 
 # ---------------------------------------------------------------------------

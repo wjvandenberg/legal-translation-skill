@@ -135,7 +135,7 @@ from keep_declarations import write_keep_declarations  # noqa: E402  (review fin
 
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-from sibling_dirs import beside, logs_dir  # noqa: E402  (register I-40)
+from sibling_dirs import corpus_dirs, logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
 DOC_ID = re.compile(r"\bD\d{2}B?\b")
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1", PYTHONDONTWRITEBYTECODE="1")
@@ -314,21 +314,6 @@ NAMED_2A = [
     ("brackets", ALL_DOCS, "23 other differences from the source, a count only",
      lambda R: (sum(brk(rep, "other") for rep, _ in R.values()) == 23, f"{per_doc(R, lambda r: brk(r, 'other'))}")),
 ]
-
-
-def corpus_dirs():
-    out, cfg = [], ROOT / ".claude" / "evidence-dirs.local"
-    names = []
-    if cfg.is_file():
-        names += [ln.strip() for ln in cfg.read_text(encoding="utf-8", errors="replace").splitlines()
-                  if ln.strip() and not ln.strip().startswith("#")]
-    if os.environ.get("LT_CORPUS_DIR"):
-        names.append(os.environ["LT_CORPUS_DIR"])
-    for name in names:
-        p = beside(name)
-        if p.is_dir() and any(p.glob("*.docx")):
-            out.append(p)
-    return out
 
 
 _TEXTS = {}

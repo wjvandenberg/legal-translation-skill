@@ -26,6 +26,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -208,6 +209,45 @@ check("an unresolvable baseline reports CONTROL VOID", "CONTROL VOID" in sec4)
 check("and the gate refuses to certify (exit 2, not 0)", rc4 == 2, f"exit {rc4}")
 check("and the verdict says so in words",
       "CANNOT CERTIFY" in out4 and "has NOT passed" in out4)
+
+# --------------------------------------------------------------------------------------
+# 4b. A MAIN THAT MOVED AFTER THE BRANCH IS NOT THIS BRANCH'S LINES (register I-41). The section judges
+# what a branch INTRODUCES; measured from main's TIP, every line main changed after the branch left it
+# reads as "added" here - on 2026-10-09 a clean branch was BLOCKED on a lexicon line #132 had changed,
+# fetched by another session mid-run. A commit OBJECT stands in for that moved main: HEAD's tree with
+# the last line of uk/SKILL.md dropped, parent HEAD - no ref, nothing pushed, no working file touched.
+print("\n4b. A MAIN THAT MOVED AFTER THE BRANCH IS NOT READ AS THIS BRANCH'S LINES")
+
+
+def _git(*args, inp=None, env=None):
+    r = subprocess.run(["git", *args], cwd=str(ROOT), input=inp, capture_output=True,
+                       env=dict(os.environ, **(env or {})))
+    if r.returncode != 0:
+        raise RuntimeError(f"git {args[0]} failed: {r.stderr.decode('utf-8', 'replace')[:200]}")
+    return r.stdout
+
+
+_head_blob = _git("show", "HEAD:uk/SKILL.md")
+_lines = _head_blob.rstrip(b"\n").split(b"\n")
+_moved_blob = _git("hash-object", "-w", "--stdin", inp=b"\n".join(_lines[:-1]) + b"\n").strip().decode()
+# The scratch index lives OUTSIDE the repository and goes with its folder, so this test removes no file by
+# hand - the rule tests/test_no_unguarded_restore.py keeps (register I-37).
+with tempfile.TemporaryDirectory(prefix="moved-main-") as _scratch:
+    _ienv = {"GIT_INDEX_FILE": str(Path(_scratch) / "index")}
+    _git("read-tree", "HEAD", env=_ienv)
+    _git("update-index", "--cacheinfo", f"100644,{_moved_blob},uk/SKILL.md", env=_ienv)
+    _moved_tree = _git("write-tree", env=_ienv).strip().decode()
+_moved = _git("commit-tree", _moved_tree, "-p", "HEAD", "-m", "test: main moved after the branch",
+              env={"GIT_AUTHOR_NAME": "test", "GIT_AUTHOR_EMAIL": "test@example.invalid",
+                   "GIT_COMMITTER_NAME": "test", "GIT_COMMITTER_EMAIL": "test@example.invalid"}).strip().decode()
+_unchanged = not _git("diff", "--name-only", "HEAD", "--", "uk/", "us/").strip()
+check("precondition: this branch changes nothing in uk/ or us/ against HEAD", _unchanged)
+sec6, rc6, _ = gate({"LT_TREE_BASELINE": _moved})
+_added = re.search(r"(\d+) line\(s\) added", sec6)
+check("a line main changed after the branch is NOT counted as added by this branch",
+      _unchanged and ("nothing added" in sec6 or (_added and _added.group(1) == "0")),
+      _added.group(0) if _added else sec6.strip().splitlines()[-1][:80] if sec6.strip() else "no section 7")
+check("and the section names the branch point it measured from", "branch point" in sec6)
 
 # --------------------------------------------------------------------------------------
 print("\n5. THE TREE IS EXACTLY AS IT WAS")
