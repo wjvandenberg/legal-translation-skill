@@ -48,6 +48,7 @@ if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
 from source_language_markers import (  # noqa: E402
     scan_remnants,
+    bare_month_hits,
     detect_language,
     SUPPORTED_LANGUAGES,
     not_supported,
@@ -375,7 +376,19 @@ def check_quotes(root, verbose):
                 issues.append(f"Missing close quote: '{full[m.start():m.end()+5]}'")
     return issues
 
-def check_source_remnants(root, verbose, source_language=None):
+# A MONTH NAME WITH NO NUMBER BESIDE IT IS A WARNING, NOT AN ISSUE (register C2, branch 12
+# slice 12b, Wouter 2026-10-12): it may be a kept name -- a street or a company named after a
+# date -- so it is printed under the summary and never counted towards the exit code. A month
+# name beside a number is counted like any other remnant. check() collects the warnings in a list
+# it owns and passes down; a caller that passes none gets no warnings and nothing kept between calls.
+def _note_bare_months(text, lang, where, sink):
+    if sink is None:
+        return
+    for _marker, context in bare_month_hits(text, lang):
+        sink.append(f"{where}: '{context.strip()[:100]}'")
+
+
+def check_source_remnants(root, verbose, source_language=None, bare_months=None):
     """Check 8: untranslated source-language words and paragraphs.
 
     Uses the shared `source_language_markers` module so the scanner is specific
@@ -403,7 +416,8 @@ def check_source_remnants(root, verbose, source_language=None):
 
     def _filtered_issues(full_text, view_tag):
         out = []
-        for _marker, context in scan_remnants(full_text, lang):
+        _note_bare_months(full_text, lang, f"{label} month name ({view_tag})", bare_months)
+        for _marker, context in scan_remnants(full_text, lang, bare_months=False):
             ctx_stripped = context.strip()
             # Italian-specific legacy filters kept for backwards compatibility.
             if extra_filter_italian:
@@ -423,7 +437,7 @@ def check_source_remnants(root, verbose, source_language=None):
         if full_t.strip() and len(full_t.split()) >= 3:
             issues.extend(_filtered_issues(full_t, 'accept-all'))
             # Full source-language paragraphs (high density of source function words)
-            dense_hits = len(scan_remnants(full_t, lang))
+            dense_hits = len(scan_remnants(full_t, lang, bare_months=False))
             if dense_hits >= 3:
                 issues.append(f"FULL {label.upper()} PARAGRAPH (accept-all): '{full_t[:100]}'")
 
@@ -432,7 +446,7 @@ def check_source_remnants(root, verbose, source_language=None):
             # 3-word minimum used for accept-all text would filter out most
             # legitimate remnants. Require only one word.
             issues.extend(_filtered_issues(full_del, 'reject-all / markup'))
-            dense_hits_del = len(scan_remnants(full_del, lang))
+            dense_hits_del = len(scan_remnants(full_del, lang, bare_months=False))
             if dense_hits_del >= 3:
                 issues.append(f"FULL {label.upper()} PARAGRAPH (reject-all / markup): '{full_del[:100]}'")
 
@@ -975,7 +989,7 @@ def check_definition_order(root, verbose):
 # ======================================================================
 # AUXILIARY-FILE SCANS # ======================================================================
 
-def _scan_aux_xml_for_remnants(xml_path, source_language, label):
+def _scan_aux_xml_for_remnants(xml_path, source_language, label, bare_months=None):
     """Parse an auxiliary OOXML file and run the source-language-remnant
     scan against every `<w:t>` element it contains. Returns a list of
     issue strings, prefixed with ``label`` (e.g. 'numbering.xml',
@@ -1002,7 +1016,8 @@ def _scan_aux_xml_for_remnants(xml_path, source_language, label):
         text = t_elem.text or ''
         if not text.strip():
             continue
-        for _marker, context in scan_remnants(text, lang):
+        _note_bare_months(text, lang, f"{label_capped} month name in {label}", bare_months)
+        for _marker, context in scan_remnants(text, lang, bare_months=False):
             issues.append(
                 f"{label_capped} remnant in {label}: '{context.strip()[:100]}'"
             )
@@ -1013,14 +1028,15 @@ def _scan_aux_xml_for_remnants(xml_path, source_language, label):
         val = lvl_elem.get(f'{{{W}}}val')
         if not val or not val.strip():
             continue
-        for _marker, context in scan_remnants(val, lang):
+        _note_bare_months(val, lang, f"{label_capped} month name in {label} lvlText", bare_months)
+        for _marker, context in scan_remnants(val, lang, bare_months=False):
             issues.append(
                 f"{label_capped} remnant in {label} lvlText: "
                 f"'{context.strip()[:100]}'"
             )
     return issues
 
-def check_aux_files(aux_dir, source_language, verbose=False):
+def check_aux_files(aux_dir, source_language, verbose=False, bare_months=None):
     """Scan every auxiliary XML part under ``aux_dir`` (typically the
     workdir's ``final/`` directory containing ``word/``) for source-
     language remnants. Returns a dict mapping aux-file basename to the
@@ -1059,14 +1075,14 @@ def check_aux_files(aux_dir, source_language, verbose=False):
     for label, rel in candidates:
         path = os.path.join(word_dir, os.path.basename(rel))
         if os.path.exists(path):
-            issues = _scan_aux_xml_for_remnants(path, source_language, label)
+            issues = _scan_aux_xml_for_remnants(path, source_language, label, bare_months)
             results[label] = issues
     # Headers and footers: pick up any headerN.xml / footerN.xml
     for fname in sorted(os.listdir(word_dir)):
         if (fname.startswith('header') or fname.startswith('footer')) \
                 and fname.endswith('.xml'):
             path = os.path.join(word_dir, fname)
-            issues = _scan_aux_xml_for_remnants(path, source_language, fname)
+            issues = _scan_aux_xml_for_remnants(path, source_language, fname, bare_months)
             results[fname] = issues
     return results
 
@@ -1076,6 +1092,7 @@ def check_aux_files(aux_dir, source_language, verbose=False):
 
 def check(xml_path, verbose=False, source_json=None, variant='uk',
           source_language=None, aux_dir=None, original_xml=None):
+    bare_months = []
     tree = etree.parse(xml_path)
     root = tree.getroot()
 
@@ -1117,7 +1134,7 @@ def check(xml_path, verbose=False, source_json=None, variant='uk',
         ('standalone_financing', check_standalone_financing),
         ('duplicates', check_duplicates),
         ('missing_quotes', check_quotes),
-        (source_lang_label, lambda r, v: check_source_remnants(r, v, source_language)),
+        (source_lang_label, lambda r, v: check_source_remnants(r, v, source_language, bare_months)),
         ('titles_headers', check_titles),
         ('word_order', check_word_order),
         ('internal_article_refs', check_article_refs),
@@ -1153,7 +1170,7 @@ def check(xml_path, verbose=False, source_json=None, variant='uk',
     aux_results = {}
     language_rows = {source_lang_label}
     if aux_dir:
-        aux_results = check_aux_files(aux_dir, source_language, verbose)
+        aux_results = check_aux_files(aux_dir, source_language, verbose, bare_months)
         for aux_label, aux_issues in aux_results.items():
             key = f'aux_{aux_label}'
             results[key] = aux_issues
@@ -1188,6 +1205,15 @@ def check(xml_path, verbose=False, source_json=None, variant='uk',
               "INHERITED from the source document\n        from one introduced by the "
               "pipeline. Re-run with --original <original document.xml>\n        before "
               "treating these as ours.")
+
+    if bare_months:
+        print(f"\n  WARNING (not counted) — {len(bare_months)} source-language month name(s) with "
+              "no number beside them. Each may be a kept name, such as a street or a company named "
+              "after a date: read each, and translate any that is not.")
+        for line in bare_months[:10]:
+            print(f"    -> {line}")
+        if len(bare_months) > 10:
+            print(f"    ... and {len(bare_months) - 10} more")
 
     if cannot_rule:
         print("\n  " + not_supported("the source-language remnant check", cannot_rule))

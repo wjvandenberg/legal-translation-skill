@@ -267,6 +267,9 @@ def _vd(tmp):
     (good / "word").mkdir(parents=True, exist_ok=True)
     _write(good, "paragraphs.json",
            [_para(i, f"Bron {i}.", f"Source {i}.", batch=1) for i in range(4)])
+    # Step 1c declared, as a compliant run does: since branch 12 slice 12b the audit FAILs a run that
+    # skipped it, and this arm is the clean one.
+    _write(good, "source_language.json", {"source_language": "dutch"})
     # The state file's real shape, taken from an actual run rather than invented:
     # `validated_indices` plus a `history` audit trail. A guessed shape made the audit
     # report all four paragraphs as never validated, which looked like the check being

@@ -194,9 +194,12 @@ GROUPS = {
  # input): a header or footer's deleted text is never offered for translation and ships in the
  # source's words, and a comment's deleted text is emptied. C19's glossary is here for shipping
  # source-language text, and A24 is that in the reject reading; A25 is the text itself gone.
+ # F48 ADDED 2026-10-12 (branch 12 slice 12b, filed and closed): one Italian numbering format string, in
+ # numbering the document uses, shipped untranslated -- source-language text in the delivery, S3's and
+ # E4's shape on a covered language, so it sits beside them.
  "1 loses content": """
    A1 A2 A3 A6 A8 A9 A16 A19 N1 C19 C17 C23 C28 C12 M1 B3 B8 A15 J1 C16 C13 C14 F16 F27 E4 S3 C2
-   B10 A24 A25
+   B10 A24 A25 F48
    """,
  # A20 added 2026-09-02 (branch 6, fourth slice). Apply slices the STRIPPED `en` with offsets
  # authored against the UNSTRIPPED one, so leading whitespace shifts every declared span and
@@ -308,12 +311,15 @@ OPTIONS = {
  # other three have NO decided fix, so they are placed here and nowhere else: option 1's
  # preserve-by-default is the obvious home for A24 and A25, and assigning it would be a decision
  # nobody has taken.
+# F48 ADDED 2026-10-12 beside S3 and E4: the numbering translator's dictionary miss, now listed and, on a
+# declared language, stopped -- this option's 'say what was left' principle.
 # C30 ADDED 2026-09-29 (3): filed and closed by branch 11 slice 4b beside C4, C13 and C14, the
 # notes-side gates this option's branch 11 carried.
  "2 check against the original": """
    C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28
    G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
    B10 A23 A24 A25 F47 C30
+   F48
    """,
  # A3 AND A6 BOTH ARRIVED HERE 2026-09-02. A3 is deliberately in TWO options -- the header
  # above says a row may need more than one, and A3 genuinely does: option 1 closed the

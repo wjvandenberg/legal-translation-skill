@@ -416,6 +416,9 @@ for t in TREES:
     wd = wtmp / "wd"
     (wd / "final" / "word").mkdir(parents=True)
     (wd / "paragraphs.json").write_text("[]", encoding="utf-8")
+    # Step 1c declared: since branch 12 slice 12b a missing declaration is a FAIL, which would
+    # outrank the WARN this section induces.
+    (wd / "source_language.json").write_text('{"source_language": "dutch"}', encoding="utf-8")
     (wd / ".validate-state.json").write_text(
         '{"validated_indices": [], "history": []}', encoding="utf-8")
     (wd / "final" / "word" / "document.xml").write_text(doc_xml(CLEAN), encoding="utf-8")

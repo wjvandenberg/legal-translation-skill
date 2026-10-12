@@ -37,8 +37,7 @@ files.
 ```bash
 python <skill-path>/scripts/translate_numbering.py \
   <original_source_language>.docx \
-  <workdir>/final/word/numbering.xml \
-  --language <source-language>
+  <workdir>/final/word/numbering.xml
 ```
 
 `word/numbering.xml` defines list and heading numbering. Each level has a `w:lvlText`
@@ -47,9 +46,18 @@ source-language words (Hungarian `%1. sz. Melléklet` = "Schedule %1"), the outp
 shows mixed-language numbering on schedule headers, appendix titles, and chapter
 headings.
 
-The script auto-detects the source language from the format strings and applies a
-built-in translation map (Hungarian, Italian, German, French, Spanish, Portuguese,
-Dutch, Polish, Finnish). Pass `--language` if auto-detect fails.
+The script reads the source language you declared at Step 1c and applies its built-in
+translation map (every supported language: Chinese, Dutch, Finnish, French, German,
+Hungarian, Italian, Japanese, Polish, Portuguese, Spanish), the keyword before or after
+the number. `--language` overrides the declaration. A language with no map prints NOT
+SUPPORTED and applies none.
+
+**It lists every format string it left.** A string still carrying a word after the map is
+printed under `NOT TRANSLATED`, marked `in use` when numbering the document uses holds it.
+Render each with `--custom <file.json>` — `{"<format string>": "<English>"}` — and re-run;
+a string that is right as it stands is kept by mapping it to itself. **It exits 1** when
+the language was declared (or given with `--language`) and is supported, and a string in
+use is left: that is a gate — fix it with `--custom`, never by skipping the step.
 
 **An attachment label follows YOUR declared English.** The script reads
 `<workdir>/paragraphs.json` and writes `Annex %1` when your text labels attachments
@@ -218,7 +226,9 @@ codes, tab stops, line breaks) byte-for-byte. Step 10 (repack) picks these up vi
 
 **Legacy dictionary-only fallback.** For watermark-only docs the older mode
 `--language <lang>` is retained — fast but can only translate tokens in its built-in
-dictionaries. Prefer the scaffold round-trip.
+dictionaries. Prefer the scaffold round-trip. It guesses no language, prints NOT
+SUPPORTED for one it has no dictionary for, and counts the text runs it left as they
+were: read each, and use the round-trip for any still in the source language.
 
 #### Step 8c: Translate comments — MANDATORY (if word/comments.xml exists)
 
