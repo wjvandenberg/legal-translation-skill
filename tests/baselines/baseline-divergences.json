@@ -56,9 +56,9 @@
    "sha256_now": "4aa0264e4b29356cb2dd9137d094c7884f87c29b22b6942040411f121c92c9d2"
   },
   "uk/scripts/translate_numbering.py": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "bfd74e2139e8e709487e14d562652039dd8f7269f9891ae59c7fa4d81acd7e9a"
+   "changed_by": "fix/numbering-newlines",
+   "commit_subject": "translate_numbering writes numbering.xml with its own line breaks - the one finding 12b's code review skipped, fixed at Wouter's word",
+   "sha256_now": "f05643d7c1367ec52e039231b4755f5f45b67a446fc75d82b11cc5c28691921f"
   },
   "uk/scripts/validate_apply.py": {
    "changed_by": "feature/branch11-wiring",
@@ -156,9 +156,9 @@
    "sha256_now": "b7bc8aa3eb15c6a644fcb1f2c49500fb10a163ba10f9f4de140deb42f4e1aa01"
   },
   "us/scripts/translate_numbering.py": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "bfd74e2139e8e709487e14d562652039dd8f7269f9891ae59c7fa4d81acd7e9a"
+   "changed_by": "fix/numbering-newlines",
+   "commit_subject": "translate_numbering writes numbering.xml with its own line breaks - the one finding 12b's code review skipped, fixed at Wouter's word",
+   "sha256_now": "f05643d7c1367ec52e039231b4755f5f45b67a446fc75d82b11cc5c28691921f"
   },
   "us/scripts/validate_apply.py": {
    "changed_by": "feature/branch11-wiring",

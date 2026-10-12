@@ -533,7 +533,10 @@ def translate_numbering(orig_docx, output_xml, language=None, custom_map=None,
     # (some documents embed text directly in numbering definitions)
 
     os.makedirs(os.path.dirname(output_xml) or '.', exist_ok=True)
-    with open(output_xml, 'w', encoding='utf-8') as f:
+    # newline='': the part goes back with exactly the line breaks it came in with. In text mode Windows
+    # wrote every '\n' as '\r\n', so the CRLF Word puts after the declaration came back CR CR LF -- content
+    # equal, bytes different (the code review of branch 12 slice 12b, 2026-10-12).
+    with open(output_xml, 'w', encoding='utf-8', newline='') as f:
         f.write(numbering_text)
 
     if changes:

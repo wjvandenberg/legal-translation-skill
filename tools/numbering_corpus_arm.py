@@ -19,7 +19,10 @@ THE ACCEPTANCE (Wouter, 2026-10-12, section 3.2 of PLAN-2-step-b.md), DECLARED a
   2  no run says "pure numeric/symbol" while it lists a string NOT TRANSLATED
   3  no supported document stops (exit 1) -- the stop fires on nothing the corpus holds
   4  every numbering.xml byte-identical to the baseline's, except D05 and D06, where exactly ONE format string
-     each differs: the keyword-before-number string the maps did not hold, now translated
+     each differs: the keyword-before-number string the maps did not hold, now translated -- the baseline's
+     CR CR LF, text mode on Windows, read as the CRLF it was
+  5  and every output byte-identical to the ORIGINAL document's own numbering part, but for the format
+     strings it translated: the line breaks go back exactly as they came (the newline fix, 2026-10-12)
 UNDECLARED arm: every run says NOT SUPPORTED and exits 0; its byte differences are counted and printed.
 
 THE BASELINE IS A REVISION, never HEAD or "the current file" (house hygiene rule 4): by default the merge-base
@@ -187,6 +190,7 @@ def main():
             orig.write_bytes(src.read_bytes())
             with zipfile.ZipFile(orig) as z:
                 has_part = "word/numbering.xml" in z.namelist()
+                orig_part = z.read("word/numbering.xml") if has_part else b""
             if not has_part:
                 print(f"  {did:5} no numbering part — nothing to translate, nothing measured")
                 continue
@@ -213,10 +217,21 @@ def main():
                     ok(f"{did} declared: no stop on the corpus (exit 0)", w["rc"] == 0 and not w["gate"],
                        f"rc {w['rc']}")
                     blank = re.compile(rb'(<w:lvlText\s+w:val=")[^"]*(")')
+                    # The baseline wrote in text mode, so on Windows each of its line breaks gained a CR: set line
+                    # breaks aside here (a CR appears in nothing else), and judge the exact bytes against the original.
+                    base_b = b["bytes"].replace(b"\r", b"")
+                    new_nocr = w["bytes"].replace(b"\r", b"")
                     ok(f"{did} declared: exactly {want} format string(s) moved against the baseline, "
                        "every other byte identical",
-                       moved == want and blank.sub(rb"\1\2", w["bytes"]) == blank.sub(rb"\1\2", b["bytes"]),
+                       moved == want and blank.sub(rb"\1\2", new_nocr) == blank.sub(rb"\1\2", base_b),
                        f"moved {moved}")
+                    lvl = re.compile(rb'<w:lvlText\s+w:val="([^"]*)"')
+                    same_strings = lvl.findall(w["bytes"]) == lvl.findall(orig_part)
+                    ok(f"{did} declared: written back byte-identical to the original part"
+                       + ("" if same_strings else ", but for its translated strings"),
+                       blank.sub(rb"\1\2", w["bytes"]) == blank.sub(rb"\1\2", orig_part)
+                       and (w["bytes"] == orig_part or not same_strings),
+                       f"cr {orig_part.count(13)}->{w['bytes'].count(13)}, {len(orig_part)}->{len(w['bytes'])} bytes")
                 else:
                     ok(f"{did} undeclared: says NOT SUPPORTED — it ran on a guess", w["ns"])
                     ok(f"{did} undeclared: a guess never stops (exit 0)", w["rc"] == 0, f"rc {w['rc']}")

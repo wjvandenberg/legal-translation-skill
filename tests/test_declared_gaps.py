@@ -246,6 +246,28 @@ ok("N16 a numbering part ElementTree cannot read: no traceback, every string tre
    res.returncode == 1 and "Traceback" not in res.stderr and "could not be read as XML" in res.stdout,
    f"rc={res.returncode} {res.stdout[-200:]} {res.stderr[-200:]}")
 
+# The text-mode write (the code review of 2026-10-12, built after 12b at Wouter's word): the part goes back with
+# exactly the line breaks it came in with. Word writes CRLF after the declaration; text mode on Windows made it CR CR LF.
+for name, used, want_same in (("nl-untouched", ["%1.", "o"], True), ("nl-translated", ["Parte %1", "%1."], False)):
+    wd_n = TMP / f"n-{name}"
+    (wd_n / "final" / "word").mkdir(parents=True)
+    src_n = wd_n / "source.docx"
+    part = numbering_xml(used).replace("standalone=\"yes\"?>\n", "standalone=\"yes\"?>\r\n")
+    docx(src_n, p(r("Body."), ppr='<w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr>'),
+         extra_parts={"word/numbering.xml": part})
+    (wd_n / "paragraphs.json").write_bytes(b"[]")
+    declare(wd_n, "italian")
+    run("translate_numbering.py", src_n, wd_n / "final" / "word" / "numbering.xml")
+    with zipfile.ZipFile(src_n) as z:
+        orig_b = z.read("word/numbering.xml")
+    got_b = (wd_n / "final" / "word" / "numbering.xml").read_bytes()
+    if want_same:
+        ok("N17 an untouched numbering part is written back BYTE-IDENTICAL, its CRLF kept", got_b == orig_b,
+           f"crlf {orig_b.count(b'\r\n')}->{got_b.count(b'\r\n')}, cr {orig_b.count(b'\r')}->{got_b.count(b'\r')}")
+    else:
+        ok("N17 a translated part differs from the original only in the format string it translated",
+           got_b == orig_b.replace(b"Parte %1", b"Part %1"), f"{len(orig_b)} -> {len(got_b)} bytes")
+
 res, vals = tn_case("pure", ["%1.", "o", "(%1)"], lang="italian")
 ok("N12 the pure numeric/symbol line is printed exactly when nothing word-bearing is left",
    PURE in res.stdout and res.returncode == 0, f"rc={res.returncode} {res.stdout[-200:]}")
