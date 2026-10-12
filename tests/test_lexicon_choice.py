@@ -21,7 +21,7 @@ gone red is not known to be able to:
          quality_check's violation list, which is the claim that three authorities agree.
   ARM 4  BEHAVIOUR, through the real script in a real workdir: sanctioned strings survive,
          unsanctioned rewrites still fire, the reasons are reported, the journal agrees.
-  ARM 5  translate_numbering FOLLOWS THE OPERATOR, in every case, and never blocks.
+  ARM 5  translate_numbering FOLLOWS THE OPERATOR, in every case, and a label choice never blocks.
   ARM 6  BOTH TREES carry the same blocks, and the two exclusion lists agree.
 
 Every input is synthetic and built in a temporary directory. Nothing is written into
@@ -461,7 +461,8 @@ CASES = [
 ]
 for name, en, custom, explicit, want, said in CASES:
     r, vals = run_tn(name, en, custom, explicit)
-    ok(f"[{name}] exits 0 — this script cannot block a run, and B1.mute asserts it",
+    ok(f"[{name}] exits 0 — a label choice never stops the run (since branch 12 slice 12b the script "
+       "stops only on a word left in numbering the document uses)",
        r.returncode == 0, f"rc={r.returncode} {(r.stderr or '')[-200:]}")
     ok(f"[{name}] the label is {want!r}", want in vals, f"got {vals}")
     ok(f"[{name}] the non-attachment level is untouched", "%2." in vals, f"got {vals}")

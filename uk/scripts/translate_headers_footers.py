@@ -423,21 +423,6 @@ LANGUAGE_MAPS = {
     'finnish': FINNISH_MAP,
 }
 
-def detect_language(all_text):
-    """Auto-detect source language from header/footer text content (legacy mode)."""
-    text_lower = all_text.lower()
-    scores = {}
-    for lang, tmap in LANGUAGE_MAPS.items():
-        score = 0
-        for src in tmap:
-            if src.lower() in text_lower:
-                score += 1
-        if score > 0:
-            scores[lang] = score
-    if scores:
-        return max(scores, key=scores.get)
-    return None
-
 # ──────────────────────────────────────────────────────────────────────
 # Run-property helpers (shared between scaffold extraction and legacy).
 # Intentionally small — we only need enough metadata for the operator to
@@ -1164,10 +1149,20 @@ def merge_split_runs(paragraph, tmap):
         i += 1
     return changed
 
-def translate_xml(xml_bytes, tmap):
-    """Translate all w:t text in an XML tree using the translation map (legacy)."""
+_HAS_WORD = re.compile(r'[^\W\d_]{2,}')
+
+
+def translate_xml(xml_bytes, tmap, left=None):
+    """Translate all w:t text in an XML tree using the translation map (legacy). When `left` is
+    a list, the number of text runs holding a word that the map did not change is appended."""
     tree = ET.fromstring(xml_bytes)
     changes = []
+    unchanged = 0
+    # Each run's text BEFORE anything is translated: merge_split_runs below translates the runs it
+    # merges, so comparing with the text the loop starts from would count those as left.
+    # Keyed by the element itself, which keeps each lxml proxy alive: an id() of a proxy that was
+    # let go can be handed to a different element later.
+    before = {t: t.text for t in tree.iter(f'{{{W}}}t')}
     for p in tree.iter(f'{{{W}}}p'):
         if merge_split_runs(p, tmap):
             changes.append('  [merged split runs]')
@@ -1180,16 +1175,30 @@ def translate_xml(xml_bytes, tmap):
         for src, tgt in sorted_entries:
             if src in translated:
                 translated = translated.replace(src, tgt)
+        if translated == before.get(t_elem) and _HAS_WORD.search(translated):
+            unchanged += 1
         if translated != original:
             t_elem.text = translated
             changes.append(f'  "{original.strip()}" → "{translated.strip()}"')
+    if left is not None:
+        left.append(unchanged)
     if changes:
         return ET.tostring(tree, xml_declaration=True, encoding='UTF-8',
                            standalone=True), changes
     return None, []
 
 def translate_headers_footers_legacy(orig_docx, output_dir, language=None):
-    """Legacy dictionary-lookup mode (Mode 3)."""
+    """Legacy dictionary-lookup mode (Mode 3).
+
+    IT GUESSES NO LANGUAGE (branch 12 slice 12b). The command line has always required
+    --language for this mode, so the guess it carried could not run from there, and a guess is
+    not a language: S1 measured four scripts guessing three wrong answers on one document. A
+    language it has no dictionary for says NOT SUPPORTED. And it COUNTS the text it left rather
+    than claiming "all numeric/symbol content" whatever the dictionary missed -- register S3's
+    shape, the absence of a dictionary match reported as the absence of content."""
+    # Imported here and not at the top: --extract and --apply, the recommended round-trip, must
+    # not depend on a file only this mode uses (this file's pattern for a partial install).
+    from source_language_markers import not_supported
     print(
         'NOTE: running legacy dictionary-lookup mode. For any header/footer '
         'that contains free-text content (agreement titles, version labels, '
@@ -1205,31 +1214,23 @@ def translate_headers_footers_legacy(orig_docx, output_dir, language=None):
         if not hf_files:
             print('No header/footer XML files found in this .docx.')
             return False
-        all_text = []
-        file_contents = {}
-        for name in hf_files:
-            data = zf.read(name)
-            file_contents[name] = data
-            tree = ET.fromstring(data)
-            for t in tree.iter(f'{{{W}}}t'):
-                if t.text:
-                    all_text.append(t.text)
-    full_text = ' '.join(all_text)
-    if language is None:
-        language = detect_language(full_text)
-        if language:
-            print(f'Auto-detected header/footer language: {language}')
-        else:
-            print('No translatable text detected in headers/footers.')
-            return False
+        file_contents = {name: zf.read(name) for name in hf_files}
+    if not language:
+        print(not_supported("the legacy dictionary mode",
+                            "no --language was given, and this mode guesses none: name the source "
+                            "language, or use --extract and --apply"))
+        return False
     tmap = LANGUAGE_MAPS.get(language.lower())
     if not tmap:
-        print(f"No translation map for language '{language}'.")
+        print(not_supported("the legacy dictionary mode",
+                            f"it has no dictionary for {language}: use --extract and --apply, "
+                            "which translate a header or footer in any language"))
         return False
     total_changes = 0
     written_files = []
+    left = []
     for name, data in file_contents.items():
-        translated_data, changes = translate_xml(data, tmap)
+        translated_data, changes = translate_xml(data, tmap, left)
         if translated_data:
             out_path = os.path.join(output_dir, name)
             os.makedirs(os.path.dirname(out_path), exist_ok=True)
@@ -1243,8 +1244,12 @@ def translate_headers_footers_legacy(orig_docx, output_dir, language=None):
     if total_changes:
         print(f'\nTranslated {total_changes} item(s) across {len(written_files)} file(s).')
         print(f'Written: {", ".join(written_files)}')
-    else:
-        print('\nNo translatable text found in headers/footers (all numeric/symbol content).')
+    if sum(left):
+        print(f'\nLEFT AS THEY WERE: {sum(left)} text run(s) with words the {language} dictionary '
+              'did not change. It holds boilerplate only, so read each: one still in the source '
+              'language needs --extract and --apply.')
+    elif not total_changes:
+        print('\nNo text with letters found in headers/footers.')
     return total_changes > 0
 
 # ──────────────────────────────────────────────────────────────────────

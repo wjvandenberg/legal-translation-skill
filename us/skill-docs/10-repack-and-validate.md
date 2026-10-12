@@ -240,6 +240,7 @@ python <skill-path>/scripts/verify_diligence.py <workdir> \
 **Pass `--mode chat`** if you are operating in Chat (see Step 1a detection signals: `<application_details>` block, presence of `mcp__cowork__*` MCP tools, `<env>` workspace-folder flag). If `--mode chat` is passed AND the overall verdict is FAIL or WARN, the diligence report will append a Cowork-mode recommendation pointing the user toward the lower-drift environment for their next translation. Pass `--mode cowork` if you are in Cowork; omit the flag (default `unknown`) only if you genuinely cannot tell. Detection is mechanical, not heuristic — there is almost always a clear answer.
 
 The script audits:
+- **Step 1c** — `source_language.json` declares the source language: PASS when it is one this skill supports, WARN when it is not (no script could look for text left in it, so read the output yourself), FAIL when it is missing or unreadable (every language-dependent check then ran on a guess).
 - **Step 4 + 4b** — `paragraphs.json` exists, `.validate-state.json` shows every translated paragraph was validated, no batch exceeded the 35-paragraph cap (or set `accept_large_batch`).
 - **Step 5** — `final/word/document.xml` exists and is non-trivially sized (apply ran).
 - **Step 8** — every aux file present in the source (`numbering.xml`, `header*.xml`, `footer*.xml`, `comments.xml`, `footnotes.xml`, `endnotes.xml`) has a translated copy in `<workdir>/final/word/`.

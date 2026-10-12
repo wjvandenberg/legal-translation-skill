@@ -6,9 +6,9 @@
  "count": 58,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "9a94c77e42e005f84da08ff5055da09fd504acba44b317da85a04ccf4bf4a52c"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "e857114f105b000b0da50614b1c98b6b1cefc901c57ffb4a32eeae19e271c0b7"
   },
   "uk/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/branch12-slice12a",
@@ -31,9 +31,9 @@
    "sha256_now": "7a4064265a13db83d9bc9dd00319cc3df278ce5704f1ca52996d7fc1c9d6b8c1"
   },
   "uk/scripts/quality_check.py": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "3f8acb9b0276745b4bb0dca65e50392f3f31a41684a38a0f36857172d258ff61"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "0b7129fd2d450db69c26dbcc3f1c89ca89db276a9da3696097d88425c932a81c"
   },
   "uk/scripts/repack_docx.py": {
    "changed_by": "feature/branch12-slice12a",
@@ -41,9 +41,9 @@
    "sha256_now": "15356d432325ecc710bda9de734d53f397a6ab4691d9154222c37fa5320a7de0"
   },
   "uk/scripts/source_language_markers.py": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "093ed03604b6f9ea501296733474e09bab3fad305afdbf29591e284a938ac5c3"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "f0a5ad911c93fc61ebfa64359025292cc1e8159dee8f97b15aa6c57259b52199"
   },
   "uk/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch11-slice4a",
@@ -51,14 +51,14 @@
    "sha256_now": "0ce03126e0eec32a4acaa6bff7f77971c7871ce8de5ec921fa655faae01e235d"
   },
   "uk/scripts/translate_headers_footers.py": {
-   "changed_by": "feature/branch7-slice3-a19",
-   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
-   "sha256_now": "b2430a50710643006d30aa2af68fbe834fb759e10d125972297bdc0b3f2dc8e8"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "4aa0264e4b29356cb2dd9137d094c7884f87c29b22b6942040411f121c92c9d2"
   },
   "uk/scripts/translate_numbering.py": {
-   "changed_by": "feature/branch10-slice3b-lexicon-choice",
-   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
-   "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "bfd74e2139e8e709487e14d562652039dd8f7269f9891ae59c7fa4d81acd7e9a"
   },
   "uk/scripts/validate_apply.py": {
    "changed_by": "feature/branch11-wiring",
@@ -71,9 +71,9 @@
    "sha256_now": "d36afd7da2d703dde74202bcc293335fe31d0317d2ab4aca2d19f4fd787597e2"
   },
   "uk/scripts/verify_diligence.py": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - C4: verify_diligence's Step 4 + 4b counts what was declared, and says how many changed and how many were kept as the source",
-   "sha256_now": "db4a883f41e932dee2ed210008d5ac2f8e8bab2f232d5f701052c2bf5169c17f"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "1dff5e89f5e6333177c93436bf2b653e52e212d0f962666c702c5ab8b81cb5f4"
   },
   "uk/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -96,19 +96,19 @@
    "sha256_now": "2a5256931f4f6fafd4e916ce9a7e34d77d70cacdd01885dc183414e7a7a652fe"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "1fefed4958237e50297b743c0066a78b96e75f4dce299f68e503073b9688e4fe"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "3438d11bb3df2aca903db3b8e138537bdf6187249ff8693e93bdd4fcf972eadd"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "d465fda4965298afdf6d5453714d99691c9ebbe482788e6878dc35e4e7a49b92"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "645a69597270b100319ee6f4d5e24f02850a34cb3c899c013b923a63ff8dd154"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "468c9aa705d2218913e853b15d164ef7b8e07369baf77cfd45444fcd58de470d"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "0b2d65140d348dde54f0a677bea649a4bfbaa8935177fa3e6c6f510f8a25784c"
   },
   "us/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/branch12-slice12a",
@@ -131,9 +131,9 @@
    "sha256_now": "1211578c21f75a42ea81489889142b68d0932871202f4df6ab4f2f1040a011ba"
   },
   "us/scripts/quality_check.py": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "57720e668eaf6d75b6ab4c4d0725b91afe9ddf4d2b682f5224b4ed249fe3660e"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "d20989f6e0dc0020d6cc79a88112dab422b6d5853718375f2fd165a7a1419ac0"
   },
   "us/scripts/repack_docx.py": {
    "changed_by": "feature/branch12-slice12a",
@@ -141,9 +141,9 @@
    "sha256_now": "15356d432325ecc710bda9de734d53f397a6ab4691d9154222c37fa5320a7de0"
   },
   "us/scripts/source_language_markers.py": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "1fb34d93850327000873e50a50340cedb5c39d130e0787fc6ba57346c1cfb905"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "bfb6fafb54cbad62f41c0f3b0a3a8939fd6acb19b60dc775593c1fa14320f6eb"
   },
   "us/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch11-slice4a",
@@ -151,14 +151,14 @@
    "sha256_now": "5f18c14d5a8c1191efb310bdea9b933f425e4cbc2b5da5106917f9f2f9822ab3"
   },
   "us/scripts/translate_headers_footers.py": {
-   "changed_by": "feature/branch7-slice3-a19",
-   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
-   "sha256_now": "3240155eff68d9f4d1a21f53f6966a121cd9adca68d7221b1a06eadb284a8ce4"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "b7bc8aa3eb15c6a644fcb1f2c49500fb10a163ba10f9f4de140deb42f4e1aa01"
   },
   "us/scripts/translate_numbering.py": {
-   "changed_by": "feature/branch10-slice3b-lexicon-choice",
-   "commit_subject": "Branch 10 slice 3b - a mandatory rewrite no longer overrules the lexicon (B5, B6, F29, B9, F45)",
-   "sha256_now": "a92bf3efff2c94450c6fbace43d4520619325c1e66ee9d985572d15cb6eab67b"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "bfd74e2139e8e709487e14d562652039dd8f7269f9891ae59c7fa4d81acd7e9a"
   },
   "us/scripts/validate_apply.py": {
    "changed_by": "feature/branch11-wiring",
@@ -171,9 +171,9 @@
    "sha256_now": "14167da617e929d80bbe294a51ebd4673379662e258c45d61edf6d470104a770"
   },
   "us/scripts/verify_diligence.py": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - C4: verify_diligence's Step 4 + 4b counts what was declared, and says how many changed and how many were kept as the source",
-   "sha256_now": "d93191b55b1b13575585424a795364fec9ffce1b7782699a428811b2f6fdda93"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "1525274732fa7d961447436344cff5a2eec53d2386a74eddd1002ad4b5469de5"
   },
   "us/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -196,14 +196,14 @@
    "sha256_now": "1d00ae2484912d4351d876e5d320ed52d6d48e4c60f92f3844ea13ab32c19871"
   },
   "us/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "949dd92e913e350f86f544f334828e071bcba5cec5e08b8cf0db2c900ad45338"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "dca1aea25199645e54fc95c33666894391c09d20289566aacead20b5af9a4c34"
   },
   "us/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "de9ba29b520e7a7b9914665a9724adb59b440d9930226a9bab8c6c035d423a7d"
+   "changed_by": "feature/branch12-slice12b",
+   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
+   "sha256_now": "7dbac7c8d878427f9e8aed5a0935eabe44652ad4e05b41a945e6b892d603d0e1"
   },
   "uk/scripts/validate_en_runs.py": {
    "changed_by": "feature/branch11-slice4b",

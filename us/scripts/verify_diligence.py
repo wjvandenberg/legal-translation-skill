@@ -4,6 +4,11 @@ Runs at the end of the pipeline and produces a single PASS/WARN/FAIL summary
 across the 11 skill steps. Catches *skipped-step* failure modes that the
 earlier auto-invoked gates do not surface as a single end-of-pipeline report:
 
+  - Step 1c       the source language was declared (source_language.json
+                  beside paragraphs.json): supported PASS; declared but not
+                  one this skill supports WARN, since no script could look
+                  for untranslated text in it; missing or unreadable FAIL,
+                  since every language-dependent check then ran on a guess
   - Step 4 + 4b   per-batch validation actually invoked, every DECLARED
                   paragraph (source text and English, changed or kept as
                   the source) is in `validated_indices`, no batch exceeded 35
@@ -88,6 +93,16 @@ def _check_self_integrity():
 
 
 _check_self_integrity()
+
+# THE DECLARED SOURCE LANGUAGE (branch 12 slice 12b) is read through the one shared reader in
+# source_language_markers.py, beside this script.
+# NO .pyc INSIDE A SHIPPED TREE: the guard must precede the sibling import (register
+# I-18's family; tests/test_no_bytecode_in_tree.py discovers the importers).
+sys.dont_write_bytecode = True
+_SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+if _SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPTS_DIR)
+from source_language_markers import read_declared_language  # noqa: E402
 
 
 # Severity levels for individual checks. Aggregated per category.
@@ -180,6 +195,25 @@ class Report:
 
 # ---------------------------------------------------------------------------
 # Step-specific check functions
+
+def check_step_1c(report, workdir):
+    """Step 1c: the source language was declared. Branch 12 slice 12b (Wouter, 2026-10-09 and
+    2026-10-12): every language-dependent check reads the declaration, so a run that skipped it
+    ran every one of them on a guess -- and nothing at the end of the pipeline said so."""
+    label = 'Step 1c: source language declared'
+    language, state, why = read_declared_language(workdir)
+    if state == 'supported':
+        report.add(label, PASS, f'declared: {language}')
+    elif state == 'unsupported':
+        report.add(label, WARN, f'declared: {language}, which no script in this skill can check',
+                   f'{why}.\nNo script looked for text left in the source language: read the '
+                   'output yourself before delivery.')
+    else:
+        report.add(label, FAIL, 'Step 1c was skipped or its declaration cannot be read',
+                   f'{why}.\nEvery language-dependent check ran on a guess. Declare it with '
+                   'source_language_markers.py --declare <language> <workdir>, then re-run '
+                   'every step from 4d onwards.')
+
 
 def check_step_4_4b(report, workdir):
     """Step 4 + 4b: paragraphs.json exists; .validate-state.json shows full
@@ -499,6 +533,7 @@ def main(argv=None):
         return 2
 
     report = Report()
+    check_step_1c(report, workdir)
     check_step_4_4b(report, workdir)
     check_step_5(report, workdir)
     check_step_8(report, workdir, args.orig_docx)

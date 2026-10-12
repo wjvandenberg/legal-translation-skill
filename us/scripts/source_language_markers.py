@@ -30,7 +30,10 @@ This module defines:
   like a source-language word in English legal drafting (for example, proper
   nouns that happen to contain "della").
 
-* Helper functions `scan_remnants()` and `detect_language()`.
+* Helper functions `scan_remnants()`, `bare_month_hits()` and `detect_language()`.
+
+* `MONTH_MARKERS` — each Latin-script language's month names, appended to its
+  list: blocking beside a number, a warning bare (register C2).
 
 * `read_declared_language()` — the ONE reader of the source language the
   operator declared at Step 1c, `source_language.json` beside the notes —
@@ -205,6 +208,76 @@ LANGUAGE_MARKERS = {
     ],
 }
 
+# ──────────────────────────────────────────────────────────────────────
+# MONTH NAMES — register C2, branch 12 slice 12b. No list above carried a
+# month name, so a source-language date left in the English scanned CLEAN;
+# one was caught only by a tokenisation accident. One marker per Latin-script
+# language, appended to its list so every reader of LANGUAGE_MARKERS sees it.
+#
+# A month word ENGLISH SHARES (april, august, september, november, december)
+# is no marker: measured over the 13 recorded English deliveries, those words
+# were the ONLY month hits any list produced, and every one was English.
+#
+# BESIDE A NUMBER IT BLOCKS, BARE IT WARNS (Wouter, 2026-10-12): "15 settembre
+# 2021" in the English is untranslated; "Via Settembre" may be a kept name — a
+# street or a company named after a date. Every month name in the recorded
+# originals stood beside a number. remnant_verdict makes a bare one advisory;
+# quality_check prints it as a warning and does not count it. CJK stays out:
+# its markers are advisory by policy (a kept name may stand in its own script).
+# ──────────────────────────────────────────────────────────────────────
+_ENGLISH_MONTHS = frozenset('january february march april may june july august september '
+                            'october november december'.split())
+_MONTH_WORDS = {
+    'italian': 'gennaio febbraio marzo aprile maggio giugno luglio agosto settembre ottobre '
+               'novembre dicembre',
+    'dutch': 'januari februari maart april mei juni juli augustus september oktober november '
+             'december',
+    'german': 'januar jänner februar märz april mai juni juli august september oktober november '
+              'dezember',
+    'french': 'janvier février mars avril mai juin juillet août septembre octobre novembre '
+              'décembre',
+    'spanish': 'enero febrero marzo abril mayo junio julio agosto septiembre setiembre octubre '
+               'noviembre diciembre',
+    'portuguese': 'janeiro fevereiro março abril maio junho julho agosto setembro outubro '
+                  'novembro dezembro',
+    # the nominative, the genitive a date uses ("15 marca 2021") and the locative ("w marcu 2021")
+    'polish': 'styczeń luty marzec kwiecień maj czerwiec lipiec sierpień wrzesień październik '
+              'listopad grudzień stycznia lutego marca kwietnia maja czerwca lipca sierpnia '
+              'września października listopada grudnia styczniu lutym marcu kwietniu maju czerwcu '
+              'lipcu sierpniu wrześniu październiku listopadzie grudniu',
+    # stems: a Finnish date inflects the month ("maaliskuuta", "maaliskuun")
+    'finnish': 'tammikuu helmikuu maaliskuu huhtikuu toukokuu kesäkuu heinäkuu elokuu syyskuu '
+               'lokakuu marraskuu joulukuu',
+    # stems: Hungarian adds case endings ("márciusban", "márciusában")
+    'hungarian': 'január február március április május június július augusztus szeptember '
+                 'október november december',
+}
+_MONTH_STEMS = frozenset({'finnish', 'hungarian'})
+MONTH_MARKERS = {
+    lang: r'\b(?:' + '|'.join(w for w in words.split() if w not in _ENGLISH_MONTHS) + ')'
+          + (r'\w*' if lang in _MONTH_STEMS else r'\b')
+    for lang, words in _MONTH_WORDS.items()
+}
+for _lang, _pattern in MONTH_MARKERS.items():
+    LANGUAGE_MARKERS[_lang].append(_pattern)
+_MONTH_PATTERNS = frozenset(MONTH_MARKERS.values())
+# A number before ("15 ", "15. ", "1er ", "1° ", "15 de ") or after (" 2021",
+# " de 2021", " 15.") the month name: what makes it a date rather than a name.
+_NUMBER_BEFORE = re.compile(r'\d(?:er|re)?[\s.,°ºª]*(?:de\s+)?$', re.IGNORECASE)
+_NUMBER_AFTER = re.compile(r'^[\s.,]*(?:de\s+)?\d', re.IGNORECASE)
+# repack reads a part with its tags stripped but its character references left as they are,
+# so a non-breaking space may arrive as "&#160;": read as a space, never as a separator.
+_CHAR_REF = re.compile(r'&(?:#\d+|#x[0-9a-fA-F]+|[A-Za-z]+);')
+BARE_MONTH_WHY = ('a month name with no number beside it: it may be a kept name, such as a '
+                  'street or a company named after a date — read it')
+
+
+def month_is_dated(text, start, end):
+    """True when a number stands beside the month name text[start:end]."""
+    before = _CHAR_REF.sub(' ', text[max(0, start - 24):start])
+    after = _CHAR_REF.sub(' ', text[end:end + 24])
+    return bool(_NUMBER_BEFORE.search(before[-12:]) or _NUMBER_AFTER.match(after[:12]))
+
 # Fragments that legitimately contain what looks like a source-language word
 # in properly translated English legal drafting. Scanner skips a match if
 # any of these contexts surround it.
@@ -292,12 +365,14 @@ def detect_language(source_text, default=None):
     # Require at least a few hits to consider detection reliable.
     return best_lang if best_score >= 5 else default
 
-def scan_remnants(text, source_language):
+def scan_remnants(text, source_language, bare_months=True):
     """Return a list of (marker_pattern, match_snippet) for every source-language
     marker found in `text`. `source_language` is one of the LANGUAGE_MARKERS keys
     (case-insensitive). Returns [] if language is unknown or has no markers.
 
     Matches inside any WHITESPACE_OK_CONTEXTS substring are suppressed.
+    `bare_months=False` leaves out a month name with no number beside it — the
+    hits bare_month_hits() returns — for a reader that warns on those apart.
     """
     if not source_language:
         return []
@@ -320,7 +395,27 @@ def scan_remnants(text, source_language):
                 context = text[max(0, start - 30): end + 30]
                 if any(ok in context for ok in WHITESPACE_OK_CONTEXTS):
                     continue
+                if (not bare_months and pat in _MONTH_PATTERNS
+                        and not month_is_dated(text, start, end)):
+                    continue
                 hits.append((pat, context))
+    return hits
+
+
+def bare_month_hits(text, source_language):
+    """(marker_pattern, match_snippet) for every month name in `text` with no
+    number beside it — the hits scan_remnants(bare_months=False) leaves out."""
+    pat = MONTH_MARKERS.get((source_language or '').lower())
+    if not pat:
+        return []
+    hits = []
+    for m in re.finditer(pat, text, flags=re.IGNORECASE):
+        start, end = m.span()
+        context = text[max(0, start - 30): end + 30]
+        if any(ok in context for ok in WHITESPACE_OK_CONTEXTS):
+            continue
+        if not month_is_dated(text, start, end):
+            hits.append((pat, context))
     return hits
 
 # ──────────────────────────────────────────────────────────────────────
@@ -330,6 +425,7 @@ def scan_remnants(text, source_language):
 # are unchanged. A hit is ADVISORY only for a class the scan cannot rule on:
 #   * a CJK character marker — a kept name may stand in its own script;
 #   * a marker in REMNANT_ADVISORY, each with its reason;
+#   * a month name with no number beside it (MONTH NAMES above, BARE_MONTH_WHY);
 #   * a hit whose own span lies inside a LEXICON_KEPT_NAMES name, each citing
 #     the lexicon row that tells the operator to write it. Measured 2026-09-25:
 #     of 30,718 lexicon rendering cells in each tree, these six held a marker,
@@ -363,6 +459,11 @@ LEXICON_KEPT_NAMES = {
         'third-party liability row',
     'dupla conforme': 'sub-lexicons/portuguese-litigation-settlement.md, '
                       '"dupla conforme (double concurrence)"',
+    # French statutes the lexicon keeps by their French name, a date in each (C2's month markers).
+    'Loi du 25 juin 2008': 'sub-lexicons/french-employment.md, the rupture conventionnelle row',
+    'Loi du 6 juillet 1989': "sub-lexicons/french-real-estate.md, the bail d'habitation row",
+    'Loi du 23 décembre 1986': 'sub-lexicons/french-real-estate.md, the bail professionnel row',
+    'Loi du 10 juillet 1965': 'sub-lexicons/french-real-estate.md, the copropriété row',
 }
 
 
@@ -402,6 +503,8 @@ def remnant_verdict(text, source_language):
                 why = 'CJK characters: a kept name may stand in its own script'
             elif pat in REMNANT_ADVISORY:
                 why = REMNANT_ADVISORY[pat]
+            elif pat in _MONTH_PATTERNS and not month_is_dated(text, start, end):
+                why = BARE_MONTH_WHY
             else:
                 why = next((f'inside the kept name "{n}" — {LEXICON_KEPT_NAMES[n]}'
                             for (s, e), n in kept if s <= start and end <= e), None)

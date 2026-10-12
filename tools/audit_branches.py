@@ -308,11 +308,14 @@ def audit_b1():
     # gained Step 1c's `--declare` command, which exits 2 on a name or a workdir it refuses, so
     # it is the nineteenth script able to block and leaves the mute list. Measured, not
     # expected: this scan and check_coverage.py both re-derived 19 on 2026-10-09 (B1.agree).
-    claim("B1.verdict", "19 of 20 can block by exit or by raise",
-          sum(x["blocks"] for x in v.values()), 19)
-    claim("B1.mute", "the one that cannot block",
+    # BRANCH 12 SLICE 12b MOVED THEM A THIRD TIME: translate_numbering.py now exits 1 when a
+    # declared, supported language leaves a word in numbering the document uses (Wouter,
+    # 2026-10-12), so all 20 can block and the mute list is empty. Re-derived by both scans.
+    claim("B1.verdict", "20 of 20 can block by exit or by raise",
+          sum(x["blocks"] for x in v.values()), 20)
+    claim("B1.mute", "none that cannot block",
           sorted(n for n, x in v.items() if not x["blocks"]),
-          ["translate_numbering.py"])
+          [])
 
     # RUN THE TOOL FROM THE REF, not from the checkout. This is the bug listed as (1) at the
     # top of this file, and the first attempt at fixing it only covered files READ from a

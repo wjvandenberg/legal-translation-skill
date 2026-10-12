@@ -23,13 +23,23 @@ where patterns can use %1, %2, etc. as numbering placeholders.
 An auto-numbered attachment label follows the operator's declared English in
 paragraphs.json: "Annex %1" where the notes label attachments Annex and never
 Schedule, "Schedule %1" otherwise (--paragraphs, or found beside final/).
+
+The source language is the one declared at Step 1c (source_language.json beside
+paragraphs.json); --language overrides it. A language with no built-in map says
+NOT SUPPORTED and applies none. Every format string still carrying a word after
+the maps is listed NOT TRANSLATED. Exit 1 when the language was declared (or
+given with --language) and supported, and such a string is in numbering the
+document uses: render it with --custom, or keep it by mapping it to itself.
+Exit 0 otherwise.
 """
 import sys
 import os
 import re
+import html
 import json
 import zipfile
 import xml.etree.ElementTree as ET
+from xml.sax.saxutils import escape as xml_escape
 
 def _check_self_integrity():
     """Detect install-time truncation. Whole-file scan tolerates null-padding."""
@@ -53,6 +63,15 @@ def _check_self_integrity():
 
 _check_self_integrity()
 
+# THE DECLARED SOURCE LANGUAGE (branch 12 slice 12b) is read through the one shared policy
+# in source_language_markers.py, beside this script.
+# NO .pyc INSIDE A SHIPPED TREE: the guard must precede the sibling import (register
+# I-18's family; tests/test_no_bytecode_in_tree.py discovers the importers).
+sys.dont_write_bytecode = True
+_SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+if _SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPTS_DIR)
+from source_language_markers import not_supported, resolve_source_language  # noqa: E402
 
 
 W = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
@@ -164,7 +183,48 @@ FINNISH_MAP = {
     r'%(\d+)\.\s*osa':               r'Part %\1',
 }
 
-LANGUAGE_MAPS = {
+# CHINESE AND JAPANESE (register E4, branch 12 slice 12b). Each entry renders a label the way
+# the skill's own lexicon does, and LEXICON_ROWS below cites the row, so the numbering never
+# disagrees with the body text. A label no lexicon row sanctions (Chinese 附件 or 节, for
+# example) is deliberately absent: the run lists it NOT TRANSLATED and the operator renders it
+# with --custom, which is better than a rendering nobody chose.
+CHINESE_MAP = {
+    r'第\s*%(\d+)\s*条':              r'Article %\1',
+    r'第\s*%(\d+)\s*章':              r'Chapter %\1',
+    r'第\s*%(\d+)\s*款':              r'Paragraph %\1',
+    r'第\s*%(\d+)\s*项':              r'Item %\1',
+}
+
+JAPANESE_MAP = {
+    r'第\s*%(\d+)\s*条':              r'Article %\1',
+    r'第\s*%(\d+)\s*章':              r'Chapter %\1',
+    r'第\s*%(\d+)\s*節':              r'Section %\1',
+    r'第\s*%(\d+)\s*項':              r'Paragraph %\1',
+    r'第\s*%(\d+)\s*号':              r'Item %\1',
+    r'別紙\s*%(\d+)':                 r'Schedule %\1',
+    r'別表\s*%(\d+)':                 r'Appended Table %\1',
+}
+
+LEXICON_ROWS = {
+    ('chinese', r'第\s*%(\d+)\s*条'): 'sub-lexicons/chinese-general-legal.md, the 条 row (article / section)',
+    ('chinese', r'第\s*%(\d+)\s*章'): ('sub-lexicons/chinese-corporate-ma-jv.md, the Civil Code '
+                                       'agency-chapter row (Chapter)'),
+    ('chinese', r'第\s*%(\d+)\s*款'): 'sub-lexicons/chinese-general-legal.md, the 款 row (paragraph)',
+    ('chinese', r'第\s*%(\d+)\s*项'): 'sub-lexicons/chinese-general-legal.md, the 项 row (item)',
+    ('japanese', r'第\s*%(\d+)\s*条'): ('sub-lexicons/japanese-general-legal.md, the numbering-'
+                                        'convention note (条 article)'),
+    ('japanese', r'第\s*%(\d+)\s*章'): 'sub-lexicons/japanese-general-legal.md, the 章 row (Chapter)',
+    ('japanese', r'第\s*%(\d+)\s*節'): 'sub-lexicons/japanese-general-legal.md, the 節 row (Section)',
+    ('japanese', r'第\s*%(\d+)\s*項'): 'sub-lexicons/japanese-general-legal.md, the 項 row (paragraph)',
+    ('japanese', r'第\s*%(\d+)\s*号'): 'sub-lexicons/japanese-general-legal.md, the 号 row (item)',
+    ('japanese', r'別紙\s*%(\d+)'): ('sub-lexicons/japanese-corporate-ma-jv.md, the 開示別紙 row '
+                                     '(disclosure schedules); the label follows the operator'),
+    ('japanese', r'別表\s*%(\d+)'): 'sub-lexicons/japanese-general-legal.md, the 別表 row (appended table)',
+}
+
+# The nine maps the GUESS reads. Chinese and Japanese are applied when declared, never guessed:
+# detect_language_from_numbering below scores Latin words, so its answers stay what they were.
+_GUESSABLE_MAPS = {
     'hungarian': HUNGARIAN_MAP,
     'italian': ITALIAN_MAP,
     'german': GERMAN_MAP,
@@ -176,11 +236,35 @@ LANGUAGE_MAPS = {
     'finnish': FINNISH_MAP,
 }
 
+LANGUAGE_MAPS = dict(_GUESSABLE_MAPS, chinese=CHINESE_MAP, japanese=JAPANESE_MAP)
+
+# THE KEYWORD BEFORE THE NUMBER (branch 12 slice 12b). Measured over the 13 recorded runs: of
+# the 25 word-bearing format strings no map matched, 12 put the keyword BEFORE the number
+# ("Capitolo %1") -- an order the maps carried only for the attachment keyword -- and on one
+# Italian document such a string, in numbering the document uses, shipped untranslated while
+# the run printed "Translated 2". So every keyword a map holds after the number is matched
+# before it too, DERIVED here rather than typed, so a keyword added later gets both orders.
+# Applied after the map's own entries, which keep their priority.
+_AFTER_NUMBER = re.compile(r'%\(\\d\+\)\\\.\\s\*([^\W\d_]+)')
+
+
+def full_map(language):
+    """The map a run applies for `language`: its own entries, then the keyword-before-number
+    order for each keyword it holds after the number. {} for a language with no map."""
+    base = LANGUAGE_MAPS.get((language or '').lower(), {})
+    out = dict(base)
+    for pattern, replacement in base.items():
+        m = _AFTER_NUMBER.fullmatch(pattern)
+        if m:
+            out.setdefault(r'(?<!\w)' + m.group(1) + r'\s*%(\d+)', replacement)
+    return out
+
+
 def detect_language_from_numbering(numbering_xml_text):
     """Try to auto-detect the source language from numbering format strings."""
     text_lower = numbering_xml_text.lower()
     scores = {}
-    for lang, tmap in LANGUAGE_MAPS.items():
+    for lang, tmap in _GUESSABLE_MAPS.items():
         score = 0
         for pattern in tmap:
             # Convert regex pattern to a simpler search
@@ -214,8 +298,9 @@ def detect_language_from_numbering(numbering_xml_text):
 # A MIX is reported and keeps Schedule; so is having no notes. An operator's own --custom map
 # is applied after this and still wins.
 #
-# IT NEVER EXITS AND NEVER RAISES, and that is load-bearing: this is one of the two scripts
-# in the skill that cannot block a run, and tools/audit_branches.py asserts it (B1.mute).
+# THIS BLOCK NEVER EXITS AND NEVER RAISES: a label choice is never a reason to stop a run. The
+# script as a whole stops on one thing only, since branch 12 slice 12b -- a word left untranslated
+# in numbering the document uses, on a declared language (see WHAT THE MAPS LEFT below).
 _ANNEX_LABEL_RE = re.compile(r'\bAnnex(?:es)?\s+(?:\d+|[IVXLC]+\b|[A-Z]\b)')
 _SCHEDULE_LABEL_RE = re.compile(r'\bSchedules?\s+(?:\d+|[IVXLC]+\b|[A-Z]\b)')
 # A legislation reference is not a label choice. The SAME keywords as post_process's
@@ -278,9 +363,108 @@ def _follow_label(tmap, label):
 # === ATTACHMENT LABEL FOLLOWS THE OPERATOR ENDS ===
 
 
+# === WHAT THE MAPS LEFT, AND THE STOP ===
+#
+# BRANCH 12 SLICE 12b, register S3: this script reported the absence of DICTIONARY MATCHES as
+# the absence of CONTENT. On a Norwegian document it guessed french, matched nothing, and said
+# "No translatable format strings found (all pure numeric/symbol patterns)" while ten format
+# strings carrying words sat in numbering the document uses -- and the strings ship inside the
+# delivered file, where no later gate reads them: a format string is an attribute, and
+# numbering.xml is not a prose part repack's remnant block scans.
+#
+# So after the maps every format string still carrying a WORD is listed, marked by whether
+# numbering the document uses holds it. A one-letter bullet ('o') is a glyph, not a word, and a
+# string of English numbering words alone (Article, Section) has nothing to translate.
+#
+# AND IT STOPS (Wouter, 2026-10-12) only where it can tell: the language was DECLARED at
+# Step 1c, or given with --language, and is one this skill supports, and the string is in
+# numbering the document uses. On a guess, or on a language with no map, a word left may be
+# English already, so it is listed and the run goes on.
+_EN_NUMBERING_WORDS = frozenset((
+    'schedule schedules annex annexes annexure appendix appendices article articles clause '
+    'clauses section sections part parts chapter chapters exhibit exhibits recital recitals '
+    'attachment attachments art sec no para paragraph paragraphs item items step page sub rule '
+    'rules title book volume tranche lot table appended figure point').split())
+_WORD = re.compile(r'[^\W\d_]+')
+_NUM_ID = re.compile(r'<w:numId\s[^>]*?w:val="(\d+)"')
+_LVLTEXT = re.compile(r'(<w:lvlText\s+w:val=")([^"]*?)(")')
+
+
+def _carries_word(val):
+    """Two or more letters once the %N placeholders are gone, and a word that is not English
+    numbering vocabulary."""
+    words = _WORD.findall(re.sub(r'%\d', '', val))
+    if len(''.join(words)) < 2:
+        return False
+    return not all(w.lower() in _EN_NUMBERING_WORDS for w in words)
+
+
+def _values_in_use(orig_docx, numbering_bytes):
+    """{format string: True when numbering the document uses holds it}, or None when the
+    numbering part cannot be read as XML. A numId the body or a style cites marks its num -- and
+    the abstractNum behind it -- as used. READ only: this script never writes through ElementTree."""
+    with zipfile.ZipFile(orig_docx, 'r') as zf:
+        cited = set()
+        for part in ('word/document.xml', 'word/styles.xml'):
+            if part in zf.namelist():
+                cited.update(_NUM_ID.findall(zf.read(part).decode('utf-8', errors='ignore')))
+    cited.discard('0')
+    try:
+        root = ET.fromstring(numbering_bytes)
+    except ET.ParseError:
+        return None
+    used_abstract = set()
+    for num in root.iter(f'{W}num'):
+        abstract = num.find(f'{W}abstractNumId')
+        if num.get(f'{W}numId') in cited and abstract is not None:
+            used_abstract.add(abstract.get(f'{W}val'))
+    out = {}
+    owners = ([(an, an.get(f'{W}abstractNumId') in used_abstract) for an in root.iter(f'{W}abstractNum')]
+              + [(num, num.get(f'{W}numId') in cited) for num in root.iter(f'{W}num')])
+    for owner, used in owners:
+        for lt in owner.iter(f'{W}lvlText'):
+            val = lt.get(f'{W}val') or ''
+            out[val] = out.get(val, False) or used
+    return out
+
+
+def _translate_value(val, tmap, custom_map):
+    """(translated, matched) for a format string as Word shows it (unescaped): an exact --custom
+    entry first, as the operator wrote it; then the first map entry that matches. A --custom key
+    is also tried as a pattern, as it always was -- but a key that is no valid pattern, a literal
+    string with a bracket in it, is skipped there rather than ending the run."""
+    if custom_map and val in custom_map:
+        return custom_map[val], True
+    for pattern, replacement in tmap.items():
+        try:
+            new_val, n = re.subn(pattern, replacement, val, flags=re.IGNORECASE)
+        except re.error:
+            continue
+        if n > 0:
+            return new_val, True
+    return val, False
+
+
+def _attr(text):
+    """A format string escaped for the w:val attribute it is written back into."""
+    return xml_escape(text, {'"': '&quot;'})
+# === WHAT THE MAPS LEFT, AND THE STOP ENDS ===
+
+
+def _layout_workdir(output_xml):
+    """<workdir> when output_xml is <workdir>/final/word/numbering.xml, Step 8a's layout; else
+    None -- never a folder that merely happens to sit three levels up."""
+    word = os.path.dirname(os.path.abspath(output_xml))
+    final = os.path.dirname(word)
+    if os.path.basename(word) == 'word' and os.path.basename(final) == 'final':
+        return os.path.dirname(final)
+    return None
+
+
 def translate_numbering(orig_docx, output_xml, language=None, custom_map=None,
                         paragraphs_json=None):
-    """Extract, translate, and write word/numbering.xml."""
+    """Extract, translate, and write word/numbering.xml. Returns True when the run must STOP
+    (see WHAT THE MAPS LEFT above), False otherwise."""
 
     # Read numbering.xml from the .docx
     with zipfile.ZipFile(orig_docx, 'r') as zf:
@@ -291,23 +475,23 @@ def translate_numbering(orig_docx, output_xml, language=None, custom_map=None,
 
     numbering_text = numbering_bytes.decode('utf-8')
 
-    # Auto-detect language if not specified
-    if language is None:
-        language = detect_language_from_numbering(numbering_text)
-        if language:
-            print(f"Auto-detected numbering language: {language}")
-        else:
-            print("Could not auto-detect numbering language. No translations applied.")
-            if not custom_map:
-                # Write unchanged
-                with open(output_xml, 'w', encoding='utf-8') as f:
-                    f.write(numbering_text)
-                return False
+    # The language: --language, else the Step 1c declaration, else a guess that is acted on
+    # but never settles anything -- source_language_markers' one policy.
+    resolved = resolve_source_language(
+        paragraphs_json or _layout_workdir(output_xml), explicit=language,
+        guess=lambda: detect_language_from_numbering(numbering_text))
+    if resolved.warning:
+        print(f"WARNING — {resolved.warning}")
+    language = resolved.language
+    settled = resolved.cannot_rule is None
+    if not settled:
+        has_map = (language or '').lower() in LANGUAGE_MAPS
+        print(not_supported("the numbering translation", resolved.cannot_rule)
+              + (" Its map is applied, and nothing it leaves stops the run." if has_map
+                 else " No built-in map is applied, and nothing it leaves stops the run."))
 
     # Build translation map
-    tmap = {}
-    if language and language.lower() in LANGUAGE_MAPS:
-        tmap.update(LANGUAGE_MAPS[language.lower()])
+    tmap = full_map(language)
     # The attachment label follows the operator (see the block above) -- BEFORE the custom
     # map, so an explicit --custom entry for the same pattern still wins.
     if any(v.startswith('Schedule') for v in tmap.values()):
@@ -318,41 +502,32 @@ def translate_numbering(orig_docx, output_xml, language=None, custom_map=None,
     if custom_map:
         tmap.update(custom_map)
 
-    if not tmap:
-        print(f"No translation map for language '{language}'. Writing unchanged.")
-        with open(output_xml, 'w', encoding='utf-8') as f:
-            f.write(numbering_text)
-        return False
-
     # Find and translate w:lvlText val attributes
     # These look like: <w:lvlText w:val="%1. sz. Melléklet"/>
     changes = 0
+    left = []
 
     def replace_lvltext(match):
         nonlocal changes
         prefix = match.group(1)   # everything before the val content
-        val = match.group(2)      # the format string
+        # The format string as Word shows it: matched, listed and compared UNESCAPED, so a
+        # --custom key the operator copies from the list matches, and written back ESCAPED, so
+        # a rendering holding & or " still makes a valid attribute.
+        val = html.unescape(match.group(2))
         suffix = match.group(3)   # closing quote + rest
 
-        translated = val
-        for pattern, replacement in tmap.items():
-            new_val, n = re.subn(pattern, replacement, translated, flags=re.IGNORECASE)
-            if n > 0:
-                translated = new_val
-                break
+        translated, matched = _translate_value(val, tmap, custom_map)
+        if not matched and _carries_word(val):
+            left.append(val)
 
         if translated != val:
             changes += 1
             print(f"  Translated: '{val}' → '{translated}'")
-            return f'{prefix}{translated}{suffix}'
+            return f'{prefix}{_attr(translated)}{suffix}'
         return match.group(0)
 
     # Match w:lvlText elements with their val attribute
-    numbering_text = re.sub(
-        r'(<w:lvlText\s+w:val=")([^"]*?)(")',
-        replace_lvltext,
-        numbering_text
-    )
+    numbering_text = _LVLTEXT.sub(replace_lvltext, numbering_text)
 
     # Also check for any other translatable text in w:t elements within numbering.xml
     # (some documents embed text directly in numbering definitions)
@@ -363,17 +538,42 @@ def translate_numbering(orig_docx, output_xml, language=None, custom_map=None,
 
     if changes:
         print(f"\nTranslated {changes} numbering format string(s).")
-    else:
-        print("\nNo translatable format strings found (all pure numeric/symbol patterns).")
+    if not left:
+        if not changes:
+            print("\nNo translatable format strings found (all pure numeric/symbol patterns).")
+        return False
 
-    return changes > 0
+    in_use = _values_in_use(orig_docx, numbering_bytes)
+    if in_use is None:
+        print("\nThe numbering part could not be read as XML, so which numbering the document uses "
+              "is unknown: every string below is treated as in use.")
+        rows = [(val, True) for val in dict.fromkeys(left)]
+    else:
+        rows = [(val, in_use.get(val, False)) for val in dict.fromkeys(left)]
+    used = sum(1 for _v, u in rows if u)
+    print(f"\nNOT TRANSLATED — {len(rows)} numbering format string(s) still carry words no map "
+          f"translated ({used} in numbering the document uses):")
+    for val, u in rows:
+        print(f"  [{'in use' if u else 'not in use'}] '{val}'")
+    print('  Render each with --custom <file.json> ({"<format string>": "<English>"}); a string '
+          'that is right as it stands is kept by mapping it to itself.')
+    if settled and used:
+        print(f"\nSKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. {used} format string(s) in "
+              f"numbering the document uses still carry {language} words, so the delivered document "
+              "would number its headings in the source language. numbering.xml was written with "
+              "every other translation applied; render them with --custom and re-run Step 8a.")
+        return True
+    return False
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Translate numbering format strings in word/numbering.xml')
     parser.add_argument('original', help='Original .docx file')
     parser.add_argument('output', help='Output numbering.xml path')
-    parser.add_argument('--language', help='Source language (hungarian, italian, german, french, spanish, portuguese, dutch, polish, finnish)', default=None)
+    parser.add_argument('--language', help=('Source language, overriding the one declared at Step 1c '
+                                            '(chinese, dutch, finnish, french, german, hungarian, '
+                                            'italian, japanese, polish, portuguese, spanish)'),
+                        default=None)
     parser.add_argument('--custom', help='JSON file with custom translations', default=None)
     parser.add_argument('--paragraphs', dest='paragraphs_json', default=None,
                         help=('paragraphs.json whose declared English decides the attachment '
@@ -383,10 +583,13 @@ if __name__ == '__main__':
 
     custom = None
     if args.custom:
-        with open(args.custom) as f:
+        # utf-8, never the platform's code page: --custom is the way out of the stop above, and
+        # a format string to render is rarely ASCII.
+        with open(args.custom, encoding='utf-8-sig') as f:
             custom = json.load(f)
 
-    translate_numbering(args.original, args.output, language=args.language, custom_map=custom,
-                        paragraphs_json=args.paragraphs_json)
+    stop = translate_numbering(args.original, args.output, language=args.language,
+                               custom_map=custom, paragraphs_json=args.paragraphs_json)
+    sys.exit(1 if stop else 0)
 
 # === SKILL FILE COMPLETE ===
