@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""house_common.py - the plumbing every house checker shares.  CHECKER VERSION 18 (2026-09-11)
+"""house_common.py - the plumbing every house checker shares.  CHECKER VERSION 19 (2026-10-12)
 
 WHAT IS HERE AND WHY IT IS HERE. The result model (PASS / FAIL / VOID / N-A / JUDGE, the
 denominator rule, the exit-code convention), reading verify.config.json, and the selftest that
 proves a config still loads. None of it is specific to documents, code or deliverables - it is
 the same in all three, and before this file it WAS the same in all three, three times over.
+THE ONE EXCEPTION, since v19 (2026-10-12): the Markdown parsers - headings, fenced blocks,
+table cells, code spans and the wrap-tolerant collapse - which verify_md.py and the
+verify_charter.py split out of it both need. They are specific to documents, and they are here
+anyway because two checkers each holding a copy is how the two come to disagree.
 
 THE MEASUREMENT THAT PRODUCED THIS FILE. The first structural review found 218 lines of
 identical code across the five scripts, 11% of the live total: three copies of the result
@@ -461,6 +465,129 @@ def finish(rep, checker: str, rc: int, quiet: bool) -> int:
         print(json.dumps(rep.as_dict(checker) | {"exit_code": rc}, indent=2,
                          ensure_ascii=False))
     return rc
+
+
+# ------------------------------------------------------------------ the Markdown parsers
+#
+# MOVED HERE FROM verify_md.py ON 2026-10-12 (v19 here, v30 there), when verify_charter.py was
+# split out of it and needed the same parsers. Two checkers each with their own idea of what a
+# heading or a table cell is is how the two come to disagree about an escaped pipe or a fenced
+# block - the same reason read_phrase_list and resolve_list came here on 2026-09-02. Moved
+# byte for byte: nothing in them changed.
+
+HEADING_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
+NUMBERED_RE = re.compile(r"^(\d+)(?:\.(\d+))?[.)]?\s+(.*)$")
+
+
+def headings(lines):
+    """Yield (lineno, level, text, number_key_or_None)."""
+    in_fence = False
+    for i, ln in enumerate(lines, 1):
+        if ln.lstrip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        m = HEADING_RE.match(ln)
+        if not m:
+            continue
+        text = m.group(2)
+        nm = NUMBERED_RE.match(text)
+        key = None
+        if nm:
+            key = nm.group(1) if nm.group(2) is None else f"{nm.group(1)}.{nm.group(2)}"
+        yield i, len(m.group(1)), text, key
+
+
+def code_fence_mask(lines):
+    """True for lines inside a fenced code block - those are examples, not prose."""
+    mask, in_fence = [], False
+    for ln in lines:
+        if ln.lstrip().startswith("```"):
+            in_fence = not in_fence
+            mask.append(True)
+        else:
+            mask.append(in_fence)
+    return mask
+
+
+# An ESCAPED pipe is a literal '|' inside a cell, not a column separator. Splitting on
+# every '|' makes a valid table look ragged - a false alarm on correct markdown, which is
+# how a check stops being believed.
+CELL_PIPE = re.compile(r"(?<!\\)\|")
+# A delimiter row must contain at least one hyphen. Without that, '| | |' - a legitimate
+# header row of empty cells - passes as a divider, and a table with no divider at all
+# renders as one run-on line while this check calls it well-formed.
+DELIM_RE = re.compile(r"^\s*\|[\s:|-]*-[\s:|-]*\|\s*$")
+
+
+def row_cells(row: str):
+    """The cells of a table row, splitting on UNESCAPED pipes only.
+
+    The leading and trailing empty fragments are the table's outer borders, not cells.
+
+    EXTRACTED 2026-09-10 so that cell_count and check_plan_purpose share ONE parser. Two
+    splitters for one syntax is how the two come to disagree about an escaped pipe, and the
+    disagreement would show up as a check that silently reads the wrong column.
+    """
+    parts = CELL_PIPE.split(row.strip())
+    if parts and parts[0] == "":
+        parts = parts[1:]
+    if parts and parts[-1] == "":
+        parts = parts[:-1]
+    return [p.strip() for p in parts]
+
+
+INLINE_CODE = re.compile(r"`[^`\n]*`")
+
+
+def strip_inline_code(line):
+    """Blank out inline code spans before scanning prose.
+
+    A document that DOCUMENTS these constructs shows them inside backticks - and that is a
+    quotation, not damage. Without this, a file explaining what formatter damage looks like
+    is flagged as damaged: the scanner matching itself, which is how a check stops being
+    believed. Whole fenced blocks are already excluded by the caller's mask.
+    """
+    return INLINE_CODE.sub(lambda m: " " * len(m.group(0)), line)
+
+
+def collapse(lines, numbers=None):
+    """Whole document as one whitespace-collapsed string, plus a line number per character.
+
+    'numbers' supplies the real line number of each entry, for a caller handing over a
+    SUBSET of a file - the added-lines arm does. One matcher for both arms rather than a
+    second copy: the wrap-tolerant matching below is the whole reason this function exists,
+    and a diff-scoped copy of it is where the two would quietly stop agreeing.
+
+    A hard-wrapped document breaks a phrase across a line ending, and a line-by-line
+    search then reports CLEAN on a document that plainly contains it. That is the worst
+    direction for this check to be wrong in: a confidentiality scan saying nothing is
+    there. Collapsing first means the wrap cannot hide anything.
+
+    THE ACCEPTED COST, stated rather than discovered later: this also matches across a
+    paragraph break, so two unrelated sentences can join into a phrase that was never
+    written. For a FORBIDDEN list that is the right way to be wrong - a false alarm costs
+    a minute of reading, and a missed confidential phrase cannot be recalled once shipped.
+    """
+    out, where, prev_space = [], [], True
+    for idx, ln in enumerate(lines):
+        i = numbers[idx] if numbers else idx + 1
+        for ch in ln:
+            if ch.isspace():
+                if not prev_space:
+                    out.append(" ")
+                    where.append(i)
+                prev_space = True
+            else:
+                out.append(ch)
+                where.append(i)
+                prev_space = False
+        if not prev_space:          # the line ending is whitespace too
+            out.append(" ")
+            where.append(i)
+            prev_space = True
+    return "".join(out).lower(), where
 
 
 # ------------------------------------------------------------------------ the config
