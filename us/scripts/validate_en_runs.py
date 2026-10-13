@@ -113,6 +113,8 @@ def main():
                              'genuinely acceptable (e.g., simple drafts).')
     args = parser.parse_args()
 
+    # NO .pyc INSIDE A SHIPPED TREE (register I-18's family): the guard precedes the sibling import.
+    sys.dont_write_bytecode = True
     scripts_dir = os.path.dirname(os.path.abspath(__file__))
     if scripts_dir not in sys.path:
         sys.path.insert(0, scripts_dir)

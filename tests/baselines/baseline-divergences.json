@@ -11,9 +11,9 @@
    "sha256_now": "e857114f105b000b0da50614b1c98b6b1cefc901c57ffb4a32eeae19e271c0b7"
   },
   "uk/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "dbd67de313c3de08eaced28daf06a819deeb8a61dadef354dbf7b68fa5eb2583"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "9776378958cf5f92665ab60e64c4db1d7e35eea4970164114448f0caea811649"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/signed-python-no-doc-moves",
@@ -31,14 +31,14 @@
    "sha256_now": "7a4064265a13db83d9bc9dd00319cc3df278ce5704f1ca52996d7fc1c9d6b8c1"
   },
   "uk/scripts/quality_check.py": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "0b7129fd2d450db69c26dbcc3f1c89ca89db276a9da3696097d88425c932a81c"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "c0414f93e2034ef19b032766aeb8d605e07fddd10733145f3e804e174795b77c"
   },
   "uk/scripts/repack_docx.py": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "15356d432325ecc710bda9de734d53f397a6ab4691d9154222c37fa5320a7de0"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "999710b3498e90099c243f8a560b74555bdfd5ddd87071c2e9117156bd795b34"
   },
   "uk/scripts/source_language_markers.py": {
    "changed_by": "feature/branch12-slice12b",
@@ -51,14 +51,14 @@
    "sha256_now": "0ce03126e0eec32a4acaa6bff7f77971c7871ce8de5ec921fa655faae01e235d"
   },
   "uk/scripts/translate_headers_footers.py": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "4aa0264e4b29356cb2dd9137d094c7884f87c29b22b6942040411f121c92c9d2"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "a47916da6796a426723101b86b13e5a4b4dd8e802eeb15786783c5bc764ac96a"
   },
   "uk/scripts/translate_numbering.py": {
-   "changed_by": "fix/numbering-newlines",
-   "commit_subject": "translate_numbering writes numbering.xml with its own line breaks - the one finding 12b's code review skipped, fixed at Wouter's word",
-   "sha256_now": "f05643d7c1367ec52e039231b4755f5f45b67a446fc75d82b11cc5c28691921f"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "dad3bc3b86656619f01449e43bfdfacd7e009be937297f6609f00bf4fbec7e0d"
   },
   "uk/scripts/validate_apply.py": {
    "changed_by": "feature/branch11-wiring",
@@ -71,9 +71,9 @@
    "sha256_now": "d36afd7da2d703dde74202bcc293335fe31d0317d2ab4aca2d19f4fd787597e2"
   },
   "uk/scripts/verify_diligence.py": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "1dff5e89f5e6333177c93436bf2b653e52e212d0f962666c702c5ab8b81cb5f4"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "cb54fbc6f58c5cf7a970e819fbf7a3df8d51d73e14dba8b59591628d58c79a7f"
   },
   "uk/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -111,9 +111,9 @@
    "sha256_now": "0b2d65140d348dde54f0a677bea649a4bfbaa8935177fa3e6c6f510f8a25784c"
   },
   "us/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "fe9d4987f4d6e1fb96b6f3ee7fa0454bad2722251c67804985e6dbe31a6ca848"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "1e05e33381de92e458b9d240db7cafff77ad87139e24888ee3bece69c3680f50"
   },
   "us/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/signed-python-no-doc-moves",
@@ -131,14 +131,14 @@
    "sha256_now": "1211578c21f75a42ea81489889142b68d0932871202f4df6ab4f2f1040a011ba"
   },
   "us/scripts/quality_check.py": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "d20989f6e0dc0020d6cc79a88112dab422b6d5853718375f2fd165a7a1419ac0"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "19c79bf4472de82a5cd74d22c7d549b7519224cfda5a49d4418297a8a78ea283"
   },
   "us/scripts/repack_docx.py": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "15356d432325ecc710bda9de734d53f397a6ab4691d9154222c37fa5320a7de0"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "999710b3498e90099c243f8a560b74555bdfd5ddd87071c2e9117156bd795b34"
   },
   "us/scripts/source_language_markers.py": {
    "changed_by": "feature/branch12-slice12b",
@@ -151,14 +151,14 @@
    "sha256_now": "5f18c14d5a8c1191efb310bdea9b933f425e4cbc2b5da5106917f9f2f9822ab3"
   },
   "us/scripts/translate_headers_footers.py": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "b7bc8aa3eb15c6a644fcb1f2c49500fb10a163ba10f9f4de140deb42f4e1aa01"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "461108cc73e6f46e823a50bc2e1e0b78f747527de7bcc3ca01fd088e0ce14ac4"
   },
   "us/scripts/translate_numbering.py": {
-   "changed_by": "fix/numbering-newlines",
-   "commit_subject": "translate_numbering writes numbering.xml with its own line breaks - the one finding 12b's code review skipped, fixed at Wouter's word",
-   "sha256_now": "f05643d7c1367ec52e039231b4755f5f45b67a446fc75d82b11cc5c28691921f"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "dad3bc3b86656619f01449e43bfdfacd7e009be937297f6609f00bf4fbec7e0d"
   },
   "us/scripts/validate_apply.py": {
    "changed_by": "feature/branch11-wiring",
@@ -171,9 +171,9 @@
    "sha256_now": "14167da617e929d80bbe294a51ebd4673379662e258c45d61edf6d470104a770"
   },
   "us/scripts/verify_diligence.py": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "1525274732fa7d961447436344cff5a2eec53d2386a74eddd1002ad4b5469de5"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "c81e5e9e75e2e8cf9db961f092c2366f9cfc588f3274bef84df03763e55e630c"
   },
   "us/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -206,14 +206,14 @@
    "sha256_now": "7dbac7c8d878427f9e8aed5a0935eabe44652ad4e05b41a945e6b892d603d0e1"
   },
   "uk/scripts/validate_en_runs.py": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - record #121 as merged, the slice's written plan, and C13: validate_en_runs refuses en_runs that do not tile en, on every paragraph",
-   "sha256_now": "2cc34e3525a9befefd1f5d2c36de0b9d58f8b3664a40eeab67ef9c5b57fc42e5"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "c36a8f277dce3898071de8e996f3a3dd020ffd6ed19aae35791da75e48b66d4c"
   },
   "us/scripts/validate_en_runs.py": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - record #121 as merged, the slice's written plan, and C13: validate_en_runs refuses en_runs that do not tile en, on every paragraph",
-   "sha256_now": "2cc34e3525a9befefd1f5d2c36de0b9d58f8b3664a40eeab67ef9c5b57fc42e5"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "c36a8f277dce3898071de8e996f3a3dd020ffd6ed19aae35791da75e48b66d4c"
   },
   "uk/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/branch11-slice4b",
@@ -221,9 +221,9 @@
    "sha256_now": "a26044f1fbf2df0c89ab4af4af6c844c97fa2792b2ea130a62e42628704aac74"
   },
   "uk/scripts/validate_translations.py": {
-   "changed_by": "feature/branch12-12c",
-   "commit_subject": "Slice 12c's review fixes",
-   "sha256_now": "896b0fd495fad354a23f2015bdf4f15d17044fc6de58032bea8a4e6b0435bad1"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "a4753f3c514ddf3fd4f015673c97673faf624db19d143fef97d7eb90f3a247ec"
   },
   "uk/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -241,9 +241,9 @@
    "sha256_now": "b1e10bf5b6cf4ebd990ada6df0cc082876be8af72df64221373de342a619ab94"
   },
   "us/scripts/validate_translations.py": {
-   "changed_by": "feature/branch12-12c",
-   "commit_subject": "Slice 12c's review fixes",
-   "sha256_now": "896b0fd495fad354a23f2015bdf4f15d17044fc6de58032bea8a4e6b0435bad1"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "a4753f3c514ddf3fd4f015673c97673faf624db19d143fef97d7eb90f3a247ec"
   },
   "us/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -286,14 +286,14 @@
    "sha256_now": "e8dd91e2d4b4dd8dfd64efd26ae4b9aaebe365d191c92ac6dff7bf0eb525f344"
   },
   "uk/scripts/lexicon_compliance.py": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "47446c92f0ffc7db06b93043b33ddbbb6599ba30284c4bd39adb5689fc456c31"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "46d598f18e0f818117286199090fc6eb81abc58b585c4cc6a855fd32dbd6374d"
   },
   "us/scripts/lexicon_compliance.py": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "0f0de51d5890071ed522687bc788483baa0e10f0494fd4faf3647262077680f2"
+   "changed_by": "fix/language-module-integrity",
+   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
+   "sha256_now": "6fb48401754c275f0cdedeb65298844d8944cb382027598f21e342ac2d1bb081"
   }
  }
 }

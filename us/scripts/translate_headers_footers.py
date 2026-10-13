@@ -1187,6 +1187,24 @@ def translate_xml(xml_bytes, tmap, left=None):
                            standalone=True), changes
     return None, []
 
+def _sibling_integrity_exit(name, exc):
+    """A sibling module this script imports is missing or cut short: a broken install, which SKILL.md rule 6
+    answers by re-installing. So the banner and the exit 3 this script prints for its OWN truncation - never a
+    raw traceback and exit 1, and never a gate's costume. Only ImportError (deleted, or cut before the names it
+    is asked for) and SyntaxError (cut mid-statement) arrive here: a broader class would dress a real defect as
+    a broken install - and an ImportError about some OTHER module, raised inside the sibling, is that sibling's
+    defect, so it is raised as it is."""
+    if isinstance(exc, ImportError) and exc.name not in (None, os.path.splitext(name)[0]):
+        raise exc
+    bar = "=" * 60
+    for line in ("", bar, "[skill] FILE INTEGRITY CHECK FAILED — script truncated.",
+                 f"  File: {os.path.join(os.path.dirname(os.path.abspath(__file__)), name)}",
+                 f"  Needed by: {os.path.basename(__file__)} ({type(exc).__name__}: {exc})",
+                 "  Re-install the skill from the .skill / .zip archive.", bar, ""):
+        print(line, file=sys.stderr)
+    sys.exit(3)
+
+
 def translate_headers_footers_legacy(orig_docx, output_dir, language=None):
     """Legacy dictionary-lookup mode (Mode 3).
 
@@ -1198,7 +1216,10 @@ def translate_headers_footers_legacy(orig_docx, output_dir, language=None):
     shape, the absence of a dictionary match reported as the absence of content."""
     # Imported here and not at the top: --extract and --apply, the recommended round-trip, must
     # not depend on a file only this mode uses (this file's pattern for a partial install).
-    from source_language_markers import not_supported
+    try:
+        from source_language_markers import not_supported
+    except (ImportError, SyntaxError) as exc:  # deleted, or cut short: SKILL.md rule 6
+        _sibling_integrity_exit('source_language_markers.py', exc)
     print(
         'NOTE: running legacy dictionary-lookup mode. For any header/footer '
         'that contains free-text content (agreement titles, version labels, '

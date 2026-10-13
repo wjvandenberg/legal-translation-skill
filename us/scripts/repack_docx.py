@@ -99,6 +99,26 @@ sys.dont_write_bytecode = True
 _SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
+
+
+def _sibling_integrity_exit(name, exc):
+    """A sibling module this script imports is missing or cut short: a broken install, which SKILL.md rule 6
+    answers by re-installing. So the banner and the exit 3 this script prints for its OWN truncation - never a
+    raw traceback and exit 1, and never a gate's costume. Only ImportError (deleted, or cut before the names it
+    is asked for) and SyntaxError (cut mid-statement) arrive here: a broader class would dress a real defect as
+    a broken install - and an ImportError about some OTHER module, raised inside the sibling, is that sibling's
+    defect, so it is raised as it is."""
+    if isinstance(exc, ImportError) and exc.name not in (None, os.path.splitext(name)[0]):
+        raise exc
+    bar = "=" * 60
+    for line in ("", bar, "[skill] FILE INTEGRITY CHECK FAILED — script truncated.",
+                 f"  File: {os.path.join(os.path.dirname(os.path.abspath(__file__)), name)}",
+                 f"  Needed by: {os.path.basename(__file__)} ({type(exc).__name__}: {exc})",
+                 "  Re-install the skill from the .skill / .zip archive.", bar, ""):
+        print(line, file=sys.stderr)
+    sys.exit(3)
+
+
 try:
     from source_language_markers import detect_language as _detect_lang
     from source_language_markers import remnant_verdict as _remnant_verdict
@@ -106,13 +126,8 @@ try:
     from source_language_markers import not_supported as _not_supported
     from source_language_markers import resolve_source_language as _resolve
     from source_language_markers import is_supported_language as _is_supported
-except Exception:  # pragma: no cover — the remnant block then REFUSES, below.
-    _detect_lang = None
-    _remnant_verdict = None
-    _read_declared = None
-    _not_supported = None
-    _resolve = None
-    _is_supported = None
+except (ImportError, SyntaxError) as _exc:  # deleted, or cut short: a broken install, SKILL.md rule 6
+    _sibling_integrity_exit('source_language_markers.py', _exc)
 try:
     from lexicon_compliance import _guess_language as _guess_lang
 except Exception:  # pragma: no cover — the agreement control is best-effort.
@@ -200,13 +215,6 @@ def _remnant_gate(orig_docx, archive, resolved):
     block scans the language detected from the ORIGINAL, exactly as before, and
     still refuses on what it finds — no gate is softened — but a guess never
     says clean."""
-    if (_detect_lang is None or _remnant_verdict is None or _not_supported is None
-            or resolved is None):
-        raise RuntimeError(
-            "SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. "
-            "source_language_markers.py could not be imported, so the remnant "
-            "block cannot run. Nothing was written to the delivery path. "
-            "Re-install the skill from the .skill / .zip archive.")
     src_lang, guessed = resolved.language, resolved.cannot_rule
     if not src_lang:
         print("  Remnant block skipped — " + _not_supported("the remnant block", guessed))
@@ -339,8 +347,6 @@ def _detect_source_language(orig_docx, announce=True):
     be detected by anything and correctly reach the disagreement branch. Making
     the check SAY it is guessing is branch 12's, not this one's.
     """
-    if _detect_lang is None:
-        return None
     text = _original_body_text(orig_docx)
     if not text.strip():
         return None
@@ -681,12 +687,10 @@ def repack(orig_docx, translated_doc_xml, output_docx,
     # `_declared`. The ORIGINAL's two-detector agreement cross-checks it (C9's
     # source of truth, now the second opinion), and only when nothing was
     # declared is it handed to the scan — as a guess, which the scan says.
-    _declared = (_read_declared(paragraphs_json) if _read_declared is not None
-                 else (None, 'unreadable', 'source_language_markers.py could not be imported'))
+    _declared = _read_declared(paragraphs_json)
     _settled = _declared[1] in ('supported', 'unsupported')
     _agreed = _detect_source_language(orig_docx, announce=not _settled)
-    if _not_supported is not None:
-        _cross_check_language(_declared, _agreed)
+    _cross_check_language(_declared, _agreed)
     _lex_args = [sys.executable,
                  os.path.join(scripts_dir, 'lexicon_compliance.py'),
                  translated_doc_xml,
@@ -1152,8 +1156,7 @@ def repack(orig_docx, translated_doc_xml, output_docx,
 
     # --- THE REMNANT BLOCK (C22), on the archive BEFORE it is written ---
     _remnant_gate(orig_docx, archive,
-                  _resolve(paragraphs_json, guess=lambda: _guess_from_original(orig_docx))
-                  if _resolve is not None else None)
+                  _resolve(paragraphs_json, guess=lambda: _guess_from_original(orig_docx)))
 
     # --- THE DELIVERED-DOCUMENT CHECK (branch 11), on a CHECK COPY, BEFORE the write ---
     _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir)
