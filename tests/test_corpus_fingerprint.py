@@ -14,7 +14,7 @@ way the real arms do - so no real corpus file, and no tracked file of this repos
      and the one sibling-folder file, and print every child accounted for.
   2  CHECK, untouched: PASS, and the last line printed is the arm's own closing line.
   3  RED FIRST: a one-byte edit to each of the eleven repository inputs and to the sibling-folder file turns
-     the check FAIL; put back, PASS. A file in the listed folder, the optional file appearing, a new commit,
+     the check FAIL - each of these checks must fail, and is asserted to; put back, PASS. A file in the listed folder, the optional file appearing, a new commit,
      and a change to the tool itself each FAIL too. The run's own output file does not.
   4  VOID: no record for a command line; and a record is REFUSED, nothing written, when a Python child
      escapes the trace - started with -I, or with PYTHONPATH stripped and no flag at all, or a stripped `-c`

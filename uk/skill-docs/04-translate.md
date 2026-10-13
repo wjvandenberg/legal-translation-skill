@@ -254,9 +254,11 @@ After each batch, run the validation script to catch truncated translations befo
 python <skill-path>/scripts/validate_translations.py <workdir>/paragraphs.json
 ```
 
-This checks character ratios between source and target for every paragraph. If any paragraph
-is flagged as potentially truncated (ratio below 0.6 for paragraphs over 150 characters),
-re-read the full source text and re-translate before moving to the next batch.
+This checks character ratios between source and target for every paragraph of 20 characters or
+more. If any paragraph is flagged as potentially truncated (ratio below 0.6 — doubled for a
+Japanese or Chinese source, whose English runs about three times as long), re-read the full
+source text and re-translate before moving to the next batch. The thresholds follow the language
+declared at Step 1c; on a source declared English the ratio cannot rule and says NOT APPLICABLE.
 
 #### Appendix: Tracked-change documents only — skip if no paragraph has tracked changes
 
