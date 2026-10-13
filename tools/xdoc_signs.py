@@ -113,9 +113,11 @@ DECLARED_BENIGN = [
     # until this session: the vocabulary TABLE became prose, which put the sign and the document
     # name on ONE line for the first time. The other two are the two new route-4 rows in 6.5,
     # identical in kind to the three above them.
-    ("an item on a branch's task list is a **sub-step**",
-     "§5.1 is this charter's own cycle subsection, where the task list lives; "
-     "`PLAN-2-step-b.md` is named on the same line for a different fact, the branch numbering"),
+    # RE-ANCHORED 2026-10-13 (2): the vocabulary paragraph was rewritten into the house's words, and
+    # the sign beside the plan's name is now §3.1 rather than §5.1 - same kind, new line.
+    ("a **step** is one row of section 2 of",
+     "§3.1 is this charter's own phases table, the one a phase is a row of; "
+     "`PLAN-2-step-b.md` is named on the same line for a different fact, the table a step is a row of"),
     ("the five ways a check passes here for the WRONG reason",
      "§5.3 is THIS charter's verification subsection, the source `verification.md` was "
      "relocated out of on 2026-09-22 — the twin column names the source, and that rule "
