@@ -79,7 +79,9 @@ def section(out, head):
     body = out[i:]
     stop = min([j for j in (body.find("\n  WARN —", 1), body.find("\n  BLOCK —", 1), body.find("\n=====", 1))
                 if j > 0] or [len(body)])
-    return [(int(m.group(1)), float(m.group(2))) for m in FLAG.finditer(body[:stop])]
+    # The script prints `idx ?` for a paragraph with no index: kept as text, so it is counted and never crashes.
+    return [(int(m.group(1)) if m.group(1).isdigit() else m.group(1), float(m.group(2)))
+            for m in FLAG.finditer(body[:stop])]
 
 
 def validate(scripts, notes_src, language, tmp, tag):
