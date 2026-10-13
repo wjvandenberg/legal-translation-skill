@@ -43,12 +43,12 @@ analysis; the rest are reference.** The A4 blind desk review's 2,222-line report
 artefact and lives in the sealed judging directory outside the repository, its path in the private
 `context.md`.
 
-**THIS PROJECT'S WORDS AND THE HOUSE WORDS THEY MEAN, because two vocabularies for one hierarchy means a
-reader translates, which is a place to make a mistake.** This charter's **step** *(0–5)* is the house's
-**phase**, one row of §3.1; its **branch** *(0–19, D1–D3)* is the house's **step**, about a session's work,
-in section 2 of `PLAN-2-step-b.md`; an item on a branch's task list is a **sub-step**, §5.1's; and **project**
-is not a level in either. **DO NOT RENAME EITHER** *(2026-08-24)* — renaming across this file, the build plan
-and the register is large risk for no gain.
+**THE HOUSE'S WORDS, SINCE 2026-10-13** *(Wouter, reversing 2026-08-24's* do not rename either*)*: a **phase**
+is one row of §3.1 *(this file said **step**, 0–5)*; a **step** is one row of section 2 of `PLAN-2-step-b.md`
+*(said **branch**, 0–19 plus D1–D3)*, about a session's work; a **sub-step** is a step's slice, numbered
+12.1 and never 12c, its task list the working checklist; and **the skill's own eleven steps are written
+skill Step N**, so step 10 and skill Step 10 never meet. **Text dated before 2026-10-13 keeps its words**,
+read through this mapping; `DECISIONS-LOG.md`, 2026-10-13 (5), owns the four rulings and what they cost.
 
 ### 1.4 Reading order for a new session
 
