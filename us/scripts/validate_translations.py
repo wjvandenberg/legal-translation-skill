@@ -1,8 +1,12 @@
 """Validate translation completeness before applying to the document.
 
-Checks character ratios between source and target for every paragraph.
-Flags paragraphs where the English translation is suspiciously short
-relative to the source — a strong indicator of truncated translation.
+Checks character ratios between source and target for every paragraph of
+MIN_IT_LENGTH characters or more. Flags paragraphs where the English
+translation is suspiciously short relative to the source — a strong
+indicator of truncated translation. The thresholds are scaled by the
+source language declared at Step 1c (EXPECTED_RATIO), and on a source
+declared English the ratio cannot rule and says NOT APPLICABLE — never
+PASS (branch 12 slice 12c, registers H2 and H4).
 
 Also enforces the per-batch translation cap. The skill's Step 4
 mandates ≤35 paragraphs per batch with this script run between
@@ -58,10 +62,24 @@ def _check_self_integrity():
 
 _check_self_integrity()
 
+from source_language_markers import TARGET_LANGUAGE, read_declared_language  # noqa: E402
+
 # Thresholds
-WARN_RATIO = 0.6       # EN/IT ratio below this triggers a warning
-BLOCK_RATIO = 0.3      # EN/IT ratio below this blocks application
-MIN_IT_LENGTH = 150    # Only check paragraphs with IT text longer than this
+WARN_RATIO = 0.6       # EN/source ratio below this triggers a warning
+BLOCK_RATIO = 0.3      # EN/source ratio below this blocks application
+# Only check paragraphs whose source text is at least this long. It was 150, which
+# left 758 of 1,291 translated paragraphs in the 13 recorded runs unexamined —
+# exactly the clause headings, defined terms and labels where a lost word is
+# hardest to see (register H4). At 20 the check examines 1,119 of them; under
+# 20 characters are numbers and labels, where a ratio is noise.
+MIN_IT_LENGTH = 20
+# The English a source language USUALLY produces, per source character: both
+# thresholds are multiplied by it. Measured over the recorded runs, the median
+# EN/source ratio is 0.94-1.33 for every alphabetic source and 2.6-3.2 for
+# Japanese, whose characters each carry more — so at an unscaled 0.6 a Japanese
+# paragraph had to lose 80% of its English to warn. Chinese is written the same
+# way. Any language not listed is 1.0.
+EXPECTED_RATIO = {'japanese': 2.0, 'chinese': 2.0}
 BATCH_CAP = 35         # Hard cap on newly-translated paragraphs per call
 PLACEHOLDER = "<<TRANSLATE:"   # Step 3b's scaffold marker; never allowed to reach apply
 
@@ -302,6 +320,16 @@ def validate(json_path, accept_large_batch=False):
         )
         return 2
 
+    # 12c: the thresholds follow the language declared at Step 1c. A source
+    # declared English is the target itself, so the ratio measures nothing and
+    # cannot rule (H2) — it says so rather than PASS; the batch cap, the
+    # placeholder refusal and the quoted-phrase check above still run.
+    language, lang_state, lang_why = read_declared_language(json_path)
+    declared = lang_state in ('supported', 'unsupported')
+    ratio_applies = not (declared and language == TARGET_LANGUAGE)
+    scale = EXPECTED_RATIO.get(language, 1.0) if declared else 1.0
+    warn_at, block_at = WARN_RATIO * scale, BLOCK_RATIO * scale
+
     warnings = []
     blocks = []
     missing = []
@@ -344,12 +372,12 @@ def validate(json_path, accept_large_batch=False):
         it_len = len(it_text)
         en_len = len(en_text)
 
-        if it_len < MIN_IT_LENGTH:
+        if it_len < MIN_IT_LENGTH or not ratio_applies:
             continue
 
         ratio = en_len / it_len
 
-        if ratio < BLOCK_RATIO:
+        if ratio < block_at:
             blocks.append({
                 'idx': p.get('idx', '?'),
                 'ratio': ratio,
@@ -358,7 +386,7 @@ def validate(json_path, accept_large_batch=False):
                 'it_preview': it_text[:100],
                 'en_preview': en_text[:100],
             })
-        elif ratio < WARN_RATIO:
+        elif ratio < warn_at:
             warnings.append({
                 'idx': p.get('idx', '?'),
                 'ratio': ratio,
@@ -374,6 +402,15 @@ def validate(json_path, accept_large_batch=False):
     print(f"  Total non-empty paragraphs: {total}")
     print(f"  Translated: {translated}")
     print(f"  Missing translation: {len(missing)}")
+    if not ratio_applies:
+        print(f"  NOT APPLICABLE — the character-ratio check cannot rule: {lang_why}.")
+    elif declared:
+        print(f"  Ratio check: source language {language}, declared at Step 1c; WARN below {warn_at:.2f}, BLOCK below "
+              f"{block_at:.2f}, on paragraphs of {MIN_IT_LENGTH}+ characters")
+    else:
+        print(f"  Ratio check: {lang_why} — checked against the unscaled thresholds "
+              f"(WARN below {warn_at:.2f}, BLOCK below {block_at:.2f}), on paragraphs of "
+              f"{MIN_IT_LENGTH}+ characters")
 
     if missing:
         print(f"\n  MISSING (no 'en' field):")
@@ -383,7 +420,7 @@ def validate(json_path, accept_large_batch=False):
             print(f"    ... and {len(missing) - 20} more")
 
     if blocks:
-        print(f"\n  BLOCK — Critically short translations (ratio < {BLOCK_RATIO}):")
+        print(f"\n  BLOCK — Critically short translations (ratio < {block_at:.2f}):")
         print(f"  These are almost certainly truncated. Re-translate before proceeding.\n")
         for b in blocks:
             print(f"    idx {b['idx']}: ratio={b['ratio']:.2f} "
@@ -393,7 +430,7 @@ def validate(json_path, accept_large_batch=False):
             print()
 
     if warnings:
-        print(f"\n  WARN — Possibly incomplete translations (ratio < {WARN_RATIO}):")
+        print(f"\n  WARN — Possibly incomplete translations (ratio < {warn_at:.2f}):")
         print(f"  Review these paragraphs — they may be truncated.\n")
         for w in warnings:
             print(f"    idx {w['idx']}: ratio={w['ratio']:.2f} "
@@ -457,8 +494,12 @@ def validate(json_path, accept_large_batch=False):
     elif missing:
         print(f"  ** WARN: {len(missing)} paragraphs without translations. **")
         return 1
+    elif not ratio_applies:
+        print(f"  NOT APPLICABLE: the character-ratio check could not rule on {translated} "
+              f"translations — the source was declared English. Nothing else was flagged.")
     else:
-        print(f"  PASS: All {translated} translations have acceptable character ratios.")
+        unscaled = "" if declared else " (unscaled: no source language declared at Step 1c)"
+        print(f"  PASS{unscaled}: All {translated} translations have acceptable character ratios.")
         if newly_translated:
             print(f"  Batch state updated: {len(newly_translated)} new indices "
                   f"validated this call ({len(state['validated_indices'])} total).")

@@ -1,5 +1,9 @@
 # PLAN-3-opus5-migration.md — goal (iii), and the verification run that follows it
 
+> **SUPERSEDED, 2026-10-13** *(Wouter)*: Opus 5 is dropped, and step 3 is now the full Cowork test of every
+> document with its repairs — section 3 of `CLAUDE.md` owns it. This document is kept for its reasoning only;
+> nothing in it is planned. `DECISIONS-LOG.md`, 2026-10-13 (3), owns the decision.
+
 > **Split out of `CLAUDE.md` on 2026-08-06**, on Wouter's instruction, because it is a self-contained
 > workstream that nothing before it depends on. `CLAUDE.md` §1 and §3 point here; **this document owns the
 > detail and `CLAUDE.md` owns the order.** Where the two disagree about *when* this work happens,

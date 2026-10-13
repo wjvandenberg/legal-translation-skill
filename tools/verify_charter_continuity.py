@@ -154,6 +154,18 @@ HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE = {
     "6.6": "demoted into 6.4; the charter's section 6 now matches the template's five, having "
            "gained the 6.5 it had never had",
 }
+# A DEMOTED HEADING WHOSE TITLE WAS LATER CHANGED ON PURPOSE: (its new title, why). Check 2 accepts the
+# NEW title as the surviving return path - and only while that new title is present, so a stale entry
+# fails exactly as a deleted heading does. Retitling is not deletion only where nothing cites the old
+# title; say in the reason how that was established.
+RETITLED_SINCE_BASELINE = {
+    "3.3": ("Step 3 — the full Cowork test, and its repairs",
+            "Wouter re-planned step 3 on 2026-10-13, Opus 5 dropped; no file outside the charter cites "
+            "the old title, by git grep the same day"),
+    "3.4": ("Step 4 — Polish, then publish",
+            "Wouter re-planned step 4 on 2026-10-13; its irreversible line - never publish without his "
+            "explicit OK - survives verbatim, and no file outside the charter cites the old title"),
+}
 
 SECTION_7_CAP = 25
 # LOWERED FROM 35 TO 25 ON 2026-09-21: the house lowered section 7's cap to 25 on 2026-09-11
@@ -457,7 +469,8 @@ def run(charter_path="CLAUDE.md", root=None):
                  f"HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE with the reason, or put it back")
     deleted = [n for n in lost
                if n in HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE
-               and was_titles.get(n) and was_titles[n] not in now_texts]
+               and was_titles.get(n) and was_titles[n] not in now_texts
+               and RETITLED_SINCE_BASELINE.get(n, ("",))[0] not in now_texts]
     if deleted:
         for n in deleted:
             bad("2", f"section {n} is declared as demoted or renumbered, but its heading text "

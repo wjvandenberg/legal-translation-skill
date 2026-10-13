@@ -221,9 +221,9 @@
    "sha256_now": "a26044f1fbf2df0c89ab4af4af6c844c97fa2792b2ea130a62e42628704aac74"
   },
   "uk/scripts/validate_translations.py": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
-   "sha256_now": "928360fe9d98dcc5ee63745677166f6080cbaa2a2c720e04bb36e31a57886183"
+   "changed_by": "feature/branch12-12c",
+   "commit_subject": "Branch 12 slice 12c - the ratio check can fire: floor 20, Japanese and Chinese scaled, NOT APPLICABLE on a source declared English (H2 H4)",
+   "sha256_now": "d2882326ce33830b7b540c81ce1714e9d4497d9d5dbec8fb999e0d777b13cfc7"
   },
   "uk/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -231,9 +231,9 @@
    "sha256_now": "f748ac9760b7b4984e3ce57cd870068f3a0e6481bd4c030afcb7aafd53e8fd3b"
   },
   "uk/skill-docs/04-translate.md": {
-   "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - J2: Step 4's Rule 1 gives the true reason for a U+200B-only seam between two tracked segments, the prescription kept",
-   "sha256_now": "43211c0decf67afbbd06af24f21c02c9a33fe673dbe7a14573fdd252bc8533f6"
+   "changed_by": "feature/branch12-12c",
+   "commit_subject": "Branch 12 slice 12c - the ratio check can fire: floor 20, Japanese and Chinese scaled, NOT APPLICABLE on a source declared English (H2 H4)",
+   "sha256_now": "d9574269ced9716a91e9f0910463ad59a44eea05330f5494bbc2fb812d473505"
   },
   "us/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/branch11-slice4b",
@@ -241,9 +241,9 @@
    "sha256_now": "b1e10bf5b6cf4ebd990ada6df0cc082876be8af72df64221373de342a619ab94"
   },
   "us/scripts/validate_translations.py": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
-   "sha256_now": "928360fe9d98dcc5ee63745677166f6080cbaa2a2c720e04bb36e31a57886183"
+   "changed_by": "feature/branch12-12c",
+   "commit_subject": "Branch 12 slice 12c - the ratio check can fire: floor 20, Japanese and Chinese scaled, NOT APPLICABLE on a source declared English (H2 H4)",
+   "sha256_now": "d2882326ce33830b7b540c81ce1714e9d4497d9d5dbec8fb999e0d777b13cfc7"
   },
   "us/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -251,9 +251,9 @@
    "sha256_now": "bfff58e9d7ace0b694e2fb20d3a0de8ada435e87a0d4d34bea9bf01ad594df5d"
   },
   "us/skill-docs/04-translate.md": {
-   "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - J2: Step 4's Rule 1 gives the true reason for a U+200B-only seam between two tracked segments, the prescription kept",
-   "sha256_now": "141a6dd160b790e4f8fa030fad5d98652bab1be53ce7a58b9efbd0fefab315c6"
+   "changed_by": "feature/branch12-12c",
+   "commit_subject": "Branch 12 slice 12c - the ratio check can fire: floor 20, Japanese and Chinese scaled, NOT APPLICABLE on a source declared English (H2 H4)",
+   "sha256_now": "50d06071f04ba58543fa3e228de164fc05f8cd49d5bea1a0122e39d4c6424d03"
   },
   "uk/scripts/translate_comments.py": {
    "changed_by": "feature/branch11-slice4c",
