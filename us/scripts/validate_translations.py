@@ -498,7 +498,9 @@ def validate(json_path, accept_large_batch=False):
         print(f"  NOT APPLICABLE: the character-ratio check could not rule on {translated} "
               f"translations — the source was declared English. Nothing else was flagged.")
     else:
-        unscaled = "" if declared else " (unscaled: no source language declared at Step 1c)"
+        unscaled = ("" if declared else
+                    " (unscaled: the Step 1c declaration cannot be read)" if lang_state == 'unreadable' else
+                    " (unscaled: no source language declared at Step 1c)")
         print(f"  PASS{unscaled}: All {translated} translations have acceptable character ratios.")
         if newly_translated:
             print(f"  Batch state updated: {len(newly_translated)} new indices "

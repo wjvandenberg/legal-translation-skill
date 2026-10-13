@@ -470,7 +470,7 @@ def run(charter_path="CLAUDE.md", root=None):
     deleted = [n for n in lost
                if n in HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE
                and was_titles.get(n) and was_titles[n] not in now_texts
-               and RETITLED_SINCE_BASELINE.get(n, ("",))[0] not in now_texts]
+               and (n not in RETITLED_SINCE_BASELINE or RETITLED_SINCE_BASELINE[n][0] not in now_texts)]
     if deleted:
         for n in deleted:
             bad("2", f"section {n} is declared as demoted or renumbered, but its heading text "
@@ -489,6 +489,14 @@ def run(charter_path="CLAUDE.md", root=None):
     elif HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE:
         ok(f"no declaration outlived its fact ({len(HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE)} "
            f"row(s) checked)")
+    # A retitle is only for a demoted heading, and only while the OLD title is gone: otherwise it is an
+    # exemption nobody rereads, the shape the row above exists to catch for the other table.
+    stale_retitles = [n for n, (_, _) in RETITLED_SINCE_BASELINE.items()
+                      if n not in HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE
+                      or was_titles.get(n) in now_texts]
+    if stale_retitles:
+        bad("2", f"retitle declared for {stale_retitles}, but the number never left the sequence or its old "
+                 f"title is back — stale")
 
     if gained == HEADINGS_ADDED_SINCE_BASELINE:
         ok(f"headings added: {gained} — as declared")

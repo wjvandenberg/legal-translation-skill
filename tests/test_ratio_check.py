@@ -43,11 +43,13 @@ def ok(label, cond, detail=""):
         FAIL.append(label)
 
 
-def run(paras, language=None):
+def run(paras, language=None, broken_declaration=False):
     """Write the notes into a fresh workdir, declare `language` if given, run the check: (rc, output)."""
     with tempfile.TemporaryDirectory(prefix="ratio-") as td:
         notes = Path(td) / "paragraphs.json"
         notes.write_bytes(json.dumps(paras, ensure_ascii=False).encode("utf-8"))
+        if broken_declaration:
+            (Path(td) / "source_language.json").write_bytes(b"{not json")
         if language:
             d = subprocess.run([sys.executable, str(SCRIPTS / "source_language_markers.py"), "--declare", language,
                                 td], capture_output=True, text=True, encoding="utf-8", errors="replace")
@@ -85,6 +87,8 @@ ok(f"Japanese ({len(JA)} characters), English at 1.0: WARNS - scaled x2.0", rc =
 ok("...and the thresholds printed are the scaled ones", "WARN below 1.20" in out, out[-300:])
 rc, out = run([para(0, JA, sized(int(len(JA) * 2.6), "e"))], "japanese")
 ok("Japanese, English at 2.6: passes", rc == 0 and "PASS" in out, f"rc={rc}")
+rc, out = run([para(0, JA, sized(len(JA), "e"))], "chinese")
+ok("declared Chinese, English at 1.0: WARNS - scaled x2.0 too", rc == 1 and "WARN below 1.20" in out, f"rc={rc}")
 for lang in ("italian", "norwegian"):
     rc, out = run([para(0, sized(200), sized(100, "e"))], lang)
     ok(f"declared {lang}, English at 0.50: WARNS, unscaled", rc == 1 and "WARN below 0.60" in out, f"rc={rc}")
@@ -108,6 +112,9 @@ ok("no declaration: PASS marked unscaled", rc == 0 and "PASS (unscaled" in out, 
 ok("...and the reason names Step 1c", "Step 1c" in out, out[-300:])
 rc, out = run([para(0, JA, sized(len(JA), "e"))])
 ok("undeclared Japanese at 1.0: unscaled, so it passes - the declaration is what scales it", rc == 0, f"rc={rc}")
+rc, out = run([para(0, sized(200), sized(180, "e"))], broken_declaration=True)
+ok("an unreadable declaration: PASS unscaled, saying the declaration cannot be read - never 'not declared'",
+   rc == 0 and "cannot be read" in out and "no source language declared" not in out, f"rc={rc}")
 
 print("\n" + "=" * 88)
 print(f"  {CHECKED} check(s), {len(FAIL)} failure(s)")

@@ -222,8 +222,8 @@
   },
   "uk/scripts/validate_translations.py": {
    "changed_by": "feature/branch12-12c",
-   "commit_subject": "Branch 12 slice 12c - the ratio check can fire: floor 20, Japanese and Chinese scaled, NOT APPLICABLE on a source declared English (H2 H4)",
-   "sha256_now": "d2882326ce33830b7b540c81ce1714e9d4497d9d5dbec8fb999e0d777b13cfc7"
+   "commit_subject": "Slice 12c's review fixes",
+   "sha256_now": "896b0fd495fad354a23f2015bdf4f15d17044fc6de58032bea8a4e6b0435bad1"
   },
   "uk/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -242,8 +242,8 @@
   },
   "us/scripts/validate_translations.py": {
    "changed_by": "feature/branch12-12c",
-   "commit_subject": "Branch 12 slice 12c - the ratio check can fire: floor 20, Japanese and Chinese scaled, NOT APPLICABLE on a source declared English (H2 H4)",
-   "sha256_now": "d2882326ce33830b7b540c81ce1714e9d4497d9d5dbec8fb999e0d777b13cfc7"
+   "commit_subject": "Slice 12c's review fixes",
+   "sha256_now": "896b0fd495fad354a23f2015bdf4f15d17044fc6de58032bea8a4e6b0435bad1"
   },
   "us/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/branch12-slice12a",
