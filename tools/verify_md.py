@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""verify_md.py - the document checker.  CHECKER VERSION 30 (2026-10-12)
+"""verify_md.py - the document checker.  CHECKER VERSION 31 (2026-10-14)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
+
+v31 ADDS line_measure, WHAT A SIZE CAP COUNTS. 'physical' (the default for one release) counts
+lines, so a Markdown table row is one line however long; 'wrapped' weighs each line at its
+length / 120, rounded up. The size breakdown prints both, whichever gates. Copy it WITH
+house_common.py v20, which holds the measure.
 
 Checks Markdown deliverables: CLAUDE.md, plan documents, registers, READMEs, research
 write-ups, guided-build playbooks. Standard library only, so it runs anywhere.
@@ -116,8 +121,25 @@ from house_common import (                                       # noqa: E402
     Report, added_line_runs, baseline_guard, code_fence_mask, collapse, finish, git,
     headings, isolated_env, load_section, loaded_lines, raw_lines, read_phrase_list,
     report_pairing, resolve_list, resolve_revision, row_cells, run_cases, selftest_config,
-    strip_inline_code, wants_report_json, write_section,
+    strip_inline_code, wants_report_json, write_section, WRAP_WIDTH, wrapped_lines,
 )
+
+#: THE TWO WAYS A SIZE CAP CAN COUNT (v31, 2026-10-14). "physical" counts lines in the file, so
+#: a table row is one line however long; "wrapped" weighs each line at its length / WRAP_WIDTH,
+#: rounded up. Physical stays the DEFAULT for one release, so nothing turns red without a
+#: decision: every project's next session switches its own key and gets under its ORIGINAL
+#: caps, which keep their numbers in the new unit (Wouter, 2026-10-14 (3)).
+LINE_MEASURES = ("physical", "wrapped")
+
+
+def measure_problem(measure):
+    """Why this line_measure cannot be used, or None. A mistyped value is VOID rather than
+    silently physical: a config asking for something unknown must not be gated on a measure
+    nobody chose."""
+    if measure in LINE_MEASURES:
+        return None
+    return (f"line_measure is {measure!r} - it must be one of "
+            + ", ".join(repr(m) for m in LINE_MEASURES))
 
 # THE CHARTER CHECKS, split out on 2026-10-12 (v30). COPY verify_charter.py ALONGSIDE THIS
 # FILE as well. Unlike house_common, its absence must NOT stop the checker: every general
@@ -172,6 +194,7 @@ DEFAULT_CONFIG = {
     "max_line_length": 0,
     "max_lines": 0,
     "section_caps": {},
+    "line_measure": "physical",
     "charter_structure": {},
     "archetype_absent": None,
     "core_sections": {},
@@ -203,14 +226,15 @@ CONFIG_COMMENT = {
     "report_numeric_claims": "List sentences asserting counts, so you can re-derive them. Never fails.",
     "report_cross_doc_refs": "Flag lines that name another .md AND use a section sign. A sign resolves against ITS OWN file, so such a line is probably pointing at the wrong section - and if the number happens to exist locally it passes SILENTLY. Reported as JUDGE, never FAIL: the checker cannot know which file was meant, so a person decides. A JUDGE does not affect the exit code. The key keeps its 'report_' name so existing configs are unaffected.",
     "max_line_length": "0 disables. Set e.g. 110 to keep documents diff-friendly.",
-    "max_lines": "0 disables. Either ONE number for every file in size_scope, or a MAP of glob to cap - {\"CLAUDE.md\": 350, \"PLAN-*.md\": 120} - when a project has documents of different size classes. With a map, the LONGEST matching glob wins, a file matching none reports N/A, and two globs of the same length both matching is VOID rather than a silent pick. TWO SIZE CLASSES: M 200 (1-8 sessions, the default) and L 350 (more than 8, a declared exemption). Class S was retired 2026-08-21 because a minimal FILLED charter measures ~200; 120 survives only as the PLAN-*.md cap, which is a different document. Counts what LOADS, not what is in the file - block-level HTML comments are stripped before Claude receives them. Over the cap means RELOCATE, never delete.",
+    "max_lines": "0 disables. Either ONE number for every file in size_scope, or a MAP of glob to cap - {\"CLAUDE.md\": 526, \"PLAN-*.md\": 120} - when a project has documents of different size classes. With a map, the LONGEST matching glob wins, a file matching none reports N/A, and two globs of the same length both matching is VOID rather than a silent pick. A charter's cap is its archetype's emit plus 120, written by new_charter.py; the plan-file cap is 120. THE NUMBER IS IN THE UNIT line_measure NAMES - the same figure in a new unit is a new cap, so say the unit beside it wherever you state it. Counts what LOADS, not what is in the file - block-level HTML comments are stripped before Claude receives them. Over the cap means RELOCATE, never delete.",
+    "line_measure": "What a size cap counts - max_lines and section_caps alike. 'physical' (the default for one release): lines in the file, so a Markdown table row is ONE line however long it is. 'wrapped': each line weighs its length divided by 120, rounded up - a wrapped prose line still counts one, a 16,000-character row counts 134. Measured 2026-10-14, the physical count was as little as 43% of what a plan file loads and 55% of a charter, and moving one 16,155-character cell out of a charter saved 19% of its bytes and ZERO counted lines - so a physical cap could be met by moving prose into a table row. SWITCH TO 'wrapped' IN YOUR PROJECT'S NEXT SESSION and get under your ORIGINAL caps, which keep their numbers in the new unit (Wouter, 2026-10-14 (3)); the size report prints both counts until you do. Anything else is VOID.",
     "size_scope": "Which files the size checks apply to, as filename globs. A cap is a property of a CHARTER - a README has no size class, and a *-TEMPLATE.md contains a template FOR a section and is legitimately long. Anything outside this list reports N/A with that reason.",
     "archetype_absent": "DEVICE 3's declaration slot. Section 1.7 must NAME one of CLAUDE-TEMPLATE.md's eleven archetypes, because every optional-block lookup in the archetype table (11 rows x 10 columns at in/ask/out) starts by knowing which row this project is - a charter recording none makes the whole table unreadable, which is how a reduction came to be planned on 'these blocks are OPTIONAL, so they can be dropped' when the archetype's own row marked every one of them IN. Set this to a REASON STRING only for a project that genuinely fits none of the eleven; a blank reason is REFUSED, and a declaration standing over a charter that DOES name one FAILS as stale. It asks for a LABELLED line and not a phrase search, and that was measured both ways over six charters: searching for the eleven NAMES returns false positives from ordinary prose, and searching for the word 'archetype' passes a charter whose only hit is a sentence about emitted line counts - two naive needles answering wrongly in OPPOSITE directions. Punctuation and case are folded, so an em dash or a stray article never fails you.",
     "core_sections": "DEVICE 1's FLOOR - a map of CORE subsection -> reason, for a CORE subsection that genuinely cannot be written. Empty is the normal state. The check asserts every one of the tier table's fourteen CORE rows is PRESENT, which is the OPPOSITE question from 'charter structure': that one is a CEILING (never MORE than the template) and a subset is exactly what MAPPING produces, so it can never see an absence. Measured 2026-09-10 over six house charters: THREE were missing at least one CORE subsection including the house repository's own, and one was missing 5.4 - TEST - in a project already closed as fully propagated. ONLY CORE IS CHECKED, and that is the discriminator: a missing DEFAULT or OPTIONAL subsection is a decision Round 0.5 took, while CORE is 'never negotiated away' in the tier table's own words. So the honest remedy is almost always to WRITE the subsection. Blank reason REFUSED; a declaration for a subsection that IS present FAILS as stale.",
     "plan_scope": "Which files the 'plan purpose' check applies to, as filename globs - the LIVE plan file(s), and nothing else. EMPTY BY DEFAULT, reporting N/A with that reason rather than passing silently. IT IS DECLARED AND NOT INFERRED, on a measurement: of 15 plan files in the house repository the 14 CLOSED ones never used strikethrough - they recorded completion in a 'status' COLUMN - so 44 finished rows read as OPEN and a 'every PLAN-*.md' default reddens twelve finished records. And the next discriminator that suggests itself is worse: the LIVE file's status row contains the word CLOSED (naming which steps are), so prose-matching it marks the one live plan finished and the check passes over the very file it exists to read. Name the live plan file here; updating this glob is the same act as renaming the file when the phase turns over. A CLOSED plan file is left out - it is a finished record, and rewriting one to satisfy a convention it predates destroys evidence.",
-    "section_caps": "Per-section caps, e.g. {\"7\": 60}, keyed by top-level section number. A capped section that is ABSENT is a finding, not a silent pass. Empty = do not check.",
+    "section_caps": "Per-section caps, e.g. {\"7\": 25}, keyed by top-level section number, in the unit line_measure names. A capped section that is ABSENT is a finding, not a silent pass. Empty = do not check.",
     "report_section_sizes": "List each top-level section's loaded line count, so you can see WHERE the weight sits. Never fails.",
-    "report_section_shape": "Beside each section size, what the section is MADE of - prose, table rows, headings, blanks - and the FLOOR those last three add up to. Never fails. It exists because a size alone cannot say whether a section is reducible: a heading may never be deleted (it is the return path every relocated pointer resolves against) and a table row is one line however long it is, so rewriting a verbose row saves nothing and only the prose count answers 'how much can a rewrite touch'. Measured on the first two reductions this house ran, savings estimated off the SPAN came in at about a third of estimate, uniformly optimistic, because the model assumed prose where the file held structure. The floor also settles reachability BEFORE the work rather than after: a target below blank+heading+table cannot be met without deleting a heading or dropping a rule, and finding that out at the end costs a session.",
+    "report_section_shape": "Beside each section size, what the section is MADE of - prose, table rows, headings, blanks - and the FLOOR those last three add up to. Never fails. It exists because a size alone cannot say whether a section is reducible: a heading may never be deleted (it is the return path every relocated pointer resolves against) and a table row is one PHYSICAL line however long it is, so under line_measure 'physical' rewriting a verbose row saves nothing on the gate and only the prose count answers 'how much can a rewrite touch'. Under 'wrapped' a long row is weight like any other, and the wrapped count beside each section size shows it. Measured on the first two reductions this house ran, savings estimated off the SPAN came in at about a third of estimate, uniformly optimistic, because the model assumed prose where the file held structure. The floor also settles reachability BEFORE the work rather than after: a target below blank+heading+table cannot be met without deleting a heading or dropping a rule, and finding that out at the end costs a session.",
 }
 
 SECTION_SIGN = "§"
@@ -790,6 +814,21 @@ def section_sizes(lines):
     next heading of ANY level and reported section 1 as two lines - which is the gap to
     section 1.1, not the size of section 1. It was caught by the answer being implausible.
     """
+    return {key: len(span) for key, span in section_spans(lines).items()}
+
+
+def section_spans(lines):
+    """{'7': [its lines], ...} - each TOP-LEVEL numbered section's lines, heading included.
+
+    THE ONE PLACE A SECTION'S SPAN IS TAKEN, since v31. section_sizes, section_shapes and the
+    wrapped weight all read it, so a section's three measures cannot cover different lines -
+    the span loop had already been written twice, and a third copy is how they come to differ.
+
+    headings() reports ONE-BASED line numbers, which is why the slice is [i - 1:end - 1] and
+    not [i:end]. Taken the obvious way a span starts one line late and ends one line early,
+    and STILL SUMS TO THE RIGHT TOTAL - so a control on the total passes while every
+    section's first line is the previous section's last.
+    """
     hs = [(i, lvl, key) for i, lvl, _, key in headings(lines)]
     out = {}
     for at, (i, lvl, key) in enumerate(hs):
@@ -800,8 +839,21 @@ def section_sizes(lines):
             if lvl2 <= lvl:
                 end = j
                 break
-        out[key] = end - i
+        out[key] = lines[i - 1:end - 1]
     return out
+
+
+def section_wrapped_sizes(lines):
+    """{'7': 31, ...} - each top-level section's WRAPPED weight, over the same span
+    section_sizes counts, weighing only what LOADS: text inside an HTML comment weighs
+    nothing, exactly as in the file-length row. Weighing the raw span instead let a long
+    maintainer note fail a section cap the file row ignored (code review, v31).
+
+    THE TRAILING NEWLINE IS LOAD-BEARING: wrapped_lines treats a final newline as ending the
+    last line, so a span joined without one loses its last line whenever that line is blank -
+    and most sections end on a blank line."""
+    return {key: wrapped_lines("\n".join(span) + "\n")
+            for key, span in section_spans(lines).items()}
 
 
 def shape_of(lines):
@@ -809,15 +861,23 @@ def shape_of(lines):
 
     WHY A REDUCTION CANNOT BE PLANNED WITHOUT IT. Two blocks of eighty lines are not the
     same size of problem. A heading may never be deleted - it is the return path every
-    relocated pointer resolves against - and A TABLE ROW IS ONE LINE HOWEVER LONG IT IS, so
-    rewriting a verbose row to a tight clause saves exactly nothing. Only the PROSE count is
-    reducible by rewriting, and a saving estimated off the span instead of off the prose is
-    optimistic by however much structure the span holds. Measured on the first two
-    reductions this house ran, estimates made that way came in at about a THIRD of estimate.
+    relocated pointer resolves against - and a table row is one PHYSICAL line however long
+    it is, so under line_measure 'physical' rewriting a verbose row saves nothing on the gate.
+    Only the PROSE count is reducible by rewriting there, and a saving estimated off the span
+    instead of off the prose is optimistic by however much structure the span holds.
+    Measured on the first two reductions this house ran, estimates made that way came in at
+    about a THIRD of estimate.
+
+    THAT BLINDNESS WAS ALSO AN INCENTIVE, which is why line_measure 'wrapped' exists (v31): a
+    physical cap could be met by moving prose INTO a table row, and a 16,155-character row
+    counted as one line in a real charter. Under 'wrapped' a long row weighs its length like
+    any line, and shortening it DOES reduce the section - the wrapped count printed beside
+    each section size is that weight.
 
     IT IS ALSO THE FLOOR. blank + heading + table is the smallest a span can become without
-    deleting a heading or dropping a rule, so a target BELOW that floor is unreachable and
-    can be shown to be unreachable before the work starts rather than after it.
+    deleting a heading or dropping a rule - under either measure, each row being at least
+    one line - so a target BELOW that floor is unreachable and can be shown to be unreachable
+    before the work starts rather than after it.
 
     EVERY LINE IS COUNTED EXACTLY ONCE, so the four sum to the span and the sum is the
     control - a classifier that double-counts or drops a line reports a shape that looks
@@ -853,20 +913,9 @@ def section_shapes(lines):
     not [i:end]. Taken the obvious way this measure starts one line late and ends one line
     early, and STILL SUMS TO THE RIGHT TOTAL - so the control would have passed while every
     section's first line was the previous section's last. Caught only by reading the helper
-    it borrows from.
+    it borrows from. Since v31 the span comes from section_spans, the one place it is taken.
     """
-    hs = [(i, lvl, key) for i, lvl, _, key in headings(lines)]
-    out = {}
-    for at, (i, lvl, key) in enumerate(hs):
-        if not key or "." in key:
-            continue
-        end = len(lines) + 1
-        for j, lvl2, _ in hs[at + 1:]:
-            if lvl2 <= lvl:
-                end = j
-                break
-        out[key] = shape_of(lines[i - 1:end - 1])
-    return out
+    return {key: shape_of(span) for key, span in section_spans(lines).items()}
 
 
 def expand_targets(root, entries):
@@ -953,7 +1002,7 @@ def cap_for(path, max_lines, in_scope):
     return max_lines[top[0]], top[0], None
 
 
-def check_file_length(rep, doc, text, limit, in_scope=True, path=None):
+def check_file_length(rep, doc, text, limit, in_scope=True, path=None, measure="physical"):
     """THE ONE DEFECT WITH NO ERROR MESSAGE. A charter over its cap is never truncated - it
     is loaded in full and simply followed less well, so nothing ever tells you it happened
     and you cannot tell the result from a session that was going badly anyway. Which is why
@@ -961,6 +1010,10 @@ def check_file_length(rep, doc, text, limit, in_scope=True, path=None):
 
     Over the cap means RELOCATE, not delete. Length is not the defect; content that is not
     needed in every session being loaded in every session is the defect.
+
+    `measure` IS line_measure (v31): 'physical' counts lines, 'wrapped' weighs each at its
+    length. Whichever gates, an over-cap finding names the other, so a project sees what
+    switching would do; a measure this file does not know is VOID.
     """
     per_glob = isinstance(limit, dict)
     cap, glob, void = cap_for(path if path is not None else doc, limit, in_scope)
@@ -982,13 +1035,25 @@ def check_file_length(rep, doc, text, limit, in_scope=True, path=None):
             reason = "not in size_scope - a cap is a charter's"
         rep.record(doc, "file length", 0, [], na_reason=reason)
         return
-    got, raw = loaded_lines(text), raw_lines(text)
+    bad = measure_problem(measure)
+    if bad:
+        rep.record(doc, "file length", 0, [], void_reason=bad)
+        return
+    phys, raw, wrap = loaded_lines(text), raw_lines(text), wrapped_lines(text)
+    got = wrap if measure == "wrapped" else phys
+    unit = f"wrapped lines (at {WRAP_WIDTH})" if measure == "wrapped" else "lines"
     over = []
     if got > cap:
         via = f" (via {glob!r})" if glob else ""
-        over.append(f"{got} lines loaded against a cap of {cap}{via} - {got - cap} over. "
+        over.append(f"{got} {unit} loaded against a cap of {cap}{via} - {got - cap} over. "
                     f"RELOCATE, do not delete: a path-scoped rule, a companion document, "
                     f"a plan document, or a hook")
+        # THE OTHER MEASURE, NAMED. Under physical it is what a switch will gate on; under
+        # wrapped it is the count a project remembers its cap in. Equal numbers say nothing.
+        if wrap != phys:
+            other = (f"{phys} physical lines" if measure == "wrapped"
+                     else f"{wrap} wrapped at {WRAP_WIDTH} - what line_measure 'wrapped' gates on")
+            over.append(f"and {other}")
     # RAW BESIDE LOADED, AND ONLY WHEN THEY DIFFER. The cap is enforced on what Claude
     # receives, but it is READ as a promise about how much document a person scrolls, and
     # block-level HTML comments are invisible to exactly one of those two. Equal numbers say
@@ -996,19 +1061,22 @@ def check_file_length(rep, doc, text, limit, in_scope=True, path=None):
     # declared rather than found later. It is a FINDING, not a failure - the note may be
     # entirely legitimate - so it is appended only when the file is already over, and
     # otherwise carried in the size breakdown where a person reading sizes will see it.
-    if raw != got and over:
-        over.append(f"and {raw} lines RAW - {raw - got} line(s) sit inside HTML comments, "
+    if raw != phys and over:
+        over.append(f"and {raw} lines RAW - {raw - phys} line(s) sit inside HTML comments, "
                     f"which the cap does not count and a reader still scrolls past")
     rep.record(doc, "file length", got, over)
 
 
-def check_section_caps(rep, doc, lines, caps, in_scope=True):
+def check_section_caps(rep, doc, lines, caps, in_scope=True, measure="physical"):
     """A cap on ONE section, because the section that is replaced every session bloats
     fastest and a whole-file cap hides that inside a number that looks fine.
 
     A capped section that is ABSENT is a finding rather than a silent pass - but only in a
     document that uses numbered sections at all, or every README in the run would fail for
     not having a section 7.
+
+    `measure` is line_measure (v31), as in check_file_length: the same span, counted or
+    weighed.
     """
     if not caps:
         rep.record(doc, "section length", 0, [], na_reason="section_caps is empty (disabled)")
@@ -1016,7 +1084,13 @@ def check_section_caps(rep, doc, lines, caps, in_scope=True):
     if not in_scope:
         rep.record(doc, "section length", 0, [], na_reason="not in size_scope - a cap is a charter's")
         return
-    sizes = section_sizes(lines)
+    bad = measure_problem(measure)
+    if bad:
+        rep.record(doc, "section length", 0, [], void_reason=bad)
+        return
+    wrapped = measure == "wrapped"
+    sizes = section_wrapped_sizes(lines) if wrapped else section_sizes(lines)
+    unit = "wrapped lines" if wrapped else "lines"
     if not sizes:
         rep.record(doc, "section length", 0, [],
                    na_reason="document uses no numbered top-level sections")
@@ -1027,7 +1101,7 @@ def check_section_caps(rep, doc, lines, caps, in_scope=True):
         if key not in sizes:
             problems.append(f"section {key} is capped at {cap} and has no heading here")
         elif sizes[key] > cap:
-            problems.append(f"section {key}: {sizes[key]} lines against a cap of {cap} "
+            problems.append(f"section {key}: {sizes[key]} {unit} against a cap of {cap} "
                             f"- {sizes[key] - cap} over")
     rep.record(doc, "section length", len(caps), problems)
 
@@ -1069,16 +1143,29 @@ def section_size_report(path, body, cfg):
     A cap belongs to a CHARTER. Out of size_scope, the sizes are still worth seeing - that is
     the point of a breakdown - but they are reported WITHOUT a verdict, and the reason is
     named rather than left for the reader to infer.
+
+    BOTH MEASURES ARE PRINTED, ALWAYS (v31): the physical count and the wrapped weight, for
+    the file and for every section, and the verdict mark follows the measure that gates. The
+    release that added line_measure gates on physical lines by default, so this breakdown is
+    where a project sees what a switch to 'wrapped' will do before it switches.
     """
-    sizes = section_sizes(body.splitlines())
+    lines = body.splitlines()
+    sizes = section_sizes(lines)
     if not sizes:
         return []
+    wsizes = section_wrapped_sizes(lines)
+    measure = cfg.get("line_measure", "physical")
+    bad = measure_problem(measure)
+    gated = wsizes if measure == "wrapped" else sizes
+    unit = "wrapped lines" if measure == "wrapped" else "physical lines"
     scoped = in_size_scope(path, cfg["size_scope"])
     cap, glob, void = cap_for(path, cfg["max_lines"], scoped)
     if void:
         against = "  (no cap applies - max_lines is ambiguous for this file)"
+    elif bad:
+        against = f"  (no verdict - {bad})"
     elif cap:
-        against = f" against a cap of {cap}" + (f" (via {glob!r})" if glob else "")
+        against = f" against a cap of {cap} {unit}" + (f" (via {glob!r})" if glob else "")
     elif glob is not None:
         # SAME ORDER AS check_file_length, deliberately. This branch existing after the
         # dict branch is what made the report say "no glob matches" about a file the check
@@ -1091,19 +1178,19 @@ def section_size_report(path, body, cfg):
         against = "  (no cap applies - not in size_scope)"
     else:
         against = " (no cap set)"
-    got, raw = loaded_lines(body), raw_lines(body)
+    got, raw, wrap = loaded_lines(body), raw_lines(body), wrapped_lines(body)
     also = "" if raw == got else f" ({raw} raw - {raw - got} in HTML comments)"
-    out = [f"  {path}: {got} loaded{also}{against}"]
-    shapes = section_shapes(body.splitlines()) if cfg["report_section_shape"] else {}
+    out = [f"  {path}: {got} loaded ({wrap} wrapped at {WRAP_WIDTH}){also}{against}"]
+    shapes = section_shapes(lines) if cfg["report_section_shape"] else {}
     for key in sorted(sizes, key=lambda k: (len(str(k)), str(k))):
         mark = ""
         sc = cfg["section_caps"].get(key)
-        if sc and scoped:
-            over = sizes[key] - sc
+        if sc and scoped and not bad:
+            over = gated[key] - sc
             mark = f"  <- cap {sc}" + (f", OVER by {over}" if over > 0 else ", ok")
-        elif sc:
+        elif sc and not bad:
             mark = "  <- capped elsewhere, not here"
-        out.append(f"      section {key:<4} {sizes[key]:>5} lines{mark}")
+        out.append(f"      section {key:<4} {sizes[key]:>5} lines {wsizes[key]:>5} wrapped{mark}")
         sh = shapes.get(key)
         if sh:
             # THE FLOOR IS PRINTED, NOT LEFT TO BE ADDED UP. blank + heading + table is the
@@ -1292,8 +1379,8 @@ def verify_file(rep, path, cfg, forbidden=None, required=None,
         check_required(rep, doc, lines, req, req_sources)
     check_line_length(rep, doc, lines, cfg["max_line_length"])
     scoped = in_size_scope(path, cfg["size_scope"])
-    check_file_length(rep, doc, text, cfg["max_lines"], scoped, path)
-    check_section_caps(rep, doc, lines, cfg["section_caps"], scoped)
+    check_file_length(rep, doc, text, cfg["max_lines"], scoped, path, cfg["line_measure"])
+    check_section_caps(rep, doc, lines, cfg["section_caps"], scoped, cfg["line_measure"])
     # THE SIX CHARTER ROWS, from verify_charter.py since v30. Both scope answers are worked out
     # HERE, because glob matching is this file's and serves the size caps as well. plan_scope
     # is a SEPARATE scope from size_scope: 'is this a charter' and 'is this a LIVE plan file'
@@ -1442,6 +1529,33 @@ def writes_body_under(count, max_lines):
     return build
 
 
+def writes_row(length, commented=False):
+    """A section-1 document holding a three-line table whose last row is `length` characters
+    long - SEVEN physical lines however long that row is, which is the whole point.
+
+    With commented set, the table sits inside a block-level HTML comment, which Claude never
+    receives, so under either measure it must weigh nothing.
+    """
+    def build(tmp):
+        row = "| " + "w" * max(1, length - 10) + " | row |"
+        table = ["| a | b |", "| --- | --- |", row]
+        if commented:
+            table = ["<!--"] + table + ["-->"]
+        q = tmp / "case.md"
+        q.write_text("# Doc" + NL + NL + "## 1 - One" + NL + NL + NL.join(table) + NL,
+                     encoding="utf-8")
+        return q
+    return build
+
+
+def writes_row_under(length, measure):
+    """writes_row paired with the line_measure to judge it under - the arms of the selector
+    case differ ONLY in the measure, so the builder carries it, as writes_scoped does."""
+    def build(tmp):
+        return writes_row(length)(tmp), measure
+    return build
+
+
 # The charter fixtures - writes_charter, writes_plan, writes_subsections and the rest - and the
 # three cross-check assertions MOVED TO verify_charter.py ON 2026-10-12 (v30), with the checks
 # they prove. Its selftest still runs them through verify_file here, so they prove the whole
@@ -1454,6 +1568,30 @@ def checks_length_under(spec):
     rep = Report()
     verify_file(rep, path, dict(SELFTEST_CFG, max_lines=max_lines))
     return rep.by_name().get(LENGTH)
+
+
+def checks_length_measured(spec):
+    """The file-length verdict for one document under one line_measure, cap 20."""
+    path, measure = spec
+    rep = Report()
+    verify_file(rep, path, dict(SELFTEST_CFG, max_lines=20, line_measure=measure))
+    return rep.by_name().get(LENGTH)
+
+
+def report_shows_wrapped(spec):
+    """Does the size breakdown print the wrapped weight beside the physical count, whichever
+    measure gates? 'both' if it does. This is the REPORT-BOTH release's whole promise - a
+    project sees what a switch would do before it switches."""
+    path, measure = spec
+    body, _ = read_doc(path)
+    cfg = dict(SELFTEST_CFG, max_lines=20, section_caps={"1": 20}, line_measure=measure)
+    out = NL.join(section_size_report(str(path), body, cfg))
+    first, sec = out.splitlines()[0] if out else "", [ln for ln in out.splitlines()
+                                                      if "section 1" in ln]
+    row_weight = -(-16000 // WRAP_WIDTH)                  # the fixture's row, at the house width
+    file_w, sec_w = 6 + row_weight, 4 + row_weight        # 6 and 4 other one-line lines
+    return ("both" if (f"{file_w} wrapped" in first and sec and f"{sec_w} wrapped" in sec[0])
+            else out[:200])
 
 
 def report_agrees_with_check(spec):
@@ -1654,6 +1792,38 @@ def cases():
         Case("out of size_scope reports N/A, not a failure",
              checks_cfg(LENGTH, max_lines=10, size_scope=["nothing-matches-this"]),
              writes_body(30), writes_body(30), want=NA, good_want=NA),
+        # THE LINE MEASURE (v31, 2026-10-14). A table row is ONE physical line however long,
+        # so a 16,155-character row counted as one line in a real charter and both size caps
+        # were blind to it. Under line_measure "wrapped" a line weighs its length / 120,
+        # rounded up. THE FIXTURE IS THE DEFECT: one 16,000-character row, seven physical
+        # lines, 140 wrapped ones, against a cap of 20.
+        Case("a 16,000-char row weighs its length when the measure is wrapped",
+             checks_cfg(LENGTH, max_lines=20, line_measure="wrapped"),
+             writes_row(16000), writes_row(60)),
+        # THE SELECTOR, proved on ONE document: the same row passes under physical lines and
+        # fails under wrapped. A key that changed nothing would pass the first case's good arm
+        # and fail here; a measure always wrapped would fail the physical arm.
+        Case("the measure is the config key, not the document", checks_length_measured,
+             writes_row_under(16000, "wrapped"), writes_row_under(16000, "physical")),
+        Case("a section's long row weighs its length too",
+             checks_cfg(SECT, section_caps={"1": 20}, line_measure="wrapped"),
+             writes_row(16000), writes_row(60)),
+        # What Claude never receives weighs nothing under either measure.
+        Case("a long row inside an HTML comment weighs nothing",
+             checks_cfg(LENGTH, max_lines=20, line_measure="wrapped"),
+             writes_row(16000), writes_row(16000, commented=True)),
+        Case("...and weighs nothing in its section either",
+             checks_cfg(SECT, section_caps={"1": 20}, line_measure="wrapped"),
+             writes_row(16000), writes_row(16000, commented=True)),
+        # A MISTYPED MEASURE IS VOID, NEVER A SILENT DEFAULT: a config asking for something
+        # this checker does not know would otherwise be gated on physical lines unannounced.
+        Case("an unknown line_measure is VOID, not a silent default", checks_length_measured,
+             writes_row_under(60, "characters"), writes_row_under(60, "wrapped"),
+             want=VOID, good_want=PASS),
+        Case("the size report prints the wrapped weight whichever measure gates",
+             report_shows_wrapped, writes_row_under(16000, "physical"), want="both",
+             unpaired_reason="a REPORTING promise, not a fire-on-bad check - every arm wants "
+                             "'both'; the gating arms above prove the verdicts"),
         # THE CHARTER CASES - structure, the CORE floor, archetype, agreed out, pointers and
         # plan purpose - MOVED TO verify_charter.py's own table on 2026-10-12 (v30), row for
         # row, with the checks they prove.
@@ -1983,6 +2153,11 @@ def selftest_shape():
     # THE DISCRIMINATING ONE. A shape whose spans are off by one passes every case above.
     cases.append(("a section's shape starts at its heading",
                   shapes["2"], {"blank": 0, "heading": 1, "table": 0, "prose": 1}))
+    # SHORT LINES, NO COMMENTS: the wrapped weight IS the physical count, section by section.
+    # Section 1 here ends on a blank line, which a weight taken off the joined span dropped -
+    # caught only by a real charter weighing LESS wrapped than physical (v31, 2026-10-14).
+    cases.append(("short lines: wrapped section == physical",
+                  section_wrapped_sizes(doc), sizes))
     for label, got, want in cases:
         good = got == want
         ok &= good

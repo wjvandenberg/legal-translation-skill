@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """run_tests.py - one command that runs everything this project tests with.
-CHECKER VERSION 5 (2026-09-07)
+CHECKER VERSION 6 (2026-10-14)
 
 VERIFY asks "did this change do what it claimed?". TEST asks "did anything else break?".
 This is the second one, and it exists so that question has a single answer rather than a
@@ -24,6 +24,24 @@ the never-regress gate, which is the whole reason for having one.
 EVERY SUITE REPORTS ITS DENOMINATOR. A configured suite that matched no tests is VOID, not
 a pass. A run with no suites at all is VOID and exits 2: "there was nothing to test" and
 "nothing was broken" are different facts.
+
+A SUITE'S OWN COUNT IS KEPT WHEN IT SAYS HOW TO READ IT - AND UNTIL v6 IT WAS NEVER KEPT.
+Every suite was added as "1 examined" and a passing suite's output thrown away, so a suite
+of thousands of checks and a suite of one printed the same row - the very denominator the
+paragraph above promises - and a session that needed the number ran the suite a SECOND
+time to see it. Measured: a 47-check suite printed "PASS  smoke  1 examined", its own
+"47 of 47" nowhere. So a configured suite may declare 'count', a pattern: WITH a group, the
+number that group captures on the LAST matching line, stdout before stderr - "([0-9]+)
+checks" for a summary line; WITHOUT one, the number of lines it matches - "^(?:PASS|FAIL) "
+for a line per check. A declared count that reads nothing is VOID, no check having been
+seen to run, and outranks a JUDGE; a group that captures a word, and a 'count' that is not
+text at all, are refused rather than guessed at. A suite that declares none prints
+as before AND SAYS its count is not kept, because the silent "1" was the defect. The
+--selftest suites keep 1: each is one checker's proof, and counts its cases in its own output.
+
+EVERY SUITE PRINTS ITS SECONDS, AND THE RUN ITS TOTAL - so a session plans its checks with a
+figure taken on this run, never with one typed into a charter weeks ago, which goes stale
+without saying so.
 
 A SUITE CAN PASS AND STILL HAVE HANDED A CLAIM TO A PERSON, and that arrives as JUDGE
 rather than PASS. A JUDGE deliberately exits 0 - a gate that blocks on a question nobody
@@ -61,8 +79,10 @@ break green runs for a reason unrelated to any change and get switched off.
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 from house_common import (                                       # noqa: E402
@@ -81,7 +101,7 @@ DEFAULT_CONFIG = {
 }
 
 CONFIG_COMMENT = {
-    "suites": "[{'name': 'smoke', 'command': 'uv run python tests/smoke_test.py'}] - the project's own suites, in the order they should run.",
+    "suites": "[{'name': 'smoke', 'command': 'uv run python tests/smoke_test.py', 'count': '^(?:PASS|FAIL) '}] - the project's own suites, in the order they should run. 'count' is optional: a pattern that reads the suite's OWN count off its output - with a group, the number it captures on the last matching line; without one, the number of lines it matches. Without it the row says 1 and that the count is not kept.",
     "selftest_globs": "Scripts whose --selftest counts as a suite. The house checkers are found by this, so a broken checker fails the test run.",
     "entry_points": "[{'command': 'uv run python tools/verify_md.py CLAUDE.md'}] - each checker's REAL entry point, run against this project. FINDINGS ARE IGNORED here: only a failure to START fails. That is why these cannot go in 'suites' - one legitimate finding would break the run.",
     "entry_points_exempt": "{'install_hooks.py': 'why'} - a checker deliberately not run this way, WITH ITS REASON. A blank reason is refused: it prints as a decision nobody made.",
@@ -110,12 +130,17 @@ def discover_scripts(root: Path, cfg):
 
 
 def discover(root: Path, cfg):
-    """Every suite this project has: the configured ones, then every --selftest found.
+    """Every suite this project has, as (name, command, spec): the configured ones, then
+    every --selftest found.
 
     A checker's own --selftest is a test of this project, not a formality: if a checker
     stops being able to fail, every result it has ever reported becomes unfalsifiable.
+
+    SPEC IS THE SUITE'S OWN CONFIG ENTRY, None for a --selftest - so each suite carries its
+    own count pattern. Looked up by name instead, two suites of one name shared the last
+    one's pattern and the first read VOID.
     """
-    out = [(s["name"], s["command"]) for s in cfg["suites"]]
+    out = [(s["name"], s["command"], s) for s in cfg["suites"]]
     for p in discover_scripts(root, cfg):
         rel = p.relative_to(root).as_posix()
         # THE INTERPRETER IS QUOTED, AND LEAVING IT UNQUOTED BREAKS EVERY PROJECT WHOSE
@@ -125,7 +150,7 @@ def discover(root: Path, cfg):
         # failed with "'C:\\...\\Coding\\Project' is not recognized", truncated exactly at
         # the space. Invisible in this folder, which has none - so it is correct where the
         # script lives and broken for the projects it is copied into.
-        out.append((f"{p.stem} --selftest", f'"{sys.executable}" "{rel}" --selftest'))
+        out.append((f"{p.stem} --selftest", f'"{sys.executable}" "{rel}" --selftest', None))
     return out
 
 
@@ -191,37 +216,106 @@ def diagnostic(text: str, limit: int):
     return out
 
 
-def run_suite(root: Path, name, command, timeout):
-    """stdin=DEVNULL, AND IT IS NOT TIDINESS - IT IS THE DIFFERENCE BETWEEN A FAILURE AND A
+def suite_count(stdout: str, stderr: str, pattern):
+    """A suite's OWN count, read off its output: (number, None), or (None, why it could not be).
+
+    WITH A GROUP, the number that group captures on the LAST matching line - a summary line -
+    looked for in stdout first and in stderr only if stdout has none, because a warning on
+    stderr must not stand in for the summary on stdout. WITHOUT ONE, the number of lines it
+    matches in both - one line per check. A group that captures a word is refused rather than
+    guessed at: brackets around an alternative are a group, and the cure, (?:...), is named in
+    the refusal. isdecimal(), not isdigit(): a superscript passes the second and crashes
+    int(). Zero is not a count either - a declared count that reads nothing means no check was
+    seen to run. And a 'count' that is not text - the expected TOTAL, written where its
+    pattern belongs - is refused by name, never a traceback.
+    """
+    if not isinstance(pattern, str) or not pattern:
+        return None, (f"its count {pattern!r} is not a pattern - 'count' is the text pattern "
+                      f"that FINDS the count in the suite's output, not the count itself")
+    try:
+        rx = re.compile(pattern)
+    except re.error as e:
+        return None, f"its count pattern {pattern!r} is not a valid pattern ({e})"
+    streams = (stdout.splitlines(), stderr.splitlines())
+    if not rx.groups:
+        n = sum(1 for lines in streams for ln in lines if rx.search(ln))
+    else:
+        last = next((m for lines in streams for m in map(rx.search, reversed(lines)) if m),
+                    None)
+        if last is None:
+            return None, f"its count pattern {pattern!r} matched no line"
+        got = last.group(1)
+        if got is None:
+            return None, ("its count pattern's group took no part in the last line it "
+                          "matched, so it read no number")
+        if not got.isdecimal():
+            return None, (f"its count pattern's group captured {got!r}, not a number - "
+                          f"write (?:...) to count the lines an alternative matches")
+        n = int(got)
+    if n == 0:
+        return None, f"its count pattern {pattern!r} counted 0 - no check was seen to run"
+    return n, None
+
+
+def run_suite(root: Path, name, command, timeout, count=None, configured=False):
+    """One suite's (status, detail lines, count examined).
+
+    stdin=DEVNULL, AND IT IS NOT TIDINESS - IT IS THE DIFFERENCE BETWEEN A FAILURE AND A
     HANG. A checked command that reads stdin inherits this process's, which in an unattended
     or piped session never closes: the read blocks for ever and the whole run sits there
     producing nothing, which looks exactly like a slow suite. Measured here on a hook script
     whose entry point reads a payload from stdin - it hung the run until it was killed, and
     the timeout that would eventually have reported it was 900 seconds away. Applied to BOTH
     runners rather than the one that bit, because the second call site is the same shape.
+
+    THE FIRST DETAIL LINE IS ALWAYS THE SUITE'S TIME, and, for a configured suite, where its
+    count came from - or that it was not kept. A silent "1 examined" over a suite of
+    thousands is the defect this line exists to end.
     """
+    declared = count is not None
+    unread = 0 if declared else 1
+    start = time.monotonic()
     try:
         r = subprocess.run(command, shell=True, cwd=root, capture_output=True,
                            text=True, encoding="utf-8", errors="replace", timeout=timeout, stdin=subprocess.DEVNULL)
     except subprocess.TimeoutExpired:
-        return FAIL, [f"timed out after {timeout}s"]
+        return FAIL, [f"timed out after {timeout}s"], unread
     except OSError as e:
-        return VOID, [f"could not start: {e}"]
+        return VOID, [f"could not start: {e}"], unread
+    took = f"{time.monotonic() - start:.1f} s"
+    # JOINED ON A NEWLINE, so a stdout without a trailing one cannot fuse its last line with
+    # stderr's first.
+    out = "\n".join(s for s in (r.stdout, r.stderr) if s)
+    examined, why = suite_count(r.stdout or "", r.stderr or "", count) if declared \
+        else (1, None)
+    if declared and why is None:
+        note = f"{examined} counted by its pattern - {took}"
+    elif declared:
+        note, examined = f"{why} - {took}", 0
+    elif configured:
+        note = f"its own count is not kept - declare a 'count' pattern for it - {took}"
+    else:
+        note = took
     if r.returncode == RC_COULD_NOT_RUN:
-        return VOID, ["exit 2 - the suite could not run"] + \
-            diagnostic(r.stdout + r.stderr, 6)
+        return VOID, ["exit 2 - the suite could not run", note] + diagnostic(out, 6), examined
     if r.returncode != 0:
-        return FAIL, [f"exit {r.returncode}"] + diagnostic(r.stdout + r.stderr, 12)
+        return FAIL, [f"exit {r.returncode}", note] + diagnostic(out, 12), examined
+    # A DECLARED COUNT THAT READ NOTHING IS VOID, NOT PASS - the same rule as a suite that
+    # matched no tests. A failure above outranks it, the suite's own verdict saying more; and
+    # it outranks a JUDGE below, which exits 0 and would carry "no check was seen" out as a
+    # clean run.
+    if why:
+        return VOID, [note], examined
     # A SUITE CAN PASS AND STILL HAVE HANDED SOMETHING TO A PERSON, and the exit code cannot
     # say so: a JUDGE deliberately exits 0, because a gate that blocks on a question nobody
     # can close mechanically is a gate that gets removed. So the ARTEFACT is read instead of
     # the exit code - which is this house's rule for every other check anyway. Without this,
     # a run that handed over twenty claims and one that found none are the same PASS here,
     # and the severity is invisible at exactly the layer everybody actually watches.
-    out = r.stdout + r.stderr
     if judge_count(out):
-        return JUDGE, [ln.strip() for ln in out.splitlines() if JUDGE_MARK in ln]
-    return PASS, []
+        return JUDGE, [note] + [ln.strip() for ln in out.splitlines() if JUDGE_MARK in ln], \
+            examined
+    return PASS, [note], examined
 
 
 TRACEBACK_MARK = "Traceback (most recent call last)"
@@ -354,7 +448,7 @@ def main(argv):
     eps = entry_points(cfg)
 
     if "--list" in argv:
-        for name, command in suites:
+        for name, command, _ in suites:
             print(f"  {name:<32} {command}")
         for name, command, _ in eps:
             print(f"  {name:<32} {command}")
@@ -370,13 +464,17 @@ def main(argv):
 
     rep = Report()
     stopped = False
-    for name, command in suites:
-        status, problems = run_suite(root, name, command, cfg["timeout_seconds"])
-        rep.add(name, status, 1, problems)
+    began = time.monotonic()
+    for name, command, spec in suites:
+        status, problems, examined = run_suite(root, name, command, cfg["timeout_seconds"],
+                                               count=(spec or {}).get("count"),
+                                               configured=spec is not None)
+        rep.add(name, status, examined, problems)
         if status == FAIL and cfg["stop_on_first_failure"]:
             rep.add("(remaining suites)", NA, 0, ["stopped at the first failure"])
             stopped = True
             break
+    suites_took = time.monotonic() - began
 
     # THE ENTRY-POINT ARM, and it runs AFTER the suites deliberately: these invoke the real
     # checkers against the real project, so a suite failure that has already stopped the run
@@ -391,7 +489,10 @@ def main(argv):
         return rep.exit_code
 
     print(rep.render(name_width=34))
+    # THIS LINE'S SHAPE IS READ BY ANOTHER TOOL - a lane parses "<n> suite(s) run" - so the
+    # time goes on a line of its own rather than onto the end of this one.
     print(f"\n{len(suites)} suite(s) run, {len(eps)} entry point(s) exercised")
+    print(f"the suites took {suites_took:.1f} s in all")
     print("OVERALL: " + rep.verdict())
     # THE CAVEAT ONLY APPLIES TO A PASS, and printing it after a FAIL asserted something
     # false: "every suite RAN and PASSED" under OVERALL: FAIL. A report that contradicts the
@@ -512,7 +613,7 @@ def _assert_spaced_interpreter_is_quoted(tmp: Path) -> bool:
     (d / "tools").mkdir(parents=True, exist_ok=True)
     (d / "tools" / "t_spaced.py").write_text(PASSING, encoding="utf-8")
     suites = discover(d, dict(DEFAULT_CONFIG))
-    made = [c for n, c in suites if "t_spaced" in n]
+    made = [c for n, c, _ in suites if "t_spaced" in n]
     # THE REAL BUILDER: whatever the interpreter is, the shell must see all of it.
     real_ok = bool(made) and _shell_program(made[0]) == sys.executable
     # THE FIXED FORM, on a path known to contain spaces.
@@ -549,7 +650,7 @@ def both_arms_probe(built):
     difference."""
     cfg = dict(DEFAULT_CONFIG)
     suites = discover(built, cfg)
-    old = run_suite(built, *suites[0], 120)[0] if suites else VOID
+    old = run_suite(built, *suites[0][:2], 120)[0] if suites else VOID
     return f"selftest={old},entry={entry_probe(built)}"
 
 
@@ -565,14 +666,75 @@ _EP_ONE = [{"command": 'python "tools/t_one.py"'}]
 _TWO_SCRIPTS = {"t_one.py": RUNS_CLEAN, "t_two.py": RUNS_CLEAN}
 
 
+# ---- A SUITE'S OWN COUNT. The fixture suite prints one PASS line per check, as a project's
+# smoke suite does, so the only way the report can say 47 is by reading the suite's output.
+_FORTY_SEVEN = [f"PASS check {i}" for i in range(47)]
+
+
+def _suites(*specs):
+    """A builder: a project whose configured suites - ALL NAMED 'smoke', on purpose - each
+    print LINES on stdout and ERR on stderr, exit RC and declare COUNT.
+    Each spec is (lines, count, rc, err)."""
+    def build(t: Path):
+        d = t / "proj"
+        (d / "tests").mkdir(parents=True, exist_ok=True)
+        suites = []
+        for i, (lines, count, rc, err) in enumerate(specs):
+            # UTF-8 OUT, OR A NON-ASCII FIXTURE PROVES NOTHING: printed to a pipe in the
+            # platform's code page, a superscript arrived as a replacement character and the
+            # case meant to reproduce its crash passed by accident.
+            body = ("import sys\nsys.stdout.reconfigure(encoding='utf-8')\n"
+                    "sys.stderr.reconfigure(encoding='utf-8')\n"
+                    + "".join(f"print({ln!r})\n" for ln in lines)
+                    + "".join(f"print({ln!r}, file=sys.stderr)\n" for ln in err)
+                    + f"sys.exit({rc})\n")
+            (d / "tests" / f"suite{i}.py").write_text(body, encoding="utf-8")
+            suite = {"name": "smoke", "command": f'"{sys.executable}" "tests/suite{i}.py"'}
+            if count is not None:
+                suite["count"] = count
+            suites.append(suite)
+        (d / "verify.config.json").write_text(
+            json.dumps({"tests": {"suites": suites, "selftest_globs": []}}), encoding="utf-8")
+        return d
+    return build
+
+
+def _counted(lines, count=None, rc=0, err=()):
+    """A builder: a project whose ONE configured suite prints LINES, exits RC, declares COUNT."""
+    return _suites((lines, count, rc, err))
+
+
+def run_main(built, *flags):
+    """main() over a built project: (exit code, everything it printed). THE ONE HARNESS for
+    every selftest that runs the whole thing, so the working directory is put back in one
+    place, even when main() raises."""
+    import io
+    import os
+    from contextlib import redirect_stdout
+    buf, cwd = io.StringIO(), os.getcwd()
+    try:
+        os.chdir(built)
+        with redirect_stdout(buf):
+            rc = main(["run_tests.py", *flags])
+    finally:
+        os.chdir(cwd)
+    return rc, buf.getvalue()
+
+
+def count_probe(built):
+    """The FIRST smoke row's status and count, read off the REPORT - the layer a session
+    reads, and the one where the count used to be lost."""
+    m = re.search(r"^\s*(\w+)\s+smoke\s+(\d+) examined", run_main(built)[1], re.M)
+    return f"{m.group(1)} {m.group(2)}" if m else "NO ROW"
+
+
 def probe(built):
     """Run the whole thing over a built project and give back the first suite's status."""
     cfg = dict(DEFAULT_CONFIG)
     suites = discover(built, cfg)
     if not suites:
         return VOID
-    status, _ = run_suite(built, *suites[0], 120)
-    return status
+    return run_suite(built, *suites[0][:2], 120)[0]
 
 
 def selftest() -> int:
@@ -657,6 +819,67 @@ def selftest() -> int:
                                     {"entry_points": _EP_ONE,
                                      "entry_points_exempt":
                                          {"t_two.py": "writes real machine state"}})),
+
+            # ---- a suite's OWN COUNT. THE DEFECT: every suite was added as "1 examined" and
+            # a passing suite's output dropped, so a session ran the suite a second time to
+            # learn how many checks it held. Each case is read off the rendered report.
+            Case("a declared count reaches the report", count_probe,
+                 _counted(_FORTY_SEVEN), _counted(_FORTY_SEVEN, count=r"^PASS "),
+                 want=f"{PASS} 1", good_want=f"{PASS} 47"),
+            Case("a count that matches nothing is VOID", count_probe,
+                 _counted(_FORTY_SEVEN, count=r"^OK "),
+                 _counted(_FORTY_SEVEN, count=r"^PASS "),
+                 want=f"{VOID} 0", good_want=f"{PASS} 47"),
+            Case("a group reads the last line's number", count_probe,
+                 _counted(["RESULT: ALL PASS"], count=r"(\d+) checks"),
+                 _counted(_FORTY_SEVEN + ["RESULT: ALL PASS - 2408 checks, 0 failed"],
+                          count=r"(\d+) checks"),
+                 want=f"{VOID} 0", good_want=f"{PASS} 2408"),
+            # THE TRAP IN THE SYNTAX: brackets around an alternative make a GROUP, and a group
+            # means "read the number it captured". Capturing the word PASS is refused out loud,
+            # never counted as some number nobody meant.
+            Case("a group that captures no number is VOID", count_probe,
+                 _counted(_FORTY_SEVEN, count=r"^(PASS|FAIL) "),
+                 _counted(_FORTY_SEVEN, count=r"^(?:PASS|FAIL) "),
+                 want=f"{VOID} 0", good_want=f"{PASS} 47"),
+            Case("a failing suite keeps its count", count_probe,
+                 _counted(_FORTY_SEVEN[:46] + ["FAIL check 46"], count=r"^(?:PASS|FAIL) ",
+                          rc=1),
+                 _counted(_FORTY_SEVEN, count=r"^(?:PASS|FAIL) "),
+                 want=f"{FAIL} 47", good_want=f"{PASS} 47"),
+            Case("a broken pattern is VOID, not a crash", count_probe,
+                 _counted(_FORTY_SEVEN, count="(unclosed"),
+                 _counted(_FORTY_SEVEN, count=r"^PASS "),
+                 want=f"{VOID} 0", good_want=f"{PASS} 47"),
+            # THE TOTAL WRITTEN WHERE ITS PATTERN BELONGS - the likeliest misreading of the key.
+            Case("a count that is not a pattern is VOID", count_probe,
+                 _counted(_FORTY_SEVEN, count=2408),
+                 _counted(_FORTY_SEVEN, count=r"^PASS "),
+                 want=f"{VOID} 0", good_want=f"{PASS} 47"),
+            # A DIGIT TO isdigit() IS NOT ALWAYS ONE TO int(): a superscript passes the first
+            # and crashes the second. Refused, never a traceback.
+            Case("a captured superscript is VOID", count_probe,
+                 _counted(["² checks"], count=r"(\S+) checks"),
+                 _counted(["47 checks"], count=r"(\S+) checks"),
+                 want=f"{VOID} 0", good_want=f"{PASS} 47"),
+            # A JUDGE MUST NOT MASK A RUN IN WHICH NO CHECK WAS SEEN: VOID exits 2, JUDGE 0.
+            Case("an unread count outranks a JUDGE", count_probe,
+                 _counted([f"{JUDGE_MARK} 2 - a person must settle these"], count=r"^PASS "),
+                 _counted(_FORTY_SEVEN + [f"{JUDGE_MARK} 2 - a person must settle these"],
+                          count=r"^PASS "),
+                 want=f"{VOID} 0", good_want=f"{JUDGE} 47"),
+            # A WARNING ON stderr MUST NOT STAND IN FOR THE SUMMARY ON stdout.
+            Case("stdout's summary beats stderr's", count_probe,
+                 _counted(["RESULT: ALL PASS - 2408 checks"], count=r"(\d+) checks",
+                          err=["warning: 3 checks skipped"]),
+                 _counted(["RESULT: ALL PASS - 2408 checks"], count=r"(\d+) checks"),
+                 want=f"{PASS} 2408", good_want=f"{PASS} 2408"),
+            # EACH SUITE CARRIES ITS OWN PATTERN - two of one name must not share the last.
+            Case("two suites of one name keep their own", count_probe,
+                 _suites((_FORTY_SEVEN, r"^PASS ", 0, ()),
+                         (["RESULT 5 checks"], r"(\d+) checks", 0, ())),
+                 _counted(_FORTY_SEVEN, count=r"^PASS "),
+                 want=f"{PASS} 47", good_want=f"{PASS} 47"),
         ]
         cok, paired, unpaired = run_cases(cases, tmp, width=34)
         ok &= cok
@@ -690,50 +913,44 @@ def selftest() -> int:
             ok &= good
             print(f"  {'OK  ' if good else 'MISS'} {label}")
 
+        # EVERY SUITE SAYS HOW LONG IT TOOK, AND A SUITE WITHOUT A COUNT SAYS SO. The time is
+        # printed fresh on every run, so no charter has to carry a figure that goes stale; the
+        # note is what turns "1 examined" from a silent wrong denominator into a visible gap.
+        plain = run_main(_counted(_FORTY_SEVEN)(tmp / "plain"))[1]
+        timed = re.search(r"^\s+- .*\b\d+\.\d s\b", plain, re.M) is not None
+        noted = "count is not kept" in plain
+        total = re.search(r"^the suites took \d+\.\d s in all$", plain, re.M) is not None
+        # A GROUP THAT TOOK NO PART IN THE LINE IT MATCHED is not "matched no line" - the
+        # refusal must send the reader to the group, not off looking for a missing line.
+        unset = run_main(_counted(["checks: none"], count=r"checks:? ?(\d+)?")(tmp / "unset"))[1]
+        for label, good in (("every suite prints its seconds", timed),
+                            ("an undeclared count says so", noted),
+                            ("the run prints its total time", total),
+                            ("an unset group is named as such", "took no part" in unset)):
+            ok &= good
+            print(f"  {'OK  ' if good else 'MISS'} {label}")
+
         # a project with nothing to test must be VOID and exit 2, never a silent pass
         empty = tmp / "empty"
         empty.mkdir()
-        import os
-        cwd = os.getcwd()
-        try:
-            os.chdir(empty)
-            rc = main(["run_tests.py"])
-        finally:
-            os.chdir(cwd)
+        rc, _ = run_main(empty)
         good = rc == RC_COULD_NOT_RUN
         ok &= good
         print(f"  {'OK  ' if good else 'MISS'} {'nothing to test exits 2':<34} -> {rc}")
 
         # --quiet must print NOTHING and still carry the verdict, or git bisect cannot
         # use it - the one mode whose whole value is that it is silent
-        import io
-        from contextlib import redirect_stdout
-        proj = _script(tmp / "q", "t_one.py", FAILING)
-        buf = io.StringIO()
-        try:
-            os.chdir(proj)
-            with redirect_stdout(buf):
-                rc = main(["run_tests.py", "--quiet"])
-        finally:
-            os.chdir(cwd)
-        silent = buf.getvalue() == ""
-        good = silent and rc == RC_FAILED
+        rc, printed = run_main(_script(tmp / "q", "t_one.py", FAILING), "--quiet")
+        good = printed == "" and rc == RC_FAILED
         ok &= good
         print(f"  {'OK  ' if good else 'MISS'} {'--quiet is silent and still fails':<34} "
-              f"-> printed={len(buf.getvalue())} chars, exit={rc}")
+              f"-> printed={len(printed)} chars, exit={rc}")
 
         # A JUDGE MUST NOT BLOCK, END TO END - not merely in the result model, but through
         # main() and out of the process, which is the number a gate or a git hook reads. And
         # the run must SAY SO on screen: exiting 0 silently is how the severity would fail.
-        jproj = _script(tmp / "je", "t_one.py", JUDGING)
-        buf = io.StringIO()
-        try:
-            os.chdir(jproj)
-            with redirect_stdout(buf):
-                rc = main(["run_tests.py"])
-        finally:
-            os.chdir(cwd)
-        said = "handed a claim to a PERSON" in buf.getvalue()
+        rc, printed = run_main(_script(tmp / "je", "t_one.py", JUDGING))
+        said = "handed a claim to a PERSON" in printed
         good = rc == RC_OK and said
         ok &= good
         print(f"  {'OK  ' if good else 'MISS'} {'a JUDGE exits 0 and says so':<34} "

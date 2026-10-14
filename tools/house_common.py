@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""house_common.py - the plumbing every house checker shares.  CHECKER VERSION 19 (2026-10-12)
+"""house_common.py - the plumbing every house checker shares.  CHECKER VERSION 20 (2026-10-14)
 
 WHAT IS HERE AND WHY IT IS HERE. The result model (PASS / FAIL / VOID / N-A / JUDGE, the
 denominator rule, the exit-code convention), reading verify.config.json, and the selftest that
@@ -9,6 +9,8 @@ THE ONE EXCEPTION, since v19 (2026-10-12): the Markdown parsers - headings, fenc
 table cells, code spans and the wrap-tolerant collapse - which verify_md.py and the
 verify_charter.py split out of it both need. They are specific to documents, and they are here
 anyway because two checkers each holding a copy is how the two come to disagree.
+v20 (2026-10-14) adds the second measure of a document's size, wrapped_lines, beside
+loaded_lines: a line weighed at its length, so a long table row stops counting as one line.
 
 THE MEASUREMENT THAT PRODUCED THIS FILE. The first structural review found 218 lines of
 identical code across the five scripts, 11% of the live total: three copies of the result
@@ -178,13 +180,64 @@ def loaded_lines(text):
     SHARED because two scripts need the same answer: the checker that reports a document
     over its cap, and the generator that must not hand a project a charter already over it.
     Two copies of a measurement is how the two come to disagree.
+
+    IT COUNTS PHYSICAL LINES, SO A TABLE ROW IS ONE LINE HOWEVER LONG IT IS - which is why
+    wrapped_lines exists beside it. See there.
     """
+    return len(_loaded_line_list(text))
+
+
+def _loaded_line_list(text):
+    """The lines Claude receives, as strings: comment characters removed, and a line that was
+    nothing but comment and whitespace dropped. loaded_lines and wrapped_lines both count
+    THIS list, so the two measures cannot disagree about WHICH lines load - only about what
+    each one weighs."""
     t = text.replace("\r\n", "\n").replace("\r", "\n")
     masked = HTML_COMMENT_RE.sub(lambda m: re.sub(r"[^\n]", COMMENTED, m.group(0)), t)
     lines = masked.split("\n")
     if lines and lines[-1] == "":
         lines.pop()
-    return sum(1 for ln in lines if COMMENTED not in ln or ln.strip(COMMENTED + " \t"))
+    return [ln.replace(COMMENTED, "") for ln in lines
+            if COMMENTED not in ln or ln.strip(COMMENTED + " \t")]
+
+
+#: THE WIDTH A LINE IS WEIGHED AT, ONE FOR THE WHOLE HOUSE (Wouter, 2026-10-14 (3)). Not a
+#: config key: a per-project width would make two projects' caps incomparable, which is the
+#: one thing a house unit is for. 120 IS THE NARROWEST WIDTH AT WHICH EVERY HARD-WRAPPED
+#: PROSE LINE IN THE HOUSE STILL COUNTS ONCE - measured that day, the house file's prose runs
+#: to 112 characters and two projects' to 114 - so only a genuinely long line pays. At 110,
+#: 51 prose lines of 111-112 characters in the house file alone would each count two, which
+#: is noise rather than weight.
+WRAP_WIDTH = 120
+
+
+def line_weight(line, width=WRAP_WIDTH):
+    """One line's weight in wrapped lines: its length divided by the width, rounded up, and
+    never less than one - a blank line still takes a line."""
+    return max(1, -(-len(line) // width))
+
+
+def wrapped_lines(text, width=WRAP_WIDTH):
+    """The lines Claude receives, EACH WEIGHED AT ITS LENGTH: a line counts its length divided
+    by WRAP_WIDTH, rounded up. A wrapped prose line still counts one; a 16,000-character
+    table row counts 134.
+
+    WHY IT EXISTS. loaded_lines counts PHYSICAL lines, and a Markdown table row must sit on one
+    physical line however long its cells are - so a row of 16,155 characters, about 2,700
+    words, counted as ONE line in a real charter, and the file-length and section-length caps
+    were blind to it. Measured 2026-10-14 over 21 documents: the physical count was as little
+    as 43% of the wrapped one for a plan file and 55% for a charter, and moving that one cell
+    to a companion file took 19% of a charter's bytes and ZERO counted lines. Worse than
+    blind, it was an incentive: the cheapest way under a physical cap is to move prose into
+    a table row, and nothing could see it.
+
+    A FIXED WIDTH, NOT A WORD WRAP. A person can check it by hand - characters over 120, rounded
+    up - and on the charter that found it the two differ by under 1% (984 against 990 at 110).
+
+    SHARED, like loaded_lines and for the same reason: the checker that gates on it and the
+    generator that writes a new project's cap from it must give the same answer.
+    """
+    return sum(line_weight(ln, width) for ln in _loaded_line_list(text))
 
 
 def raw_lines(text):
@@ -1272,6 +1325,35 @@ def _selftest_loaded_lines():
     return ok
 
 
+def _selftest_wrapped_lines():
+    """wrapped_lines, proved AGAINST loaded_lines on the fixture that made it necessary: one
+    16,000-character table row is ONE loaded line and 134 wrapped ones. A wrapped measure
+    that quietly counted physical lines would pass every short-line case below and fail
+    that one, which is why it is first. Looked up by name so a missing measure is a MISS
+    on the report rather than a crash that hides the other parts."""
+    ok = True
+    wrapped = globals().get("wrapped_lines")
+    if wrapped is None:
+        print("  MISS wrapped_lines                    -> does not exist")
+        return False
+    row = "| " + "w" * 15990 + " | row |"
+    plain = "\n".join(f"line {i}" for i in range(5))
+    for label, got, want in (
+            ("a 16,000-char row: loaded counts 1", loaded_lines(row), 1),
+            ("a 16,000-char row: wrapped counts 134", wrapped(row), 134),
+            ("a line of exactly the width counts 1", wrapped("x" * WRAP_WIDTH), 1),
+            ("one character over counts 2", wrapped("x" * (WRAP_WIDTH + 1)), 2),
+            ("a blank line still counts 1", wrapped("a\n\nb"), 3),
+            ("short lines: wrapped == loaded", wrapped(plain), loaded_lines(plain)),
+            ("a long line inside a comment is 0", wrapped("<!--\n" + "x" * 500 + "\n-->"), 0),
+            ("an inline comment weighs nothing", wrapped("a <!-- " + "x" * 500 + " --> b"), 1),
+            ("lines are weighed one by one", wrapped("x" * 240 + "\n\n"), 3)):
+        good = got == want
+        ok &= good
+        print(f"  {'OK  ' if good else 'MISS'} {label:<38} -> {got} (want {want})")
+    return ok
+
+
 def _selftest_safe_stdout():
     """safe_stdout, PROVED BOTH WAYS on a stream that really cannot encode the character.
 
@@ -1644,7 +1726,8 @@ def _selftest_write_section():
 # THE ORDER IS THE ORDER THE ROWS WERE PRINTED IN BEFORE THE SPLIT. A part that is written
 # and never added here would be silently absent, so the count is PRINTED - the same reason
 # report_pairing prints a number instead of letting a reader assume the suite is two-sided.
-SELFTEST_PARTS = (_selftest_status_model, _selftest_loaded_lines, _selftest_safe_stdout,
+SELFTEST_PARTS = (_selftest_status_model, _selftest_loaded_lines, _selftest_wrapped_lines,
+                  _selftest_safe_stdout,
                   _selftest_exit_codes, _selftest_judge_mark, _selftest_blank_reasons,
                   _selftest_doc_grouping, _selftest_case_harness, _selftest_mask_phrases,
                   _selftest_list_fingerprint, _selftest_isolated_env,
