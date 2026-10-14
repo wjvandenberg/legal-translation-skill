@@ -1,4 +1,4 @@
-r"""auto_mode_headless.py - run an unattended chain of hops in a loop.  CHECKER VERSION 6 (2026-09-30)
+r"""auto_mode_headless.py - run an unattended chain of hops in a loop.  CHECKER VERSION 7 (2026-10-14)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -1521,23 +1521,39 @@ def _selftest() -> int:
     #     KeyboardInterrupt while a hop whose child holds the pipe is running; the interrupt
     #     must propagate AND the child's heartbeat must stop - subprocess.run killed the child
     #     on the way out, and a bare Popen does not unless told to.
+    #     EVERY WAIT HERE IS ON A CONDITION, NEVER A FIXED TIME (v7). The interrupt waited a
+    #     fixed 1.5 s for the heartbeat to begin, and on a busy machine two interpreters had not
+    #     yet started - measured 4 misses in 10 beside 16 busy processes - so the case read
+    #     "heartbeat never began" though the kill worked. Now the interrupt waits for the first
+    #     beat, and "stopped" means unchanged for ten beats; each wait has a generous ceiling,
+    #     and the child and its parent outlive every ceiling, so a kill that fails still shows.
     beat = tmp / "beat.txt"
     hb = tmp / "hb.py"
     hb.write_bytes(("import time, pathlib\np = pathlib.Path(r'" + str(beat) + "')\n"
-                    "for i in range(60):\n    p.write_text(str(i)); time.sleep(0.2)\n")
+                    "for i in range(600):\n    p.write_text(str(i)); time.sleep(0.2)\n")
                    .encode("utf-8"))
     parent = tmp / "parent.py"
     parent.write_bytes(("import subprocess, sys, time\n"
                         f"subprocess.Popen([sys.executable, r'{hb}'], stdout=sys.stdout)\n"
-                        "time.sleep(12)\n").encode("utf-8"))
+                        "time.sleep(180)\n").encode("utf-8"))
     real_comm = subprocess.Popen.communicate
-    calls = {"n": 0}
+    calls, began = {"n": 0}, {"yes": False}
+
+    def beat_now() -> str:
+        try:
+            return beat.read_text()
+        except OSError:
+            return ""
 
     def interrupted(self, *a, **kw):
         calls["n"] += 1
         if calls["n"] == 1:
-            time.sleep(1.5)                                  # let the child start beating
-            raise KeyboardInterrupt
+            seen, until = "", time.monotonic() + 60          # the child's FIRST beat, not a fixed time
+            while not seen and time.monotonic() < until:
+                seen = beat_now()
+                time.sleep(0 if seen else 0.05)
+            began["yes"] = bool(seen)                        # the read that saw it: a re-read can meet
+            raise KeyboardInterrupt                          # the beat mid-write, empty
         return real_comm(self, *a, **kw)
 
     subprocess.Popen.communicate = interrupted
@@ -1548,15 +1564,21 @@ def _selftest() -> int:
         propagated = True
     finally:
         subprocess.Popen.communicate = real_comm
-    time.sleep(0.6)
-    first = beat.read_text() if beat.exists() else ""
-    time.sleep(1.0)
-    second = beat.read_text() if beat.exists() else ""
-    good = propagated and first != "" and first == second
+    stopped, last = False, beat_now()                        # unchanged for 2 s - ten beats - within 30 s
+    since, until = time.monotonic(), time.monotonic() + 30
+    while began["yes"] and time.monotonic() < until:
+        time.sleep(0.1)
+        now = beat_now()
+        if now != last:
+            last, since = now, time.monotonic()
+        elif time.monotonic() - since >= 2.0:
+            stopped = True
+            break
+    good = propagated and began["yes"] and stopped
     ok &= good
     print(f"  {'OK  ' if good else 'MISS'} an interrupt kills the hop's whole tree"
           f"         -> propagated={propagated}, heartbeat "
-          f"{'stopped' if first and first == second else 'STILL GOING' if first else 'never began'}")
+          f"{'stopped' if stopped else 'STILL GOING' if began['yes'] else 'never began'}")
 
     print()
     report_pairing(paired, unpaired)
