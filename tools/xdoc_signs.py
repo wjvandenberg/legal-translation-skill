@@ -53,12 +53,11 @@ DECLARED_BENIGN = [
     ("how the work is done",
      "'§5 here' -- the word 'here' is the disambiguator, and REGISTER-findings.md has no "
      "numbered sections at all"),
-    ("the 199-file install ceiling",
-     "§6.3 is this charter's envisaged-tree subsection, where the file ceiling is recorded. "
-     "The SAME cell carried a bare §4 meaning PLAN-2-step-b.md's test-method section, which "
-     "this check caught on the commit that wrote it -- it is now 'that document's section 4' "
-     "in words, and it is the exact silent misdirection the rule exists to prevent: §4 of "
-     "THIS file is the tech stack, so the sign would have resolved, against the wrong section"),
+    # 2026-10-14: 'the 199-file install ceiling' (§6.3 in section 3.1's phase-2 cell) left with that cell's
+    # history, moved word for word to evidence/EVIDENCE-phase2-history.md. Its successor is the pointer to it.
+    ("moved word for word out of §3.1",
+     "§3.1 is THIS charter's phase table, the cell the history was moved out of; `DECISIONS-LOG.md` and "
+     "the history file are named on the same line as the row's own subjects, not as the sign's target"),
     ("D03 alone",
      "§5.5 is this charter's test corpus; section 11 of A3 is cited in words on the same line"),
     ("all eleven structural questions settled",
