@@ -159,12 +159,16 @@ HEADINGS_LEFT_THE_SEQUENCE_SINCE_BASELINE = {
 # fails exactly as a deleted heading does. Retitling is not deletion only where nothing cites the old
 # title; say in the reason how that was established.
 RETITLED_SINCE_BASELINE = {
-    "3.3": ("Step 3 — the full Cowork test, and its repairs",
-            "Wouter re-planned step 3 on 2026-10-13, Opus 5 dropped; no file outside the charter cites "
-            "the old title, by git grep the same day"),
-    "3.4": ("Step 4 — Polish, then publish",
-            "Wouter re-planned step 4 on 2026-10-13; its irreversible line - never publish without his "
-            "explicit OK - survives verbatim, and no file outside the charter cites the old title"),
+    # 2026-10-14: the house's words (rename commit b1) - a project 'step' is a PHASE, so each title says so.
+    "3.3": ("Phase 3 — the full Cowork test, and its repairs",
+            "Wouter re-planned it on 2026-10-13, Opus 5 dropped, and it took the house's word PHASE on 2026-10-14; "
+            "no file outside the charter cites either title, by git grep the same day"),
+    "3.4": ("Phase 4 — Polish, then publish",
+            "Wouter re-planned it on 2026-10-13 and it took the word PHASE on 2026-10-14; its irreversible line - "
+            "never publish without his explicit OK - survives verbatim; the publishing skill's three pointers "
+            "to its block were renamed in the same commit"),
+    "3.5": ("Phase 5 — the private run-logging tier, and the monthly analysis",
+            "the house's word PHASE, 2026-10-14; no file outside the charter cites the old title, by git grep"),
 }
 
 SECTION_7_CAP = 25

@@ -11,8 +11,8 @@ rather than charter text.** `CLAUDE.md` 6.6 keeps the standing facts and points 
 > **READ THIS FIRST: NEITHER SCRIPT EXISTS YET.** `tools/package.py` and `tools/publish.py` are named
 > below and in the charter's 6.4, and **both are absent from `tools/` — checked by listing, 2026-08-24,
 > and named nowhere else in the repository.** So this document is a **specification**, not a runbook.
-> **Building them is step 4's work** *(section 3.2 of `CLAUDE.md`, its step-4 block, third bullet: the
-> deferred items land there, not in step 2)*. Do not write a release script from memory of this page
+> **Building them is phase 4's work** *(section 3.2 of `CLAUDE.md`, its phase-4 block, third bullet: the
+> deferred items land there, not in phase 2)*. Do not write a release script from memory of this page
 > without re-reading that block first, and do not describe either script as existing.
 
 ## What the deliverable is, and what it is not
@@ -41,9 +41,9 @@ which is not a skill.
 ## What this skill deliberately does NOT carry
 
 - **The approval rule.** *Never make a repo public, or publish, without Wouter's explicit OK* is in
-  **section 3.2 of `CLAUDE.md`, its step-4 block** and stays there. It is the only irreversible act in step 4, and a rule
+  **section 3.2 of `CLAUDE.md`, its phase-4 block** and stays there. It is the only irreversible act in phase 4, and a rule
   whose absence is irreversible may not live behind an invocation — it has to load every session.
 - **The confidentiality gate.** Both controls and the publication check over the archives **and the
-  commit history** are that step-4 block's second bullet, and section 5.6 owns the rules themselves.
+  commit history** are that phase-4 block's second bullet, and section 5.6 owns the rules themselves.
 - **What goes inside the archive.** *No changelog inside the archive, ever* is section 5.7's, and it
   stays in the charter for the same reason as the approval rule.
