@@ -585,15 +585,15 @@ entry point and `verify_charter.py` a reasoned exemption, each measured in a dis
 reads `OVERALL: PASS`, no row tolerated, and the house's `auto_mode_guard.py` v4 closed the fresh-clone gap it found.
 
 **BUILT:** #149; then #150, amendment 3 — in the five sibling imports a cut-short sibling exits as FILE INTEGRITY and
-a missing one keeps its designed fallback, route 5 (none designed) exiting too; `tests/test_sibling_import_integrity.py`
-red first, 11 of 51 per tree. Wouter's five answers, and what was judged alone: `DECISIONS-LOG.md`, 2026-10-16 (2).
+a missing one keeps its designed fallback, route 5 (none designed) exiting too; its suite red first, 11 of 51 per
+tree, 59 checks since its review. Wouter's five answers and the judgements: `DECISIONS-LOG.md`, 2026-10-16 (2).
 
 **SINGLE NEXT ACTION: RENAME (b2), THE BUILD PLAN** — from `temp/s1013b_rename_b_plan.md`, its status cell treated as
 section 3.1's was; then step 13's plan from `temp/s1013b_branch13_explore.md` and Wouter's four step-13 choices.
 
 **WHAT A NEW SESSION WOULD GET WRONG:** `validate_apply.py`'s delivered check exits 3 for its own VOID, the integrity
-code, so judge a broken install by its banner; `tests/run_tests.py` runs none of the standalone `tests/test_*.py`
-suites; the house's guard v4 is committed there but not pushed.
+code, so judge a broken install by its banner; `tests/run_tests.py` runs neither standalone integrity suite
+(`tests/test_language_module_integrity.py`, `tests/test_sibling_import_integrity.py`): only a verify list does.
 
 **Open, none blocking:** 2026-10-14's carried items, word for word in `DECISIONS-LOG.md`, 2026-10-16; the reduction's
-fresh-clone verdict; `install_hooks.py --check` exits 1 here on every run. **Context: 49% when this was written.**
+fresh-clone verdict; `install_hooks.py --check` exits 1 here every run. **Context: 49% when written, measured.**

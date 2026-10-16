@@ -1466,8 +1466,10 @@ widened to name the job (H1/H3). The accepted-input envelope is DECLARED AND REF
 `.docm`, non-Word, image-only — each refused with a message saying what to do, three synthetic inputs proving it
 (L5). The short-document gear is MEASURED FIRST — per-step minutes for the short runs, from the forensic logs —
 before anything is designed. R1's one decision: the two LANGUAGE values set to the delivered variant, `w:author`
-and `people.xml` left alone, built in step 13. **(6)** In chat, mid-session: no questions while he is away; rename
-(b2) and step 13's plan kept for a new session; close when done.
+and `people.xml` left alone, built in step 13. **(6)** In chat, mid-session, his words: *"I'll be out for about 45 minutes so please no questions,
+keep everything for a new session - close when you are done"*. **This session's reading, a judgement
+and not his ruling:** finish and merge the sibling fix already under way, then close; rename (b2) and
+step 13's plan carried to the next session.
 
 **JUDGEMENTS TAKEN ALONE, CARRIED TO THE CLOSE.** **(a)** Each of the seven tools was run in a disposable clone,
 bare and with its flag, before its entry point was chosen: `install_hooks.py` run bare INSTALLS (four files written
@@ -1487,7 +1489,7 @@ INTEGRITY for a missing sibling too; the existing helper moved above the import 
 **OPEN, NONE BLOCKING.** `tests/run_tests.py` runs none of the standalone `tests/test_*.py` integrity suites, #142's
 and this one included, so the full runner cannot see one go red; `validate_apply.py`'s VOID exit 3 shares the
 integrity code; `install_hooks.py --check` exits 1 here on every run, `tools/hooks` holding a Claude Code hook it
-reads as a git hook; the house's v4 is committed but not pushed, the push Wouter's. **And four of #150's seven review findings, carried rather than built:** (1) judge truncation by each sibling's closing sentinel rather than by the exception's type — a WHOLE sibling with a real defect now reads as a broken install, and a re-install cannot fix it — a change to the approach #142 merged, so Wouter's to make; (2) a SyntaxError in a nested module is named against the direct sibling, unreachable in today's import graph, and (1) would close it too; (3) the VOID exit 3 above; (4) the deleted-sibling cases prove only that importing did not crash, never that each fallback works.
+reads as a git hook; the house's v4, committed but not yet pushed when this entry was drafted, was pushed by the house's own session the same afternoon (`be89bfb` is on its `origin/main`). **And four of #150's seven review findings, carried rather than built:** (1) judge truncation by each sibling's closing sentinel rather than by the exception's type — a WHOLE sibling with a real defect now reads as a broken install, and a re-install cannot fix it — a change to the approach #142 merged, so Wouter's to make; (2) a SyntaxError in a nested module is named against the direct sibling, unreachable in today's import graph, and (1) would close it too; (3) the VOID exit 3 above; (4) the deleted-sibling cases prove only that importing did not crash, never that each fallback works.
 
 **The 2026-10-16 handoff, as it stood at `eeabead`, word for word:**
 
