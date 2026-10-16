@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""auto_mode_guard.py - refuse an unattended session's irreversible acts.  CHECKER VERSION 3 (2026-10-09)
+"""auto_mode_guard.py - refuse an unattended session's irreversible acts.  CHECKER VERSION 4 (2026-10-16)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -305,6 +305,16 @@ def main(argv) -> int:
 
     f = find_state_file()
     if f is None:
+        if probe:
+            # v4: --probe exists to REPORT, and v3 returned here before it looked at the flag -
+            # so in a project that never armed a run, or a fresh clone of one that gitignores its
+            # state file, it printed NOTHING and an entry-point check called the guard broken.
+            # The hook path below stays silent and fast. No path is printed: it carries a username.
+            print("auto_mode_guard: " + (
+                "AUTO_MODE_RUN_FILE names a file that does not exist"
+                if os.environ.get("AUTO_MODE_RUN_FILE") else
+                "no AUTO-MODE-RUN.md in this folder or any parent, and AUTO_MODE_RUN_FILE is not set")
+                + " - INERT here; a hook call would be ALLOWED silently")
         return ALLOW                                   # no AUTO MODE here. Silent, and fast.
     try:
         fields, _raw, _term = read_state(f)
@@ -462,6 +472,28 @@ def selftest() -> int:
     print(f"  {'OK  ' if good else 'MISS'} piped raw UTF-8: --probe reports, never crashes"
           f"          -> exit {pr.returncode}, stdout {ascii(pr.stdout[:6])}")
 
+    # ---- v4: WITH NO STATE FILE AT ALL, --probe REPORTS and the HOOK SAYS NOTHING. v3 returned
+    #      before it looked at the flag, so the probe printed nothing - measured, rc 0 and zero
+    #      lines - and every case above names a state file, so none could see it. Both of the
+    #      probe's routes to "none": a named file that is missing, and a walk up that finds none.
+    print()
+    alone = tmp / "no-state-anywhere"
+    alone.mkdir(parents=True, exist_ok=True)
+    walk_clear = not any((p / "AUTO-MODE-RUN.md").exists() for p in (alone, *alone.parents))
+    for label, flags, named, want_said in (
+            ("--probe, a named state file missing", ("--probe",), True, True),
+            ("--probe, none in any parent folder", ("--probe",), False, True),
+            ("the hook call, a forced push", (), True, False)):
+        if not named and not walk_clear:
+            print(f"  SKIP no state file: {label:<36} -> a parent of the temp folder holds one")
+            continue
+        r = _stateless_probe(alone, named, *flags)
+        said = (r.stdout + r.stderr).strip()
+        good = r.returncode == ALLOW and (b"INERT" in r.stdout if want_said else not said)
+        ok &= good
+        print(f"  {'OK  ' if good else 'MISS'} no state file: {label:<36} -> exit {r.returncode}, "
+              f"{len(said)} bytes said, want {'INERT' if want_said else 'nothing'}")
+
     print()
     report_pairing(paired, unpaired)
     shutil.rmtree(tmp, ignore_errors=True)
@@ -521,6 +553,19 @@ def _piped_probe(tmp: Path, command: str, folder: str, *flags: str) -> subproces
     return subprocess.run([sys.executable, str(Path(__file__).resolve()), *flags],
                           input=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
                           capture_output=True, env=env, timeout=60)
+
+
+def _stateless_probe(d: Path, named: bool, *flags: str) -> subprocess.CompletedProcess:
+    """The REAL entry point run from `d` with NO state file: either AUTO_MODE_RUN_FILE names one
+    that does not exist, which is answered without walking up, or it is unset and the walk up
+    from `d` finds none - the caller checks that first. Fed a forced push, as a hook would be."""
+    env = {k: v for k, v in os.environ.items() if k != "AUTO_MODE_RUN_FILE"}
+    if named:
+        env["AUTO_MODE_RUN_FILE"] = str(d / "no-such-run" / "AUTO-MODE-RUN.md")
+    payload = {"tool_name": "Bash", "tool_input": {"command": "git push --force"}, "cwd": str(d)}
+    return subprocess.run([sys.executable, str(Path(__file__).resolve()), *flags],
+                          input=json.dumps(payload).encode("utf-8"), capture_output=True,
+                          cwd=str(d), env=env, timeout=60)
 
 
 if __name__ == "__main__":
