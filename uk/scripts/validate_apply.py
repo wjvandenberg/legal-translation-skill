@@ -87,9 +87,44 @@ sys.dont_write_bytecode = True
 _SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
+
+
+def _sibling_integrity_exit(name, exc):
+    """A sibling module this script imports is missing or cut short: a broken install, which SKILL.md rule 6
+    answers by re-installing. So the banner and the exit 3 this script prints for its OWN truncation - never a
+    raw traceback and exit 1, and never a gate's costume. Only ImportError (deleted, or cut before the names it
+    is asked for) and SyntaxError (cut mid-statement) arrive here: a broader class would dress a real defect as
+    a broken install - and an ImportError about some OTHER module, raised inside the sibling, is that sibling's
+    defect, so it is raised as it is."""
+    if isinstance(exc, ImportError) and exc.name not in (None, os.path.splitext(name)[0]):
+        raise exc
+    bar = "=" * 60
+    for line in ("", bar, "[skill] FILE INTEGRITY CHECK FAILED — script truncated.",
+                 f"  File: {os.path.join(os.path.dirname(os.path.abspath(__file__)), name)}",
+                 f"  Needed by: {os.path.basename(__file__)} ({type(exc).__name__}: {exc})",
+                 "  Re-install the skill from the .skill / .zip archive.", bar, ""):
+        print(line, file=sys.stderr)
+    sys.exit(3)
+
+
+def _sibling_cut_short(name, exc):
+    """True when importing the sibling `name` failed because it is PRESENT BUT CUT SHORT: a SyntaxError (cut
+    mid-statement - the whole file is compiled before any of it runs), or an ImportError that is not a
+    ModuleNotFoundError and names the sibling itself (cut cleanly before the names asked of it). A sibling that
+    is simply MISSING - a ModuleNotFoundError naming it - is not, so a fallback designed for a partial install
+    still runs; and an ImportError about some OTHER module, raised inside a whole sibling, is that sibling's
+    defect, not an install's."""
+    if isinstance(exc, SyntaxError):
+        return True
+    return (isinstance(exc, ImportError) and not isinstance(exc, ModuleNotFoundError)
+            and exc.name == os.path.splitext(name)[0])
+
+
 try:
     from post_process import will_fix_spacing_fire  # noqa: E402
-except ImportError:
+except (ImportError, SyntaxError) as _exc:
+    if _sibling_cut_short('post_process.py', _exc):  # present but cut short: a broken install, SKILL.md rule 6
+        _sibling_integrity_exit('post_process.py', _exc)
     # Fallback for environments where post_process isn't importable
     # (e.g. partial install). Inline the rule so validate_apply still
     # works; the post_process version remains the canonical source.
@@ -1816,13 +1851,15 @@ def _side_hf_reader():
     --extract writes into the scaffold -- or None. Imported here, when this arm
     runs, and not at the top of the file, so no other mode depends on it."""
     try:
-        import translate_headers_footers as thf
-    except ImportError:
+        from translate_headers_footers import _field_aware_text_and_fields, _para_text
+    except (ImportError, SyntaxError) as exc:
+        if _sibling_cut_short('translate_headers_footers.py', exc):  # present but cut short: SKILL.md rule 6
+            _sibling_integrity_exit('translate_headers_footers.py', exc)
         return None
 
     def read(p):
-        text, _fields, has_fields = thf._field_aware_text_and_fields(p)
-        return text if has_fields else thf._para_text(p)
+        text, _fields, has_fields = _field_aware_text_and_fields(p)
+        return text if has_fields else _para_text(p)
     return read
 
 

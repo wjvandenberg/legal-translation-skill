@@ -36,9 +36,9 @@
    "sha256_now": "c0414f93e2034ef19b032766aeb8d605e07fddd10733145f3e804e174795b77c"
   },
   "uk/scripts/repack_docx.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "999710b3498e90099c243f8a560b74555bdfd5ddd87071c2e9117156bd795b34"
+   "changed_by": "fix/sibling-import-integrity",
+   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
+   "sha256_now": "adc4d5f235e09775d8f504e6982ed19582be873d4e7be245f1c35230d4cca809"
   },
   "uk/scripts/source_language_markers.py": {
    "changed_by": "feature/branch12-slice12b",
@@ -51,9 +51,9 @@
    "sha256_now": "0ce03126e0eec32a4acaa6bff7f77971c7871ce8de5ec921fa655faae01e235d"
   },
   "uk/scripts/translate_headers_footers.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "a47916da6796a426723101b86b13e5a4b4dd8e802eeb15786783c5bc764ac96a"
+   "changed_by": "fix/sibling-import-integrity",
+   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
+   "sha256_now": "b366072f07ae2eeca91db27d330cfc86350ff6c6a4d43f5afbac3048d4f6d5b8"
   },
   "uk/scripts/translate_numbering.py": {
    "changed_by": "fix/language-module-integrity",
@@ -61,9 +61,9 @@
    "sha256_now": "dad3bc3b86656619f01449e43bfdfacd7e009be937297f6609f00bf4fbec7e0d"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 1: C16's class COUNTED, an added space in the three measured places, a lost space and a split word still blocking",
-   "sha256_now": "5ef6f8cac2971c205c326ec82993f40ab4ef777c465f8bc42f0470fc1fedb201"
+   "changed_by": "fix/sibling-import-integrity",
+   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
+   "sha256_now": "aa280a377a3434831934c38dc76a82baa5ad643c83da7452e948c4b6418fc03a"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -136,9 +136,9 @@
    "sha256_now": "19c79bf4472de82a5cd74d22c7d549b7519224cfda5a49d4418297a8a78ea283"
   },
   "us/scripts/repack_docx.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "999710b3498e90099c243f8a560b74555bdfd5ddd87071c2e9117156bd795b34"
+   "changed_by": "fix/sibling-import-integrity",
+   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
+   "sha256_now": "adc4d5f235e09775d8f504e6982ed19582be873d4e7be245f1c35230d4cca809"
   },
   "us/scripts/source_language_markers.py": {
    "changed_by": "feature/branch12-slice12b",
@@ -151,9 +151,9 @@
    "sha256_now": "5f18c14d5a8c1191efb310bdea9b933f425e4cbc2b5da5106917f9f2f9822ab3"
   },
   "us/scripts/translate_headers_footers.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "461108cc73e6f46e823a50bc2e1e0b78f747527de7bcc3ca01fd088e0ce14ac4"
+   "changed_by": "fix/sibling-import-integrity",
+   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
+   "sha256_now": "606bdc21fc99ed36dbad21d08af7a4f7904bb004606c5cb25ea326824ba47163"
   },
   "us/scripts/translate_numbering.py": {
    "changed_by": "fix/language-module-integrity",
@@ -161,9 +161,9 @@
    "sha256_now": "dad3bc3b86656619f01449e43bfdfacd7e009be937297f6609f00bf4fbec7e0d"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "feature/branch11-wiring",
-   "commit_subject": "Branch 11 Step 10 wiring - sub-step 1: C16's class COUNTED, an added space in the three measured places, a lost space and a split word still blocking",
-   "sha256_now": "9f452e4a626c2c0293e30dba45928d430fe9516077b269a89dd3e984de1052cc"
+   "changed_by": "fix/sibling-import-integrity",
+   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
+   "sha256_now": "605254e29dc9277b262b407282e7f251e0c92b13722d86d22c25c12f1437376f"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/check-scoping-quality-check",
@@ -206,14 +206,14 @@
    "sha256_now": "7dbac7c8d878427f9e8aed5a0935eabe44652ad4e05b41a945e6b892d603d0e1"
   },
   "uk/scripts/validate_en_runs.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "c36a8f277dce3898071de8e996f3a3dd020ffd6ed19aae35791da75e48b66d4c"
+   "changed_by": "fix/sibling-import-integrity",
+   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
+   "sha256_now": "82306e41b551059e76d0bc7c0680c372c027673e81cd2c4526408704b0888996"
   },
   "us/scripts/validate_en_runs.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "c36a8f277dce3898071de8e996f3a3dd020ffd6ed19aae35791da75e48b66d4c"
+   "changed_by": "fix/sibling-import-integrity",
+   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
+   "sha256_now": "82306e41b551059e76d0bc7c0680c372c027673e81cd2c4526408704b0888996"
   },
   "uk/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/branch11-slice4b",

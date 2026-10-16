@@ -103,6 +103,24 @@ def tiling_violations(paras):
     return out
 
 
+def _sibling_integrity_exit(name, exc):
+    """A sibling module this script imports is missing or cut short: a broken install, which SKILL.md rule 6
+    answers by re-installing. So the banner and the exit 3 this script prints for its OWN truncation - never a
+    raw traceback and exit 1, and never a gate's costume. Only ImportError (deleted, or cut before the names it
+    is asked for) and SyntaxError (cut mid-statement) arrive here: a broader class would dress a real defect as
+    a broken install - and an ImportError about some OTHER module, raised inside the sibling, is that sibling's
+    defect, so it is raised as it is."""
+    if isinstance(exc, ImportError) and exc.name not in (None, os.path.splitext(name)[0]):
+        raise exc
+    bar = "=" * 60
+    for line in ("", bar, "[skill] FILE INTEGRITY CHECK FAILED — script truncated.",
+                 f"  File: {os.path.join(os.path.dirname(os.path.abspath(__file__)), name)}",
+                 f"  Needed by: {os.path.basename(__file__)} ({type(exc).__name__}: {exc})",
+                 "  Re-install the skill from the .skill / .zip archive.", bar, ""):
+        print(line, file=sys.stderr)
+    sys.exit(3)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Pre-apply gate: BLOCK if a detected definitions section '
@@ -118,7 +136,10 @@ def main():
     scripts_dir = os.path.dirname(os.path.abspath(__file__))
     if scripts_dir not in sys.path:
         sys.path.insert(0, scripts_dir)
-    import reorder_definitions
+    try:
+        from reorder_definitions import find_definitions_section_in_texts
+    except (ImportError, SyntaxError) as exc:  # deleted, or cut short: a broken install, SKILL.md rule 6
+        _sibling_integrity_exit('reorder_definitions.py', exc)
 
     with open(args.paragraphs_json, 'r', encoding='utf-8') as f:
         paras = json.load(f)
@@ -164,7 +185,7 @@ def main():
         src = (p.get('text') or '').strip()
         texts.append(en if en else src)
 
-    start, end = reorder_definitions.find_definitions_section_in_texts(texts)
+    start, end = find_definitions_section_in_texts(texts)
     if start is None:
         return 0
 

@@ -131,11 +131,46 @@ sys.dont_write_bytecode = True
 _SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, _SCRIPTS_DIR)
+
+
+def _sibling_integrity_exit(name, exc):
+    """A sibling module this script imports is missing or cut short: a broken install, which SKILL.md rule 6
+    answers by re-installing. So the banner and the exit 3 this script prints for its OWN truncation - never a
+    raw traceback and exit 1, and never a gate's costume. Only ImportError (deleted, or cut before the names it
+    is asked for) and SyntaxError (cut mid-statement) arrive here: a broader class would dress a real defect as
+    a broken install - and an ImportError about some OTHER module, raised inside the sibling, is that sibling's
+    defect, so it is raised as it is."""
+    if isinstance(exc, ImportError) and exc.name not in (None, os.path.splitext(name)[0]):
+        raise exc
+    bar = "=" * 60
+    for line in ("", bar, "[skill] FILE INTEGRITY CHECK FAILED — script truncated.",
+                 f"  File: {os.path.join(os.path.dirname(os.path.abspath(__file__)), name)}",
+                 f"  Needed by: {os.path.basename(__file__)} ({type(exc).__name__}: {exc})",
+                 "  Re-install the skill from the .skill / .zip archive.", bar, ""):
+        print(line, file=sys.stderr)
+    sys.exit(3)
+
+
+def _sibling_cut_short(name, exc):
+    """True when importing the sibling `name` failed because it is PRESENT BUT CUT SHORT: a SyntaxError (cut
+    mid-statement - the whole file is compiled before any of it runs), or an ImportError that is not a
+    ModuleNotFoundError and names the sibling itself (cut cleanly before the names asked of it). A sibling that
+    is simply MISSING - a ModuleNotFoundError naming it - is not, so a fallback designed for a partial install
+    still runs; and an ImportError about some OTHER module, raised inside a whole sibling, is that sibling's
+    defect, not an install's."""
+    if isinstance(exc, SyntaxError):
+        return True
+    return (isinstance(exc, ImportError) and not isinstance(exc, ModuleNotFoundError)
+            and exc.name == os.path.splitext(name)[0])
+
+
 try:
     from extract_paragraphs import (                                    # noqa: E402
         _GRAPHIC_ATTR_SURFACES, graphic_metadata_surfaces)
     _GRAPHICS_AVAILABLE = True
-except ImportError:
+except (ImportError, SyntaxError) as _exc:
+    if _sibling_cut_short('extract_paragraphs.py', _exc):  # present but cut short: a broken install, rule 6
+        _sibling_integrity_exit('extract_paragraphs.py', _exc)
     _GRAPHIC_ATTR_SURFACES = ()
     _GRAPHICS_AVAILABLE = False
 
@@ -1186,24 +1221,6 @@ def translate_xml(xml_bytes, tmap, left=None):
         return ET.tostring(tree, xml_declaration=True, encoding='UTF-8',
                            standalone=True), changes
     return None, []
-
-def _sibling_integrity_exit(name, exc):
-    """A sibling module this script imports is missing or cut short: a broken install, which SKILL.md rule 6
-    answers by re-installing. So the banner and the exit 3 this script prints for its OWN truncation - never a
-    raw traceback and exit 1, and never a gate's costume. Only ImportError (deleted, or cut before the names it
-    is asked for) and SyntaxError (cut mid-statement) arrive here: a broader class would dress a real defect as
-    a broken install - and an ImportError about some OTHER module, raised inside the sibling, is that sibling's
-    defect, so it is raised as it is."""
-    if isinstance(exc, ImportError) and exc.name not in (None, os.path.splitext(name)[0]):
-        raise exc
-    bar = "=" * 60
-    for line in ("", bar, "[skill] FILE INTEGRITY CHECK FAILED — script truncated.",
-                 f"  File: {os.path.join(os.path.dirname(os.path.abspath(__file__)), name)}",
-                 f"  Needed by: {os.path.basename(__file__)} ({type(exc).__name__}: {exc})",
-                 "  Re-install the skill from the .skill / .zip archive.", bar, ""):
-        print(line, file=sys.stderr)
-    sys.exit(3)
-
 
 def translate_headers_footers_legacy(orig_docx, output_dir, language=None):
     """Legacy dictionary-lookup mode (Mode 3).
