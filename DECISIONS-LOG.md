@@ -1393,6 +1393,20 @@ retired at the end of the reduction, its full text below. **(f)** Section 7 rewr
 it in the same change — lowering caps Wouter said to keep is his call, and the time ran short; the two declared
 reds removed because both rows now pass. **(h)** `md.pointers` gains three entries, for 2.5, 3.1 and 5.1.
 
+**THE JUDGEMENTS TAKEN AFTER THIS ENTRY WAS FIRST WRITTEN, AND WOUTER'S ANSWERS AT 12:30.** **(i)** The full test
+run: all 21 suites and every entry point PASS, one row red — run_tests v6's *"entry points cover the checkers"*,
+seven installed tools with no entry point or exemption, arriving with #146's re-copy, not with this work —
+DECLARED BY CONTENT in the verify driver (that row alone, naming exactly those seven; a planted second failure
+rejected), not fixed. **(j)** Six phrases `claudemd_claims` and `claudemd_disposal` key on, lost in the rewording,
+restored word for word at no cost; both back to their baseline readings. **(k)** The ten `/code-review` findings
+on #148 fixed before the merge: four stale notes, three checker edge cases red first — two equally long cap globs
+give no cap, an `md` section that is not an object is VOID, and a disabled cap asks for no declaration, reversing
+v3's first design — the 1.3 row naming 5.1, an unused import. **Wouter, 12:30, through the question tool:**
+**(1)** every judgement (a) to (k) stands; **(2)** the section caps re-set at measured size — sections 1, 2, 4 and
+5 to 77, 92, 25 and 243, section 3 kept at 70 for status updates, 6 at 101 and 7 at the house's 25 — the reduction
+template's row K, a planted line in section 4 proving the cap fires; **(3)** the test runner's red row is the next
+session's first job; **(4)** #148 squash-merged once VERIFY and TEST are green.
+
 **WHAT MOVED, AND WHERE.** Phase 2's status cell to `evidence/EVIDENCE-phase2-history.md`, word for word as at
 `798dd03`; section 5.1's *"planned step 2 from section 3.3 alone"* to `EVIDENCE-measurement.md` 3.8. **Kept HERE,
 word for word, because nothing else held them:** section 2.5's 2026-07-30 clause *"The register is the input to the

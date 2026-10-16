@@ -52,7 +52,6 @@ into a PUBLIC repository -- the exact class `tools/publication_check.py` exists 
 Without it that check is VOID and this script exits 1 with a banner. An unreadable source is not a pass.
 """
 import fnmatch
-import json
 import os
 import re
 import subprocess
@@ -62,7 +61,7 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from house_common import load_section, loaded_lines, wrapped_lines  # noqa: E402
+from house_common import loaded_lines, read_config_json, wrapped_lines  # noqa: E402
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 ROOT = Path(__file__).resolve().parent.parent
@@ -208,11 +207,10 @@ SECTION_7_CAP = 25
 # 619 -> 637 ON 2026-10-16, AND THE NUMBER IS NOW IN WRAPPED LINES (the house's v46): the same
 # `rebuild`/L emit re-measured at 517 wrapped by new_charter.py v27 --dry-run from an empty folder
 # outside the repository, plus the kept 120. The same number in a new unit is a new cap.
-# IT MUST EQUAL verify.config.json's max_lines for CLAUDE.md -- and the number is stated in SIX
-# places across three files, not the THREE this comment used to claim: that config key, its
-# comment, section 1.7's opening sentence, 1.7's emit figure, this constant and this note.
-# Only the config key gates, and check 3 sees only ONE of the six -- the "N lines against a cap
-# of C" sentence -- so moving any of them alone trades one red for another.
+# UNTIL v3 IT HAD TO EQUAL verify.config.json's max_lines for CLAUDE.md, the number being stated in
+# SIX places across three files -- that config key, its comment, section 1.7's opening sentence,
+# 1.7's emit figure, this constant and this note -- so moving any of them alone traded one red for
+# another.
 # AND SINCE v3 (2026-10-16) THERE IS NO CONSTANT HERE AT ALL: configured_cap() reads md.max_lines as
 # verify_md reads it, so this checker holds no copy of the number to go stale, and the charter states
 # none while it is under its cap. The story above is kept as the record of why the number moved.
@@ -325,11 +323,15 @@ def md_config(root=None):
     """The md section of verify.config.json over the defaults of the two keys this checker reads, through
     house_common's own reader (which strips a byte-order mark). None when it cannot be read as an object:
     a malformed config is VOID, never a traceback."""
+    f = Path(root or ROOT) / "verify.config.json"
     try:
-        cfg = load_section(Path(root or ROOT), "md", {"line_measure": MEASURE_DEFAULT, "max_lines": 0})
+        raw = read_config_json(f) if f.exists() else {}
     except (OSError, ValueError, AttributeError, TypeError):
         return None
-    return cfg if isinstance(cfg, dict) else None
+    md = raw.get("md", {}) if isinstance(raw, dict) else None
+    if not isinstance(md, dict):
+        return None
+    return {"line_measure": MEASURE_DEFAULT, "max_lines": 0, **md}
 
 
 def line_measure(root=None):
@@ -350,6 +352,8 @@ def configured_cap(charter_path="CLAUDE.md", root=None):
         return ml or None
     if isinstance(ml, dict):
         hits = sorted((g for g in ml if fnmatch.fnmatch(charter_path, g)), key=len, reverse=True)
+        if len(hits) > 1 and len(hits[0]) == len(hits[1]):
+            return None  # two equally long globs match: verify_md calls that VOID, never a silent pick
         return ml[hits[0]] if hits and isinstance(ml[hits[0]], int) else None
     return None
 
@@ -357,8 +361,9 @@ def configured_cap(charter_path="CLAUDE.md", root=None):
 def declaration_required(measured, cap):
     """Must the charter state its own length? Only while it is OVER its cap, where section 1.7's over-cap
     declaration carries the figure; at or under the cap it states none, so no figure can go stale
-    (Wouter, 2026-10-16). With no cap configured, a declaration is the only record and stays required."""
-    return cap is None or measured > cap
+    (Wouter, 2026-10-16). With no cap at all - max_lines 0 disables it - there is nothing to be over, so
+    nothing need be declared."""
+    return cap is not None and measured > cap
 
 
 def measure(text, unit):
@@ -810,11 +815,18 @@ def selftest():
     print("v3 — the cap read from the config, the declaration waived under it, a malformed config VOID")
     case("under its cap, no length declaration is required", declaration_required(600, 637), False)
     case("over its cap, a length declaration is required", declaration_required(700, 637), True)
-    case("with no cap configured, a declaration is required", declaration_required(600, None), True)
+    case("with no cap at all (0 disables it), nothing need be declared", declaration_required(600, None), False)
     with tempfile.TemporaryDirectory() as d:
         Path(d, "verify.config.json").write_text(
             '{"md": {"max_lines": {"CLAUDE.md": 500, "*.md": 9}}}', encoding="utf-8")
         case("the cap is the config's, the longest matching glob winning", configured_cap("CLAUDE.md", d), 500)
+        Path(d, "verify.config.json").write_text(
+            '{"md": {"max_lines": {"CLAUDE.md": 500, "*LAUDE.md": 9}}}', encoding="utf-8")
+        case("two equally long matching globs are ambiguous, as verify_md says: no cap is picked",
+             configured_cap("CLAUDE.md", d), None)
+        Path(d, "verify.config.json").write_text('{"md": []}', encoding="utf-8")
+        case("an md section that is not an object reads as no unit (VOID), never as the defaults",
+             line_measure(d), None)
         Path(d, "verify.config.json").write_text('["not", "an", "object"]', encoding="utf-8")
         try:
             got = line_measure(d)

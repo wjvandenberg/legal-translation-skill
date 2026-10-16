@@ -34,7 +34,7 @@ from a summary of the evidence and reached a wrong conclusion.
 | **`PLAN-3-opus5-migration.md`** | goal (iii) — **SUPERSEDED 2026-10-13**, Opus 5 dropped *(Wouter)* | for its reasoning only | the Opus 5 steps and Step C's design, neither now planned |
 | **`DECISIONS-LOG.md`** | the dated reasons for what was decided; beside it `evidence/EVIDENCE-phase2-history.md`, moved word for word out of §3.1 | before re-opening anything settled | closed questions · phase 2's history |
 | **`evidence/EVIDENCE-confidentiality.md`** | the dated evidence behind §5.6 — **no rule**: each stayed in the charter, route 1 | **before touching a confidentiality control** | measurements, incidents, the controls' history, the census |
-| **`evidence/EVIDENCE-measurement.md`** | the twelve-row test-corpus listing *(from §5.5)* and the dated cost stories *(from §5.5 and §5.3)* | corpus facts, defect costs | the corpus, grader gaps, every cost story, the gate's measures |
+| **`evidence/EVIDENCE-measurement.md`** | the twelve-row test-corpus listing *(from §5.5)* and the cost stories *(from §5.1, §5.3 and §5.5)* | corpus facts, defect costs | the corpus, grader gaps, every cost story, the gate's measures |
 | **the private sibling folder** | `context.md`, `leakage-names.txt`, the A4 set, grader backups, the harness | before anything touching confidentiality, packaging or publication | **never committable** |
 
 **The build plan, the register and the structural analysis are live inputs; the rest are reference.** The A4
@@ -580,19 +580,20 @@ Wouter's explicit OK.)*
 
 ### HANDOFF — 2026-10-16, THE CHARTER BACK UNDER ITS CAP, IN WRAPPED LINES
 
-**PURPOSE: MET, PENDING WOUTER'S 12:30 REVIEW.** It was *so that the charter is under its cap in the measure the
-house now uses*: the switch merged as #147, then 831 → 632 wrapped lines against 637, no heading lost, route 1 untouched.
+**PURPOSE: MET.** It was *so that the charter is under its cap in the measure the house now uses*: the switch merged
+as #147, the reduction as #148 — 831 → 632 wrapped lines against 637, no heading lost, route 1 untouched.
 
-**BUILT:** `check_checkers` v20 adopted; the v46 switch (#147); on `reduce/wrapped-cap`, sections 5, 2, 1, 6 and 3
-cut at Wouter's word block by block, 4 and a second pass alone, the 1.7 box retired; the continuity checker v3, the
-cap read from the config and no length declared under it. What moved where: `DECISIONS-LOG.md`, 2026-10-16.
+**BUILT:** `check_checkers` v20 adopted; the v46 switch; sections 5, 2, 1, 6 and 3 cut at Wouter's word block by
+block, 4 and a second pass alone, the 1.7 box retired; the continuity checker v3; the section caps re-set at
+measured size, 3, 6 and 7 kept (Wouter, 12:30), one proved to fire. What moved where: `DECISIONS-LOG.md`, 2026-10-16.
 
-**SINGLE NEXT ACTION: THE 12:30 REVIEW** of `temp/s1016_alone.md` with Wouter, then the reduction PR merged; then the
-sibling-import follow-up (`temp/s1013b_integrity_plan.md` amendment 3), rename (b2), step 13's plan.
+**SINGLE NEXT ACTION: THE TEST RUNNER'S RED ROW** — an entry point or a reasoned exemption in `verify.config.json`
+for each of seven tools (Wouter, 12:30); then the sibling-import follow-up (`temp/s1013b_integrity_plan.md`
+amendment 3), rename (b2), step 13's plan.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** every cap is in WRAPPED lines, so a long table row costs what it holds; the
-section caps keep their old numbers, NOT yet re-set at measured size (the reduction template's row K, owed), and
-section 6 sits at its cap; `claudemd_claims` carries its standing check-2 red, declared by content.
+**WHAT A NEW SESSION WOULD GET WRONG:** every cap is in WRAPPED lines, a long table row costing what it holds; the
+section caps now sit AT measured size, so any addition outside section 3 is paid for in its own section;
+`claudemd_claims` carries its standing check-2 red, declared by content.
 
 **Open, none blocking:** 2026-10-14's carried items, word for word in `DECISIONS-LOG.md`, 2026-10-16; the
-reduction's planted-control and fresh-clone checks. **Context: 54% when this was written, measured.**
+reduction's fresh-clone verdict. **Context: 64% when this was written, measured.**
