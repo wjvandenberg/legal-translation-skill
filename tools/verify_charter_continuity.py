@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 """DID THE CHARTER REDUCTION LOSE ANYTHING, AND DOES THE CHARTER STILL STATE ITS OWN SIZE TRUTHFULLY?
 
-CHECKER VERSION 2 (2026-10-16)
+CHECKER VERSION 3 (2026-10-16)
+
+v3: THE CAP IS READ FROM verify.config.json (md.max_lines, the longest matching glob, as verify_md
+reads it) rather than held as a constant; check 3 no longer demands a length declaration from a
+charter AT OR UNDER its cap (Wouter, 2026-10-16); a malformed config is VOID, never a traceback; and
+every count the report prints is in md.line_measure's unit.
 
 v2: CHECKS 3 AND 4 COUNT IN THE UNIT verify.config.json's md.line_measure NAMES, through house_common's
 own functions, so this checker and verify_md cannot disagree about a size. v1 counted len(splitlines())
@@ -46,18 +51,19 @@ into a PUBLIC repository -- the exact class `tools/publication_check.py` exists 
 
 Without it that check is VOID and this script exits 1 with a banner. An unreadable source is not a pass.
 """
-import json
+import fnmatch
 import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.dont_write_bytecode = True
-from house_common import loaded_lines, wrapped_lines  # noqa: E402  (tools/ is on the path: this script's own folder)
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from house_common import loaded_lines, read_config_json, wrapped_lines  # noqa: E402
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parent.parent
 
 # --------------------------------------------------------------------------- configuration
@@ -201,12 +207,13 @@ SECTION_7_CAP = 25
 # 619 -> 637 ON 2026-10-16, AND THE NUMBER IS NOW IN WRAPPED LINES (the house's v46): the same
 # `rebuild`/L emit re-measured at 517 wrapped by new_charter.py v27 --dry-run from an empty folder
 # outside the repository, plus the kept 120. The same number in a new unit is a new cap.
-# IT MUST EQUAL verify.config.json's max_lines for CLAUDE.md -- and the number is stated in SIX
-# places across three files, not the THREE this comment used to claim: that config key, its
-# comment, section 1.7's opening sentence, 1.7's emit figure, this constant and this note.
-# Only the config key gates, and check 3 sees only ONE of the six -- the "N lines against a cap
-# of C" sentence -- so moving any of them alone trades one red for another.
-DECLARED_CAP = 637
+# UNTIL v3 IT HAD TO EQUAL verify.config.json's max_lines for CLAUDE.md, the number being stated in
+# SIX places across three files -- that config key, its comment, section 1.7's opening sentence,
+# 1.7's emit figure, this constant and this note -- so moving any of them alone traded one red for
+# another.
+# AND SINCE v3 (2026-10-16) THERE IS NO CONSTANT HERE AT ALL: configured_cap() reads md.max_lines as
+# verify_md reads it, so this checker holds no copy of the number to go stale, and the charter states
+# none while it is under its cap. The story above is kept as the record of why the number moved.
 
 # --------------------------------------------------------------------------- check 3 data
 # A DECLARATION is a sentence in which the charter states ITS OWN length. Each pattern below has a
@@ -308,13 +315,55 @@ CR = bytes([13]).decode("ascii")
 
 
 # --------------------------------------------------------------------------- the unit (v2)
+LINE_MEASURES = ("physical", "wrapped")
+MEASURE_DEFAULT = "physical"
+
+
+def md_config(root=None):
+    """The md section of verify.config.json over the defaults of the two keys this checker reads, through
+    house_common's own reader (which strips a byte-order mark). None when it cannot be read as an object:
+    a malformed config is VOID, never a traceback."""
+    f = Path(root or ROOT) / "verify.config.json"
+    try:
+        raw = read_config_json(f) if f.exists() else {}
+    except (OSError, ValueError, AttributeError, TypeError):
+        return None
+    md = raw.get("md", {}) if isinstance(raw, dict) else None
+    if not isinstance(md, dict):
+        return None
+    return {"line_measure": MEASURE_DEFAULT, "max_lines": 0, **md}
+
+
 def line_measure(root=None):
     """The unit verify.config.json's md.line_measure names, or None when it cannot be read."""
-    cfg = Path(root or ROOT) / "verify.config.json"
-    try:
-        return json.loads(cfg.read_text(encoding="utf-8")).get("md", {}).get("line_measure", "physical")
-    except (OSError, ValueError):
+    cfg = md_config(root)
+    return None if cfg is None else cfg.get("line_measure", MEASURE_DEFAULT)
+
+
+def configured_cap(charter_path="CLAUDE.md", root=None):
+    """md.max_lines for this charter, read as verify_md reads it: one number for every file, or a map whose
+    LONGEST matching glob wins. None when nothing caps it. v3 reads it rather than holding a copy, so the
+    cap is stated in one place - the config - and this checker cannot go stale against it."""
+    cfg = md_config(root)
+    ml = None if cfg is None else cfg.get("max_lines")
+    if isinstance(ml, bool):
         return None
+    if isinstance(ml, int):
+        return ml or None
+    if isinstance(ml, dict):
+        hits = sorted((g for g in ml if fnmatch.fnmatch(charter_path, g)), key=len, reverse=True)
+        if len(hits) > 1 and len(hits[0]) == len(hits[1]):
+            return None  # two equally long globs match: verify_md calls that VOID, never a silent pick
+        return ml[hits[0]] if hits and isinstance(ml[hits[0]], int) else None
+    return None
+
+
+def declaration_required(measured, cap):
+    """Must the charter state its own length? Only while it is OVER its cap, where section 1.7's over-cap
+    declaration carries the figure; at or under the cap it states none, so no figure can go stale
+    (Wouter, 2026-10-16). With no cap at all - max_lines 0 disables it - there is nothing to be over, so
+    nothing need be declared."""
+    return cap is not None and measured > cap
 
 
 def measure(text, unit):
@@ -421,7 +470,7 @@ def run(charter_path="CLAUDE.md", root=None):
         return 2
     ok(f"baseline {BASELINE[:8]} resolves, holds the pre-reduction marker, and differs from the tree")
     unit = line_measure(root)
-    if unit not in ("physical", "wrapped"):
+    if unit not in LINE_MEASURES:
         print(f"  VOID — verify.config.json's md.line_measure reads {unit!r}. Checks 3 and 4 would")
         print("  measure in one unit and compare against caps stated in another. Fix the config.")
         return 2
@@ -457,7 +506,7 @@ def run(charter_path="CLAUDE.md", root=None):
                  f"entry point and every comparison against it is meaningless")
     else:
         ok(f"phase pin {PHASE_BASELINE} is an ancestor of HEAD "
-           f"({len(phase.splitlines())} lines at entry)")
+           f"({measure(phase, unit)} {unit} lines at entry)")
         for num in MUST_NOT_TOUCH:
             was, now = section_body(flat(phase), num), section_body(flat(charter), num)
             if was is None or now is None:
@@ -481,10 +530,10 @@ def run(charter_path="CLAUDE.md", root=None):
                        f"reversing them is byte-identical to the phase pin")
                 else:
                     ok(f"section {num:5} byte-unchanged since phase entry "
-                       f"({len(now.splitlines())} lines)")
+                       f"({measure(now, unit)} {unit} lines)")
             else:
                 bad("1", f"section {num} CHANGED beyond its declared touches "
-                         f"({len(was.splitlines())} -> {len(now.splitlines())} lines) and it is "
+                         f"({measure(was, unit)} -> {measure(now, unit)} {unit} lines) and it is "
                          f"not this phase's to touch")
 
     # ------------------------------------------------------------------ 2
@@ -568,10 +617,15 @@ def run(charter_path="CLAUDE.md", root=None):
 
     # ------------------------------------------------------------------ 3
     head(3, "THE DECLARED SIZE — every sentence stating this file's own length, against the measurement")
+    cap = configured_cap(charter_path, root)
     decls = declared_sizes(charter)
-    if not decls:
-        bad("3", "the charter declares its own length NOWHERE. 1.7 must carry the exemption, taken "
-                 "from the checker on the commit that declares it")
+    if not decls and declaration_required(measured, cap):
+        bad("3", f"the charter is {measured} {unit} lines against a cap of {cap} and declares its own "
+                 f"length NOWHERE. Over its cap, 1.7 must carry the over-cap declaration, taken from "
+                 f"the checker on the commit that declares it")
+    elif not decls:
+        ok(f"no length is declared and none is needed: {measured} {unit} lines, under the "
+           f"configured cap of {cap}")
     for label, raw, value, snippet in decls:
         if value == measured:
             ok(f"{label:34} says {raw} and the file is {measured} {unit} — measured, not remembered")
@@ -581,10 +635,10 @@ def run(charter_path="CLAUDE.md", root=None):
                      f"— {snippet!r}")
     caps = {int(m) for pat in (DECLARATIONS[0][1], DECLARATIONS[3][1])
             for m in [g[1] for g in pat.findall(charter)] if m}
-    if caps and caps != {DECLARED_CAP}:
-        bad("3", f"a declared cap of {sorted(caps)} against the configured {DECLARED_CAP}")
+    if caps and caps != {cap}:
+        bad("3", f"a declared cap of {sorted(caps)} against the configured {cap}")
     elif caps:
-        ok(f"every declared cap is {DECLARED_CAP}")
+        ok(f"every declared cap is {cap}, the configured one")
     # A REPORT, NEVER A FAILURE: four-digit thousands figures near the file's own size that no
     # pattern claimed. The patterns are a list, and a list is always incomplete.
     near = sorted({m for m in re.findall(r"\b\d,\d{3}\b", charter)
@@ -613,7 +667,7 @@ def run(charter_path="CLAUDE.md", root=None):
         if not body:
             bad("5", f"section {num} is missing entirely — the heading is the pointer's return path")
         elif must in body:
-            ok(f"section {num:5} carries its pointer ({len(body.splitlines())} lines)")
+            ok(f"section {num:5} carries its pointer ({measure(body, unit)} {unit} lines)")
         else:
             bad("5", f"section {num} has no pointer naming what left it (looked for {must!r})")
 
@@ -757,6 +811,31 @@ def selftest():
     case("an unknown unit is refused, never guessed", refused, True)
     case("this project's config names a unit this checker knows",
          line_measure() in ("physical", "wrapped"), True)
+
+    print("v3 — the cap read from the config, the declaration waived under it, a malformed config VOID")
+    case("under its cap, no length declaration is required", declaration_required(600, 637), False)
+    case("over its cap, a length declaration is required", declaration_required(700, 637), True)
+    case("with no cap at all (0 disables it), nothing need be declared", declaration_required(600, None), False)
+    with tempfile.TemporaryDirectory() as d:
+        Path(d, "verify.config.json").write_text(
+            '{"md": {"max_lines": {"CLAUDE.md": 500, "*.md": 9}}}', encoding="utf-8")
+        case("the cap is the config's, the longest matching glob winning", configured_cap("CLAUDE.md", d), 500)
+        Path(d, "verify.config.json").write_text(
+            '{"md": {"max_lines": {"CLAUDE.md": 500, "*LAUDE.md": 9}}}', encoding="utf-8")
+        case("two equally long matching globs are ambiguous, as verify_md says: no cap is picked",
+             configured_cap("CLAUDE.md", d), None)
+        Path(d, "verify.config.json").write_text('{"md": []}', encoding="utf-8")
+        case("an md section that is not an object reads as no unit (VOID), never as the defaults",
+             line_measure(d), None)
+        Path(d, "verify.config.json").write_text('["not", "an", "object"]', encoding="utf-8")
+        try:
+            got = line_measure(d)
+        except Exception as e:  # noqa: BLE001 - the case is that NOTHING escapes
+            got = f"raised {type(e).__name__}"
+        case("a malformed config reads as no unit (VOID), never a traceback", got, None)
+    import verify_md  # noqa: E402  (the two checkers must agree; asserting it catches drift on either side)
+    case("the unit list is verify_md's", LINE_MEASURES == tuple(verify_md.LINE_MEASURES), True)
+    case("the default unit is verify_md's", MEASURE_DEFAULT == verify_md.DEFAULT_CONFIG["line_measure"], True)
 
     print("section_body — the span used by checks 1, 4 and 5")
     doc = "### 5.1 A\nalpha\n\n### 5.2 B\nbeta\n\n## 6. C\ngamma\n"

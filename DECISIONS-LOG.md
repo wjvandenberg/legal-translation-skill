@@ -1358,3 +1358,98 @@ tracker; no tool uses one).
 ## 2026-10-14 — rename commit (b1), the charter, brought forward; Step C's leftovers moved to phase 3; what a table row weighs
 
 **WOUTER, 2026-10-14, through the question tool and in chat.** **(1)** Step C — the dropped Opus 5 verification run — still carried three live things, and they move to phase 3, the full Cowork test: input point 2 is his blind review of phase 3's documents, the grader stays frozen at v3 until phase 3 ends, and D09's arm role goes with Step C's design. **(2)** Rename commit (b1), the charter, done now, ahead of the sibling-import follow-up, the Step C fix with it. **(3)** The charter's phase-2 status cell — one table row of 16,156 characters, about 2,700 words, nearly all history — becomes a short current status in the new words, steps 3 to 11 in one line and step 12 in detail; its text moved word for word to `evidence/EVIDENCE-phase2-history.md`, labels as written, the charter's section 3 owning status and not history (Wouter: *"a waste of space, and the plan and history files already contain this"*). The build plan's status cell gets the same treatment in (b2). **(4)** Measured at his request: the charter stays 690 counted lines and loses 14,587 bytes, 19% — a table row counts as one line however long; at a 110-character wrap it measured 984 lines before and 858 after. Wouter: *"table lines should count as normal lines"* — a house change, its prompt `temp/s1014_house_prompt.md`, for the house's own session. **JUDGEMENTS TAKEN ALONE.** **(a)** The sweep is proved by reversal: 59 swaps on 48 lines, each asserted once, reversed byte-identical. **(b)** Git's own sense of branch kept (branch protection, a PR per branch, stacked branches); section 2.3's strands and section 2.5's dated decisions keep their words, 2.5's 2026-07-30 row gaining what binds now; the build plan's D1–D3 written in the charter as steps 20–22 with that note, until (b2). **(c)** The publishing skill's three pointers to the renamed phase-4 block renamed in the same commit; `tools/xdoc_signs.py`'s declaration for a line that left with the history replaced by one for its pointer. **(d)** `tools/vocabulary_census.py` built, red first on the real charter, whose previous handoff still held five old words. **(e)** The session's closing records ride (b1)'s commit, saving a test cycle.
+
+## 2026-10-16 — the house's v46 switch, and the charter back under its cap by relocation
+
+**WOUTER'S RULINGS OF 2026-10-14 (2), RECORDED HERE BECAUSE THAT SESSION STOPPED BEFORE ITS CLOSE.** *"We need to
+get claude.md back to the cap!!!"* — the house's v46 release first, then the reduction; the sibling-import
+follow-up, rename (b2) and step 13's plan after it, superseding that session's own single next action. **And his
+merge answer:** he added the `gh pr merge` permission to this project's local settings himself, and Claude merges
+each pull request once VERIFY, TEST and `/code-review` are green, the findings shown in chat — #146 and #147 were
+merged that way, and the charter's sections 3.2 and 5.2 now say so.
+
+**WOUTER'S RULINGS OF 2026-10-16.** **(1)** The switch as planned: `line_measure` wrapped, the file cap 637 (the
+`rebuild` wrapped emit 517 plus 120), every section cap keeping its number, the continuity checker in the same unit,
+section 1.7's box re-derived with its REASON paragraph untouched — merged as #147, `798dd03`, which he agreed to
+squash-merge. **(2)** The reduction inventory as the starting point, section 5 first. **(3)** The gap between the
+estimates and 632 closed by deeper rewrites, route 1 last — route 1 was not needed. **(4)** The continuity
+checker's check 3 waived for a charter at or under its cap, so section 1.7 states no length. **(5)** Sections 5,
+2, 1, 6 and 3 each approved as drafted, block by block. **(6)** At 11:19: continue without questions until 12:30,
+following the recommended answer, the judgements tested with him then; and a session done before 12:15 closes
+normally, the next keeping the no-questions rule until 12:15.
+
+**JUDGEMENTS TAKEN ALONE AFTER 11:19, EACH FOR THE 12:30 REVIEW** *(the working list is `temp/s1016_alone.md`)*.
+**(a)** The reduction PR is made green but HELD, unmerged, until the review. **(b)** Section 4: the 3.14
+fixture-rebuild clause shortened in place to point at register I-25, which records it; the signed-Python and
+no-move rules untouched. **(c)** A second pass on section 5 and the opening paragraph: the instruments table's rows
+to one line each, 5.1's Plan, Verify and Test rows shortened, the definition of done, roster, never-regress and
+corpus blocks re-wrapped — the definition of done's *"both confidentiality controls and the publication check"*
+written as *"all three confidentiality controls"*, the same three. **(d)** The continuity checker v3: the cap read
+from `verify.config.json` rather than held as a constant, a malformed config VOID, every printed count in one
+unit, and its unit list and default asserted equal to `verify_md`'s by the selftest rather than imported at run
+time — the 2026-10-16 review findings on #147 fixed with it, each new case red first. **(e)** Section 1.7's box
+retired at the end of the reduction, its full text below. **(f)** Section 7 rewritten to fit under the cap.
+**(g)** The section caps NOT re-set at measured size this session, though the reduction template's row K asks for
+it in the same change — lowering caps Wouter said to keep is his call, and the time ran short; the two declared
+reds removed because both rows now pass. **(h)** `md.pointers` gains three entries, for 2.5, 3.1 and 5.1.
+
+**THE JUDGEMENTS TAKEN AFTER THIS ENTRY WAS FIRST WRITTEN, AND WOUTER'S ANSWERS AT 12:30.** **(i)** The full test
+run: all 21 suites and every entry point PASS, one row red — run_tests v6's *"entry points cover the checkers"*,
+seven installed tools with no entry point or exemption, arriving with #146's re-copy, not with this work —
+DECLARED BY CONTENT in the verify driver (that row alone, naming exactly those seven; a planted second failure
+rejected), not fixed. **(j)** Six phrases `claudemd_claims` and `claudemd_disposal` key on, lost in the rewording,
+restored word for word at no cost; both back to their baseline readings. **(k)** The ten `/code-review` findings
+on #148 fixed before the merge: four stale notes, three checker edge cases red first — two equally long cap globs
+give no cap, an `md` section that is not an object is VOID, and a disabled cap asks for no declaration, reversing
+v3's first design — the 1.3 row naming 5.1, an unused import. **Wouter, 12:30, through the question tool:**
+**(1)** every judgement (a) to (k) stands; **(2)** the section caps re-set at measured size — sections 1, 2, 4 and
+5 to 77, 92, 25 and 243, section 3 kept at 70 for status updates, 6 at 101 and 7 at the house's 25 — the reduction
+template's row K, a planted line in section 4 proving the cap fires; **(3)** the test runner's red row is the next
+session's first job; **(4)** #148 squash-merged once VERIFY and TEST are green.
+
+**WHAT MOVED, AND WHERE.** Phase 2's status cell to `evidence/EVIDENCE-phase2-history.md`, word for word as at
+`798dd03`; section 5.1's *"planned step 2 from section 3.3 alone"* to `EVIDENCE-measurement.md` 3.8. **Kept HERE,
+word for word, because nothing else held them:** section 2.5's 2026-07-30 clause *"The register is the input to the
+fix exploration"*; its 2026-08-04 clause *"A rebuild is presented as a real option but the default is to keep the
+present architecture"*, overtaken by 2026-08-05's rebuild declined; and the two blocks below.
+
+**Section 1.7's over-cap box, as it stood at `798dd03`, word for word:**
+
+> **OVER-CAP, RE-DERIVED 2026-10-16 AT THE SWITCH TO WRAPPED LINES: 831 lines against a cap of 637 — 194 OVER**,
+> every figure here in wrapped lines *(the house's v46: a line weighs its length / 120, rounded up)*, the cap
+> being this archetype's emit *(`rebuild`/L, 517 wrapped)* plus the kept **120**. The ladder before it was physical:
+> **1,241 → 815 → 776 → 760 → 691 → 686 → 687 → 683 → 687 → 685 → 692 → 690**, the +7 §4's signed-Python pin and its no-move rule, put in the charter at Wouter's word so that it is read before any code touches a file *(2026-09-28 (4))*, the −2 a shorter handoff *(2026-10-09 (4))*; the same 690 weighed **829** wrapped at the switch. *(Re-derived LAST: editing this block moves it.)*
+>
+> **REASON — EVERY ROUTE IS NOW MEASURED, AND THE PER-HEADING INVENTORY IS WHAT MEASURED THEM.** Pass one
+> collapsed 27 blocks for **−49**, bulletised route-1 §5.6 for **−7 out of 77 prose lines** *(so route 1 was
+> not hiding slack)* and took two rule-groups out by route 4 for **−14** — but it worked from a block list
+> and **never filled the blueprint's inventory, so routes 2, 3 and 5 were never assigned.** Pass two filled
+> it: **59 headings, one disposition each. ROUTE 3 IS EMPTY** *(every procedure here is already a skill)*;
+> **ROUTE 5 IS FOUR HEADINGS AND YIELDS ZERO**, three being two-line pointers and §2.5 eleven TABLE rows,
+> where a row is one line however long; **ROUTE 2 IS FIVE BLOCKS AND YIELDED 5**, the gate's measures going
+> to `EVIDENCE-measurement.md` 3.7 with the needle test and both controls clean. **Route 0** re-probed
+> against the day's 25 new house rules: **2 twins, ~4 lines.** **Reflow ceiling −18**; **59 headings and 65
+> table rows are lines no rewrite touches.**
+>
+> **TRIGGER — AN EVENT, AND IT HAS FIRED.** Wouter DECLARED the floor above on **2026-09-22 (4)**, in physical
+> lines, to end when the `rebuild` EMIT moved or he retired rules; the house's v46 moved it, to 517 wrapped, and
+> on **2026-10-14 (2)** he ruled that the charter goes back under its cap.
+> **This declaration retires when the reduction lands at 632 or below.**
+
+**Section 7's handoff of 2026-10-14, as it stood at `798dd03`, word for word — its open items and warnings carried:**
+
+> ### HANDOFF — 2026-10-14, THE CHARTER IN THE HOUSE'S WORDS, RENAME COMMIT (b1) — DOCUMENTS AND ONE TOOL
+>
+> **PURPOSE: MET.** It was *so that the charter reads in one vocabulary, the house's, and nothing in it still hangs on a step that was dropped*: 59 swaps on 48 lines, proved by reversing them byte-identical; `tools/vocabulary_census.py` finds no old word in living text and its selftest goes red on a planted one; input point 2 and the grader freeze now hang on phase 3; section 3.1's phase-2 history moved word for word to `evidence/EVIDENCE-phase2-history.md` — the charter 19% smaller in bytes and not one counted line shorter.
+>
+> **BUILT THIS SESSION:** rename commit (b1), brought forward at Wouter's word ahead of the sibling-import follow-up — the charter's living text in phase, step and sub-step, the skill's own steps as skill Step N, the build plan's D1–D3 as steps 20–22, five headings retitled and the continuity checker told; `tools/vocabulary_census.py` new; the publishing skill's three pointers to the phase-4 block renamed; `tools/xdoc_signs.py` re-anchored. And `temp/s1014_house_prompt.md`, for the house's own session.
+>
+> **WOUTER'S RULINGS, 2026-10-14:** the dropped Opus 5 run's three leftovers move to phase 3 — input point 2 is phase 3's documents, the grader stays frozen until phase 3 ends, D09 is no arm; (b1) now, that fix with it; section 3.1's cell a short status, its history moved word for word, steps 3–11 one line and step 12 in detail; and **a table row must count as the lines it fills** — the house's measure, fixed in the house's session. `DECISIONS-LOG.md`, 2026-10-14, owns them.
+>
+> **SINGLE NEXT ACTION: THE SIBLING-IMPORT FOLLOW-UP** — in the five partial-install routes a cut-short sibling exits as FILE INTEGRITY and a missing one stays tolerated, red first; then rename (b2), the build plan, from `temp/s1013b_rename_b_plan.md`, its status cell treated as section 3.1's was; then (c), (d); then step 13's plan from `temp/s1013b_branch13_explore.md`.
+>
+> **WHAT A NEW SESSION WOULD GET WRONG:** the charter is 690 counted lines but 858 at a 110-character wrap — the house counts a table row as one line, and the fix is the house's; `tools/vocabulary_census.py` gains a SWEPT entry per rename commit and cannot judge `step 3`, which is legitimate new text — a sweep is proved by reversing itself; a ratio corpus arm's baseline is pinned `--ref 94bbdd8`; `claudemd_claims` carries a standing red, check 2, declared by content in `temp/s1013b_verify.py`; any change under `tools/` re-runs the delivered arms in full.
+>
+> **Open, none blocking.** **(1)** Wouter's page reads: 12c's five warnings — D02 10, D05 4 and 15, D09 21, D11 39 — D08 page 2 and D02 pages 4 and 6. **(2)** `test_precommit_gate`'s two unexplained failures; red before and still red: `test_claims_contents_cut`, `test_cycle_gate`, `preflight_metacheck`'s VOID rig. **(3)** #119's three findings, `tools/hooks/pre-push`'s header, I-26, F46, F44's live refusals and G13; A24 and A25 on their trigger. **(4)** The empty worktree folders `bold-germain` and `stoic-banach`. **(5)** The third copy of the doc-to-language table.
+>
+> **GATE:** VERIFY and TEST through the cycle gate; the census, its selftest and every document instrument green, `claudemd_claims` and `stepb_audit` red only on their standing rows, compared by content. **Context: 65% when this record was written, measured with the usage tool.**

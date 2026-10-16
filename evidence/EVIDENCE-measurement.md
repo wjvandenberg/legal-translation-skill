@@ -190,6 +190,13 @@ same-document repeat this project has: **~40% of paragraphs differed linguistica
 output was identical** — variance large in prose, nil in mechanics. A grading tier that moves by 40% on an
 unchanged document cannot be the gate; a tier that does not move at all can.
 
+### 3.8 Planning from the brief alone — relocated from the charter's section 5.1, 2026-10-16
+
+**Read what the brief POINTS AT, not only the brief.** Section 3.3 of `PLAN-2-step-b.md` says option 7's
+substance lives in that document's section 6, and a session that planned step 2 from section 3.3 alone got
+the arm count, the comparison method and the term-list source all wrong. The house file now carries the
+general rule; this is the project's instance of it, kept here when the charter's Explore cell was shortened.
+
 ## 4 — This document's own confidentiality review
 
 **Run before its first commit, like `EVIDENCE-confidentiality.md`'s** — and it matters more here, because
