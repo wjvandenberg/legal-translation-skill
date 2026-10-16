@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–11 CLOSED · 12 CLOSED but H1's half, step 13's · 13 EXPLORED, its four choices Wouter's · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–11 CLOSED · 12 CLOSED but H1's half, step 13's · 13 EXPLORED, Wouter's four choices made 2026-10-16 (2), its plan next · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,22 +578,22 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-16, THE CHARTER BACK UNDER ITS CAP, IN WRAPPED LINES
+### HANDOFF — 2026-10-16 (2), THE TEST RUNNER GREEN, A CUT-SHORT SIBLING CAUGHT
 
-**PURPOSE: MET.** It was *so that the charter is under its cap in the measure the house now uses*: the switch merged
-as #147, the reduction as #148 — 831 → 632 wrapped lines against 637, no heading lost, route 1 untouched.
+**PURPOSE: MET.** It was *so that the session-close test run is green with no declared red*: #149 gave six tools an
+entry point and `verify_charter.py` a reasoned exemption, each measured in a disposable clone first; the full runner
+reads `OVERALL: PASS`, no row tolerated, and the house's `auto_mode_guard.py` v4 closed the fresh-clone gap it found.
 
-**BUILT:** `check_checkers` v20 adopted; the v46 switch; sections 5, 2, 1, 6 and 3 cut at Wouter's word block by
-block, 4 and a second pass alone, the 1.7 box retired; the continuity checker v3; the section caps re-set at
-measured size, 3, 6 and 7 kept (Wouter, 12:30), one proved to fire. What moved where: `DECISIONS-LOG.md`, 2026-10-16.
+**BUILT:** #149; then #150, amendment 3 — in the five sibling imports a cut-short sibling exits as FILE INTEGRITY and
+a missing one keeps its designed fallback, route 5 (none designed) exiting too; `tests/test_sibling_import_integrity.py`
+red first, 11 of 51 per tree. Wouter's five answers, and what was judged alone: `DECISIONS-LOG.md`, 2026-10-16 (2).
 
-**SINGLE NEXT ACTION: THE TEST RUNNER'S RED ROW** — an entry point or a reasoned exemption in `verify.config.json`
-for each of seven tools (Wouter, 12:30); then the sibling-import follow-up (`temp/s1013b_integrity_plan.md`
-amendment 3), rename (b2), step 13's plan.
+**SINGLE NEXT ACTION: RENAME (b2), THE BUILD PLAN** — from `temp/s1013b_rename_b_plan.md`, its status cell treated as
+section 3.1's was; then step 13's plan from `temp/s1013b_branch13_explore.md` and Wouter's four step-13 choices.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** every cap is in WRAPPED lines, a long table row costing what it holds; the
-section caps now sit AT measured size, so any addition outside section 3 is paid for in its own section;
-`claudemd_claims` carries its standing check-2 red, declared by content.
+**WHAT A NEW SESSION WOULD GET WRONG:** `validate_apply.py`'s delivered check exits 3 for its own VOID, the integrity
+code, so judge a broken install by its banner; `tests/run_tests.py` runs none of the standalone `tests/test_*.py`
+suites; the house's guard v4 is committed there but not pushed.
 
-**Open, none blocking:** 2026-10-14's carried items, word for word in `DECISIONS-LOG.md`, 2026-10-16; the
-reduction's fresh-clone verdict. **Context: 64% when this was written, measured.**
+**Open, none blocking:** 2026-10-14's carried items, word for word in `DECISIONS-LOG.md`, 2026-10-16; the reduction's
+fresh-clone verdict; `install_hooks.py --check` exits 1 here on every run. **Context: 49% when this was written.**
