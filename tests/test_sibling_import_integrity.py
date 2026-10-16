@@ -57,7 +57,19 @@ ROUTES = [
     ("repack_docx.py", "lexicon_compliance.py", "load", True),
     ("validate_en_runs.py", "reorder_definitions.py", "en_runs", False),
 ]
-IMPORT_RE = re.compile(r"^[ \t]*(?:from[ \t]+([A-Za-z_]\w*)[ \t]+import[ \t(]|import[ \t]+([A-Za-z_]\w*))", re.M)
+# the names each importer asks of its sibling: a clean cut before the sibling's own check must remove every one
+NAMES = {"post_process.py": ["will_fix_spacing_fire"],
+         "translate_headers_footers.py": ["_field_aware_text_and_fields", "_para_text"],
+         "extract_paragraphs.py": ["_GRAPHIC_ATTR_SURFACES", "graphic_metadata_surfaces"],
+         "lexicon_compliance.py": ["_guess_language"],
+         "reorder_definitions.py": ["find_definitions_section_in_texts"]}
+FROM_RE = re.compile(r"^[ \t]*from[ \t]+([A-Za-z_]\w*)[ \t]+import[ \t(]", re.M)
+# `import a, b as c` names every module in the list, not only the first
+IMPORT_RE = re.compile(r"^[ \t]*import[ \t]+([A-Za-z_][\w.]*(?:[ \t]+as[ \t]+\w+)?(?:[ \t]*,[ \t]*[A-Za-z_][\w.]*"
+                       r"(?:[ \t]+as[ \t]+\w+)?)*)", re.M)
+DYNAMIC_RE = re.compile(r"\bimport_module\(|\b__import__\(")
+# THE TWO HELPERS ARE COPIED, NOT SHARED (no shared library, 2026-08-05): every copy must stay byte-identical
+HELPERS = ("_sibling_integrity_exit", "_sibling_cut_short")
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1", PYTHONDONTWRITEBYTECODE="1")
 PLANTED = "zz_no_such_module_here"
 FAIL, CHECKED, VOIDED = [], 0, []
@@ -82,11 +94,32 @@ def sibling_imports(scripts):
     stems = {p.stem for p in scripts.glob("*.py")}
     pairs = set()
     for p in sorted(scripts.glob("*.py")):
-        for m in IMPORT_RE.finditer(p.read_bytes().decode("utf-8")):
-            mod = m.group(1) or m.group(2)
+        text = p.read_bytes().decode("utf-8")
+        mods = [m.group(1) for m in FROM_RE.finditer(text)]
+        for m in IMPORT_RE.finditer(text):
+            mods += [part.split()[0] for part in m.group(1).split(",") if part.strip()]
+        for mod in mods:
             if mod in stems and mod != p.stem:
                 pairs.add((p.name, mod + ".py"))
     return pairs
+
+
+def dynamic_imports(scripts):
+    """Scripts that load a module by name at run time - a route no import statement shows."""
+    return sorted(p.name for p in scripts.glob("*.py") if DYNAMIC_RE.search(p.read_bytes().decode("utf-8")))
+
+
+def helper_copies(scripts, name):
+    """Every copy of a top-level helper: from its def line up to the next line that starts a new top-level
+    statement, trailing blank lines dropped - keyed by the script that holds it."""
+    out = {}
+    for p in sorted(scripts.glob("*.py")):
+        lines = p.read_bytes().decode("utf-8").split("\n")
+        starts = [i for i, ln in enumerate(lines) if ln.startswith(f"def {name}(")]
+        for s in starts:
+            e = next((k for k in range(s + 1, len(lines)) if lines[k] and not lines[k][0].isspace()), len(lines))
+            out[p.name] = "\n".join(lines[s:e]).rstrip("\n")
+    return out
 
 
 def argv_for(reach, work):
@@ -160,6 +193,15 @@ print(f"  sibling imports discovered: {len(found)} - {len(found) - len(others)} 
       f"(the other suite's), {len(others)} others")
 ok("the other sibling imports are exactly the five routes here", others == declared,
    f"undeclared {sorted(set(others) - set(declared))}, declared but absent {sorted(set(declared) - set(others))}")
+dyn = dynamic_imports(scripts_dir)
+ok("no shipped script loads a module by name at run time (importlib.import_module, __import__)", not dyn,
+   f"found in {dyn} - a sibling route no import statement shows; give it its route here")
+for helper in HELPERS:
+    copies = helper_copies(scripts_dir, helper)
+    variants = sorted(set(copies.values()))
+    print(f"  {helper}: {len(copies)} cop{'y' if len(copies) == 1 else 'ies'} in {', '.join(copies)}")
+    ok(f"every copy of {helper} is byte-identical", len(copies) >= 1 and len(variants) == 1,
+       f"{len(variants)} different versions among {len(copies)} copies")
 DAMAGE = {}
 try:
     for _imp, sib, _r, _t in ROUTES:
@@ -183,6 +225,10 @@ with tempfile.TemporaryDirectory(prefix="sibling-") as td:
                     compiles = False
                 ok(f"{sib} {shape}: {'does not compile' if shape == 'cut mid-statement' else 'compiles'}",
                    compiles == (shape != "cut mid-statement"))
+            left = [n for n in NAMES[sib]
+                    if re.search(rf"^(?:def {n}\(|{n}\s*=)", shapes["cut before its check"], re.M)]
+            ok(f"{sib} cut before its check: none of the names its importer asks for survives", not left,
+               f"still defined: {left}")
 
     # THE BANNER IS THE SIGNAL, NOT THE EXIT CODE, wherever a run is NOT a broken install: validate_apply's delivered
     # check exits 3 for its own VOID ("nothing was examined") - the side-part route's empty paragraphs list gives one -
