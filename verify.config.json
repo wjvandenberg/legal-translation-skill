@@ -38,8 +38,6 @@
         "name": "charter",
         "command": ["uv", "run", "python", "tools/verify_md.py", "--report-json", "CLAUDE.md"],
         "tolerated": {
-          "verify_md.py::CLAUDE.md::file length": "BY DESIGN while section 1.7's over-cap declaration stands, AND NO LONGER A FLOOR. Four reductions ran between 2026-09-10 and 2026-09-22 and Wouter declared the routes measured out on 2026-09-22 (4) - but in PHYSICAL lines, where a table row counted one line however long and 59 headings and 74 table rows were lines no rewrite touched. On 2026-10-16 this project switched to WRAPPED lines (the house's v46), a long row now weighing what it holds, the file cap re-derived as the wrapped emit plus 120; so that floor no longer holds, and Wouter ruled on 2026-10-14 (2) that the charter goes back under its cap. RE-MEASURE THE ARCHETYPE FLOOR WITH new_charter.py RATHER THAN QUOTING A NUMBER - that figure has gone stale five times in this house. Section 1.7 ALONE states this charter's own figure and verify_charter_continuity.py compares it to the measurement; it is NOT restated here, because this comment once carried a number for a day after the charter had moved on. TRIGGER: the reduction landing at the cap minus five or better, when section 1.7's declaration retires and this row reports DECL-STALE and is removed. NEVER silence this row by setting the cap to 0, which reports 'exempt' and measures nothing.",
-          "verify_md.py::CLAUDE.md::section length": "DECLARED 2026-10-16 AT THE SWITCH TO WRAPPED LINES, AND TEMPORARY BY CONSTRUCTION. Every section cap kept its NUMBER in the new unit (Wouter, the house's v46: 'stick to the original caps for sections etc as much as possible'), and all seven sections measured over them at the switch - section 7 because the handoff is replaced only at a session's close, the other six because their long table rows now weigh what they hold. TRIGGER: the reduction landing, when the caps are re-set at measured size plus a stated margin (REDUCTION-TEMPLATE.md's row K) and this row reports DECL-STALE and is removed."
         }
       },
       {
@@ -116,6 +114,9 @@
       "1.1": "which loads in every project",
       "1.5": "not restated",
       "2.1": "owns the description",
+      "2.5": "holds each one's reasoning by date",
+      "3.1": "EVIDENCE-phase2-history.md",
+      "5.1": "EVIDENCE-measurement.md` 3.8",
       "5.4": "Invoke it, do not improvise",
       "5.3": "verification.md",
       "5.5": "route 4",
