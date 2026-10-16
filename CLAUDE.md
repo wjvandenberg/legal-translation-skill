@@ -81,9 +81,10 @@ stale 500 and 35 until 2026-09-22 — a restated cap is a second place to go sta
 this project has run far past eight sessions, the observable test. **Every cap is enforced, not
 aspirational**, and `check_checkers.py` reports whether the copy you run is the current one.
 
-> **OVER-CAP, RE-DERIVED 2026-10-09 (4) AFTER I-40's FOLLOW-UP: 690 lines against a cap of 619 — 71 OVER**, the
-> cap being this archetype's emit *(`rebuild`/L, counted at 499)* plus the measured **120** for a project's own
-> content. Ladder **1,241 → 815 → 776 → 760 → 691 → 686 → 687 → 683 → 687 → 685 → 692 → 690**, the +7 §4's signed-Python pin and its no-move rule, put in the charter at Wouter's word so that it is read before any code touches a file *(2026-09-28 (4))*, the −2 a shorter handoff *(2026-10-09 (4))*. *(Re-derived LAST: editing this block moves it.)*
+> **OVER-CAP, RE-DERIVED 2026-10-16 AT THE SWITCH TO WRAPPED LINES: 831 lines against a cap of 637 — 194 OVER**,
+> every figure here in wrapped lines *(the house's v46: a line weighs its length / 120, rounded up)*, the cap
+> being this archetype's emit *(`rebuild`/L, 517 wrapped)* plus the kept **120**. The ladder before it was physical:
+> **1,241 → 815 → 776 → 760 → 691 → 686 → 687 → 683 → 687 → 685 → 692 → 690**, the +7 §4's signed-Python pin and its no-move rule, put in the charter at Wouter's word so that it is read before any code touches a file *(2026-09-28 (4))*, the −2 a shorter handoff *(2026-10-09 (4))*; the same 690 weighed **829** wrapped at the switch. *(Re-derived LAST: editing this block moves it.)*
 >
 > **REASON — EVERY ROUTE IS NOW MEASURED, AND THE PER-HEADING INVENTORY IS WHAT MEASURED THEM.** Pass one
 > collapsed 27 blocks for **−49**, bulletised route-1 §5.6 for **−7 out of 77 prose lines** *(so route 1 was
@@ -96,9 +97,10 @@ aspirational**, and `check_checkers.py` reports whether the copy you run is the 
 > against the day's 25 new house rules: **2 twins, ~4 lines.** **Reflow ceiling −18**; **59 headings and 65
 > table rows are lines no rewrite touches.**
 >
-> **TRIGGER — AN EVENT, AND THE PREVIOUS ONE HAS FIRED.** Wouter DECLARED this measured floor on **2026-09-22 (4)**,
-> over retiring rules and over moving the cap, every block left being one imperative with its reason as a trailing
-> clause. **It ends when the `rebuild` EMIT moves — phase 6, Cowork, is the next scheduled — or when he RETIRES rules here.**
+> **TRIGGER — AN EVENT, AND IT HAS FIRED.** Wouter DECLARED the floor above on **2026-09-22 (4)**, in physical
+> lines, to end when the `rebuild` EMIT moved or he retired rules; the house's v46 moved it, to 517 wrapped, and
+> on **2026-10-14 (2)** he ruled that the charter goes back under its cap.
+> **This declaration retires when the reduction lands at 632 or below.**
 
 ---
 
