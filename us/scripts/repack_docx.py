@@ -119,6 +119,19 @@ def _sibling_integrity_exit(name, exc):
     sys.exit(3)
 
 
+def _sibling_cut_short(name, exc):
+    """True when importing the sibling `name` failed because it is PRESENT BUT CUT SHORT: a SyntaxError (cut
+    mid-statement - the whole file is compiled before any of it runs), or an ImportError that is not a
+    ModuleNotFoundError and names the sibling itself (cut cleanly before the names asked of it). A sibling that
+    is simply MISSING - a ModuleNotFoundError naming it - is not, so a fallback designed for a partial install
+    still runs; and an ImportError about some OTHER module, raised inside a whole sibling, is that sibling's
+    defect, not an install's."""
+    if isinstance(exc, SyntaxError):
+        return True
+    return (isinstance(exc, ImportError) and not isinstance(exc, ModuleNotFoundError)
+            and exc.name == os.path.splitext(name)[0])
+
+
 try:
     from source_language_markers import detect_language as _detect_lang
     from source_language_markers import remnant_verdict as _remnant_verdict
@@ -130,7 +143,9 @@ except (ImportError, SyntaxError) as _exc:  # deleted, or cut short: a broken in
     _sibling_integrity_exit('source_language_markers.py', _exc)
 try:
     from lexicon_compliance import _guess_language as _guess_lang
-except Exception:  # pragma: no cover — the agreement control is best-effort.
+except Exception as _exc:  # pragma: no cover — the agreement control is best-effort.
+    if _sibling_cut_short('lexicon_compliance.py', _exc):  # but cut short is a broken install, SKILL.md rule 6
+        _sibling_integrity_exit('lexicon_compliance.py', _exc)
     _guess_lang = None
 
 _TAG_STRIP_RE = re.compile(r'<[^>]+>')
