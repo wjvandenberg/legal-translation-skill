@@ -1453,3 +1453,62 @@ present architecture"*, overtaken by 2026-08-05's rebuild declined; and the two 
 > **Open, none blocking.** **(1)** Wouter's page reads: 12c's five warnings — D02 10, D05 4 and 15, D09 21, D11 39 — D08 page 2 and D02 pages 4 and 6. **(2)** `test_precommit_gate`'s two unexplained failures; red before and still red: `test_claims_contents_cut`, `test_cycle_gate`, `preflight_metacheck`'s VOID rig. **(3)** #119's three findings, `tools/hooks/pre-push`'s header, I-26, F46, F44's live refusals and G13; A24 and A25 on their trigger. **(4)** The empty worktree folders `bold-germain` and `stoic-banach`. **(5)** The third copy of the doc-to-language table.
 >
 > **GATE:** VERIFY and TEST through the cycle gate; the census, its selftest and every document instrument green, `claudemd_claims` and `stepb_audit` red only on their standing rows, compared by content. **Context: 65% when this record was written, measured with the usage tool.**
+
+## 2026-10-16 (2) — the test runner's red row closed; a cut-short sibling exits as FILE INTEGRITY; step 13's choices
+
+**WOUTER, 2026-10-16 (2), THROUGH THE QUESTION TOOL — each the recommended answer.** **(1)** `auto_mode_guard.py
+--probe` printing nothing in a fresh clone is a house-script defect, and it goes to the house's own session rather
+than being fixed from this one, that session's parked commit holding the changelogs a fix touches; here the guard
+keeps its `--probe` entry point meanwhile. The house shipped v4 the same afternoon (`be89bfb`), adopted in #149.
+**(2)–(5), step 13's four choices.** A source already in English opens a NAMED VARIANT-CONVERSION MODE at skill
+Step 1c — the translation steps skipped, the variant conventions and every gate after apply kept, the frontmatter
+widened to name the job (H1/H3). The accepted-input envelope is DECLARED AND REFUSED at admission — size, password,
+`.docm`, non-Word, image-only — each refused with a message saying what to do, three synthetic inputs proving it
+(L5). The short-document gear is MEASURED FIRST — per-step minutes for the short runs, from the forensic logs —
+before anything is designed. R1's one decision: the two LANGUAGE values set to the delivered variant, `w:author`
+and `people.xml` left alone, built in step 13. **(6)** In chat, mid-session, his words: *"I'll be out for about 45 minutes so please no questions,
+keep everything for a new session - close when you are done"*. **This session's reading, a judgement
+and not his ruling:** finish and merge the sibling fix already under way, then close; rename (b2) and
+step 13's plan carried to the next session.
+
+**JUDGEMENTS TAKEN ALONE, CARRIED TO THE CLOSE.** **(a)** Each of the seven tools was run in a disposable clone,
+bare and with its flag, before its entry point was chosen: `install_hooks.py` run bare INSTALLS (four files written
+into the clone), so it is declared with `--check`; `verify_charter.py` is exempt as a library `verify_md.py` runs.
+**(b)** The house's guard v4 adopted INTO #149 rather than a separate pull request, closing that request's own open
+gap. **(c)** #149's review fix, notes only, tested by proof rather than a second full run: every key the runner acts
+on identical to the reviewed commit. **(d)** The sibling fix: routes 2 and 5 made from-imports, so a clean cut is an
+ImportError like the other routes' rather than a later AttributeError; route 4's broad `except Exception` kept AFTER
+the narrowing, as the best-effort control it was; route 5, which never had a designed fallback, exits as FILE
+INTEGRITY for a missing sibling too; the existing helper moved above the import it now guards in
+`translate_headers_footers.py`. **(e)** Amendment 3's *"none catches a SyntaxError"* was wrong for route 4 —
+`repack_docx.py` caught it in `except Exception` and its control went dark — read off the code, then measured red.
+**(f)** The new suite judges a run that is NOT a broken install by the banner, not the exit code:
+`validate_apply.py`'s delivered check exits 3 for its own VOID. **(g)** No register row for the sibling half, as
+#142 filed none for the language module's; carried for Wouter.
+
+**OPEN, NONE BLOCKING.** `tests/run_tests.py` runs none of the standalone `tests/test_*.py` integrity suites, #142's
+and this one included, so the full runner cannot see one go red; `validate_apply.py`'s VOID exit 3 shares the
+integrity code; `install_hooks.py --check` exits 1 here on every run, `tools/hooks` holding a Claude Code hook it
+reads as a git hook; the house's v4, committed but not yet pushed when this entry was drafted, was pushed by the house's own session the same afternoon (`be89bfb` is on its `origin/main`). **And four of #150's seven review findings, carried rather than built:** (1) judge truncation by each sibling's closing sentinel rather than by the exception's type — a WHOLE sibling with a real defect now reads as a broken install, and a re-install cannot fix it — a change to the approach #142 merged, so Wouter's to make; (2) a SyntaxError in a nested module is named against the direct sibling, unreachable in today's import graph, and (1) would close it too; (3) the VOID exit 3 above; (4) the deleted-sibling cases prove only that importing did not crash, never that each fallback works.
+
+**The 2026-10-16 handoff, as it stood at `eeabead`, word for word:**
+
+> ### HANDOFF — 2026-10-16, THE CHARTER BACK UNDER ITS CAP, IN WRAPPED LINES
+>
+> **PURPOSE: MET.** It was *so that the charter is under its cap in the measure the house now uses*: the switch merged
+> as #147, the reduction as #148 — 831 → 632 wrapped lines against 637, no heading lost, route 1 untouched.
+>
+> **BUILT:** `check_checkers` v20 adopted; the v46 switch; sections 5, 2, 1, 6 and 3 cut at Wouter's word block by
+> block, 4 and a second pass alone, the 1.7 box retired; the continuity checker v3; the section caps re-set at
+> measured size, 3, 6 and 7 kept (Wouter, 12:30), one proved to fire. What moved where: `DECISIONS-LOG.md`, 2026-10-16.
+>
+> **SINGLE NEXT ACTION: THE TEST RUNNER'S RED ROW** — an entry point or a reasoned exemption in `verify.config.json`
+> for each of seven tools (Wouter, 12:30); then the sibling-import follow-up (`temp/s1013b_integrity_plan.md`
+> amendment 3), rename (b2), step 13's plan.
+>
+> **WHAT A NEW SESSION WOULD GET WRONG:** every cap is in WRAPPED lines, a long table row costing what it holds; the
+> section caps now sit AT measured size, so any addition outside section 3 is paid for in its own section;
+> `claudemd_claims` carries its standing check-2 red, declared by content.
+>
+> **Open, none blocking:** 2026-10-14's carried items, word for word in `DECISIONS-LOG.md`, 2026-10-16; the
+> reduction's fresh-clone verdict. **Context: 64% when this was written, measured.**
