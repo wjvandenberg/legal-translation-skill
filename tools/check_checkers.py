@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """check_checkers.py - is this project's copy of each standard script current?
-CHECKER VERSION 19 (2026-10-12)
+CHECKER VERSION 20 (2026-10-15)
 
 Every project gets its OWN COPY of the standard scripts in its tools\\ folder. Copies drift:
 the shared one gets fixed and yours does not hear about it, or yours gets edited and the fix
@@ -13,6 +13,7 @@ never travels back. Three very different situations look identical from the outs
 This script tells them apart. Run it from a project root:
 
     uv run python tools/check_checkers.py
+    uv run python tools/check_checkers.py --adopt        # IT WRITES - see ADOPT below
     uv run python tools/check_checkers.py --selftest
 
 VERDICTS, one per file:
@@ -105,6 +106,30 @@ judged at all:
 
 Without --roster the arm prints N/A and says so. It never silently does not run: a check
 that opened no file is VOID, never CLEAN.
+
+ADOPT, --adopt: A STALE COPY IS COPIED AND PROVED, NEVER RE-TESTED. A shared script's tests
+run once, in the session that fixed it; a project copies the new version byte for byte and
+runs nothing else for it. Two projects once each re-tested the same new version as if it
+were their own change, which is the cost this option exists to remove. For every STALE row:
+
+    ADOPTED       copied, re-read from disk, its sha-256 equal to the shared one, and the
+                  house commit named - the last to change the file
+    REFUSED       FORKED, DIVERGED or UNKNOWN - never overwritten. Or STALE but not provably
+                  safe: the shared file is not its committed version (its tests may never
+                  have run), or the copy matches no version the shared folder ever shipped
+    PROOF FAILED  the bytes on disk are not the shared bytes - the old copy is put back, exit 2
+
+IT WRITES, and nothing else is run but git, to name commits. It then prints the ordinary
+report, whose exit code it keeps. A MISSING file is not copied: copy-or-declare is a decision.
+
+WHY A LOWER VERSION IS NOT ENOUGH TO OVERWRITE. classify() calls any copy with a lower
+CHECKER VERSION STALE, whatever else in it differs - so an old copy carrying an undeclared
+local fix reads STALE, and copying over it would destroy the fix. The copy is adopted only
+when its blob is one the shared file has held, renames followed: then it is merely OLD.
+
+THE FIRST ADOPTION RUNS THE SHARED COPY. A project's own copy older than this version has no
+--adopt, so run the shared one from the project root - it finds its folder by walking up, as
+the drift check does: uv run python <the shared folder>/check_checkers.py --adopt
 """
 from __future__ import annotations
 
@@ -116,6 +141,8 @@ import json
 import os
 import re
 import shutil
+import stat
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -503,6 +530,122 @@ def roster_report(rows, void_reason, declared: bool):
     return 1 if bad else 0
 
 
+# ----------------------------------------------------------------------------- adopt
+
+def _git(cwd: Path, *args, data: bytes | None = None):
+    """(rc, stdout) of one git command in cwd. Bytes both ways, so no codepage touches them,
+    and quotePath off, so a path holding a byte above 0x80 comes back as a path."""
+    try:
+        r = subprocess.run(["git", "-c", "core.quotePath=false", *args], cwd=cwd,
+                           input=data, capture_output=True)
+    except OSError as exc:
+        return 127, f"git could not start - {type(exc).__name__}"
+    return r.returncode, r.stdout.decode("utf-8", "replace").strip()
+
+
+def house_record(shared: Path, name: str):
+    """(commit and date, {blob: commit}, refusal) for one shared file.
+
+    The commit is the last one to change the file, and it is named ONLY when the file on disk
+    is that path's blob at HEAD: an uncommitted shared copy may be a fix whose tests never ran
+    where it was made, which is the one place they are meant to run. The blob map holds every
+    version the path has had, renames followed, each keyed to the commit that introduced it -
+    the proof that a copy about to be replaced is merely OLD rather than locally edited.
+    """
+    rc, _ = _git(shared, "rev-parse", "--show-prefix")
+    if rc != 0:
+        return None, {}, ("the shared folder is in no git repository, so no commit can be named "
+                          "and no history can show this copy is merely old")
+    rc, at_head = _git(shared, "rev-parse", f"HEAD:./{name}")
+    rc2, on_disk = _git(shared, "hash-object", f"--path={name}", "--", name)
+    if rc != 0 or rc2 != 0 or at_head != on_disk:
+        return None, {}, ("the shared file is not its committed version - uncommitted, so its "
+                          "tests may never have run where it was fixed. Commit it there first")
+    rc, when = _git(shared, "log", "-1", "--format=%h %cs", "--", name)
+    rc2, raw = _git(shared, "log", "--follow", "--no-abbrev", "--format=C %H", "--raw", "--", name)
+    if rc != 0 or rc2 != 0 or not when:
+        return None, {}, ("git could not read this file's history, so no commit can be named "
+                          "and nothing shows this copy is merely old")
+    shipped, commit = {}, None
+    for line in raw.splitlines():
+        if line.startswith("C "):
+            commit = line[2:14]            # twelve characters, the house's own short form
+        elif line.startswith(":"):
+            blob = line.split()[3]
+            if blob.strip("0"):
+                shipped[blob] = commit     # newest first, so the last write is the introduction
+    return when, shipped, None
+
+
+def adopt(project: Path, shared: Path, declared, write=None) -> int:
+    """Copy every STALE script byte for byte, prove each, and run nothing but git.
+
+    Returns 0, or 2 when a copy could not be proved - its old bytes then put back. The caller
+    prints the ordinary report afterwards, which owns every other finding and its exit code.
+    `write` exists for the selftest, which hands in a writer that corrupts, so the proof is
+    seen to fail at least once: a proof that cannot fail is a print statement.
+    """
+    write = write or (lambda path, data: path.write_bytes(data))
+    print("ADOPT - each STALE copy replaced byte for byte from the shared folder, proved by "
+          "sha-256;\n        nothing is run but git, to name the commits\n")
+    rows = run(project, shared, declared)
+    width = max((len(n) for n, _, _ in rows), default=0)
+    adopted = refused = forks = 0
+    rc = 0
+    for name, verdict, detail in rows:
+        if verdict in (FORKED, DIVERGED, UNKNOWN):
+            flag = "  " if verdict == FORKED else "! "
+            print(f"{flag}{'REFUSED':<12} {name:<{width}}  {verdict}, never overwritten - {detail}")
+            if verdict == FORKED:
+                forks += 1                 # a recorded decision, not a refusal to act on
+            else:
+                refused += 1
+            continue
+        if verdict != STALE:
+            continue
+        local, source = project / "tools" / name, shared / name
+        when, shipped, why = house_record(shared, name)
+        old = local.read_bytes()
+        if why is None:
+            rcb, blob = _git(shared, "hash-object", f"--path={name}", "--stdin", data=old)
+            origin = shipped.get(blob) if rcb == 0 else None
+            if origin is None:
+                why = ("STALE, but this copy matches no version the shared folder ever shipped - "
+                       "a local edit adopting would destroy. Declare the fork, or promote the fix")
+        if why:
+            print(f"! {'REFUSED':<12} {name:<{width}}  {why}")
+            refused += 1
+            continue
+        new = source.read_bytes()
+        try:
+            write(local, new)
+            proved = sha(local) == sha(source)
+        except OSError:
+            proved = False
+        if not proved:
+            try:
+                local.write_bytes(old)
+                back = local.read_bytes() == old
+            except OSError:
+                back = False
+            print(f"! {'PROOF FAILED':<12} {name:<{width}}  the bytes on disk are not the shared "
+                  f"bytes - " + ("the old copy is put back" if back else
+                                 "AND THE OLD COPY COULD NOT BE PUT BACK: check it by hand"))
+            rc = 2
+            continue
+        lv = version_of(old.decode("utf-8", "replace"))
+        sv = version_of(new.decode("utf-8", "replace"))
+        print(f"  {'ADOPTED':<12} {name:<{width}}  v{lv} -> v{sv}, sha-256 {sha(local)[:16]} = "
+              f"shared {sha(source)[:16]}; from house commit {when}, replacing the copy "
+              f"shipped in {origin}")
+        adopted += 1
+    print(f"\n{adopted} adopted, {refused} refused, {forks} declared fork(s) kept. Nothing was run for them but git: their tests "
+          f"ran once,\nwhere each was fixed. A config key a new version needs in THIS project is "
+          f"the one\nexception - run that script's entry point once against the config, and "
+          f"nothing more.\n")
+    return rc
+
+
 # -------------------------------------------------------------------------- selftest
 
 def selftest() -> int:
@@ -611,8 +754,11 @@ def selftest() -> int:
               f"rc={rc} (want 2)")
 
         ok &= roster_selftest(tmp, shared)
+        ok &= adopt_selftest(tmp)
     finally:
-        shutil.rmtree(tmp, ignore_errors=True)
+        # git writes its objects read-only, which Windows will not delete without help
+        cleanup = "onexc" if sys.version_info >= (3, 12) else "onerror"
+        shutil.rmtree(tmp, **{cleanup: _writable_then_retry})
     print("\nSELFTEST: " + ("PASS" if ok else "FAIL"))
     return 0 if ok else 1
 
@@ -777,6 +923,194 @@ def roster_selftest(tmp: Path, shared: Path) -> bool:
 _ROSTER_SEQ = iter(range(1, 10_000))
 
 
+def _writable_then_retry(func, path, _exc):
+    """rmtree's error hook: clear the read-only bit git gives its objects, then try once more."""
+    with contextlib.suppress(OSError):
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+
+
+def adopt_selftest(tmp: Path) -> bool:
+    """--adopt, every case written before the code and read red against v19 first.
+
+    THE SHARED FOLDER HERE IS A REAL GIT REPOSITORY, because two of the guards are git facts -
+    the commit a copy comes from, and whether the copy it replaces is a version the shared
+    folder ever shipped. A fixture that faked them would prove the fake.
+    """
+    print("\nSELFTEST - --adopt, every case written red first\n")
+    ok = True
+    house = tmp / "house"
+    shared = house / "standard-scripts"
+    shared.mkdir(parents=True)
+
+    def git(*args) -> str:
+        r = subprocess.run(["git", "-c", "user.name=selftest",
+                            "-c", "user.email=selftest@example.invalid",
+                            "-c", "core.autocrlf=false", *args], cwd=house, capture_output=True)
+        return r.stdout.decode("utf-8", "replace").strip()
+
+    def body(name: str, v: int, extra: str = "") -> bytes:
+        return f'"""{name} CHECKER VERSION {v}"""\nprint("v{v}"){extra}\n'.encode("utf-8")
+
+    names = ["verify_code.py", "verify_md.py", "verify_refs.py", "verify_deliverable.py",
+             "run_tests.py", "house_common.py", "check_checkers.py", "cycle_evidence.py"]
+    git("init", "-q")
+    commits = []
+    for v in (1, 2):
+        for n in names:
+            (shared / n).write_bytes(body(n, v))
+        git("add", "-A")
+        git("commit", "-q", "-m", f"v{v}")
+        commits.append(git("rev-parse", "--short=7", "HEAD"))
+    c2 = commits[1]
+    # AN UNCOMMITTED v3 of one file: the session that fixed it may never have run its tests
+    (shared / "cycle_evidence.py").write_bytes(body("cycle_evidence.py", 3))
+
+    seq = iter(range(1, 100))
+
+    def project(files: dict, config: str | None = None) -> Path:
+        d = tmp / f"adoptproj{next(seq)}"
+        (d / "tools").mkdir(parents=True)
+        for n, b in files.items():
+            (d / "tools" / n).write_bytes(b)
+        if config is not None:
+            (d / CONFIG_NAME).write_bytes(config.encode("utf-8"))
+        return d
+
+    def drive(argv):
+        """(rc, stdout) of main(argv). An option v19 lacks reads as a crash, never as a pass."""
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(io.StringIO()):
+                rc = main(argv)
+        except SystemExit as exc:
+            rc = f"exit {exc.code}"
+        except Exception as exc:          # noqa: BLE001 - a crash is a MISS, reported as one
+            rc = f"crash {type(exc).__name__}"
+        return rc, buf.getvalue()
+
+    def check(label: str, good: bool, got: str = ""):
+        nonlocal ok
+        ok &= bool(good)
+        print(f"  {'OK  ' if good else 'MISS'} {label:<62} {got}")
+
+    def says(out: str, *needles: str) -> bool:
+        return any(all(n in line for n in needles) for line in out.splitlines())
+
+    # ONE PROJECT HOLDING EVERY SHAPE AT ONCE, so a guard that leaks reaches a file it must not
+    forked = (b"# FORKED FROM standard-scripts v1 ON 2026-10-15 BECAUSE a local need\n"
+              + body("verify_md.py", 1))
+    mixed = {"verify_code.py": body("verify_code.py", 1),                 # STALE, shipped
+             "verify_md.py": forked,                                       # FORKED
+             "verify_refs.py": body("verify_refs.py", 2, "  # edit"),      # DIVERGED, same v
+             "verify_deliverable.py": body("verify_deliverable.py", 3),    # DIVERGED, ahead
+             "run_tests.py": body("run_tests.py", 1, "  # a local fix"),   # STALE, never shipped
+             "house_common.py": body("house_common.py", 2),                # CURRENT
+             "cycle_evidence.py": body("cycle_evidence.py", 1)}            # STALE, shared dirty
+    d = project(mixed)
+    tools = d / "tools"
+    # EVERY PROCESS STARTED DURING THE RUN IS RECORDED: "runs nothing else" is a claim to test
+    calls = []
+    real_popen, real_system = subprocess.Popen, os.system
+
+    class Recorder(real_popen):
+        def __init__(self, args, *a, **k):
+            first = args[0] if isinstance(args, (list, tuple)) else str(args).split()[0]
+            calls.append(Path(str(first)).stem.lower())
+            super().__init__(args, *a, **k)
+
+    subprocess.Popen = Recorder
+    os.system = lambda *a, **k: calls.append("os.system") or 1
+    try:
+        rc, out = drive(["--adopt", "--project", str(d), "--shared", str(shared)])
+    finally:
+        subprocess.Popen, os.system = real_popen, real_system
+    same = lambda n, b: (tools / n).read_bytes() == b                       # noqa: E731
+    check("a STALE copy the house shipped is ADOPTED, byte for byte",
+          same("verify_code.py", (shared / "verify_code.py").read_bytes()), f"rc={rc}")
+    check("its line names the house commit and the proved sha-256",
+          says(out, "ADOPTED", "verify_code.py", c2, sha(shared / "verify_code.py")[:16]))
+    check("FORKED is refused and never overwritten",
+          same("verify_md.py", forked) and says(out, "REFUSED", "verify_md.py"))
+    check("DIVERGED at the same version is refused, never overwritten",
+          same("verify_refs.py", mixed["verify_refs.py"]) and says(out, "REFUSED", "verify_refs.py"))
+    check("DIVERGED ahead of the shared copy is refused, never overwritten",
+          same("verify_deliverable.py", mixed["verify_deliverable.py"])
+          and says(out, "REFUSED", "verify_deliverable.py"))
+    check("STALE carrying a local edit no version ever shipped is refused",
+          same("run_tests.py", mixed["run_tests.py"]) and says(out, "REFUSED", "run_tests.py"))
+    check("STALE whose shared file is not its committed one is refused",
+          same("cycle_evidence.py", mixed["cycle_evidence.py"])
+          and says(out, "REFUSED", "cycle_evidence.py"))
+    check("CURRENT is left alone and MISSING is not created",
+          same("house_common.py", mixed["house_common.py"])
+          and not (tools / "check_checkers.py").exists())
+    check("the run ends on the ordinary report, its findings intact",
+          rc == 1 and "8 tracked, 5 needing a decision" in out, f"rc={rc}")
+    check("nothing but git was started", bool(calls) and set(calls) == {"git"},
+          f"started={sorted(set(calls))}")
+
+    # A PROJECT WHOSE ONLY FINDINGS WERE STALE ENDS GREEN - the reading a project opens on
+    clean = [n for n in names if n not in ("check_checkers.py", "cycle_evidence.py")]
+    d2 = project({n: body(n, 1) for n in clean}, config=json.dumps({"checkers": {
+        "declared_absent": {"check_checkers.py": "selftest", "cycle_evidence.py": "selftest"}}}))
+    rc2, out2 = drive(["--adopt", "--project", str(d2), "--shared", str(shared)])
+    check("only STALE findings: all adopted, the run exits 0",
+          rc2 == 0 and "6 adopted" in out2 and "8 tracked, 0 needing a decision" in out2
+          and all((d2 / "tools" / n).read_bytes() == (shared / n).read_bytes() for n in clean),
+          f"rc={rc2}")
+
+    # THE PROOF MUST BE ABLE TO FAIL, or it is a print statement. A writer that corrupts the
+    # copy is caught, and the old bytes are put back rather than left half-adopted.
+    d3 = project({"verify_code.py": body("verify_code.py", 1)})
+    buf = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(buf):
+            rc3 = adopt(d3, shared, {}, write=lambda p, b: p.write_bytes(b + b"#"))
+    except Exception as exc:              # noqa: BLE001
+        rc3 = f"crash {type(exc).__name__}"
+    check("a copy that does not prove equal is PUT BACK, exit 2",
+          rc3 == 2 and "PROOF FAILED" in buf.getvalue()
+          and (d3 / "tools" / "verify_code.py").read_bytes() == body("verify_code.py", 1),
+          f"rc={rc3}")
+
+    # NO REPOSITORY BEHIND THE SHARED FOLDER: no commit can be named, so nothing is adopted
+    plain = tmp / "plain" / "standard-scripts"
+    plain.mkdir(parents=True)
+    for n in names:
+        (plain / n).write_bytes(body(n, 2))
+    d4 = project({"verify_code.py": body("verify_code.py", 1)})
+    saved = os.environ.get("GIT_CEILING_DIRECTORIES")
+    os.environ["GIT_CEILING_DIRECTORIES"] = str(tmp)
+    try:
+        rc4, out4 = drive(["--adopt", "--project", str(d4), "--shared", str(plain)])
+    finally:
+        if saved is None:
+            os.environ.pop("GIT_CEILING_DIRECTORIES", None)
+        else:
+            os.environ["GIT_CEILING_DIRECTORIES"] = saved
+    check("no repository behind the shared folder: nothing adopted",
+          rc4 == 1 and says(out4, "REFUSED", "verify_code.py")
+          and (d4 / "tools" / "verify_code.py").read_bytes() == body("verify_code.py", 1),
+          f"rc={rc4}")
+
+    # IT RUNS NOTHING ELSE, SO IT TAKES NOTHING ELSE - and the self-comparison guard still holds
+    d5 = project({"verify_code.py": body("verify_code.py", 1)})
+    rc5, out5 = drive(["--adopt", "--roster", str(tmp / "r.md"),
+                       "--project", str(d5), "--shared", str(shared)])
+    check("--adopt with --roster is VOID and writes nothing",
+          rc5 == 2 and "runs nothing else" in out5
+          and (d5 / "tools" / "verify_code.py").read_bytes() == body("verify_code.py", 1),
+          f"rc={rc5}")
+    d6 = project({"verify_code.py": body("verify_code.py", 1)})
+    rc6, out6 = drive(["--adopt", "--project", str(d6), "--shared", str(d6 / "tools")])
+    check("--adopt against the project's OWN tools is VOID, writes nothing",
+          rc6 == 2 and "against itself" in out6
+          and (d6 / "tools" / "verify_code.py").read_bytes() == body("verify_code.py", 1),
+          f"rc={rc6}")
+    return ok
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description="Compare this project's checker copies "
                                             "against the shared standard scripts.")
@@ -791,6 +1125,10 @@ def main(argv=None):
     p.add_argument("--roster", default="",
                    help="a document listing the scripts and their versions, checked "
                         "against the docstrings between its ROSTER:BEGIN/END markers")
+    p.add_argument("--adopt", action="store_true",
+                   help="IT WRITES: copy every STALE script from the shared folder over this "
+                        "project's copy, byte for byte, and prove each sha-256. FORKED and "
+                        "DIVERGED are refused and never overwritten; nothing is run but git")
     p.add_argument("--selftest", action="store_true")
     args = p.parse_args(argv)
     if args.selftest:
@@ -854,6 +1192,15 @@ def main(argv=None):
         if name:
             declared.setdefault(name, CLI_REASON)
     stale = stale_declarations(project, shared, declared)
+    # ADOPTION SITS BEHIND BOTH VOID GUARDS ABOVE, so it can never copy a project's own file
+    # over itself, and it ends on the ordinary report, which owns every other finding.
+    if args.adopt:
+        if args.roster:
+            print("VOID - --adopt runs nothing else, so it does not take --roster. Run the")
+            print("       roster arm on its own, before or after.")
+            return 2
+        rc_adopt = adopt(project, shared, declared)
+        return max(report(run(project, shared, declared), refused, stale), rc_adopt)
     rc = report(run(project, shared, declared), refused, stale)
     rows, void = ([], None) if not args.roster else check_roster(Path(args.roster), shared)
     rc_roster = roster_report(rows, void, declared=bool(args.roster))

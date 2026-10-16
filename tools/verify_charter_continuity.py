@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 """DID THE CHARTER REDUCTION LOSE ANYTHING, AND DOES THE CHARTER STILL STATE ITS OWN SIZE TRUTHFULLY?
 
-CHECKER VERSION 1 (2026-08-24)
+CHECKER VERSION 2 (2026-10-16)
+
+v2: CHECKS 3 AND 4 COUNT IN THE UNIT verify.config.json's md.line_measure NAMES, through house_common's
+own functions, so this checker and verify_md cannot disagree about a size. v1 counted len(splitlines())
+-- physical lines -- which went wrong the day this project switched to wrapped lines (the house's v46),
+a table row then weighing what it holds rather than one line however long. An unknown unit is VOID.
 
 WHY THIS IS IN `tools/` AND NOT IN `temp/`. It began as `temp/verify_3a_continuity.py`, written for one
 phase of the charter reduction. Section 1.7 of CLAUDE.md declares the charter's own line count in prose,
@@ -19,7 +24,8 @@ THE SIX CHECKS, and each exists because the failure it names has actually happen
                                       THIS PHASE'S ENTRY -- see the two-baseline note below
   2  NO HEADING LOST, NO RENUMBER     headings are what every pointer resolves against
   3  THE DECLARED SIZE                every sentence in which the charter states its own length must
-                                      equal the measured length. THIS IS THE REASON THIS FILE EXISTS
+                                      equal the measured length, in md.line_measure's unit. THIS IS
+                                      THE REASON THIS FILE EXISTS
   4  SECTION 7 AT ITS CAP             the handoff is replaced every session, so it bloats fastest
   5  EVERY RELOCATION LEFT A POINTER  a rule that simply vanishes reads as a rule that was repealed
   6  2 -> 1, NEVER 2 -> 0             relocation can promote a duplicate into the ONLY copy, and then
@@ -40,11 +46,15 @@ into a PUBLIC repository -- the exact class `tools/publication_check.py` exists 
 
 Without it that check is VOID and this script exits 1 with a banner. An unreadable source is not a pass.
 """
+import json
 import os
 import re
 import subprocess
 import sys
 from pathlib import Path
+
+sys.dont_write_bytecode = True
+from house_common import loaded_lines, wrapped_lines  # noqa: E402  (tools/ is on the path: this script's own folder)
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
@@ -188,12 +198,15 @@ SECTION_7_CAP = 25
 # FILLED one?".  Both emits were EMITTED TO A FILE AND COUNTED rather than quoted; the 38 a
 # record had carried for the archetype's 5.6 was wrong by 38, and re-deriving it moved the
 # recommendation from 560 to 510 before the allowance moved it again.
+# 619 -> 637 ON 2026-10-16, AND THE NUMBER IS NOW IN WRAPPED LINES (the house's v46): the same
+# `rebuild`/L emit re-measured at 517 wrapped by new_charter.py v27 --dry-run from an empty folder
+# outside the repository, plus the kept 120. The same number in a new unit is a new cap.
 # IT MUST EQUAL verify.config.json's max_lines for CLAUDE.md -- and the number is stated in SIX
 # places across three files, not the THREE this comment used to claim: that config key, its
-# comment, section 1.7's opening sentence, 1.7's NUMBER clause, this constant and this note.
+# comment, section 1.7's opening sentence, 1.7's emit figure, this constant and this note.
 # Only the config key gates, and check 3 sees only ONE of the six -- the "N lines against a cap
 # of C" sentence -- so moving any of them alone trades one red for another.
-DECLARED_CAP = 619
+DECLARED_CAP = 637
 
 # --------------------------------------------------------------------------- check 3 data
 # A DECLARATION is a sentence in which the charter states ITS OWN length. Each pattern below has a
@@ -293,6 +306,29 @@ NEVER_ONLY_PATH_SCOPED = [
 
 CR = bytes([13]).decode("ascii")
 
+
+# --------------------------------------------------------------------------- the unit (v2)
+def line_measure(root=None):
+    """The unit verify.config.json's md.line_measure names, or None when it cannot be read."""
+    cfg = Path(root or ROOT) / "verify.config.json"
+    try:
+        return json.loads(cfg.read_text(encoding="utf-8")).get("md", {}).get("line_measure", "physical")
+    except (OSError, ValueError):
+        return None
+
+
+def measure(text, unit):
+    """A size in the named unit, through house_common's own functions, so this checker and verify_md
+    cannot disagree: 'physical' counts the lines that load, 'wrapped' weighs each at its length / 120,
+    rounded up. Anything else is refused rather than guessed -- a mistyped unit would otherwise
+    measure in one unit and compare against a cap stated in another."""
+    if unit == "wrapped":
+        return wrapped_lines(text)
+    if unit == "physical":
+        return loaded_lines(text)
+    raise ValueError(f"line_measure {unit!r} is neither 'physical' nor 'wrapped'")
+
+
 failures = []
 notes = []
 
@@ -384,8 +420,13 @@ def run(charter_path="CLAUDE.md", root=None):
         print("  VOID — baseline is byte-identical to the working tree. Nothing was measured.")
         return 2
     ok(f"baseline {BASELINE[:8]} resolves, holds the pre-reduction marker, and differs from the tree")
-    measured = len(charter.splitlines())
-    ok(f"baseline {len(base.splitlines())} lines · working {measured} lines")
+    unit = line_measure(root)
+    if unit not in ("physical", "wrapped"):
+        print(f"  VOID — verify.config.json's md.line_measure reads {unit!r}. Checks 3 and 4 would")
+        print("  measure in one unit and compare against caps stated in another. Fix the config.")
+        return 2
+    measured = measure(charter, unit)
+    ok(f"baseline {measure(base, unit)} · working {measured} lines, {unit} — md.line_measure's unit")
 
     # LINE TERMINATORS, IN BYTES. A `grep -c` for a carriage return once reported 0 on this file
     # while it had one per line, so the reassuring answer came from a broken needle. `.gitattributes`
@@ -533,9 +574,9 @@ def run(charter_path="CLAUDE.md", root=None):
                  "from the checker on the commit that declares it")
     for label, raw, value, snippet in decls:
         if value == measured:
-            ok(f"{label:34} says {raw} and the file is {measured} — measured, not remembered")
+            ok(f"{label:34} says {raw} and the file is {measured} {unit} — measured, not remembered")
         else:
-            bad("3", f"{label} says {raw}; the file is {measured}. A number that was true when "
+            bad("3", f"{label} says {raw}; the file is {measured} {unit}. A number that was true when "
                      f"written and is false now misleads exactly as much as one never true "
                      f"— {snippet!r}")
     caps = {int(m) for pat in (DECLARATIONS[0][1], DECLARATIONS[3][1])
@@ -559,11 +600,11 @@ def run(charter_path="CLAUDE.md", root=None):
     if not m7:
         bad("4", "no section 7 found at all")
     else:
-        n7 = len(("## 7." + m7.group(1)).splitlines())
+        n7 = measure("## 7." + m7.group(1), unit)
         if n7 <= SECTION_7_CAP:
-            ok(f"section 7 is {n7} lines against the cap of {SECTION_7_CAP}")
+            ok(f"section 7 is {n7} lines, {unit}, against the cap of {SECTION_7_CAP}")
         else:
-            bad("4", f"section 7 is {n7} lines against a cap of {SECTION_7_CAP}")
+            bad("4", f"section 7 is {n7} lines, {unit}, against a cap of {SECTION_7_CAP}")
 
     # ------------------------------------------------------------------ 5
     head(5, "EVERY RELOCATION LEFT A POINTER — a cut with no pointer reads as a repeal")
@@ -703,6 +744,19 @@ def selftest():
          [1305])
     case("prose with no self-declaration yields nothing",
          declared_sizes("A cap of 350 lines is the L class."), [])
+
+    print("measure — the unit checks 3 and 4 count in (v2, the house's v46)")
+    case("a 250-character line weighs 3 wrapped lines", measure("x" * 250 + "\n", "wrapped"), 3)
+    case("...and 1 physical line", measure("x" * 250 + "\n", "physical"), 1)
+    case("a blank line still weighs one", measure("a\n\nb\n", "wrapped"), 3)
+    try:
+        measure("a\n", "words")
+        refused = False
+    except ValueError:
+        refused = True
+    case("an unknown unit is refused, never guessed", refused, True)
+    case("this project's config names a unit this checker knows",
+         line_measure() in ("physical", "wrapped"), True)
 
     print("section_body — the span used by checks 1, 4 and 5")
     doc = "### 5.1 A\nalpha\n\n### 5.2 B\nbeta\n\n## 6. C\ngamma\n"
