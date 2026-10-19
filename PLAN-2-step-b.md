@@ -1094,8 +1094,9 @@ specification review rather than on the decision. Recorded against Option 2 as w
 > **13.1 MEASURED, 2026-10-19 (2), NOTHING BUILT** — the table is a dated addition to section 3.4 of
 > `evidence/EVIDENCE-a3-structure.md`, which owns it. **What it changes for the gear:** no single step holds
 > the fixed cost, repair is under 3 minutes on every short run, and 28% to 55% of each run's active time ends
-> at the A1 harness's own per-step paperwork, so a user's fixed cost lies between about 14 and about 25
-> minutes and these July runs cannot say where. The gear's design went to Wouter at the session's close.
+> at a record the A1 harness had the operator write, mostly its forensic notes, so a user's fixed cost lies
+> between about 14 and about 25 minutes and these July runs cannot say where. The gear's design goes to
+> Wouter at the session's close.
 
 ### 3.5 Fix the claim, not only the code — option 9 · **GO, plus six new register rows** · *step 3, then folded in as steps land, then step 21*
 

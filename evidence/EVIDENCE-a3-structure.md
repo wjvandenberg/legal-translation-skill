@@ -776,8 +776,8 @@ thoroughness will make a lawyer feel otherwise. The measured answer is not "make
 **"give it more than one gear"** — which is the same declared-mode change KS5 already needs for H3 and L5.
 
 **ADDED 2026-10-19 — STEP 13's SUB-STEP 13.1: WHERE A SHORT RUN'S MINUTES GO, PER SKILL STEP, AND HOW MUCH OF
-THE FIXED COST IS THE TEST HARNESS'S OWN PAPERWORK** **[M]** *(the gear's design is Wouter's decision, put to
-him with this table; `DECISIONS-LOG.md` records his answer)*
+THE FIXED COST IS THE TEST HARNESS'S OWN PAPERWORK** **[M]** *(the gear's design is Wouter's decision, to be
+put to him with this table; his answer goes to `DECISIONS-LOG.md`)*
 
 **Method — this section's rule, not a new one.** `temp/s1019b_gear_measure.py`, gitignored and never
 committed, applies the 300-second interruption threshold and books each gap to the step of the record that
@@ -807,18 +807,21 @@ its least-squares intercept over all twelve runs — indicative only, the whole 
 **Five things the table says.**
 
 1. **No single step holds the fixed cost.** Translating's own fixed part, about 7 minutes, is the largest;
-   no other step's is above 3 minutes (`05-apply`, 2.9). The fixed cost is spread across the pipeline.
+   no other single step's is above 3 minutes — the largest, `05-apply` at 2.9, sits inside the 6.5 of
+   putting the English back. The fixed cost is spread across the pipeline.
 2. **Repair is not where a short run's time goes:** at most 0.3, 2.7 and 0.6 minutes after a failed check
    on the three short runs. The logs cannot tell a repair from the re-translation it prompts, so the floor
    leaves out any window holding new translating and the ceiling counts every window.
-3. **The script's share is under 1% on every one of the four runs** — 0.3% to 0.7%, as conclusion 2 above
+3. **The script's share is under 1% on every one of the four runs** — 0.2% to 0.7%, as conclusion 2 above
    found. The Python is not the cost.
-4. **Between 28% and 55% of every run's active time ends at the harness's own paperwork** — the compliance
-   record, snapshot, note and journal the A1 harness had the operator write at each step, which a user's run
-   does not write. Taken out, the fit falls from 24.6 fixed minutes and 2.40 seconds a paragraph to **14.3
-   and 1.25**. Not all of it is overhead: the model's reading of a step's output precedes the note and would
-   happen without it. **So a user's fixed cost lies between about 14 and about 25 minutes, and these logs
-   cannot say where** — the *"25 minutes of fixed overhead"* above is its ceiling, not its measure.
+4. **Between 28% and 55% of every run's active time ends at a record the A1 harness had the operator write**
+   — across all twelve 43.2%: the forensic notes 33.1%, the journal 5.6%, the compliance record 4.3%, the snapshot
+   0.3%. A user's run writes none of them, but not all of that time is overhead: the model's reading of a
+   step's output precedes the note and would happen without it, and the compliance record LOGS the skill's
+   own end-of-step *Internal compliance check*, which a user's run works through too. Taken out entirely,
+   the fit falls from 24.6 fixed minutes and 2.40 seconds a paragraph to **14.3 and 1.25**. **So a user's
+   fixed cost lies between about 14 and about 25 minutes, and these logs cannot say where** — the
+   *"25 minutes of fixed overhead"* above is its ceiling, not its measure.
 5. **All twelve runs date from July 2026**, before the repository existed and so before any of phase 2's
    steps changed the gates, apply and the tidy-up script: a gear designed on them is designed on the old
    pipeline.
