@@ -24,6 +24,14 @@ does not support says NOT SUPPORTED and the block does not run; nothing
 declared, it scans the language detected from the original, refuses on what it
 finds, and never says clean on a guess.
 
+The document's language
+-----------------------
+The w:val of every w:lang in word/styles.xml and of w:themeFontLang in
+word/settings.xml is set to the delivered variant's — en-GB (uk), en-US (us),
+--variant, this tree's own by default — so Word spell-checks the delivery as
+English rather than as the source language (register R1). w:eastAsia, w:bidi,
+every other part and every other byte are left as they are.
+
 The delivered-document check
 ----------------------------
 Last, and still BEFORE the write, `validate_apply.py --delivered` reads a
@@ -204,6 +212,50 @@ def _scrub_zwsp(data):
         n += k
         return b'>' + _ZWSP_REF_RE.sub(b'', m.group(1).replace(_ZWSP, b'')) + b'<'
     return _CHARDATA_RE.sub(one, data), n
+
+
+# THE DOCUMENT'S LANGUAGE — register R1. Apply strips the source-language w:lang
+# from the body's runs, which leaves styles.xml's defaults and settings.xml's theme
+# language deciding what Word spell-checks the delivery against: the source
+# language, measured on three documents from three, so nearly every English word
+# was flagged. So the two values that say what language the document is in are set
+# to the delivered variant's: the w:val of every w:lang in styles.xml and of
+# w:themeFontLang in settings.xml. NOTHING ELSE MOVES. w:eastAsia and w:bidi choose
+# fonts for East Asian and right-to-left text, which is layout, so they stay; a
+# w:lang with no w:val gets none; a w:lang inside a run, in any part, is left to
+# apply; and the edit rewrites one attribute's bytes, never re-serialises the part.
+VARIANT_LANGUAGE = {'uk': 'en-GB', 'us': 'en-US'}
+_LANGUAGE_ELEMENT = {'word/styles.xml': rb'<w:lang(?=[\s/>])[^>]*>',
+                     'word/settings.xml': rb'<w:themeFontLang(?=[\s/>])[^>]*>'}
+_LANGUAGE_VAL_RE = re.compile(rb'(\sw:val=)(["\'])[^"\']*\2')
+# The patterns read the w: prefix Word writes. A part whose root does not carry it
+# binds the namespace to another prefix, so nothing in it can be read: that is SAID
+# (found None), never reported as a part with no language value in it.
+_LANGUAGE_ROOT = {'word/styles.xml': b'<w:styles', 'word/settings.xml': b'<w:settings'}
+
+
+def _set_document_language(part, data, tag):
+    """(data with each w:val of the part's language element set to `tag`, values
+    found, values changed). A part not named in _LANGUAGE_ELEMENT is returned as is;
+    one whose root is not w:-prefixed is returned as is with found None."""
+    pattern = _LANGUAGE_ELEMENT.get(part)
+    if pattern is None:
+        return data, 0, 0
+    if _LANGUAGE_ROOT[part] not in data:
+        return data, None, 0
+    value = tag.encode('ascii')
+    found = changed = 0
+
+    def one(m):
+        nonlocal found, changed
+        v = _LANGUAGE_VAL_RE.search(m.group(0))
+        if v is None:
+            return m.group(0)
+        found += 1
+        new = _LANGUAGE_VAL_RE.sub(lambda a: a.group(1) + a.group(2) + value + a.group(2), m.group(0), count=1)
+        changed += new != m.group(0)
+        return new
+    return re.sub(pattern, one, data), found, changed
 
 
 def _guess_from_original(orig_docx):
@@ -663,10 +715,16 @@ def repack(orig_docx, translated_doc_xml, output_docx,
            translated_footnotes_xml=None, translated_endnotes_xml=None,
            translated_glossary_xml=None,
            clean_track_revisions=True,
-           paragraphs_json=None):
+           paragraphs_json=None,
+           variant='uk'):
     """Copy orig_docx to output_docx, replacing word/document.xml and any
     optionally-supplied auxiliary XML parts (numbering, headers/footers,
     comments, footnotes, endnotes, glossary).
+
+    ``variant`` ('uk' or 'us') is the delivered variant: the document language set
+    in styles.xml and settings.xml, en-GB or en-US. NAME IT: this default is 'uk' in
+    both trees, so the two stay one program; the command line defaults --variant to
+    the tree's own.
 
     THE GLOSSARY IS THE ONE THAT BLOCKS WHEN ITS FLAG IS MISSING, and it is the only
     auxiliary part whose check reads the ORIGINAL rather than the workdir. See the gate
@@ -691,6 +749,12 @@ def repack(orig_docx, translated_doc_xml, output_docx,
     cannot accidentally skip either gate.
     """
     scripts_dir = os.path.dirname(os.path.abspath(__file__))
+    # THE COMMAND LINE defaults --variant to this tree's own; a caller of repack()
+    # names it. The function's default is the same in both trees, so the two stay
+    # one program (tools/parity_check.py compares them as parsed programs).
+    if variant not in VARIANT_LANGUAGE:
+        raise ValueError(f"variant must be one of {sorted(VARIANT_LANGUAGE)}, not {variant!r}")
+    language_tag = VARIANT_LANGUAGE[variant]
 
     # --- PRE-REPACK MANDATORY GATES ------------------------------------
     # Run before any byte is written to output_docx so failures abort
@@ -1053,6 +1117,7 @@ def repack(orig_docx, translated_doc_xml, output_docx,
         # So the archive is held in memory, checked there, and written once.
         archive = io.BytesIO()
         scrubbed = {}
+        languages = {}
         with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as zout:
             seen_normalized = set()  # track normalized paths to skip duplicates
             for item in zin.infolist():
@@ -1101,6 +1166,11 @@ def repack(orig_docx, translated_doc_xml, output_docx,
                 else:
                     data = zin.read(item.filename)
 
+                # THE DOCUMENT'S LANGUAGE (R1), on whichever branch above produced the part.
+                if norm_filename in _LANGUAGE_ELEMENT:
+                    data, _found, _changed = _set_document_language(norm_filename, data, language_tag)
+                    languages[norm_filename] = (_found, _changed)
+
                 # THE U+200B SCRUB (J1), on every prose part whatever its source —
                 # a part copied from the original carries the defect as surely.
                 if _is_prose_part(norm_filename):
@@ -1110,6 +1180,13 @@ def repack(orig_docx, translated_doc_xml, output_docx,
                 zout.writestr(new_item, data)
         for _part, _n in sorted(scrubbed.items()):
             print(f"  U+200B scrubbed: {_n} from {_part}")
+        for _part, (_found, _changed) in sorted(languages.items()):
+            if _found is None:
+                print(f"  WARNING: document language NOT SET in {_part}: its root is not "
+                      f"w:-prefixed, so its language values could not be read")
+            else:
+                print(f"  Document language: {_found} value(s) in {_part} read {language_tag} "
+                      f"({_changed} changed)")
 
     # --- VERIFY THE ARCHIVE IN MEMORY, AND WRITE IT ONLY IF EVERY CHECK PASSES ---
     #
@@ -1221,6 +1298,10 @@ if __name__ == '__main__':
                              '/ strip_noop / reorder_definitions. The repack '
                              'REFUSES to bundle without it — the gate is '
                              'unconditional, not advisory.')
+    parser.add_argument('--variant', choices=sorted(VARIANT_LANGUAGE), default='us',
+                        help='The delivered variant: sets the document language in '
+                             'styles.xml and settings.xml to en-GB (uk) or en-US (us). '
+                             "Defaults to this tree's own variant.")
     args = parser.parse_args()
     repack(args.original, args.translated_xml, args.output,
            translated_numbering_xml=args.numbering,
@@ -1230,7 +1311,8 @@ if __name__ == '__main__':
            translated_endnotes_xml=args.endnotes,
            translated_glossary_xml=args.glossary,
            clean_track_revisions=not args.no_clean_track_revisions,
-           paragraphs_json=args.paragraphs)
+           paragraphs_json=args.paragraphs,
+           variant=args.variant)
 
     # SET SUCCESS EXPLICITLY, rather than merely avoiding a failure code.
     # This block set no exit code at all, so a 0 from repack was only Python's

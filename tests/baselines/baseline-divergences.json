@@ -36,9 +36,9 @@
    "sha256_now": "c0414f93e2034ef19b032766aeb8d605e07fddd10733145f3e804e174795b77c"
   },
   "uk/scripts/repack_docx.py": {
-   "changed_by": "fix/sibling-import-integrity",
-   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
-   "sha256_now": "adc4d5f235e09775d8f504e6982ed19582be873d4e7be245f1c35230d4cca809"
+   "changed_by": "feature/step13-2-document-language",
+   "commit_subject": "Sub-step 13.2, R1: the delivered document's language set to the variant's, both trees, nothing else moved",
+   "sha256_now": "465b60ffec0cb75f2714d81245c206c6c62fa55d3bbd697493a1abf8e006c52f"
   },
   "uk/scripts/source_language_markers.py": {
    "changed_by": "feature/branch12-slice12b",
@@ -136,9 +136,9 @@
    "sha256_now": "19c79bf4472de82a5cd74d22c7d549b7519224cfda5a49d4418297a8a78ea283"
   },
   "us/scripts/repack_docx.py": {
-   "changed_by": "fix/sibling-import-integrity",
-   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
-   "sha256_now": "adc4d5f235e09775d8f504e6982ed19582be873d4e7be245f1c35230d4cca809"
+   "changed_by": "feature/step13-2-document-language",
+   "commit_subject": "Sub-step 13.2, R1: the delivered document's language set to the variant's, both trees, nothing else moved",
+   "sha256_now": "192ae09f3db5d986d1e8e4d9106b7faa19f5a5c329b2153211a3b2fb756b876c"
   },
   "us/scripts/source_language_markers.py": {
    "changed_by": "feature/branch12-slice12b",
