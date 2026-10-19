@@ -1584,3 +1584,53 @@ come after step 13, at Wouter's word below.
 >
 > **Open, none blocking:** 2026-10-14's carried items, word for word in `DECISIONS-LOG.md`, 2026-10-16; the reduction's
 > fresh-clone verdict; `install_hooks.py --check` exits 1 here every run. **Context: 49% when written, measured.**
+
+## 2026-10-19 (2) — sub-step 13.1 measured, 13.2 built; the gear re-measured in phase 3, the size limit 1,000 paragraphs
+
+**WOUTER AT THE CLOSE, THROUGH THE QUESTION TOOL — each the recommended answer, every claim the options made measured
+first.** **(1) THE GEAR:** re-measure first — phase 3's plan times at least one short document in Cowork with no
+harness notes, timestamps only, on the rebuilt skill, and the gear is designed on that; the runtime problem stays
+open until then. **(2) R1'S RESIDUE** — run-level `w:lang` in side parts and Word 2010's `stylesWithEffects.xml` — a
+new register row, built as a small sub-step after 13.4. **(3) 13.3's SIZE LIMIT:** 1,000 body paragraphs, the refusal
+telling the user to split the document; paragraphs, not bytes. **(4) THE LANGUAGE CLAIM** goes into `README.md` and
+both `SKILL.md` files with 13.4, three places or none.
+
+**JUDGEMENTS TAKEN ALONE, CARRIED TO THE CLOSE.** **(a)** 13.1's table went to section 3.4 of
+`evidence/EVIDENCE-a3-structure.md`, which owns the runtime measurements, generated and never typed; #154's review
+found one typed range wrong, so the prose's figures are now built from the generator's own lines too. **(b)** The
+harness's share is stated as bounds, 14 to 25 fixed minutes: a gap ending at a note holds thinking a user's run also
+does, and the compliance record logs the skill's own end-of-step check. **(c)** Repair time floor to ceiling, the logs
+unable to tell a repair from the re-translation it prompts. **(d)** `repack()`'s default is `uk` in both trees, only
+the command line defaulting per tree: `tools/parity_check.py` flagged a per-tree function default as new drift, never
+to be baselined; `post_process`'s own is baselined drift awaiting step 20. **(e)** Arm 5 of
+`tests/test_repack_scrub_and_block.py` asserted the two repacks byte-identical and now asserts they differ ONLY by
+that line, as it does for the markers' one spelling, a second difference still failing. **(f)** From #155's review:
+the corpus arm's 13.2 checks are not counted on a document with no delivery read, and a part not `w:`-prefixed is
+said unreadable. **(g)** 13.3's envelope measured ahead of its build, counts only: 11 corpus files, the largest
+0.3 MB, none in a refusal class. **(h)** The register row asked for now is the next session's first action: filing one
+moves counts in four files and would not have finished under 75%.
+
+**OPEN, NONE BLOCKING.** The standalone suites, `tests/test_document_language.py` now among them, are not in the full
+runner (open since 2026-10-16 (2)); the plan's line 160; check 2's vacuity row with rename (c).
+
+**The 2026-10-19 handoff, as it stood at `5f209b2`, word for word:**
+
+> ### HANDOFF — 2026-10-19, RENAME (b2) MERGED, STEP 13'S PLAN WRITTEN
+>
+> **PURPOSE: MET.** It was *so that the build plan speaks the charter's words, no row of it read as a step of the skill,
+> and step 13 is built from a plan Wouter has seen*: #152 swept the plan's living text, 145 swaps proved by reversal,
+> the census 0 on both documents; step 13's plan is section 3.4 of `PLAN-2-step-b.md`, approved by Wouter at the close.
+>
+> **BUILT:** #152 — the status cell's history moved word for word to `evidence/EVIDENCE-phase2-history.md`, D1–D3
+> renumbered steps 20–22, `stepb_audit`'s step-table check found passing on nothing and repaired, 15 metacheck probes;
+> then this close. Wouter's answers and the judgements taken alone: `DECISIONS-LOG.md`, 2026-10-19.
+>
+> **SINGLE NEXT ACTION: SUB-STEP 13.1, THE PLAN APPROVED** *(Wouter)* — the short-document gear measured from the
+> forensic logs, counts only, nothing built; then 13.2 if there is room, each sub-step its own pull request.
+>
+> **WHAT A NEW SESSION WOULD GET WRONG:** the plan's records keep the old words whatever their date — each option's
+> build record after its brief, 9.3's rows, Parts Two and Four — exactly the spans `tools/vocabulary_census.py`
+> declares; section 9.3 is typed, only 9.1 and 9.2 are printed by `tools/stepb_verify.py`.
+>
+> **Open, none blocking:** the plan's line 160 naming the charter's section 6 for the phase order; no register row for
+> check 2's vacuity until rename (c) files it; (c) and (d) after step 13 (Wouter). **Context: 59% when written, measured.**

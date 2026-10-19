@@ -196,7 +196,7 @@ work's second sub-step cannot begin before that check exists, and carries the of
 
 #### Phase 3 — the full Cowork test, and its repairs
 **Opus 5 is DROPPED** *(Wouter, 2026-10-13; `DECISIONS-LOG.md` owns it)*; `PLAN-3-opus5-migration.md` is
-superseded. **After every step of phase 2:** every document through Cowork, all recorded, each failure repaired here.
+superseded. **After every step of phase 2:** every document through Cowork, all recorded, each failure repaired here; and one short document timed with no harness notes, the gear designed on it *(Wouter, 2026-10-19 (2))*.
 
 #### Phase 4 — Polish, then publish
 The skill's steps renumbered, as §6.3 allows, and smaller repairs; step 22 and the publish step are the build
@@ -578,22 +578,22 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-19, RENAME (b2) MERGED, STEP 13'S PLAN WRITTEN
+### HANDOFF — 2026-10-19 (2), 13.1 MEASURED, 13.2 BUILT AND MERGED
 
-**PURPOSE: MET.** It was *so that the build plan speaks the charter's words, no row of it read as a step of the skill,
-and step 13 is built from a plan Wouter has seen*: #152 swept the plan's living text, 145 swaps proved by reversal,
-the census 0 on both documents; step 13's plan is section 3.4 of `PLAN-2-step-b.md`, approved by Wouter at the close.
+**PURPOSE: MET.** It was *so that the short-document gear is designed by Wouter from measured minutes rather than a
+guess, and a delivered English file is spell-checked as English*: #154 measured it, Wouter choosing to re-measure in
+phase 3; #155 sets the document's two language values, R1 closed — the side parts' run-level tags a new row.
 
-**BUILT:** #152 — the status cell's history moved word for word to `evidence/EVIDENCE-phase2-history.md`, D1–D3
-renumbered steps 20–22, `stepb_audit`'s step-table check found passing on nothing and repaired, 15 metacheck probes;
-then this close. Wouter's answers and the judgements taken alone: `DECISIONS-LOG.md`, 2026-10-19.
+**BUILT:** #154 — the per-step table in section 3.4 of `evidence/EVIDENCE-a3-structure.md`; 28–55% of active time ends
+at the A1 harness's paperwork, so a user's fixed cost is 14–25 minutes. #155 — `repack_docx.py` both trees, its suite
+red first, the corpus arm's third `--ref` sense. Wouter's four answers and the judgements: `DECISIONS-LOG.md`, 2026-10-19 (2).
 
-**SINGLE NEXT ACTION: SUB-STEP 13.1, THE PLAN APPROVED** *(Wouter)* — the short-document gear measured from the
-forensic logs, counts only, nothing built; then 13.2 if there is room, each sub-step its own pull request.
+**SINGLE NEXT ACTION: FILE R1'S RESIDUE AS A REGISTER ROW** *(Wouter; carried, the filing moving counts in four
+files)*, then **SUB-STEP 13.3, L5** — the envelope refused at admission, its size limit 1,000 paragraphs *(Wouter)*.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** the plan's records keep the old words whatever their date — each option's
-build record after its brief, 9.3's rows, Parts Two and Four — exactly the spans `tools/vocabulary_census.py`
-declares; section 9.3 is typed, only 9.1 and 9.2 are printed by `tools/stepb_verify.py`.
+**WHAT A NEW SESSION WOULD GET WRONG:** `repack()` defaults to `uk` in BOTH trees by design — the parity check reads a
+per-tree function default as new drift — and only the command line defaults per tree, arm 5 of
+`tests/test_repack_scrub_and_block.py` asserting that one line; standalone suites run only when a TEST list names them.
 
-**Open, none blocking:** the plan's line 160 naming the charter's section 6 for the phase order; no register row for
-check 2's vacuity until rename (c) files it; (c) and (d) after step 13 (Wouter). **Context: 59% when written, measured.**
+**Open, none blocking:** the plan's line 160; check 2's vacuity row with rename (c); the language claim in `README.md`
+and both `SKILL.md` with 13.4 *(Wouter)*. **Context: 60% when written, measured.**
