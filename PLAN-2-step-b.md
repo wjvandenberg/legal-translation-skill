@@ -1106,6 +1106,11 @@ specification review rather than on the decision. Recorded against Option 2 as w
 > checks, two mutants red. `tests/test_document_language.py` RED on `c4639fa` (7 of 9 failing), 27 assertions
 > after; one synthetic page rendered, pixel-identical. Outside the brief and left as delivered: run-level
 > `w:lang` in side parts (51 across the July deliveries) and `stylesWithEffects.xml` (D04 D08).
+>
+> **WOUTER, 2026-10-19 (2), AT THE CLOSE** *(`DECISIONS-LOG.md`)*: the gear re-measured in phase 3, one short
+> document timed with no harness notes, the runtime problem open until then; 13.3's limit 1,000 body paragraphs, the
+> refusal telling the user to split the document; the language claim in `README.md` and both `SKILL.md` with 13.4;
+> R1's residue a new register row, built as a sub-step after 13.4.
 
 ### 3.5 Fix the claim, not only the code — option 9 · **GO, plus six new register rows** · *step 3, then folded in as steps land, then step 21*
 
