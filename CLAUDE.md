@@ -582,7 +582,7 @@ Wouter's explicit OK.)*
 
 **PURPOSE: MET.** It was *so that the short-document gear is designed by Wouter from measured minutes rather than a
 guess, and a delivered English file is spell-checked as English*: #154 measured it, Wouter choosing to re-measure in
-phase 3; #155 sets the document's two language values, R1 closed — the side parts' run-level tags a new row.
+phase 3; #155 sets the document's two language values, R1 closed — the side parts' tags a row still to file.
 
 **BUILT:** #154 — the per-step table in section 3.4 of `evidence/EVIDENCE-a3-structure.md`; 28–55% of active time ends
 at the A1 harness's paperwork, so a user's fixed cost is 14–25 minutes. #155 — `repack_docx.py` both trees, its suite
@@ -595,5 +595,5 @@ files)*, then **SUB-STEP 13.3, L5** — the envelope refused at admission, its s
 per-tree function default as new drift — and only the command line defaults per tree, arm 5 of
 `tests/test_repack_scrub_and_block.py` asserting that one line; standalone suites run only when a TEST list names them.
 
-**Open, none blocking:** the plan's line 160; check 2's vacuity row with rename (c); the language claim in `README.md`
-and both `SKILL.md` with 13.4 *(Wouter)*. **Context: 60% when written, measured.**
+**Open, none blocking:** renames (c), with check 2's vacuity row, and (d) after step 13 *(Wouter)*; the language
+claim with 13.4; line 160 of the plan naming section 6 for the order. **Context: 60% when written, measured.**
