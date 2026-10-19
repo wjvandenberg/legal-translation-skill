@@ -149,17 +149,26 @@ count_variants("no-compliant-repair count", r"(eighteen|fourteen|thirteen) findi
 # deferred items", so the old needle "twenty branches" stopped matching and the guard went silent
 # without failing. Caught by this warning rather than by reading. Now BOTH the prose figures are
 # guarded AND the table is counted, which is stronger than either.
-count_variants("branch count", r"(Twenty|Nineteen|twenty|nineteen) numbered branches")
+# RENAME (b2), 2026-10-19: "twenty-three numbered steps" since D1-D3 became steps 20-22. "numbered branches" is
+# still read, so a stale phrase left anywhere in LIVE counts as a second, inconsistent figure rather than vanishing.
+count_variants("step count",
+               r"(Twenty-three|twenty-three|Twenty|twenty|Nineteen|nineteen) numbered (?:steps|branches)")
 count_variants("total pieces of work", r"(twenty-three|twenty-two|twenty-four) pieces of work")
 # the branch table lives in section 2 ONLY. Spanning to section 4 swallowed section 3's
 # record table and counted its rows as branches -- 29 instead of 20.
 sec4 = doc[doc.index("## 2. The plan of work"):doc.index("## 3. The build brief")]
 nrows = len(re.findall(r"^\| \*\*(\d+)\*\* \|", sec4, re.M))
 drows = len(re.findall(r"^\| \*\*D(\d)\*\* \|", sec4, re.M))
-if (nrows, drows) != (20, 3):
-    fail("2", f"§4's table holds {nrows} numbered branches and {drows} deferred items, expected 20 and 3")
+# D1-D3 RENUMBERED AS STEPS 20-22 on 2026-10-19 (Wouter, 2026-10-13 (6)): no D-labelled row, and the numbered
+# rows run 0 to the N the plan's own "numbered steps, 0-N" claim states - read from it, never typed here
+_last = re.search(r"numbered steps, 0–(\d+)", LIVEFLAT)
+if not _last:
+    fail("2", "the plan's 'numbered steps, 0-N' claim was not found, so the table has nothing to be held to")
+elif (nrows, drows) != (int(_last.group(1)) + 1, 0):
+    fail("2", f"section 2's tables hold {nrows} numbered steps and {drows} D-labelled rows; the plan claims "
+              f"0–{_last.group(1)} and none D-labelled")
 else:
-    ok(f"§4's table holds exactly {nrows} numbered branches + {drows} deferred items = {nrows + drows}")
+    ok(f"section 2's tables hold exactly {nrows} numbered steps, 0–{_last.group(1)}, and no D-labelled row")
 # derive rather than hardcode: the register grows, and a literal total goes stale silently
 count_variants("skill findings total", r"(1\d\d) recorded findings")
 count_variants("options total", r"There are (eleven|ten|nine) things we could do")
