@@ -775,6 +775,57 @@ and for a 613-paragraph contract at 4.9 seconds a paragraph that is entirely def
 thoroughness will make a lawyer feel otherwise. The measured answer is not "make the skill faster" but
 **"give it more than one gear"** — which is the same declared-mode change KS5 already needs for H3 and L5.
 
+**ADDED 2026-10-19 — STEP 13's SUB-STEP 13.1: WHERE A SHORT RUN'S MINUTES GO, PER SKILL STEP, AND HOW MUCH OF
+THE FIXED COST IS THE TEST HARNESS'S OWN PAPERWORK** **[M]** *(the gear's design is Wouter's decision, to be
+put to him with this table; his answer goes to `DECISIONS-LOG.md`)*
+
+**Method — this section's rule, not a new one.** `temp/s1019b_gear_measure.py`, gitignored and never
+committed, applies the 300-second interruption threshold and books each gap to the step of the record that
+ends it, over each document's graded log as `tools/gate_replay.py` picks it, by its published command count;
+it prints step ids and numbers only. **Its controls:** thirteen planted on a synthetic log, every one fired;
+every run's ACTIVE minutes reproduce the table above to the decimal, 12 of 12; and the stages' fixed parts
+below add to the whole fit's 24.55 minutes exactly. `temp/s1019b_gear_table.py` generated this table from
+the same reading — none of it is typed.
+
+| stage — the skill steps in it | D01 · 24 paragraphs | D11 · 43 paragraphs | D10 · 45 paragraphs | D06 · 613 paragraphs | fixed part, all 12 runs |
+|---|---|---|---|---|---|
+| setting up and extracting — `01-setup`, `02-extract` and the reading before them | 3.5 | 2.6 | 4.0 | 6.4 | 3.5 |
+| the lexicons — `03-lexicons`, `03b-scaffold` | 0.7 | 5.4 | 1.0 | 1.8 | 2.8 |
+| translating — `04-translate` | 9.2 | 4.4 | 6.8 | 19.6 | 7.2 |
+| the per-batch checks — `04b-validate`, `04c-crossrefs`, `04d-lexicon-compliance` | 0.4 | 2.6 | 0.5 | 4.1 | 1.1 |
+| putting the English back — `05-apply` to `08-aux`, and `10-repack` | 2.9 | 6.2 | 2.2 | 7.5 | 6.5 |
+| quality and diligence — `09-quality`, `11a-diligence` | 1.2 | 1.8 | 0.6 | 2.7 | 1.1 |
+| the final validate and render — `11-validate` | 2.8 | 2.5 | 2.7 | 7.6 | 2.4 |
+| **all of it — ACTIVE** | **20.6** | **25.6** | **17.8** | **49.6** | **24.6** |
+| of which ends at the harness's own paperwork | 9.6 · 47% | 14.1 · 55% | 6.3 · 35% | 24.2 · 49% | — |
+| repair after a failed check, floor to ceiling | 0.3–0.3 | 1.2–2.7 | 0.0–0.6 | 2.3–20.7 | — |
+| the script's share | 0.3% | 0.2% | 0.4% | 0.7% | — |
+
+*Each figure is rounded once, so a column's stages can miss its ACTIVE figure by 0.1. A stage's fixed part is
+its least-squares intercept over all twelve runs — indicative only, the whole fit's R² being 0.64.*
+
+**Five things the table says.**
+
+1. **No single step holds the fixed cost.** Translating's own fixed part, about 7 minutes, is the largest;
+   no other single step's is above 3 minutes — the largest, `05-apply` at 2.9, sits inside the 6.5 of
+   putting the English back. The fixed cost is spread across the pipeline.
+2. **Repair is not where a short run's time goes:** at most 0.3, 2.7 and 0.6 minutes after a failed check
+   on the three short runs. The logs cannot tell a repair from the re-translation it prompts, so the floor
+   leaves out any window holding new translating and the ceiling counts every window.
+3. **The script's share is under 1% on every one of the four runs** — 0.2% to 0.7%, as conclusion 2 above
+   found. The Python is not the cost.
+4. **Between 28% and 55% of every run's active time ends at a record the A1 harness had the operator write**
+   — across all twelve 43.2%: the forensic notes 33.1%, the journal 5.6%, the compliance record 4.3%, the snapshot
+   0.3%. A user's run writes none of them, but not all of that time is overhead: the model's reading of a
+   step's output precedes the note and would happen without it, and the compliance record LOGS the skill's
+   own end-of-step *Internal compliance check*, which a user's run works through too. Taken out entirely,
+   the fit falls from 24.6 fixed minutes and 2.40 seconds a paragraph to **14.3 and 1.25**. **So a user's
+   fixed cost lies between about 14 and about 25 minutes, and these logs cannot say where** — the
+   *"25 minutes of fixed overhead"* above is its ceiling, not its measure.
+5. **All twelve runs date from July 2026**, before the repository existed and so before any of phase 2's
+   steps changed the gates, apply and the tidy-up script: a gear designed on them is designed on the old
+   pipeline.
+
 ### 3.5 Redundancy and over-engineering — the answer is capabilities, not files
 
 *Added after Wouter asked whether A3 had looked for redundant or over-engineered elements. It had not,
