@@ -181,10 +181,14 @@ if not dec_cited <= {"1", "2", "3", "4", "5", "6"}:
 else: ok(f"decisions cited: {sorted(dec_cited)} — all within 1-6")
 
 br_declared = set(re.findall(r"^\|\s*\*\*(\d+)\*\*\s*\|", doc, re.M))
-br_cited = set(re.findall(r"branch(?:es)? (\d+)", doc)) | set(re.findall(r"branches (\d+)[,–-]", doc))
+# RENAME (b2), 2026-10-19: living text cites a row as "step N", the records keep "branch N"; both are citations of
+# section 2's rows - lowercase, and capitalised at a sentence's start or in a bold label, but never the skill's
+# own "skill Step N" (code review, 2026-10-19: a capitalised dangling citation passed).
+br_cited = (set(re.findall(r"(?:branch(?:es)?|steps?|(?<!skill )Steps?) (\d+)", doc))
+            | set(re.findall(r"(?:branches|steps|(?<!skill )Steps) (\d+)[,–-]", doc)))
 gapb = sorted(br_cited - br_declared, key=int)
-if gapb: fail("1e", f"cites branch(es) not in the table: {gapb}")
-else: ok(f"branch table rows {min(br_declared, key=int)}–{max(br_declared, key=int)}, all citations resolve")
+if gapb: fail("1e", f"cites step(s) not in the table: {gapb}")
+else: ok(f"step table rows {min(br_declared, key=int)}–{max(br_declared, key=int)}, all citations resolve")
 
 att = set(re.findall(r"refutation attempt (\d+)", doc))
 if not att <= {str(i) for i in range(1, 10)}:
@@ -193,24 +197,43 @@ else: ok(f"refutation attempts cited: {sorted(att, key=int)} (table has 9 rows)"
 
 print()
 print("=" * 80)
-print("CHECK 2 — the branch table: count, behaviour-change tally, dependency order")
+print("CHECK 2 — the step table: count and behaviour-change tally")
 print("=" * 80)
-brs = re.findall(r"^\|\s*\*\*(\d+)\*\*\s*\|\s*([^|]+)\|([^|]*)\|\s*(\*\*(?:no|yes|doc only)\*\*[^|]*)\|",
-                 doc, re.M)
+# REPAIRED 2026-10-19, rename (b2): THIS CHECK HAD BEEN PASSING ON NOTHING. Its row pattern wanted the behaviour in a
+# row's FOURTH cell; section 2's order table has had five since it gained its option column, so it parsed four rows
+# of another table, found no claim, and printed OK for both halves (and its heading promised a dependency-order
+# check that was never written). Now: section 2's two tables - steps 0-19 and the deferrable 20-22, D1-D3 until
+# 2026-10-19 - each row's behaviour read from its LAST cell, and a claim it cannot find is a FAILURE, never an OK.
+# Its negative tests are probes in tools/stepb_metacheck.py.
+sec2 = doc[doc.index("## 2. The plan of work"):doc.index("## 3. The build brief")]
+brs = [(m.group(1), m.group(2).rsplit("|", 1)[-1])
+       for m in re.finditer(r"^\| \*\*(\d+)\*\* \|(.*)\|\s*$", sec2, re.M)]
 nums = [int(b[0]) for b in brs]
-print(f"  branch rows parsed: {len(brs)}  ids {nums}")
-claimed = re.search(r"\*\*(\w+) branches(?:, numbered [0-9–-]+)?\.\*\*", LIVE)
+print(f"  step rows parsed: {len(brs)}  ids {nums}")
+# every number word to ninety-nine, generated, so a true count in any word is read and never misreported
+_U = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen " \
+     "seventeen eighteen nineteen".split()
+_T = "twenty thirty forty fifty sixty seventy eighty ninety".split()
+WORDS = {w: i for i, w in enumerate(_U)}
+WORDS.update({t + ("-" + u if k else ""): 20 + 10 * j + k
+              for j, t in enumerate(_T) for k, u in enumerate(_U[:10])})
+claimed = re.search(r"\*\*([\w-]+) numbered steps, 0–(\d+)", LIVE)
 print(f"  the document claims: {claimed.group(0)!r}" if claimed else "  (no claim found)")
-WORDS = {"nineteen": 19, "twenty": 20, "eighteen": 18}
-if claimed and WORDS.get(claimed.group(1).lower()) != len(brs):
-    fail("2a", f"claims {claimed.group(1)} branches; the table has {len(brs)} rows (0–{max(nums)})")
-else: ok("branch count claim matches the table")
-nochange = [b[0] for b in brs if "**no**" in b[3] or "doc only" in b[3]]
-print(f"  branches with no observable behaviour change: {nochange}  = {len(nochange)}")
-m = re.search(r"\*\*(\w+) branches change nothing (?:a document can see|observable)", LIVE)
-if m:
+if not claimed:
+    fail("2a", "the step-count claim is not in the document - a check that finds no claim proves nothing")
+elif (WORDS.get(claimed.group(1).lower()) != len(brs) or int(claimed.group(2)) != max(nums)
+      or nums != list(range(len(nums)))):
+    fail("2a", f"claims {claimed.group(1)} steps, 0–{claimed.group(2)}; the tables hold {len(brs)} rows {nums}")
+else: ok("step count claim matches the tables")
+nochange = [b[0] for b in brs if "yes" not in b[1].lower()]
+print(f"  steps with no observable behaviour change: {nochange}  = {len(nochange)}")
+m = re.search(r"\*\*([\w-]+) of the [\w-]+ numbered steps\*\* change nothing (?:a document can see|observable)",
+              LIVE)
+if not m:
+    fail("2b", "the behaviour-change claim is not in the document - a check that finds no claim proves nothing")
+else:
     print(f"  the document claims: {m.group(0)!r}")
-    if WORDS.get(m.group(1).lower(), {"eight": 8, "nine": 9}.get(m.group(1).lower())) != len(nochange):
+    if WORDS.get(m.group(1).lower()) != len(nochange):
         fail("2b", f"claims {m.group(1)}; actual {len(nochange)}")
     else: ok("behaviour-change tally correct")
 m2 = re.findall(r"(\w+) of which change nothing observable", LIVE)
@@ -544,7 +567,7 @@ print("=" * 80)
 refut = doc[doc.index("### Pass B"):doc.index("### Pass C")] if "### Pass B" in doc else ""
 # §11 quotes WOUTER'S OWN VERDICTS, which live in no file. They are real quotations and are
 # unverifiable by design -- the same class as his audit instruction. Excluded explicitly.
-record = doc[doc.index("## 3. The build brief"):doc.index("## 4. How each branch")] if "## 3. The build brief" in doc else ""
+record = doc[doc.index("## 3. The build brief"):doc.index("## 4. How each step")] if "## 3. The build brief" in doc else ""
 audrec = ""
 if "### The deep audit" in doc:
     audrec = doc[doc.index("### The deep audit"):doc.index("### Confidence, per claim")]

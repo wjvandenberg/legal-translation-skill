@@ -2,13 +2,13 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS.** Branches 3, 4, 5 and 14's `quality_check` slice MERGED. **Branch 6 slice 1 MERGED** `4a1c452` — A1 A2 A8 A9 F27. **Slices 2 and 3 MERGED** `049484e` and `2a71e71` *(2026-09-02)* — the table-of-contents tab placement and then the page-number widening, which together close **A3's TOC and doubled-tab instances**, so A3 is **PARTIAL** and **A6 has moved to branches 15–17**. **Slice 4, the last, MERGED** `d3c7f19`: **C17 and F16 CLOSED, C16 PARTIAL** — two mechanisms found and fixed, and the corpus instance shown to be neither. Two new register rows came out of it, **A20** and **C29**, and neither belongs to branch 6. **Branch 6 is CLOSED** — its four slices `4a1c452` `049484e` `2a71e71` `d3c7f19`, closed by PR #63, with the instruments branch PR #64 after it. **BRANCH 7's SLICE 1 IS MERGED** `544f908` *(2026-09-08)*: **A16 and N1 CLOSED**, the container class measured at twelve rather than three, two new rows **A21** and **A22** neither of which is branch 7's to fix. **BRANCH 7 IS CLOSED** `6c1be4c` *(2026-09-09)* — slices 2 and 3 merged `ae48f6d` and `010c34f`, all four of its rows closed, two new rows **A21** and **A22** belonging to neither. **BRANCH 8 IS CLOSED** `513b541` *(2026-09-10)* — **C28 CLOSED, C12 PARTIAL, M1's count-not-content half CLOSED**, built as a MODE on `validate_apply.py` rather than a new file because each tree is at 198 against a 199 ceiling; **F43 closed as NOT A LOSS and F44 filed** in the same session. **BRANCH 9 IS CLOSED** `c803b56`, closed `28cf6be` *(2026-09-23)* — **C15 PARTIAL, B6 PARTIAL with its misattribution half CLOSED**, the journal on disk in both trees and branch 11 buildable. **BRANCH 10 OPENED 2026-09-23 AND WAS CUT INTO FOUR SLICES BY WHAT EACH PASS MUST READ** *(Wouter, 2026-09-23)*: **1** the journal's FORMATTING arm *(additive, byte-identical acceptance)* · **2** the passes needing NO new input — B4 B8 B2 B3 · **3** the passes needing the DECLARED NOTES — B1 B5 B6(a) F29 · **4** the pass needing the ORIGINAL — B7, plus the principle and the detector reports. **It is NOT a two-file split**: each tree is at 198 against §6.3's 199 ceiling whose one slot is D3's, and §6's own Option 6 amendment says the split into two files stopped being the point. **The full corpus re-grade §3.8 makes mandatory is DEFERRED TO STEP C** *(Wouter, 2026-09-23)* — the grader is frozen at v3, `CLAUDE.md` §5.3 already scopes the never-regress re-grade to a FIXED SUBSET at branch boundaries, and the mechanical arm now reaches **13 of 13** because every frozen workdir matches a source 100%, so apply can regenerate a genuine pre-`post_process` input for every document. **SLICE 1 IS MERGED** `5107aaf` *(PR #95)* **and CLOSED** `bc816cd` *(PR #96)*. **SLICE 2 IS MERGED** `fd98ec2` *(PR #97)* **and CLOSED** `539852f` *(PR #98)* — **B4 B3 B2 B8 CLOSED plus C15's remaining half**, the bytes moving on 2 of 13 workdirs with every movement explained by a register row and none unexplained. **SLICE 3 IS RE-CUT INTO 3a AND 3b** *(Wouter, 2026-09-23)* on a measurement of what the notes actually carry — §3.8 owns it. **SLICE 3a IS BUILT, 2026-09-23 — B1 CLOSED**, the pass conditional on the declaration, the bytes moving on 2 of 13 with every movement explained, §5.2's rendered diff discharged for the first time on this branch, and B1's 36-versus-38 settled by REFUTING its hypothesis: rev44's own code removes 36 too. **SLICE 3b IS MERGED `6d8bbab` (PR #103) AND CLOSED, 2026-09-23 — B5 B6 F29 CLOSED, B9 and F45 filed and closed, F46 filed open**: one declared `LEXICON_SANCTIONED` table, each entry citing the lexicon row that sanctions it, so a mandatory rewrite no longer overrules the lexicon; `translate_numbering` follows the operator's attachment label; the bytes moved on exactly 1 of 13 rebuilt inputs with every movement explained, and all three documents the rows name turned out to have had their notes edited to get past the gate — §3.8 owns it. **SLICE 4 IS BUILT, 2026-09-24 — B7 CLOSED, I-26 FILED OPEN**: the page-break pass is now a DETECTOR that inserts nothing, the 11 breaks it imposed on 6 documents having been needed on none; the principle every pass obeys is a declared `PASS_CONDITIONS` table a suite enforces; the detections reach the journal at schema 3; and the bytes moved on exactly those 6 of 13, both variants, 0 unexplained — §3.8 owns it. **SLICE 4 IS MERGED `b47603d` (PR #105) AND CLOSED, AND BRANCH 10 IS CLOSED WITH IT, 2026-09-24** — its five slices `5107aaf` `fd98ec2` `d3efa24` `6d8bbab` `b47603d`, and every row §9.3 holds it accountable for is closed. **BRANCH 11, THE DELIVERED-DOCUMENT CHECK, IS PLANNED, 2026-09-24 — four slices cut by what each reads, built to block only once today's output is clean; §3.2 owns the plan.** **SLICE 1 IS MERGED `7c5725e` (PR #107), 2026-09-24, REPORT-ONLY** — it sees every named defect it can on the July deliveries, 7 of 7 pinned, and its owed items merged `3a1f35b` (#109). **The widened ruling and the check's own two defects are MERGED `3654842` (PR #111), 2026-09-25: today's output now carries 129 findings, 17 of them blocking and every one real — B10's 2, C16's 14, J1's 1 — so Step 10 stays REPORT-ONLY until slices 2 and 4** *(Wouter)*; §3.2 owns it. **SLICE 2 IS EXPLORED AND PLANNED, 2026-09-25 — measured before any choice, cut into 2a (the delivered check reads) and 2b (repack moves bytes), every choice and its acceptance Wouter's; §3.2 owns it.** · **SLICE 2a IS MERGED `f75815c` (PR #113), 2026-09-25 (2) — the delivered check sees U+200B and brackets, reading only; §3.2 owns it.** · **SLICE 2b IS MERGED `4d3d247` (PR #114), 2026-09-25 (3) — J1 AND C8 CLOSED, C22's BLOCK HALF CLOSED, G13 I-29 I-30 FILED: repack scrubs every U+200B and refuses delivery on a survivor or a source-language remnant, the bytes moving on exactly the U+200B workdirs it reaches and nowhere else; §3.2 owns it.** · **SLICE 3 IS EXPLORED AND PLANNED, 2026-09-25 (4) — measured before any choice and cut into 3a, the side-part check, report-only, and 3b, the declaration route for notes and glossary; C6's harm measured LIVE; every choice and its acceptance Wouter's; §3.2 owns it.** · **SLICE 3a IS MERGED `2fde578` (PR #116), 2026-09-28 — C6 PARTIAL, A23 A24 A25 F47 I-31 FILED: the side-part check reads every text-bearing part of the original against the delivery and the declarations, report-only, every approved number held on both variants and no delivered byte moving; §3.2 owns it.** · **SLICE 3b IS MERGED `9214bc2` (PR #117), 2026-09-28 (2) — C7 CLOSED, F6 WITH IT, C6 STILL PARTIAL, I-32 FILED AND FIXED: Step 8d and 8e save a translations file per part beside the notes and the side-part check reads it, a declared keep quiet and an undeclared one a finding, report-only, every approved number held on both variants and no delivered byte moving; §3.2 owns it.** · **SLICE 4 IS EXPLORED AND PLANNED, 2026-09-28 (3), AND MERGED `bc9c5d8` (PR #118) — measured before any choice and cut by what each reads into 4a B10, 4b C13 C4 C14 with a refusal of a leftover scaffold placeholder, and 4c A23 with F47; every choice and its acceptance Wouter's; Step 10 report-only through slice 4; §3.2 owns it.** · **SLICE 4a IS BUILT, 2026-09-28 (4) — B10 CLOSED, A2's D08 REMAINDER WITH IT: strip_noop keeps a wrapper whole while it holds anything besides runs, run properties and text; the bytes move on D08 alone, both variants, its anchors 13, 13 and 13, blocking 16 → 14; the side arms re-pinned at Wouter's word; **its proof re-taken on the signed Python, 2026-09-29 (2), after `66af307` (PR #119), AND MERGED `7ce1a8f` (PR #120)**; §3.2 owns it.** · **SLICE 4b IS BUILT, 2026-09-29 (3) — C13 C4 C14 CLOSED, C30 FILED AND CLOSED: the four notes-side gates, both trees, each red first, every approved corpus number held and no delivered byte moving, 13 of 13, both variants, AND MERGED `3a2c1e1` (PR #122), 2026-09-29 (4); §3.2 owns it.** · **SLICE 4c IS BUILT, 2026-09-29 (4) — A23 AND F47 CLOSED: a comment declared with line breaks is written one piece per text paragraph of the source comment and a count that does not match refused, `--list` and the check read it by paragraph and the script's reader shows Word's text; Step 8c says so, both trees; every approved corpus number held and no delivered byte moving, 13 of 13, both variants; §3.2 owns it.** **STEP 10's WIRING IS EXPLORED, MEASURED AND PLANNED, 2026-09-30, AS ONE SLICE OF FOUR SUB-STEPS, EVERY CHOICE WOUTER'S** — C16's class counted in both measured shapes, the check called by repack before its one write, a declared acceptance file as rule 5b's way out, I-33's fix and J2's corrected reason inside it; Step 10 stays report-only until it is built; §3.2 owns it. · **J2 AND THE WIRING's SUB-STEPS 1 AND 2 ARE BUILT, 2026-09-30 (2), on `feature/branch11-wiring`, UNMERGED — C16's class counted in the three places measured, at Wouter's ruling, and repack refusing a delivery the check finds wrong; 3 and 4 next; §3.2 owns it.** · **SUB-STEPS 2, 3 AND 4 ARE COMMITTED, 2026-09-30 (4), BY ONE UNATTENDED HOP, AND REVIEWED 2026-09-30 (3) — the hop's six answers confirmed by Wouter, eight review findings raised and five fixed `a5ec030`, the slice pushed and squash-merged as pull request #126 on Wouter's approval; §3.2 owns it.** · **BRANCH 11's FOLLOW-UP AND CLOSE PASS, 2026-10-08, `1384502` — I-34 AND I-35 FIXED, I-36 FILED OPEN, AND EVERY ROW BRANCH 11 IS ACCOUNTABLE FOR DECIDED BY WOUTER: C1 C6 C18 CLOSED on Step 10's wiring, C8 J1 C22 marked, A24 and A25 DEFERRED with a trigger — so BRANCH 11 CLOSES WITH THIS MERGE; §3.2 owns it.** · **I-36 FIXED, 2026-10-08 (2), `404dd57` — the corpus arm's `--sides` pins learn Step 10's wiring, a refused document read from repack's refusal, the skip-Step-8 scenario declaring nothing; the pre-commit gate's control 6 scoped to a working copy's own fixtures in the same commit; §3.2 owns it.** · **BRANCH 12, DECLARE THE LANGUAGE, IS EXPLORED, MEASURED AND PLANNED, 2026-10-08 (2) — three slices, every choice and its acceptance Wouter's; §3.2 owns it.** · **SLICE 12a IS BUILT `0bf959a` AND MERGED AS PULL REQUEST #133, 2026-10-09 — S2 C9 C22 CLOSED, S1 H1 PARTIAL: the operator declares the source language at Step 1c and every language-dependent check reads it, an unsupported language NOT SUPPORTED and never CLEAN or PASSED, no delivered byte moving, 13 of 13, both variants; §3.2 owns it.** · **SLICE 12b IS MERGED AS #136, 2026-10-12, its one skipped review finding fixed after it — S1 S3 E4 C2 and F48 CLOSED, H1 PARTIAL on branch 13's half alone: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c; §3.2 owns it.** · **SLICE 12c IS MERGED AS #139 AND ITS REVIEW FIXES AS #140, 2026-10-13 — H2 AND H4 CLOSED, SO BRANCH 12 IS CLOSED, H1's REMAINING HALF BEING BRANCH 13's: the ratio check examines paragraphs of 20 characters and more, its thresholds doubled for a Japanese or Chinese source and NOT APPLICABLE on one declared English; §3.2 owns it.** · **THIS SESSION, 2026-10-16 (2) — SESSION PURPOSE — what · how · purpose:** the test runner's red row first, at Wouter's word of 2026-10-16 12:30, then the sibling-import follow-up, rename (b2) and step 13's plan — each of the seven installed tools that run_tests' row 'entry points cover the checkers' names (auto_mode, auto_mode_guard, auto_mode_headless, install_hooks, purpose_guard, verify_charter, vocabulary_census) run bare against a copy first, to learn whether it writes anything, then given a real entry point under `tests.entry_points` or a reasoned entry under `tests.entry_points_exempt` in `verify.config.json`, on a branch, VERIFY and TEST through the cycle gate, a pull request merged once `/code-review` is green · **so that the session-close test run is green with no declared red, which every later step's evidence rests on** *(written immediately after the tag `rollback-2026-10-16b-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is next, in §3.4. Step 14's remainder and steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-19 — SESSION PURPOSE — what · how · purpose:** rename (b2), this build plan, then step 13's plan — the survey re-run first; this file's living sections swept into the house's words in the order the rename plan fixes, by a sweep tool that declares each section's living or record split with its reason, proved by the inverse; `tools/vocabulary_census.py` taking this file into its swept set, red first on a planted word; the status cell cut to a short current status, its history moved word for word to `evidence/EVIDENCE-phase2-history.md`; the seven tools keyed on the wording compared by content against a baseline taken first; on a git branch, VERIFY and TEST through the cycle gate, a pull request merged once `/code-review` is green; then step 13's section-3 plan from its explore and Wouter's four answers, shown to him before any code · **so that the build plan speaks the charter's words, no row of it read as a step of the skill, and step 13 is built from a plan Wouter has seen** *(written immediately after the tag `rollback-2026-10-19-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
-| **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3.)* |
-| **produces** | branches **3–19 plus D1–D3** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
-| **deliverable** | each merged branch with its own *Done when* met, tested by its kind's method in §4, no criterion regressed against the frozen v3 baseline |
-| **done when** | every branch in §2 is merged with its own *Done when* in §3 met, tested by its kind's method in §4, and no criterion regressed against the frozen v3 baseline |
-| **must NOT** | restate the charter's project order — §3 of `CLAUDE.md` owns *when* a step happens, this document owns *what it contains*, and that charter says so. ~~**Not to be renamed, and not to be split** *(Wouter, 2026-08-24)*~~ — **BOTH HALVES SUPERSEDED 2026-09-10**, see below |
+| **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
+| **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
+| **deliverable** | each merged step with its own *Done when* met, tested by its kind's method in §4, no criterion regressed against the frozen v3 baseline |
+| **done when** | every step in §2 is merged with its own *Done when* in §3 met, tested by its kind's method in §4, and no criterion regressed against the frozen v3 baseline |
+| **must NOT** | restate the charter's project order — §3 of `CLAUDE.md` owns *when* a phase happens, this document owns *what it contains*, and that charter says so. ~~**Not to be renamed, and not to be split** *(Wouter, 2026-08-24)*~~ — **BOTH HALVES SUPERSEDED 2026-09-10**, see below |
 | **depends on** | `REGISTER-findings.md` for every claim · `EVIDENCE-a3-structure.md` for the measurements. **Nothing in the house templates** |
 | **size** | **BEYOND L — the overage is declared below** |
 
@@ -97,14 +97,14 @@ with the reasoning and with what it leaves open.
 | **1** | The verdict, on one page | the eight things that matter most, in one page |
 | **2** | **The plan of work** | what Step B hands over · the three ordering facts · **all twenty-three pieces of work in sequence**, each with its option, its risk and what it waits on |
 | **3** | **The build brief, option by option** | per option: **what to build, what it must NOT do, what counts as done**, the verdict, and what the verdict changed. Ordered to match §2 |
-| **4** | How each branch is tested | the method by branch kind, and the frozen-intermediate trick that makes it affordable |
+| **4** | How each step is tested | the method by step kind, and the frozen-intermediate trick that makes it affordable |
 | | **PART TWO — THE CASE** | *why the work is worth doing; consult it when a judgement call comes up* |
 | **5** | What is actually wrong | 168 findings grouped by **what they do to a document a lawyer is about to sign** |
 | **6** | The eleven options in full | the four-columned argument for each — pros · cons · **what it would break** · **what it does NOT fix** |
 | **7** | What is not in this plan, and why | the exclusions, including two gaps declared rather than hidden |
 | | **PART THREE — LOOK-UP** | |
 | **8** | Glossary | every unavoidable technical term, defined once |
-| **9** | Traceability appendix | consequence groups · option map · **branch → findings** · positives. **Generated by script**, never typed |
+| **9** | Traceability appendix | consequence groups · option map · **step → findings** · positives. **Generated by script**, never typed |
 | | **PART FOUR — THE RECORD** | *nothing here is needed to build* |
 | **10** | The ranking — **SUPERSEDED** | kept for its reasoning; **do not build from it** |
 | **11** | The decisions that were yours | all answered; a pointer to where each answer lives |
@@ -118,10 +118,10 @@ with the reasoning and with what it leaves open.
 |---|---|---|
 | **1st — §2** | **what to do next.** All twenty-three pieces of work in sequence, each with its option, whether it changes behaviour, and what it waits on | it holds no test methods and no rationale |
 | **2nd — §3** | **what that piece actually is:** what it builds, what it must NOT do, what counts as done, and the verdict behind it. **Ordered to match §2** — §3.2 is the first option you meet, §3.11 the last | it does not restate the sequence |
-| **3rd — §4** | **how to prove it**, by branch kind: byte comparison on frozen intermediates, synthetic fixtures, negative inputs, or a graded run | it does not say what done means — §3 does |
+| **3rd — §4** | **how to prove it**, by step kind: byte comparison on frozen intermediates, synthetic fixtures, negative inputs, or a graded run | it does not say what done means — §3 does |
 
 **Then, only if you need it: §6** for the full argument behind an option — its four columns, including *what
-it would break* and *what it does NOT fix* — and **§9.3** for the specific recorded failures that branch is
+it would break* and *what it does NOT fix* — and **§9.3** for the specific recorded failures that step is
 accountable for closing.
 
 ### If you are here to understand the problem rather than build
@@ -137,9 +137,9 @@ audit caught it rather than a reader.**
 
 | § | it owns | it does NOT own |
 |---|---|---|
-| **2** | **THE ORDER.** Twenty numbered branches plus three deferred items, with the dependency and the gate on each | scope · rationale · test method |
+| **2** | **THE ORDER.** Twenty-three numbered steps, the last three deferrable, with the dependency and the gate on each | scope · rationale · test method |
 | **3** | **what each option BUILDS**, what it must not do, and **what counts as done** | the order (§2) · the method (§4) |
-| **4** | **the test METHOD** per branch kind | what counts as done (§3) |
+| **4** | **the test METHOD** per step kind | what counts as done (§3) |
 | **6** | **what each option CONTAINS**, four-columned, plus the box recording what was decided about it | the order · the method |
 | **9** | the traceability maps, **generated from the register** so they cannot drift from the evidence | anything typed |
 | **10** | **why** each piece is worth doing — the reasoning column only | **the order. SUPERSEDED** |
@@ -158,10 +158,10 @@ disagree about what an option contains, §6 wins.**
 | **The blind desk review's full report** — 2,222 lines, 454 `file:line` citations | the sealed judging directory, **outside the repository** — its path is in `..\legal-translation-private\context.md` | **THE PRIMARY ARTEFACT. Never work from a précis of it** — this document did, and it cost six items |
 | The comparison of the two methods, and the coverage matrix | `..\legal-translation-private\A4-A3-COMPARISON.md` | **never committable** |
 | The project charter — goals, constraints, confidentiality, working method | `CLAUDE.md` *(this folder)* | its §6 owns the project's phase order and status |
-| **The code baseline** — the two published trees, 198 files each | `..\skills\legal-translation\PUBLICATION VERSIONS\` | rev44 UK + US `.skill`. **Commit these unmodified at branch 0** |
+| **The code baseline** — the two published trees, 198 files each | `..\skills\legal-translation\PUBLICATION VERSIONS\` | rev44 UK + US `.skill`. **Commit these unmodified at step 0** |
 | The 11-document test corpus | `..\legal-translation-test-documents\` | **never committable — the filenames alone carry counterparty names** |
 | Raw forensic logs, grade reports, renders, and **the frozen intermediates** | `..\legal-translation-logs\` | **never committable.** The frozen intermediates are the most content-rich files the project has ever produced and must be excluded **by path** before version control starts |
-| The frozen grader, v3 | the `translation-grading` skill package, **outside the repository** — its path is in `..\legal-translation-private\context.md` | **do not change it until the verification run** — a moving ruler destroys the never-regress comparison |
+| The frozen grader, v3 | the `translation-grading` skill package, **outside the repository** — its path is in `..\legal-translation-private\context.md` | **do not change it until phase 3 ends** *(Wouter, 2026-10-14)* — a moving ruler destroys the never-regress comparison |
 
 ### The instruments that keep this document honest — run them after any edit
 
@@ -174,7 +174,7 @@ class of error.**
 | `stepb_verify.py` | **84 claims** against the register rows they cite, and it **generates §9's appendix** |
 | `stepb_audit.py` | fifteen independent checks: arithmetic, quotations verbatim against source, and **29 argument-carrying figures two-sided** |
 | `stepb_audit3.py` | the new content traces to its sources; internal consistency; heading structure |
-| `stepb_metacheck.py` | **eleven NEGATIVE tests and a null control, each PLANTED IN A COPY of this document, never in it** — a probe counts only when the check reports a failure the unmutated copy did not *(registers I-37 and I-38, 2026-10-08: it wrote into this file and scored by exit code until then)* |
+| `stepb_metacheck.py` | **fifteen NEGATIVE tests and a null control, each PLANTED IN A COPY of this document, never in it** — a probe counts only when the check reports a failure the unmutated copy did not *(registers I-37 and I-38, 2026-10-08: it wrote into this file and scored by exit code until then)* |
 | `check_o7.py` `check_o8.py` `check_o9.py` `check_o11.py` | per-option pre-presentation checks. **Between them they recovered items that sat in no option's prose at all** |
 | `md_tables.py` *(committed in `tools/`; `a3_md_tables.py` was its `temp/` name)* | every Markdown table actually renders. **It has caught four defects nothing else in this project can see**, twice while this document was being written |
 | `audit_session_stepb.py` | the whole document end to end: nothing lost, every figure sourced, every reference resolving, every restating table agreeing |
@@ -236,7 +236,7 @@ bags-of-words sentence alone will under-build it — a mistake this project has 
 writing.**
 
 **4. There are eleven things we could do. Ten of them are worth doing, in an order, and none of them is a
-rebuild.** The leap you asked for is available without one — because the most ambitious of the ten *is* the rebuild, done in slices small enough to merge one at a time. §2 argues that properly.
+rebuild.** The leap you asked for is available without one — because the most ambitious of the ten *is* the rebuild, done in steps small enough to merge one at a time. §2 argues that properly.
 
 **5. Three things must be built before any fix can be believed, and only one of them was on the plan.**
 The known one is the test harness. The two new ones came out of trying to refute the proposals: a rule
@@ -278,9 +278,9 @@ each is recorded with its reasoning *and with what it leaves open*.
 
 | what exists | where |
 |---|---|
-| **Twenty-three pieces of work in order** — twenty numbered branches plus three deferred items, each merge-sized, nine of the twenty changing nothing observable | the table below |
+| **Twenty-three pieces of work in order** — twenty-three numbered steps, the last three deferrable, each merge-sized, eleven of the twenty-three changing nothing observable | the table below |
 | **A build brief per option** — what it builds, what it must not do, what counts as done | §3 |
-| **A test method per branch kind**, built on frozen intermediates that make the pipeline's mechanical half a deterministic function, with committable synthetic fixtures kept strictly apart from never-committable real ones, and **a negative input required for every check** | §4 |
+| **A test method per step kind**, built on frozen intermediates that make the pipeline's mechanical half a deterministic function, with committable synthetic fixtures kept strictly apart from never-committable real ones, and **a negative input required for every check** | §4 |
 | **A row-level map covering all 168 findings** — 25 more than the structural analysis's own map, which this work was otherwise instructed to derive from, and the 25 include two of the worst grade | §9 |
 | **All eleven decisions answered** — six numbered plus Option 7's five | §11 points at every answer |
 | **Two declared gaps rather than hidden ones** — no cross-language parity check, because none could honestly be written; and no verification that the dictionary rows are *correct*, which needs a bilingual lawyer rather than a script and is the single largest unexamined surface in the project | §7 |
@@ -295,12 +295,12 @@ each is recorded with its reasoning *and with what it leaves open*.
    asked the same question differently. **Never a two-word needle: use a phrase that could only appear if
    the thing is carried.**
 3. **The instruments are the ground everything else stands on.** The never-regress rule is unenforceable
-   today. Branches 0, 1 and 2 change no behaviour, and they are what make every later claim provable.
+   today. Steps 0, 1 and 2 change no behaviour, and they are what make every later claim provable.
 
 ### The order, and what owns it
 
 > **THIS SECTION IS THE ONLY OWNER OF THE ORDER.** *(Stated 2026-08-05, when §3 became the build brief.)*
-> **§3 says what each option builds and what counts as done; §4 says how a branch of that kind is tested;
+> **§3 says what each option builds and what counts as done; §4 says how a step of that kind is tested;
 > this section says what comes next and what each piece waits on.** Where §3 and this section disagree about
 > order, **this one wins**; where they disagree about scope, §3 does. Nothing here restates a test method and
 > nothing in §3 restates the sequence.
@@ -308,50 +308,50 @@ each is recorded with its reasoning *and with what it leaves open*.
 > **And §10's ranking is not the order** — it is a statement of value, it has been overtaken, and it says so.
 > **Read §10 to understand why the work is worth doing; read this to decide what to do first.**
 
-**Twenty numbered branches, 0–19, plus three deferred items D1–D3 — twenty-three pieces of work.** No branch
+**Twenty-three numbered steps, 0–22, the last three deferrable — twenty-three pieces of work.** No step
 depends on a decision that has not been taken by the time it starts. The **behaviour change?** column is the
-one to read for risk: **nine of the twenty numbered branches** change nothing a document can see. The
-**option** column is the cross-reference into §3, where that branch's constraints and its definition of done
+one to read for risk: **eleven of the twenty-three numbered steps** change nothing a document can see. The
+**option** column is the cross-reference into §3, where that step's constraints and its definition of done
 live.
 
-| # | branch | option | what it does | behaviour change? |
+| # | step | option | what it does | behaviour change? |
 |---|---|---|---|---|
 | **0** | baseline | — | Commit both published trees **unmodified**, with the confidentiality scan run over them first. Record the twelve graded baselines. Archive the recovered revision history read-only | **no** |
 | **1** | the harness | 2 | Synthetic test documents; freeze the real intermediates from the July runs; the byte-comparison; **one failing input per check**; wire `git bisect`; the three-command confirmation of the two predicted failure chains; **and close the four open defects in our own measuring tools** — see below | **no** |
-| **2** | the parity check | **7a** | The two-tree comparison as a script — dictionary rows, script string literals, function signatures, rule-table lengths. Covered by branch 1 | **no** |
+| **2** | the parity check | **7a** | The two-tree comparison as a script — dictionary rows, script string literals, function signatures, rule-table lengths. Covered by step 1 | **no** |
 | **3** | the scope rule | 5, 9 | One paragraph stating that a check can be wrong *in scope*, that the remedy is to fix the check and never to bypass it, and never to alter a faithful translation to satisfy it. Plus the reconciliation of the two colliding truncation instructions, and what delivery notes must contain | **doc only** |
-| **4** | the exception channel | 5 | The specification for *"known consequence, accepted and disclosed"* — what qualifies, what must be recorded, and that it can never be granted for a check the operator has not first tried to satisfy. **Requires decision 3 — ANSWERED 2026-08-05: 3b.** And its specification is **reviewed by Wouter before it lands**, so branch 5 cannot start until that review is closed | **doc only** |
+| **4** | the exception channel | 5 | The specification for *"known consequence, accepted and disclosed"* — what qualifies, what must be recorded, and that it can never be granted for a check the operator has not first tried to satisfy. **Requires decision 3 — ANSWERED 2026-08-05: 3b.** And its specification is **reviewed by Wouter before it lands**, so step 5 cannot start until that review is closed | **doc only** |
 | **5** | checks can fail | 2, 8 | Give the mandatory quality check an exit code. Make a failed integrity test on the delivered file stop the run and write to a temporary name first. Make the skipped-by-omission check refuse. Make a truncation exit code block unconditionally. Move the misplaced truncation guard | **yes** — runs that used to finish will now stop |
 | **6** | stop deleting | 1 | The three clauses: rebuild only text, preserve every non-text child in position, delete only the provably redundant. Closes the footnote, comment, hyperlink, tab-inside-text and cross-reference-duplication cases | **yes** |
 | **7** | the container inventory | 1 | One explicit tested inventory shared by the reading and writing halves, failing loudly on anything unlisted. Adds content controls, smart tags, graphic metadata; gives the repackager a route for the glossary part | **yes** |
 | **8** | reading-apart completeness | 2 | The same-language exact comparison: original document text against what was captured. The cheapest half of the baseline problem and the one the planned gate leaves open | **no** — a new check only |
-| **9** | the change journal | 6, 2 | The tidy-up script records every edit it makes, machine-readably. Small, and it is what makes branch 11 buildable | **no** — additive |
+| **9** | the change journal | 6, 2 | The tidy-up script records every edit it makes, machine-readably. Small, and it is what makes step 11 buildable | **no** — additive |
 | **10** | the tidy-up split | 6 | Separate the mechanical passes from the opinionated ones, per **decision 2**. Includes the two-line spacing fix and the two template-specific rules | **yes** — on every document |
 | **11** | the delivered-document check | 2 | Reconstruct both readings from the finished document and diff them character-exactly against what was declared, accounting for the journal. Extend with an auxiliary-part **content** diff, a source-language sweep over **every** part, a bracket-balance assertion and the invisible-character scrub | **yes** — it will block runs |
 | **12** | declare the language | 2 | Every language-dependent check announces that it is guessing and refuses to print CLEAN for an unsupported language. Reuse the detection that already gets it right. Closes the guessing group | **yes** |
 | **13** | declared modes | 5 | Variant-conversion, authored-not-extracted, and the short-document gear — **declared by the operator, never inferred**. **Requires no decision** — the evidence names two of the three modes and the runtime measurement gives the third *(corrected 2026-08-05: this cell said "Requires decision 4", which is the layout decision and has nothing to do with modes)* | **yes** |
 | **14** | check scoping | 2 | The false-positive fixes. Each is a pattern change; each needs a test that proves it still catches the true positive | **yes** |
 | **15** | formatting, part 1 | 3 | The reading-apart step **emits** effective computed formatting per run, resolving the style chain and character styles. Nothing consumes it yet. **Definition of done (agreed 2026-08-05): output must byte-compare IDENTICAL** — it adds fields and changes nothing, so movement means something is wrong before we have started. **And it is the rebuild probe, a decision point rather than a formality** | **no** — additive |
-| **16** | formatting, part 2 | 3 | The writing-back step consumes it per span; the explicit off-flags are removed **in the same branch**, because separating them renders a document entirely bold. **Definition of done (agreed 2026-08-05): does not begin until branch 11's delivered-document check exists** — a wrong cascade is the one failure that would make the skill quietly worse, and that check is the only instrument that would catch it. **Regenerate the frozen intermediates FROM THE ARCHIVED RUNS, not by re-translating** | **yes** — the largest single change in the plan |
+| **16** | formatting, part 2 | 3 | The writing-back step consumes it per span; the explicit off-flags are removed **in the same step**, because separating them renders a document entirely bold. **Definition of done (agreed 2026-08-05): does not begin until step 11's delivered-document check exists** — a wrong cascade is the one failure that would make the skill quietly worse, and that check is the only instrument that would catch it. **Regenerate the frozen intermediates FROM THE ARCHIVED RUNS, not by re-translating** | **yes** — the largest single change in the plan |
 | **17** | formatting, part 3 | 3 | The longest rule in the skill collapses; the four instructions that existed only because the formatting was unknowable are deleted rather than reworded | **doc only** |
-| **18** | layout (**option 11**) | 11 | Flag any layout device whose **rendered** position changes between source and target — tab-positioned blocks, empty-paragraph page breaks, width-bearing padding, justified segments ending in a manual break — and route it through branch 4's channel. **Plus the tab-authoring rule, which the register twice says belongs in this branch and not elsewhere**, and the specific justified-short-tail check, which needs no render. **Decision 4 ANSWERED 2026-08-05: build 11a only.** And 11a must **CLASSIFY** each flagged instance — fixable by real tab stops / fixable by a real page break / neither — because that classification is what makes the later 11b decision arithmetic instead of judgement | **yes** — a new check |
+| **18** | layout (**option 11**) | 11 | Flag any layout device whose **rendered** position changes between source and target — tab-positioned blocks, empty-paragraph page breaks, width-bearing padding, justified segments ending in a manual break — and route it through step 4's channel. **Plus the tab-authoring rule, which the register twice says belongs in this step and not elsewhere**, and the specific justified-short-tail check, which needs no render. **Decision 4 ANSWERED 2026-08-05: build 11a only.** And 11a must **CLASSIFY** each flagged instance — fixable by real tab stops / fixable by a real page break / neither — because that classification is what makes the later 11b decision arithmetic instead of judgement | **yes** — a new check |
 | **19** | furniture and prohibition | 4 | The furniture convention statements with both decided renderings; promote or reconcile the 221-entry script phrase map; and the prohibition decision. **Requires decision 1** | **yes** — content |
 
-**Then, in this order, and all three are genuinely deferrable:**
+**Then, in this order, and all three are genuinely deferrable — steps 20, 21 and 22, called D1, D2 and D3 until 2026-10-19 and renumbered at Wouter's word of 2026-10-13 (6):**
 
-| # | what | why it is here rather than numbered above | behaviour change? |
+| # | what | why it comes last | behaviour change? |
 |---|---|---|---|
-| **D1** | **Reconciling the two trees** — the marker restoration, the drifted rule tables in both the tidy-up script and the checker, the parameterisation of the three drifted scripts, and the four substantive adjudications. **Decided 2026-08-05** *(§3.3)* | **It is the only change in the plan that requires re-grading both variants of every document**, so its verification folds into the planned verification run instead of being paid for separately. And the drift cannot grow while it waits, because the parity check lands at **branch 2** and catches every new divergence as it is introduced | **yes** — on both variants |
-| **D2** | The standalone claim audit — whatever of the claims pass has not already been folded into the branches above as they landed | Most of it rides with the branches that open the same files; only the residue is standalone | **doc only** |
-| **D3** | The coverage-and-manifest work, and the size discipline | It belongs with the **skill's** publication, and the manifest is a packaging change | **no** |
+| **20** | **Reconciling the two trees** — the marker restoration, the drifted rule tables in both the tidy-up script and the checker, the parameterisation of the three drifted scripts, and the four substantive adjudications. **Decided 2026-08-05** *(§3.3)* | **It is the only change in the plan that requires re-grading both variants of every document** — a re-grade it now runs for itself, inside phase 2, the later run it was deferred to fold into having been dropped *(Wouter, 2026-10-13 (4))*. And the drift cannot grow while it waits, because the parity check lands at **step 2** and catches every new divergence as it is introduced | **yes** — on both variants |
+| **21** | The standalone claim audit — whatever of the claims pass has not already been folded into the steps above as they landed | Most of it rides with the steps that open the same files; only the residue is standalone | **doc only** |
+| **22** | The coverage-and-manifest work, and the size discipline | It belongs with the **skill's** publication, and the manifest is a packaging change | **no** |
 
 **And one thing that is deferred but is NOT on this list, because it is a decision rather than a piece of
 work: one tree instead of two, literally — a shared source with generated variants.** Its revisit trigger is
-**D1's completion plus the classification of the residue** *(§3.3, decision 1)*. Nothing is scheduled for it
+**Step 20's completion plus the classification of the residue** *(§3.3, decision 1)*. Nothing is scheduled for it
 because the decision comes first.
 
-**Three sequencing facts, not preferences.** Branch 5 must follow branches 3 and 4, or it stops the pipeline
-with no way out. Branch 11 must follow branch 9, or it cannot be built. Branch 16 must follow branch 15 and
+**Three sequencing facts, not preferences.** Step 5 must follow steps 3 and 4, or it stops the pipeline
+with no way out. Step 11 must follow step 9, or it cannot be built. Step 16 must follow step 15 and
 must contain the off-flag removal.
 
 > **AND A FOURTH, ADDED 2026-08-19 BY MEASUREMENT RATHER THAN BY ARGUMENT: BRANCH 14's
@@ -425,8 +425,8 @@ false-positive heuristic that punishes verifying a fix, and an invalid command s
 text. **None of them changes a skill finding. All four will corrupt Step C's evidence if they are still open
 when it runs**, which is why they belong in branch 1 rather than in a later tidy-up.
 
-**One file-level warning for merge order.** The writing-back script is touched by branches 6, 7, 16 and the
-truncation fix; the quality script by branches 5, 12 and the parity work; the repackager by branches 5 and 7.
+**One file-level warning for merge order.** The writing-back script is touched by steps 6, 7, 16 and the
+truncation fix; the quality script by steps 5, 12 and the parity work; the repackager by steps 5 and 7.
 **[measured]** The changes are logically disjoint but they will conflict textually, so they should be merged
 in the order above rather than in parallel.
 
@@ -445,7 +445,7 @@ in the order above rather than in parallel.
 >
 > | this section owns | §2 owns | §4 owns |
 > |---|---|---|
-> | **what each approved option builds**, what it depends on, **what it must not do**, and **what counts as done** — plus the verdict and what it changed | **the ORDER**: all twenty-three pieces of work in sequence, with the dependency and the gate on each | **the METHOD**: how a branch of that kind is actually tested — byte comparison, fixtures, or a graded run |
+> | **what each approved option builds**, what it depends on, **what it must not do**, and **what counts as done** — plus the verdict and what it changed | **the ORDER**: all twenty-three pieces of work in sequence, with the dependency and the gate on each | **the METHOD**: how a step of that kind is actually tested — byte comparison, fixtures, or a graded run |
 >
 > **So: read §2 to know what to do next, this section to know what to do and what would count as
 > having done it, and §4 to know how to prove it.** Where this section and §2 disagree about
@@ -464,7 +464,7 @@ in the order above rather than in parallel.
 > and the move was proved byte-for-byte content-preserving.**
 >
 > **§3.1 is the fork that gates everything. §3.2 to §3.11 are the ten approved options in build order.
-> §3.12 and §3.13 are records that are not branches.**
+> §3.12 and §3.13 are records that are not steps.**
 >
 > **Status legend.** `GO` (approved as written) · `GO, AMENDED` (approved with changes, recorded) ·
 > `DEFERRED` (agreed in principle, not now) · `DROPPED` · `NO` (a decision answered in the negative).
@@ -476,12 +476,12 @@ are the only things a coding session needs to hold in mind while working through
 
 1. **Nothing can be judged until the instrument that judges it exists.** The never-regress rule is
    unenforceable today, and nothing in the package can demonstrate that any of its own checks is capable of
-   failing. **So branches 0, 1 and 2 are instruments and they come first.**
+   failing. **So steps 0, 1 and 2 are instruments and they come first.**
 2. **A discerning check without an escape hatch deadlocks the pipeline.** A large set of findings state in
    their own text that there is no compliant repair — **§12 enumerates the set and owns the count.** **So the scope rule and the exception channel come before the
-   checks get teeth** — and branch 4 ends in Wouter's review of the specification, not in a merge.
-3. **Two build dependencies are absolute.** Branch 11 cannot be built before branch 9. Branch 16 cannot
-   begin before branch 11, and must contain the off-flag removal in the same branch.
+   checks get teeth** — and step 4 ends in Wouter's review of the specification, not in a merge.
+3. **Two build dependencies are absolute.** Step 11 cannot be built before step 9. Step 16 cannot
+   begin before step 11, and must contain the off-flag removal in the same step.
 
 ### The record, option by option
 
@@ -524,17 +524,17 @@ branch shows that a per-span model cannot be layered onto the present extraction
 must be replaced wholesale rather than extended — then a rebuild is already happening and has to be named as
 such, with the decomposition renegotiated. **That branch is the probe that settles it.**
 
-### 3.2 Check the delivered document against the original — option 2 · **GO, four slices** · *branches 1, 5, 8, 11*
+### 3.2 Check the delivered document against the original — option 2 · **GO, as four steps** · *steps 1, 5, 8, 11*
 
-> **FOR THE BUILD.** **Branches 1, 5, 8, 11.** *(slice 1 → branch 1 · slice 2 → branch 5 · slice 3 →
-> branch 8 · slice 4 → branch 11.)*
-> **Needs first:** branch 5 needs branches 3 and 4 to exist **and** Wouter's review of the way-out
+> **FOR THE BUILD.** **Steps 1, 5, 8, 11**, each one whole step of this option, in that order.
+> *(The verdict below numbers them 1 to 4, in the same order.)*
+> **Needs first:** step 5 needs steps 3 and 4 to exist **and** Wouter's review of the way-out
 > specification to be closed — turning a discerning check on without an escape hatch deadlocks the
-> pipeline on real documents, and the findings enumerated in §12 say there is no compliant repair. Branch 11 needs
-> branch 9's change journal, or it cannot be built at all.
-> **Unblocks:** branch 16 — the largest change in the plan — cannot start until branch 11 exists.
-> **Done when:** slice 1's negative inputs each make their check fail · slice 3 reports zero loss over all
-> eleven frozen intermediates · **slice 4's first run REPRODUCES the known defects** (the missing bracket,
+> pipeline on real documents, and the findings enumerated in §12 say there is no compliant repair. Step 11 needs
+> step 9's change journal, or it cannot be built at all.
+> **Unblocks:** step 16 — the largest change in the plan — cannot start until step 11 exists.
+> **Done when:** step 1's negative inputs each make their check fail · step 8 reports zero loss over all
+> eleven frozen intermediates · **step 11's first run REPRODUCES the known defects** (the missing bracket,
 > the lost anchors, the cleared whitespace, the destroyed tracked change) — if it does not find them it is
 > not built correctly.
 > **Must not:** make any quality judgement. Text inventories, character diffs, reference counts, span
@@ -906,18 +906,18 @@ answered. Recorded against Option 5 as well.
 >
 > **BRANCH 12 SLICE 12c — BUILD RECORD, 2026-10-13: THE RATIO CHECK THAT CANNOT FIRE, BUILT ON `feature/branch12-12c`** *(the written plan `temp/s1013_12c_plan.md`, before the first edit; Wouter's four answers and the judgements taken alone `DECISIONS-LOG.md`, 2026-10-13 (2))*. **MEASURED FIRST** (`temp/s1013_ratio_probe.py`, counts and language names only): of 1,468 source paragraphs in the 13 recorded runs, 177 are identical to their English and skipped, and of the 1,291 left the check examined 533, the other 758 under its floor of 150; the median EN/source ratio is 0.94–1.33 for every alphabetic source and 2.6–3.2 for Japanese; on D07, already English, 41 of 52 paragraphs are identical and the rest sit at 1.00. **WHAT IT BUILDS, both trees, no file added (198 of 199).** `validate_translations` checks every paragraph of 20 characters and more; scales WARN 0.6 and BLOCK 0.3 by a declared `EXPECTED_RATIO` — Japanese and Chinese 2.0, every other language 1.0 — read through the Step 1c declaration; on a source declared English says NOT APPLICABLE and never PASS, the batch cap, the placeholder refusal and the quoted-phrase check still running; with nothing declared, checks unscaled and says so. Step 4's text says so. **Red first:** `tests/test_ratio_check.py`, 10 of 16 red against the old script, **16 of 16 green, both variants.** **Over the 13 recorded runs**, `tools/ratio_corpus_arm.py`, each true language declared: exactly the five warnings measured before the change — D02 10, D05 4 and 15, D09 21, D11 39 — and 0 blocks, D07 NOT APPLICABLE, the old script flagging none; **6 of 6, both variants, 0 void**; the five await Wouter's page read. **H2 AND H4 CLOSED; BRANCH 12 CLOSES WITH THIS MERGE, H1's remaining half being branch 13's.**
 
-### 3.3 One tree instead of two — option 7 · **GO, AMENDED, all five questions answered** · *branch 2, then deferred D1*
+### 3.3 One tree instead of two — option 7 · **GO, AMENDED, all five questions answered** · *step 2, then step 20, deferred*
 
-> **FOR THE BUILD.** **Branch 2 for the check (7a); deferred item D1 for the reconciliation (7b).**
-> **Needs first:** nothing for branch 2 — it changes no behaviour and its own output is the assertion.
-> D1 needs the both-variants probe to have run, and Wouter's decision on each substantive adjudication.
-> **Unblocks:** branch 2 is what makes deferring D1 safe — **from branch 2 onward every NEW divergence is
-> caught as it is introduced**, so the drift cannot grow while the repair waits. And **D1 is the
+> **FOR THE BUILD.** **Step 2 for the check (7a); step 20, deferred, for the reconciliation (7b).**
+> **Needs first:** nothing for step 2 — it changes no behaviour and its own output is the assertion.
+> Step 20 needs the both-variants probe to have run, and Wouter's decision on each substantive adjudication.
+> **Unblocks:** step 2 is what makes deferring step 20 safe — **from step 2 onward every NEW divergence is
+> caught as it is introduced**, so the drift cannot grow while the repair waits. And **step 20 is the
 > precondition for deciding 7c**, because a generator cannot produce two different opinions from one source.
 > **Done when:** *(i)* the probe has run — one document, both variants, byte-compared, no model needed;
-> *(ii)* **the parity check goes from failing to clean**, which is D1's acceptance test — a reconciliation
+> *(ii)* **the parity check goes from failing to clean**, which is step 20's acceptance test — a reconciliation
 > that leaves it failing is not finished; *(iii)* the four substantive adjudications are verified by the
-> graded run, which folds into the planned verification run rather than standing alone.
+> graded run, its own and inside phase 2, the later run it once folded into having been dropped *(Wouter, 2026-10-13 (4))*.
 > **Must not:** converge the always-loaded file's **variant-selection logic** — 31 of its 49 changed
 > line-pairs *are* that logic, and it is the mechanism that makes the two builds behave differently at all.
 > Do not touch the default flag values, which are measured consistent in all eight places they appear. Do
@@ -978,17 +978,17 @@ reading.
 named as D1 · section 5 gained the reconciliation's three-stage test plan, which it had never had · section 6
 gained two declared out-of-scope items, cross-language parity and dictionary-row correctness · and Option 9
 gained one sentence to write.
-### 3.4 One authority, one way out, more than one gear — option 5 · **GO, decision 3 = 3b** · *branches 3, 4, 13*
+### 3.4 One authority, one way out, more than one gear — option 5 · **GO, decision 3 = 3b** · *steps 3, 4, 13*
 
-> **FOR THE BUILD.** **Branches 3, 4 and 13**, cheap half first: the scope rule, then the way out, then the
-> declared modes. Its share of the wrong instructions and the conflict rules rides with branch 14.
-> **Needs first:** nothing for branch 3.
-> **Unblocks:** **branch 4 ENDS IN A REVIEW, NOT A MERGE** — Wouter reads the way-out specification before
-> it lands, and branch 5 cannot start until that review is closed. He approved the principle, not the text.
-> **Done when:** the four instruments in §4 plus his review. *(Corrected 2026-08-11 on branch 4. This line
-> read "a graded run plus his review. There is no script instrument for an instruction change." Branch 3
+> **FOR THE BUILD.** **Steps 3, 4 and 13**, cheap half first: the scope rule, then the way out, then the
+> declared modes. Its share of the wrong instructions and the conflict rules rides with step 14.
+> **Needs first:** nothing for step 3.
+> **Unblocks:** **step 4 ENDS IN A REVIEW, NOT A MERGE** — Wouter reads the way-out specification before
+> it lands, and step 5 cannot start until that review is closed. He approved the principle, not the text.
+> **Done when:** the four instruments in §4 plus his review. *(Corrected 2026-08-11 on step 4. This line
+> read "a graded run plus his review. There is no script instrument for an instruction change." Step 3
 > amended §4's method table to the opposite on 2026-08-07 and built four such instruments, but left this
-> line untouched — so branch 4's own brief still prescribed the superseded method. §4 owns the method and
+> line untouched — so step 4's own brief still prescribed the superseded method. §4 owns the method and
 > this line is a method statement; it now points there rather than restating a stale one.)*
 > **Must not:** soften a single word of the anti-drift text. An independent reader called that language
 > *mature*. This option **adds** a rule where there is a gap; it never relaxes one. And the way out is
@@ -1037,10 +1037,10 @@ decide what each rule says.
 **What this verdict moved elsewhere.** Option 2's slice 2 is unblocked **in principle** and now gated on the
 specification review rather than on the decision. Recorded against Option 2 as well.
 
-### 3.5 Fix the claim, not only the code — option 9 · **GO, plus six new register rows** · *branch 3, then folded in as branches land, then D2*
+### 3.5 Fix the claim, not only the code — option 9 · **GO, plus six new register rows** · *step 3, then folded in as steps land, then step 21*
 
-> **FOR THE BUILD.** **Branch 3 for the scope-rule half; the rest folds into each branch as it lands; the
-> residue is D2.**
+> **FOR THE BUILD.** **Step 3 for the scope-rule half; the rest folds into each step as it lands; the
+> residue is step 21.**
 > **Needs first:** nothing.
 > **Execute as ONE editorial pass with option 5's instruction work** — they open the same files, and that
 > is the operative fact rather than either one's rank.
@@ -1078,15 +1078,15 @@ been overtaken:** every option reviewed is approved, nothing cut, execution orde
 opens with that warning. **The operative fact for this option was never its rank — it and Option 5 open the same
 files and must be executed as one editorial pass.**
 
-### 3.6 Protect the whole package from truncation — option 8 · **GO, SPLIT** · *branch 5, then D3 with the skill's publication*
+### 3.6 Protect the whole package from truncation — option 8 · **GO, SPLIT** · *step 5, then step 22 with the skill's publication*
 
-> **FOR THE BUILD.** **Branch 5 for items 2 and 3** — a few lines each, in files branches 5 and 6 already
-> open. **Items 1, 4, 5, 6, 7 are D3, with the skill's publication, and item 5 comes before item 4** because
+> **FOR THE BUILD.** **Step 5 for items 2 and 3** — a few lines each, in files steps 5 and 6 already
+> open. **Items 1, 4, 5, 6, 7 are step 22, with the skill's publication, and item 5 comes before item 4** because
 > a Markdown file cannot carry its own guard.
 > **Needs first:** the manifest is a **precondition**, not a nicety — the coverage fix cannot be built
 > without it.
 > **Done when:** the guard is truncation-tested at 50, 75, 90 and 99% · the three-command confirmation in
-> branch 1 has shown both predicted failure chains are real in execution.
+> step 1 has shown both predicted failure chains are real in execution.
 > **Must not:** promise a fix for truncation itself. **The cut happens in the host's install pipeline and
 > cannot be reached from inside the skill** — only the exposure can be reduced. Say that rather than imply
 > otherwise.
@@ -1120,14 +1120,14 @@ by the distribution channel. **That is the missing version identity seen from th
 **One honesty note:** for the misplaced guard the **ordering is measured**, the **practical effect is inferred**
 — if the file were truncated the main block might itself be cut, so where the cut falls decides what happens.
 
-### 3.7 Stop deleting what you do not recognise — option 1 · **GO, as written** · *branches 6, 7*
+### 3.7 Stop deleting what you do not recognise — option 1 · **GO, as written** · *steps 6, 7*
 
-> **FOR THE BUILD. THIS IS THE FIRST FIX BRANCH — branches 6 and 7.**
-> **Needs first:** branch 0 (both trees committed unmodified) and branch 1 (the harness). Both are
-> instruments, neither is a decision, and branch 1 is what makes *provable by byte comparison* true.
+> **FOR THE BUILD. THIS IS THE FIRST FIX STEP — steps 6 and 7.**
+> **Needs first:** step 0 (both trees committed unmodified) and step 1 (the harness). Both are
+> instruments, neither is a decision, and step 1 is what makes *provable by byte comparison* true.
 > **Done when:** byte comparison on the frozen intermediates is clean and the synthetic fixtures pass.
-> Branch 6 needs a document with a footnote anchor, a comment anchor, a hyperlink wrapping a tab-only run,
-> and a run carrying both text and a tab. **Branch 7's four fixtures — a content control, a smart tag, an
+> Step 6 needs a document with a footnote anchor, a comment anchor, a hyperlink wrapping a tab-only run,
+> and a run carrying both text and a tab. **Step 7's four fixtures — a content control, a smart tag, an
 > image with alt text, a chart with a title — are reproducible from NO corpus document**, which is exactly
 > why they have to be built.
 > **Must not:** implement the retired one-line slogan. **The rule is three clauses** — rebuild only text,
@@ -1159,11 +1159,11 @@ number, one of them saying the opposite of the other. Deleted.)*
 
 ---
 
-### 3.8 Take the tidy-up script's authority — option 6 · **GO, decision 2 = 2c revised** · *branches 9, 10*
+### 3.8 Take the tidy-up script's authority — option 6 · **GO, decision 2 = 2c revised** · *steps 9, 10*
 
-> **FOR THE BUILD.** **Branch 9 (the change journal) then branch 10 (the split).**
+> **FOR THE BUILD.** **Step 9 (the change journal) then step 10 (the split).**
 > **Needs first:** nothing.
-> **Unblocks:** **branch 9 is what makes branch 11 buildable** — the highest-value check in the plan cannot
+> **Unblocks:** **step 9 is what makes step 11 buildable** — the highest-value check in the plan cannot
 > exist until this stage declares what it changed. Land the journal early even if the split takes longer.
 > **Done when:** byte comparison on the frozen intermediates, **plus a full corpus re-grade** — behaviour
 > changes on every document, so the re-grade is mandatory rather than optional.
@@ -1522,21 +1522,21 @@ written: §6's Option 1 states the retired slogan, says it is self-contradictory
 **What this verdict moved elsewhere.** Option 2's slice 4 is unblocked once the journal lands at branch 9 —
 ahead of the conditional rewrite at branch 10, so that dependency resolves early. Recorded against Option 2.
 
-### 3.9 Say what the formatting is — option 3 · **GO, three slices, two conditions** · *branches 15, 16, 17 — and this is the leap*
+### 3.9 Say what the formatting is — option 3 · **GO, as three steps, two conditions** · *steps 15, 16, 17 — and this is the leap*
 
-> **FOR THE BUILD. Branches 15, 16, 17, in that order and not otherwise.**
-> **Needs first:** **branch 16 does not begin until branch 11's delivered-document check exists.** A wrong
+> **FOR THE BUILD. Steps 15, 16, 17, in that order and not otherwise.**
+> **Needs first:** **step 16 does not begin until step 11's delivered-document check exists.** A wrong
 > cascade computation is the one failure in this plan that would make the skill *quietly worse*, and that
 > check is the only instrument that would catch it.
-> **Done when:** **branch 15's output byte-compares IDENTICAL** — it adds fields and changes nothing, so any
-> movement means something is wrong before the work has properly started. Branch 16 carries the off-flag
-> removal **in the same branch**, because separating them renders a document entirely bold.
+> **Done when:** **step 15's output byte-compares IDENTICAL** — it adds fields and changes nothing, so any
+> movement means something is wrong before the work has properly started. Step 16 carries the off-flag
+> removal **in the same step**, because separating them renders a document entirely bold.
 > **Must not:** regenerate the frozen intermediates by re-translating. **Regenerate them FROM THE ARCHIVED
 > JULY RUNS** — 40% of paragraphs differ linguistically between two runs, so re-translating moves the
 > never-regress baseline by a large and undetectable amount.
-> **And branch 15 is the rebuild probe.** Whoever runs it must report explicitly whether a per-span model
+> **And step 15 is the rebuild probe.** Whoever runs it must report explicitly whether a per-span model
 > can be layered onto the present extraction and apply, or whether both must be replaced wholesale. **Do not
-> proceed silently to branch 16.** If it is the latter, a rebuild is already happening and has to be named.
+> proceed silently to step 16.** If it is the latter, a rebuild is already happening and has to be named.
 
 
 **Wouter's verdict, in his words:** *"go, both conditions accepted."*
@@ -1576,10 +1576,10 @@ be large and undetectable as error.
 the layout group. Five of those six findings are forbidden by the golden rule or resolve to detect-and-disclose.
 They have Option 11, whose record is §3.10 and whose work is branch 18.
 
-### 3.10 Layout: see it and say so — option 11 · **GO, 11a NOW and 11b DEFERRED** · *branch 18*
+### 3.10 Layout: see it and say so — option 11 · **GO, 11a NOW and 11b DEFERRED** · *step 18*
 
-> **FOR THE BUILD.** **Branch 18, and 11a only.**
-> **Needs first:** it routes its findings through branch 4's disclosure channel, so branch 4 must exist.
+> **FOR THE BUILD.** **Step 18, and 11a only.**
+> **Needs first:** it routes its findings through step 4's disclosure channel, so step 4 must exist.
 > **Done when:** it fires on the four documents where the register records the defect and **stays silent on
 > the one document that is the positive control** · and every flagged instance is **CLASSIFIED** into one of
 > three buckets — repairable by real tab stops, repairable by a real page break, or neither.
@@ -1588,7 +1588,7 @@ They have Option 11, whose record is §3.10 and whose work is branch 18.
 > fall in the third bucket — but that is a count of mechanisms, not of instances, and **nobody has the
 > instance count.**
 > **Must not:** repair anything. The golden rule is left unopened. **Wouter's signature-block complaint
-> remains unfixed by this branch** — it becomes visible and disclosed, which is not the same as repaired.
+> remains unfixed by this step** — it becomes visible and disclosed, which is not the same as repaired.
 > **The justified-short-tail check needs no render**, so it is the one part that can run on every change.
 
 
@@ -1639,14 +1639,14 @@ the verdict and is restated here so that nobody reading the record later mistake
 > owns the project's order and status, and **a Step B whose outcome never reaches §6 is a Step B the next
 > session cannot act on** — the overhaul must carry every verdict in §3, not a summary of them.
 
-### 3.11 A home for document furniture — option 4 · **GO, AMENDED, decision 1 = 1c restated** · *branch 19*
+### 3.11 A home for document furniture — option 4 · **GO, AMENDED, decision 1 = 1c restated** · *step 19*
 
-> **FOR THE BUILD.** **Branch 19.**
+> **FOR THE BUILD.** **Step 19.**
 > **Needs first:** decision 1, answered as 1c restated.
-> **Done when: Wouter's own review at Step C says so.** This is **the only approved option whose quality
+> **Done when: Wouter's own review at input point 2, on phase 3's documents, says so** *(Wouter, 2026-10-19: it named the dropped Opus 5 run's review until then; step 19 still merges in phase 2)*. This is **the only approved option whose quality
 > cannot be proved by comparing bytes** — no automatic check can reach it, and the grader is *differential*,
 > so it compares source against target and can never ask whether the English suits the instrument class.
-> **Build order inside the branch:** reword the five false prohibition instructions **first** — they are
+> **Build order inside the step:** reword the five false prohibition instructions **first** — they are
 > five sentences and they are honest the moment they land. Then generate the compliance rules **from** the
 > Avoid rows, which needs no new evidence and closes the rules-cite-rows-that-do-not-exist finding. Then
 > seed the rows from evidence already held: the 50 hand-transcribed per-language rules, the 180 of 184
@@ -1764,11 +1764,11 @@ rather than *confirmed*.
 
 ---
 
-## 4. How each branch is tested — THE METHOD
+## 4. How each step is tested — THE METHOD
 
 
 > **This section owns the test METHOD and nothing else.** *(Stated 2026-08-05.)* **§2 owns the order; §3 owns
-> what counts as done for each option.** So: come here to find out *how* a branch of this kind is proved —
+> what counts as done for each option.** So: come here to find out *how* a step of this kind is proved —
 > byte comparison on a frozen intermediate, a synthetic fixture, a negative input, or a graded run — and go
 > to §3's *Done when* line for the condition that has to be met. **Nothing here restates an acceptance
 > criterion and nothing in §3 restates a method.**
@@ -1798,21 +1798,21 @@ the July runs.**
 so a test set of only-passing cases produces tests that pass because nothing is being tested. **One input per
 check, built to violate that check's stated pass condition.**
 
-**Which branches can be byte-compared, and which cannot — this is the important distinction.**
+**Which steps can be byte-compared, and which cannot — this is the important distinction.**
 
-| branch kind | instrument | why |
+| step kind | instrument | why |
 |---|---|---|
-| **Script changes** — branches 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18 | **Byte comparison on frozen intermediates**, plus the synthetic set and the negative inputs. Deterministic, seconds | the mechanical half is measured deterministic |
-| **Instruction and dictionary changes** — branches 3, 4, 13, 17, 19 | **AMENDED 2026-08-07 — see the four instruments below the table.** Was: *"a graded run plus your review"*. It is now **four static and executable instruments plus your review**, and the graded run moves to Step C. **CONFIRMED 2026-08-05: Wouter accepted that his own review at Step C is Option 4's verification instrument** — the only approved option whose quality cannot be proved by comparing bytes | they change what the *model* does, and two runs of one document differ in 40% of paragraphs linguistically. And the grader is *differential*, so it structurally cannot ask whether the English suits the instrument class |
-| **Measurement-only** — branches 0, 1, 2, 15 | **Self-proving**: branch 1 is the instrument; branch 2 is a script whose output is the assertion; branch 15 is additive and must byte-compare **identical** output | nothing observable changes |
+| **Script changes** — steps 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18 | **Byte comparison on frozen intermediates**, plus the synthetic set and the negative inputs. Deterministic, seconds | the mechanical half is measured deterministic |
+| **Instruction and dictionary changes** — steps 3, 4, 13, 17, 19 | **AMENDED 2026-08-07 — see the four instruments below the table.** Was: *"a graded run plus your review"*. It is now **four static and executable instruments plus your review**, and the graded run moves to phase 3, the full Cowork test, input point 2 being Wouter's review of its documents *(Wouter, 2026-10-19)*. **CONFIRMED 2026-08-05: Wouter accepted that his own review is Option 4's verification instrument** — the only approved option whose quality cannot be proved by comparing bytes | they change what the *model* does, and two runs of one document differ in 40% of paragraphs linguistically. And the grader is *differential*, so it structurally cannot ask whether the English suits the instrument class |
+| **Measurement-only** — steps 0, 1, 2, 15 | **Self-proving**: step 1 is the instrument; step 2 is a script whose output is the assertion; step 15 is additive and must byte-compare **identical** output | nothing observable changes |
 
-**HOW AN INSTRUCTION BRANCH IS ACTUALLY TESTED — amended 2026-08-07, on branch 3, with
+**HOW AN INSTRUCTION STEP IS ACTUALLY TESTED — amended 2026-08-07, on step 3, with
 Wouter's decision recorded.** *(Wouter, asked whether a graded run was the only option:
 **"Can you not test this in any other way? Please let's explore this first."** It was, and
 there are four.)*
 
 **Why the graded run was the wrong instrument here, and this is measured rather than
-argued.** An instruction branch of this kind only bites **when a check fires with the wrong
+argued.** An instruction step of this kind only bites **when a check fires with the wrong
 scope**. Cluster G is that set, and it is attested on **5 of the 11 corpus documents**, so a
 single graded run reaches the situation slightly under half the time even before asking
 whether it detects anything. And when it does reach it, the grader scores the *output* on 17
@@ -1824,50 +1824,50 @@ expensive here; it measures the wrong variable.** That is the ground for moving 
 
 | | instrument | what it settles | model needed? |
 |---|---|---|---|
-| **1** | **`tools/reachability.py`** — §4.1's half one, which this document already assigns to branch 3 | Could the operator have **read** the rule at the moment it had to decide? Measures the steps at which a check can block and asserts the rule is readable at all of them | **no** |
+| **1** | **`tools/reachability.py`** — §4.1's half one, which this document already assigns to step 3 | Could the operator have **read** the rule at the moment it had to decide? Measures the steps at which a check can block and asserts the rule is readable at all of them | **no** |
 | **2** | **The static decision** — a contradiction between two mandatory instructions on one observable is a property of the text, not of the operator | Whether the reconciliation exists and states which rule governs. For a rule *collision* this is not a proxy for the test; it **is** the test | **no** |
 | **3** | **Execution** — fire the real gate on a synthetic input and read what it actually prints | Whether the edited wording is on the path the operator hits, rather than merely present in the file | **no** |
 | **4** | **`tools/gate_replay.py`** — the twelve A1 runs recorded every gate met and what happened next | Whether the rule is **aimed** at situations that really arose. Counts only; the logs quote real client text and none of it is printed | **no** |
 
 **What the four cannot do, stated so nobody reads them as more than they are:** none shows
 that a future operator will **apply** the rule. That is behavioural, it needs a model in the
-loop, and **§4.1 already puts it at Step C** as the third arm. The four settle presence,
+loop, and **§4.1's half two is that arm, PARKED on 2026-10-19** for phase 3's plan *(Wouter)*. The four settle presence,
 placement, reachability, non-regression of the anti-drift text, cross-tree equality and
 aim — everything except persuasion.
 
-**Per-branch specifics worth stating now.**
+**Per-step specifics worth stating now.**
 
-- **Branch 6** needs synthetic documents with a footnote anchor, a comment anchor, a hyperlink wrapping a
+- **Step 6** needs synthetic documents with a footnote anchor, a comment anchor, a hyperlink wrapping a
   tab-only run, and a run carrying both text and a tab. Three of those four reproduce from the corpus, so
   the frozen intermediates are the higher-fidelity check.
-- **Branch 7** needs synthetic documents for a content control, a smart tag, an image with alt text and a
+- **Step 7** needs synthetic documents for a content control, a smart tag, an image with alt text and a
   chart with a title — **none of which is reproducible from the corpus**, which is exactly why they need to
   be built. Add the `Symbol`-font document, for the same reason.
-- **Branch 8** is self-verifying against the corpus: run it over all eleven frozen intermediates and it must
+- **Step 8** is self-verifying against the corpus: run it over all eleven frozen intermediates and it must
   report zero loss on every one, since the deliverables were graded complete. **Any hit is either a real
   historical loss or a bug in the check** — and either result is worth having.
-- **Branch 11**'s first run over the frozen intermediates should **reproduce the known defects**. That is the
+- **Step 11**'s first run over the frozen intermediates should **reproduce the known defects**. That is the
   acceptance test: if it does not find the missing bracket, the lost anchors, the cleared whitespace and the
   destroyed tracked change, it is not built correctly.
-- **Branches 15 and 16** must regenerate the frozen intermediates, because the notes format changes.
+- **Steps 15 and 16** must regenerate the frozen intermediates, because the notes format changes.
   Regenerate them from the *archived* runs, not from new translations, or the baseline moves.
-- **Branch 18** cannot be byte-compared for correctness — it is a *rendered* comparison — so its test is
+- **Step 18** cannot be byte-compared for correctness — it is a *rendered* comparison — so its test is
   that it fires on the four documents where the register records the defect and stays silent on the one
   document that is the positive control.
-- **Reconciling the two trees (D1) is tested in three stages, and the first is nearly free.** *(Added
+- **Reconciling the two trees (step 20) is tested in three stages, and the first is nearly free.** *(Added
   2026-08-05 with Option 7's verdict; the reconciliation previously had no test plan at all, because it had
   no place in this table.)* **(i)** Before it starts, **run one document under both variants and byte-compare
   the two deliverables.** It needs no model — the divergent logic is all in the mechanical half — so it is
   the mechanical pipeline run twice over one frozen intermediate with each variant flag. **That is the
   measurement the whole option currently lacks**, and the drifted rule tables predict a difference.
-  **(ii)** After the marker restoration and the script parameterisation, **the parity check from branch 2 is
+  **(ii)** After the marker restoration and the script parameterisation, **the parity check from step 2 is
   the acceptance test** — it must go from failing to clean, and a reconciliation that leaves it failing is
   not finished. **(iii)** The four substantive adjudications change what the *model* is told, so they cannot
-  be byte-compared at all; they need the graded run, which is why D1's re-grade folds into the planned
-  verification run rather than standing alone.
+  be byte-compared at all; they need the graded run, which is why step 20 carries its own re-grade, inside
+  phase 2 *(Wouter, 2026-10-13 (4))*.
 
-**One thing to keep constant across all of it.** The grader is frozen at version 3 until the verification
-run, the harness is at version 2.2, and every graded run so far used one thinking level. **Do not vary any of
+**One thing to keep constant across all of it.** The grader is frozen at version 3 until phase 3
+ends, the harness is at version 2.2, and every graded run so far used one thinking level. **Do not vary any of
 the three inside a comparison** — the project has already been bitten twice by a moving ruler.
 
 ### 4.1 The prose-reachability probe — how and when, and it is NOT part of a fix
@@ -1875,7 +1875,7 @@ the three inside a comparison** — the project has already been bitten twice by
 **Wouter, 2026-08-05: *"How and when do you want to do the probe? Is this part of the fix?"***
 
 **No, it is not part of a fix. It is a MEASUREMENT**, and that settles where it goes: it produces no code and
-no instruction edit, so it does not belong in a fix branch. It belongs with the measuring work.
+no instruction edit, so it does not belong in a fix step. It belongs with the measuring work.
 
 **It splits into two halves that answer different questions, and only the second needs a run.**
 
@@ -1884,14 +1884,14 @@ an agent *obeys* an instruction, measure whether the instruction is **reachable 
 This is a static analysis of the instruction layer and it costs nothing: for every mandatory rule, identify
 the step at which the decision it governs is actually taken, and flag every rule whose governing statement
 cannot legitimately be read until afterwards. **The register already holds one worked instance and it caused a
-real wrong decision:** the date rule's governing statement lives in the Step 4 document, reading a step
-document before arriving at it is forbidden, so the operator meets two misleading statements at Step 3,
+real wrong decision:** the date rule's governing statement lives in the skill Step 4 document, reading a step
+document before arriving at it is forbidden, so the operator meets two misleading statements at skill Step 3,
 decides, and meets the governing rule afterwards. **On one document it reasoned carefully, wrote a note, and
-got it wrong — then reversed at Step 4.** That is a *reachability* defect, not a compliance defect, and no
-behavioural experiment is needed to find more of them. **This half goes into Option 5's branch 3 as an
+got it wrong — then reversed at skill Step 4.** That is a *reachability* defect, not a compliance defect, and no
+behavioural experiment is needed to find more of them. **This half goes into Option 5's step 3 as an
 analysis step, because its output is a list of rules to move.**
 
-**HALF TWO — the behavioural dose-response. At Step C, as a third arm.**
+**HALF TWO — the behavioural dose-response. PARKED, 2026-10-19 *(Wouter)*: it was to run as a third arm beside the dropped Opus 5 run's two thinking-level arms, which went with it, so phase 3's plan takes it up or drops it. The design as it stood:**
 
 | | design |
 |---|---|
@@ -3573,9 +3573,9 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 > forcing them into a keystone. **Forcing them into an option would have been false completeness — which is
 > exactly what the audit was looking for.**
 
-### 9.3 Branches → options → findings
+### 9.3 Steps → options → findings
 
-| branch | option(s) | the findings it is accountable for |
+| step | option(s) | the findings it is accountable for |
 |---|---|---|
 | 0 baseline · 1 harness · 2 parity check | instruments | C27 (nothing can make a check fail) · V2 (no parity mechanism) · **plus the four OPEN measurement-instrument defects, which are bugs in our own tooling and not in the skill: I-7, I-8, I-9, I-10** · and the harness is the instrument for every branch below |
 | 3 the scope rule | 5, 9 | K1 K2 K3 F35 X3 |
@@ -3602,7 +3602,7 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 
 - **P4 / P10 / P18** — the 35-paragraph batch cap is correctly calibrated on twelve runs and is an
   **attention** limit, not a context limit. **Do not raise it**, and note that the corrupt-state-file finding
-  is the one path that makes it assertable again, which is why it is in branch 5.
+  is the one path that makes it assertable again, which is why it is in step 5.
 - **P11** — the term-sanity guard refused to reorder a notarial deed when the detector was wrong, turning a
   corruption into a no-op. **It must survive the definitions work.**
 - **P27** — the thirteen construction properties, the register's only record of what is good about how the
@@ -3613,8 +3613,8 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 anywhere in this document.** *(Added 2026-08-05.)* The three above are the ones that bear on the plan's
 structure, and the definition of done already requires that no graded criterion regresses — but **a positive
 can be destroyed without moving a grade**, which is exactly what the construction positives exist to catch.
-**Before any branch merges, its reviewer should read the positives table in full and name which ones the
-branch could plausibly touch.** That is a cheap step and nothing else in this plan performs it.
+**Before any step merges, its reviewer should read the positives table in full and name which ones the
+step could plausibly touch.** That is a cheap step and nothing else in this plan performs it.
 
 Plus **P23**, which is not a positive to preserve but the licence for the whole test plan: the pipeline's
 mechanical behaviour is **measured deterministic** across two independent runs of one document, while 40% of

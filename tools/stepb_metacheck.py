@@ -221,6 +221,29 @@ MUTATIONS = [
                       "### 5.3 Things that say it worked when it did not — 46 findings", 1),
   "stepb_audit.py",
   "NEW GUARD: check 5d compares EACH group heading to the map, not only their sum"),
+
+ # THE STEP TABLE'S TWO CLAIMS, 2026-10-19, rename (b2): check 2 had passed on nothing since the order table gained
+ # its option column - it parsed four rows of another table and found no claim. Repaired the same day; these two
+ # probes are its negative tests, and the third holds check 1e to the living text's "step N" citations.
+ ("misstate the step count (twenty-three -> twenty-two)",
+  lambda t: t.replace("**Twenty-three numbered steps, 0–22,", "**Twenty-two numbered steps, 0–22,", 1),
+  "stepb_audit.py",
+  "check 2a reads the count claim against section 2's two tables"),
+
+ ("misstate the no-behaviour-change tally (eleven -> ten)",
+  lambda t: t.replace("**eleven of the twenty-three numbered steps**", "**ten of the twenty-three numbered steps**", 1),
+  "stepb_audit.py",
+  "check 2b counts the rows whose last cell is not 'yes'"),
+
+ ("dangle a step citation in living text (step 11 -> step 27)",
+  lambda t: t.replace("cannot start until step 11 exists.", "cannot start until step 27 exists.", 1),
+  "stepb_audit.py",
+  "check 1e reads living text's 'step N' as well as the records' 'branch N'"),
+
+ ("dangle a capitalised step citation (Step 11 -> Step 27)",
+  lambda t: t.replace("Step 11 must follow step 9,", "Step 27 must follow step 9,", 1),
+  "stepb_audit.py",
+  "check 1e reads a capitalised 'Step N' too - the code review of 2026-10-19 found one dangling unseen"),
 ]
 
 # THE NULL CONTROL: a change no check reads, run against EVERY check, and it must fire none.

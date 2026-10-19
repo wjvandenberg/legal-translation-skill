@@ -589,20 +589,23 @@ n_branches = len(re.findall(r"^\| \*\*(\d+)\*\* \|", sb_branch_table, re.M))
 n_deferred = len(re.findall(r"^\| \*\*D(\d)\*\* \|", sb_branch_table, re.M))
 sb_subs = re.findall(r"^### 3\.(\d+) .*?— option (\d+)", SB, re.M)
 sb_go = len(re.findall(r"\|\s*\*\*3\.\d+\*\*\s*\|\s*\*\*\d+ — [^|]+\|\s*\*\*GO", SB))
-print(f"  the analysis: {n_branches} numbered branches + {n_deferred} deferred = "
+sb_ids = sorted(int(x) for x in re.findall(r"^\| \*\*(\d+)\*\* \|", sb_branch_table, re.M))
+print(f"  the analysis: {n_branches} numbered steps + {n_deferred} D-labelled = "
       f"{n_branches + n_deferred} pieces of work; {len(sb_subs)} option records; "
       f"{sb_go} marked GO")
 SBC = [
-    ("twenty branches plus three deferred items", n_branches == 20 and n_deferred == 3),
+    # rename (b2), 2026-10-19: D1-D3 renumbered as steps 20-22, so the plan's section 2 holds steps 0 to 22 and no
+    # D-labelled row; CLAUDE.md's section 3.1 says "steps 3 to 22", read here in place of a phrase it no longer has
+    ("steps 3 to 22", sb_ids == list(range(23)) and n_deferred == 0),
     ("eleven options", len(sb_subs) == 11),
     ("ten options approved, the rebuild declined", sb_go == 10),
     ("in four parts", SB.count("## PART ") == 4),
-    # "changes nothing a document can see" is every branch row whose LAST cell is not
-    # "yes" -- three plain "no", three "doc only", and three qualified "no -- ...".
+    # "changes nothing a document can see" is every step row whose LAST cell is not
+    # "yes" -- four plain "no", four "doc only", and three qualified "no -- ...", steps 20-22 included.
     # Counting only the plain "no" cells gave 3 and reported a true claim as false.
-    ("Nine of the twenty branches change nothing a document can see",
+    ("Eleven of the twenty-three steps change nothing a document can see",
      len([r for r in re.findall(r"^\| \*\*\d+\*\* \|.*$", sb_branch_table, re.M)
-          if "yes" not in r.rsplit("|", 2)[-2].lower()]) == 9),
+          if "yes" not in r.rsplit("|", 2)[-2].lower()]) == 11),
     ("only Part One is needed to build", "only Part One is needed to build" in SB),
 ]
 for label, truth in SBC:
@@ -802,10 +805,10 @@ if present("198 files becomes roughly 200 to 205 per variant"):
 named_branches = set(int(x) for x in re.findall(r"\*\*(\d+) — ", CMD))
 plan_branches = set(int(x) for x in re.findall(r"^\| \*\*(\d+)\*\* \|", sb_branch_table, re.M))
 if named_branches - plan_branches:
-    fail("15", f"CLAUDE.md names branch(es) the plan does not have: "
+    fail("15", f"CLAUDE.md names step(s) the plan does not have: "
                f"{sorted(named_branches - plan_branches)}")
 else:
-    ok(f"every branch CLAUDE.md names ({sorted(named_branches)}) exists in the plan's table")
+    ok(f"every step CLAUDE.md names ({sorted(named_branches)}) exists in the plan's table")
 # the old charter names must map onto the plan's numbering exactly as §3.1 claims
 for old_name, new_no, needle in [
         ("feature/baseline-and-inventory", 0, "baseline"),
@@ -814,7 +817,7 @@ for old_name, new_no, needle in [
     row = re.search(rf"^\| \*\*{new_no}\*\* \| ([^|]+)\|", sb_branch_table, re.M)
     got = row.group(1).strip() if row else "<<missing>>"
     (ok if needle in got else lambda m: fail("15", m))(
-        f"{old_name} -> plan branch {new_no} ({got!r})")
+        f"{old_name} -> plan step {new_no} ({got!r})")
 # and the three sequencing facts §3.2 summarises must be the plan's three -- the comment said
 # §3.3 and had been wrong since before the 2026-09-09 mapping: the facts have always sat in the
 # step-2 block. The CHECK is phrase-keyed and was never affected, which is why nothing caught it.

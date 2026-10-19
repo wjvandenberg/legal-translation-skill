@@ -12,6 +12,12 @@ not read as more: an old `step 3` meaning phase 3 - `step 3` is legitimate new t
 proved by the sweep reversing itself byte-identical, never by this count; and a bare `branch` with no number, which
 is also git's word (branch protection, a PR per branch) and is judged by reading.
 
+SWEPT so far: CLAUDE.md, rename commit (b1), 2026-10-14; PLAN-2-step-b.md, rename commit (b2), 2026-10-19 - its split
+Wouter's of that day: Part One's live text and Part Three's look-up are living; each option's verdict and build
+record after its FOR THE BUILD brief, 9.3's rows and Parts Two and Four keep their words, the document's own front
+matter declaring Parts Two to Four the record. A span that matches nothing, or a heading prefix that matches more
+than one heading, is refused as stale: a declaration that quietly covers nothing would read as a clean census.
+
     uv run python tools/vocabulary_census.py             # every swept document; exit 0 clean, 1 an old word, 3 VOID
     uv run python tools/vocabulary_census.py --selftest  # red on a planted old word, green on one planted in a record
 """
@@ -27,7 +33,11 @@ SHAPES = [
 ]
 # document -> record spans: (kind, anchor, why). kind: 'paragraph' (the block of non-blank lines that holds the
 # anchor), 'section' (from the heading that IS the anchor to the next heading of the same or a higher level),
-# 'line' (any line matching the anchor as a regex).
+# 'line' (any line matching the anchor as a regex), 'heading' (as 'section', the ONE heading that starts with the
+# anchor), 'brief-tail' (anchor (heading prefix, brief prefix): that section after the paragraph opening with the
+# brief prefix - the brief itself stays living) and 'range' (anchor (start prefix, end prefix or None): from the ONE
+# heading starting with the first up to the ONE starting with the second, or to the end).
+BRIEF = "> **FOR THE BUILD"
 SWEPT = {
     "CLAUDE.md": [
         ("paragraph", "**THE HOUSE'S WORDS, SINCE 2026-10-13**", "the mapping must name the old words it maps"),
@@ -35,14 +45,82 @@ SWEPT = {
         ("line", r"^\| 20\d\d-\d\d-\d\d \|", "section 2.5's dated decisions keep the words they were taken in"),
         ("line", r"^\| \*\*`PLAN-3-opus5-migration\.md`\*\*", "names what the superseded Opus 5 plan holds"),
     ],
+    "PLAN-2-step-b.md": [
+        ("line", r"^\*\*SESSION PURPOSE — 20", "earlier sessions' purpose lines, each dated"),
+        ("paragraph", "> **THIS DOCUMENT IS STEP 2'S PLAN FILE", "the 2026-09-10 rename and over-cap record"),
+        ("paragraph", "> **Phase 3, Step B. THE EXPLORATION IS COMPLETE", "the 2026-08-05 preface: how it was made"),
+        ("paragraph", "> **CORRECTED 2026-08-05, and the correction matters", "a dated correction"),
+        ("paragraph", "> **AND A FOURTH, ADDED 2026-08-19", "a dated addition to the order, since discharged"),
+        ("paragraph", "> **THIS GATE IS DISCHARGED, 2026-08-20", "the discharged gate, preserved as written"),
+        ("paragraph", "**The four open defects in our own tooling belong to branch 1",
+         "step 1's added scope, the deep audit's of 2026-08-05; step 1 is closed"),
+        ("heading", "### The record, option by option", "the verdict record, option by option"),
+        ("heading", "### 3.1 ", "the dropped fork's record: no brief"),
+    ] + [("brief-tail", (f"### 3.{n} ", BRIEF), "the verdict and build record after the brief") for n in range(2, 12)] + [
+        ("heading", "### 3.12 ", "a standing rule's record: no brief"),
+        ("heading", "### 3.13 ", "a procedural record: no brief"),
+        ("line", (r"^\| (?:\d|deferred: |standalone )", "### 9.3 "),
+         "9.3's rows: their cells carry dated closure notes"),
+        ("paragraph", "> **THIS LINE WAS STALE BY TWO", "a dated correction"),
+        ("paragraph", "> **Regenerated 2026-08-05 by the deep audit", "a dated regeneration note"),
+        ("range", ("## PART TWO ", "## PART THREE "), "Part Two, the case: the front matter declares it the record"),
+        ("range", ("## PART FOUR ", None), "Part Four, the record"),
+    ],
 }
+
+
+def _level(line):
+    return len(line) - len(line.lstrip("#"))
+
+
+def _one_heading(lines, prefix):
+    hits = [i for i, l in enumerate(lines) if l.startswith("#") and l.strip().startswith(prefix)]
+    if len(hits) != 1:
+        raise LookupError(f"heading prefix {prefix!r} matched {len(hits)} headings - it must match exactly one")
+    return hits[0]
+
+
+def _section_end(lines, i):
+    j = i + 1
+    while j < len(lines) and not (lines[j].startswith("#") and _level(lines[j]) <= _level(lines[i])):
+        j += 1
+    return j
 
 
 def exempt_lines(lines, spans):
     out = set()
     for kind, anchor, _ in spans:
-        if kind == "line":
-            hits = [i for i, l in enumerate(lines) if re.search(anchor, l)]
+        if kind == "heading":
+            i = _one_heading(lines, anchor)
+            hits = list(range(i, _section_end(lines, i)))
+            out |= set(hits)
+        elif kind == "brief-tail":
+            head, brief = anchor
+            i = _one_heading(lines, head)
+            j = _section_end(lines, i)
+            k = next((x for x in range(i + 1, j) if lines[x].startswith(brief)), None)
+            if k is None:
+                raise LookupError(f"brief-tail {head!r} holds no paragraph opening {brief!r} - the declaration is stale")
+            while k + 1 < j and lines[k + 1].strip():
+                k += 1
+            hits = list(range(k + 1, j))
+            out |= set(hits)
+        elif kind == "range":
+            start, end = anchor
+            a = _one_heading(lines, start)
+            b = _one_heading(lines, end) if end else len(lines)
+            hits = list(range(a, b))
+            out |= set(hits)
+        elif kind == "line":
+            # a bare regex reads the whole document; (regex, heading prefix) only the ONE section under that heading
+            # (code review, 2026-10-19: a document-wide row pattern also exempted rows of unrelated tables)
+            rx, scope = anchor if isinstance(anchor, tuple) else (anchor, None)
+            if scope is None:
+                where = range(len(lines))
+            else:
+                i = _one_heading(lines, scope)
+                where = range(i, _section_end(lines, i))
+            hits = [i for i in where if re.search(rx, lines[i])]
             out |= set(hits)
         elif kind == "paragraph":
             # the paragraph must OPEN with the anchor: one that merely quotes it is living text (code review)
@@ -107,6 +185,45 @@ def selftest():
         base = census("CLAUDE.md", text, spans)[2]
         checks.append((f"{word!r} planted in {where} text is {'counted' if want else 'left alone'}",
                        len(hits) - len(base) == want))
+    # the build plan, rename (b2): counted in a brief and in section 2; left alone in a brief's record tail, in Part
+    # Two and in a 9.3 row; and each new span kind refused when its declaration has gone stale
+    ptext = (ROOT / "PLAN-2-step-b.md").read_bytes().decode("utf-8")
+    pspans = SWEPT["PLAN-2-step-b.md"]
+    plines = ptext.replace("\r\n", "\n").split("\n")
+    pbase = len(census("PLAN-2-step-b.md", ptext, pspans)[2])
+
+    def at(pred):
+        return next(i for i, l in enumerate(plines) if pred(l))
+    head_32 = at(lambda l: l.startswith("### 3.2 "))
+    brief_32 = next(i for i in range(head_32, len(plines)) if plines[i].startswith(BRIEF))
+    order = at(lambda l: l.startswith("### The order, and what owns it"))
+    tail_32 = at(lambda l: l.startswith("**Wouter's verdict, in his words:**") and "four slices" in l)
+    part_two = at(lambda l: l.startswith("## PART TWO ")) + 2
+    row_93 = at(lambda l: l.startswith("| 13 declared modes |"))
+    for where, i, want, word in (("a brief", brief_32, 1, "> a planted branch 7 line"),
+                                 ("section 2", order, 1, "a planted slice line"),
+                                 ("a brief's record tail", tail_32, 0, "a planted branch 7 line"),
+                                 ("Part Two", part_two, 0, "a planted slice line")):
+        planted = list(plines)
+        planted.insert(i + 1, word)
+        got = len(census("PLAN-2-step-b.md", "\n".join(planted), pspans)[2]) - pbase
+        checks.append((f"the plan: {word!r} planted in {where} is {'counted' if want else 'left alone'}", got == want))
+    planted = list(plines)
+    planted[row_93] += " branch 7"
+    got = len(census("PLAN-2-step-b.md", "\n".join(planted), pspans)[2]) - pbase
+    checks.append(("the plan: an old word added to a 9.3 row is left alone", got == 0))
+    planted = list(plines)
+    planted.insert(order + 1, "| 3 the planted row | branch 7 |")
+    got = len(census("PLAN-2-step-b.md", "\n".join(planted), pspans)[2]) - pbase
+    checks.append(("the plan: a 9.3-shaped row OUTSIDE 9.3 is counted (the row span is scoped)", got == 1))
+    for label, bad_span in (("a brief-tail whose section has no brief", ("brief-tail", ("### 3.1 ", BRIEF), "x")),
+                            ("a heading prefix that matches many headings", ("heading", "### 3.", "x")),
+                            ("a range whose first heading is absent", ("range", ("## PART NINE ", None), "x"))):
+        try:
+            census("PLAN-2-step-b.md", ptext, [bad_span])
+            checks.append((f"the plan: refused - {label}", False))
+        except LookupError:
+            checks.append((f"the plan: refused - {label}", True))
     stale = [("section", "### 9.9 No such heading", "a stale span")]
     try:
         census("CLAUDE.md", text, stale)
