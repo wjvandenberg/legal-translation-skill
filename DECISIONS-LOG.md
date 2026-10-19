@@ -1512,3 +1512,75 @@ reads as a git hook; the house's v4, committed but not yet pushed when this entr
 >
 > **Open, none blocking:** 2026-10-14's carried items, word for word in `DECISIONS-LOG.md`, 2026-10-16; the
 > reduction's fresh-clone verdict. **Context: 64% when this was written, measured.**
+
+## 2026-10-19 — rename commit (b2), the build plan in the house's words; step 13's plan written
+
+**WOUTER, 2026-10-19, THROUGH THE QUESTION TOOL — each the recommended answer, asked after measuring
+(`temp/s1019_split_survey.py`).** **(1) THE SPLIT:** Part One's live text and Part Three's look-up take the new
+words; each option's verdict and build record after its FOR THE BUILD brief, 9.3's rows, and Parts Two and Four
+keep theirs — the plan's own front matter declares Parts Two to Four the record, corrected and never truncated.
+Measured: 185 old-word occurrences in 766 living lines, against 244 in 2,283 with Part Two. **(2) STEP C:** step
+19's done-when and section 4's review of instruction changes become his review at input point 2, on phase 3's
+documents, as he moved input point 2 on 2026-10-14 — step 19 still merges in phase 2; section 4.1's behavioural
+arm is PARKED, the thinking-level arms it sat beside having gone with Opus 5, for phase 3's plan to take up or
+drop. The grader and step 20's re-grade follow his rulings of 2026-10-14 (1) and 2026-10-13 (4). **(3) SLICES OF
+AN OPTION:** option 2's four and option 3's three were each one whole step, so the briefs name the step — steps
+1, 5, 8, 11 and 15, 16, 17 — never "sub-step". **(4)** In chat, mid-session: *"I'll be out for the next 45 minutes
+so please continue and let me answer all questions at the end"* — so the session continued and kept every
+question for the close.
+
+**WOUTER AT THE CLOSE, THROUGH THE QUESTION TOOL — each the recommended answer.** **(5)** Step 13's plan, section
+3.4 of the build plan, approved as written. **(6)** The next session starts with sub-step 13.1, then 13.2 if there
+is room; rename (c), the register, and (d), the rest, come after step 13. **(7)** Check 2's vacuity gets a register
+row, filed with rename (c), which opens the register anyway. **And in chat, after the computer slept mid-TEST:**
+the close's first full run failed one row alone — `verify_code.py`'s entry point timed out at 900 s across the
+sleep — and was re-run whole, OVERALL: PASS; a failed run is not evidence and the cycle gate recorded none.
+
+**JUDGEMENTS TAKEN ALONE, CARRIED TO THE CLOSE.** **(a)** The tools' baseline was taken in the working tree after
+the purpose splice, not in a worktree at the session tag: the one byte range moved since the tag is today's
+purpose clause, so the baseline isolates the sweep, and it reads the same gitignored `temp/`. **(b)** The paragraph
+*"The four open defects in our own tooling belong to branch 1"* is declared a record — step 1's dated addition of
+2026-08-05, step 1 closed — so its Step C sentence keeps its words. **(c)** `stepb_audit`'s check 2 was found
+PASSING ON NOTHING — it parsed four rows of another table since the order table gained its option column, found
+no claim, and printed OK for both halves — and is repaired in (b2), since it guards exactly the counts the rename
+moves; three probes in `stepb_metacheck`, a fourth from the code review, so the plan's and the audit-gate skill's
+probe count reads fifteen. **(d)** Section 9 is only partly generated: `tools/stepb_verify.py` prints 9.1 and 9.2;
+9.3 is typed — the handoff's précis said otherwise. **(e)** The sweep's first run missed line 142, caught by the
+residue scan after it; the whole chain was re-run from git rather than patched, so one reversal proves it all.
+**(f)** The plan's `serves` row now says its records keep the old words whatever their date; the history file's
+title and two front-matter sentences corrected for the second document it now holds. **(g)** `/code-review` at
+high: five findings, all fixed — the census's 9.3 row span scoped to 9.3, check 1e reading a capitalised "Step N",
+`stepb_audit3` reading its expected row count from the plan's claim, the number words generated, the self-test
+aimed at the brief by its marker; `claudemd_claims` keeps its two literals, which are the claims' own text.
+**(h)** No register row filed for check 2's vacuity in (b2), as #142 and #150 filed none for theirs; his answer (7).
+**(i)** #152 merged as `87e0cd4` under the standing rule — VERIFY 15 of 15, TEST 5 of 5 (the full runner OVERALL:
+PASS and both standalone integrity suites on both trees), the review's five findings fixed and shown — its tree
+identical to the verified commit's. **(j)** Step 13's plan is written into section 3.4 after the verdict record,
+in the new words, inside the span the census declares a record.
+
+**OPEN, NONE BLOCKING.** The plan's line 160 says the charter's §6 owns the phase order — §3 does — left, not being
+vocabulary; the charter's section 1.3 says text dated before 2026-10-13 keeps its words, where the plan's records
+keep theirs whatever their date — left, the charter being at its cap; rename (c), the register, and (d), the rest,
+come after step 13, at Wouter's word below.
+
+**The 2026-10-16 (2) handoff, as it stood at `87e0cd4`, word for word:**
+
+> ### HANDOFF — 2026-10-16 (2), THE TEST RUNNER GREEN, A CUT-SHORT SIBLING CAUGHT
+>
+> **PURPOSE: MET.** It was *so that the session-close test run is green with no declared red*: #149 gave six tools an
+> entry point and `verify_charter.py` a reasoned exemption, each measured in a disposable clone first; the full runner
+> reads `OVERALL: PASS`, no row tolerated, and the house's `auto_mode_guard.py` v4 closed the fresh-clone gap it found.
+>
+> **BUILT:** #149; then #150, amendment 3 — in the five sibling imports a cut-short sibling exits as FILE INTEGRITY and
+> a missing one keeps its designed fallback, route 5 (none designed) exiting too; its suite red first, 11 of 51 per
+> tree, 59 checks since its review. Wouter's five answers and the judgements: `DECISIONS-LOG.md`, 2026-10-16 (2).
+>
+> **SINGLE NEXT ACTION: RENAME (b2), THE BUILD PLAN** — from `temp/s1013b_rename_b_plan.md`, its status cell treated as
+> section 3.1's was; then step 13's plan from `temp/s1013b_branch13_explore.md` and Wouter's four step-13 choices.
+>
+> **WHAT A NEW SESSION WOULD GET WRONG:** `validate_apply.py`'s delivered check exits 3 for its own VOID, the integrity
+> code, so judge a broken install by its banner; `tests/run_tests.py` runs neither standalone integrity suite
+> (`tests/test_language_module_integrity.py`, `tests/test_sibling_import_integrity.py`): only a verify list does.
+>
+> **Open, none blocking:** 2026-10-14's carried items, word for word in `DECISIONS-LOG.md`, 2026-10-16; the reduction's
+> fresh-clone verdict; `install_hooks.py --check` exits 1 here every run. **Context: 49% when written, measured.**

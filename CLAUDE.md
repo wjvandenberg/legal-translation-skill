@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–11 CLOSED · 12 CLOSED but H1's half, step 13's · 13 EXPLORED, Wouter's four choices made 2026-10-16 (2), its plan next · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–11 CLOSED · 12 CLOSED but H1's half, step 13's · 13 PLANNED and approved 2026-10-19, section 3.4 of the build plan, 13.1 next · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,22 +578,22 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-16 (2), THE TEST RUNNER GREEN, A CUT-SHORT SIBLING CAUGHT
+### HANDOFF — 2026-10-19, RENAME (b2) MERGED, STEP 13'S PLAN WRITTEN
 
-**PURPOSE: MET.** It was *so that the session-close test run is green with no declared red*: #149 gave six tools an
-entry point and `verify_charter.py` a reasoned exemption, each measured in a disposable clone first; the full runner
-reads `OVERALL: PASS`, no row tolerated, and the house's `auto_mode_guard.py` v4 closed the fresh-clone gap it found.
+**PURPOSE: MET.** It was *so that the build plan speaks the charter's words, no row of it read as a step of the skill,
+and step 13 is built from a plan Wouter has seen*: #152 swept the plan's living text, 145 swaps proved by reversal,
+the census 0 on both documents; step 13's plan is section 3.4 of `PLAN-2-step-b.md`, approved by Wouter at the close.
 
-**BUILT:** #149; then #150, amendment 3 — in the five sibling imports a cut-short sibling exits as FILE INTEGRITY and
-a missing one keeps its designed fallback, route 5 (none designed) exiting too; its suite red first, 11 of 51 per
-tree, 59 checks since its review. Wouter's five answers and the judgements: `DECISIONS-LOG.md`, 2026-10-16 (2).
+**BUILT:** #152 — the status cell's history moved word for word to `evidence/EVIDENCE-phase2-history.md`, D1–D3
+renumbered steps 20–22, `stepb_audit`'s step-table check found passing on nothing and repaired, 15 metacheck probes;
+then this close. Wouter's answers and the judgements taken alone: `DECISIONS-LOG.md`, 2026-10-19.
 
-**SINGLE NEXT ACTION: RENAME (b2), THE BUILD PLAN** — from `temp/s1013b_rename_b_plan.md`, its status cell treated as
-section 3.1's was; then step 13's plan from `temp/s1013b_branch13_explore.md` and Wouter's four step-13 choices.
+**SINGLE NEXT ACTION: SUB-STEP 13.1, THE PLAN APPROVED** *(Wouter)* — the short-document gear measured from the
+forensic logs, counts only, nothing built; then 13.2 if there is room, each sub-step its own pull request.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** `validate_apply.py`'s delivered check exits 3 for its own VOID, the integrity
-code, so judge a broken install by its banner; `tests/run_tests.py` runs neither standalone integrity suite
-(`tests/test_language_module_integrity.py`, `tests/test_sibling_import_integrity.py`): only a verify list does.
+**WHAT A NEW SESSION WOULD GET WRONG:** the plan's records keep the old words whatever their date — each option's
+build record after its brief, 9.3's rows, Parts Two and Four — exactly the spans `tools/vocabulary_census.py`
+declares; section 9.3 is typed, only 9.1 and 9.2 are printed by `tools/stepb_verify.py`.
 
-**Open, none blocking:** 2026-10-14's carried items, word for word in `DECISIONS-LOG.md`, 2026-10-16; the reduction's
-fresh-clone verdict; `install_hooks.py --check` exits 1 here every run. **Context: 49% when written, measured.**
+**Open, none blocking:** the plan's line 160 naming the charter's section 6 for the phase order; no register row for
+check 2's vacuity until rename (c) files it; (c) and (d) after step 13 (Wouter). **Context: 59% when written, measured.**
