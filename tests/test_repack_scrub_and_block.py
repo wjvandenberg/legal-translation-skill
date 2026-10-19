@@ -497,8 +497,14 @@ print("\n" + "-" * 96 + "\nARM 5 — the two trees\n" + "-" * 96)
 if args.scripts:
     void("ARM 5", "run against another scripts directory; the trees are the working tree's")
 else:
-    ok("5: repack_docx.py is byte-identical in uk/ and us/",
-       (ROOT / "uk" / "scripts" / "repack_docx.py").read_bytes()
+    # SUB-STEP 13.2 (2026-10-19 (2)) GAVE repack ONE DIFFERENCE OF THE VARIANTS' OWN: its command line defaults
+    # --variant to the tree's variant (the document language it sets). Asserted as exactly that one line, as the
+    # markers' spelling below is, so any other difference still fails.
+    uk_r = (ROOT / "uk" / "scripts" / "repack_docx.py").read_bytes()
+    _uk_default = b"choices=sorted(VARIANT_LANGUAGE), default='uk',"
+    ok("5: repack_docx.py differs between the trees ONLY by 13.2's --variant default",
+       uk_r.count(_uk_default) == 1
+       and uk_r.replace(_uk_default, _uk_default.replace(b"'uk'", b"'us'"))
        == (ROOT / "us" / "scripts" / "repack_docx.py").read_bytes())
     # ONE DIFFERENCE PREDATES THIS SLICE AND IS THE VARIANTS' OWN: a docstring's "minimise" /
     # "minimize". Asserted as exactly that, so any other difference — this slice's included — fails.

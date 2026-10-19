@@ -98,6 +98,14 @@ document's findings are read from the REFUSAL -- one line per blocking class, ch
 so PIN_B and PIN_C keep their per-document coverage, compared by count; the flattened-comment pin, never blocking,
 cannot travel in a refusal and is said to be NOT ASSERTED there. --skip-step8 with --declare-glossary-kept is refused.
 
+STEP 13, SUB-STEP 13.2 (2026-10-19 (2), register R1) CHANGES WHAT --ref ASSERTS ONCE MORE: repack now sets the w:val
+of every w:lang in styles.xml and of w:themeFontLang in settings.xml to the variant's tag, so against a pin at or
+before START_13_2 those two members MUST move -- by those values and nothing else (`lang_restored`: each put back to
+the pin's gives the pin's bytes) -- exactly where the pin's delivery carried a value not the variant's, and every
+value delivered must read the variant's; a pin carrying it moves nothing there. Whether it does is settled by
+ancestry and by the pin's own repack, a disagreement VOID; and against a pin that predates it, a run where no
+delivery's language moved FAILS rather than passing an IFF over nothing.
+
 WHAT IT NEVER PRINTS: a filename, a path below the logs root, or any document text. Doc-ids,
 paragraph indices, classes and lengths only (CLAUDE.md 5.6). Nothing is written into the logs
 folder: every input is copied into a temporary directory first.
@@ -111,6 +119,7 @@ folder: every input is copied into a temporary directory first.
     uv run --with lxml python tools/delivered_corpus_arm.py --sides --arm b --skip-step8 --doc D02
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref be50e12 --declare-glossary-kept \
         --declare-language                                                                  # slice 12a
+    uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref c4639fa --declare-glossary-kept   # 13.2
 """
 import argparse
 import io
@@ -451,6 +460,7 @@ print(f"  frozen workdirs enumerated: {len(workdirs)} · corpus folder(s) reacha
       + (f" · limited to {' '.join(args.doc)}" if args.doc else ""))
 
 REFTREE, BYTES, BLOCK_NOTE = None, {}, {}
+BYTES_LANG = {}   # 13.2: per workdir, which of the two language members OUR build delivered (read, or NOT READ)
 # WHICH GATE STOPPED REPACK, by the fixed text of its own refusal -- a label is printed, never
 # repack's output, which can quote the document.
 REPACK_GATES = (("lexicon", "lexicon_compliance.py --stage pre-repack returned exit code"),
@@ -499,6 +509,42 @@ WIRING_STOP = {"uk": {"D03B"}, "us": {"D03B"}}
 # (temp/s1008b_flag_b_*.txt): the glossary is declared kept on D03B alone, both variants, and D03B then delivers with
 # no side finding.
 GLOSSARY_KEPT = {"D03B"}
+# STEP 13, SUB-STEP 13.2 (register R1, 2026-10-19 (2)): repack sets the w:val of every w:lang in styles.xml and of
+# w:themeFontLang in settings.xml to the variant's tag before its one write, and nothing else. A pin at or before
+# START_13_2 lacks it, so under --ref those two members MUST move -- by those values and nothing else -- exactly where
+# the pin's delivery carried a value that is not the variant's (measured beforehand, temp/s1019b_lang_census.py: on
+# every one of the 13, both variants); a pin that carries it moves nothing. Settled by ancestry AND by the pin's repack.
+START_13_2 = "c4639fa"
+MARK_13_2 = b"def _set_document_language("
+LANG_TAG = {"uk": b"en-GB", "us": b"en-US"}
+LANG_PARTS = {"docx:word/styles.xml": rb"<w:lang(?=[\s/>])[^>]*>",
+              "docx:word/settings.xml": rb"<w:themeFontLang(?=[\s/>])[^>]*>"}
+LANG_VAL = re.compile(rb"(\sw:val=)([\"'])([^\"']*)\2")
+
+
+def lang_values(b, k):
+    """The w:val of each language element of a styles/settings member, in order (None where it has none)."""
+    out = []
+    for e in re.finditer(LANG_PARTS[k], b):
+        v = LANG_VAL.search(e.group(0))
+        out.append(v.group(3) if v else None)
+    return out
+
+
+def lang_restored(new_b, ref_b, k):
+    """True when ours is the pin's with ONLY the language elements' w:val values changed: each put back, in order,
+    to the pin's value gives the pin's bytes exactly."""
+    pin = [LANG_VAL.search(e.group(0)) for e in re.finditer(LANG_PARTS[k], ref_b)]
+    if len(pin) != len(re.findall(LANG_PARTS[k], new_b)):
+        return False
+    it = iter(pin)
+
+    def one(e):
+        s = next(it)
+        if s is None:
+            return e.group(0)
+        return LANG_VAL.sub(lambda v: v.group(1) + v.group(2) + s.group(3) + v.group(2), e.group(0), count=1)
+    return re.sub(LANG_PARTS[k], one, new_b) == ref_b
 # A delivery the wired check refuses writes no .docx, so --sides reads that document's findings from the REFUSAL --
 # one line per blocking class, "  <class>/<shape>: <n>" -- checked against the total the refusal states, so a line the
 # reader missed is a failure and never a smaller count. Class names and counts only; no other line is kept.
@@ -638,6 +684,20 @@ if REFTREE is not None:
         PRE_WIRING = w_ancestry
         print(f"  --ref {args.ref}: {'predates' if PRE_WIRING else 'carries'} the delivered gate "
               f"(by ancestry against {START_WIRING} and by its own repack, agreeing)")
+# SUB-STEP 13.2's SENSE OF --ref, asked the same two ways: does the pin's repack set the document's language?
+PRE_13_2 = None
+if REFTREE is not None:
+    pin_rp = REFTREE / "repack_docx.py"
+    l_ancestry = is_ancestor(args.ref, START_13_2)
+    l_content = pin_rp.is_file() and MARK_13_2 not in pin_rp.read_bytes()
+    if l_ancestry != l_content:
+        void("the byte comparison", f"{args.ref} is {'at or before' if l_ancestry else 'after'} 13.2's start "
+             f"{START_13_2}, but its repack {'lacks' if l_content else 'carries'} the document-language setting")
+        REFTREE = None
+    else:
+        PRE_13_2 = l_ancestry
+        print(f"  --ref {args.ref}: {'predates' if PRE_13_2 else 'carries'} 13.2's document language "
+              f"(by ancestry against {START_13_2} and by its own repack, agreeing)")
 OURS_WIRED = GATE_WIRING in (SCRIPTS / "repack_docx.py").read_bytes()
 GLOSSARY_DECLARED, WIRED_REFUSED = {}, set()
 
@@ -783,9 +843,11 @@ def outputs(d):
 def compare(new, ref):
     """Slice 2b's sense and slice 4a's: each output identical; or a .docx member that is the PINNED
     bytes with every U+200B removed and none left; or an XML member that is the pin's with wrappers
-    the guard kept restored (`restored`). Returns (U+200B-moved members, U+200B removed, {XML member:
-    wrappers restored}, other movement, the members whose pin carried a U+200B)."""
-    moved, removed, wmoved, other = [], 0, {}, []
+    the guard kept restored (`restored`); or (13.2) a styles.xml or settings.xml member that is the pin's with
+    only its language values changed (`lang_restored`). Returns (U+200B-moved members, U+200B removed, {XML
+    member: wrappers restored}, other movement, the members whose pin carried a U+200B, the language-moved
+    members, the members whose pin carried a language value not the variant's, ours still carrying one)."""
+    moved, removed, wmoved, other, lmoved = [], 0, {}, [], []
     for k in sorted(set(new) | set(ref)):
         a, b = new.get(k), ref.get(k)
         if a == b:
@@ -795,12 +857,19 @@ def compare(new, ref):
             removed += zcount(b)
         elif k in XML_MEMBERS and a is not None and b is not None and restored(a, b):
             wmoved[k] = restored(a, b)
+        elif k in LANG_PARTS and a is not None and b is not None and lang_restored(a, b, k):
+            lmoved.append(k[5:])
         else:
             other.append(k)
     # WHICH members carried one, not only whether any did: a U+200B is three bytes, and three bytes
     # can occur in a binary member (an image, a font) by chance -- said, never folded into a bool.
     carried = sorted(k[5:] for k, v in ref.items() if k.startswith("docx:") and zcount(v))
-    return moved, removed, wmoved, other, carried
+    tag = LANG_TAG[args.variant]
+    lcarried = sorted(k[5:] for k in LANG_PARTS if ref.get(k) is not None
+                      and any(v is not None and v != tag for v in lang_values(ref[k], k)))
+    lstill = sorted(k[5:] for k in LANG_PARTS if new.get(k) is not None
+                    and any(v is not None and v != tag for v in lang_values(new[k], k)))
+    return moved, removed, wmoved, other, carried, lmoved, lcarried, lstill
 
 
 def txt_blocking(rep):
@@ -1711,6 +1780,7 @@ for n, wd in enumerate(workdirs, 1):
                 dn = {k: v for k, v in dn.items() if not k.startswith("docx")}
                 dr = {k: v for k, v in dr.items() if not k.startswith("docx")}
             BYTES[key] = (same_rc, compare(dn, dr), len(dn), rcs, rrcs)
+            BYTES_LANG[key] = {k for k in LANG_PARTS if k in dn}
             # SLICE 4a: the SAME check, today's, reads the pin's build too, so what a change to the
             # pipeline does to the findings is measured, never inferred from the bytes.
             rtarget = rb / "delivered.docx" if (rb / "delivered.docx").is_file() else rb / "checked.xml"
@@ -1864,10 +1934,29 @@ if args.arm in ("b", "both"):
               f"NOTHING ELSE — the chain run with {args.ref}'s scripts and the working tree's:")
         moved_by_doc, wmoved_by_doc = defaultdict(int), defaultdict(list)
         scrubbed = is_ancestor(SCRUB_2B, args.ref)
-        for key, (same_rc, (moved, removed, wmoved, other, carried), nparts, rcs, rrcs) in BYTES.items():
+        lang_moved_keys = []
+        for key, (same_rc, (moved, removed, wmoved, other, carried, lmoved, lcarried, lstill), nparts, rcs,
+                  rrcs) in BYTES.items():
             ok(f"{key}: every exit code equal {rcs}", same_rc, f"now {rcs}, at the ref {rrcs}")
-            ok(f"{key}: of {nparts} output(s), nothing moved but U+200B removals and wrappers the guard kept",
-               not other, f"other movement in {other}")
+            ok(f"{key}: of {nparts} output(s), nothing moved but U+200B removals, wrappers the guard kept and "
+               f"13.2's language values", not other, f"other movement in {other}")
+            # SUB-STEP 13.2: the language values move IFF the pin predates it AND delivered a value not the variant's
+            tag = LANG_TAG[args.variant].decode()
+            if not BYTES_LANG.get(key):
+                # REVIEW FIX: a document with no delivery read is SAID to be unread and never counted as a pass --
+                # slice 2b's rule for a stopped document. (Ours delivering nothing while the pin did is other
+                # movement, failed above.)
+                print(f"  --   {key}: no delivery read — 13.2's language checks NOT READ, never counted as a pass")
+            else:
+                if PRE_13_2:
+                    ok(f"{key}: the language values moved IFF the pin's delivery carried one not {tag} "
+                       f"(carried {lcarried or 'none'}; moved {lmoved or 'none'})", lmoved == lcarried)
+                else:
+                    ok(f"{key}: no language value moved — the pin carries 13.2's", not lmoved, f"moved {lmoved}")
+                ok(f"{key}: every language value in the delivered styles.xml and settings.xml reads {tag}",
+                   not lstill, f"still {lstill}")
+            if lmoved:
+                lang_moved_keys.append(key)
             if wmoved:
                 print(f"        wrapper(s) restored, per XML member: {wmoved}")
                 wmoved_by_doc[did_of(key)].append(wmoved)
@@ -1885,6 +1974,14 @@ if args.arm in ("b", "both"):
                    f"({carried or 'none'}; {len(moved)} member(s), {removed} U+200B removed"
                    + (f": {' '.join(moved)}" if moved else "") + ")", bool(moved) == bool(carried))
             moved_by_doc[did_of(key)] += bool(moved)
+        # 13.2's PREMISE, asserted rather than assumed: against a pin that predates it the language MUST have moved
+        # somewhere, or the IFF above was answered over nothing (every document stopped, or no delivery read).
+        delivered = [k for k, parts in BYTES_LANG.items() if parts]
+        print(f"  13.2 — the document language moved on {len(lang_moved_keys)} of {len(delivered)} delivered "
+              f"workdir(s) ({args.variant}; the pin {'predates' if PRE_13_2 else 'carries'} it)")
+        if PRE_13_2:
+            ok(f"13.2: the language moved on at least one delivery — the pin predates it", bool(lang_moved_keys),
+               f"{len(delivered)} delivered workdir(s), none moved")
         plan = {} if scrubbed else MOVE_2B[args.variant]
         want = {d: n for d, n in plan.items() if d in present}
         got = {d: n for d, n in moved_by_doc.items() if n}
