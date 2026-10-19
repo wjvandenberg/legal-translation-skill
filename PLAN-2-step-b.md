@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is next, in §3.4. Step 14's remainder and steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-19 — SESSION PURPOSE — what · how · purpose:** rename (b2), this build plan, then step 13's plan — the survey re-run first; this file's living sections swept into the house's words in the order the rename plan fixes, by a sweep tool that declares each section's living or record split with its reason, proved by the inverse; `tools/vocabulary_census.py` taking this file into its swept set, red first on a planted word; the status cell cut to a short current status, its history moved word for word to `evidence/EVIDENCE-phase2-history.md`; the seven tools keyed on the wording compared by content against a baseline taken first; on a git branch, VERIFY and TEST through the cycle gate, a pull request merged once `/code-review` is green; then step 13's section-3 plan from its explore and Wouter's four answers, shown to him before any code · **so that the build plan speaks the charter's words, no row of it read as a step of the skill, and step 13 is built from a plan Wouter has seen** *(written immediately after the tag `rollback-2026-10-19-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is next. Step 14's remainder and steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-19 — SESSION PURPOSE — what · how · purpose:** rename (b2), this build plan, then step 13's plan — the survey re-run first; this file's living sections swept into the house's words in the order the rename plan fixes, by a sweep tool that declares each section's living or record split with its reason, proved by the inverse; `tools/vocabulary_census.py` taking this file into its swept set, red first on a planted word; the status cell cut to a short current status, its history moved word for word to `evidence/EVIDENCE-phase2-history.md`; the seven tools keyed on the wording compared by content against a baseline taken first; on a git branch, VERIFY and TEST through the cycle gate, a pull request merged once `/code-review` is green; then step 13's section-3 plan from its explore and Wouter's four answers, shown to him before any code · **so that the build plan speaks the charter's words, no row of it read as a step of the skill, and step 13 is built from a plan Wouter has seen** *(written immediately after the tag `rollback-2026-10-19-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -1036,6 +1036,60 @@ decide what each rule says.
 
 **What this verdict moved elsewhere.** Option 2's slice 2 is unblocked **in principle** and now gated on the
 specification review rather than on the decision. Recorded against Option 2 as well.
+
+> **STEP 13's WRITTEN PLAN, 2026-10-19 — DECLARED MODES, FOUR SUB-STEPS, EVERY CHOICE WOUTER'S OF 2026-10-16 (2),
+> AND THE PLAN ITSELF APPROVED BY HIM ON 2026-10-19** *(the explore `temp/s1013b_branch13_explore.md`; rows H1's remaining half, H3, L5,
+> R1 and the runtime problem — §9.3's row 13)*. **Each sub-step is its own pull request, both trees, red first, no
+> new file in either tree** — each stands at 198 of the 199 that section 6.3 of `CLAUDE.md` allows, the last slot
+> step 22's.
+>
+> **13.1 THE SHORT-DOCUMENT GEAR — MEASURED, NOTHING BUILT** *(Wouter: measure first)*. A counts-only reader over
+> the forensic logs, in `temp/` and never committed, printing per run and per skill step the minutes and the model
+> share — step ids and numbers, no document text and no file name — for the short runs (24, 43 and 45 paragraphs)
+> beside the 613-paragraph one. **Done when:** the table is in hand and **the gear's design goes back to Wouter as
+> its own decision**, with what the fixed minutes are spent on. **Must not:** design a gear on the guess that a
+> shorter document needs fewer steps, or touch any of the three levers section 2.2 of `CLAUDE.md` forbids — fewer
+> lexicons, a bigger batch, a thinner gate.
+>
+> **13.2 R1 — THE TWO LANGUAGE VALUES SET TO THE DELIVERED VARIANT.** `repack_docx.py`, before its one write:
+> every `w:lang` `w:val` in `styles.xml` and `w:themeFontLang` `w:val` in `settings.xml` set to `en-GB` (uk) or
+> `en-US` (us); **`w:eastAsia` and `w:bidi` left as they are** — they choose fonts for East Asian and right-to-left
+> text, which is layout; **`w:author` and `people.xml` left alone**, being people's names and not language
+> *(Wouter)*. Measured first, counts only, on the 13 deliveries: how many `w:lang` elements each part holds and with
+> which attributes. **Done when:** on all 13, both variants, those values read the variant and **every other byte
+> of every part is identical** to the delivery before the change · a synthetic source in a non-English language
+> proves it red first · a rendered diff of one synthetic page shows the layout unmoved. **Must not:** touch a
+> `w:lang` inside a run (apply already strips those) or any part but the two.
+>
+> **13.3 L5 — THE ACCEPTED-INPUT ENVELOPE, DECLARED AND REFUSED AT ADMISSION** *(Wouter)*. The envelope written
+> once in `SKILL.md` and skill Step 1b, both trees; `extract_paragraphs.py` — the first script that reads the
+> original on every run — refuses before it extracts, each refusal saying what to do: **not a Word document**
+> (convert to `.docx` first) · **password-protected** (an encrypted package, not a zip: remove the password in Word
+> and save again) · **macro-enabled `.docm`** (save as `.docx`) · **image-only**, a body with drawings and no text
+> (OCR it to `.docx`, then run the skill — L5's first route) · **over the declared size**. **The size limit's
+> value is the one thing not yet measured:** the largest corpus document's bytes and paragraphs are read first and
+> the limit put to Wouter before it is built. **Done when:** one synthetic input per refusal, each RED against
+> today's script and refused with its message after, plus a clean synthetic input admitted — six inputs, five
+> refusals where the register's prescription names three · no delivered byte moves on the 13 corpus documents, both variants. **Must
+> not:** refuse anything the corpus holds, or add a gate the operator meets anywhere but at admission.
+>
+> **13.4 H1 AND H3 — A NAMED VARIANT-CONVERSION MODE** *(Wouter)*. Declaring `english` at skill Step 1c opens it,
+> recorded in `source_language.json` as the mode: **the translation steps are skipped** — skill Step 3's
+> per-language layer and skill Step 4's translating, the operator writing each paragraph's English as the source
+> converted to the delivered variant — and **the variant conventions and every gate from apply onward are kept**,
+> the language-dependent checks saying NOT APPLICABLE as they already do. **The frontmatter widened to name the
+> job** — "give me the US version of this English contract" — and with it `README.md` and both `SKILL.md` files in
+> the same pull request, a feature claim changing in three places or in none (section 2.1 of `CLAUDE.md`).
+> `verify_diligence.py` reads the mode and stops asking for what it skips. **Done when:** D07's frozen
+> intermediate, run through the mode, delivers the variant changes it delivered in July and moves no other byte ·
+> a synthetic English source does the same, red first · the four instruments of §4 on the instruction change,
+> and Wouter's review at input point 2, on phase 3's documents. **Must not:** infer the mode from the text, ever —
+> declared by the operator, never guessed; skip or soften a gate; or reach for it on a source that is not English.
+>
+> **THE ORDER, AND WHY.** 13.1 first: it reads only and decides nothing. Then 13.2, one script and the one sub-step
+> that moves delivered bytes; 13.3, one script and documents; 13.4 last, the largest and the only one that changes
+> what the operator is told. **WHAT CLOSES:** R1 at 13.2, L5 at 13.3, H1 and H3 at 13.4; the runtime problem
+> stays open until Wouter has the 13.1 table and decides the gear.
 
 ### 3.5 Fix the claim, not only the code — option 9 · **GO, plus six new register rows** · *step 3, then folded in as steps land, then step 21*
 
