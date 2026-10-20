@@ -1,6 +1,9 @@
 """Extract paragraphs from a .docx file with formatting metadata for translation.
 
-Accepts either a .docx file (reads word/document.xml from the ZIP) or a raw document.xml path.
+Accepts either a .docx file (reads word/document.xml from the ZIP) or a raw document.xml path
+(a path ending .xml).
+Refuses at admission, before a paragraph is read and with exit 2, anything outside the accepted
+input - see THE ACCEPTED-INPUT ENVELOPE below, and skill Step 1b.
 
 Instead of extracting individual w:t elements (which fragment sentences and lose context),
 this script extracts full paragraphs with metadata about which character ranges are bold,
@@ -152,15 +155,152 @@ _CONTAINER_KNOWN = (_CONTAINER_RECURSE + _CONTAINER_DECLINED + _CONTAINER_TC
                     + _PARA_CHILD_INERT)
 
 
+# ──────────────────────────────────────────────────────────────────────
+# THE ACCEPTED-INPUT ENVELOPE — register L5, step 13 sub-step 13.3.
+#
+# This is the first script that reads the original on every run, so it is where a document the
+# skill cannot translate is turned away: BEFORE a paragraph is extracted, saying what to do
+# instead. Until 13.3 each of these got further than this, or died on a traceback, and the one
+# observed in production - a scan - went through with nothing to extract, so every gate after
+# it passed on nothing:
+#   not a Word document     a legacy .doc, a PDF, a spreadsheet, a Strict Open XML .docx: convert it
+#   password-protected      an encrypted package is not a zip at all, so nothing in it is read
+#   macro-enabled           a .docm, or a package carrying a macro project: save it as .docx
+#   image-only              a body with drawings and no text: OCR it to .docx first
+#   over 1,000 paragraphs   every w:p in the body, counted as extraction counts them: split it
+# Skill Step 1b lists the same envelope for the operator. A raw document.xml - this script's
+# other input, which the tests use and a user never hands over - meets the two body checks only.
+# The checks RAISE, so a caller sees the refusal; the command line prints it and exits 2.
+# ──────────────────────────────────────────────────────────────────────
+MAX_BODY_PARAGRAPHS = 1000  # Wouter, 2026-10-19 (2): paragraphs, not bytes
+_CFB_MAGIC = bytes.fromhex('d0cf11e0a1b11ae1')  # an OLE compound file: a legacy .doc, or an encrypted package
+_ENCRYPTED_STREAM = 'EncryptedPackage'.encode('utf-16-le')
+_ENCRYPTION_INFO = 'EncryptionInfo'.encode('utf-16-le')  # both names, so a .doc whose text holds one is not called encrypted
+_MACRO_MAIN = 'macroEnabled.main+xml'
+_TODO_CONVERT = ('a legacy .doc is converted to .docx first, as skill Step 1b says, its password removed in Word '
+                 'first if it asks for one; a PDF is converted to a .docx, by OCR if it is a scan; anything '
+                 'else, open it in Word and save it as a .docx; then run the skill on the .docx')
+
+
+class AdmissionRefused(Exception):
+    """The input is outside the accepted envelope. args: (what it is, why, what to do)."""
+
+
+def check_container(input_path):
+    """Refuse unless input_path is a .docx package or a raw document.xml; return the route,
+    'docx' or 'xml'. Decided on the BYTES, the extension only after them: a .docm renamed
+    .docx still declares its macros, and an encrypted package keeps its .docx name."""
+    ext = os.path.splitext(input_path)[1].lower()
+    with open(input_path, 'rb') as f:
+        head = f.read(8)
+        if head == _CFB_MAGIC:
+            data = head + f.read()
+            if _ENCRYPTED_STREAM in data and _ENCRYPTION_INFO in data:
+                raise AdmissionRefused(
+                    'password-protected',
+                    'it is encrypted - a password-protected Word file is an encrypted package, '
+                    'not a zip, so nothing in it can be read',
+                    'open it in Word with its password, remove the password, save it again as a '
+                    '.docx, and run the skill on that file')
+            raise AdmissionRefused(
+                'not a Word document',
+                'it is a legacy binary Office file - a .doc, or another Office format - not a .docx',
+                _TODO_CONVERT)
+    if head[:2] == b'PK':
+        try:
+            with zipfile.ZipFile(input_path) as zf:
+                names = set(zf.namelist())
+                types = (zf.read('[Content_Types].xml').decode('utf-8', 'replace')
+                         if '[Content_Types].xml' in names else '')
+                if 'word/document.xml' in names:
+                    # read HERE, so a body zip cannot open - an encrypted member, a compression method
+                    # zipfile lacks - is refused at admission, never met as a traceback in extraction
+                    zf.read('word/document.xml')
+        except (zipfile.BadZipFile, zipfile.LargeZipFile, OSError, RuntimeError, NotImplementedError,
+                EOFError) as e:
+            raise AdmissionRefused('not a Word document',
+                                   f'it cannot be read as a .docx package ({e})', _TODO_CONVERT)
+        if 'word/document.xml' not in names:
+            raise AdmissionRefused('not a Word document',
+                                   'it is a zip package with no Word document in it - a spreadsheet, '
+                                   'a presentation, or another format', _TODO_CONVERT)
+        if _MACRO_MAIN in types or any(n.lower().endswith('vbaproject.bin') for n in names):
+            raise AdmissionRefused('macro-enabled',
+                                   'it is macro-enabled - a .docm, or a package carrying a macro '
+                                   'project - and the skill does not deliver macros',
+                                   'open it in Word and save it as a .docx, which leaves the macros '
+                                   'behind, and run the skill on that file')
+        if ext != '.docx':
+            raise AdmissionRefused('not a Word document',
+                                   f'it is a Word package saved as "{ext or "no extension"}", not as a '
+                                   '.docx', 'open it in Word and save it as a .docx, and run the skill '
+                                   'on that file')
+        return 'docx'
+    if ext == '.xml':
+        return 'xml'
+    raise AdmissionRefused('not a Word document',
+                           'it is not a Word package at all - a PDF, an image, a text file or another '
+                           'format', _TODO_CONVERT)
+
+
+def check_body(root):
+    """Refuse a body this script cannot read, an image-only body, then a body over
+    MAX_BODY_PARAGRAPHS - before extraction."""
+    ns = etree.QName(root).namespace
+    if ns != W:
+        raise AdmissionRefused('not a Word document',
+                               f'its body is written in a namespace this skill does not read ({ns}) - a '
+                               '.docx saved as Strict Open XML, most likely',
+                               'open it in Word and save it as an ordinary .docx, not Strict Open XML, '
+                               'and run the skill on that file')
+    has_text = any((t.text or '').strip() for t in root.iter(f'{{{W}}}t'))
+    has_picture = any(True for _ in root.iter(f'{{{W}}}drawing', f'{{{W}}}pict'))
+    if has_picture and not has_text:
+        raise AdmissionRefused('image-only',
+                               'its body holds pictures and no text - a scan, most likely - so there is '
+                               'nothing to extract, and every check after this one would pass on nothing',
+                               'run OCR to produce a .docx with real text, then run the skill on that file')
+    n = sum(1 for _ in root.iter(f'{{{W}}}p'))
+    if n > MAX_BODY_PARAGRAPHS:
+        raise AdmissionRefused('over the size limit',
+                               f'its body holds {n:,} paragraphs - every paragraph mark, empty ones and '
+                               f'those in text boxes included - over the limit of {MAX_BODY_PARAGRAPHS:,}',
+                               f'split it into documents of at most {MAX_BODY_PARAGRAPHS:,} paragraphs '
+                               'each - at a schedule or annex boundary where there is one - and run the '
+                               'skill on each')
+
+
+def refuse_and_exit(refused, output_json=None):
+    """The command line's form of a refusal: what, why and what to do, on stderr, exit 2. A
+    paragraphs.json already at output_json is an EARLIER run's, and the refusal says so."""
+    what, why, todo = refused.args
+    bar = '=' * 60
+    print(f'{bar}', file=sys.stderr)
+    print('[extract_paragraphs] SKILL GATE FIRED — REFUSED AT ADMISSION.', file=sys.stderr)
+    print(f'  This document is outside what the skill accepts: {what}.', file=sys.stderr)
+    print(f'  Why: {why}.', file=sys.stderr)
+    print(f'  What to do: {todo}.', file=sys.stderr)
+    print('  Nothing was extracted and no paragraphs.json was written. The accepted input is', file=sys.stderr)
+    print('  listed in skill Step 1b (skill-docs/01-setup-and-extract.md).', file=sys.stderr)
+    if output_json and os.path.exists(output_json):
+        print(f'  A paragraphs.json from an earlier run is still at {output_json}', file=sys.stderr)
+        print("  and it is NOT this document's: do not go on from it.", file=sys.stderr)
+    print(f'{bar}', file=sys.stderr)
+    sys.exit(2)
+
+
 def extract_paragraphs(input_path, output_json):
-    # Accept either .docx (ZIP) or raw .xml path
-    if input_path.lower().endswith('.docx'):
+    # THE ENVELOPE FIRST (register L5): the container before it is opened, the body before a
+    # paragraph is read. Either raises AdmissionRefused, and nothing below runs on a refused input.
+    route = check_container(input_path)
+    if route == 'docx':
         with zipfile.ZipFile(input_path) as zf:
             xml_bytes = zf.read('word/document.xml')
         root = etree.fromstring(xml_bytes)
     else:
         tree = etree.parse(input_path)
         root = tree.getroot()
+    check_body(root)
 
     paragraphs = []
 
@@ -910,8 +1050,11 @@ if __name__ == '__main__':
     if len(sys.argv) != 3:
         print("Usage: extract_paragraphs.py <input.docx|document.xml> <output.json>")
         print()
-        print("Accepts either a .docx file (reads from ZIP) or a raw document.xml path.")
+        print("Accepts either a .docx file (reads from ZIP) or a raw document.xml path (.xml).")
         sys.exit(1)
-    extract_paragraphs(sys.argv[1], sys.argv[2])
+    try:
+        extract_paragraphs(sys.argv[1], sys.argv[2])
+    except AdmissionRefused as refused:
+        refuse_and_exit(refused, sys.argv[2])
 
 # === SKILL FILE COMPLETE ===

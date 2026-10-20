@@ -8,6 +8,11 @@ negotiate and in principle sign — with the numbering, styles, tables, headers,
 footnotes, comments and tracked changes still intact, and the definitions re-sorted into
 English alphabetical order.
 
+It takes a Word `.docx` of up to 1,000 paragraphs — a legacy `.doc` once converted — and turns
+anything else away before it starts, saying what to do: a PDF (convert it to `.docx`, by OCR if
+it is a scan), a password-protected or macro-enabled file (save it as a plain `.docx`), or a
+longer document (split it).
+
 Two variants are published: **UK English** (the default) and **US English**.
 
 ---

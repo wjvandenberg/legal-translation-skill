@@ -217,11 +217,16 @@ try:
                            errors="replace", cwd=tmp, env=ENV)
         out = (r.stdout or "") + (r.stderr or "")
         tripped = r.returncode == 3 or "integrity" in out.lower() or "truncat" in out.lower()
-        syntax = "SyntaxError" in out
+        # PYTHON'S WHOLE COMPILE-ERROR FAMILY, BY NAME (register I-42): an IndentationError and a TabError ARE
+        # SyntaxErrors - the file is refused and nothing runs - but their message never contains the word, so
+        # matching it alone printed "NEITHER - it ran" over a copy Python had refused (2026-10-20, a 50% cut
+        # landing in an elif block once 13.3 moved the file's midpoint).
+        refused_as = next((e for e in ("SyntaxError", "IndentationError", "TabError") if e in out), None)
+        syntax = refused_as is not None
         if tripped:
             how = "the GUARD trips — exit 3, with a diagnosis"
         elif syntax:
-            how = "PYTHON refuses to compile it — exit 1, SyntaxError, no diagnosis"
+            how = f"PYTHON refuses to compile it — exit 1, {refused_as}, no diagnosis"
         else:
             how = "NEITHER — it ran"
         print(f"  truncated to {pct:>2}%  exit {r.returncode:<4} {how}")

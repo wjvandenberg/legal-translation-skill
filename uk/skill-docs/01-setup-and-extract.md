@@ -22,6 +22,24 @@ Post the warning **once per session**, not once per document. After posting, pro
 
 #### Step 1b — Set up workdir and convert source
 
+**THE ACCEPTED INPUT — declared here, once, and refused at admission.** The skill translates a Word
+`.docx` whose body holds **at most 1,000 paragraphs**; a legacy `.doc` is accepted once converted below.
+`extract_paragraphs.py` — Step 2, the first script that reads the original on every run — refuses
+anything else **before it reads a single paragraph**, exits 2, and says what to do:
+
+| refused at admission | what to do |
+|---|---|
+| **not a Word document** — a PDF, an image, a spreadsheet, a legacy `.doc` not yet converted, a Word file saved under another extension or as Strict Open XML | convert it to an ordinary `.docx` first: a legacy `.doc` as below, a PDF by converting it (by OCR if it is a scan), anything else by saving it as `.docx` in Word |
+| **password-protected** — an encrypted package, which nothing can read | open it in Word with its password, remove the password and save it again as `.docx` |
+| **macro-enabled** — a `.docm`, or any package carrying a macro project | save it as `.docx` in Word, which leaves the macros behind |
+| **image-only** — a body with pictures and no text, almost always a scan | OCR it to a `.docx` with real text first |
+| **over 1,000 paragraphs** — every paragraph mark counted, empty ones included | split it into documents of at most 1,000 paragraphs — at a schedule or annex boundary where there is one — and translate each |
+
+**A refusal is the gate doing its job: fix the input as it says and run the skill again.** Never work
+around it, and never build the English document outside the pipeline instead — a scanned deed once went
+through that way,
+and every gate after this one was bypassed.
+
 **If a script fails with `SyntaxError`, `NameError`, or prints a `FILE INTEGRITY CHECK FAILED — script truncated` banner, the install copy was truncated during marketplace transfer.** The packaged `.skill` / `.zip` archive is intact; only the local install was cut. Re-install the skill from the archive. The integrity check runs at every CLI invocation of apply / extract / validate scripts, so truncation is caught at the start of any step rather than failing mysteriously partway through. Do not work around an integrity-check failure by editing the script — re-install the archive instead.
 
 ```bash
