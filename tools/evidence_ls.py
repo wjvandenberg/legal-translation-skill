@@ -6,7 +6,7 @@ work out how it was laid out, and the output printed real corpus filenames carry
 counterparty and personal names straight into the conversation transcript. Nothing was
 committed and no scanner could ever have caught it: CLAUDE.md 6.4 says session metadata is
 reachable by neither the scanners nor the location rule, so there is no after-the-fact
-control at all. Prevention is the only control, and 6.5's rule -- "any glob over an evidence
+control at all. Prevention is the only control, and 6.4's rule -- "any glob over an evidence
 folder must be explicit about which files it expects" -- had been read that same morning and
 broken anyway. That is this project's standing argument that prose is not a control.
 

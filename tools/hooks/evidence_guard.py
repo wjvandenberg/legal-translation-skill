@@ -14,7 +14,7 @@ COMMITTED CONTENT -- leakage_scan, publication_check, descriptor_shape_sweep, th
 gate. This leak reached the TRANSCRIPT, and CLAUDE.md 6.4 states plainly that session
 metadata is reachable by neither the scanners nor the location rule. There is no
 after-the-fact control, so the control has to run BEFORE the command does. And the written
-rule already existed -- 6.5's "any glob over an evidence folder must be explicit about which
+rule already existed -- 6.4's "any glob over an evidence folder must be explicit about which
 files it expects" -- and was read the same morning and broken anyway. That is the project's
 own standing argument, from 5.1, that prose is not a control and only an artefact is.
 

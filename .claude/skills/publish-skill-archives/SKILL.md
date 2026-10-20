@@ -6,7 +6,7 @@ description: The release procedure for this repository - how the two variant tre
 # Publishing from the monorepo
 
 **This is a release procedure — it runs at one moment, not every session, which is why it is a skill
-rather than charter text.** `CLAUDE.md` 6.6 keeps the standing facts and points here.
+rather than charter text.** `CLAUDE.md` 6.4 keeps the standing facts and points here.
 
 > **READ THIS FIRST: NEITHER SCRIPT EXISTS YET.** `tools/package.py` and `tools/publish.py` are named
 > below and in the charter's 6.4, and **both are absent from `tools/` — checked by listing, 2026-08-24,

@@ -8,7 +8,7 @@ description: The seven-point audit method for any analysis deliverable in this p
 **Wouter's standing requirement:** *"triple check, do a deep audit and verify your summary. This summary
 is the basis of the changes, and I REALLY don't want it to contain errors or omissions."*
 
-`CLAUDE.md` 5.12 keeps the trigger and points here. **The gate applies wherever the deliverable is an
+`CLAUDE.md` 5.3 keeps the trigger and points here. **The gate applies wherever the deliverable is an
 analysis rather than code** — that condition is part of the charter's VERIFY stage and does not depend on
 this page being loaded.
 
