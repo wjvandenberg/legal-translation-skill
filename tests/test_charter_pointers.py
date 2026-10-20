@@ -29,8 +29,9 @@ and either read as text or counted as not text by extension - a denominator that
 WHAT IT CANNOT SEE: a pointer already wrong on the day its number was pinned - the pin records what a person checked,
 so the pins were set only after the hand check that mended I-43's eight and two more this test found (2026-10-20 (3)).
 
-RED FIRST: eight built cases run before the real tree, each rule seen to fail on one and a clean case seen to pass;
-and --charter reads another copy of the charter, so a renumbering can be simulated against the real pointers.
+RED FIRST: eleven built cases run before the real tree, each rule seen to fail on one and a clean case seen to pass;
+and on every run the renumbering arm swaps the titles of the two most-cited sections in a copy of the charter and
+requires every real pointer to either to fail as moved. --charter reads another copy of the charter instead.
 
     uv run --with lxml python tests/test_charter_pointers.py [--charter PATH]
 
@@ -52,10 +53,10 @@ ANCHORED = [
     re.compile(re.escape(_DOC) + r"`?\s*§?\s*(\d\.\d{1,2})(?![\d.]*\d)"),
     re.compile(re.escape(_DOC) + r"`?\s+section\s+§?(\d\.\d{1,2})(?![\d.]*\d)"),
     re.compile(r"section\s+§?(\d\.\d{1,2})\s+of\s+(?:the\s+)?`?" + re.escape(_DOC)),
-    re.compile(r"charter(?:'s)?\s+§?\s*(\d\.\d{1,2})(?![\d.]*\d)"),
+    re.compile(r"\bcharter(?:'s)?\s+§?\s*(\d\.\d{1,2})(?![\d.]*\d)"),
 ]
-ANCHOR_LINE = re.compile(re.escape(_DOC) + r"|charter")
-BARE = re.compile(r"(?<![\w.§v/-])(\d\.\d{1,2})(?![\d.]*\d)\b")
+ANCHOR_LINE = re.compile(re.escape(_DOC) + r"|\bcharter\b")   # a word: never inside verify_charter_continuity
+BARE = re.compile(r"(?<![\w./-])(?<!v)§?(\d\.\d{1,2})(?![\d.]*\d)\b")   # "§6.5" as much as "6.5"
 # a quotation opens after a space, colon, dash or bracket - never straight after the number, which is how the end of
 # one code string and the start of the next read as a quote on this test's first run (test_declared_language.py:250)
 QUOTE = re.compile(r"""^(?:[^"“\n]{0,12}?[\s:(—-])["“]([^"”\n]{20,})["”]""")
@@ -92,18 +93,23 @@ PINNED = {
 }
 FILE_EXEMPT = {
     "tests/test_charter_pointers.py": "this test: its docstring, built cases and exemption list carry stale and "
-                                      "non-section numbers ON PURPOSE, and its eight built cases are what check it",
+                                      "non-section numbers ON PURPOSE, and its eleven built cases are what check it",
     "tools/verify_charter.py": "a house copy that checks a charter AGAINST THE HOUSE TEMPLATE, so every section number "
                                "it carries is the template's, never this charter's",
 }
+HIST = "a historical map: where each pre-2026-09-09 subsection went, keyed by its OLD number on purpose"
+# Each exemption excuses ONE number: its text must contain it, and only a pointer inside that text is excused - a
+# real pointer elsewhere on the same line is still judged. An exemption that matches nothing fails: it is dead.
 LINE_EXEMPT = [
     ("tests/make_fixtures.py", "Clause 4.2", "fixture text: a clause number inside a synthetic document"),
     ("tests/test_checks_can_fail.py", 'xml version="1.0"', "an XML declaration's version, not a section"),
     ("tools/stepb_audit.py", "section 3.6 exists to CORRECT", "the build plan's section 3.6 (truncation), named in "
                                                               "the sentence before"),
     ("tools/vocabulary_census.py", "9.3's rows", "the build plan's section 9.3, the document this tool reads"),
-    ("tools/verify_charter_continuity.py", "demoted into", "a historical map: where each pre-2026-09-09 subsection "
-                                                           "went, keyed by its OLD number on purpose"),
+    ("tools/verify_charter_continuity.py", '"5.14": "demoted', HIST),
+    ("tools/verify_charter_continuity.py", '"5.15": "demoted', HIST),
+    ("tools/verify_charter_continuity.py", '"5.16": "demoted', HIST),
+    ("tools/verify_charter_continuity.py", '"6.6": "demoted', HIST),
     ("tools/verify_charter_continuity.py", '"3.4": ("Phase 4', "the same historical map, a pre-mapping number"),
     ("tools/verify_charter_continuity.py", "measured * 0.25", "a ratio, not a section"),
     ("tools/verify_md.py", "Round 0.5", "a house copy naming the charter interview's Round 0.5, not a section"),
@@ -126,7 +132,7 @@ def norm(s):
 def scan(charter, files, pinned, file_exempt, line_exempt):
     """(pointers, exempted, failures) over {path: text}. Pure: the built cases call it on synthetic input."""
     heads = headings(charter)
-    pointers, exempted, failures = [], [], []
+    pointers, exempted, failures, used = [], [], [], set()
     for path, reason in file_exempt.items():
         if not reason.strip():
             failures.append(f"{path}: a file exemption with no reason")
@@ -145,15 +151,17 @@ def scan(charter, files, pinned, file_exempt, line_exempt):
             for rx in ANCHORED:
                 for m in rx.finditer(line):
                     spans.append(m.span())
-                    found.append((m.group(1), "anchored", m.end()))
+                    found.append((m.group(1), "anchored", m.start(1), m.end()))
             if 0 <= n - last <= WINDOW:
                 for m in BARE.finditer(line):
                     if not any(a <= m.start(1) < b for a, b in spans):
-                        found.append((m.group(1), "bare", m.end()))
-            for num, kind, end in found:
-                ex = next((r for p, s, r in line_exempt if p == path and s in line), None)
+                        found.append((m.group(1), "bare", m.start(1), m.end()))
+            for num, kind, start, end in found:
+                ex = next(((i, r) for i, (p, s, r) in enumerate(line_exempt) if p == path and num in s
+                           and any(o <= start < o + len(s) for o in _occurrences(line, s))), None)
                 if ex is not None:
-                    exempted.append((path, n, num, ex))
+                    used.add(ex[0])
+                    exempted.append((path, n, num, ex[1]))
                     continue
                 pointers.append((path, n, num, kind))
                 where = f"{path}:{n} cites {num} ({kind})"
@@ -169,10 +177,23 @@ def scan(charter, files, pinned, file_exempt, line_exempt):
                 q = QUOTE.match(line[end:]) if kind == "anchored" else None
                 if q and norm(q.group(1)) not in section_text(charter, num):
                     failures.append(f"{where}: quotes words section {num} does not hold: {q.group(1)[:60]!r}")
+    for i, (path, sub, _r) in enumerate(line_exempt):
+        if i not in used:
+            failures.append(f"{path}: the exemption for {sub!r} matches no pointer - it is dead; delete it")
+    for path in file_exempt:
+        if path not in files:
+            failures.append(f"{path}: a file exemption for a file this run did not list - it is dead; delete it")
     return pointers, exempted, failures
 
 
-# ---- RED FIRST: eight built cases, each rule seen to fail on one, a clean case seen to pass --------------------------
+def _occurrences(line, sub):
+    i = line.find(sub)
+    while i >= 0:
+        yield i
+        i = line.find(sub, i + 1)
+
+
+# ---- RED FIRST: eleven built cases, each rule seen to fail on one, a clean case seen to pass --------------------------
 CH = "# x\n\n### 5.4 Foo bar\n\nThe rule is: keep the list outside the repo.\n\n### 6.4 Baz\n\nText.\n"
 PIN = {"5.4": "Foo bar", "6.4": "Baz"}
 CASES = [
@@ -186,9 +207,16 @@ CASES = [
     ("a BARE number after a charter line, naming a missing section", CH,
      {"a.py": f"# the gate, per {_DOC}\n# 5.12 prescribes a command"}, PIN, {}, [], 1),
     ("a cited number nobody pinned", CH, {"a.py": f"# {_DOC} 6.4 holds it"}, {"5.4": "Foo bar"}, {}, [], 1),
-    ("an exemption with no reason", CH, {"a.py": f"# {_DOC} 5.4 x"}, PIN, {}, [("a.py", "x", "  ")], 1),
+    ("an exemption with no reason", CH, {"a.py": f"# per {_DOC}\n# Clause 4.2 x"}, PIN, {},
+     [("a.py", "Clause 4.2", "  ")], 1),
     ("a declared exemption is honoured, and printed", CH, {"a.py": f"# per {_DOC}\n# Clause 4.2 of a fixture"}, PIN,
      {}, [("a.py", "Clause 4.2", "fixture text")], 0),
+    ("a dead exemption, matching no pointer", CH, {"a.py": f"# {_DOC} 5.4 x"}, PIN, {},
+     [("a.py", "Clause 4.2", "fixture text")], 1),
+    ("a stale pointer on a line with exempted text is still judged", CH,
+     {"a.py": f"# per {_DOC}\n# Clause 4.2 here, and 5.12 beside it"}, PIN, {}, [("a.py", "Clause 4.2", "fixture")], 1),
+    ("a bare pointer written with a section sign", CH, {"a.py": f"# per the charter\n# see §5.12 there"}, PIN, {}, [],
+     1),
 ]
 print("BUILT CASES (each must behave as stated before the real tree is read)")
 built_bad = 0
@@ -206,12 +234,14 @@ if _cli and not (_cli[:1] == ["--charter"] and len(_cli) == 2):
     sys.exit(2)
 listed = subprocess.run(["git", "-c", "core.quotePath=false", "ls-files", "--", *SCOPE], cwd=str(ROOT),
                         capture_output=True, text=True, encoding="utf-8", check=True).stdout.splitlines()
-files, not_text = {}, Counter()
+files, not_text, unreadable = {}, Counter(), []
 for rel in listed:
     try:
         files[rel] = (ROOT / rel).read_text(encoding="utf-8")
-    except (UnicodeDecodeError, OSError):
+    except UnicodeDecodeError:
         not_text[Path(rel).suffix or "(none)"] += 1
+    except OSError as exc:   # listed and not openable: said and failed, never folded into "not text"
+        unreadable.append(f"{rel}: listed by git but could not be opened ({type(exc).__name__})")
 print(f"\nREAL TREE: {len(listed)} tracked file(s) listed under {', '.join(SCOPE)}; {len(files)} read as text, "
       f"{sum(not_text.values())} not text ({dict(sorted(not_text.items()))}); {len(headings(charter))} numbered "
       f"heading(s) in the charter")
@@ -219,6 +249,23 @@ if not files or not headings(charter):
     print("VOID: nothing read, or the charter has no numbered heading - said rather than reported clean")
     sys.exit(2)
 pointers, exempted, failures = scan(charter, files, PINNED, FILE_EXEMPT, LINE_EXEMPT)
+failures = unreadable + failures
+# finding 3: THE RENUMBERING, ON THE REAL POINTERS, EVERY RUN - the two most-cited numbers have their titles swapped in
+# a copy of the charter, and every real pointer to either must then fail as moved, and nothing else.
+top = [n for n, _c in Counter(num for _p, _n, num, _k in pointers).most_common(2)]
+if len(top) == 2:
+    a, b = (f"\n### {t} " for t in top)
+    swapped = charter.replace(a, "\n### X.X ").replace(b, a).replace("\n### X.X ", b)
+    _sp, _se, sf = scan(swapped, files, PINNED, FILE_EXEMPT, LINE_EXEMPT)
+    want = sum(1 for _p, _n, num, _k in pointers if num in top)
+    moved = [f for f in sf if " is now " in f and any(f" cites {t} (" in f for t in top)]
+    good = len(moved) == want and len(sf) == len(failures) - len(unreadable) + want and want > 0
+    print(f"  RENUMBERING ARM: {top[0]} and {top[1]} swapped in a copy - {len(moved)} of {want} pointer(s) to them "
+          f"fail as moved, {len(sf) - len(moved)} other failure(s) {'(as on the real charter)' if good else ''}")
+    if not good:
+        failures.append("the renumbering arm: a swap of the two most-cited sections did not fail exactly their pointers")
+else:
+    failures.append("the renumbering arm could not run: fewer than two cited sections")
 kinds = Counter(k for *_x, k in pointers)
 print(f"  {len(pointers)} pointer(s) judged ({kinds['anchored']} anchored, {kinds['bare']} bare) in "
       f"{len({p for p, *_x in pointers})} file(s); {len(exempted)} exempted:")
