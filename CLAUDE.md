@@ -588,8 +588,8 @@ I-43; #164 sets the language in every part the delivery holds and closes R2.
 places mended. #164 — `repack_docx.py` both trees; its suite 25 of 89 red on main, 89 after; on the 13, uk 7 of 11
 delivered workdirs moved, us 6 of 9, nothing else. Rulings and judgements: `DECISIONS-LOG.md`, 2026-10-20 (3).
 
-**SINGLE NEXT ACTION: RENAME (c), THE REGISTER**, with check 2's vacuity filed as its row *(Wouter, 2026-10-19 (6)
-and (7), confirmed 2026-10-20 (3))*; then (d), the rest; then step 14's remainder.
+**SINGLE NEXT ACTION: RENAME (c), THE REGISTER**, with check 2's vacuity filed as its row *(Wouter: the 2026-10-19
+entry's rulings (6) and (7), confirmed 2026-10-20 (3))*; then (d), the rest; then step 14's remainder.
 
 **WHAT A NEW SESSION WOULD GET WRONG:** per pull request only its own acceptance check, the three confidentiality
 controls and the covering suites; the base list, the twelve-tool comparison and the ~40-minute full runner ONCE, at
