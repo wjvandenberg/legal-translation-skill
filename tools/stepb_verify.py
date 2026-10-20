@@ -219,9 +219,11 @@ GROUPS = {
  # re-grouped, these two should move together.
  # A23 ADDED 2026-09-28 (branch 11 slice 3a): a multi-paragraph comment arrives as one paragraph --
  # every character there, the breaks gone, so the page is wrong and nothing is lost.
+ # R2 ADDED 2026-10-20 (step 13): R1's residue, the language tags 13.2 left in the parts it did not touch --
+ # R1's page-level consequence, on the text those tags cover.
  "2 looks wrong on the page": """
    A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 A20 A21 A22 O1 D1 D2 D3 D4 D5 D6 B1 B7 F7 F13 F19
-   F22 C20 E9 E12 R1 A23
+   F22 C20 E9 E12 R1 A23 R2
    """,
  # G10 added 2026-08-12 (branch 5). THIS LIST IS THE SOURCE and §9.1's table is generated
  # from it — a hand-edit to the document alone leaves the two disagreeing, which is exactly
@@ -351,9 +353,10 @@ OPTIONS = {
  # mandatory map -- which is this option's subject even though option 6's principle is what
  # closed it. F46 is here ALONE: which layer of the lexicon wins when a sub-lexicon offers
  # what its reference lists under Avoid is a decision about authority, not about a script.
+ # R2 ADDED 2026-10-20 beside R1: built as step 13's sub-step 13.5, after 13.4 (Wouter, 2026-10-19 (2)).
  "5 one authority, one way out, more than one gear": """
    A15 C5 C7 C26 C29 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28
-   F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 D3 D5 F45 F46
+   F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 H1 H2 H3 K1 K2 K3 L5 R1 D3 D5 F45 F46 R2
    """,
  # B9 AND F45 ADDED 2026-09-23: the passes' and the numbering map's authority to override a
  # lexicon-sanctioned rendering is exactly what slice 3b took away.
