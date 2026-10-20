@@ -81,8 +81,20 @@ for label, cmd in MUST_BLOCK:
 
 check("and the refusal names the safe alternative",
       "tools/evidence_ls.py" in ask(MUST_BLOCK[0][1])[1])
-check("and cites the rule it is enforcing",
-      "6.5" in ask(MUST_BLOCK[0][1])[1])
+# The CITATION, and that it still lands on the rule. This asked for "6.5", the number before the charter's
+# sections moved; the hook cites 6.4, where the rule now is, and this check went red in silence, no runner
+# naming this suite (found 2026-10-20 (2)). So the section the hook cites must also HOLD the words it quotes -
+# the next renumbering fails here with a reason, not a stale number.
+_refusal = ask(MUST_BLOCK[0][1])[1]
+_charter = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+# BOTH headings or nothing: with 6.5 renamed, the slice would run to the end of the charter and find the words
+# wherever they had gone.
+_s64 = (_charter.split("\n### 6.4 ", 1)[1].split("\n### 6.5 ", 1)[0]
+        if "\n### 6.4 " in _charter and "\n### 6.5 " in _charter.split("\n### 6.4 ", 1)[1] else "")
+check("and cites the rule it is enforcing", "CLAUDE.md 6.4" in _refusal)
+check("...and the section it cites holds the words it quotes",
+      "any glob over an evidence folder must be explicit about which files it expects" in " ".join(_s64.split())
+      and "any glob over an evidence folder must be explicit about which files it expects" in " ".join(_refusal.split()))
 
 # --------------------------------------------------------------------------------------
 # 2. MUST ALLOW — a guard that blocks the work is a guard that gets removed.

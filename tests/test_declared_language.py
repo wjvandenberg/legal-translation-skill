@@ -452,8 +452,15 @@ ok("P6: nothing declared, an Italian remnant — still REFUSED: no gate softened
 # ARM T — the two trees and the words
 # =============================================================================================
 section("ARM T — both trees, and Step 1c")
-ok("T1: repack_docx.py is byte-identical in uk/ and us/",
-   (ROOT / "uk" / "scripts" / "repack_docx.py").read_bytes() == (ROOT / "us" / "scripts" / "repack_docx.py").read_bytes())
+# SUB-STEP 13.2 (2026-10-19 (2)) GAVE repack ONE DIFFERENCE OF THE VARIANTS' OWN, its command line's --variant
+# default; tests/test_repack_scrub_and_block.py's arm 5 was moved to it and this check was not, no runner naming
+# this suite (found 2026-10-20 (2)). Asserted the same way: exactly that one line, any other difference failing.
+_uk_repack = (ROOT / "uk" / "scripts" / "repack_docx.py").read_bytes()
+_uk_default = b"choices=sorted(VARIANT_LANGUAGE), default='uk',"
+ok("T1: repack_docx.py differs between uk/ and us/ ONLY by 13.2's --variant default",
+   _uk_repack.count(_uk_default) == 1
+   and _uk_repack.replace(_uk_default, _uk_default.replace(b"'uk'", b"'us'"))
+   == (ROOT / "us" / "scripts" / "repack_docx.py").read_bytes())
 for t in ("uk", "us"):
     doc = (ROOT / t / "skill-docs" / "01-setup-and-extract.md").read_text(encoding="utf-8")
     ok(f"T2: {t}'s Step 1 carries Step 1c and its --declare command",

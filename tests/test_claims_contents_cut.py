@@ -41,7 +41,11 @@ ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
 
 HEADING_16 = "### 1.6 Contents"
 HEADING_17 = "### 1.7 The size class, and the cap this charter is held to"
-POINTER_16 = "**CUT 2026-08-24 AND MUST NOT COME BACK**"
+# THE CHARTER'S OWN WORDS, and they changed under this test: 1.6 writes the pointer in lower case now, and the
+# capitals this needle carried made it refuse at its first line - unseen for as long as no runner named this
+# suite (found 2026-10-20 (2), when every suite was wired into the full runner). Check 14 keys on
+# "CUT 2026-08-24" alone, which the replacement in mutation 2 removes.
+POINTER_16 = "**CUT 2026-08-24 and must not come back**"
 
 TABLE = ("| § | section | what it covers |\n"
          "|---|---|---|\n"
