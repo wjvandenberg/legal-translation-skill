@@ -70,6 +70,8 @@
       {"name": "strip_noop_guard", "command": "uv run --with lxml python tests/test_strip_noop_guard.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "strip_noop_guard [us]", "command": "uv run --with lxml python tests/test_strip_noop_guard.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "toc_shapes", "command": "uv run --with lxml python tests/test_toc_shapes.py", "count": "^  (?:OK|XX)   "},
+      {"name": "variant_conversion", "command": "uv run --with lxml python tests/test_variant_conversion.py", "count": "VARIANT CONVERSION: ([0-9]+) check\\(s\\)"},
+      {"name": "variant_conversion [us]", "command": "uv run --with lxml python tests/test_variant_conversion.py --variant us", "count": "VARIANT CONVERSION: ([0-9]+) check\\(s\\)"},
       {"name": "whitespace_and_offsets", "command": "uv run --with lxml python tests/test_whitespace_and_offsets.py", "count": "^  (?:OK|XX)   "}
     ],
     "selftest_globs": ["tools/*.py"],

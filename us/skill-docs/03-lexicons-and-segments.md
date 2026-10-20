@@ -70,6 +70,10 @@ Rules for this step:
 If a document straddles multiple domains (e.g., an NDA prepared in the context of an M&A
 transaction, or a shareholder loan sitting alongside an SHA), read both relevant lexicons.
 
+**In the variant-conversion mode (Step 1c), skip the layer below:** there is no English
+sub-lexicon. The English references above are still read in full — they carry the conventions of
+the variant the conversion delivers.
+
 **Then read the language-specific sub-lexicons:**
 
 Sub-lexicons are bundled **inside the skill folder** at `<skill-path>/sub-lexicons/` and cover
@@ -219,6 +223,7 @@ Before moving to the next step, confirm:
 
 - [ ] You read all relevant English reference lexicons in full **in this document's session** (do not rely on lexicon reads from a previous document)
 - [ ] You read every applicable per-language sub-lexicon in full **in this document's session** (sub-lexicon Avoid-column entries that fit Document N-1 may not fit Document N — re-Read or you will drift)
+- [ ] In the variant-conversion mode (Step 1c) none applies: you read no sub-lexicon, and every English reference above in full
 - [ ] For TC documents, you scaffolded `en_segments` (Step 3b) before translating
 - [ ] You did NOT skim the lexicons or summarize — you read them end-to-end
 

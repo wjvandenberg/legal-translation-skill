@@ -8,6 +8,10 @@ negotiate and in principle sign — with the numbering, styles, tables, headers,
 footnotes, comments and tracked changes still intact, and the definitions re-sorted into
 English alphabetical order.
 
+Hand it a legal document already in English and it delivers the same document in UK or US
+English — *give me the US version of this English contract* — converting instead of translating,
+every gate still run.
+
 It takes a Word `.docx` of up to 1,000 paragraphs — a legacy `.doc` once converted — and turns
 anything else away before it starts, saying what to do: a PDF (convert it to `.docx`, by OCR if
 it is a scan), a password-protected or macro-enabled file (save it as a plain `.docx`), or a
@@ -68,7 +72,8 @@ between 18 and 50 across the runs measured, scaling with paragraph count.
 - **Tracked changes read correctly both when accepted and when rejected.**
 - **Definitions reordered alphabetically** in English.
 - **Headers, footers, footnotes and comments translated.**
-- **UK English by default, US English on request.**
+- **UK English by default, US English on request** — and the delivered file is marked as that
+  English, so Word spell-checks it as English rather than as the source language.
 - Quality gates at every stage.
 
 ---

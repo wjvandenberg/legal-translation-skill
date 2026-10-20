@@ -240,13 +240,27 @@ with tempfile.TemporaryDirectory(prefix="moved-main-") as _scratch:
 _moved = _git("commit-tree", _moved_tree, "-p", "HEAD", "-m", "test: main moved after the branch",
               env={"GIT_AUTHOR_NAME": "test", "GIT_AUTHOR_EMAIL": "test@example.invalid",
                    "GIT_COMMITTER_NAME": "test", "GIT_COMMITTER_EMAIL": "test@example.invalid"}).strip().decode()
-_unchanged = not _git("diff", "--name-only", "HEAD", "--", "uk/", "us/").strip()
-check("precondition: this branch changes nothing in uk/ or us/ against HEAD", _unchanged)
+# THE BRANCH'S OWN LINES, READ FIRST, AND THE MOVED MAIN MUST ADD NONE TO THEM. This asked that the branch change
+# nothing in uk/ or us/ and that the moved main read 0 lines added - true only on a branch that touches no tree
+# file, so on every branch that does (13.4's, staged, its TEST run by the full runner) the precondition failed and
+# the arm with it, for the branch's state and not the gate (found 2026-10-20 (2), once the full runner ran every
+# suite). Asked a second way: the gate's added-line count against HEAD is the branch's own; against the moved main
+# it must be the SAME - one more is the I-41 defect, main's dropped line read as this branch's.
+def _added_count(sec):
+    if "nothing added" in sec:
+        return 0
+    m = re.search(r"(\d+) line\(s\) added", sec)
+    return int(m.group(1)) if m else None
+
+
+sec_h, _rc_h, _ = gate({"LT_TREE_BASELINE": "HEAD"})
+_own = _added_count(sec_h)
+check("precondition: the branch's own added tree lines are read against HEAD", _own is not None,
+      sec_h.strip().splitlines()[-1][:80] if sec_h.strip() else "no section 7")
 sec6, rc6, _ = gate({"LT_TREE_BASELINE": _moved})
-_added = re.search(r"(\d+) line\(s\) added", sec6)
+_after = _added_count(sec6)
 check("a line main changed after the branch is NOT counted as added by this branch",
-      _unchanged and ("nothing added" in sec6 or (_added and _added.group(1) == "0")),
-      _added.group(0) if _added else sec6.strip().splitlines()[-1][:80] if sec6.strip() else "no section 7")
+      _own is not None and _after == _own, f"against HEAD {_own}, against the moved main {_after}")
 check("and the section names the branch point it measured from", "branch point" in sec6)
 
 # --------------------------------------------------------------------------------------

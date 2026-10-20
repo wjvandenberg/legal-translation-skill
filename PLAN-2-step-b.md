@@ -1129,6 +1129,25 @@ specification review rather than on the decision. Recorded against Option 2 as w
 > **WOUTER, 2026-10-20, AT THE CLOSE** *(`DECISIONS-LOG.md`)*: the 46 standalone suites wired into the full runner
 > before 13.4 — a piece of its own, not a sub-step, its added minutes measured first; Step 1b's sentence against
 > building the English document outside the pipeline kept.
+>
+> **THE SUITES WIRED INTO THE FULL RUNNER, 2026-10-20 (2), #160** — measured first, one at a time: the full
+> runner 7.3 minutes; the 46 standalone suites 25.1 more on the uk tree and 11.0 on the us; Wouter chose all
+> 68 runs. `verify.config.json` names every `tests/test_*.py` as its own top-level command, a `--variant us`
+> twin where it parses the flag, each with a `count` read off its measured closing line;
+> `tests/test_runner_names_every_suite.py` fails the run on the day a suite is added and not named. Four
+> suites had gone red in silence, each a needle the work moved; all four repaired and proved alone.
+>
+> **13.4 BUILT, 2026-10-20 (2), H1 AND H3 CLOSED** — `source_language_markers.py --declare english`, both
+> trees, records `"mode": "variant-conversion"` and says so; `declared_mode()` reads it back only where the
+> declaration names English and carries the key, so a file written by hand or before 13.4 opens no mode;
+> `verify_diligence.py`'s Step 1c PASSes on the mode and WARNs on English without it. Skill Steps 1c, 3 and 4,
+> the frontmatter and three rows of `SKILL.md`'s step table, words only, and `README.md` name the job; the
+> language claim, 13.2's, rides with it (Wouter, 2026-10-19 (2)). `tests/test_variant_conversion.py` is red on
+> `main`'s scripts, its six mode checks failing and the chain passing, and green after, 26 of 26 per tree. D07
+> through the mode moves no delivered byte against `main`, both variants; the four instruments: reachability
+> PASS, two new heuristic candidates judged (each cites Step 1c, where the mode opens, and governs the step it
+> is read at); the static decision, every reconciliation before the rule it overrides and nothing softened;
+> execution, the suite; the aim, D07's notes 41 of 52 kept as the source and 11 changed, as H3 records.
 
 ### 3.5 Fix the claim, not only the code — option 9 · **GO, plus six new register rows** · *step 3, then folded in as steps land, then step 21*
 

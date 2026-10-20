@@ -168,8 +168,9 @@ ap.add_argument("--declare-glossary-kept", action="store_true",
                      "with every letter-bearing text mapped to itself -- slice 3b's keep route -- so the "
                      "delivered check reads the glossary as DECLARED kept. Counts only are printed")
 ap.add_argument("--declare-language", action="store_true",
-                help="BRANCH 12 SLICE 12a, arm (b): write each workdir's TRUE source language beside the notes, as "
-                     "Step 1c now does (doc-id and language only), run Step 4d and Step 9 as well, and read what every "
+                help="BRANCH 12 SLICE 12a, arm (b): declare each workdir's TRUE source language beside the notes "
+                     "through the tree's own Step 1c command (sub-step 13.4: so D07, english, runs in the "
+                     "variant-conversion mode), run Step 4d and Step 9 as well, and read what every "
                      "language-dependent check says from its own lines. With --ref the pin's build is read the same "
                      "way and must FAIL the acceptance it predates -- the acceptance's own red")
 args = ap.parse_args()
@@ -773,7 +774,15 @@ def chain(scripts_dir, d, src, wd, today=None, language=None):
     xml, py = d / "final" / "word" / "document.xml", ["uv", "run", "--with", "lxml", "python"]
     said = {}
     if language is not None:
-        (d / "source_language.json").write_bytes(json.dumps({"source_language": language}).encode("utf-8"))
+        # SUB-STEP 13.4: declared through THE TREE'S OWN Step 1c command, as an operator declares - so a tree whose
+        # --declare records the variant-conversion mode (english, since 13.4) runs the chain in it, and under --ref
+        # the pin declares its own way. A pin older than the command gets the file written as before, and the
+        # reading says so. Neither route writes anything the --ref comparison reads.
+        r1c = run(py + [str(scripts_dir / "source_language_markers.py"), "--declare", language, str(d)])
+        said["1c"] = (r1c.stdout or "") + (r1c.stderr or "")
+        if r1c.returncode != 0 or not (d / "source_language.json").is_file():
+            (d / "source_language.json").write_bytes(json.dumps({"source_language": language}).encode("utf-8"))
+            said["1c"] += "\n[written by the arm: this tree has no --declare]"
         r4d = run(py + [str(scripts_dir / "lexicon_compliance.py"), str(d / "paragraphs.json"),
                         "--stage", "pre-apply"])
         said["4d"] = (r4d.stdout or "") + (r4d.stderr or "")
@@ -2038,6 +2047,11 @@ if args.declare_language and args.arm in ("b", "both"):
               f" 10={rd['10 lexicon'].get('blocking')}")
         for label, passed, detail in acceptance(did, rd):
             ok(label, passed, detail)
+        # SUB-STEP 13.4: OUR build's Step 1c, through the tree's own --declare - english opens the variant-conversion
+        # mode and says so, and no other language does. A fact read off the command's own words, never its text.
+        opened = "VARIANT-CONVERSION MODE" in said.get("1c", "")
+        ok(f"{key} step 1c: {'english opens the variant-conversion mode' if lang == 'english' else 'no mode opened'}"
+           f" (sub-step 13.4)", opened == (lang == "english"), f"mode said: {opened}")
         if rd["10 remnant"]["verdict"] == "not reached":
             # A reading the corpus cannot give is said, and must be explained: repack stops these documents at its
             # EARLIER gate (slice 2b's STOP_2B), at the pin and today alike, so the remnant block never runs.

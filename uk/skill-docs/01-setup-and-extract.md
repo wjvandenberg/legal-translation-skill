@@ -90,9 +90,19 @@ The command says whether the language is one of the eleven this skill supports. 
 NOT SUPPORTED, the run goes on** — translate with the English reference lexicons alone
 (Step 3) — but every language-dependent check will say NOT SUPPORTED and cannot rule, so no
 script can find text left untranslated: read the output for it yourself. A source already in
-English is reported the same way. **Without a declaration every one of those checks falls
+English opens the variant-conversion mode, below. **Without a declaration every one of those checks falls
 back to a guess** — which has named Norwegian as Polish and English as Portuguese — and says
 NOT SUPPORTED rather than CLEAN or PASSED.
+
+**A SOURCE ALREADY IN ENGLISH OPENS THE VARIANT-CONVERSION MODE.** When the user wants an English
+document in UK or US English — *"give me the US version of this English contract"* — declare
+`english`: the command records the mode in `source_language.json` beside the language, and says
+so. Only that declaration opens it, and only for a document written in English — never a script's
+guess and never the look of the text. In the mode, Step 3 reads no language sub-lexicon (none
+exists for English) and Step 4 converts instead of translating: each paragraph's `en` is its
+source in the delivered variant and nothing else. Every other step, the 35-paragraph batches and
+every gate run as for a translation; the language-dependent checks say NOT SUPPORTED or NOT APPLICABLE, there being
+no source language for them to look for, and the diligence audit at Step 11 reads the mode.
 
 ### Step 2: Extract paragraphs with formatting metadata
 
@@ -200,7 +210,8 @@ Before moving to the next step, confirm:
 - [ ] You converted .doc → .docx (if needed) using soffice, NOT pandoc
 - [ ] You inspected `clean_conversion_artifacts.py`'s author/ratio output and did not run it on a redline
 - [ ] **You declared the source language at Step 1c** — `source_language.json` is in the workdir,
-      and you noted whether the command called it supported or NOT SUPPORTED
+      and you noted whether the command called it supported or NOT SUPPORTED — or, for a source
+      already in English, that it opened the variant-conversion mode
 - [ ] You produced `paragraphs.json` with `extract_paragraphs.py`
 - [ ] **You ran `validate_apply.py --extraction-completeness` and its BODY count is zero.**
       A non-zero body count means extraction did not read a paragraph, and nothing later in

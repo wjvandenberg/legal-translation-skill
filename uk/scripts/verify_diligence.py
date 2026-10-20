@@ -5,7 +5,8 @@ across the 11 skill steps. Catches *skipped-step* failure modes that the
 earlier auto-invoked gates do not surface as a single end-of-pipeline report:
 
   - Step 1c       the source language was declared (source_language.json
-                  beside paragraphs.json): supported PASS; declared but not
+                  beside paragraphs.json): supported PASS, and English with
+                  the variant-conversion mode recorded PASS; declared but not
                   one this skill supports WARN, since no script could look
                   for untranslated text in it; missing or unreadable FAIL,
                   since every language-dependent check then ran on a guess
@@ -123,7 +124,8 @@ def _sibling_integrity_exit(name, exc):
 
 
 try:
-    from source_language_markers import read_declared_language  # noqa: E402
+    from source_language_markers import (read_declared_language, declared_mode,  # noqa: E402
+                                         TARGET_LANGUAGE, VARIANT_CONVERSION)
 except (ImportError, SyntaxError) as _exc:  # deleted, or cut short: a broken install, SKILL.md rule 6
     _sibling_integrity_exit('source_language_markers.py', _exc)
 
@@ -227,6 +229,14 @@ def check_step_1c(report, workdir):
     language, state, why = read_declared_language(workdir)
     if state == 'supported':
         report.add(label, PASS, f'declared: {language}')
+    elif declared_mode(workdir) == VARIANT_CONVERSION:
+        # SUB-STEP 13.4 (H1, H3): English opens a mode of its own, and the WARN below asks for a reading the
+        # mode makes moot - in a conversion there is no source language for text to be left in.
+        report.add(label, PASS, f'declared: {language} — the variant-conversion mode, converted, not translated')
+    elif state == 'unsupported' and language == TARGET_LANGUAGE:
+        report.add(label, WARN, f'declared: {language}, with no variant-conversion mode recorded',
+                   f'{why}.\nThe declaration predates the mode or was written by hand: run '
+                   'source_language_markers.py --declare english <workdir> to open it.')
     elif state == 'unsupported':
         report.add(label, WARN, f'declared: {language}, which no script in this skill can check',
                    f'{why}.\nNo script looked for text left in the source language: read the '
