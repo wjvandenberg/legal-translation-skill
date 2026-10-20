@@ -127,6 +127,7 @@ folder: every input is copied into a temporary directory first.
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref be50e12 --declare-glossary-kept \
         --declare-language                                                                  # slice 12a
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref c4639fa --declare-glossary-kept   # 13.2
+    uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref 8ad07c3 --declare-glossary-kept   # 13.5
 """
 import argparse
 import io
@@ -895,8 +896,9 @@ def outputs(d):
 def compare(new, ref):
     """Slice 2b's sense and slice 4a's: each output identical; or a .docx member that is the PINNED
     bytes with every U+200B removed and none left; or an XML member that is the pin's with wrappers
-    the guard kept restored (`restored`); or (13.2) a styles.xml or settings.xml member that is the pin's with
-    only its language values changed (`lang_restored`). Returns (U+200B-moved members, U+200B removed, {XML
+    the guard kept restored (`restored`); or a language part `lang_part` names (13.2's styles.xml and
+    settings.xml, 13.5's side parts and the glossary's) that is the pin's with only its language values changed
+    (`lang_restored`). Returns (U+200B-moved members, U+200B removed, {XML
     member: wrappers restored}, other movement, the members whose pin carried a U+200B, the language-moved
     members, the members whose pin carried a language value not the variant's, ours still carrying one)."""
     moved, removed, wmoved, other, lmoved = [], 0, {}, [], []

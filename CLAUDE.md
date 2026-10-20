@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–11 CLOSED · 12 CLOSED but H1's half, step 13's · 13 PLANNED and approved 2026-10-19, five sub-steps, section 3.4 of the build plan, 13.1 measured, 13.2, 13.3 and 13.4 built, every suite in the full runner, 13.5 (register R2) next · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) and (d) next *(Wouter)* · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,22 +578,22 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-20 (2), EVERY SUITE IN THE RUNNER, 13.4 BUILT, H1 AND H3 CLOSED
+### HANDOFF — 2026-10-20 (3), I-43 FILED, 13.5 BUILT, STEP 13 DONE BUT FOR THE RUNTIME PROBLEM
 
-**PURPOSE: MET.** It was *so that no TEST can silently leave a suite out, and an English source can be delivered in the
-other variant through a declared mode instead of a guess*: #160 wired every suite, a guard failing the day one is left
-out; #161 built the variant-conversion mode, opened by declaring `english` at skill Step 1c, every gate kept.
+**PURPOSE: MET.** It was *so that the four silent reds are on the record beside the guard that ends them, and every
+part of a delivered document declares the target English instead of the source language*: #163 filed register
+I-43; #164 sets the language in every part the delivery holds and closes R2.
 
-**BUILT:** #160 — 70 suites, all 68 added runs *(Wouter)*, four silent reds repaired. #161 — the mode recorded
-and read back, Steps 1c, 3 and 4, both `SKILL.md`, `README.md` and 13.2's language claim; D07 through it moves no
-delivered byte against `main`. Wouter's rulings and the judgements: `DECISIONS-LOG.md`, 2026-10-20 (2).
+**BUILT:** #163 — I-43, re-measured in a scratch worktree, and the eight stale charter numbers #74 left in seven
+places mended. #164 — `repack_docx.py` both trees; its suite 25 of 89 red on main, 89 after; on the 13, uk 7 of 11
+delivered workdirs moved, us 6 of 9, nothing else. Rulings and judgements: `DECISIONS-LOG.md`, 2026-10-20 (3).
 
-**SINGLE NEXT ACTION: SUB-STEP 13.5, REGISTER R2** — 13.2's rule carried to every part the delivery holds, `w:eastAsia`
-and `w:bidi` untouched; then step 13 is done but for the runtime problem, open until phase 3's timing.
+**SINGLE NEXT ACTION: RENAME (c), THE REGISTER**, with check 2's vacuity filed as its row *(Wouter, 2026-10-19 (6)
+and (7), confirmed 2026-10-20 (3))*; then (d), the rest; then step 14's remainder.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** the full runner, every suite, ~40 minutes, runs ONCE a session, at its close
-*(Wouter)*, each pull request's TEST being the suites covering its change; a new `tests/test_*.py` fails it until named
-in `verify.config.json` with a `count`; the corpus arm's `--declare-language --ref main` fails 12a's pin by design.
+**WHAT A NEW SESSION WOULD GET WRONG:** per pull request only its own acceptance check, the three confidentiality
+controls and the covering suites; the base list, the twelve-tool comparison and the ~40-minute full runner ONCE, at
+the end *(Wouter)*; the corpus arm's 13.5 pin is `8ad07c3`; "the glossary" means all its parts *(Wouter, kept)*.
 
-**Open, none blocking:** the four silent reds as a register row; a suite-coverage arm in the house runner; renames (c),
-with check 2's vacuity row, and (d) after step 13; `SKILL.md` larger again, goal (iv)'s. **Context: 65% when written, measured.**
+**Open, none blocking:** a session started here builds the charter-pointer checker, the house's version Wouter's
+to plan; the house runner's suite-coverage arm; `SKILL.md`'s size, goal (iv)'s. **Context: 59% when written, measured.**

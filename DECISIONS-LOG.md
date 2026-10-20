@@ -1736,3 +1736,53 @@ change, the house's); renames (c), with check 2's vacuity row, and (d) after ste
 >
 > **Open, none blocking:** renames (c), with check 2's vacuity row, and (d) after step 13 *(Wouter)*; the language claim
 > with 13.4; line 160 of the plan; `SKILL.md` 115 bytes larger, goal (iv)'s. **Context: 53% when written, measured.**
+
+## 2026-10-20 (3) — I-43 filed; sub-step 13.5 built, R2 closed; per pull request only its own checks
+
+**WOUTER IN THE SESSION.** **(1) THE CHECKS** *(the question tool, the recommended answer)*: asked *"why are you not
+doing those checks at the end?"* after a register row's VERIFY ran 21 checks, the session put three ways to him, and
+he chose slim per pull request, broad at the end: before each commit only the change's own acceptance check, the three
+confidentiality controls and the suites covering it; the base list, the twelve-tool comparison and the full runner
+once, at the session's end. **(2) THE POINTER CHECKER** *(in words)*: *"or at least give a prompt for house tooling
+so I can add it to the plan there"* — the prompt given in chat; the project-local session proposed for it had already
+been started from its card. **(3) #164** *(in words)*: *"Please merge"*, given during its review, whose two findings
+— wording in the corpus arm's docstring and usage — were folded into the close. **AT THE CLOSE, THROUGH THE QUESTION
+TOOL, each the recommended answer:** **(4)** "the glossary" read as all of the glossary's parts, kept; **(5)** the
+next session starts with rename (c), the register, with check 2's vacuity row, then (d), then step 14's remainder;
+**(6)** the local pointer-checker session left to finish, the house's version to replace it once built.
+
+**JUDGEMENTS TAKEN ALONE, CARRIED TO THE CLOSE.** **(a)** I-43's figures re-measured, never re-read: each suite as it
+stood at `4ae494f` run on that tree in a scratch worktree, each needle dated by `git log -S`; the machine crashed in
+the seventh run, the six finished outputs kept and the seventh re-run alone. **(b)** The audit gate on I-43 found four
+errors — a two-character needle, the hook's own stale pointer, an overstated plant, an exit code read through a pipe
+— and `/code-review` on #163 found the row understated #74's renumbering: eight stale numbers in seven places, all
+mended there. **(c)** 13.5's population measured over every DELIVERED package: the glossary's own styles and settings,
+which R2's `final/`-only census could not see, carry a value not English in D03 and D03B. **(d)** 13.5's corpus run
+taken once and bound by fingerprint to the 101 scripts it measured, VERIFY reading it; its reader first looked for
+the wrong failure mark and would have read a failure as clean — caught before any reading, then proved to fail a
+planted failure. **(e)** The full runner, once, at the end: OVERALL: PASS, 92 suites and 14 entry points, 107 rows and none failing, in 3021.5 s.
+
+**OPEN, NONE BLOCKING.** The charter-pointer checker (a session here; the house's version Wouter's to plan); the house
+runner's suite-coverage arm; `SKILL.md`'s size, goal (iv)'s.
+
+**The 2026-10-20 (2) handoff, as it stood at `0f476bf`, word for word:**
+
+> ### HANDOFF — 2026-10-20 (2), EVERY SUITE IN THE RUNNER, 13.4 BUILT, H1 AND H3 CLOSED
+>
+> **PURPOSE: MET.** It was *so that no TEST can silently leave a suite out, and an English source can be delivered in the
+> other variant through a declared mode instead of a guess*: #160 wired every suite, a guard failing the day one is left
+> out; #161 built the variant-conversion mode, opened by declaring `english` at skill Step 1c, every gate kept.
+>
+> **BUILT:** #160 — 70 suites, all 68 added runs *(Wouter)*, four silent reds repaired. #161 — the mode recorded
+> and read back, Steps 1c, 3 and 4, both `SKILL.md`, `README.md` and 13.2's language claim; D07 through it moves no
+> delivered byte against `main`. Wouter's rulings and the judgements: `DECISIONS-LOG.md`, 2026-10-20 (2).
+>
+> **SINGLE NEXT ACTION: SUB-STEP 13.5, REGISTER R2** — 13.2's rule carried to every part the delivery holds, `w:eastAsia`
+> and `w:bidi` untouched; then step 13 is done but for the runtime problem, open until phase 3's timing.
+>
+> **WHAT A NEW SESSION WOULD GET WRONG:** the full runner, every suite, ~40 minutes, runs ONCE a session, at its close
+> *(Wouter)*, each pull request's TEST being the suites covering its change; a new `tests/test_*.py` fails it until named
+> in `verify.config.json` with a `count`; the corpus arm's `--declare-language --ref main` fails 12a's pin by design.
+>
+> **Open, none blocking:** the four silent reds as a register row; a suite-coverage arm in the house runner; renames (c),
+> with check 2's vacuity row, and (d) after step 13; `SKILL.md` larger again, goal (iv)'s. **Context: 65% when written, measured.**
