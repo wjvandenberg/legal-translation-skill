@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–11 CLOSED · 12 CLOSED but H1's half, step 13's · 13 PLANNED and approved 2026-10-19, section 3.4 of the build plan, 13.1 measured, 13.2 built, 13.3 next · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–11 CLOSED · 12 CLOSED but H1's half, step 13's · 13 PLANNED and approved 2026-10-19, five sub-steps, section 3.4 of the build plan, 13.1 measured, 13.2 and 13.3 built, the test-runner wiring then 13.4 next, 13.5 (register R2) last · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,22 +578,22 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-19 (2), 13.1 MEASURED, 13.2 BUILT AND MERGED
+### HANDOFF — 2026-10-20, R2 FILED, 13.3 BUILT AND MERGED, I-42 FIXED
 
-**PURPOSE: MET.** It was *so that the short-document gear is designed by Wouter from measured minutes rather than a
-guess, and a delivered English file is spell-checked as English*: #154 measured it, Wouter choosing to re-measure in
-phase 3; #155 sets the document's two language values, R1 closed — the side parts' tags a row still to file.
+**PURPOSE: MET.** It was *so that a known residue cannot be forgotten once R1 reads closed, and a document the skill
+cannot handle is stopped at the door with an instruction*: #157 filed R1's residue as register R2, re-measured over
+all 13 workdirs; #158 refuses five classes at admission, each saying what to do, and closes L5.
 
-**BUILT:** #154 — the per-step table in section 3.4 of `evidence/EVIDENCE-a3-structure.md`; 28–55% of active time ends
-at the A1 harness's paperwork, so a user's fixed cost is 14–25 minutes. #155 — `repack_docx.py` both trees, its suite
-red first, the corpus arm's third `--ref` sense. Wouter's four answers and the judgements: `DECISIONS-LOG.md`, 2026-10-19 (2).
+**BUILT:** #157 — R2 and every count it moves, the 51 of 13.2's close shown to be 9 workdirs' figure, folded. #158 —
+`extract_paragraphs.py` and skill Step 1b both trees, `SKILL.md`'s pointers, `README.md`'s sentence, the new suite;
+its TEST found register I-42, `tools/confirm_failure_chains.py` calling a refused copy "it ran", fixed there.
 
-**SINGLE NEXT ACTION: FILE R1'S RESIDUE AS A REGISTER ROW** *(Wouter; carried, the filing moving counts in four
-files)*, then **SUB-STEP 13.3, L5** — the envelope refused at admission, its size limit 1,000 paragraphs *(Wouter)*.
+**SINGLE NEXT ACTION: WIRE THE 46 STANDALONE SUITES INTO THE FULL RUNNER** *(Wouter: before 13.4, a piece of its
+own, its added minutes measured first)*, then **SUB-STEP 13.4**, H1 and H3; his answers: `DECISIONS-LOG.md`, 2026-10-20.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** `repack()` defaults to `uk` in BOTH trees by design — the parity check reads a
-per-tree function default as new drift — and only the command line defaults per tree, arm 5 of
-`tests/test_repack_scrub_and_block.py` asserting that one line; standalone suites run only when a TEST list names them.
+**WHAT A NEW SESSION WOULD GET WRONG:** the runner names 1 of the 47 `tests/test_*.py`, so until the wiring every TEST
+lists its suites by hand; the corpus's legacy `.doc` is refused at admission until Step 1b converts it, by design; and
+`tools/confirm_failure_chains.py`'s 50% control lands wherever `extract_paragraphs.py`'s midpoint falls.
 
-**Open, none blocking:** renames (c), with check 2's vacuity row, and (d) after step 13 *(Wouter)*; the language
-claim with 13.4; line 160 of the plan naming section 6 for the order. **Context: 60% when written, measured.**
+**Open, none blocking:** renames (c), with check 2's vacuity row, and (d) after step 13 *(Wouter)*; the language claim
+with 13.4; line 160 of the plan; `SKILL.md` 115 bytes larger, goal (iv)'s. **Context: 53% when written, measured.**
