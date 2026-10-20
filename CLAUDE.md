@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–11 CLOSED · 12 CLOSED but H1's half, step 13's · 13 PLANNED and approved 2026-10-19, five sub-steps, section 3.4 of the build plan, 13.1 measured, 13.2 and 13.3 built, the test-runner wiring then 13.4 next, 13.5 (register R2) last · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–11 CLOSED · 12 CLOSED but H1's half, step 13's · 13 PLANNED and approved 2026-10-19, five sub-steps, section 3.4 of the build plan, 13.1 measured, 13.2, 13.3 and 13.4 built, every suite in the full runner, 13.5 (register R2) next · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,22 +578,22 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-20, R2 FILED, 13.3 BUILT AND MERGED, I-42 FIXED
+### HANDOFF — 2026-10-20 (2), EVERY SUITE IN THE RUNNER, 13.4 BUILT, H1 AND H3 CLOSED
 
-**PURPOSE: MET.** It was *so that a known residue cannot be forgotten once R1 reads closed, and a document the skill
-cannot handle is stopped at the door with an instruction*: #157 filed R1's residue as register R2, re-measured over
-all 13 workdirs; #158 refuses five classes at admission, each saying what to do, and closes L5.
+**PURPOSE: MET.** It was *so that no TEST can silently leave a suite out, and an English source can be delivered in the
+other variant through a declared mode instead of a guess*: #160 wired every suite, a guard failing the day one is left
+out; #161 built the variant-conversion mode, opened by declaring `english` at skill Step 1c, every gate kept.
 
-**BUILT:** #157 — R2 and every count it moves, the 51 of 13.2's close shown to be 9 workdirs' figure, folded. #158 —
-`extract_paragraphs.py` and skill Step 1b both trees, `SKILL.md`'s pointers, `README.md`'s sentence, the new suite;
-its TEST found register I-42, `tools/confirm_failure_chains.py` calling a refused copy "it ran", fixed there.
+**BUILT:** #160 — 70 suites, all 68 added runs *(Wouter)*, four silent reds repaired. #161 — the mode recorded
+and read back, Steps 1c, 3 and 4, both `SKILL.md`, `README.md` and 13.2's language claim; D07 through it moves no
+delivered byte against `main`. Wouter's rulings and the judgements: `DECISIONS-LOG.md`, 2026-10-20 (2).
 
-**SINGLE NEXT ACTION: WIRE THE 46 STANDALONE SUITES INTO THE FULL RUNNER** *(Wouter: before 13.4, a piece of its
-own, its added minutes measured first)*, then **SUB-STEP 13.4**, H1 and H3; his answers: `DECISIONS-LOG.md`, 2026-10-20.
+**SINGLE NEXT ACTION: SUB-STEP 13.5, REGISTER R2** — 13.2's rule carried to every part the delivery holds, `w:eastAsia`
+and `w:bidi` untouched; then step 13 is done but for the runtime problem, open until phase 3's timing.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** the runner names 1 of the 47 `tests/test_*.py`, so until the wiring every TEST
-lists its suites by hand; the corpus's legacy `.doc` is refused at admission until Step 1b converts it, by design; and
-`tools/confirm_failure_chains.py`'s 50% control lands wherever `extract_paragraphs.py`'s midpoint falls.
+**WHAT A NEW SESSION WOULD GET WRONG:** the full runner, every suite, ~40 minutes, runs ONCE a session, at its close
+*(Wouter)*, each pull request's TEST being the suites covering its change; a new `tests/test_*.py` fails it until named
+in `verify.config.json` with a `count`; the corpus arm's `--declare-language --ref main` fails 12a's pin by design.
 
-**Open, none blocking:** renames (c), with check 2's vacuity row, and (d) after step 13 *(Wouter)*; the language claim
-with 13.4; line 160 of the plan; `SKILL.md` 115 bytes larger, goal (iv)'s. **Context: 53% when written, measured.**
+**Open, none blocking:** the four silent reds as a register row; a suite-coverage arm in the house runner; renames (c),
+with check 2's vacuity row, and (d) after step 13; `SKILL.md` larger again, goal (iv)'s. **Context: 65% when written, measured.**

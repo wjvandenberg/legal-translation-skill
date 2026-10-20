@@ -1682,3 +1682,57 @@ instrument's, not the change's: `tools/confirm_failure_chains.py` knew a compile
 >
 > **Open, none blocking:** renames (c), with check 2's vacuity row, and (d) after step 13 *(Wouter)*; the language
 > claim with 13.4; line 160 of the plan naming section 6 for the order. **Context: 60% when written, measured.**
+
+## 2026-10-20 (2) — every suite in the full runner; sub-step 13.4 built, H1 and H3 closed
+
+**WOUTER IN THE SESSION.** **(1) THE WIRING** *(the question tool, the recommended answer, the table put to him
+first)*: all 68 runs — the 46 standalone suites on the uk tree and 22 on the us — the full runner measured at 7.3
+minutes before and about 43 after. **(2) 13.4 THIS SESSION** *(in words)*: at 46% context the session proposed to stop
+at 13.4's plan under the brief's 75% rule; Wouter: *"No, please continue with 13.4"* and *"We'll take the risk"*;
+then, going away, to continue without asking. **(3) THE FULL RUN ONCE A SESSION** *(in words, after the second
+full run of the session)*: the full runner runs ONCE, at a session's END, as the house file says; each pull
+request's TEST runs the suites covering its change; this session closes on 13.4's run, the close's TEST the suites
+reading the documents it changes. The wiring stays: what changed is how often the full run happens, not what it holds.
+
+**JUDGEMENTS TAKEN ALONE, CARRIED TO THE CLOSE.** **(a)** "The language claim" (2026-10-19 (2), answer 4) is 13.2's
+behaviour, the delivered file marked as the variant's English — measured, not asked: #155's description records the
+review finding it answered. **(b)** A declaration naming English with no mode key opens no mode: written by hand or
+before 13.4, the operator declares again; never inferred. **(c)** The mode keeps Step 4b and the 35-paragraph cap — the
+brief skips Step 3's language layer and Step 4's translating only, and must not skip or soften a gate. **(d)** The
+diligence audit's Step 1c PASSes on the mode, its WARN asking for a reading the mode makes moot. **(e)** The four
+suites red in silence were repaired in the wiring, not declared: their needles had moved, not the product. **(f)**
+Instrument 4 for 13.4 was D07's own notes, `tools/gate_replay.py`'s population being the gate-scope rule's.
+**(g)** `/code-review` carried, of #160's: a suite-coverage arm in the shared house runner instead of a project test;
+two suites asserting one repack difference; the shipped-tables check run twice; of 13.4's: the integrity message on
+a version mismatch; a double read of a small file; `SKILL.md`'s size; the arm's fallback for a pin older than
+`--declare`. **(h) A SESSION ERROR:** this session's first baseline script was written to `temp/s1020b_baseline.py`,
+the 2026-10-20 session's 13.3 baseline script, overwriting it — gitignored scratch whose work was merged, nothing
+tracked touched; moved to a fresh prefix, and every later scratch name checked first. **(i)** The session's full run
+met `tests/test_gate_tree_scan.py`'s arm 4b red: its precondition, a branch changing nothing in the trees, only a
+branch touching no tree file can meet; asked a second way and repaired in #161, the moved main's count required
+to equal the branch's own against `HEAD`.
+
+**OPEN, NONE BLOCKING.** The four silent reds as a register row; the house runner's coverage arm (a shared-script
+change, the house's); renames (c), with check 2's vacuity row, and (d) after step 13; `SKILL.md`'s size, goal (iv)'s.
+
+**The 2026-10-20 handoff, as it stood at `0a40b4d`, word for word:**
+
+> ### HANDOFF — 2026-10-20, R2 FILED, 13.3 BUILT AND MERGED, I-42 FIXED
+>
+> **PURPOSE: MET.** It was *so that a known residue cannot be forgotten once R1 reads closed, and a document the skill
+> cannot handle is stopped at the door with an instruction*: #157 filed R1's residue as register R2, re-measured over
+> all 13 workdirs; #158 refuses five classes at admission, each saying what to do, and closes L5.
+>
+> **BUILT:** #157 — R2 and every count it moves, the 51 of 13.2's close shown to be 9 workdirs' figure, folded. #158 —
+> `extract_paragraphs.py` and skill Step 1b both trees, `SKILL.md`'s pointers, `README.md`'s sentence, the new suite;
+> its TEST found register I-42, `tools/confirm_failure_chains.py` calling a refused copy "it ran", fixed there.
+>
+> **SINGLE NEXT ACTION: WIRE THE 46 STANDALONE SUITES INTO THE FULL RUNNER** *(Wouter: before 13.4, a piece of its
+> own, its added minutes measured first)*, then **SUB-STEP 13.4**, H1 and H3; his answers: `DECISIONS-LOG.md`, 2026-10-20.
+>
+> **WHAT A NEW SESSION WOULD GET WRONG:** the runner names 1 of the 47 `tests/test_*.py`, so until the wiring every TEST
+> lists its suites by hand; the corpus's legacy `.doc` is refused at admission until Step 1b converts it, by design; and
+> `tools/confirm_failure_chains.py`'s 50% control lands wherever `extract_paragraphs.py`'s midpoint falls.
+>
+> **Open, none blocking:** renames (c), with check 2's vacuity row, and (d) after step 13 *(Wouter)*; the language claim
+> with 13.4; line 160 of the plan; `SKILL.md` 115 bytes larger, goal (iv)'s. **Context: 53% when written, measured.**
