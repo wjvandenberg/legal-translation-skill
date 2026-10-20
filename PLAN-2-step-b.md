@@ -1117,6 +1117,14 @@ specification review rather than on the decision. Recorded against Option 2 as w
 > figures: the 51 in 13.2's record above read the 9 with an exact delivery and folded into one figure the tags
 > with an English value or none, `numbering.xml` and the Word 2010 copy. 13.5 carries 13.2's rule to every part
 > the delivery holds.
+>
+> **13.3 BUILT, 2026-10-20, L5 CLOSED** — `extract_paragraphs.py`, both trees, refuses at admission the five
+> classes, each saying what to do, exit 2, before a paragraph is read. The envelope is written once: in full in
+> skill Step 1b, `SKILL.md`'s step table pointing at it — `SKILL.md` is already past the one truncation point
+> ever observed (register W1), so it gets words, not the table — and one sentence in `README.md`.
+> `tests/test_admission_envelope.py` is red on `33bf4b9`, 0 of 14 refusals, and after it 14 of 14 and 4 of 4
+> admissions per tree; `/code-review`'s ten findings, nine applied, the suite's place in the full runner carried
+> to the close. Nothing the corpus holds is refused, and against `33bf4b9` no delivered byte moved, both variants.
 
 ### 3.5 Fix the claim, not only the code — option 9 · **GO, plus six new register rows** · *step 3, then folded in as steps land, then step 21*
 

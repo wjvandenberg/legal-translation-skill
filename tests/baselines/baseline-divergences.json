@@ -6,9 +6,9 @@
  "count": 58,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "e857114f105b000b0da50614b1c98b6b1cefc901c57ffb4a32eeae19e271c0b7"
+   "changed_by": "feature/step13-3-admission-envelope",
+   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
+   "sha256_now": "85a93a6cf65b644a6bd6ebe17400019ff7369de8fa9cdf70143a8a456625e8b3"
   },
   "uk/scripts/apply_translations_textmatch.py": {
    "changed_by": "fix/language-module-integrity",
@@ -21,9 +21,9 @@
    "sha256_now": "97a7fc549a8ad39a63c8c62adaf25e107352947dbc377d239a8b0ff1c9618fb6"
   },
   "uk/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/branch7-slice3-a19",
-   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
-   "sha256_now": "91f49df10cb0a69a04f806433720cc3fc0df6ff687d151ce285045d137104583"
+   "changed_by": "feature/step13-3-admission-envelope",
+   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
+   "sha256_now": "2ba725e153c5061dc82bb31203a819f5d57bba655b77a7e4a63751dca41e73d6"
   },
   "uk/scripts/post_process.py": {
    "changed_by": "feature/branch10-slice4-page-break-detector",
@@ -76,9 +76,9 @@
    "sha256_now": "cb54fbc6f58c5cf7a970e819fbf7a3df8d51d73e14dba8b59591628d58c79a7f"
   },
   "uk/skill-docs/01-setup-and-extract.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "24a0a322a6cdcd7bc27cb335b1f577a9d36ddf7cacb936165013a9e9ba1f05a2"
+   "changed_by": "feature/step13-3-admission-envelope",
+   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
+   "sha256_now": "015bee040b07e63fc9342f8c45d8dc2d7f73f2a17aaf5d20c494bacf57661fa5"
   },
   "uk/skill-docs/04b-translate-gates.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -106,9 +106,9 @@
    "sha256_now": "645a69597270b100319ee6f4d5e24f02850a34cb3c899c013b923a63ff8dd154"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "0b2d65140d348dde54f0a677bea649a4bfbaa8935177fa3e6c6f510f8a25784c"
+   "changed_by": "feature/step13-3-admission-envelope",
+   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
+   "sha256_now": "dc2b9fe200fbedfe9f05bea222b2cb88043ab99e8d964ab1d03c23006dd6198f"
   },
   "us/scripts/apply_translations_textmatch.py": {
    "changed_by": "fix/language-module-integrity",
@@ -121,9 +121,9 @@
    "sha256_now": "97a7fc549a8ad39a63c8c62adaf25e107352947dbc377d239a8b0ff1c9618fb6"
   },
   "us/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/branch7-slice3-a19",
-   "commit_subject": "Branch 7 slice 3 — A19: alt text is an attribute a screen reader speaks, and the surfaces with no route are reported rather than refused",
-   "sha256_now": "0df16cb99fbc01cb25bbdbf2c52dfa7449869a9c0fd542248987e8f995909b74"
+   "changed_by": "feature/step13-3-admission-envelope",
+   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
+   "sha256_now": "f82dd1acc7d07607d0018f7c6a8f8053a142345b47e4edc875722f25b192225e"
   },
   "us/scripts/post_process.py": {
    "changed_by": "feature/branch10-slice4-page-break-detector",
@@ -176,9 +176,9 @@
    "sha256_now": "c81e5e9e75e2e8cf9db961f092c2366f9cfc588f3274bef84df03763e55e630c"
   },
   "us/skill-docs/01-setup-and-extract.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "24a0a322a6cdcd7bc27cb335b1f577a9d36ddf7cacb936165013a9e9ba1f05a2"
+   "changed_by": "feature/step13-3-admission-envelope",
+   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
+   "sha256_now": "015bee040b07e63fc9342f8c45d8dc2d7f73f2a17aaf5d20c494bacf57661fa5"
   },
   "us/skill-docs/04b-translate-gates.md": {
    "changed_by": "feature/branch12-slice12a",

@@ -187,8 +187,8 @@ High-level summary of what each step does. Detail in the step files.
 
 | # | Step | Action | File |
 |---|------|--------|------|
-| 1 | Set up | Convert .doc→.docx if needed, unpack to a workdir, **declare the source language** (1c) | `skill-docs/01-setup-and-extract.md` |
-| 2 | Extract | `extract_paragraphs.py` produces paragraphs.json with formatting metadata | `skill-docs/01-setup-and-extract.md` |
+| 1 | Set up | Convert .doc→.docx if needed, unpack to a workdir, **declare the source language** (1c); the input the skill accepts is declared at 1b | `skill-docs/01-setup-and-extract.md` |
+| 2 | Extract | `extract_paragraphs.py` **refuses at admission** anything outside 1b's accepted input, then produces paragraphs.json with formatting metadata | `skill-docs/01-setup-and-extract.md` |
 | 3 | Lexicons | Identify document domain, load English references and per-language sub-lexicons | `skill-docs/03-lexicons-and-segments.md` |
 | 3b | Scaffold | (TC documents only) Build `en_segments` skeleton for fragmented TC | `skill-docs/03-lexicons-and-segments.md` |
 | 4 | Translate | Fill `en` and `en_runs` for every paragraph, ≤35 per batch | `skill-docs/04-translate.md` |
