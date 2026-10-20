@@ -16,6 +16,18 @@ to have rows that match its header (`tests/test_shipped_tables.py`, register E15
 everything, and a check that cannot tell good from bad is not a check. Three of the fourteen
 cases here failed their *clean* arm first — that is the arm that earns its place.
 
+## Every suite at once
+
+```bash
+uv run python tools/run_tests.py
+```
+
+The full runner runs every suite in this folder — each `test_*.py` as its own command, a second
+time with `--variant us` wherever it takes the flag, and `run_tests.py` on both trees — beside the
+checkers' selftests and entry points. Until 2026-10-20 it ran `run_tests.py` alone and the rest
+were listed by hand, and four suites went red in silence. **`test_runner_names_every_suite.py`
+fails that run on the day a suite is added and not named in `verify.config.json`.**
+
 ## The branch-5 acceptance test
 
 ```bash

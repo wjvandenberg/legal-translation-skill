@@ -56,8 +56,12 @@ with guard.protecting(STORE):
     if STORE.exists():
         STORE.unlink()
 
+    # The gate's words, asked two ways: it blocks the commit AND names the phase with nothing recorded. This
+    # read "no evidence for", the wording before the house's cycle_evidence was re-copied; the gate went on
+    # refusing and this case went red in silence, no runner naming this suite (found 2026-10-20 (2)).
     rc, out = run("check")
-    case("with no evidence at all, check REFUSES", (rc, "no evidence for" in out), (1, True))
+    case("with no evidence at all, check REFUSES",
+         (rc, "COMMIT BLOCKED" in out and "nothing recorded for verify" in out), (1, True))
 
     rc, out = run("verify", "--", sys.executable, "-c", "import sys; sys.exit(1)")
     case("a command that exits non-zero is NOT recorded",
