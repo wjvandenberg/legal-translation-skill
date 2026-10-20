@@ -6,7 +6,7 @@ description: How a change to this pipeline is actually tested - freeze the trans
 # How a change is actually tested
 
 **Section 4 of `PLAN-2-step-b.md` owns the method per branch kind. This is the principle behind it,**
-and `CLAUDE.md` 5.8 keeps the standing rules and points here.
+and `CLAUDE.md` 5.4 keeps the standing rules and points here.
 
 ## THE TRICK: FREEZE THE TRANSLATED INTERMEDIATE FROM AN EXISTING RUN
 
@@ -31,7 +31,7 @@ document and grade it"* is neither.
 | **Synthetic** | hand-built documents with no client text, in `tests/fixtures/` | **YES** — these are what runs on every change and what `git bisect` uses | every commit |
 | **Real, frozen** | the frozen intermediates from the eleven corpus documents; they contain the **full client text** | **NEVER.** They live with the logs, outside the repo, and are excluded **by path** | before every merge |
 
-**The never-commit half of that table also lives unconditionally in `CLAUDE.md` 6.5 and 5.4**, because
+**The never-commit half of that table also lives unconditionally in `CLAUDE.md` 6.4 and 5.6**, because
 forgetting it publishes client text and there is no un-publishing. If this page and the charter ever
 disagree about what may be committed, **the charter wins.**
 
