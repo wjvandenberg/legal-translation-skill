@@ -45,8 +45,8 @@ import re
 import sys
 from pathlib import Path
 
-# Public already: tools/gate_replay.py carries the first as a default path, and CLAUDE.md
-# 5.12 prescribes a command inside the second. Naming them here reveals nothing new.
+# Public already: tools/gate_replay.py carries the first as a default path, and
+# tools/sibling_dirs.py the second. Naming them here reveals nothing new.
 DEFAULT_DIRS = ["legal-translation-logs", "legal-translation-private"]
 
 # Utilities whose whole job is to emit names. `cat`/`head`/`tail`/`Get-Content` are here too:

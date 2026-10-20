@@ -8,6 +8,7 @@
       {"name": "baseline_unmodified", "command": "uv run --with lxml python tests/test_baseline_unmodified.py", "count": "[0-9]+ of ([0-9]+) files"},
       {"name": "change_journal", "command": "uv run --with lxml python tests/test_change_journal.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "change_journal [us]", "command": "uv run --with lxml python tests/test_change_journal.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
+      {"name": "charter_pointers", "command": "uv run --with lxml python tests/test_charter_pointers.py", "count": "CHARTER POINTERS: ([0-9]+) pointer"},
       {"name": "check_scoping", "command": "uv run --with lxml python tests/test_check_scoping.py", "count": "([0-9]+) assertions"},
       {"name": "check_scoping_properties", "command": "uv run --with lxml python tests/test_check_scoping_properties.py", "count": "(?:PASS\\W+|of )([0-9]+) properties"},
       {"name": "checks_can_fail", "command": "uv run --with lxml python tests/test_checks_can_fail.py", "count": "[0-9]+ of ([0-9]+) cases"},
