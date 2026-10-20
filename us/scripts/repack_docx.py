@@ -26,11 +26,14 @@ finds, and never says clean on a guess.
 
 The document's language
 -----------------------
-The w:val of every w:lang in word/styles.xml and of w:themeFontLang in
-word/settings.xml is set to the delivered variant's — en-GB (uk), en-US (us),
---variant, this tree's own by default — so Word spell-checks the delivery as
-English rather than as the source language (register R1). w:eastAsia, w:bidi,
-every other part and every other byte are left as they are.
+The w:val of every w:lang in every part that can say what language its text is
+in — styles.xml and Word 2010's copy stylesWithEffects.xml, numbering.xml, the
+headers, footers, footnotes, endnotes and comments, and the glossary's own parts —
+and of w:themeFontLang in settings.xml (the glossary's too) is set to the
+delivered variant's — en-GB (uk), en-US (us), --variant, this tree's own by
+default — so Word spell-checks the delivery as English rather than as the source
+language (registers R1 and R2). w:eastAsia, w:bidi, the body (whose run-level
+w:lang apply strips) and every other byte are left as they are.
 
 The delivered-document check
 ----------------------------
@@ -214,34 +217,66 @@ def _scrub_zwsp(data):
     return _CHARDATA_RE.sub(one, data), n
 
 
-# THE DOCUMENT'S LANGUAGE — register R1. Apply strips the source-language w:lang
-# from the body's runs, which leaves styles.xml's defaults and settings.xml's theme
-# language deciding what Word spell-checks the delivery against: the source
+# THE DOCUMENT'S LANGUAGE — registers R1 and R2. Apply strips the source-language
+# w:lang from the body's runs, which leaves styles.xml's defaults and settings.xml's
+# theme language deciding what Word spell-checks the delivery against: the source
 # language, measured on three documents from three, so nearly every English word
-# was flagged. So the two values that say what language the document is in are set
-# to the delivered variant's: the w:val of every w:lang in styles.xml and of
-# w:themeFontLang in settings.xml. NOTHING ELSE MOVES. w:eastAsia and w:bidi choose
-# fonts for East Asian and right-to-left text, which is layout, so they stay; a
-# w:lang with no w:val gets none; a w:lang inside a run, in any part, is left to
-# apply; and the edit rewrites one attribute's bytes, never re-serialises the part.
+# was flagged (R1, sub-step 13.2). And a w:lang in any other part — a header, a
+# footer, a footnote, a comment, numbering.xml, the glossary, Word 2010's copy
+# stylesWithEffects.xml — still carried the source's language, so the text under it
+# was checked against that language's dictionary (R2, sub-step 13.5). So every value
+# that says what language a part is in is set to the delivered variant's: the w:val
+# of every w:lang in every part _language_part names, and of w:themeFontLang in the
+# two settings parts. NOTHING ELSE MOVES. w:eastAsia and w:bidi choose fonts for East
+# Asian and right-to-left text, which is layout, so they stay; a w:lang with no w:val
+# gets none; the body, word/document.xml, is never named — its run-level w:lang is
+# apply's, stripped upstream; w:author and people.xml are people's names, not a
+# language; and the edit rewrites one attribute's bytes, never re-serialises a part.
 VARIANT_LANGUAGE = {'uk': 'en-GB', 'us': 'en-US'}
-_LANGUAGE_ELEMENT = {'word/styles.xml': rb'<w:lang(?=[\s/>])[^>]*>',
-                     'word/settings.xml': rb'<w:themeFontLang(?=[\s/>])[^>]*>'}
+_LANG_TAG = rb'<w:lang(?=[\s/>])[^>]*>'
+_THEME_LANG_TAG = rb'<w:themeFontLang(?=[\s/>])[^>]*>'
+# Each language part by its class: the element whose w:val names the language, and
+# the root that proves the part writes the w: prefix these patterns read. A part whose
+# root does not carry it binds the namespace to another prefix, so nothing in it can
+# be read: that is SAID (found None), never reported as a part with no language value
+# in it. The same classes serve the main document (word/) and the glossary's own
+# (word/glossary/), which has its own styles and settings.
+_LANGUAGE_CLASS = {
+    'styles': (_LANG_TAG, b'<w:styles'),                # 13.2
+    'settings': (_THEME_LANG_TAG, b'<w:settings'),      # 13.2
+    'stylesWithEffects': (_LANG_TAG, b'<w:styles'),     # 13.5, from here down
+    'numbering': (_LANG_TAG, b'<w:numbering'),
+    'header': (_LANG_TAG, b'<w:hdr'),
+    'footer': (_LANG_TAG, b'<w:ftr'),
+    'footnotes': (_LANG_TAG, b'<w:footnotes'),
+    'endnotes': (_LANG_TAG, b'<w:endnotes'),
+    'comments': (_LANG_TAG, b'<w:comments'),
+}
+_LANGUAGE_PART_RE = re.compile(
+    r'^word/(?:glossary/)?(?:(header|footer)\d*|(styles|settings|stylesWithEffects|'
+    r'numbering|footnotes|endnotes|comments))\.xml$')
 _LANGUAGE_VAL_RE = re.compile(rb'(\sw:val=)(["\'])[^"\']*\2')
-# The patterns read the w: prefix Word writes. A part whose root does not carry it
-# binds the namespace to another prefix, so nothing in it can be read: that is SAID
-# (found None), never reported as a part with no language value in it.
-_LANGUAGE_ROOT = {'word/styles.xml': b'<w:styles', 'word/settings.xml': b'<w:settings'}
+
+
+def _language_part(part):
+    """(element pattern, root) for a part whose language values repack sets, else
+    None. The glossary's own document is the one class with no twin in word/: the
+    body, word/document.xml, is apply's and is never named."""
+    if part == _GLOSSARY_PART:
+        return _LANG_TAG, b'<w:glossaryDocument'
+    m = _LANGUAGE_PART_RE.match(part)
+    return _LANGUAGE_CLASS[m.group(1) or m.group(2)] if m else None
 
 
 def _set_document_language(part, data, tag):
-    """(data with each w:val of the part's language element set to `tag`, values
-    found, values changed). A part not named in _LANGUAGE_ELEMENT is returned as is;
+    """(data with each w:val of the part's language elements set to `tag`, values
+    found, values changed). A part _language_part does not name is returned as is;
     one whose root is not w:-prefixed is returned as is with found None."""
-    pattern = _LANGUAGE_ELEMENT.get(part)
-    if pattern is None:
+    lp = _language_part(part)
+    if lp is None:
         return data, 0, 0
-    if _LANGUAGE_ROOT[part] not in data:
+    pattern, root = lp
+    if root not in data:
         return data, None, 0
     value = tag.encode('ascii')
     found = changed = 0
@@ -721,8 +756,8 @@ def repack(orig_docx, translated_doc_xml, output_docx,
     optionally-supplied auxiliary XML parts (numbering, headers/footers,
     comments, footnotes, endnotes, glossary).
 
-    ``variant`` ('uk' or 'us') is the delivered variant: the document language set
-    in styles.xml and settings.xml, en-GB or en-US. NAME IT: this default is 'uk' in
+    ``variant`` ('uk' or 'us') is the delivered variant: the language set in every
+    part that carries one, en-GB or en-US. NAME IT: this default is 'uk' in
     both trees, so the two stay one program; the command line defaults --variant to
     the tree's own.
 
@@ -1166,8 +1201,8 @@ def repack(orig_docx, translated_doc_xml, output_docx,
                 else:
                     data = zin.read(item.filename)
 
-                # THE DOCUMENT'S LANGUAGE (R1), on whichever branch above produced the part.
-                if norm_filename in _LANGUAGE_ELEMENT:
+                # THE DOCUMENT'S LANGUAGE (R1, R2), on whichever branch above produced the part.
+                if _language_part(norm_filename):
                     data, _found, _changed = _set_document_language(norm_filename, data, language_tag)
                     languages[norm_filename] = (_found, _changed)
 
@@ -1184,9 +1219,12 @@ def repack(orig_docx, translated_doc_xml, output_docx,
             if _found is None:
                 print(f"  WARNING: document language NOT SET in {_part}: its root is not "
                       f"w:-prefixed, so its language values could not be read")
-            else:
+            elif _found:
                 print(f"  Document language: {_found} value(s) in {_part} read {language_tag} "
                       f"({_changed} changed)")
+        _quiet = sum(1 for _f, _c in languages.values() if _f == 0)
+        if _quiet:
+            print(f"  Document language: {_quiet} other language part(s) carry no language value")
 
     # --- VERIFY THE ARCHIVE IN MEMORY, AND WRITE IT ONLY IF EVERY CHECK PASSES ---
     #
@@ -1299,8 +1337,8 @@ if __name__ == '__main__':
                              'REFUSES to bundle without it — the gate is '
                              'unconditional, not advisory.')
     parser.add_argument('--variant', choices=sorted(VARIANT_LANGUAGE), default='us',
-                        help='The delivered variant: sets the document language in '
-                             'styles.xml and settings.xml to en-GB (uk) or en-US (us). '
+                        help='The delivered variant: sets the language in every part '
+                             'that carries one to en-GB (uk) or en-US (us). '
                              "Defaults to this tree's own variant.")
     args = parser.parse_args()
     repack(args.original, args.translated_xml, args.output,
