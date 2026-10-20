@@ -11,7 +11,10 @@ description: >
   asks for a "format-preserving translation" of a legal document. This skill covers all legal
   domains: finance, M&A, corporate, IP, real estate, regulatory, consumer, taxes, litigation,
   SaaS and more. Even if the user just says "translate this contract" or "translate this into
-  English", use this skill if the document is legal in nature.
+  English", use this skill if the document is legal in nature. Also use it to deliver a legal
+  document already in English in UK or US English ("give me the US version of this English
+  contract"): it declares a variant-conversion mode and converts instead of translating, every
+  gate still run.
 ---
 
 # Legal Document Translation Skill
@@ -187,11 +190,11 @@ High-level summary of what each step does. Detail in the step files.
 
 | # | Step | Action | File |
 |---|------|--------|------|
-| 1 | Set up | Convert .doc→.docx if needed, unpack to a workdir, **declare the source language** (1c); the input the skill accepts is declared at 1b | `skill-docs/01-setup-and-extract.md` |
+| 1 | Set up | Convert .doc→.docx if needed, unpack to a workdir, **declare the source language** (1c) — `english` opens the variant-conversion mode; the input the skill accepts is declared at 1b | `skill-docs/01-setup-and-extract.md` |
 | 2 | Extract | `extract_paragraphs.py` **refuses at admission** anything outside 1b's accepted input, then produces paragraphs.json with formatting metadata | `skill-docs/01-setup-and-extract.md` |
-| 3 | Lexicons | Identify document domain, load English references and per-language sub-lexicons | `skill-docs/03-lexicons-and-segments.md` |
+| 3 | Lexicons | Identify document domain, load English references and per-language sub-lexicons (none in the variant-conversion mode) | `skill-docs/03-lexicons-and-segments.md` |
 | 3b | Scaffold | (TC documents only) Build `en_segments` skeleton for fragmented TC | `skill-docs/03-lexicons-and-segments.md` |
-| 4 | Translate | Fill `en` and `en_runs` for every paragraph, ≤35 per batch | `skill-docs/04-translate.md` |
+| 4 | Translate | Fill `en` and `en_runs` for every paragraph, ≤35 per batch; converted, not translated, in the variant-conversion mode | `skill-docs/04-translate.md` |
 | 4b | Per-batch validate | `validate_translations.py` after each batch | `skill-docs/04b-translate-gates.md` |
 | 4c | Cross-refs | Resolve broken cross-references in translated text | `skill-docs/04b-translate-gates.md` |
 | 4d | Lexicon compliance | `lexicon_compliance.py` pre-apply scan | `skill-docs/04b-translate-gates.md` |
@@ -374,6 +377,10 @@ If you are uncertain whether a specific term is "generic legal vocabulary" (gove
 variant) or "jurisdiction-specific" (not governed), treat it as jurisdiction-specific and
 preserve the established English rendering. Over-Anglicizing or over-Americanizing
 jurisdiction-specific terms is a more serious error than leaving register slightly off.
+
+**The delivered file is marked as the variant's English.** Repack sets the document's own
+language to `en-GB` or `en-US`, whichever variant it delivers, so Word spell-checks the English
+as English rather than against the source language's dictionary.
 
 ## Scripts reference
 

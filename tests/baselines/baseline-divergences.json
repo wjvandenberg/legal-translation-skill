@@ -6,9 +6,9 @@
  "count": 58,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/step13-3-admission-envelope",
-   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
-   "sha256_now": "85a93a6cf65b644a6bd6ebe17400019ff7369de8fa9cdf70143a8a456625e8b3"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "f00e69f3a06621c6a50d8335266474ce53e77845e33684f2896d6538def39655"
   },
   "uk/scripts/apply_translations_textmatch.py": {
    "changed_by": "fix/language-module-integrity",
@@ -41,9 +41,9 @@
    "sha256_now": "465b60ffec0cb75f2714d81245c206c6c62fa55d3bbd697493a1abf8e006c52f"
   },
   "uk/scripts/source_language_markers.py": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "f0a5ad911c93fc61ebfa64359025292cc1e8159dee8f97b15aa6c57259b52199"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "810daa47f9246b32bf055ea824a0c70fbd8801dd6ea3fe19d01e1182bdce512f"
   },
   "uk/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch11-slice4a",
@@ -71,14 +71,14 @@
    "sha256_now": "d36afd7da2d703dde74202bcc293335fe31d0317d2ab4aca2d19f4fd787597e2"
   },
   "uk/scripts/verify_diligence.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "cb54fbc6f58c5cf7a970e819fbf7a3df8d51d73e14dba8b59591628d58c79a7f"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "bf9778d3f582073efb896353d242f6add668132b75d8f31c2304068a77f1ac28"
   },
   "uk/skill-docs/01-setup-and-extract.md": {
-   "changed_by": "feature/step13-3-admission-envelope",
-   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
-   "sha256_now": "015bee040b07e63fc9342f8c45d8dc2d7f73f2a17aaf5d20c494bacf57661fa5"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "6148bd37e96bc5cdefbb85f7a78d51ee69d9c2378c6d384924b8dd00cbf96ef3"
   },
   "uk/skill-docs/04b-translate-gates.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -106,9 +106,9 @@
    "sha256_now": "645a69597270b100319ee6f4d5e24f02850a34cb3c899c013b923a63ff8dd154"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/step13-3-admission-envelope",
-   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
-   "sha256_now": "dc2b9fe200fbedfe9f05bea222b2cb88043ab99e8d964ab1d03c23006dd6198f"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "2f19e93d28330348343f6e9ba09c5e686565b3df835d774376ce21bcb1d209dd"
   },
   "us/scripts/apply_translations_textmatch.py": {
    "changed_by": "fix/language-module-integrity",
@@ -141,9 +141,9 @@
    "sha256_now": "192ae09f3db5d986d1e8e4d9106b7faa19f5a5c329b2153211a3b2fb756b876c"
   },
   "us/scripts/source_language_markers.py": {
-   "changed_by": "feature/branch12-slice12b",
-   "commit_subject": "Branch 12 slice 12b - the gaps the declaration exposes: numbering reads the declaration and lists what it left, month names are remnants, the diligence audit asks for Step 1c (S1 S3 E4 C2 F48 closed; H1 partial)",
-   "sha256_now": "bfb6fafb54cbad62f41c0f3b0a3a8939fd6acb19b60dc775593c1fa14320f6eb"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "94ddd04218a209b16e87fef658b409ab2fb31fd0cb52eaef9247a97bfb4948d8"
   },
   "us/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch11-slice4a",
@@ -171,14 +171,14 @@
    "sha256_now": "14167da617e929d80bbe294a51ebd4673379662e258c45d61edf6d470104a770"
   },
   "us/scripts/verify_diligence.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "c81e5e9e75e2e8cf9db961f092c2366f9cfc588f3274bef84df03763e55e630c"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "3bb5ed10f42429b57bd81b756d4e7c7058a0475816a2876a9c4a4b642122019c"
   },
   "us/skill-docs/01-setup-and-extract.md": {
-   "changed_by": "feature/step13-3-admission-envelope",
-   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
-   "sha256_now": "015bee040b07e63fc9342f8c45d8dc2d7f73f2a17aaf5d20c494bacf57661fa5"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "6148bd37e96bc5cdefbb85f7a78d51ee69d9c2378c6d384924b8dd00cbf96ef3"
   },
   "us/skill-docs/04b-translate-gates.md": {
    "changed_by": "feature/branch12-slice12a",
@@ -226,14 +226,14 @@
    "sha256_now": "a4753f3c514ddf3fd4f015673c97673faf624db19d143fef97d7eb90f3a247ec"
   },
   "uk/skill-docs/03-lexicons-and-segments.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "f748ac9760b7b4984e3ce57cd870068f3a0e6481bd4c030afcb7aafd53e8fd3b"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "02b8d5c3c4b430419a707d86e77d1734fa6a8e568a3ba0e70308cc0fbcdacbd3"
   },
   "uk/skill-docs/04-translate.md": {
-   "changed_by": "feature/branch12-12c",
-   "commit_subject": "Branch 12 slice 12c - the ratio check can fire: floor 20, Japanese and Chinese scaled, NOT APPLICABLE on a source declared English (H2 H4)",
-   "sha256_now": "d9574269ced9716a91e9f0910463ad59a44eea05330f5494bbc2fb812d473505"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "88f933b8a8c7319517bc4d27c7dc223b2e2ccd37944f1059bf1b457be52b984c"
   },
   "us/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/branch11-slice4b",
@@ -246,14 +246,14 @@
    "sha256_now": "a4753f3c514ddf3fd4f015673c97673faf624db19d143fef97d7eb90f3a247ec"
   },
   "us/skill-docs/03-lexicons-and-segments.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "bfff58e9d7ace0b694e2fb20d3a0de8ada435e87a0d4d34bea9bf01ad594df5d"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "c34927055febc10a448a93af3b5998252b29d466286ef07cf187eb4217ae6c5f"
   },
   "us/skill-docs/04-translate.md": {
-   "changed_by": "feature/branch12-12c",
-   "commit_subject": "Branch 12 slice 12c - the ratio check can fire: floor 20, Japanese and Chinese scaled, NOT APPLICABLE on a source declared English (H2 H4)",
-   "sha256_now": "50d06071f04ba58543fa3e228de164fc05f8cd49d5bea1a0122e39d4c6424d03"
+   "changed_by": "feature/step13-4-variant-conversion",
+   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
+   "sha256_now": "f01fb3d4c3ac335d596493887d75520582eee0daed301a949ff1fdc3c897f9c4"
   },
   "uk/scripts/translate_comments.py": {
    "changed_by": "feature/branch11-slice4c",

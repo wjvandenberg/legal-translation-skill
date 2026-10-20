@@ -6,6 +6,13 @@
 
 **The skill-wide Hard Rules apply to this step.** See SKILL.md for the full block. The rules that bite hardest in Step 4: ≤35 paragraphs per batch (enforced by `validate_translations.py`), every paragraph's complete `text` field must be in your context window during translation, and `en_runs` is mandatory for every definitions-section paragraph (enforced by `validate_en_runs.py` at the start of Step 5).
 
+**In the variant-conversion mode (Step 1c) you do not translate — you convert.** Write each
+paragraph's `en` as its source in the delivered variant: its spelling, its terms of art, its date
+and number conventions, and nothing else. Never re-draft, re-punctuate or improve it; a paragraph
+that needs no change is written exactly as its source. Everything else in this step still binds:
+every paragraph, at most 35 per batch, `en_runs` where they are mandatory, and Step 4b after each
+batch.
+
 Translate **every non-empty paragraph** by filling in the `"en"` field in the JSON.
 
 ```json
@@ -900,6 +907,7 @@ Before moving to the next step, confirm:
 
 - [ ] You translated every paragraph of the source (no skipping, no summarization)
 - [ ] You stayed within the ≤35 paragraphs per batch cap
+- [ ] In the variant-conversion mode (Step 1c): each `en` is its source in the delivered variant and nothing else
 - [ ] You ran `validate_translations.py` after each batch (Step 4b)
 - [ ] You populated `en_runs` for every definitions-section paragraph
 - [ ] You produced `en_segments` for every TC paragraph (no shortcuts)

@@ -540,6 +540,11 @@ def is_supported_language(language):
 # ──────────────────────────────────────────────────────────────────────
 DECLARATION_FILE = 'source_language.json'
 TARGET_LANGUAGE = 'english'
+# SUB-STEP 13.4 (registers H1 and H3): a source ALREADY IN ENGLISH is an input class with a mode of its own,
+# not a translation in which every language check is inert. Declaring `english` at Step 1c OPENS it, and only
+# that declaration does: recorded beside the language, read back by declared_mode(), never inferred from text.
+MODE_KEY = 'mode'
+VARIANT_CONVERSION = 'variant-conversion'
 _LANGUAGE_NAME_RE = re.compile(r'^[a-z]+$')
 
 
@@ -562,6 +567,17 @@ def language_state(language, origin='declared'):
                            f"({', '.join(SUPPORTED_LANGUAGES)})")
 
 
+def _declaration_path(notes):
+    """`source_language.json` beside paragraphs.json, or None when no notes are named. A
+    paragraphs.json path names its folder; anything else IS the folder, existing or not —
+    never its parent, which would read another workdir's declaration."""
+    if not notes:
+        return None
+    folder = (os.path.dirname(os.path.abspath(notes))
+              if notes.lower().endswith('.json') and not os.path.isdir(notes) else notes)
+    return os.path.join(folder, DECLARATION_FILE)
+
+
 def read_declared_language(notes):
     """THE ONE READER of the declaration: (language, state, why).
 
@@ -576,14 +592,8 @@ def read_declared_language(notes):
     `language` is the declared name for the first two and None otherwise —
     an unreadable declaration is never turned into a language. `why` is the
     reason a check prints, never document text."""
-    if not notes:
-        return None, 'undeclared', _undeclared_why()
-    # A paragraphs.json path names its folder; anything else IS the folder, existing or not —
-    # never its parent, which would read another workdir's declaration.
-    folder = (os.path.dirname(os.path.abspath(notes))
-              if notes.lower().endswith('.json') and not os.path.isdir(notes) else notes)
-    path = os.path.join(folder, DECLARATION_FILE)
-    if not os.path.isfile(path):
+    path = _declaration_path(notes)
+    if path is None or not os.path.isfile(path):
         return None, 'undeclared', _undeclared_why()
     try:
         # utf-8-sig: a declaration written by hand on Windows often carries a BOM.
@@ -602,6 +612,22 @@ def read_declared_language(notes):
             "declare the language again at Step 1c")
     state, why = language_state(language)
     return language, state, why
+
+
+def declared_mode(notes):
+    """The mode RECORDED at Step 1c, or None. Only `--declare english` writes one, the
+    variant-conversion mode, and it is read back only where the declaration still names English
+    and carries the key: a declaration written by hand or before sub-step 13.4, or one naming any
+    other language, opens no mode - the operator declares again. Never inferred from the text."""
+    language, _state, _why = read_declared_language(notes)
+    if language != TARGET_LANGUAGE:
+        return None
+    try:
+        with open(_declaration_path(notes), 'r', encoding='utf-8-sig') as fh:
+            data = json.load(fh)
+    except (OSError, ValueError):
+        return None
+    return VARIANT_CONVERSION if data.get(MODE_KEY) == VARIANT_CONVERSION else None
 
 
 def not_supported(check, why):
@@ -663,11 +689,20 @@ def _declare(argv):
     earlier, _state, _why = read_declared_language(workdir)
     with open(os.path.join(workdir, DECLARATION_FILE), 'w', encoding='utf-8',
               newline='') as fh:
-        fh.write(json.dumps({'source_language': language}) + '\n')
+        record = {'source_language': language}
+        if language == TARGET_LANGUAGE:
+            record[MODE_KEY] = VARIANT_CONVERSION
+        fh.write(json.dumps(record) + '\n')
     if earlier and earlier != language:
         print(f"Replaced the earlier declaration ({earlier}) with {language}.")
     _lang, state, why = read_declared_language(workdir)
-    if state == 'supported':
+    if declared_mode(workdir) == VARIANT_CONVERSION:
+        print(f"Declared the source language: {language} — the VARIANT-CONVERSION MODE is open. "
+              "The document is already in English, so it is converted to the delivered variant, not "
+              "translated: Step 3 reads no language sub-lexicon, Step 4 writes each paragraph's English "
+              "as its source in the variant and nothing else, and every gate runs as for a translation. "
+              + not_supported("every language-dependent check", why))
+    elif state == 'supported':
         print(f"Declared the source language: {language} — supported, one of the "
               f"{len(SUPPORTED_LANGUAGES)}. Every language-dependent check will read it.")
     else:
