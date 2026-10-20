@@ -1634,3 +1634,51 @@ runner (open since 2026-10-16 (2)); the plan's line 160; check 2's vacuity row w
 >
 > **Open, none blocking:** the plan's line 160 naming the charter's section 6 for the phase order; no register row for
 > check 2's vacuity until rename (c) files it; (c) and (d) after step 13 (Wouter). **Context: 59% when written, measured.**
+
+## 2026-10-20 — R1's residue filed as R2; sub-step 13.3 built, L5 closed; I-42; the standalone suites to the runner
+
+**WOUTER AT THE CLOSE, THROUGH THE QUESTION TOOL — each the recommended answer, the option's claim measured first.**
+**(1) THE STANDALONE SUITES:** all 46 that the full runner does not name — measured, 1 of the 47 `tests/test_*.py` is
+named — wired into it as a piece of its own before 13.4, not a sub-step, its added minutes measured first. **(2) THE
+SENTENCE BEYOND 13.3's BRIEF:** skill Step 1b's *never build the English document outside the pipeline instead* is
+kept, naming the bypass L5 observed.
+
+**JUDGEMENTS TAKEN ALONE, CARRIED TO THE CLOSE.** **(a)** R2's figures were re-measured over all 13 workdirs, not
+the 9 with an exact delivery: the 51 recorded at 13.2's close folded tags with an English value or none,
+`numbering.xml` and the Word 2010 copy into one figure, and R1's sentence now points at R2, which owns them. **(b)** R2
+is LOW where R1 is MED, its reach the text those tags cover; it sits in consequence group 2 and option 5 beside R1,
+and is numbered 13.5, "a sub-step after 13.4" being Wouter's. **(c)** The envelope's full text is in skill Step 1b
+and `SKILL.md`'s step table only points at it, `SKILL.md` being already past the one truncation point ever observed
+(register W1); it still grew 115 bytes. **(d)** A refusal exits 2 under the gate banner, the shape of
+`clean_conversion_artifacts.py`, the skill's one earlier admission gate; the checks raise so a caller sees them.
+**(e)** From the review, beyond the brief's five: a Strict Open XML `.docx` and a zip the probe cannot read are
+refused as not a Word document, an encrypted package needs both stream names, a `.doc` asking for a password is told
+to remove it, and the raw route reads a `.xml` path only. **(f)** Option 5 was "the largest group" in two places and
+option 2 is larger; both now say so, and two of option 5's three typed counts went. **(g)** TEST's failure was our
+instrument's, not the change's: `tools/confirm_failure_chains.py` knew a compile refusal only by the word
+`SyntaxError`, filed and fixed as I-42; the other checks catch the exception class and were never affected.
+
+**OPEN, NONE BLOCKING.** Renames (c), with check 2's vacuity row, and (d) after step 13; the language claim with
+13.4; the plan's line 160; `SKILL.md`'s size, goal (iv)'s.
+
+**The 2026-10-19 (2) handoff, as it stood at `0ba7688`, word for word:**
+
+> ### HANDOFF — 2026-10-19 (2), 13.1 MEASURED, 13.2 BUILT AND MERGED
+>
+> **PURPOSE: MET.** It was *so that the short-document gear is designed by Wouter from measured minutes rather than a
+> guess, and a delivered English file is spell-checked as English*: #154 measured it, Wouter choosing to re-measure in
+> phase 3; #155 sets the document's two language values, R1 closed — the side parts' tags a row still to file.
+>
+> **BUILT:** #154 — the per-step table in section 3.4 of `evidence/EVIDENCE-a3-structure.md`; 28–55% of active time ends
+> at the A1 harness's paperwork, so a user's fixed cost is 14–25 minutes. #155 — `repack_docx.py` both trees, its suite
+> red first, the corpus arm's third `--ref` sense. Wouter's four answers and the judgements: `DECISIONS-LOG.md`, 2026-10-19 (2).
+>
+> **SINGLE NEXT ACTION: FILE R1'S RESIDUE AS A REGISTER ROW** *(Wouter; carried, the filing moving counts in four
+> files)*, then **SUB-STEP 13.3, L5** — the envelope refused at admission, its size limit 1,000 paragraphs *(Wouter)*.
+>
+> **WHAT A NEW SESSION WOULD GET WRONG:** `repack()` defaults to `uk` in BOTH trees by design — the parity check reads a
+> per-tree function default as new drift — and only the command line defaults per tree, arm 5 of
+> `tests/test_repack_scrub_and_block.py` asserting that one line; standalone suites run only when a TEST list names them.
+>
+> **Open, none blocking:** renames (c), with check 2's vacuity row, and (d) after step 13 *(Wouter)*; the language
+> claim with 13.4; line 160 of the plan naming section 6 for the order. **Context: 60% when written, measured.**
