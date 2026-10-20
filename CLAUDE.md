@@ -595,5 +595,5 @@ entry's rulings (6) and (7), confirmed 2026-10-20 (3))*; then (d), the rest; the
 controls and the covering suites; the base list, the twelve-tool comparison and the ~40-minute full runner ONCE, at
 the end *(Wouter)*; the corpus arm's 13.5 pin is `8ad07c3`; "the glossary" means all its parts *(Wouter, kept)*.
 
-**Open, none blocking:** a session started here builds the charter-pointer checker, the house's version Wouter's
-to plan; the house runner's suite-coverage arm; `SKILL.md`'s size, goal (iv)'s. **Context: 59% when written, measured.**
+**Open, none blocking:** the charter-pointer checker built here, `tests/test_charter_pointers.py`, the house's
+version Wouter's to plan; the house runner's suite-coverage arm; `SKILL.md`'s size, goal (iv)'s. **Context: 59% when written, measured.**

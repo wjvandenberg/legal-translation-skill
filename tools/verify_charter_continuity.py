@@ -271,7 +271,8 @@ LEDGER = [
     ("the ten OOXML rules",        "ZWSP",                         ["CLAUDE.md", ".claude/rules/ooxml.md"]),
     # THE NEEDLE WAS WRONG ON THE FIRST RUN, not the rule: it read "no changelog" against a charter
     # that says "No changelog inside the archive, ever." A lowercase two-word needle reported a
-    # route-1 rule as GONE. This is 5.12's sixth point committed inside the instrument that cites it.
+    # route-1 rule as GONE. This is the audit gate's sixth point, never a two-word needle, committed inside the
+# instrument that cites it.
     ("no changelog in the archive", "No changelog inside the archive", ["CLAUDE.md"]),
     ("the rev44 token",            "v2026.04.22-rev44",            ["CLAUDE.md"]),
     # STEP 7 -- the three skills. A skill's body is not in context until invoked, so the charter must

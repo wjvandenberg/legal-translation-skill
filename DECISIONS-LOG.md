@@ -1786,3 +1786,15 @@ runner's suite-coverage arm; `SKILL.md`'s size, goal (iv)'s.
 >
 > **Open, none blocking:** the four silent reds as a register row; a suite-coverage arm in the house runner; renames (c),
 > with check 2's vacuity row, and (d) after step 13; `SKILL.md` larger again, goal (iv)'s. **Context: 65% when written, measured.**
+
+## 2026-10-20 (3), continued — the charter-pointer checker, built here
+
+**WOUTER, AFTER THE CLOSE** *(in words)*: *"Do this task here"* — the card proposed for it had been started, but no
+session, branch or pull request existed, so it was built in this session. **JUDGEMENTS TAKEN ALONE.** **(a)** Measured
+first: 109 anchored pointers and every one naming a section that exists, so an existence check alone would have caught
+two of I-43's eight; the test therefore PINS the title at every cited number and fails a pointer whose number's
+title has moved. **(b)** Bare numbers within three lines of a charter mention are judged too, being how two of the
+eight were written; what is not a pointer is a declared exemption with its reason, printed every run. **(c)** The
+first run found two more of #74's stale numbers and a paraphrase in quotation marks, all mended; the house copies
+`verify_charter.py` and `verify_md.py` are exempted, never edited here. **(d)** A pin cannot see a pointer already
+wrong when pinned, so the pins were set after the hand check, and the docstring says so.
