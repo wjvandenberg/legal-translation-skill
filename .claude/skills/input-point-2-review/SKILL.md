@@ -1,19 +1,19 @@
 ---
 name: input-point-2-review
-description: The per-document review protocol for INPUT POINT 2 - how Wouter's blind review of the 11 Step C documents is run, the three-way triage per point, the two artefacts and where they may live, the blind rule, and what Claude must not do. Use when running or preparing INPUT POINT 2, when Step C's graded documents come back for review, or when any blind review of translated output is being set up. Relocated from CLAUDE.md 5.4 under route 3 on 2026-09-11, at THE CHARTER REDUCTION part (e) - the official trigger applies word for word: a section of CLAUDE.md that has grown into a procedure rather than a fact.
+description: The per-document review protocol for INPUT POINT 2 - how Wouter's blind review of phase 3's 11 test documents is run, the three-way triage per point, the two artefacts and where they may live, the blind rule, and what Claude must not do. Use when running or preparing INPUT POINT 2, when phase 3's graded documents come back for review, or when any blind review of translated output is being set up. Relocated from CLAUDE.md 5.4 under route 3 on 2026-09-11, at THE CHARTER REDUCTION part (e) - the official trigger applies word for word: a section of CLAUDE.md that has grown into a procedure rather than a fact.
 ---
 
 # The review protocol — for INPUT POINT 2
 
-**Kept because Step C repeats it.** `CLAUDE.md` 5.4 keeps the trigger and points here. This is a procedure
+**Kept because phase 3 repeats it.** `CLAUDE.md` 5.4 keeps the trigger and points here. This is a procedure
 run at one moment, not a fact that must hold every session — which is why it lives here and not in the
 charter.
 
 ## Why this is a procedure and not a rule
 
 There are **exactly two input points** in this project, and 1 is closed (Wouter's blind review of all 12
-A1+A2 documents, CLOSED 2026-07-31). **INPUT POINT 2 is his review of all 11 Step C documents**, and it
-happens once, at step 3, after the build. The charter keeps *that* fact — the order and the count — because
+A1+A2 documents, CLOSED 2026-07-31). **INPUT POINT 2 is his review of all 11 of phase 3's test documents**, and it
+happens once, in phase 3, after the build. The charter keeps *that* fact — the order and the count — because
 order is what section 3 owns. Everything below is how the session is actually run on the day.
 
 ## The loop, per document

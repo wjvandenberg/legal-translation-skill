@@ -11,8 +11,8 @@ rather than charter text.** `CLAUDE.md` 6.4 keeps the standing facts and points 
 > **READ THIS FIRST: NEITHER SCRIPT EXISTS YET.** `tools/package.py` and `tools/publish.py` are named
 > below and in the charter's 6.4, and **both are absent from `tools/` — checked by listing, 2026-08-24,
 > and named nowhere else in the repository.** So this document is a **specification**, not a runbook.
-> **Building them is phase 4's work** *(section 3.2 of `CLAUDE.md`, its phase-4 block, third bullet: the
-> deferred items land there, not in phase 2)*. Do not write a release script from memory of this page
+> **Building them is phase 4's work** *(section 3.2 of `CLAUDE.md`, its phase-4 block)*.
+> Do not write a release script from memory of this page
 > without re-reading that block first, and do not describe either script as existing.
 
 ## What the deliverable is, and what it is not

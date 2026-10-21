@@ -14,7 +14,7 @@
 # Three things this project depends on would then be quietly wrong, and none of them would
 # announce it:
 #
-#   1. Branch 0's premise. It commits both published trees UNMODIFIED, and "unmodified" is
+#   1. Step 0's premise. It commits both published trees UNMODIFIED, and "unmodified" is
 #      verified by SHA-256 against the archive. A CRLF checkout fails that comparison on
 #      every text file while the diff shows nothing at all.
 #   2. The byte-comparison harness. The pipeline's mechanical half is a deterministic

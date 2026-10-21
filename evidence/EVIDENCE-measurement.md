@@ -41,7 +41,7 @@ lives in the private sibling folder, as it always has.
 | D06 | Contract (Italian) | 613 | **the only TRUE legacy binary `.doc`** — the sole exercise of the conversion path; the largest document |
 | D07 | Novation (English) | 97 | **source language == target language**, which nothing in the pipeline notices |
 | D08 | Agreement (Finnish) | 57 | comments plus highlights |
-| D09 | Document (Hungarian) | 96 | the most tables; **four known-answer judgement calls**, which is why it is the Step C arm document |
+| D09 | Document (Hungarian) | 96 | the most tables; **four known-answer judgement calls**, which made it the arm document of the dropped Opus 5 run — **no longer an arm document** *(2026-10-14)* |
 | D10 | Guarantee (Polish) | 45 | delivered both the positive and the negative highlight control in one file |
 | D11 | MOU (Japanese) | 43 | **the only non-Latin script**, plus tracked changes |
 
@@ -184,7 +184,7 @@ what makes `git bisect` usable on this pipeline at all:
 - definitions ordering
 - accept/reject reconstruction
 
-**Tier two is a full LLM re-grade at branch boundaries only**, on a fixed subset, against the frozen v3
+**Tier two is a full LLM re-grade at step boundaries only**, on a fixed subset, against the frozen v3
 baselines. **The measurement that makes tier one primary rather than merely cheaper** is the only
 same-document repeat this project has: **~40% of paragraphs differed linguistically while the mechanical
 output was identical** — variance large in prose, nil in mechanics. A grading tier that moves by 40% on an

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """cycle_evidence.py - did VERIFY and TEST actually run, against the content being committed?
-CHECKER VERSION 1 (2026-08-27)
+CHECKER VERSION 2 (2026-10-21)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -15,6 +15,8 @@ reading the tree, only by recording something at the moment a command runs.
     uv run python tools/cycle_evidence.py test   -- <the test command>
     uv run python tools/cycle_evidence.py na verify "<why it does not apply, 15+ chars>"
     uv run python tools/cycle_evidence.py check          # what a pre-commit hook calls
+    uv run python tools/cycle_evidence.py full -- <the full test command>   # v2: on a CLEAN tree
+    uv run python tools/cycle_evidence.py check-push <commit>   # v2: what a pre-push hook calls
     uv run python tools/cycle_evidence.py status
     uv run python tools/cycle_evidence.py --selftest     # prove every check can FAIL
     uv run python tools/cycle_evidence.py --write-config
@@ -38,7 +40,25 @@ what the commands actually ran against: A PARTIALLY STAGED COMMIT IS A SUBSET OF
 TESTED, which is safe, and the unsafe case - committing something never tested - cannot
 happen while the worktree hash matches.
 
-  CHECKED HERE     that a command was recorded for verify and for test, or one of them
+THE PUSH RECORD, v2 - THE FULL SUITE ONCE BEFORE A PUSH, NEVER ONCE PER COMMIT. A commit's own
+evidence is the test groups covering what it changed; the whole suite is what a PUSH must carry,
+because a push is where work leaves the machine. Measured before this existed: a gate that wanted
+the full suite as each code commit's test made a session run it once per commit, against the
+house rule that it runs once. `full` records a full run, and `check-push` answers for a commit:
+  * A FULL RUN IS RECORDED ONLY ON A CLEAN TREE, AND ONLY IF IT IS STILL CLEAN AFTERWARDS. The
+    record vouches for a commit, so it must be taken on exactly that commit's content: a run
+    over uncommitted edits - or one that edited the tree while it ran - vouches for something
+    no commit holds. Clean means `git status --porcelain` is empty: modified, staged and
+    untracked-but-not-ignored files all count.
+  * IT IS KEYED BY THE TREE, NOT THE COMMIT. A reworded or rebased commit with the same content
+    is the same thing to a test; a commit id would make a message edit cost a whole run.
+  * A PUSH PASSES ON ITS OWN TREE'S RECORD, OR ON THE NEAREST ANCESTOR'S WHEN EVERY PATH CHANGED
+    SINCE ENDS IN .md - documents cannot break a script except by crashing a checker the
+    commit's own evidence already ran. The suffix is FIXED, for the reason PHASES is.
+  * THE RECORDS SIT IN THE SAME UNCOMMITTABLE STORE, under a key git refuses as a branch name,
+    so they can never be mistaken for a branch's verify and test.
+
+  CHECKED HERE    that a command was recorded for verify and for test, or one of them
                    declared N/A with a reason of real length - the weaker reading, reported
                    as its own row * that every record's content hash still equals the
                    current worktree hash, so nothing was edited after being checked * that
@@ -65,6 +85,9 @@ happen while the worktree hash matches.
 
 EXIT CODES.  0 = both phases have evidence matching this content.  1 = blocked.
 2 = could not run at all (not a git repository, or the store is unreadable).
+check-push: 0 = the push may go, 1 = refused, 2 = not a commit, so nothing was decided.
+full: 0 = recorded; the command's own exit code if it failed; 2 = nothing recorded though the
+command may have passed - the tree was not clean before, or the run changed it.
 """
 from __future__ import annotations
 
@@ -93,6 +116,17 @@ from house_common import (                                          # noqa: E402
 PHASES = ("verify", "test")
 
 MIN_REASON = 15
+
+#: v2. The store key for full runs - one git refuses as a branch name, ':' being barred from a
+#: ref, so the push records can never collide with a branch's verify and test.
+FULL_KEY = "full-runs:"
+
+#: v2. What counts as a document for a push after the last full run. FIXED, for the reason
+#: PHASES is: a project able to widen it would widen it to whatever was failing.
+DOC_SUFFIXES = (".md",)
+
+#: v2. How far back a push looks for the nearest full run before it refuses.
+SEARCH_DEPTH = 200
 
 DEFAULT_CONFIG = {
     "store": "temp/.cycle-evidence.json",
@@ -265,6 +299,110 @@ def declare_na(root: Path, store: Path, phase: str, reason: str) -> int:
     return RC_OK
 
 
+# --------------------------------------------------------------------------- the push record, v2
+
+def tree_of(root: Path, rev: str):
+    """The tree id of the commit `rev` names, or None if it names no commit. A name beginning
+    with '-' is refused rather than handed to git, which would read it as an option."""
+    if not rev or rev.startswith("-"):
+        return None
+    rc, out = git_text(root, "rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}")
+    if rc != 0 or not out:
+        return None
+    rc, tree = git_text(root, "rev-parse", f"{out}^{{tree}}")
+    return tree if rc == 0 and tree else None
+
+
+def unclean(root: Path):
+    """None if the worktree is exactly HEAD's tree, else why not - as a count, never a path list."""
+    rc, out = git_text(root, "status", "--porcelain")
+    if rc != 0:
+        return f"git status exited {rc}, so the tree could not be read"
+    lines = [ln for ln in out.splitlines() if ln.strip()]
+    return f"{len(lines)} path(s) differ from HEAD or are untracked" if lines else None
+
+
+def record_full(root: Path, store: Path, cmd, cwd: Path | None = None) -> int:
+    """Run the FULL suite and record it against HEAD's TREE - only on a clean tree, only on exit
+    0, and only if the tree is still clean and HEAD unmoved afterwards (THE PUSH RECORD, above).
+
+    THE AFTER-CHECK IS NOT BELT-AND-BRACES. A suite that writes a tracked file while it runs - a
+    regenerated fixture, a rewritten config - passes against content that is in no commit, and
+    a record taken then would vouch for a tree it never saw.
+    """
+    why = unclean(root)
+    if why:
+        print(f"  [full] REFUSED - {why}. A full run vouches for a commit, so it runs on exactly "
+              f"a commit's content: commit or stash first. Nothing was run or recorded.")
+        return RC_COULD_NOT_RUN
+    tree = tree_of(root, "HEAD")
+    if not tree:
+        print("  [full] REFUSED - there is no commit yet, so there is no tree to vouch for.")
+        return RC_COULD_NOT_RUN
+    head = git_text(root, "rev-parse", "HEAD")[1]
+    where = Path(cwd) if cwd else root
+    print(f"  [full] {' '.join(cmd)}")
+    print(f"  [full] in {where}, on tree {tree[:12]}")
+    sys.stdout.flush()
+    env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+    rc = subprocess.run(cmd, cwd=str(where), env=env, stdin=subprocess.DEVNULL).returncode
+    if rc != 0:
+        print(f"  [full] exit {rc} - NOT recorded. A failing command is not evidence.")
+        return rc
+    after = unclean(root)
+    if after or tree_of(root, "HEAD") != tree:
+        # 2, NOT 1: the suite PASSED, and an exit 1 would read as a failing suite and send
+        # someone hunting a red test that does not exist.
+        print(f"  [full] exit 0 but NOT recorded - the run changed what it was testing "
+              f"({after or 'HEAD moved'}), so it vouches for no commit.")
+        return RC_COULD_NOT_RUN
+    d = load(store)
+    d.setdefault(FULL_KEY, {})[tree] = {
+        "commit": head, "command": " ".join(cmd), "cwd": str(where), "exit": rc,
+        "when": time.strftime("%Y-%m-%dT%H:%M:%S"),
+    }
+    save(store, d)
+    print(f"  [full] exit 0 - recorded for tree {tree[:12]} (commit {head[:12]}).")
+    return RC_OK
+
+
+def check_push(root: Path, store: Path, rev: str):
+    """(True, why) the push may go · (False, why) it is refused · (None, why) no commit named.
+
+    THE NEAREST RECORDED ANCESTOR, NOT ANY ONE: the question is what changed since the content a
+    full run last saw, and an older run saw less of it. The NET diff from there to the pushed
+    commit decides, because that is exactly what the push carries beyond what was tested.
+    """
+    tree = tree_of(root, rev)
+    if not tree:
+        return None, f"'{rev}' names no commit here, so nothing was decided"
+    runs = load(store).get(FULL_KEY, {})
+    if tree in runs:
+        return True, f"a full run passed on exactly this content ({runs[tree]['when']})"
+    # ONE git call for the whole walk, commit and tree per line - not one process per ancestor.
+    rc, out = git_text(root, "log", f"--max-count={SEARCH_DEPTH}", "--format=%H %T", rev)
+    if rc != 0:
+        return False, f"git could not walk the history (exit {rc}), so no earlier full run can be found"
+    for c, t in (ln.split() for ln in out.splitlines()[1:] if ln.strip()):
+        if t not in runs:
+            continue
+        # --no-renames: with rename detection a script renamed to a .md path lists only the new
+        # name, and the deletion of the script would pass as a documents-only change.
+        rc2, changed = git_text(root, "-c", "core.quotePath=false", "diff", "--no-renames",
+                                "--name-only", c, rev)
+        if rc2 != 0:
+            return False, f"git diff exited {rc2}, so what changed since the last full run is unknown"
+        paths = [p for p in changed.splitlines() if p]
+        code = [p for p in paths if not p.lower().endswith(DOC_SUFFIXES)]
+        if not code:
+            return True, (f"the last full run passed at {c[:12]}; since then only {len(paths)} "
+                          f"document(s) changed")
+        return False, (f"the last full run passed at {c[:12]}, and {len(code)} non-document "
+                       f"path(s) changed since - run the full suite on this commit")
+    return False, (f"no full run is recorded on this commit or its last {SEARCH_DEPTH} "
+                   f"ancestors - run the full suite on this commit")
+
+
 # --------------------------------------------------------------------------- the checks
 
 def check_ran(rep, records) -> None:
@@ -412,6 +550,7 @@ def main(argv):
         print(f"root  {root}")
         print(f"store {store}")
         print(json.dumps(load(store).get(branch(root), {}), indent=1))
+        print(f"full runs recorded: {len(load(store).get(FULL_KEY, {}))}")
         return RC_OK
 
     if cmd == "na":
@@ -427,6 +566,22 @@ def main(argv):
             print("  give a command to run after --")
             return RC_COULD_NOT_RUN
         return record(root, store, cmd, rest, cwd=Path.cwd())
+
+    if cmd == "full":
+        if rest and rest[0] == "--":
+            rest = rest[1:]
+        if not rest:
+            print("  give the full test command after --")
+            return RC_COULD_NOT_RUN
+        return record_full(root, store, rest, cwd=Path.cwd())
+
+    if cmd == "check-push":
+        if len(rest) != 1:
+            print("  check-push needs exactly one commit")
+            return RC_COULD_NOT_RUN
+        ok, why = check_push(root, store, rest[0])
+        print(f"  PUSH {'ALLOWED' if ok else 'REFUSED' if ok is False else 'VOID'} - {why}")
+        return RC_OK if ok else RC_FAILED if ok is False else RC_COULD_NOT_RUN
 
     if cmd != "check":
         print(f"  unknown: {cmd}")
@@ -517,6 +672,26 @@ def _stale(tmp: Path, name: str) -> Path:
     return d
 
 
+def _full_count(d: Path) -> int:
+    return len(load(_store(d)).get(FULL_KEY, {}))
+
+
+def _has_full(d: Path) -> str:
+    """PASS if a full run was recorded, FAIL if not - read off the store, for _has_record's reason."""
+    return PASS if _full_count(d) else FAIL
+
+
+def _push(d: Path, rev: str = "HEAD") -> str:
+    ok, _why = check_push(d, _store(d), rev)
+    return PASS if ok else FAIL if ok is False else VOID
+
+
+def _commit(d: Path, name: str, body: bytes, *extra: str) -> None:
+    (d / name).write_bytes(body)
+    git_bytes(d, "add", "-A")
+    git_bytes(d, "commit", "-q", *extra, "-m", "next")
+
+
 def cases(tmp: Path):
     seq = iter(range(1, 999))
 
@@ -575,7 +750,105 @@ def cases(tmp: Path):
         save(_store(d), {})
         return d
 
+    # ---- v2: the push record. Every "records nothing" case is PAIRED with one that records,
+    #      because a version that records nothing passes each of them by doing nothing.
+    ok_cmd = [sys.executable, "-c", "pass"]
+
+    def full_clean(_):
+        d = fresh()
+        record_full(d, _store(d), ok_cmd)
+        return d
+
+    def full_dirty(_):
+        d = fresh()
+        (d / "tracked.txt").write_bytes(b"edited, not committed\n")
+        record_full(d, _store(d), ok_cmd)
+        return d
+
+    # THE BEFORE-CHECK HAS A CASE OF ITS OWN because the after-check alone also refuses to RECORD
+    # on a dirty tree - measured by a mutant that removed it and stayed green. What only the
+    # before-check buys is that the suite never STARTS, so the case reads a marker the command
+    # leaves in an ignored folder: absent on a dirty tree, present on a clean one.
+    marker_cmd = [sys.executable, "-c",
+                  "import pathlib; p = pathlib.Path('temp'); p.mkdir(exist_ok=True); "
+                  "(p / 'ran').write_bytes(b'1')"]
+
+    def marker_dirty(_):
+        d = fresh()
+        (d / "tracked.txt").write_bytes(b"edited, not committed\n")
+        record_full(d, _store(d), marker_cmd)
+        return d
+
+    def marker_clean(_):
+        d = fresh()
+        record_full(d, _store(d), marker_cmd)
+        return d
+
+    def full_untracked(_):
+        d = fresh()
+        (d / "new.txt").write_bytes(b"never added\n")
+        record_full(d, _store(d), ok_cmd)
+        return d
+
+    def full_failing(_):
+        d = fresh()
+        record_full(d, _store(d), [sys.executable, "-c", "raise SystemExit(3)"])
+        return d
+
+    def full_edits_tree(_):
+        d = fresh()
+        record_full(d, _store(d), [sys.executable, "-c",
+                                   "open('tracked.txt', 'wb').write(b'written by the run\\n')"])
+        return d
+
+    def push_code_after(_):
+        d = full_clean(_)
+        _commit(d, "tracked.txt", b"content B\n")
+        return d
+
+    def push_docs_after(_):
+        d = full_clean(_)
+        _commit(d, "notes.md", b"# notes\n")
+        return d
+
+    def push_renamed_to_md(_):
+        """A non-document RENAMED to a .md name: with rename detection only the new name is
+        listed, and the deletion would pass as documents-only - the code review's catch."""
+        d = full_clean(_)
+        git_bytes(d, "mv", "tracked.txt", "tracked.md")
+        git_bytes(d, "commit", "-q", "-m", "renamed")
+        return d
+
+    def push_content_amend(_):
+        d = full_clean(_)
+        _commit(d, "tracked.txt", b"amended content\n", "--amend")
+        return d
+
+    def push_message_amend(_):
+        d = full_clean(_)
+        git_bytes(d, "commit", "-q", "--amend", "-m", "reworded only")
+        return d
+
     return [
+        Case("v2: full on a MODIFIED tree", _has_full, full_dirty, full_clean,
+             want=FAIL, good_want=PASS),
+        Case("v2: a dirty tree never STARTS the run",
+             lambda d: PASS if (d / "temp" / "ran").exists() else FAIL, marker_dirty, marker_clean,
+             want=FAIL, good_want=PASS),
+        Case("v2: full with an UNTRACKED file", _has_full, full_untracked, full_clean,
+             want=FAIL, good_want=PASS),
+        Case("v2: a FAILING full run", _has_full, full_failing, full_clean,
+             want=FAIL, good_want=PASS),
+        Case("v2: a run that EDITS the tree", _has_full, full_edits_tree, full_clean,
+             want=FAIL, good_want=PASS),
+        Case("v2: a push with no full run", _push, nothing, full_clean,
+             want=FAIL, good_want=PASS),
+        Case("v2: CODE after the run, not DOCS", _push, push_code_after, push_docs_after,
+             want=FAIL, good_want=PASS),
+        Case("v2: a RENAME to .md is not docs-only", _push, push_renamed_to_md, push_docs_after,
+             want=FAIL, good_want=PASS),
+        Case("v2: by TREE - content, not message", _push, push_content_amend, push_message_amend,
+             want=FAIL, good_want=PASS),
         Case("stale content -> the hash row FAILS", lambda d: _status(d, MATCHES),
              stale, matching, want=FAIL, good_want=PASS),
         Case("no record -> the ran row FAILS", lambda d: _status(d, RAN),
@@ -732,6 +1005,49 @@ def _assert_store_is_repo_scoped(tmp: Path) -> bool:
     return good
 
 
+def _assert_full_key_is_no_branch(tmp: Path) -> bool:
+    """THE RESERVED KEY'S CLAIM, ASKED OF GIT rather than asserted in a comment: git must refuse
+    it as a branch name, and accept an ordinary one - the control that the question works."""
+    d = _repo(tmp, "refname")
+    bad = git_bytes(d, "check-ref-format", "--branch", FULL_KEY).returncode
+    ctl = git_bytes(d, "check-ref-format", "--branch", "main").returncode
+    good = bad != 0 and ctl == 0
+    print(f"  {'OK  ' if good else 'MISS'} {'v2: the full-run key is no branch name':<42} -> "
+          f"git refuses it: exit {bad}; control 'main': exit {ctl}")
+    return good
+
+
+def _assert_push_cli(tmp: Path) -> bool:
+    """THE ENTRY POINT A HOOK CALLS, run as a hook runs it: 1 for a commit with no full run, 0
+    once one is recorded, 2 for a name that is no commit - three codes a shell can branch on."""
+    d = _repo(tmp, "pushcli")
+    env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+
+    def run(*a):
+        return subprocess.run([sys.executable, str(Path(__file__).resolve()), *a], cwd=str(d),
+                              capture_output=True, stdin=subprocess.DEVNULL, env=env,
+                              timeout=120).returncode
+    got = (run("check-push", "HEAD"), run("full", "--", sys.executable, "-c", "pass"),
+           run("check-push", "HEAD"), run("check-push", "no-such-commit"))
+    good = got == (1, 0, 0, 2)
+    print(f"  {'OK  ' if good else 'MISS'} {'v2: check-push exit codes, real entry':<42} -> "
+          f"none, full, recorded, bogus: {got} (want (1, 0, 0, 2))")
+    return good
+
+
+def _assert_full_runs_leave_check_alone(tmp: Path) -> bool:
+    """A FULL-RUN RECORD CHANGES NOTHING THE PRE-COMMIT CHECK SAYS - v2's must-not, measured."""
+    d = _repo(tmp, "coexist")
+    _recorded(d)
+    before = check(d, _store(d)).verdict()
+    record_full(d, _store(d), [sys.executable, "-c", "pass"])
+    after = check(d, _store(d)).verdict()
+    good = before == after == PASS and _full_count(d) == 1
+    print(f"  {'OK  ' if good else 'MISS'} {'v2: a full record leaves check alone':<42} -> "
+          f"check {before} before, {after} after, {_full_count(d)} full record(s)")
+    return good
+
+
 def selftest() -> int:
     safe_stdout()
     print("SELFTEST - each check must fire on a bad input AND stay quiet on a good one")
@@ -748,6 +1064,9 @@ def selftest() -> int:
         ok &= _assert_na_can_go_stale(tmp)
         ok &= _assert_not_a_repo_is_void(tmp)
         ok &= _assert_store_is_repo_scoped(tmp)
+        ok &= _assert_full_key_is_no_branch(tmp)
+        ok &= _assert_push_cli(tmp)
+        ok &= _assert_full_runs_leave_check_alone(tmp)
         ok &= selftest_config(tmp, "cycle", "store", load_config, width=42)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

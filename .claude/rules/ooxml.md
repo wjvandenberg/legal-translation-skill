@@ -31,7 +31,7 @@ re-tested. If you need these twice in one session, re-open this file deliberatel
   Matching `etree.QName(el).localname == 't'` feels like the careful, prefix-agnostic thing to do — a
   prefix is the document's choice, so localname-matching is right for an element whose name is
   *unambiguous*. But **`t` is one of the most reused names in OOXML**: `w:t` is a text run, `a:t` a
-  DrawingML text run, `dgm:t` a SmartArt node's text. Measured on branch 7 slice 3: a graphic-metadata
+  DrawingML text run, `dgm:t` a SmartArt node's text. Measured on sub-step 7.3: a graphic-metadata
   report written that way counted a chart part as **four** surfaces instead of two and labelled every one
   of them **both** `c:title` and `dgm:t`, because `a:t` sits *inside* a `c:title`. **Match the full
   `{namespace}localname` wherever the localname is shared** — and the tell that you are in that case is
