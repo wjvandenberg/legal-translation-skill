@@ -460,7 +460,7 @@ acted = [
  ("attempt 1 — cross-language comparison not decidable",
   r"decidable form is\s+\*\*same-language\*\*", "option 2 text carries the refinement"),
  ("attempt 2 — tidy-up script coupling",
-  r"^\|\s*\*\*9\*\*\s*\|\s*the change journal", "branch 9 exists"),
+  r"^\|\s*\*\*9\*\*\s*\|\s*the change journal", "step 9 exists"),
  ("attempt 3 — 'preserve by default' self-contradictory",
   r"three clauses: \*\*rebuild only text", "option 1 states the three clauses"),
  ("attempt 4 — partial resolver insufficient",
@@ -477,7 +477,7 @@ acted = [
  ("attempt 9 — A3 never priced a true rebuild",
   r"a genuine rebuild has never been priced", "option 10 says so"),
  ("omission 1 — the deadlock",
-  r"^\|\s*\*\*4\*\*\s*\|\s*the exception channel", "branch 4 exists and precedes branch 5"),
+  r"^\|\s*\*\*4\*\*\s*\|\s*the exception channel", "step 4 exists and precedes step 5"),
  ("omission 2 — no manifest / version identity rows",
   r"recorded as rows before that branch starts|needs a manifest", "flagged with an action"),
  ("omission 7 — merge-order file conflicts",
@@ -620,7 +620,7 @@ print(f"  (iii) Wouter's verdicts quoted in the record  : {record.count(chr(42)+
 #
 # stepb_metacheck.py caught that immediately: detection dropped from 10 of 10 mutations to 9,
 # because the "misquote a source" mutation now landed in the excused bucket. **The softening
-# blunted the check it was meant to make honest** — which is the exact failure this branch has
+# blunted the check it was meant to make honest** — which is the exact failure this step has
 # been finding in other people's instruments all day, committed here in my own.
 #
 # So an unverifiable quotation is still a FAILURE, and the banner says why the audit cannot be

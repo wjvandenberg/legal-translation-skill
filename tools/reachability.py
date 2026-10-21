@@ -2,13 +2,13 @@
 """STATIC REACHABILITY OF THE INSTRUCTION LAYER — PLAN-2-step-b.md §4.1, half one.
 
 §4.1 splits the prose-reachability probe in two and assigns the halves to different places.
-Half two is behavioural, needs a run, and belongs at Step C. **Half one is this: static,
-no run, and §4.1 calls it "the more actionable half" and puts it in branch 3.**
+Half two is behavioural, needs a run, and belongs at phase 3's test. **Half one is this: static,
+no run, and §4.1 calls it "the more actionable half" and puts it in step 3.**
 
 THE QUESTION IT ANSWERS. Not "does the operator obey the rule" but the prior one: **could the
 operator have READ the rule at the moment it had to decide?** The skill's Mandatory Reading
 Order forbids reading a step document before arriving at that step. So a rule that governs a
-Step 3 decision but is stated only in the Step 4 document is unreachable BY CONSTRUCTION --
+skill Step 3 decision but is stated only in the skill Step 4 document is unreachable BY CONSTRUCTION --
 the operator meets it after deciding. That is a reachability defect, not a compliance defect,
 and no behavioural experiment is needed to find it. The register holds a worked instance that
 produced a real wrong decision, later reversed.
@@ -76,7 +76,7 @@ def reading_order(skill_md):
         # "— Pre-repack hooks + Steps 10+11:". The first version of this regex demanded
         # "Steps" immediately and therefore silently dropped the FINAL step document --
         # the one covering repack, validate and delivery, which is precisely where this
-        # branch's delivery-notes work lands. It reported "7 files" for a list of 8 and
+        # step's delivery-notes work lands. It reported "7 files" for a list of 8 and
         # nothing said so. Hence the count assertion in reading_order's caller.
         m = re.match(r"\s*\d+\.\s+`(skill-docs/[^`]+)`\s*[—-]\s*.*?\bSteps?\s+([0-9a-z+ ]+):",
                      line.strip())
@@ -167,7 +167,7 @@ def analyse(tree):
                 # A statement that CITES where the governing rule lives is a pointer, not
                 # the rule's home -- the operator reaching it has already met the rule at
                 # the earlier step. Learned from the one candidate the first run produced:
-                # 06-postprocess cites the Step 4 rule and the rule really is in the Step 4
+                # 06-postprocess cites the skill Step 4 rule and the rule really is in the skill Step 4
                 # document, so flagging it was a false positive.
                 #
                 # SUPPRESSED, NOT DROPPED. §5.1: a bounded instrument must say what it set
@@ -186,13 +186,13 @@ def analyse(tree):
     # ---- ARM 1b: conventions with more than one home, at different steps. ----------
     # ARM 1 STRUCTURALLY CANNOT FIND THE REGISTER'S OWN WORKED INSTANCE, and saying so is
     # the point of having this arm. The date rule's defect is not a backward reference: the
-    # operator meets two misleading statements at Step 3, decides, and meets the governing
-    # statement afterwards in the Step 4 document. Nothing in that shape names an earlier
+    # operator meets two misleading statements at skill Step 3, decides, and meets the governing
+    # statement afterwards in the skill Step 4 document. Nothing in that shape names an earlier
     # step, so Arm 1 is blind to it by construction.
     #
     # The convention list is SOURCED, not invented -- these are the four that
     # PLAN-2-step-b.md §6, Option 5 gap 1 and prescriptions (i) and (ii) name.
-    # The reference and sub-lexicon layers are read at Step 3 -- SKILL.md: "You MUST read
+    # The reference and sub-lexicon layers are read at skill Step 3 -- SKILL.md: "You MUST read
     # both at Step 3". They are IN SCOPE for this arm and the first version left them out,
     # which made its silence meaningless: three of the four named conventions live there and
     # nowhere else, so an arm that only read skill-docs/ was guaranteed to find nothing and
@@ -253,8 +253,8 @@ def analyse(tree):
         if can_block:
             blocking_steps.append(step)
 
-    # BOTH gate rules are measured, not just the scope rule. Branch 3 added 5a (the check is
-    # wrong -- fix it); branch 4 adds 5b (the check is right and no compliant repair exists).
+    # BOTH gate rules are measured, not just the scope rule. Step 3 added 5a (the check is
+    # wrong -- fix it); step 4 adds 5b (the check is right and no compliant repair exists).
     # They answer different questions at the same moment, so an operator who can reach only
     # one of them is still stuck at a gate, and the arm would have reported PASS.
     rule_homes = {}
@@ -305,7 +305,7 @@ def analyse(tree):
 # a needle that only matches one capitalisation is a needle waiting to go quiet.
 SCOPE_NEEDLE = re.compile(r"a check can be wrong IN SCOPE", re.I)
 
-# Branch 4's channel. Same needle discipline: a phrase that cannot occur unless the rule is
+# Step 4's channel. Same needle discipline: a phrase that cannot occur unless the rule is
 # actually carried. "no compliant repair" alone appears in the register and in analysis prose,
 # so the needle binds it to the instruction that acts on it.
 CHANNEL_NEEDLE = re.compile(
@@ -318,9 +318,9 @@ RULES = [
 
 # WHERE THE REPAIR LOOP IS AUTHORED, swept rather than listed.
 #
-# F41 says "measured across all 198 files: TWO such instructions". Re-derived on branch 4:
+# F41 says "measured across all 198 files: TWO such instructions". Re-derived on step 4:
 # there are FOUR in the shipped prose, not two -- the two F41 names plus a repeat-until-exit-0
-# in the always-loaded file's calque pitfall and a re-run-everything remediation at Step 10.
+# in the always-loaded file's calque pitfall and a re-run-everything remediation at skill Step 10.
 # A hardcoded list of sites would have shipped the same blind spot F41 had, so this SWEEPS:
 # every repair-repeat instruction in the tree's prose must carry the bound. A new one added
 # later arrives unbounded and fails here.
@@ -330,7 +330,7 @@ RULES = [
 #     ("iterates until a pass produces no change"), which is an algorithm and not an
 #     instruction to anyone; and an apply-gate message saying "fix the underlying issue, then
 #     re-run", which is a single remediation rather than a loop. Bounding the second is a
-#     SCRIPT edit and branch 4 is doc-only; it belongs with branch 5.
+#     SCRIPT edit and step 4 is doc-only; it belongs with step 5.
 #   * The bound text itself quotes "re-run until it passes" to explain what it forbids, so
 #     the window below is searched on BOTH sides of a match, not only after it.
 REPEAT_UNTIL = re.compile(
