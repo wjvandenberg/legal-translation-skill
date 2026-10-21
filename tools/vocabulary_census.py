@@ -34,9 +34,11 @@ as a clean census. So is a declared phrase that occurs nowhere in living text.
     uv run python tools/vocabulary_census.py             # every swept document; exit 0 clean, 1 an old word, 3 VOID
     uv run python tools/vocabulary_census.py --selftest  # red on a planted old word, green on one planted in a record
 """
+import io
 import re
 import subprocess
 import sys
+import tokenize
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -149,6 +151,93 @@ def tracked_files():
     if r.returncode != 0:
         raise OSError(f"git ls-files exited {r.returncode}")
     return r.stdout.decode("utf-8").splitlines()
+
+
+# THE CODE ARM - rename (d2), Wouter's 2026-10-21 ruling (2): in the tracked Python of tools/ and tests/, read by
+# Python's own tokenizer and never by a pattern on the line, every string is living - printed text and needles, an
+# f-string's literal parts included (3.12+ tokenizes them apart from STRING) - and so is every comment that carries no
+# date; identifiers, file names and git branch names never move and are never read. THE COMMENT BLOCK IS THE UNIT: a
+# dated note runs over several comment lines and carries its date on one, so a block of comments on consecutive lines
+# any one of which carries a date is a record whole. A word kept in its own sense (Python's own slice) or inside a
+# quotation of a record is declared as a 'phrase', as for a document. The house's copies are fixed in the house, never
+# here. Each (d2) pull request adds the files it swept whole; the rest are counted as pending, by name in --list-pending.
+DATE = re.compile(r"20\d\d-\d\d-\d\d")
+HOUSE_COPIES = {"verify_md.py", "verify_charter.py", "verify_code.py", "verify_deliverable.py", "verify_expected.py",
+                "verify_confidential.py", "cycle_evidence.py", "check_checkers.py", "run_tests.py", "auto_mode.py",
+                "auto_mode_guard.py", "purpose_guard.py", "install_hooks.py", "house_common.py"}
+CODE_SWEPT = {
+    # rename (d2a), 2026-10-21 (2): the four files the 2026-10-21 close named - stepb_verify's printed labels beside
+    # its needles, and the three whose comments restated a phrase rename (c) changed
+    "tools/stepb_verify.py": [],
+    "tools/reachability.py": [],
+    "tools/stepb_audit.py": [],
+    "tests/probe-5b/make_probe_documents.py": [],
+}
+_TEXT_TOKENS = {tokenize.STRING} | {getattr(tokenize, n) for n in ("FSTRING_MIDDLE", "TSTRING_MIDDLE")
+                                    if hasattr(tokenize, n)}
+
+
+def code_living(src):
+    """(line, text) for every living piece of a Python source: each line of each string token (an f-string's literal
+    parts included), and each line of a comment block that carries no date anywhere in it."""
+    out, block = [], []
+
+    def flush():
+        if block and not any(DATE.search(t.string) for t in block):
+            out.extend((t.start[0], t.string) for t in block)
+        block.clear()
+    for t in tokenize.generate_tokens(io.StringIO(src.replace("\r\n", "\n")).readline):
+        if t.type == tokenize.COMMENT:
+            if block and t.start[0] != block[-1].start[0] + 1:
+                flush()
+            block.append(t)
+        elif t.type in _TEXT_TOKENS:
+            out.extend((t.start[0] + k, part) for k, part in enumerate(t.string.split("\n")))
+    flush()
+    return out
+
+
+def code_census(name, src, spans):
+    living = code_living(src)
+    phrases = [anchor for kind, anchor, _ in spans if kind == "phrase"]
+    if len(phrases) != len(spans):
+        raise LookupError(f"{name}: a code file declares phrases only - the comment block's date decides a record")
+    seen = dict.fromkeys(phrases, 0)
+    hits = []
+    for n, piece in living:
+        for p in phrases:
+            seen[p] += piece.count(p)
+            piece = piece.replace(p, " " * len(p))
+        hits += [(n, label, m.group(0)) for label, rx in SHAPES for m in rx.finditer(piece)]
+    stale = [p for p, c in seen.items() if not c]
+    if stale:
+        raise LookupError(f"{name}: phrase {stale[0]!r} occurs nowhere in living text - the declaration is stale")
+    return len(living), hits
+
+
+def code_scope(tracked):
+    """The tracked Python the code arm owns: tools/ and tests/, the house's copies apart - by PATH, since they live in
+    tools/ only and tests/run_tests.py, this project's own suite runner, shares a name with the house's."""
+    house = {f"tools/{n}" for n in HOUSE_COPIES}
+    return sorted(f for f in tracked if f.startswith(("tools/", "tests/")) and f.endswith(".py") and f not in house)
+
+
+def run_code(tracked):
+    scope = set(code_scope(tracked))
+    wrong = sorted(set(CODE_SWEPT) - scope)
+    if wrong:
+        raise LookupError(f"code file(s) in CODE_SWEPT that are not tracked project Python: {wrong}")
+    bad = 0
+    for name, spans in CODE_SWEPT.items():
+        living, hits = code_census(name, (ROOT / name).read_bytes().decode("utf-8"), spans)
+        kept = f", {len(spans)} phrase(s) kept" if spans else ""
+        print(f"  {name}: {living} living piece(s){kept}, {len(hits)} old word(s)")
+        for n, label, word in hits:
+            print(f"    line {n}: {label} - {word!r}")
+        bad += len(hits)
+    print(f"  code: {len(CODE_SWEPT)} of {len(scope)} project Python file(s) in tools/ and tests/ swept, "
+          f"{len(scope) - len(CODE_SWEPT)} pending rename (d2)")
+    return len(CODE_SWEPT), bad
 
 
 def _level(line):
@@ -412,6 +501,44 @@ def selftest():
                    sorted(set(unjudged(tracked + new)) - base) == sorted(new)))
     checks.append(("the shipped trees and the code stay out of scope",
                    set(unjudged(tracked + ["uk/new.md", "tools/new.md", "tests/new.md"])) == base))
+    # the code arm, rename (d2), on a synthetic source with a known answer: an old word counted in a docstring, a
+    # string, an f-string's text and an undated comment; never read in an identifier; left alone on a dated comment
+    # block's undated line; a declared phrase masked; a stale phrase and a non-phrase declaration refused
+    src = ('"""A docstring: a planted branch 7."""\n'
+           'x = "a planted slice"\n'
+           'y = f"a planted Step C {x} beside"\n'
+           '# an undated comment: branch 8\n'
+           'branch_7 = slice(1, 2)  # never read: the names on this line\n'
+           '\n'
+           '# 2026-01-01: a dated note\n'
+           '# whose second line holds branch 9\n'
+           'z = "kept: string slicing slices the text"\n')
+    keep = [("phrase", "slices the text", "Python's own sense")]
+    got = sorted({n for n, _, _ in code_census("synthetic", src, keep)[1]})
+    checks.append(("code: counted in a docstring, a string, an f-string's text and an undated comment",
+                   got == [1, 2, 3, 4]))
+    checks.append(("code: never read in an identifier, left alone on a dated block's undated line",
+                   5 not in got and 8 not in got))
+    checks.append(("code: without its phrase declaration, exactly the one own-sense word more counts",
+                   len(code_census("synthetic", src, [])[1]) == len(code_census("synthetic", src, keep)[1]) + 1))
+    for label, bad_spans in (("a phrase that occurs nowhere", keep + [("phrase", "nowhere at all", "x")]),
+                             ("a declaration other than a phrase", [("line", "x", "y")])):
+        try:
+            code_census("synthetic", src, bad_spans)
+            checks.append((f"code: refused - {label}", False))
+        except LookupError:
+            checks.append((f"code: refused - {label}", True))
+    real = "tools/stepb_verify.py"
+    rsrc = (ROOT / real).read_bytes().decode("utf-8")
+    rbase_n = len(code_census(real, rsrc, CODE_SWEPT.get(real, []))[1])
+    for tail, want, where in (("\n# a planted branch 7\n", 1, "an undated comment"),
+                              ("\n# 2026-10-21: a dated note\n# a planted branch 7\n", 0, "a dated comment block")):
+        n = len(code_census(real, rsrc + tail, CODE_SWEPT.get(real, []))[1]) - rbase_n
+        checks.append((f"code: {real}: an old word planted in {where} is {'counted' if want else 'left alone'}",
+                       n == want))
+    cs = code_scope(tracked)
+    checks.append(("code: tests/run_tests.py is the project's, in scope; tools/run_tests.py the house's, out",
+                   "tests/run_tests.py" in cs and "tools/run_tests.py" not in cs))
     for label, good in checks:
         print(("  OK   " if good else "  XX   ") + label)
     ok = all(g for _, g in checks)
@@ -432,7 +559,8 @@ def main():
             return 3
     print("vocabulary census - the house's words in living text")
     try:
-        missing = unjudged(tracked_files())
+        tracked = tracked_files()
+        missing = unjudged(tracked)
     except OSError as exc:
         print(f"  VOID  the tracked documents could not be listed ({exc})")
         return 3
@@ -440,16 +568,21 @@ def main():
         print(f"  VOID  tracked document(s) never judged - each joins SWEPT with its split, or is a record by kind: "
               f"{missing}")
         return 3
+    if "--list-pending" in sys.argv:
+        for f in sorted(set(code_scope(tracked)) - set(CODE_SWEPT)):
+            print(f"  pending: {f}")
     try:
         examined, bad = run(docs)
-    except LookupError as exc:
+        code_examined, code_bad = run_code(tracked)
+    except (LookupError, OSError, UnicodeDecodeError, SyntaxError, tokenize.TokenError) as exc:
         print(f"  VOID  {exc}")
         return 3
     if examined == 0:
         print("VOID: no swept document examined")
         return 3
-    print(f"{examined} document(s) examined, {bad} old word(s) in living text")
-    return 1 if bad else 0
+    print(f"{examined} document(s) and {code_examined} code file(s) examined, {bad + code_bad} old word(s) in "
+          f"living text")
+    return 1 if bad + code_bad else 0
 
 
 if __name__ == "__main__":
