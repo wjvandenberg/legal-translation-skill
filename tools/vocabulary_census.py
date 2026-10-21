@@ -15,8 +15,12 @@ is also git's word (branch protection, a PR per branch) and is judged by reading
 SWEPT so far: CLAUDE.md, rename commit (b1), 2026-10-14; PLAN-2-step-b.md, rename commit (b2), 2026-10-19 - its split
 Wouter's of that day: Part One's live text and Part Three's look-up are living; each option's verdict and build
 record after its FOR THE BUILD brief, 9.3's rows and Parts Two and Four keep their words, the document's own front
-matter declaring Parts Two to Four the record. A span that matches nothing, or a heading prefix that matches more
-than one heading, is refused as stale: a declaration that quietly covers nothing would read as a clean census.
+matter declaring Parts Two to Four the record. evidence/REGISTER-findings.md, rename (c), 2026-10-21 - its split
+Wouter's of that day: the header, the open rows and the clusters' live prose are living; THE ROW IS THE UNIT, so a
+skill-finding row whose own text records its closure is a record whole, and so is an instrument row whose status
+cell says fixed; a row still open, partly closed, deferred or standing, and a positive, are living whole. A span that
+matches nothing, or a heading prefix that matches more than one heading, is refused as stale: a declaration that
+quietly covers nothing would read as a clean census. So is a declared phrase that occurs nowhere in living text.
 
     uv run python tools/vocabulary_census.py             # every swept document; exit 0 clean, 1 an old word, 3 VOID
     uv run python tools/vocabulary_census.py --selftest  # red on a planted old word, green on one planted in a record
@@ -36,8 +40,14 @@ SHAPES = [
 # 'line' (any line matching the anchor as a regex), 'heading' (as 'section', the ONE heading that starts with the
 # anchor), 'brief-tail' (anchor (heading prefix, brief prefix): that section after the paragraph opening with the
 # brief prefix - the brief itself stays living) and 'range' (anchor (start prefix, end prefix or None): from the ONE
-# heading starting with the first up to the ONE starting with the second, or to the end).
+# heading starting with the first up to the ONE starting with the second, or to the end). And 'phrase' (anchor an
+# exact phrase): NOT a record - the line stays living and only that phrase is masked, for a word used in its own
+# sense rather than the project's (a string "slice", a run that verifies), so a project word beside it still counts.
 BRIEF = "> **FOR THE BUILD"
+# the register's skill-finding rows whose own text records their closure, judged row by row by reading each status
+# phrase (rename (c), 2026-10-21); a row that closes later is written in the new words and need not join this list
+REGISTER_CLOSED = """A2 A16 A23 B1 B2 B3 B4 B5 B6 B7 B8 B9 B10 C1 C2 C4 C6 C7 C8 C9 C13 C14 C15 C17 C18 C19 C22 C28
+C30 D3 E4 E15 E16 F6 F15 F16 F29 F43 F45 F47 F48 G5 G10 G11 H1 H2 H3 H4 J1 J2 L1 L5 S1 S2 S3 R1 R2 N1""".split()
 SWEPT = {
     "CLAUDE.md": [
         ("paragraph", "**THE HOUSE'S WORDS, SINCE 2026-10-13**", "the mapping must name the old words it maps"),
@@ -65,6 +75,19 @@ SWEPT = {
         ("paragraph", "> **Regenerated 2026-08-05 by the deep audit", "a dated regeneration note"),
         ("range", ("## PART TWO ", "## PART THREE "), "Part Two, the case: the front matter declares it the record"),
         ("range", ("## PART FOUR ", None), "Part Four, the record"),
+    ],
+    "evidence/REGISTER-findings.md": [
+        ("line", (r"^\| (?:" + "|".join(REGISTER_CLOSED) + r") \|", "## Register"),
+         "skill-finding rows whose own text records their closure: the row is the unit"),
+        ("line", (r"^\| I-\d+ \|.*\| fixed[^|]*\|\s*$", "## Measurement-instrument defects"),
+         "instrument rows whose status cell says fixed"),
+        ("phrase", "APPLY SLICES THE STRIPPED", "A20: string slicing, the defect's own mechanism"),
+        ("phrase", "then slices *that*", "A20: string slicing"),
+        ("phrase", "each span slices its neighbour", "A20: string slicing"),
+        ("phrase", "the string apply slices", "A20: string slicing"),
+        ("phrase", "OWN slice edge", "C16: a segment's slice of the string"),
+        ("phrase", "onto the translated slice", "G9: a segment's slice of the string"),
+        ("phrase", "*read-only* verification run", "I-7: a run that verifies, not the dropped Step C"),
     ],
 }
 
@@ -149,9 +172,20 @@ def exempt_lines(lines, spans):
 
 def census(name, text, spans):
     lines = text.replace("\r\n", "\n").split("\n")
-    skip = exempt_lines(lines, spans)
+    skip = exempt_lines(lines, [s for s in spans if s[0] != "phrase"])
     living = [(n + 1, l) for n, l in enumerate(lines) if n not in skip]
-    hits = [(n, label, m.group(0)) for n, l in living for label, rx in SHAPES for m in rx.finditer(l)]
+    phrases = [anchor for kind, anchor, _ in spans if kind == "phrase"]
+    seen = dict.fromkeys(phrases, 0)
+    masked = []
+    for n, l in living:
+        for p in phrases:
+            seen[p] += l.count(p)
+            l = l.replace(p, " " * len(p))
+        masked.append((n, l))
+    stale = [p for p, c in seen.items() if not c]
+    if stale:
+        raise LookupError(f"phrase {stale[0]!r} occurs nowhere in living text - the declaration is stale")
+    hits = [(n, label, m.group(0)) for n, l in masked for label, rx in SHAPES for m in rx.finditer(l)]
     return len(lines), len(living), hits
 
 
@@ -160,7 +194,9 @@ def run(docs):
     for name, (text, spans) in docs.items():
         total, living, hits = census(name, text, spans)
         examined += 1
-        print(f"  {name}: {living} living line(s) of {total}, {len(spans)} record span(s) declared, "
+        nphrase = sum(1 for s in spans if s[0] == "phrase")
+        kept = f", {nphrase} phrase(s) kept in their own sense" if nphrase else ""
+        print(f"  {name}: {living} living line(s) of {total}, {len(spans) - nphrase} record span(s) declared{kept}, "
               f"{len(hits)} old word(s)")
         for n, label, word in hits:
             print(f"    line {n}: {label} - {word!r}")
@@ -230,6 +266,34 @@ def selftest():
         checks.append(("a record span that matches nothing is refused", False))
     except LookupError:
         checks.append(("a record span that matches nothing is refused", True))
+    # the register, rename (c): the row is the unit - an old word counted in an open row, an open instrument row and
+    # a cluster cell; left alone in a closed row and a fixed instrument row; counted beside a declared phrase; and a
+    # phrase that occurs nowhere refused
+    rname = "evidence/REGISTER-findings.md"
+    rtext = (ROOT / rname).read_bytes().decode("utf-8")
+    rspans = SWEPT[rname]
+    rlines = rtext.replace("\r\n", "\n").split("\n")
+    rbase = len(census(rname, rtext, rspans)[2])
+
+    def row(rid):
+        return next(i for i, l in enumerate(rlines) if l.startswith(f"| {rid} |"))
+    for where, i, want in (("an open row (A1)", row("A1"), 1), ("a closed row (A2)", row("A2"), 0),
+                           ("an open instrument row (I-26)", row("I-26"), 1),
+                           ("a fixed instrument row (I-2)", row("I-2"), 0),
+                           ("a clusters-table cell (G)", next(i for i, l in enumerate(rlines)
+                                                             if l.startswith("| **G** |")), 1),
+                           ("the row beside a declared phrase (A20)", row("A20"), 1)):
+        planted = list(rlines)
+        head, sep, tail = planted[i].partition(" | ")
+        planted[i] = head + sep + "a planted branch 7 " + tail
+        got = len(census(rname, "\n".join(planted), rspans)[2]) - rbase
+        checks.append((f"the register: an old word planted in {where} is {'counted' if want else 'left alone'}",
+                       got == want))
+    try:
+        census(rname, rtext, rspans + [("phrase", "a phrase that occurs nowhere", "x")])
+        checks.append(("the register: a declared phrase that occurs nowhere is refused", False))
+    except LookupError:
+        checks.append(("the register: a declared phrase that occurs nowhere is refused", True))
     for label, good in checks:
         print(("  OK   " if good else "  XX   ") + label)
     ok = all(g for _, g in checks)

@@ -222,8 +222,9 @@ MUTATIONS = [
   "stepb_audit.py",
   "NEW GUARD: check 5d compares EACH group heading to the map, not only their sum"),
 
- # THE STEP TABLE'S TWO CLAIMS, 2026-10-19, rename (b2): check 2 had passed on nothing since the order table gained
- # its option column - it parsed four rows of another table and found no claim. Repaired the same day; these two
+ # THE STEP TABLE'S TWO CLAIMS, 2026-10-19, rename (b2): check 2 had passed on nothing since it entered tools/ - the
+ # order table always had the option column, so it parsed four rows of another table and found no claim (register
+ # I-44). Repaired the same day; these two
  # probes are its negative tests, and the third holds check 1e to the living text's "step N" citations.
  ("misstate the step count (twenty-three -> twenty-two)",
   lambda t: t.replace("**Twenty-three numbered steps, 0–22,", "**Twenty-two numbered steps, 0–22,", 1),

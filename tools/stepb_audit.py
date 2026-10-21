@@ -200,8 +200,9 @@ print("=" * 80)
 print("CHECK 2 — the step table: count and behaviour-change tally")
 print("=" * 80)
 # REPAIRED 2026-10-19, rename (b2): THIS CHECK HAD BEEN PASSING ON NOTHING. Its row pattern wanted the behaviour in a
-# row's FOURTH cell; section 2's order table has had five since it gained its option column, so it parsed four rows
-# of another table, found no claim, and printed OK for both halves (and its heading promised a dependency-order
+# row's FOURTH cell; section 2's order table had five from the repository's first commit, five days before this check
+# arrived in tools/, so it parsed four rows of another table, found no claim, printed OK for the count and no verdict
+# for the tally - for sixty-nine days, register I-44 (and its heading promised a dependency-order
 # check that was never written). Now: section 2's two tables - steps 0-19 and the deferrable 20-22, D1-D3 until
 # 2026-10-19 - each row's behaviour read from its LAST cell, and a claim it cannot find is a FAILURE, never an OK.
 # Its negative tests are probes in tools/stepb_metacheck.py.

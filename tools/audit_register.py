@@ -139,9 +139,10 @@ for s, v in rows.items():
 # translated. I-12..I-16 are the first of that population -- the earlier I-rows all came out
 # of A1 runs and so carried document ids. Added 2026-08-11 rather than renaming those rows to
 # a document that had nothing to do with them, which would have made the column lie to keep a
-# pattern quiet.
+# pattern quiet. Rename (c), 2026-10-21: a living row names it "step N" in the house's words, a
+# record keeps "branch N" - both are the same column's answer.
 DOCTOK = re.compile(r'^(D\d{2}B?|WvdB|June|PM|all|—|-|and|\+|vs|probe|code|repro|log|grade'
-                    r'|branch|\d{1,2}|evidence|guard|harness|review)$')
+                    r'|branch|step|\d{1,2}|evidence|guard|harness|review)$')
 for s, v in rows.items():
     for fid, cols, ln in v:
         if fid.startswith('I-') or (s and s.startswith('Positives')):
