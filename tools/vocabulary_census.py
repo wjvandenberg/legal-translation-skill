@@ -9,8 +9,10 @@ commit's guard: an old word put back into living text turns it red.
 WHAT IT COUNTS, in living text only: a project branch with its number (`branch 7`, `BRANCHES 15`, `branch D2`),
 any `slice`, and the dropped Step C (`Step C`, `the verification run`). WHAT IT CANNOT COUNT, said so a green run is
 not read as more: an old `step 3` meaning phase 3 - `step 3` is legitimate new text - so that half of a sweep is
-proved by the sweep reversing itself byte-identical, never by this count; and a bare `branch` with no number, which
-is also git's word (branch protection, a PR per branch) and is judged by reading.
+proved by the sweep reversing itself byte-identical, never by this count; a bare `branch` with no number, which
+is also git's word (branch protection, a PR per branch) and is judged by reading; and the skill's own `Step 5` left
+unprefixed - once the project's steps are `step N`, a capitalised `Step 14` at a sentence's start is the project's,
+so the two cannot be told apart by pattern, and `skill Step N` is held by reading.
 
 SWEPT so far: CLAUDE.md, rename commit (b1), 2026-10-14; PLAN-2-step-b.md, rename commit (b2), 2026-10-19 - its split
 Wouter's of that day: Part One's live text and Part Three's look-up are living; each option's verdict and build
@@ -189,9 +191,19 @@ def census(name, text, spans):
     return len(lines), len(living), hits
 
 
+def closed_ids_stale(text):
+    """REGISTER_CLOSED ids that do not start exactly one register row: the alternation's span is refused only when it
+    matches nothing at all, so a single mistyped or renumbered id would otherwise cover nothing in silence."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    return [i for i in REGISTER_CLOSED if sum(1 for l in lines if l.startswith(f"| {i} |")) != 1]
+
+
 def run(docs):
     bad, examined = 0, 0
     for name, (text, spans) in docs.items():
+        stale = closed_ids_stale(text) if name == "evidence/REGISTER-findings.md" else []
+        if stale:
+            raise LookupError(f"closed row id(s) {stale} start no row, or more than one - the declaration is stale")
         total, living, hits = census(name, text, spans)
         examined += 1
         nphrase = sum(1 for s in spans if s[0] == "phrase")
@@ -294,6 +306,13 @@ def selftest():
         checks.append(("the register: a declared phrase that occurs nowhere is refused", False))
     except LookupError:
         checks.append(("the register: a declared phrase that occurs nowhere is refused", True))
+    nphrase = sum(1 for s in rspans if s[0] == "phrase")
+    unmasked = len(census(rname, rtext, [s for s in rspans if s[0] != "phrase"])[2]) - rbase
+    checks.append((f"the register: without its {nphrase} phrase declarations, exactly {nphrase} own-sense words count",
+                   unmasked == nphrase))
+    checks.append(("the register: every closed-row id starts exactly one row", closed_ids_stale(rtext) == []))
+    checks.append(("the register: a mistyped closed-row id is refused",
+                   closed_ids_stale(rtext.replace("| C30 |", "| C31 |", 1)) == ["C30"]))
     for label, good in checks:
         print(("  OK   " if good else "  XX   ") + label)
     ok = all(g for _, g in checks)
