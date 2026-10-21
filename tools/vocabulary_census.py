@@ -21,18 +21,21 @@ matter declaring Parts Two to Four the record. evidence/REGISTER-findings.md, re
 Wouter's of that day: the header, the open rows and the clusters' live prose are living; THE ROW IS THE UNIT, so a
 skill-finding row whose own text records its closure is a record whole, and so is an instrument row whose status
 cell says fixed; a row still open, partly closed, deferred or standing, and a positive, are living whole. Rename (d1),
-2026-10-21 (2), Wouter's of that day: EVERY living document outside code and the records by kind joins, an old word
-in it or none, so a word put back anywhere is caught - the evidence documents, verify.config.json, .gitattributes,
-the four skills, the five rules, README.md and .gitignore; the A3 analysis and the superseded Opus 5 plan are records
-whole; a dated declaration is a record, as a dated comment is in code; a record span is declared only where a record
-holds an old word, counted or read. A span that matches nothing, or a heading prefix that matches more than one
-heading, is refused as stale: a declaration that quietly covers nothing would read as a clean census. So is a
-declared phrase that occurs nowhere in living text.
+2026-10-21 (2), Wouter's of that day: EVERY living document outside the shipped trees and tools/ and tests/ (whose
+text is rename (d2)'s) joins, an old word in it or none, so a word put back anywhere is caught - the evidence
+documents, verify.config.json, .gitattributes, every skill and rule, README.md and .gitignore; the A3 analysis and the
+superseded Opus 5 plan are records whole; a dated declaration is a record, as a dated comment is in code; a record
+span is declared only where a record holds an old word, counted or read. AND A TRACKED DOCUMENT IN THAT SCOPE THAT IS
+NEITHER SWEPT NOR A RECORD BY KIND TURNS THE CENSUS VOID (code review of #169): a fixed list would leave a new skill,
+rule or evidence document outside the guard while the census read green. A span that matches nothing, or a heading
+prefix that matches more than one heading, is refused as stale: a declaration that quietly covers nothing would read
+as a clean census. So is a declared phrase that occurs nowhere in living text.
 
     uv run python tools/vocabulary_census.py             # every swept document; exit 0 clean, 1 an old word, 3 VOID
     uv run python tools/vocabulary_census.py --selftest  # red on a planted old word, green on one planted in a record
 """
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -127,6 +130,25 @@ SWEPT = {
     ".claude/rules/skill-authoring.md": [],
     ".claude/rules/verification.md": [],
 }
+# records by their kind keep their words whole and are never swept (DECISIONS-LOG.md, 2026-10-13 (5), ruling 3)
+RECORDS_BY_KIND = ("DECISIONS-LOG.md", "evidence/EVIDENCE-phase2-history.md")
+# the shipped trees mean only their own steps; tools/ and tests/ are code, their text rename (d2)'s
+OUT_OF_SCOPE = ("uk/", "us/", "tools/", "tests/")
+CONFIG_DOCS = (".gitattributes", ".gitignore", "verify.config.json")
+
+
+def unjudged(tracked):
+    """Every tracked document in scope - a .md outside the shipped trees and the code, or one of the configuration
+    files that carry prose - that is neither in SWEPT nor a record by kind."""
+    return sorted(f for f in tracked if not f.startswith(OUT_OF_SCOPE) and (f.endswith(".md") or f in CONFIG_DOCS)
+                  and f not in SWEPT and f not in RECORDS_BY_KIND)
+
+
+def tracked_files():
+    r = subprocess.run(["git", "-c", "core.quotePath=false", "ls-files"], cwd=ROOT, capture_output=True)
+    if r.returncode != 0:
+        raise OSError(f"git ls-files exited {r.returncode}")
+    return r.stdout.decode("utf-8").splitlines()
 
 
 def _level(line):
@@ -369,7 +391,10 @@ def selftest():
         dspans = SWEPT[name]
         dlines = dtext.replace("\r\n", "\n").split("\n")
         dbase = len(census(name, dtext, dspans)[2])
-        i = next(k for k, l in enumerate(dlines) if l.startswith(prefix))
+        i = next((k for k, l in enumerate(dlines) if l.startswith(prefix)), None)
+        if i is None:
+            checks.append((f"{name}: the selftest's anchor {prefix!r} is present", False))
+            continue
         planted = list(dlines)
         if inline:
             planted[i] += " a planted branch 7"
@@ -378,6 +403,15 @@ def selftest():
         got = len(census(name, "\n".join(planted), dspans)[2]) - dbase
         checks.append((f"{name}: an old word planted in {where} is {'counted' if want else 'left alone'}",
                        got == want))
+    # and the scope: every tracked document in it judged, and one added outside SWEPT refused, code and trees out
+    tracked = tracked_files()
+    checks.append(("every tracked document in scope is swept or a record by kind", unjudged(tracked) == []))
+    new = ["evidence/EVIDENCE-new.md", ".claude/rules/new.md", ".claude/skills/new/SKILL.md"]
+    base = set(unjudged(tracked))
+    checks.append(("a document added outside SWEPT is refused - an evidence document, a rule, a skill",
+                   sorted(set(unjudged(tracked + new)) - base) == sorted(new)))
+    checks.append(("the shipped trees and the code stay out of scope",
+                   set(unjudged(tracked + ["uk/new.md", "tools/new.md", "tests/new.md"])) == base))
     for label, good in checks:
         print(("  OK   " if good else "  XX   ") + label)
     ok = all(g for _, g in checks)
@@ -397,6 +431,15 @@ def main():
             print(f"  VOID  {name} could not be read ({type(exc).__name__})")
             return 3
     print("vocabulary census - the house's words in living text")
+    try:
+        missing = unjudged(tracked_files())
+    except OSError as exc:
+        print(f"  VOID  the tracked documents could not be listed ({exc})")
+        return 3
+    if missing:
+        print(f"  VOID  tracked document(s) never judged - each joins SWEPT with its split, or is a record by kind: "
+              f"{missing}")
+        return 3
     try:
         examined, bad = run(docs)
     except LookupError as exc:
