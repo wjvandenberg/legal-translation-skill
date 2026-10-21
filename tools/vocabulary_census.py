@@ -33,6 +33,7 @@ as a clean census. So is a declared phrase that occurs nowhere in living text.
 
     uv run python tools/vocabulary_census.py             # every swept document; exit 0 clean, 1 an old word, 3 VOID
     uv run python tools/vocabulary_census.py --selftest  # red on a planted old word, green on one planted in a record
+    uv run python tools/vocabulary_census.py --list-pending  # also name the code files rename (d2) has still to sweep
 """
 import io
 import re
@@ -157,14 +158,19 @@ def tracked_files():
 # Python's own tokenizer and never by a pattern on the line, every string is living - printed text and needles, an
 # f-string's literal parts included (3.12+ tokenizes them apart from STRING) - and so is every comment that carries no
 # date; identifiers, file names and git branch names never move and are never read. THE COMMENT BLOCK IS THE UNIT: a
-# dated note runs over several comment lines and carries its date on one, so a block of comments on consecutive lines
-# any one of which carries a date is a record whole. A word kept in its own sense (Python's own slice) or inside a
-# quotation of a record is declared as a 'phrase', as for a document. The house's copies are fixed in the house, never
-# here. Each (d2) pull request adds the files it swept whole; the rest are counted as pending, by name in --list-pending.
+# dated note runs over several comment lines and carries its date on one, so a block of comments each alone on its
+# line, on consecutive lines, any one of which carries a date is a record whole; a comment trailing code is a unit of
+# its own (code review of #170: consecutive trailing comments are no one note). A word kept in its own sense (Python's
+# own slice) or inside a quotation of a record is declared as a 'phrase', as for a document - matched within ONE line,
+# so a phrase wrapped across two lines of a string cannot be declared. The house's copies are fixed in the house,
+# never here: the selftest holds this list against the shared standard-scripts folder. Each (d2) pull request adds the
+# files it swept whole; the rest are counted as pending, by name with --list-pending.
 DATE = re.compile(r"20\d\d-\d\d-\d\d")
 HOUSE_COPIES = {"verify_md.py", "verify_charter.py", "verify_code.py", "verify_deliverable.py", "verify_expected.py",
                 "verify_confidential.py", "cycle_evidence.py", "check_checkers.py", "run_tests.py", "auto_mode.py",
-                "auto_mode_guard.py", "purpose_guard.py", "install_hooks.py", "house_common.py"}
+                "auto_mode_guard.py", "auto_mode_headless.py", "purpose_guard.py", "install_hooks.py",
+                "house_common.py", "trace_instructions.py"}
+SHARED = ROOT.parent / "templates" / "standard-scripts"
 CODE_SWEPT = {
     # rename (d2a), 2026-10-21 (2): the four files the 2026-10-21 close named - stepb_verify's printed labels beside
     # its needles, and the three whose comments restated a phrase rename (c) changed
@@ -190,6 +196,11 @@ def code_living(src):
         if t.type == tokenize.COMMENT:
             if block and t.start[0] != block[-1].start[0] + 1:
                 flush()
+            if not t.line.lstrip().startswith("#"):     # trailing code: a unit of its own
+                flush()
+                block.append(t)
+                flush()
+                continue
             block.append(t)
         elif t.type in _TEXT_TOKENS:
             out.extend((t.start[0] + k, part) for k, part in enumerate(t.string.split("\n")))
@@ -539,6 +550,19 @@ def selftest():
     cs = code_scope(tracked)
     checks.append(("code: tests/run_tests.py is the project's, in scope; tools/run_tests.py the house's, out",
                    "tests/run_tests.py" in cs and "tools/run_tests.py" not in cs))
+    trail = ('x = 1  # 2026-01-01: a dated trailing note\n'
+             'y = 2  # an undated trailing comment: branch 7\n'
+             '# a standalone note dated 2026-01-01\n'
+             'z = 3  # trailing the next line, undated: branch 8\n')
+    tgot = sorted({n for n, _, _ in code_census("synthetic", trail, [])[1]})
+    checks.append(("code: a trailing comment is its own unit - a dated neighbour exempts neither", tgot == [2, 4]))
+    # the house's copies held against the shared folder: a tools/ script named there and missing here would be swept
+    # as project code; a name here that is not a tracked tools/ script is a stale entry. Unreachable is a FAILED check
+    shared = {p.name for p in SHARED.glob("*.py")} if SHARED.is_dir() else None
+    here = {Path(f).name for f in tracked if f.startswith("tools/") and f.endswith(".py") and "/" not in f[6:]}
+    checks.append((f"code: HOUSE_COPIES is exactly the tools/ scripts named in {SHARED.name}/ "
+                   f"({'unreachable' if shared is None else len(shared & here)})",
+                   shared is not None and HOUSE_COPIES == (shared & here)))
     for label, good in checks:
         print(("  OK   " if good else "  XX   ") + label)
     ok = all(g for _, g in checks)
