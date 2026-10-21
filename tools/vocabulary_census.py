@@ -43,6 +43,8 @@ import tokenize
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "tools"))
+from sibling_dirs import beside  # noqa: E402  (register I-40)
 SHAPES = [
     ("branch N", re.compile(r"\b(?:[Bb]ranch(?:es)?|BRANCH(?:ES)?)\s+(?:\d+|D[1-3])\b")),
     ("slice", re.compile(r"\b(?:[Ss]lices?|SLICES?)\b")),
@@ -170,7 +172,7 @@ HOUSE_COPIES = {"verify_md.py", "verify_charter.py", "verify_code.py", "verify_d
                 "verify_confidential.py", "cycle_evidence.py", "check_checkers.py", "run_tests.py", "auto_mode.py",
                 "auto_mode_guard.py", "auto_mode_headless.py", "purpose_guard.py", "install_hooks.py",
                 "house_common.py", "trace_instructions.py"}
-SHARED = ROOT.parent / "templates" / "standard-scripts"
+SHARED = beside("templates") / "standard-scripts"   # beside the MAIN checkout, a worktree too (register I-40)
 CODE_SWEPT = {
     # rename (d2a), 2026-10-21 (2): the four files the 2026-10-21 close named - stepb_verify's printed labels beside
     # its needles, and the three whose comments restated a phrase rename (c) changed
