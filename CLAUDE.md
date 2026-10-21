@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) and (d) next *(Wouter)* · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · rename (c) merged, #167; (d) next *(Wouter)* · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,22 +578,22 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-20 (3), I-43 FILED, 13.5 BUILT, STEP 13 DONE BUT FOR THE RUNTIME PROBLEM
+### HANDOFF — 2026-10-21, RENAME (c) MERGED WITH I-44, RENAME (d) MEASURED
 
-**PURPOSE: MET.** It was *so that the four silent reds are on the record beside the guard that ends them, and every
-part of a delivered document declares the target English instead of the source language*: #163 filed register
-I-43; #164 sets the language in every part the delivery holds and closes R2.
+**PURPOSE: MET.** It was *so that the register's living text reads in the house's words while its records and
+permanent ids stay as written, and stepb_audit's check 2 passing on nothing is on the record as its own row*: #167.
 
-**BUILT:** #163 — I-43, re-measured in a scratch worktree, and the eight stale charter numbers #74 left in seven
-places mended. #164 — `repack_docx.py` both trees; its suite 25 of 89 red on main, 89 after; on the 13, uk 7 of 11
-delivered workdirs moved, us 6 of 9, nothing else. Rulings and judgements: `DECISIONS-LOG.md`, 2026-10-20 (3).
+**BUILT:** #167 — 186 logged edits on the register's 63 living lines, reversed byte-identical, the row the unit (62
+living, 84 records); I-44 re-measured from git; the census holds the register and words used in their own sense.
+Rename (d) measured, not built: `temp/s1021_rename_d_plan.md`. Rulings, judgements: `DECISIONS-LOG.md`, 2026-10-21.
 
-**SINGLE NEXT ACTION: RENAME (c), THE REGISTER**, with check 2's vacuity filed as its row *(Wouter: the 2026-10-19
-entry's rulings (6) and (7), confirmed 2026-10-20 (3))*; then (d), the rest; then step 14's remainder.
+**SINGLE NEXT ACTION: RENAME (d1), THE DOCUMENTS, SKILLS AND RULES**, then (d2), the tools' and tests' text — in
+code, strings, docstrings and undated comments; a dated comment, an identifier and a name keep theirs *(Wouter)*.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** per pull request only its own acceptance check, the three confidentiality
-controls and the covering suites; the base list, the twelve-tool comparison and the ~40-minute full runner ONCE, at
-the end *(Wouter)*; the corpus arm's 13.5 pin is `8ad07c3`; "the glossary" means all its parts *(Wouter, kept)*.
+**WHAT A NEW SESSION WOULD GET WRONG:** in living text an unprefixed `Step N` is the project's step, the skill's is
+`skill Step N`; a closed step's lettered label keeps its letters, `step 11's sub-step 2b` *(Wouter)*; per pull
+request only its own checks, the base list, the twelve-tool comparison and the ~50-minute full runner ONCE, at the end.
 
-**Open, none blocking:** the charter-pointer checker built here, `tests/test_charter_pointers.py`, the house's
-version Wouter's to plan; the house runner's suite-coverage arm; `SKILL.md`'s size, goal (iv)'s. **Context: 59% when written, measured.**
+**Open, none blocking:** the house's `cycle_evidence.py` v2, released mid-session — adopt it at the opening, byte for
+byte; `stepb_verify`'s printed labels, rename (d)'s; the house's pointer checker and runner arm, Wouter's to plan;
+`SKILL.md`'s size, goal (iv)'s. **Context: 54% when written, measured.**

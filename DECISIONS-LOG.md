@@ -1798,3 +1798,66 @@ eight were written; what is not a pointer is a declared exemption with its reaso
 first run found two more of #74's stale numbers and a paraphrase in quotation marks, all mended; the house copies
 `verify_charter.py` and `verify_md.py` are exempted, never edited here. **(d)** A pin cannot see a pointer already
 wrong when pinned, so the pins were set after the hand check, and the docstring says so.
+
+## 2026-10-21 — rename (c), the register in the house's words; I-44 filed; rename (d) measured
+
+**WOUTER IN THE SESSION, THROUGH THE QUESTION TOOL, the recommended answer.** **(1) A CLOSED STEP'S TWO-PART LABEL
+KEEPS ITS LABEL** — `branch 11 slice 2b` becomes `step 11's sub-step 2b`, the token searchable where the decision log,
+the commits and the git branch names carry it; a numbered slice takes the house form, `branch 7 slice 3` becoming
+`sub-step 7.3`, as 12c became 12.3. **AT THE CLOSE, THROUGH THE QUESTION TOOL, each the recommended answer, asked
+after measuring (`temp/s1021_rename_d_plan.md`):** **(2) WHAT IN CODE IS LIVING:** printed strings and needles
+(212), docstrings (310) and undated comments (378) take the new words; a comment carrying a date (102) is a record;
+identifiers, file names and git branch names never move. **(3) THE CUT:** two pull requests — (d1) the six documents
+and the two skill and rule files, each given its split in the census; (d2) the tools' and tests' text, with a census
+for code built on Python's tokenizer. Step 14's remainder follows.
+
+**JUDGEMENTS TAKEN ALONE, CARRIED TO THE CLOSE.** **(a) THE ROW IS THE UNIT.** The census reads lines, so a register
+row is living or a record whole: 58 skill-finding rows whose own text records their closure, judged row by row from
+every status phrase, and 26 instrument rows whose status cell says fixed, are records; a row open, partly closed,
+deferred or pinned, a standing count, a positive and an open instrument row are living, their dated notes with
+them. **(b)** Words used in their own sense — string slicing in A20, C16 and G9, I-7's read-only verification run —
+are kept and declared as the census's new `phrase` kind, never reworded; quotations keep their words; Q1's `Step 0`
+is the project's strand, the skill having none. **(c) I-44 RE-MEASURED, AND IT REFUTES THIS LOG'S 2026-10-19 ENTRY,
+JUDGEMENT (c):** the order table had its option column in the first commit, 2026-08-06, five days before check 2
+reached `tools/`, so the check never parsed that table here — sixty-nine days passing on nothing, printing OK for
+the count and no verdict for the tally; the two tool comments repeating the claim corrected, this log's entry left
+as written. **(d)** Comparing every register-keyed tool by content against a baseline taken before the first edit
+found two keyings no count could: `audit_register.py` warned on `step 10` in I-26's found-on column, and
+`stepb_verify.py`'s needles into F28 and L4 failed — both told the new words. **(e)** `/code-review` at high: five
+findings, four fixed in #167 — a stale closed-row id refused, the phrase mask proved, the skill-Step limit stated, a
+comment reflowed — and `stepb_verify`'s printed labels left to rename (d). **(f)** Rename (d) not begun, measured
+instead: context stood at 44% after (c), which had cost about 32 points, and (d) is the larger sweep. **(g) THE
+FIRST FULL RUN WAS VOID.** `tools/run_tests.py --help`, run to read its usage, started it — the tool reads four flags
+and runs on any other — and its pipe through `head -15` kept eight rows and no verdict, the exit code `head`'s.
+Re-run bare on `main` at `924c683`, to a file, its own exit code kept, the machine kept awake:
+OVERALL: PASS, 93 suites and 14 entry points, 108 rows and none failing, in 3936.7 s.
+**(h)** Wouter, in words, mid-close: the `adeu` MCP server out of the user-wide Claude Code config and its 35 copies
+ended, the `apollo` connector out of the one project that had it, WhatsApp kept; adeu's cached copies are his to
+delete, by a command given in chat — the house's rule that a session deletes only what it created. **(i)** The
+house released `cycle_evidence.py` v2 at 11:08, after this session's opening read 16 tracked and none STALE;
+the close's base list declares that one STALE row by content, and the next session adopts it at its opening.
+
+**OPEN, NONE BLOCKING.** Rename (d), from its measured plan; `stepb_verify`'s printed labels with it; the house's
+pointer checker and suite-coverage arm, Wouter's to plan; `SKILL.md`'s size, goal (iv)'s.
+
+**The 2026-10-20 (3) handoff, as it stood at `924c683`, word for word:**
+
+> ### HANDOFF — 2026-10-20 (3), I-43 FILED, 13.5 BUILT, STEP 13 DONE BUT FOR THE RUNTIME PROBLEM
+>
+> **PURPOSE: MET.** It was *so that the four silent reds are on the record beside the guard that ends them, and every
+> part of a delivered document declares the target English instead of the source language*: #163 filed register
+> I-43; #164 sets the language in every part the delivery holds and closes R2.
+>
+> **BUILT:** #163 — I-43, re-measured in a scratch worktree, and the eight stale charter numbers #74 left in seven
+> places mended. #164 — `repack_docx.py` both trees; its suite 25 of 89 red on main, 89 after; on the 13, uk 7 of 11
+> delivered workdirs moved, us 6 of 9, nothing else. Rulings and judgements: `DECISIONS-LOG.md`, 2026-10-20 (3).
+>
+> **SINGLE NEXT ACTION: RENAME (c), THE REGISTER**, with check 2's vacuity filed as its row *(Wouter: the 2026-10-19
+> entry's rulings (6) and (7), confirmed 2026-10-20 (3))*; then (d), the rest; then step 14's remainder.
+>
+> **WHAT A NEW SESSION WOULD GET WRONG:** per pull request only its own acceptance check, the three confidentiality
+> controls and the covering suites; the base list, the twelve-tool comparison and the ~40-minute full runner ONCE, at
+> the end *(Wouter)*; the corpus arm's 13.5 pin is `8ad07c3`; "the glossary" means all its parts *(Wouter, kept)*.
+>
+> **Open, none blocking:** the charter-pointer checker built here, `tests/test_charter_pointers.py`, the house's
+> version Wouter's to plan; the house runner's suite-coverage arm; `SKILL.md`'s size, goal (iv)'s. **Context: 59% when written, measured.**
