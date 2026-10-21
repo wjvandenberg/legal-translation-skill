@@ -163,7 +163,7 @@ string.** The 21 fall into four kinds, and **only the first was on the old list:
 
 ---
 
-## 5 — The three things that were open at branch 0
+## 5 — The three things that were open at step 0
 
 **(a) and (c) are CLOSED. (b) is still open, and it is the only live item in this document.**
 

@@ -20,9 +20,14 @@ record after its FOR THE BUILD brief, 9.3's rows and Parts Two and Four keep the
 matter declaring Parts Two to Four the record. evidence/REGISTER-findings.md, rename (c), 2026-10-21 - its split
 Wouter's of that day: the header, the open rows and the clusters' live prose are living; THE ROW IS THE UNIT, so a
 skill-finding row whose own text records its closure is a record whole, and so is an instrument row whose status
-cell says fixed; a row still open, partly closed, deferred or standing, and a positive, are living whole. A span that
-matches nothing, or a heading prefix that matches more than one heading, is refused as stale: a declaration that
-quietly covers nothing would read as a clean census. So is a declared phrase that occurs nowhere in living text.
+cell says fixed; a row still open, partly closed, deferred or standing, and a positive, are living whole. Rename (d1),
+2026-10-21 (2), Wouter's of that day: EVERY living document outside code and the records by kind joins, an old word
+in it or none, so a word put back anywhere is caught - the evidence documents, verify.config.json, .gitattributes,
+the four skills, the five rules, README.md and .gitignore; the A3 analysis and the superseded Opus 5 plan are records
+whole; a dated declaration is a record, as a dated comment is in code; a record span is declared only where a record
+holds an old word, counted or read. A span that matches nothing, or a heading prefix that matches more than one
+heading, is refused as stale: a declaration that quietly covers nothing would read as a clean census. So is a
+declared phrase that occurs nowhere in living text.
 
     uv run python tools/vocabulary_census.py             # every swept document; exit 0 clean, 1 an old word, 3 VOID
     uv run python tools/vocabulary_census.py --selftest  # red on a planted old word, green on one planted in a record
@@ -91,6 +96,36 @@ SWEPT = {
         ("phrase", "onto the translated slice", "G9: a segment's slice of the string"),
         ("phrase", "*read-only* verification run", "I-7: a run that verifies, not the dropped Step C"),
     ],
+    "evidence/EVIDENCE-a3-structure.md": [
+        ("range", ("# A3 ", None), "every paragraph dated - the 2026-07-31 analysis, its corrections and additions - and "
+         "its 'branch 2' names the register's July order, which no step number now means: a record whole"),
+    ],
+    "PLAN-3-opus5-migration.md": [
+        ("range", ("# PLAN-3-opus5-migration.md ", None), "SUPERSEDED 2026-10-13 by its own header: a record whole"),
+    ],
+    "evidence/EVIDENCE-confidentiality.md": [
+        ("paragraph", "> **SUBSTANTIALLY MITIGATED 2026-08-11", "a dated mitigation note"),
+    ],
+    "evidence/EVIDENCE-measurement.md": [
+        ("heading", "### 3.5 ", "the 2026-08-06 cost story, dated"),
+    ],
+    "verify.config.json": [
+        ("line", r'^\s*"verify_code\.py::::commit author identity": "PRE-EXISTING AND DEFERRED BY WOUTER, 2026-09-09',
+         "Wouter's dated deferral: a dated declaration is a record"),
+        ("line", r'^\s*"section_caps": "Section 7 is the handoff', "the section caps' dated re-set record"),
+    ],
+    ".gitattributes": [],
+    "README.md": [],
+    ".gitignore": [],
+    ".claude/skills/audit-gate/SKILL.md": [],
+    ".claude/skills/frozen-intermediate-test/SKILL.md": [],
+    ".claude/skills/input-point-2-review/SKILL.md": [],
+    ".claude/skills/publish-skill-archives/SKILL.md": [],
+    ".claude/rules/gates.md": [],
+    ".claude/rules/instruments.md": [],
+    ".claude/rules/ooxml.md": [],
+    ".claude/rules/skill-authoring.md": [],
+    ".claude/rules/verification.md": [],
 }
 
 
@@ -313,6 +348,36 @@ def selftest():
     checks.append(("the register: every closed-row id starts exactly one row", closed_ids_stale(rtext) == []))
     checks.append(("the register: a mistyped closed-row id is refused",
                    closed_ids_stale(rtext.replace("| C30 |", "| C31 |", 1)) == ["C30"]))
+    # rename (d1): an old word planted in each kind of new document's living text is counted, one planted in a
+    # declared record is left alone - a line inserted after the anchor line, or (inline) the anchor line itself added to
+    for name, prefix, inline, want, where in (
+            ("evidence/EVIDENCE-a3-structure.md", "## 6. ", False, 0, "a record whole"),
+            ("PLAN-3-opus5-migration.md", "## 1. ", False, 0, "a record whole"),
+            ("evidence/EVIDENCE-confidentiality.md", "## 5 — ", False, 1, "living text"),
+            ("evidence/EVIDENCE-confidentiality.md", "> **SUBSTANTIALLY MITIGATED 2026-08-11", False, 0,
+             "a dated paragraph"),
+            ("evidence/EVIDENCE-measurement.md", "## 1 — ", False, 1, "the corpus listing"),
+            ("evidence/EVIDENCE-measurement.md", "### 3.5 ", False, 0, "a dated section"),
+            ("verify.config.json", '      "verify_deliverable.py":', True, 1, "an undated declaration"),
+            ("verify.config.json", '          "verify_code.py::::commit author identity":', True, 0,
+             "a dated declaration"),
+            (".gitattributes", "# NEVER TRANSLATE", False, 1, "living text"),
+            ("README.md", "## Contributing", False, 1, "living text"),
+            (".claude/skills/frozen-intermediate-test/SKILL.md", "# How a change", False, 1, "a skill"),
+            (".claude/rules/ooxml.md", "# OOXML hard rules", False, 1, "a rule, a CRLF file")):
+        dtext = (ROOT / name).read_bytes().decode("utf-8")
+        dspans = SWEPT[name]
+        dlines = dtext.replace("\r\n", "\n").split("\n")
+        dbase = len(census(name, dtext, dspans)[2])
+        i = next(k for k, l in enumerate(dlines) if l.startswith(prefix))
+        planted = list(dlines)
+        if inline:
+            planted[i] += " a planted branch 7"
+        else:
+            planted.insert(i + 1, "a planted branch 7 line")
+        got = len(census(name, "\n".join(planted), dspans)[2]) - dbase
+        checks.append((f"{name}: an old word planted in {where} is {'counted' if want else 'left alone'}",
+                       got == want))
     for label, good in checks:
         print(("  OK   " if good else "  XX   ") + label)
     ok = all(g for _, g in checks)

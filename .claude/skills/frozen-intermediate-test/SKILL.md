@@ -1,11 +1,11 @@
 ---
 name: frozen-intermediate-test
-description: How a change to this pipeline is actually tested - freeze the translated intermediate from an existing run so the whole mechanical half becomes a deterministic function, plus the two fixture tiers, the blind spot the trick does not announce, and the mandatory negative inputs. Use when planning or running a branch's TEST stage, building a fixture, deciding whether a change needs a graded run, or making git bisect possible. Relocated from CLAUDE.md 5.4 under route 3 on 2026-08-24.
+description: How a change to this pipeline is actually tested - freeze the translated intermediate from an existing run so the whole mechanical half becomes a deterministic function, plus the two fixture tiers, the blind spot the trick does not announce, and the mandatory negative inputs. Use when planning or running a step's TEST stage, building a fixture, deciding whether a change needs a graded run, or making git bisect possible. Relocated from CLAUDE.md 5.4 under route 3 on 2026-08-24.
 ---
 
 # How a change is actually tested
 
-**Section 4 of `PLAN-2-step-b.md` owns the method per branch kind. This is the principle behind it,**
+**Section 4 of `PLAN-2-step-b.md` owns the method per step kind. This is the principle behind it,**
 and `CLAUDE.md` 5.4 keeps the standing rules and points here.
 
 ## THE TRICK: FREEZE THE TRANSLATED INTERMEDIATE FROM AN EXISTING RUN
