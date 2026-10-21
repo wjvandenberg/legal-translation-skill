@@ -1861,3 +1861,69 @@ pointer checker and suite-coverage arm, Wouter's to plan; `SKILL.md`'s size, goa
 >
 > **Open, none blocking:** the charter-pointer checker built here, `tests/test_charter_pointers.py`, the house's
 > version Wouter's to plan; the house runner's suite-coverage arm; `SKILL.md`'s size, goal (iv)'s. **Context: 59% when written, measured.**
+
+## 2026-10-21 (2) — renames (d1) and (d2a): the documents swept, the census reads code; (d2) cut in three
+
+**WOUTER AT THE OPENING, THROUGH THE QUESTION TOOL, each the recommended answer, after measuring:** **(1)** the A3
+structural analysis and the superseded Opus 5 plan are records whole — every A3 paragraph dated, its `branch 2` the
+register's July order, which no step number now means; **(2)** a dated declaration in `verify.config.json` is a
+record, as a dated comment is in code — the 2026-09-09 deferral keeps `branch 7`, the caps' re-set record `slice
+4a`; **(3)** every living document joins the census, those holding no old word too; **(4)** the publish skill's
+aside pointing at a `third bullet` that no longer exists is fixed in (d1). **AND IN WORDS, MID-SESSION:** *"Don't
+disturb me for the next hour - just take all decisions by yourself."*
+
+**JUDGEMENTS TAKEN ALONE, CARRIED TO THE CLOSE.** **(a)** The house's `cycle_evidence.py` v2 adopted at the
+opening, byte for byte. **(b) THE HOUSE RELEASED `install_hooks.py` v8 AT 14:05, MID-SESSION**, its changelog entry
+not yet written: declared by content in this session's checks, adopted at the next opening, never mid-work. **(c)**
+From #169's review: a tracked document in the census's scope that is neither swept nor a record by kind turns it
+VOID — a fixed list would have left a new skill, rule or evidence document unguarded; seven findings, four fixed,
+one no change, two carried (`graded-baselines.json`'s D09 to (d2c), `check-push` unwired). **(d) (d2) CUT IN
+THREE** — (d2a) the census's code arm and the four files the 2026-10-21 close named, (d2b) the tools, (d2c) the
+tests: measured, the tools' and tests' living text held 769 old words, judgement-dense (a lettered label needs its
+step's context, many a `STEP 13` already the new words), against (c)'s 186 for about 32 points of context.
+**(e) THE COMMENT BLOCK IS THE UNIT** — a dated note carries its date on one line, so a block of standalone
+comments with a date on any line is a record whole, moving 134 occurrences from living to record against the
+per-line count; a comment trailing code is its own unit (#170's review). **(f) TWO MEASUREMENTS CORRECTED:** Python
+3.12+ tokenizes an f-string's text apart from STRING, so the 212 strings undercounted; and `tests/run_tests.py`,
+this project's own runner, was dropped as a house copy by its name — house copies are now left out by path, the
+list held against the shared folder, which also found two missing (`auto_mode_headless.py`,
+`trace_instructions.py`). **(g)** The three comments said to restate a phrase rename (c) changed could not be told
+apart again — (c)'s finder kept no output — so their three files were swept whole. **(h)** `/code-review` on #170:
+seven findings, five fixed, one no change, one for Wouter. **(i)** Context stood at 55% after (d2a), so no further
+sweep began; (d2)'s remainder is measured in `temp/s1021b_rename_d2_plan.md`. **(j)** The full run, once, on
+`main` at `295eaf3`, through `cycle_evidence.py full`:
+**OVERALL: FAIL, 107 of 108 rows passing, the suites 4815.6 s in all**, the one red `tests/test_sibling_dirs.py`:
+#170's review fix had found the shared folder as `ROOT.parent`, outside `tools/sibling_dirs.py` (register I-40) —
+the full run caught what it exists to catch; fixed in #171 with `beside()`. **WOUTER, THROUGH THE QUESTION TOOL,
+the recommended answer: a COMPOSED record**, not an 80-minute re-run — the 107 rows at `295eaf3`, and at `60d37dd`
+every suite reading the one changed file, all passing: `sibling_dirs` 42 of 42, the charter pointers 196, runner
+coverage, the census and its selftest.
+
+**OPEN FOR WOUTER: IS A COMMENT THAT ONLY CITES A DATED RULING A RECORD?** The ruling's measure was a comment
+carrying a date, and a citation carries one, so `(Wouter, 2026-10-20 (3))` exempts its whole block; narrowing it
+to a dated NOTE would be a new rule, not a reading of this one *(the #170 review's third finding)*.
+
+**OPEN, NONE BLOCKING.** Renames (d2b) and (d2c); `check-push` into the pre-push hook; the house's pointer checker
+and suite-coverage arm, Wouter's to plan; `SKILL.md`'s size, goal (iv)'s.
+
+**The 2026-10-21 handoff, as it stood at `295eaf3`, word for word:**
+
+> ### HANDOFF — 2026-10-21, RENAME (c) MERGED WITH I-44, RENAME (d) MEASURED
+>
+> **PURPOSE: MET.** It was *so that the register's living text reads in the house's words while its records and
+> permanent ids stay as written, and stepb_audit's check 2 passing on nothing is on the record as its own row*: #167.
+>
+> **BUILT:** #167 — 186 logged edits on the register's 63 living lines, reversed byte-identical, the row the unit (62
+> living, 84 records); I-44 re-measured from git; the census holds the register and words used in their own sense.
+> Rename (d) measured, not built: `temp/s1021_rename_d_plan.md`. Rulings, judgements: `DECISIONS-LOG.md`, 2026-10-21.
+>
+> **SINGLE NEXT ACTION: RENAME (d1), THE DOCUMENTS, SKILLS AND RULES**, then (d2), the tools' and tests' text — in
+> code, strings, docstrings and undated comments; a dated comment, an identifier and a name keep theirs *(Wouter)*.
+>
+> **WHAT A NEW SESSION WOULD GET WRONG:** in living text an unprefixed `Step N` is the project's step, the skill's is
+> `skill Step N`; a closed step's lettered label keeps its letters, `step 11's sub-step 2b` *(Wouter)*; per pull
+> request only its own checks, the base list, the twelve-tool comparison and the ~50-minute full runner ONCE, at the end.
+>
+> **Open, none blocking:** the house's `cycle_evidence.py` v2, released mid-session — adopt it at the opening, byte for
+> byte; `stepb_verify`'s printed labels, rename (d)'s; the house's pointer checker and runner arm, Wouter's to plan;
+> `SKILL.md`'s size, goal (iv)'s. **Context: 54% when written, measured.**
