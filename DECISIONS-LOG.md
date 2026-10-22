@@ -1967,3 +1967,14 @@ Python 3.14, lxml 6.1.3 in it. `uv run` from the root now resolves to it, and th
 `uv run --with lxml` commands land in it directly, with no temporary environment. `uv.toml` says how to build it,
 and that a clone without it works as before, only slower. Its measured effect is B's entry to record, B starting
 from A's two runs after.
+
+**A AND B, MEASURED — two recorded full runs on each starting commit, all six passing.** Wall time: **41.9 and 38.1
+minutes before A; 34.0 and 43.2 after A; 41.6 and 37.7 after B.** The machine's load rose through the afternoon
+(mean CPU 52–60%, 62–69%, then 71–73%), so the whole-run clock cannot show a saving of this size, and each effect
+was measured where the change acts. **A:** the unchanged `uv run --with lxml` start, quiet, **1.04 s to 0.31 s**;
+the 21 suites that start 10 or more lxml children took 938 and 834 s before A, **595 and 730 s after it**, and 838
+and 798 s after B, at the day's highest load — divided by the house selftests, which A cannot touch, 2.62 and 3.34
+before, 1.71 and 1.93 after A, 2.11 twice after B: **that ratio does not fully cancel load, which falls hardest on
+process start-up.** **B:** a gate run **22 to 25 s before, 10 to 13 s after**, its whole output byte-identical; the
+two gate suites together **428 to 503 s in the four runs before B, 298 and 259 s after.** The security agent's log:
+no entry from the stamp before A was built to the end of B's runs.
