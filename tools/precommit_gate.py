@@ -256,7 +256,9 @@ else:
         print(f"  {cat:<44} {tot.group(1) if tot else '0'}  ({why})")
 
 head("5. COMMITTABILITY OF THE CODE — does a file hold one real string per pattern?")
-out, rc = run(ROOT / "tools" / "script_committability.py")
+# --skip-scratch (Wouter, 2026-10-22: "Gate skips temp/"). The scanner's temp/ arm never blocks and this section
+# never printed it, yet it cost about 9 s of every gate run; tools/script_committability.py says why in full.
+out, rc = run(ROOT / "tools" / "script_committability.py", "--skip-scratch")
 if rc == 2:
     VOID.append("script_committability (list unreadable)")
     print("  CONTROL VOID — a pattern list could not be read")

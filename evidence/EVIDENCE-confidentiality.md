@@ -161,6 +161,15 @@ string.** The 21 fall into four kinds, and **only the first was on the old list:
 > is a floor and not a ceiling — **read a script and ask what it reveals about the CONTROL, not only what
 > strings it holds.** *(The four files themselves are listed in §6.4, which is route 1.)*
 
+**2026-10-22 — THE GATE'S CALL STOPPED READING `temp/`, AND NOTHING THE GATE REPORTS CHANGED** *(Wouter: "Gate
+skips temp/")*. The committability scanner reads three folders, and only `tools/` decides its exit code. Section 5
+of the pre-commit gate forwards only the scanner's `tools/`, `RESULT:` and `BLOCKER` lines, so what the `temp/`
+arm found was never printed at a commit — yet reading the 936 scratch scripts was about 9 of the scanner's 11 s,
+on each of the 26 gate runs a full test run makes. The gate now passes `--skip-scratch`: `temp/` is not read and
+the scanner says so in one line; `tools/` and the private tools are read as before; and run on its own, the
+scanner still reads `temp/`, which is how a scratch script holding a real string is caught before promotion. **The
+gate's output was compared byte for byte before and after the change, on the same tree.**
+
 ---
 
 ## 5 — The three things that were open at step 0

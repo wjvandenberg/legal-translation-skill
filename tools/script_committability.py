@@ -28,11 +28,20 @@ OUTPUT POLICY, copied from `leakage_scan.py` and for its reason: a hit is a COUN
 CATEGORY, never the matched text. This output lands in transcripts and scrollback, and a
 client name reproduced there is the exact leak the list exists to prevent. `--show` reveals.
 
+--skip-scratch, FOR THE PRE-COMMIT GATE'S CALL ONLY (Wouter, 2026-10-22: "Gate skips temp/").
+`temp/` is the scratch folder: a hit there never blocks, and the gate forwards only `tools/`,
+`RESULT:` and `BLOCKER` lines, so it never even printed what this arm found. Measured that day,
+the arm was about 9 of this scanner's 11 s on each of the 26 gate runs a full test run makes.
+With the flag the folder is NOT read, and the output SAYS so in one line - never silently.
+Without it, `temp/` is read exactly as before: that is how a scratch script holding a real
+string is seen before it is promoted into `tools/`, where the same probes then block it.
+
 Exit codes:  0 = every committable folder is clean · 1 = something committable holds a real
 string · 2 = a pattern list is missing, so the control has NOT run.
 
     uv run python tools/script_committability.py
     uv run python tools/script_committability.py --show
+    uv run python tools/script_committability.py --skip-scratch   # the gate's call: temp/ not read, and said so
 """
 import io
 import os
@@ -45,6 +54,7 @@ ROOT = Path(__file__).resolve().parent.parent
 from sibling_dirs import private_dir  # noqa: E402  (register I-40)
 PRIV = private_dir()
 SHOW = "--show" in sys.argv
+SKIP_SCRATCH = "--skip-scratch" in sys.argv     # the gate's call: see the docstring
 
 
 def load(env, default):
@@ -123,6 +133,10 @@ print("=" * 96)
 print(f"  {len(DESC)} descriptor + {len(NAMES)} name pattern(s) + {len(PROBES) - 2} shape probe(s)")
 
 for label, folder, committable in FOLDERS:
+    if SKIP_SCRATCH and folder == ROOT / "temp":
+        print(f"\n  {label:<18} not read: --skip-scratch, the gate's call. A hit here never blocks;"
+              f" run this scanner alone to read it.")
+        continue
     if not folder.exists():
         print(f"\n  {label:<18} does not exist")
         continue

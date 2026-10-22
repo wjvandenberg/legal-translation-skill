@@ -16,11 +16,18 @@ project has already paid for twice, once from a hand-counted list and once from 
 regex.
 
 NOTHING HERE IS A REAL PATH. Every vector is invented for the purpose, per section 5.6.
+
+AND THE GATE'S `--skip-scratch` CALL (2026-10-22), run on a copy of the live scanner in an invented layout: see
+`scratch_arms`.
 """
 import ast
+import os
 import pathlib
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
@@ -88,6 +95,68 @@ DOUBLED_MUST_NOT_FIRE = [
 ]
 
 
+# --skip-scratch, THE GATE'S CALL (2026-10-22, Wouter: "Gate skips temp/"). The scanner's temp/ arm never blocks and
+# the gate never printed it, yet it was about 9 of the scanner's 11 s on each of the 26 gate runs a full run makes.
+# These arms run a BYTE-IDENTICAL COPY of the live scanner in an invented layout - its own tools/, temp/ and private
+# folder, two invented one-pattern lists - so they are fast and touch nothing real. A copy that differed from the
+# live file would guard nothing, so that is asserted first. Red on the scanner before the flag existed: it read
+# temp/ whatever it was passed, and the gate's call carried no flag.
+def scratch_arms() -> bool:
+    live = ROOT / "tools" / "script_committability.py"
+    shape = str(100 + 23) + " " + "M" + "W"      # a capacity figure, built here so this file holds none
+    ok = True
+    print("\n  --skip-scratch -- the gate's call leaves out temp/, and only temp/")
+
+    def arm(label, cond):
+        print(f"    {'OK  ' if cond else 'MISS'} {label}")
+        return cond
+
+    with tempfile.TemporaryDirectory(prefix="committability-") as td:
+        root = pathlib.Path(td)
+        for d in ("tools", "temp", "private/tools"):
+            (root / d).mkdir(parents=True)
+        shutil.copyfile(live, root / "tools" / "script_committability.py")
+        shutil.copyfile(ROOT / "tools" / "sibling_dirs.py", root / "tools" / "sibling_dirs.py")
+        (root / "tools" / "clean.py").write_text("X = 1\n", encoding="utf-8")
+        (root / "temp" / "scratch.py").write_text(f"NOTE = '{shape}'\n", encoding="utf-8")
+        (root / "private" / "names.txt").write_text("zzinventedname\n", encoding="utf-8")
+        (root / "private" / "descriptors.txt").write_text("zzinventeddescriptor\n", encoding="utf-8")
+        env = dict(os.environ, LT_PRIVATE_DIR=str(root / "private"), PYTHONDONTWRITEBYTECODE="1",
+                   LEAKAGE_LIST_PATH=str(root / "private" / "names.txt"),
+                   CORPUS_DESCRIPTORS_FILE=str(root / "private" / "descriptors.txt"), PYTHONIOENCODING="utf-8")
+
+        def scan(*flags):
+            r = subprocess.run([sys.executable, str(root / "tools" / "script_committability.py"), *flags],
+                               cwd=root, env=env, capture_output=True, text=True, encoding="utf-8",
+                               errors="replace", stdin=subprocess.DEVNULL)
+            return r.returncode, r.stdout + r.stderr
+
+        copy = (root / "tools" / "script_committability.py").read_bytes()
+        ok &= arm("the copy is byte-identical to the live scanner", copy == live.read_bytes())
+        rc, out = scan()
+        if rc == 2:
+            print("    VOID  the copy could not load its invented lists -- these arms proved nothing")
+            return False
+        ok &= arm("without the flag, temp/ is read: its planted shape is seen, and blocks nothing",
+                  rc == 0 and bool(re.search(r"^temp/\s+0 clean\s+\|\s+1 hold a real string", out, re.M)))
+        rc, out = scan("--skip-scratch")
+        ok &= arm("with --skip-scratch, temp/ is not read",
+                  rc == 0 and not re.search(r"^temp/", out, re.M))
+        ok &= arm("...and the output SAYS so, never silently",
+                  bool(re.search(r"^\s+temp/\s+not read", out, re.M)))
+        ok &= arm("...while tools/ and the private tools are still read",
+                  bool(re.search(r"^tools/\s+\d+ clean", out, re.M))
+                  and bool(re.search(r"^private/tools/\s+\d+ clean", out, re.M)))
+        (root / "tools" / "leak.py").write_text(f"CAP = '{shape}'\n", encoding="utf-8")
+        rc, out = scan("--skip-scratch")
+        ok &= arm("...and a planted shape in tools/ still blocks with the flag, exit 1",
+                  rc == 1 and "RESULT: 1 COMMITTABLE" in out)
+    gate = (ROOT / "tools" / "precommit_gate.py").read_text(encoding="utf-8")
+    ok &= arm("the gate's section 5 calls the scanner with --skip-scratch",
+              bool(re.search(r'run\(ROOT / "tools" / "script_committability\.py", "--skip-scratch"\)', gate)))
+    return ok
+
+
 def main() -> int:
     pat = re.compile(probe_pattern())
     print("=" * 92)
@@ -146,9 +215,11 @@ def main() -> int:
     ok &= blocks
     print(f"    {'OK  ' if blocks else 'MISS'} scan_trees.py carries the doubled form, blocking")
 
+    ok &= scratch_arms()
+
     print("\n" + "=" * 92)
-    print("PASS -- the probe still catches a path and no longer catches an escape sequence."
-          if ok else "FAIL")
+    print("PASS -- the probe still catches a path and no longer catches an escape sequence, and the gate's "
+          "call leaves out temp/ alone." if ok else "FAIL")
     print("=" * 92)
     return 0 if ok else 1
 
