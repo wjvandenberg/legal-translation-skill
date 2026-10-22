@@ -55,6 +55,7 @@
       {"name": "parity_check", "command": "uv run --with lxml python tests/test_parity_check.py", "count": "RESULT: [0-9]+ of ([0-9]+)"},
       {"name": "pass_conditions", "command": "uv run --with lxml python tests/test_pass_conditions.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "pass_conditions [us]", "command": "uv run --with lxml python tests/test_pass_conditions.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
+      {"name": "pre_push_hook", "command": "uv run python tests/test_pre_push_hook.py", "count": "PRE-PUSH HOOK: [0-9]+ of ([0-9]+) checks"},
       {"name": "precommit_gate", "command": "uv run --with lxml python tests/test_precommit_gate.py", "count": "RESULT: [0-9]+ of ([0-9]+)"},
       {"name": "ratio_check", "command": "uv run --with lxml python tests/test_ratio_check.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "ratio_check [us]", "command": "uv run --with lxml python tests/test_ratio_check.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},

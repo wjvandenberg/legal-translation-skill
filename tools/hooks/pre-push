@@ -1,15 +1,14 @@
 #!/bin/sh
 # REFUSE A DIRECT PUSH TO main.
 #
-# Why this exists as a FILE rather than as a setting. Branch protection was decided for this
-# repository "from repository creation" (charter §5.2). GitHub declines it on a private
-# repository on the Free plan -- both classic protection and the ruleset fallback the charter
-# names return 403. So the decided control is unavailable at the server until the repository
-# is either paid for or made public, and the flip needs an explicit decision at the moment it
-# happens.
-#
-# This is the half that can be had now, and it is the half the charter says matters most:
-# "It also stops *Claude* committing to `main` by accident, which is the likelier failure."
+# Why this exists as a FILE as well as a setting. Branch protection was decided for this
+# repository "from repository creation" (charter §5.2), and GitHub declined it on a private
+# repository on the Free plan -- both classic protection and the ruleset fallback returned 403
+# -- so this guard came first, as the half that could be had then. The repository went public
+# on 2026-08-07 and the server's protection on main has been live since, admins included
+# (charter §5.2 holds its state). That is the real control. This one stops the same accident
+# earlier, on this machine, before anything reaches the server -- and the likelier accident is
+# *Claude* pushing to `main`.
 #
 # WHAT IT DOES NOT DO, stated plainly so nobody mistakes it for the real thing: it is local,
 # it does not travel with a clone, it does not apply to anything pushed from another machine
@@ -24,7 +23,7 @@
 # house block at the end refuses a push unless a full run - tools/cycle_evidence.py full, on a
 # clean tree - vouches for exactly the commit each ref carries, and refuses whenever the check
 # cannot be made. It is the house's hooks/pre-push block, CARRIED HERE rather than installed over
-# this file, so this project's guard and its override above stay exactly as they were.
+# this file, so this project's guard and its override above stay this project's own.
 # Override the full-run check, with a reason of 15 characters or more:
 #     HOUSE_PUSH_WITHOUT_FULL_RUN="<why this push cannot wait for a full run>" git push
 
@@ -34,8 +33,9 @@ remote="$1"
 # the guard's own loop would consume them and leave the house block nothing, which passes everything.
 refs=$(cat)
 
-# THIS PROJECT'S GUARD, ITS LINES UNCHANGED, over the saved copy. Its `exit 1` ends the group, which
-# the `|| exit 1` turns into the hook's refusal; its `continue` and its pass fall through to the block.
+# THIS PROJECT'S GUARD, ITS LOGIC UNCHANGED, over the saved copy - its refusal reworded on 2026-10-22 to
+# the charter's §5.2 (Wouter). Its `exit 1` ends the group, which the `|| exit 1` turns into the hook's
+# refusal; its `continue` and its pass fall through to the block. tests/test_pre_push_hook.py runs both.
 printf '%s\n' "$refs" | {
 while read -r local_ref local_sha remote_ref remote_sha; do
     case "$remote_ref" in
@@ -47,8 +47,8 @@ while read -r local_ref local_sha remote_ref remote_sha; do
             echo "" >&2
             echo "  BLOCKED: direct push to main on '$remote'." >&2
             echo "" >&2
-            echo "  Every branch goes through a pull request, gets a presented review, and" >&2
-            echo "  Wouter approves the merge. Autonomy never means self-merging." >&2
+            echo "  Every branch goes through a pull request: its diff and review are shown," >&2
+            echo "  and it is squash-merged once verify, test and the review are green." >&2
             echo "" >&2
             echo "    git switch -c feature/<name>" >&2
             echo "    git push -u origin feature/<name>" >&2

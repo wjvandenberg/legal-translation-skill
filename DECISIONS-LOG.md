@@ -1978,3 +1978,22 @@ before, 1.71 and 1.93 after A, 2.11 twice after B: **that ratio does not fully c
 process start-up.** **B:** a gate run **22 to 25 s before, 10 to 13 s after**, its whole output byte-identical; the
 two gate suites together **428 to 503 s in the four runs before B, 298 and 259 s after.** The security agent's log:
 no entry from the stamp before A was built to the end of B's runs.
+
+## 2026-10-22 (3) — #173's three findings for this project closed: a suite that runs the pre-push hook, the installer's text, the guard's refusal
+
+**BUILT** *(a side session; its step list `temp/s1022h_hook_test_plan.md`, gitignored)*: `tests/test_pre_push_hook.py`
+runs the real `tools/hooks/pre-push` with Git's own `sh` over invented ref lines, in a scratch repository whose
+stub `cycle_evidence.py` vouches only for the commits a case names — eleven cases, each leaving one check the only
+one that can refuse, and three mutants each made to fail one: the guard's `|| exit 1` dropped, standard input read
+before the save, and read after it. **Red first, measured:** each mutant written into the real hook through
+`tools/inplace_guard.py` turned the suite red — exit 1, with three, seven and four cases failing — and the hook
+came back byte-identical. `tools/install_project_hooks.py` now says the pre-push also refuses any push no full run
+vouches for. **The house's full-run block is byte-identical to #173's**: its three findings stay the house's.
+
+**WOUTER, THROUGH THE QUESTION TOOL, both the recommended answers:** (1) the guard's refusal matched to §5.2 —
+*"its diff and review are shown, and it is squash-merged once verify, test and the review are green"* — in place
+of *"Wouter approves the merge"*; the house's like sentence sits in its AUTO MODE guard only, which this guard is
+not. (2) The two notes calling server-side branch protection unavailable — the hook's header and the installer's
+summary — corrected in the same pull request: measured 2026-10-22, protection live on `main`, `enforce_admins`
+true, 0 required approvals, the repository public. **Then, in words:** *"Do not ask questions this session, just
+assume everything in your recommended way."*
