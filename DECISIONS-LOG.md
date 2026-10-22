@@ -1927,3 +1927,43 @@ and suite-coverage arm, Wouter's to plan; `SKILL.md`'s size, goal (iv)'s.
 > **Open, none blocking:** the house's `cycle_evidence.py` v2, released mid-session — adopt it at the opening, byte for
 > byte; `stepb_verify`'s printed labels, rename (d)'s; the house's pointer checker and runner arm, Wouter's to plan;
 > `SKILL.md`'s size, goal (iv)'s. **Context: 54% when written, measured.**
+
+## 2026-10-22 — the full run made faster without testing less: measured first, four rulings, the house's pre-push landed (#173), A built
+
+**MEASURED FIRST, NOTHING CHANGED BEFORE WOUTER CHOSE** *(a side session; the plan and every figure behind this
+entry are `temp/s1022r_runner_speed_plan.md`, gitignored)*. On a quiet machine the full run took **40.5 and 50.5
+minutes**, both passing — the 66 to 80 minutes of 2026-10-21 was load from other sessions, which roughly doubled
+nearly every suite. A counted run found **852 children started through `uv run --with lxml`**, each building a
+temporary environment because the shared one holds no lxml (median 0.80 s a start inside the run). The
+confidentiality gate runs **26 times a full run**, and about 9 of each run's 21 s go on the committability scanner
+reading the 936 scratch scripts in `temp/`, whose hits never block — the gate forwards only `tools/`, `RESULT:` and
+`BLOCKER` lines. **The shared state is the whole working copy, not `tests/fixtures/`:** nine suites change tracked
+files in place through `tools/inplace_guard.py` and the smoke suite rebuilds every fixture, so side-by-side runs
+need a working copy per lane. **The house had not solved it:** its `run_tests.py` is this project's byte for byte,
+one suite at a time.
+
+**WOUTER, THROUGH THE QUESTION TOOL, each the recommended option:** **(A)** this project gets its own environment
+holding lxml — project-only, never the shared environment, whose house checkers are standard library only;
+**(B)** the gate's call leaves out the scanner's `temp/` arm, which the scanner keeps when run alone; **(C)**
+side-by-side lanes go to the house, after A and B, as one experiment with its queued task *a suite safe beside
+another project's*; **(D)** the two git-heavy house selftests (`cycle_evidence`, `verify_confidential`: 1,058 git
+calls, about 180 s a run) are the house's. **The `[us]` repeat stays** — dropping it would test less, which the
+brief ruled out. **Then, in words:** *"once the house rollout's legal-translation step has landed, build A (the
+project environment with lxml), then B (the gate skips temp/), each on its own branch with two full runs before
+and after."* **And twice more through the question tool:** the rollout's commit through its own pull request
+first (*"I PR it first"*), and merged as pushed, its review's findings routed to their owners (*"Merge as
+pushed"*).
+
+**#173 — THE HOUSE'S FULL-RUN CHECK IN THIS PROJECT'S PRE-PUSH**, made by the house session (its evidence 10.22),
+merged after two full runs on its exact tree through `cycle_evidence.py full`: **41.9 and 38.1 minutes, both
+passing, both recorded** — its own push the hook's first real use, allowed on that record. **Its review, six
+findings:** three in the house's block, sent to the house (a bare-`python` fallback when `uv` is not on the hook's
+path; a tag on an older commit refused; no drift report for a copy carried inside a project's own hook); three for
+this project (no suite exercises the combined hook; `install_project_hooks.py` still calls it a guard for `main`
+only; the guard's message says Wouter approves every merge, against §5.2's rule of 2026-10-14 (2)).
+
+**A, BUILT, NOTHING ELSE CHANGED:** `.venv` in the project root — already gitignored — on the signed system
+Python 3.14, lxml 6.1.3 in it. `uv run` from the root now resolves to it, and the suites' unchanged
+`uv run --with lxml` commands land in it directly, with no temporary environment. `uv.toml` says how to build it,
+and that a clone without it works as before, only slower. Its measured effect is B's entry to record, B starting
+from A's two runs after.

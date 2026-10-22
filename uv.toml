@@ -2,4 +2,12 @@
 # SIGNED C:\Python314, and this machine's security agent ends an UNSIGNED process that moves or renames
 # a Word, email or PDF file, while the run it ends can still look finished. .python-version says which
 # version; this says where it may come from. CLAUDE.md section 4.
+#
+# AND AN ENVIRONMENT OF THIS PROJECT'S OWN, HOLDING lxml (Wouter, 2026-10-22): `.venv` in this folder, gitignored,
+# on the same signed Python. Build it from this folder:
+#     uv venv --python C:\Python314\python.exe .venv
+#     uv pip install --python .venv\Scripts\python.exe lxml
+# `uv run` finds it before the shared environment, so every suite's UNCHANGED `uv run --with lxml` starts in it
+# without building a temporary environment: 0.69 s to 0.36 s a start, measured quiet, about 850 starts a full run.
+# A clone without it works exactly as before, only slower. DECISIONS-LOG.md, 2026-10-22.
 python-preference = "system"
