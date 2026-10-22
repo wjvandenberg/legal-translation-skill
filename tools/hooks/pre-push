@@ -19,9 +19,24 @@
 #
 # Install:  uv run python tools/install_project_hooks.py
 # Override, deliberately and rarely:  LT_ALLOW_MAIN_PUSH=1 git push
+#
+# THE SECOND CHECK, 2026-10-22: THE FULL SUITE ONCE BEFORE A PUSH, NEVER ONCE PER COMMIT. The
+# house block at the end refuses a push unless a full run - tools/cycle_evidence.py full, on a
+# clean tree - vouches for exactly the commit each ref carries, and refuses whenever the check
+# cannot be made. It is the house's hooks/pre-push block, CARRIED HERE rather than installed over
+# this file, so this project's guard and its override above stay exactly as they were.
+# Override the full-run check, with a reason of 15 characters or more:
+#     HOUSE_PUSH_WITHOUT_FULL_RUN="<why this push cannot wait for a full run>" git push
 
 remote="$1"
 
+# THE REFS ARE READ ONCE. Git writes them to stdin a single time, and both checks below need them:
+# the guard's own loop would consume them and leave the house block nothing, which passes everything.
+refs=$(cat)
+
+# THIS PROJECT'S GUARD, ITS LINES UNCHANGED, over the saved copy. Its `exit 1` ends the group, which
+# the `|| exit 1` turns into the hook's refusal; its `continue` and its pass fall through to the block.
+printf '%s\n' "$refs" | {
 while read -r local_ref local_sha remote_ref remote_sha; do
     case "$remote_ref" in
         refs/heads/main)
@@ -45,5 +60,74 @@ while read -r local_ref local_sha remote_ref remote_sha; do
             ;;
     esac
 done
+} || exit 1
+
+# >>> THE FULL RUN AT THE PUSH - one block over "$refs" and "$remote", so a project's own hook can
+# carry it beside its own checks rather than be replaced by this file.
+root=$(git rev-parse --show-toplevel)
+checker=""
+for c in "$root/tools/cycle_evidence.py" "$root/standard-scripts/cycle_evidence.py"; do
+    if [ -f "$c" ]; then
+        checker="$c"
+        break
+    fi
+done
+py=$(git config --get house.python)
+reason="$HOUSE_PUSH_WITHOUT_FULL_RUN"
+
+check_push() {
+    if [ -z "$checker" ]; then
+        echo "  no cycle_evidence.py in tools/ or standard-scripts/, so nothing can vouch for it"
+        return 2
+    fi
+    if [ -n "$py" ]; then
+        "$py" "$checker" check-push "$1"
+    elif command -v uv >/dev/null 2>&1; then
+        uv run python "$checker" check-push "$1"
+    else
+        python "$checker" check-push "$1"
+    fi
+}
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+    [ -n "$local_sha" ] || continue
+    case "$local_sha" in
+        *[!0]*) ;;
+        *) continue ;;                          # a deletion: all zeros, it carries nothing
+    esac
+
+    answer=$(check_push "$local_sha" 2>&1)
+    rc=$?
+    if [ "$rc" -eq 0 ]; then
+        printf 'pre-push: %s ALLOWED%s\n' "$local_ref" "${answer#*PUSH ALLOWED}" >&2
+        continue
+    fi
+
+    if [ ${#reason} -ge 15 ]; then
+        echo "pre-push: HOUSE_PUSH_WITHOUT_FULL_RUN - pushing $local_ref WITHOUT a full run on it." >&2
+        echo "  the reason given: $reason" >&2
+        continue
+    fi
+
+    echo "" >&2
+    echo "  BLOCKED: no full run vouches for $local_ref ($local_sha) on '$remote'." >&2
+    printf '%s\n' "$answer" | sed 's/^/  /' >&2
+    echo "" >&2
+    echo "  Run the full suite on this commit's CLEAN tree, then push again:" >&2
+    echo "    <python> <path to>/cycle_evidence.py full -- <the full test command>" >&2
+    echo "" >&2
+    if [ -n "$reason" ]; then
+        echo "  HOUSE_PUSH_WITHOUT_FULL_RUN is set, and too short to be a reason: it takes" >&2
+        echo "  15 characters or more, because a one-word excuse reads as a decision nobody made." >&2
+    else
+        echo "  If this push genuinely cannot wait for a full run:" >&2
+        echo "    HOUSE_PUSH_WITHOUT_FULL_RUN=\"<why, 15 characters or more>\" git push" >&2
+    fi
+    echo "" >&2
+    exit 1
+done <<EOF
+$refs
+EOF
+# <<< THE FULL RUN AT THE PUSH
 
 exit 0
