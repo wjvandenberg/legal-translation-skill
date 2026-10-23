@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 7 (2026-10-09)
+"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 11 (2026-10-22)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -47,6 +47,28 @@ v7 (2026-10-09) - EVERY BITE SENDS WHAT CLAUDE CODE SENDS: raw UTF-8, carrying a
 see fire(). Until then each bite sent json.dumps's ASCII escapes, the one input a hook reading its stdin as TEXT
 survives, and every hook in the house read it that way. v6 was issued and withdrawn on 2026-09-30, so that number
 already names other content.
+
+v8 (2026-10-21) - THE SELFTEST RUNS THE REAL pre-push, THROUGH REAL PUSHES. hooks/pre-push now also refuses a push
+no full run vouches for - cycle_evidence.py check-push, with HOUSE_PUSH_WITHOUT_FULL_RUN as its override - and
+until v8 nothing here ever ran the hook it installs: cases 1-4 prove the verification on a one-line dummy. Case 12
+drives the real one through push_arms(), both arms. RE-COPY hooks/pre-push WITH THIS FILE: beside cycle_evidence.py,
+an older pre-push fails case 12, which is the case working.
+
+v9 (2026-10-22) - CASE 13 SKIPS WHERE CASE 12 SKIPS. Case 12 declares a skip when no hooks/pre-push sits beside this
+copy; case 13, the next one, read that same file with no existence check, so in such a copy the selftest died with
+FileNotFoundError - a traceback where a DECLARED SKIP was meant. Found in a project that holds the scripts and no hooks.
+
+v10 (2026-10-22) - ARM (e) USES THE HOOK'S OWN MAIN OVERRIDE. hooks/pre-push's full-run block invites a project to
+carry it beside its own guard, and that guard keeps its own override; arm (e) pushed to main with HOUSE_ALLOW_MAIN_PUSH
+only, so such a hook failed it and the project's full run went red. main_overrides() reads the names from the hook's
+text, and case 14 proves arm (e) on the real hook with its override renamed - red against v9.
+
+v11 (2026-10-22) - THREE ARMS FOR TWO FIXES TO hooks/pre-push, both red against the hook before them. (i) with no
+house.python and no uv the hook ran a bare `python` - whatever the PATH holds - and now refuses, naming the fix. (j) a
+tag on a commit the remote already has was refused for want of a record, though it carries nothing; it now goes. (k)
+is the other direction, green both sides: a tag carrying a new commit is still checked. An arm may DECLARE A SKIP
+now, printed N/A with its reason. And interpreter_missing() joins checker_missing(): an install that would refuse
+every push for want of a Python says so at install time - case 15. RE-COPY hooks/pre-push WITH THIS FILE, as for v8.
 
 WHERE THE SOURCES COME FROM. A directory named 'hooks' beside this file. In a project that
 is tools/hooks/; in the shared folder it is standard-scripts/hooks/. Discovered rather
@@ -315,6 +337,222 @@ def guard_bites(root: Path) -> tuple[bool, str]:
     return True, ""
 
 
+#: v8: the two overrides hooks/pre-push reads - the branch guard's, and the full-run check's.
+MAIN_OVERRIDE = "HOUSE_ALLOW_MAIN_PUSH"
+FULL_RUN_OVERRIDE = "HOUSE_PUSH_WITHOUT_FULL_RUN"
+
+#: v8: what push_arms() proves, one line per arm, in the order it runs them.
+PUSH_ARMS = {
+    "a": "a push no full run vouches for is refused",
+    "c": "an override of '1' is refused as no reason",
+    "f": "a checker that cannot start refuses, never passes",
+    "b": "the same push, after a full run, goes",
+    "d": "an override with a reason lets it go, and prints the reason",
+    "e": "main stays guarded with a record, and goes with its own override",
+    "h": "a deletion carries nothing, so it is not checked",
+    "i": "with no configured Python and no uv, a push refuses and names the fix",
+    "j": "a tag on a commit the remote already has carries nothing, so it is not checked",
+    "k": "a tag that carries a new commit is still checked",
+    "g": "with no checker in the project, a push refuses",
+}
+
+
+def main_overrides(hook: Path) -> list:
+    """v10: THE NAMES A HOOK'S OWN MAIN GUARD ANSWERS TO, read from its text - the house's always, and every
+    other *_ALLOW_MAIN_PUSH it carries. hooks/pre-push's block invites a project to carry it beside its OWN
+    guard, and that guard keeps its own override; arm (e) asked only for the house's, so such a hook could
+    never pass it - a project adopting this file beside its own guard had a red full run for doing as invited."""
+    text = hook.read_bytes().decode("utf-8", errors="replace")
+    return sorted(set(re.findall(r"\b[A-Z][A-Z0-9_]*_ALLOW_MAIN_PUSH\b", text)) | {MAIN_OVERRIDE})
+
+
+def _git(cwd: Path, *args, env=None) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, encoding="utf-8",
+                          errors="replace", stdin=subprocess.DEVNULL, env=env, timeout=120)
+
+
+def _setup(cwd: Path, *args) -> None:
+    """A SETUP step must succeed, or the arms after it fail for a reason nobody named: raised, so the
+    caller prints the git command that failed rather than seven arms that 'could not push'."""
+    r = _git(cwd, *args)
+    if r.returncode != 0:
+        raise subprocess.CalledProcessError(r.returncode, ["git", *args], r.stdout, r.stderr)
+
+
+def checker_missing(root: Path, src: Path) -> str | None:
+    """v8: why an installed pre-push would refuse EVERY push, or None. A pre-push that calls
+    `check-push` with no cycle_evidence.py in tools/ or standard-scripts/ refuses each push for want
+    of a checker - correct at push time, and only found out then unless the install says so."""
+    if src.name != "pre-push" or b"check-push" not in src.read_bytes():
+        return None
+    if any((root / d / "cycle_evidence.py").exists() for d in ("tools", "standard-scripts")):
+        return None
+    return ("pre-push: it calls cycle_evidence.py check-push and there is none in tools/ or "
+            "standard-scripts/, so it will refuse every push - copy the checker, or keep the old hook")
+
+
+def interpreter_missing(root: Path, src: Path) -> str | None:
+    """v11: the other way an installed pre-push refuses EVERY push - nothing to run its checker with. It runs
+    house.python, else `uv run python`, and since v11 never a bare `python`. Read from THIS process's PATH,
+    which is the install's and may not be the push's: a warning at install time, not a guarantee."""
+    if src.name != "pre-push" or b"check-push" not in src.read_bytes():
+        return None
+    r = _git(root, "config", "--get", "house.python")
+    py = r.stdout.strip() if r.returncode == 0 else ""
+    if py:
+        if shutil.which(py) or Path(py).is_file():
+            return None
+        return ("pre-push: house.python names a Python that is not there, so it will refuse every push - "
+                "point git config house.python at one")
+    if shutil.which("uv"):
+        return None
+    return ("pre-push: no house.python and no uv on this PATH, so it will refuse every push - "
+            "git config house.python <path to python>")
+
+
+def push_arms(hook: Path, work: Path, checker_dir: Path = HERE, only=None) -> dict:
+    """v8: DRIVE A pre-push THROUGH REAL PUSHES TO A BARE REMOTE, and say per arm whether it behaved.
+
+    REAL BECAUSE EVERY CLAIM IS ABOUT GIT: what reaches the hook's stdin, what an exit code does to
+    the push, what the remote holds afterwards. Each arm is asserted on THE REMOTE - is the branch
+    there, at which commit - and never on the exit code alone, which a hook that refused for the
+    wrong reason would satisfy. The scratch repository holds the checker in tools/, as a project
+    does, and names this interpreter in house.python, so the arms do not depend on uv being found.
+    Every override is stripped from the environment - the full-run one, and each main override
+    main_overrides() reads from the hook (v10) - so a developer's own setting cannot pass an arm.
+    Returns {arm: (ok, what happened)} in PUSH_ARMS' order - an arm that never ran is absent.
+    v10: `only` runs the named arms alone, for a case proving one - each arm sets up what it needs.
+    """
+    def want(arm):
+        return only is None or arm in only
+
+    remote, repo = work / "remote.git", work / "repo"
+    _setup(work, "init", "-q", "--bare", str(remote))
+    _setup(work, "init", "-q", "-b", "work", str(repo))
+    for k, v in (("user.email", "noreply@example.invalid"), ("user.name", "selftest"),
+                 ("commit.gpgsign", "false"), ("house.python", Path(sys.executable).as_posix())):
+        _setup(repo, "config", k, v)
+    _setup(repo, "remote", "add", "origin", str(remote))
+    (repo / "tools").mkdir()
+    for name in ("cycle_evidence.py", "house_common.py"):
+        shutil.copyfile(checker_dir / name, repo / "tools" / name)
+    (repo / ".gitignore").write_bytes(b"temp/\n__pycache__/\n")
+    (repo / "a.py").write_bytes(b"print('one')\n")
+    _setup(repo, "add", "-A")
+    _setup(repo, "commit", "-q", "-m", "one")
+    install_one(hook, repo / ".git" / "hooks")
+    overrides = main_overrides(hook)
+    base = {k: v for k, v in os.environ.items() if k not in (*overrides, FULL_RUN_OVERRIDE)}
+    base["PYTHONDONTWRITEBYTECODE"] = "1"
+
+    def push(*refspec, extra=None, pre=()):
+        r = _git(repo, *pre, "push", "-q", "origin", *refspec, env=dict(base, **(extra or {})))
+        return r.returncode, r.stdout + r.stderr
+
+    def on_remote(branch, kind="heads"):
+        r = _git(remote, "rev-parse", "--verify", "--quiet", f"refs/{kind}/{branch}")
+        return r.stdout.strip() if r.returncode == 0 else None
+
+    def commit(name, body):
+        (repo / name).write_bytes(body)
+        _setup(repo, "add", "-A")
+        _setup(repo, "commit", "-q", "-m", name)
+
+    def head():
+        return _git(repo, "rev-parse", "HEAD").stdout.strip()
+
+    def full():
+        r = subprocess.run([sys.executable, str(repo / "tools" / "cycle_evidence.py"), "full", "--",
+                            sys.executable, "-c", "pass"], cwd=str(repo), capture_output=True,
+                           stdin=subprocess.DEVNULL, env=base, timeout=120)
+        return r.returncode == 0
+
+    arms = {}
+    if want("a"):
+        rc, _ = push("work")
+        arms["a"] = (rc != 0 and on_remote("work") is None, f"exit {rc}, on the remote: {bool(on_remote('work'))}")
+    if want("c"):
+        rc, _ = push("work", extra={FULL_RUN_OVERRIDE: "1"})
+        arms["c"] = (rc != 0 and on_remote("work") is None, f"exit {rc}, on the remote: {bool(on_remote('work'))}")
+    if want("f"):
+        rc, _ = push("work", pre=("-c", f"house.python={(work / 'no-such-python').as_posix()}"))
+        arms["f"] = (rc != 0 and on_remote("work") is None, f"exit {rc}, on the remote: {bool(on_remote('work'))}")
+    if want("b"):
+        recorded = full()
+        rc, _ = push("work")
+        arms["b"] = (recorded and rc == 0 and on_remote("work") == head(),
+                     f"recorded {recorded}, exit {rc}, the remote at HEAD: {on_remote('work') == head()}")
+    if want("d"):
+        (repo / "b.py").write_bytes(b"print('two')\n")
+        _setup(repo, "add", "-A")
+        _setup(repo, "commit", "-q", "-m", "two")
+        why = "selftest: a reason of real length"
+        rc, out = push("work", extra={FULL_RUN_OVERRIDE: why})
+        arms["d"] = (rc == 0 and on_remote("work") == head() and why in out,
+                     f"exit {rc}, the remote at HEAD: {on_remote('work') == head()}, reason printed: {why in out}")
+    if want("e"):
+        recorded = full()
+        rc, _ = push("HEAD:refs/heads/main")
+        guarded = rc != 0 and on_remote("main") is None
+        rc2, _ = push("HEAD:refs/heads/main", extra={name: "1" for name in overrides})
+        arms["e"] = (recorded and guarded and rc2 == 0 and on_remote("main") == head(),
+                     f"recorded {recorded}, refused without its override: {guarded}, with it exit {rc2}")
+    if want("h"):
+        rc, _ = push(":work")
+        arms["h"] = (rc == 0 and on_remote("work") is None,
+                     f"exit {rc}, still on the remote: {bool(on_remote('work'))}")
+    if want("i"):
+        # v11: A BARE `python` IS WHATEVER THE PATH HOLDS - another interpreter, a stub that hangs, or nothing. HEAD
+        # gets a record first, so a hook that falls back to one finds the push vouched for and lets it go; a stub
+        # put first on the PATH answers ALLOWED for the same reason. Every folder holding uv is dropped from it.
+        commit("i.py", b"print('three')\n")
+        recorded = full()
+        stub = work / "stub-bin"
+        stub.mkdir()
+        (stub / "python").write_bytes(b"#!/bin/sh\necho 'PUSH ALLOWED - a bare python stub ran'\n")
+        os.chmod(stub / "python", 0o755)
+        kept = [d for d in base.get("PATH", "").split(os.pathsep)
+                if d and not any((Path(d) / n).exists() for n in ("uv", "uv.exe"))]
+        path = os.pathsep.join([str(stub), *kept])
+        if shutil.which("uv", path=path) or not shutil.which("git", path=path):
+            arms["i"] = (None, "DECLARED SKIP: uv cannot be hidden from this PATH without hiding git")
+        else:
+            rc, out = push("HEAD:refs/heads/arm-i", extra={"PATH": path}, pre=("-c", "house.python="))
+            named = "house.python" in out
+            # and it does not send the reader to run the full suite, which cannot cure a missing interpreter
+            misled = "Run the full suite" in out
+            arms["i"] = (recorded and rc != 0 and on_remote("arm-i") is None and named and not misled,
+                         f"recorded {recorded}, exit {rc}, on the remote: {bool(on_remote('arm-i'))}, "
+                         f"names house.python: {named}, full-run advice: {misled}")
+    if want("j"):
+        # v11: the commit goes up first, with the override and no record; a tag on it then carries nothing. Each
+        # new arm pushes a branch of its own, so arm (g) still finds 'work' off the remote whatever these did.
+        commit("j.py", b"print('four')\n")
+        rc0, _ = push("HEAD:refs/heads/arm-j", extra={FULL_RUN_OVERRIDE: "selftest: the commit goes first, unvouched"})
+        _setup(repo, "tag", "-a", "-m", "selftest", "arm-j")
+        rc, _ = push("refs/tags/arm-j")
+        arms["j"] = (rc0 == 0 and rc == 0 and on_remote("arm-j", "tags") is not None,
+                     f"commit pushed: exit {rc0}; tag exit {rc}, on the remote: {bool(on_remote('arm-j', 'tags'))}")
+    if want("k"):
+        # v11: the other direction - a tag on a commit the remote lacks pushes that commit, so it is checked.
+        commit("k.py", b"print('five')\n")
+        _setup(repo, "tag", "arm-k")
+        rc, _ = push("refs/tags/arm-k")
+        arms["k"] = (rc != 0 and on_remote("arm-k", "tags") is None,
+                     f"exit {rc}, on the remote: {bool(on_remote('arm-k', 'tags'))}")
+    if want("g"):
+        # (g) LAST, because it takes the checker away. v11: HEAD is recorded here, since arm (k) leaves it unvouched -
+        # so only the missing checker can refuse.
+        recorded = full()
+        (repo / "tools").rename(repo / "tools-away")
+        rc, out = push("work")
+        (repo / "tools-away").rename(repo / "tools")
+        arms["g"] = (recorded and rc != 0 and on_remote("work") is None and "no cycle_evidence.py" in out,
+                     f"recorded {recorded}, exit {rc}, on the remote: {bool(on_remote('work'))}, "
+                     f"names the missing checker: {'no cycle_evidence.py' in out}")
+    return arms
+
+
 #: THE THREE KINDS --only can select, in the order they are reported. v4, 2026-09-24.
 KINDS = ("git", "auto", "purpose")
 
@@ -407,6 +645,14 @@ def main(argv) -> int:
             state, problem = hook_state(src, dst_dir / src.name)
             if problem:
                 problems.append(problem)
+            missing = checker_missing(root, src)
+            if missing:
+                problems.append(missing)
+                state += " - BUT NO CHECKER: every push will be refused"
+            no_python = interpreter_missing(root, src)
+            if no_python:
+                problems.append(no_python)
+                state += " - BUT NO PYTHON FOR ITS CHECKER: every push will be refused"
             print(f"  {src.name:<14} {state}")
 
         print()
@@ -724,6 +970,122 @@ def selftest() -> int:
         print(f"    {'OK  ' if good else 'MISS'} the {real.stem} bite fails a text-mode reader"
               f" -> as-is {'bites' if verdicts['as-is'] else 'DOES NOT BITE'}, "
               + ", ".join(f"{k} {'CAUGHT' if not verdicts[k] else 'PASSED'}" for k in text_modes))
+
+    # 12. v8: THE REAL pre-push, BOTH ARMS, THROUGH REAL PUSHES - push_arms() above. Every case before
+    #     this one runs a one-line dummy, so nothing here had ever run the hook it installs. RED
+    #     against v7's pre-push, which lets arm (a)'s push through: it guards main and nothing else.
+    #     Needs cycle_evidence.py beside this copy, for the hook to call - DECLARED SKIP without it.
+    real_hook = SRC / "pre-push"
+    if not ((HERE / "cycle_evidence.py").exists() and (HERE / "house_common.py").exists()
+            and real_hook.exists()):
+        print(f"    N/A  the real pre-push, through real pushes -> DECLARED SKIP: cycle_evidence.py,"
+              f" house_common.py or hooks/pre-push is not beside this copy")
+    else:
+        work = tmp / "push-arms"
+        work.mkdir()
+        try:
+            arms = push_arms(real_hook, work)
+        except (OSError, subprocess.SubprocessError) as e:
+            arms = {}
+            print(f"    MISS the real pre-push could not be driven at all - {e}")
+        for arm, claim in PUSH_ARMS.items():
+            good, what = arms.get(arm, (False, "NEVER RAN"))
+            if good is None:                    # v11: a declared skip, with its reason
+                print(f"    N/A  pre-push ({arm}) {claim} -> {what}")
+                continue
+            ok &= good
+            print(f"    {'OK  ' if good else 'MISS'} pre-push ({arm}) {claim} -> {what}")
+
+    # 13. v8: AN INSTALL THAT WOULD REFUSE EVERY PUSH SAYS SO AT INSTALL TIME. The real hooks go into a scratch
+    #     repository with no checker - exit 1, the problem named - then a checker is planted, and the same
+    #     install exits 0. Both ways, so a check that always complained would fail the second half.
+    #     v9: SKIPS WHERE CASE 12 SKIPS - with no hooks/pre-push beside this copy it read a missing file and crashed.
+    if not (SRC / "pre-push").exists():
+        print("    N/A  an install with no checker is reported -> DECLARED SKIP: no hooks/pre-push beside this copy")
+    elif b"check-push" not in (SRC / "pre-push").read_bytes():
+        print("    N/A  an install with no checker is reported -> DECLARED SKIP: the pre-push beside this copy"
+              " does not call check-push")
+    else:
+        repo13 = _repo("no-checker")
+        # v11: an interpreter named, so the only thing this case varies is the checker - see case 15
+        subprocess.run(["git", "-C", str(repo13), "config", "house.python", Path(sys.executable).as_posix()],
+                       capture_output=True)
+        bare13, _ = _run(repo13, ["--only", "git"])
+        (repo13 / "tools").mkdir()
+        (repo13 / "tools" / "cycle_evidence.py").write_bytes(b"# planted: its existence is what is read\n")
+        with_checker, _ = _run(repo13, ["--only", "git"])
+        good = bare13 == 1 and with_checker == 0
+        ok &= good
+        print(f"    {'OK  ' if good else 'MISS'} an install with no checker is reported -> no checker exit {bare13}"
+              f" (want 1), with one exit {with_checker} (want 0)")
+
+    # 14. v10: A PROJECT'S OWN GUARD BESIDE THE HOUSE BLOCK KEEPS ITS OWN OVERRIDE - the shape the block's own
+    #     comment in hooks/pre-push invites - and main must still go with THAT one. Arm (e) alone, against the
+    #     real hook with its guard's override renamed. RED against v9, whose arm (e) set HOUSE_ALLOW_MAIN_PUSH
+    #     only, so the renamed guard refused the push it was meant to let through. Skips as case 12 does.
+    if not ((HERE / "cycle_evidence.py").exists() and (HERE / "house_common.py").exists()
+            and real_hook.exists()):
+        print(f"    N/A  pre-push (e) with a project's own main override -> DECLARED SKIP: cycle_evidence.py,"
+              f" house_common.py or hooks/pre-push is not beside this copy")
+    else:
+        own = tmp / "own-guard" / "pre-push"
+        own.parent.mkdir()
+        own.write_bytes(real_hook.read_bytes().replace(MAIN_OVERRIDE.encode(), b"PROJECT_ALLOW_MAIN_PUSH"))
+        work14 = tmp / "push-arms-own"
+        work14.mkdir()
+        try:
+            good, what = push_arms(own, work14, only=("e",)).get("e", (False, "NEVER RAN"))
+        except (OSError, subprocess.SubprocessError) as e:
+            good, what = False, f"could not be driven at all - {e}"
+        ok &= good
+        print(f"    {'OK  ' if good else 'MISS'} pre-push (e) with a project's own main override -> {what}")
+
+    # 15. v11: THE OTHER WAY AN INSTALL REFUSES EVERY PUSH - nothing to run the checker with, since the hook no longer
+    #     falls back to a bare `python`. A checker planted, house.python unset with the global and system config shut
+    #     out, every folder holding uv off the PATH: the install exits 1 naming house.python; with house.python set
+    #     to this interpreter, 0. Both ways, as case 13. RED against v10, which never asked.
+    if not (SRC / "pre-push").exists() or b"check-push" not in (SRC / "pre-push").read_bytes():
+        print("    N/A  an install with no Python for its checker is reported -> DECLARED SKIP: no pre-push beside"
+              " this copy that calls check-push")
+    else:
+        repo15 = _repo("no-python")
+        (repo15 / "tools").mkdir()
+        (repo15 / "tools" / "cycle_evidence.py").write_bytes(b"# planted: its existence is what is read\n")
+        empty_cfg = tmp / "empty.gitconfig"
+        empty_cfg.write_bytes(b"")
+        names = ("PATH", "GIT_CONFIG_GLOBAL", "GIT_CONFIG_NOSYSTEM")
+        saved_env = {k: os.environ.get(k) for k in names}
+        try:
+            os.environ["PATH"] = os.pathsep.join(
+                d for d in (saved_env["PATH"] or "").split(os.pathsep)
+                if d and not any((Path(d) / n).exists() for n in ("uv", "uv.exe")))
+            os.environ["GIT_CONFIG_GLOBAL"] = str(empty_cfg)
+            os.environ["GIT_CONFIG_NOSYSTEM"] = "1"
+            if shutil.which("uv") or not shutil.which("git"):
+                print("    N/A  an install with no Python for its checker is reported -> DECLARED SKIP: uv cannot be"
+                      " hidden from this PATH without hiding git")
+            else:
+                buf = io.StringIO()
+                try:
+                    os.chdir(repo15)
+                    with contextlib.redirect_stdout(buf):
+                        bare15 = main(["--only", "git"])
+                finally:
+                    os.chdir(saved_cwd)
+                named = "house.python" in buf.getvalue()
+                subprocess.run(["git", "-C", str(repo15), "config", "house.python", Path(sys.executable).as_posix()],
+                               capture_output=True)
+                with_python, _ = _run(repo15, ["--only", "git"])
+                good = bare15 == 1 and named and with_python == 0
+                ok &= good
+                print(f"    {'OK  ' if good else 'MISS'} an install with no Python for its checker is reported -> none"
+                      f" exit {bare15} (want 1), names house.python: {named}, with one exit {with_python} (want 0)")
+        finally:
+            for k, v in saved_env.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
 
     shutil.rmtree(tmp, ignore_errors=True)
     print("\nSELFTEST: " + ("PASS" if ok else "FAIL"))
