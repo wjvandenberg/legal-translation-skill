@@ -186,7 +186,7 @@ check("the gate's own exit is 0 on the unmodified tree", rc3 == 0, f"exit {rc3}"
 # §5.6 says every pattern must be tested against the string it was written for, in the same
 # commit. The plant above proves the class still catches a filename carrying proper nouns.
 # These prove it no longer fires on prose that merely names the extension — which is what the
-# unnarrowed pattern did to branch 5's own added lines (" the .docx", " a partial .docx"),
+# unnarrowed pattern did to step 5's own added lines (" the .docx", " a partial .docx"),
 # blocking the gate on text containing no filename at all.
 BENIGN = [
     "The repack writes a partial .docx only under a temporary name.",
@@ -265,7 +265,7 @@ check("and the section names the branch point it measured from", "branch point" 
 
 # --------------------------------------------------------------------------------------
 print("\n5. THE TREE IS EXACTLY AS IT WAS")
-# THIS ASSERTED THE WRONG THING UNTIL BRANCH 5, and branch 5 is the first branch to expose
+# THIS ASSERTED THE WRONG THING UNTIL STEP 5, and step 5 is the first step to expose
 # it. It ran `git diff --name-only -- uk/ us/` and required the result to be EMPTY — which
 # is not "this test changed nothing", it is "the working tree matches HEAD". Every branch
 # from 6 onward legitimately modifies the published trees, so on exactly the branches this

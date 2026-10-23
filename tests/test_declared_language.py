@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 12 SLICE 12a — the declared source language, and every check that reads it.
+"""SUB-STEP 12.1 — the declared source language, and every check that reads it.
 
 WHAT THE ROWS SAY. S1: on a language the skill does not support, four scripts guessed, three wrong
 answers, and every one printed CLEAN or PASSED. S2: the lexicon check applied the wrong language's rules
@@ -7,20 +7,20 @@ and passed. C9: its guess is wrong and prints PASSED. H1: five components, four 
 C22's detection half: the remnant block scanned the language one detector guessed.
 
 WOUTER'S CHOICES (2026-10-08 (2), section 3.2 of PLAN-2-step-b.md): the operator DECLARES the source
-language once at Step 1; every language-dependent check reads that declaration; repack's two-detector
+language once at skill Step 1; every language-dependent check reads that declaration; repack's two-detector
 agreement on the original cross-checks it, a mismatch reported; a language the skill does not support,
 or one not settled, makes every such check say NOT SUPPORTED — never CLEAN or PASSED — the run going on.
 
   R  THE READER AND THE WRITER — source_language_markers.read_declared_language, not_supported, and the
      --declare command that writes source_language.json beside the notes.
-  L  lexicon_compliance — the declaration beside the notes (Step 4d) or given by --notes (pre-repack);
+  L  lexicon_compliance — the declaration beside the notes (skill Step 4d) or given by --notes (pre-repack);
      an unsupported language runs only the language-agnostic rules, which still block; a guess never
      says PASSED.
   A  apply's source-language scan.
   Q  quality_check's remnant rows and its closing line; an aux part that will not parse is an issue.
   P  repack — the cross-check, the pre-repack lexicon scan and the remnant block; nothing that blocks
      today stops blocking when nothing was declared.
-  T  THE TWO TREES and the words: repack identical; Step 1c written in both.
+  T  THE TWO TREES and the words: repack identical; skill Step 1c written in both.
 
 RED FIRST: run before 12a's code exists, every arm must fail.
 
@@ -128,7 +128,7 @@ def wrap(body):
 
 
 print("=" * 96)
-print(f"BRANCH 12 SLICE 12a — the declared source language   variant={args.variant}")
+print(f"SUB-STEP 12.1 — the declared source language   variant={args.variant}")
 print(f"scripts {SCRIPTS}")
 print("=" * 96)
 
@@ -159,7 +159,7 @@ if callable(reader):
        got[:2] == ("english", "unsupported") and "target" in got[2].lower(), got)
     d, nj = workdir("r-none", "italian", CLEAN)
     got = reader(str(nj))
-    ok("R6: no declaration is 'undeclared', its reason naming Step 1c and the file",
+    ok("R6: no declaration is 'undeclared', its reason naming skill Step 1c and the file",
        got[:2] == (None, "undeclared") and "1c" in got[2] and DECL in got[2], got)
     for label, raw in (("not JSON", b"{not json"), ("an empty name", b'{"source_language": ""}'),
                        ("a name that is not letters", b'{"source_language": "nor-wegian 2"}'),
@@ -451,7 +451,7 @@ ok("P6: nothing declared, an Italian remnant — still REFUSED: no gate softened
 # =============================================================================================
 # ARM T — the two trees and the words
 # =============================================================================================
-section("ARM T — both trees, and Step 1c")
+section("ARM T — both trees, and skill Step 1c")
 # SUB-STEP 13.2 (2026-10-19 (2)) GAVE repack ONE DIFFERENCE OF THE VARIANTS' OWN, its command line's --variant
 # default; tests/test_repack_scrub_and_block.py's arm 5 was moved to it and this check was not, no runner naming
 # this suite (found 2026-10-20 (2)). Asserted the same way: exactly that one line, any other difference failing.
@@ -463,7 +463,7 @@ ok("T1: repack_docx.py differs between uk/ and us/ ONLY by 13.2's --variant defa
    == (ROOT / "us" / "scripts" / "repack_docx.py").read_bytes())
 for t in ("uk", "us"):
     doc = (ROOT / t / "skill-docs" / "01-setup-and-extract.md").read_text(encoding="utf-8")
-    ok(f"T2: {t}'s Step 1 carries Step 1c and its --declare command",
+    ok(f"T2: {t}'s skill Step 1 carries skill Step 1c and its --declare command",
        "Step 1c" in doc and "source_language_markers.py --declare" in doc)
 
 if not args.keep:

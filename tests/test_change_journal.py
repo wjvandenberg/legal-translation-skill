@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 9 — C15 and B6: the tidy-up script records every edit it makes.
+"""STEP 9 — C15 and B6: the tidy-up script records every edit it makes.
 
 WHAT THE ROWS SAY. C15: `validate_apply` joins `en_segments` with no separator before
 tokenising while `post_process`'s spacing backstop inserts a space at exactly that seam, so
 ONE validator invoked THREE times on ONE file gave TWO different opinions about it and the
-block arrived at repack having passed at Steps 5 and 6. B6: `post_process` overrode a
+block arrived at repack having passed at skill Steps 5 and 6. B6: `post_process` overrode a
 lexicon-sanctioned choice and its own drift gate then blocked because `document.xml` no
 longer matched `paragraphs.json` — THE OPERATOR IS SHOWN A DRIFT ERROR, NOT A TERMINOLOGY
 ERROR, which points at the wrong diagnosis entirely.
@@ -13,7 +13,7 @@ WHY A JOURNAL AND NOT A FIX TO EITHER. PLAN-2-step-b.md section 6, Option 6: opt
 character-exact comparison is IMPOSSIBLE while a mandatory script may rewrite the text after
 the last comparison. Either the opinionated passes move upstream of the comparison, or the
 stage must journal every change it makes so the comparison can account for exactly those and
-nothing else. Branch 11 cannot be built at all until this exists.
+nothing else. Step 11 cannot be built at all until this exists.
 
 AND IT REPLACES A SIMULATION WITH A RECORD. `validate_apply.py` already imports
 `will_fix_spacing_fire` from `post_process` and PREDICTS what the spacing pass will do. That
@@ -32,8 +32,8 @@ IT IS DECLARED BLIND TO NON-TEXT CHANGE, never silently blind: the italic strip 
 `w:i`, the page-break pass adds `pageBreakBefore`, and the spacing pass sets `xml:space`.
 None of those is text and none is journalled as an edit. Each pass instead records its
 element count before and after, so a structural change is VISIBLE as a count even though its
-content is not recorded. Branch 11 diffs READINGS, which are text, so text is the contract it
-needs; B1's and B7's formatting rows are branch 10's and are not closed here.
+content is not recorded. Step 11 diffs READINGS, which are text, so text is the contract it
+needs; B1's and B7's formatting rows are step 10's and are not closed here.
 
 THE SECOND READER IS THE POINT OF THIS FILE. .claude/rules/verification.md rule 3: a reader
 that normalises its input cannot see a change in what it normalised away, and the reader is
@@ -203,7 +203,7 @@ def run(argv, timeout=900, scripts_dir=None):
 # THE SECOND READER. Implemented from the contract in the docstring, importing NOTHING from
 # post_process.py. If this file ever imports the script it measures, delete the import: an
 # instrument that shares its subject's reader shares its subject's blind spots, which is the
-# defect branch 8 spent a whole slice on.
+# defect step 8 spent a whole sub-step on.
 # =========================================================================================
 TEXT_TAGS = (f"{{{W}}}t", f"{{{W}}}delText")
 
@@ -260,7 +260,7 @@ def doc(paragraphs):
 
     A tag in `_EMPTY_TAGS` ignores its text and emits a self-closing element, so a
     paragraph can carry a rendered tab or break between two runs — which is what
-    slice 2's B4 arm needs and what no earlier fixture in this suite had.
+    sub-step 10.2's B4 arm needs and what no earlier fixture in this suite had.
     """
     body = []
     for runs in paragraphs:
@@ -279,7 +279,7 @@ def doc(paragraphs):
 # which is C15's own mechanism; 5 is the negative control INSIDE the document and no pass in
 # either variant may touch it.
 #
-# PARAGRAPH 0 USED TO TRIP THE ANNEX REWRITE, AND SINCE SLICE 3b THAT PASS REWRITES NOTHING.
+# PARAGRAPH 0 USED TO TRIP THE ANNEX REWRITE, AND SINCE SUB-STEP 3b THAT PASS REWRITES NOTHING.
 # The lexicon offers Annex as a free choice, so `annex_to_schedule` is a detector and the
 # input would have tripped two rewriting passes where arm 2 asks for three. The paragraph
 # keeps its `Annex 1` -- now a string that must SURVIVE, which arm 8 asserts -- and gains a
@@ -371,7 +371,7 @@ def owner_map(xml_bytes):
 def replay(before_xml, before_paras, jrnl):
     """Apply the journal to the BEFORE state and return the paragraph texts it predicts.
 
-    This is what branch 11 will do: account for exactly the stage's declared changes and
+    This is what step 11 will do: account for exactly the stage's declared changes and
     nothing else. Returns (predicted_paragraphs, error_or_None).
 
     THE ELEMENT RECORD IS WHAT DRIVES THE PREDICTION, and this is the point. The first
@@ -467,8 +467,8 @@ ok("it names the variant it ran as", j1.get("variant") == args.variant,
 pass_stage = next((s for s in j1.get("stages", []) if s.get("stage") == "passes"), None)
 ok("there is a `passes` stage", pass_stage is not None)
 edits = (pass_stage or {}).get("edits", [])
-# THREE, NOT FOUR, SINCE SLICE 2 — AND THE MISSING ONE IS THE POINT RATHER THAN A REGRESSION.
-# This input trips terminology (annex_to_schedule until slice 3b), a spelling pass,
+# THREE, NOT FOUR, SINCE SUB-STEP 10.2 — AND THE MISSING ONE IS THE POINT RATHER THAN A REGRESSION.
+# This input trips terminology (annex_to_schedule until sub-step 3b), a spelling pass,
 # fix_spacing and, until B8,
 # fix_double_punctuation on `Definitions::`. That fourth pass is now a DETECTOR: it reports
 # the doubled colon and changes nothing, so it contributes no edit and must not. Arm 9 asserts
@@ -492,7 +492,7 @@ ok("the passes the edits name are all passes the run actually reported",
    f"unknown={sorted(named - {c.get('pass') for c in counts})}")
 
 # =========================================================================================
-# ARM 3 — COMPLETENESS, READ BY THE SECOND READER. This is the arm branch 11 depends on.
+# ARM 3 — COMPLETENESS, READ BY THE SECOND READER. This is the arm step 11 depends on.
 # =========================================================================================
 print("\nARM 3 — the journal accounts for EVERY text change, read independently")
 before_flat = flat_texts(PASSES_DOC)
@@ -599,9 +599,9 @@ else:
            e2 is None and p2 == a2, e2 or "replay did not reproduce the after")
 
 # =========================================================================================
-# ARM 6 — THE DELIVERED BYTES MOVED, AND THE JOURNAL CLAIMS THE MOVEMENT. Branch 9 and slice
-# 1 were ADDITIVE and this arm asserted the opposite of what it asserts now: not one byte may
-# move. Slice 2 changes behaviour on every document by design, so byte identity would be a
+# ARM 6 — THE DELIVERED BYTES MOVED, AND THE JOURNAL CLAIMS THE MOVEMENT. Step 9 and sub-step
+# 10.1 were ADDITIVE and this arm asserted the opposite of what it asserts now: not one byte may
+# move. Sub-step 10.2 changes behaviour on every document by design, so byte identity would be a
 # FAILURE and is asserted as such. The pin block above says why the question changed rather
 # than only the sha.
 # =========================================================================================
@@ -628,7 +628,7 @@ else:
     ok("both arms exit 0", rn.returncode == 0 and ro.returncode == 0,
        f"new={rn.returncode} old={ro.returncode}")
     nb, obb = x3.read_bytes(), x4.read_bytes()
-    ok("the delivered bytes MOVED — slice 2 changes behaviour, so identity is a failure",
+    ok("the delivered bytes MOVED — sub-step 10.2 changes behaviour, so identity is a failure",
        nb != obb,
        f"new={hashlib.sha256(nb).hexdigest()[:12]} "
        f"old={hashlib.sha256(obb).hexdigest()[:12]} ({len(nb)} vs {len(obb)} bytes) "
@@ -672,7 +672,7 @@ if OPEN in uk_src and OPEN in us_src and CLOSE in uk_src and CLOSE in us_src:
 # the banner sends the operator to it. If the journal were written after the gate, or the
 # banner never mentioned it, the operator would be exactly where B6 left them.
 #
-# SINCE SLICE 3b THE PASS THAT FIRES THE GATE HERE IS NO LONGER THE ONE B6 NAMES. The Annex
+# SINCE SUB-STEP 3b THE PASS THAT FIRES THE GATE HERE IS NO LONGER THE ONE B6 NAMES. The Annex
 # rewrite is a detector now, so the text is moved by the terminology and spelling passes --
 # rewrites no lexicon sanctions, which the gate is RIGHT to stop. What this arm proves about
 # the diagnosis is unchanged; the two B6(a) limbs below prove the override itself is gone.
@@ -703,7 +703,7 @@ else:
                     for e in st.get("edits", [])}
         ok("and it NAMES the pass that moved the text — the diagnosis B6 says is missing",
            bool(moved_by), f"passes named: {sorted(moved_by)}")
-        # B6's OTHER HALF, CLOSED AT SLICE 3b, AND ASSERTED ON THE SAME RUN. The gate still
+        # B6's OTHER HALF, CLOSED AT SUB-STEP 3b, AND ASSERTED ON THE SAME RUN. The gate still
         # fires here -- the terminology and spelling passes legitimately rewrite declared
         # text -- but the lexicon-sanctioned choice B6 is about is no longer among what
         # moved. A run that shows the diagnosis while the override still happens would be
@@ -724,17 +724,17 @@ else:
        "WORK OUT WHICH OF THREE THINGS IS WRONG" in blob5)
 
 # =========================================================================================
-# BRANCH 10 SLICE 1 — THE FORMATTING CONTRACT.
+# SUB-STEP 10.1 — THE FORMATTING CONTRACT.
 #
-# Branch 9 DECLARED the journal blind to non-text change and reported it as a bare figure.
-# That was honest and it was not enough, because branch 10 slice 3 turns the italic strip
+# Step 9 DECLARED the journal blind to non-text change and reported it as a bare figure.
+# That was honest and it was not enough, because sub-step 10.3 turns the italic strip
 # into a CONDITIONAL pass and no count can show a conditional pass did the right thing.
 #
 # The two shapes below are B1's and B7's, and they are the register's own: on the one frozen
 # document that keeps a pre-post_process snapshot, `spurious_italic` reports 36 fixes against
 # an element delta of exactly -36, and `schedule_page_breaks` reports 3 against +3 — which
 # matches B7's measured `pageBreakBefore` 0 -> 3 on that document exactly. Neither moved a
-# single character of text, which is why branch 9's journal recorded nothing for either.
+# single character of text, which is why step 9's journal recorded nothing for either.
 #
 # THE READERS BELOW ARE REIMPLEMENTED FROM THE CONTRACT AND IMPORT NOTHING FROM THE SCRIPT.
 # A reader shared between the two sides of a comparison cannot see what it normalised away,
@@ -783,7 +783,7 @@ def paragraph_formats(xml_bytes):
 
 def format_replay(before_xml, after_xml, jrnl):
     """Apply the journal's FORMATTING record to the before-shapes and return what it
-    predicts. This is what branch 11 will have to do for a conditional pass: account for
+    predicts. This is what step 11 will have to do for a conditional pass: account for
     exactly the declared changes and nothing else."""
     before = flat_formats(before_xml)
     after = flat_formats(after_xml)
@@ -838,10 +838,10 @@ FORMAT_DOC = (
     '</w:r></w:p>'
     '</w:body></w:document>').encode("utf-8")
 
-print("\nARM 9 — the FORMATTING record: is branch 9's declared blind spot closed?")
+print("\nARM 9 — the FORMATTING record: is step 9's declared blind spot closed?")
 d9, x9 = stage("format", FORMAT_DOC)
 before9 = x9.read_bytes()
-# SINCE SLICE 3a THIS FIXTURE NEEDS NOTES, AND THAT IS NOT A CONVENIENCE. The italic strip
+# SINCE SUB-STEP 3a THIS FIXTURE NEEDS NOTES, AND THAT IS NOT A CONVENIENCE. The italic strip
 # is now conditional on the declaration, so without one it changes nothing and this arm
 # would VOID on an empty record — a formatting arm reporting nothing to record, on a run
 # where the deliverable was working correctly. The notes declare the italic run as NOT
@@ -879,7 +879,7 @@ else:
            isinstance(j9.get("format_contract"), str)
            and "w:pPr" in (j9.get("format_contract") or ""),
            repr(j9.get("format_contract"))[:120])
-        # /3 SINCE SLICE 4, which added `detections`. The claim is unchanged -- the version
+        # /3 SINCE SUB-STEP 10.4, which added `detections`. The claim is unchanged -- the version
         # moves whenever the artefact describes something new -- and it moved again.
         ok("the schema version moved, because the artefact describes something new",
            j9.get("schema") == "post-process-journal/3", repr(j9.get("schema")))
@@ -897,9 +897,9 @@ else:
                and f"{{{W}}}i" not in (e.get("after") or "") for e in italic),
            "a record whose before/after do not show the italic going is not evidence")
 
-        # B7 — INVERTED AT SLICE 4, AND THE INVERSION IS RECORDED RATHER THAN MADE QUIETLY.
-        # Until slice 4 this limb asserted the imposed break was RECORDED, because the page-
-        # break pass imposed one on paragraph 1 and the record had to catch it. Slice 4 made
+        # B7 — INVERTED AT SUB-STEP 10.4, AND THE INVERSION IS RECORDED RATHER THAN MADE QUIETLY.
+        # Until sub-step 10.4 this limb asserted the imposed break was RECORDED, because the page-
+        # break pass imposed one on paragraph 1 and the record had to catch it. Sub-step 10.4 made
         # that pass a detector, so the same paragraph must now gain NOTHING and no record may
         # name the pass. What the paragraph-level recorder can still do once a pass changes a
         # w:pPr -- none does any more -- is proved on the recorder itself, in-process, by
@@ -945,7 +945,7 @@ else:
 
 # =========================================================================================
 # ARM 10 — THE POSITIVE CONTROL FOR THE FORMATTING ARM. Remove one recorded formatting edit
-# and require ARM 9's replay to go RED for it. Branch 9's own control caught two real
+# and require ARM 9's replay to go RED for it. Step 9's own control caught two real
 # defects in the check on its first run — an element record that was walked but never used,
 # so deleting an entry changed nothing, and entries carrying no paragraph id. Both read as
 # working. An arm that reports "accounted" everywhere must be shown able to say otherwise.
@@ -976,7 +976,7 @@ else:
 # ARM 11 — THE STRIP STAGE CARRIES THE FORMAT CONTRACT TOO. It is the one stage that
 # DELETES, so its ordinals shift and only the paragraph level can describe it. Leaving it
 # out would have been cheaper and wrong: a contract with one stage silently exempt reads as
-# coverage, and B3 — slice 2's — is a defect in exactly this stage.
+# coverage, and B3 — sub-step 10.2's — is a defect in exactly this stage.
 # =========================================================================================
 print("\nARM 11 — the strip stage is inside the formatting contract, not exempt from it")
 d11, x11 = stage("format_strip", TC_DOC)
@@ -995,13 +995,13 @@ else:
            repr(strip11[0].get("format_paragraphs"))[:120])
 
 # =========================================================================================
-# ARM 12 — SLICE 2: EVERY PASS TESTS THE CONDITION IT ASSUMES. Four conditions, each with
+# ARM 12 — SUB-STEP 10.2: EVERY PASS TESTS THE CONDITION IT ASSUMES. Four conditions, each with
 # BOTH limbs asserted — the case the pass must now skip AND the case it must still take.
 # One limb alone is half a check: a pass that stopped firing entirely would satisfy every
 # "must skip" and break the pipeline, and a pass that never changed would satisfy every
 # "must still fire".
 # =========================================================================================
-print("\nARM 12 — slice 2: each pass tests the condition it assumes (B4, B3, B2, B8)")
+print("\nARM 12 — sub-step 10.2: each pass tests the condition it assumes (B4, B3, B2, B8)")
 
 # ---- B4: a seam bridged by a RENDERED tab or break already has its separator.
 B4_DOC = doc([
@@ -1121,7 +1121,7 @@ ok(f"and the {_other} tree carries it too",
    "def load_spacing_record(" in _va_other)
 
 # =========================================================================================
-# ARM 14 — SLICE 3a: THE ITALIC STRIP TESTS THE CONDITION IT ASSUMES (B1).
+# ARM 14 — SUB-STEP 3a: THE ITALIC STRIP TESTS THE CONDITION IT ASSUMES (B1).
 #
 # The old rule — more than two unparenthesised words, not a listed Latin term — is not a
 # test of whether the italic was the operator's. It is UNSATISFIABLE BY FAITHFUL WORK: an
@@ -1130,7 +1130,7 @@ ok(f"and the {_other} tree carries it too",
 # every instance correctly.
 #
 # FOUR LIMBS, AND THE LAST ONE IS THE REASON THIS ARM EXISTS RATHER THAN A SIMPLER ONE.
-# Arm 6 already runs post_process on a fixture with NO notes beside it, so after slice 3a
+# Arm 6 already runs post_process on a fixture with NO notes beside it, so after sub-step 3a
 # the italic pass changes nothing there — and arm 6 still passes, because the other passes
 # move bytes. A suite could therefore go green over a condition it never evaluated once.
 # Limb (d) is what makes that impossible to miss: it asserts the no-notes case REPORTS.
@@ -1139,7 +1139,7 @@ ok(f"and the {_other} tree carries it too",
 # authored on top, exactly as arm 8 does. Offsets are COMPUTED from the strings, never
 # typed: a hand-typed offset is a second place for this arm to be wrong.
 # =========================================================================================
-print("\nARM 14 — slice 3a: the italic strip consults the declared notes (B1)")
+print("\nARM 14 — sub-step 3a: the italic strip consults the declared notes (B1)")
 
 _I = '<w:r><w:rPr><w:i/></w:rPr><w:t xml:space="preserve">%s</w:t></w:r>'
 _P = '<w:r><w:t xml:space="preserve">%s</w:t></w:r>'
@@ -1259,7 +1259,7 @@ else:
        "docstring carve-out claims to protect")
     ok("B1 (d): a two-word run was never a candidate and is untouched either way",
        B1_SHORT in after14,
-       "the candidacy rule changed, which slice 3a must not do")
+       "the candidacy rule changed, which sub-step 3a must not do")
 
 # ---- limb (e): NO NOTES AT ALL -> change nothing, and SAY SO.
 d14b, x14b = stage("b1-nonotes", B1_DOC)

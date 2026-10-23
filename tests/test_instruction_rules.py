@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-"""ACCEPTANCE TEST FOR THE INSTRUCTION LAYER — branch 3 (the scope rule), and the file the
+"""ACCEPTANCE TEST FOR THE INSTRUCTION LAYER — step 3 (the scope rule), and the file the
 later instruction branches extend.
 
-PLAN-2-step-b.md §4 puts branches 3, 4, 13, 17 and 19 in one row: "instruction and
+PLAN-2-step-b.md §4 puts steps 3, 4, 13, 17 and 19 in one row: "instruction and
 dictionary changes ... a graded run plus your review. There is no script instrument for
 these." **This is a script instrument for the part of them that IS decidable** -- not for
-whether the prose persuades an operator, which needs Step C, but for whether the rule is
+whether the prose persuades an operator, which needs phase 3's test, but for whether the rule is
 present, whether it says what the register requires, whether it is in BOTH trees, and
 whether adding it softened anything it was forbidden to soften.
 
-Branch 4 should add its cases here rather than start a parallel file.
+Step 4 should add its cases here rather than start a parallel file.
 
 WHY EVERY NEEDLE IS A PHRASE. §5.3 rule 6: eleven checks in this project have passed for
 the wrong reason and every one used a needle short enough to occur by accident. "in scope"
@@ -92,7 +92,7 @@ REQUIRED = [
     ("F1", "SKILL.md", "AND CHECK 5a BEFORE 5b, NOT AFTER"),
     ("F1", "SKILL.md", "Read the check's source before concluding that no repair exists"),
 
-    # ---- BRANCH 4 — the exception channel -------------------------------------------
+    # ---- STEP 4 — the exception channel -------------------------------------------
     # The channel is for the case rule 5a is NOT for: the check is right and every repair
     # left is forbidden. The needles bind the rule to its own conditions, so a file that
     # merely mentions "no compliant repair" cannot satisfy them.
@@ -109,7 +109,7 @@ REQUIRED = [
     # The fifth gap: the bound. Without it the channel is optional.
     ("F41", "SKILL.md", "THE BOUND — five attempts, then stop"),
     ("F41", "SKILL.md", "do not make a sixth"),
-    # K3 again — condition (c) has to land in the format branch 3 laid down, not a new one.
+    # K3 again — condition (c) has to land in the format step 3 laid down, not a new one.
     ("F41", "SKILL.md", "this item is where its condition (c) is discharged"),
     # THE DISCLOSURE BLOCK. Free prose cannot discharge condition (c): an undisclosed
     # exception and a well-handled one look identical in prose, and no gate can tell them
@@ -129,7 +129,7 @@ REQUIRED = [
     ("F41", "SKILL.md", "Free prose does not discharge this condition"),
 
     # The bound must be stated WHERE THE LOOP IS. All four prose sites, not the two F41
-    # named -- the sweep on branch 4 found two more, one of them in the always-loaded file.
+    # named -- the sweep on step 4 found two more, one of them in the always-loaded file.
     ("F41", "skill-docs/04b-translate-gates.md",
      "THE REPAIR LOOP IS BOUNDED AT FIVE ATTEMPTS"),
     ("F41", "skill-docs/08-aux-and-quality.md",
@@ -179,7 +179,7 @@ PRESERVED = [
     ("skill-docs/05-apply.md",
      "The gates exist because every prior occasion the operator went around them shipped "
      "output below the quality the skill is designed to deliver."),
-    # Branch 4's own guard rails. PLAN-2-step-b.md calls the exception channel "the
+    # Step 4's own guard rails. PLAN-2-step-b.md calls the exception channel "the
     # highest-risk documentation change in the whole plan" -- written loosely it is a licence
     # to bypass checks. These four sentences are what stop that reading, so they are asserted
     # byte-for-byte exactly like the anti-drift text they sit beside.
@@ -213,7 +213,7 @@ def read(tree, rel):
 
 
 print("=" * 96)
-print("INSTRUCTION-LAYER ACCEPTANCE — branches 3 and 4")
+print("INSTRUCTION-LAYER ACCEPTANCE — steps 3 and 4")
 print("=" * 96)
 
 print("\n1. EVERY REQUIRED RULE IS PRESENT, IN BOTH TREES")
@@ -238,7 +238,7 @@ print("\n4. THE ADDED PROSE IS THE SAME IN BOTH TREES")
 # Markdown prose is invisible to the parity check -- it compares scripts and the dictionary
 # tables, nothing else -- so without this the two trees could drift here unnoticed.
 for label, rel, start, end in [
-    # This span now covers 5a AND 5b, so branch 4's new prose is compared across trees by
+    # This span now covers 5a AND 5b, so step 4's new prose is compared across trees by
     # the same assertion -- no second block needed, and no way to add a third sub-rule that
     # escapes it.
     ("rules 5a + 5b (scope rule and exception channel)", "SKILL.md",
@@ -249,9 +249,9 @@ for label, rel, start, end in [
     # of this list left the file hardcoded, so both new entries would have searched SKILL.md,
     # failed to locate, and reported "section not found" -- a check that fails for the wrong
     # reason is as bad as one that passes for the wrong reason.
-    ("the bounded loop at Step 4b", "skill-docs/04b-translate-gates.md",
+    ("the bounded loop at skill Step 4b", "skill-docs/04b-translate-gates.md",
      "**THE REPAIR LOOP IS BOUNDED AT FIVE ATTEMPTS", "\nWarnings are printed"),
-    ("the bounded loop at Step 9", "skill-docs/08-aux-and-quality.md",
+    ("the bounded loop at skill Step 9", "skill-docs/08-aux-and-quality.md",
      "**THAT LOOP IS BOUNDED AT FIVE ATTEMPTS", "\n**Do NOT silently strip"),
 ]:
     blocks = {}
@@ -332,9 +332,9 @@ check("the cross-tree prose check FAILS when one tree is edited alone", drifted 
 # (d) string-only-edit must FAIL on a control-flow change, not just pass on a text one.
 #
 # BOTH ARMS NOW USE A PLANTED EDIT, AND THE REASON IS THAT THE OLD PAIR BROKE SILENTLY ON
-# BRANCH 9. They were aimed at `post_process.py` and compared it against origin/main, on the
+# STEP 9. They were aimed at `post_process.py` and compared it against origin/main, on the
 # premise that the only thing any branch had ever done to that file was reword a message.
-# Branch 9 added a change journal to it, and the pair came apart in BOTH directions at once:
+# Step 9 added a change journal to it, and the pair came apart in BOTH directions at once:
 # the PASS arm failed honestly, which is how this was found — but the FAIL arm went on
 # reporting OK while testing nothing, because by then the file differed structurally from
 # origin/main whether the mutation was applied or not. A check whose premise is "no future
@@ -376,7 +376,7 @@ check("string_only_edit FAILS when control flow changes", flow_rc == 1, f"exit {
 check("and the unmutated file is itself clean against origin/main",
       _probe_string_only() == 0, f"exit {_probe_string_only()}")
 
-# ---- BRANCH 4's negatives ------------------------------------------------------------
+# ---- STEP 4's negatives ------------------------------------------------------------
 # (e) remove the exception channel -> reachability must notice it is unreachable. Rule 5a
 #     surviving is not enough: 5a says a check can be WRONG, and an operator facing a check
 #     that is RIGHT with no compliant repair gets no answer from it.
@@ -460,13 +460,13 @@ else:
 # 7. THE K2 MESSAGE, BY EXECUTION.
 #
 # Sections 1 and 2 search the source for a phrase. That proves the words are in the file,
-# not that the operator ever sees them. This fires the real Step 6 post-strip drift gate on
+# not that the operator ever sees them. This fires the real skill Step 6 post-strip drift gate on
 # a real (synthetic) violation and reads what the gate actually prints -- which is the only
 # way to know the edited string is on the path the operator hits. post_process.py has no
 # case in tests/negative_inputs.py, so before this branch nothing had ever made this gate
 # fire.
 # --------------------------------------------------------------------------------------
-print("\n7. THE STEP 6 GATE, FIRED FOR REAL — not a text search")
+print("\n7. THE skill STEP 6 GATE, FIRED FOR REAL — not a text search")
 
 import json
 import tempfile
@@ -513,7 +513,7 @@ PARAS = [{"idx": 0, "style": "Normal",
 
 if not PY:
     for tree in TREES:
-        check(f"{tree}: the Step 6 gate could be executed at all", False,
+        check(f"{tree}: the skill Step 6 gate could be executed at all", False,
               "VOID — `uv` is not on PATH, so the gate scripts cannot be run with their "
               "lxml dependency. This is not a pass; the gate was never fired.")
 
@@ -631,7 +631,7 @@ for n, c in results:
 print()
 print("  WHAT THIS DOES NOT PROVE: that an operator meeting a wrongly-scoped gate will")
 print("  now do the right thing. That is behavioural, it needs a model in the loop, and")
-print("  PLAN-2-step-b.md §4.1 puts it at Step C. This proves the rule is there, says")
+print("  PLAN-2-step-b.md §4.1 puts it at phase 3's test. This proves the rule is there, says")
 print("  what the register requires, is in both trees, and softened nothing.")
 print("=" * 96)
 sys.exit(0 if ok == len(results) else 1)

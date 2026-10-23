@@ -1997,3 +1997,49 @@ not. (2) The two notes calling server-side branch protection unavailable — the
 summary — corrected in the same pull request: measured 2026-10-22, protection live on `main`, `enforce_admins`
 true, 0 required approvals, the repository public. **Then, in words:** *"Do not ask questions this session, just
 assume everything in your recommended way."*
+
+## 2026-10-23 — the house's hook fixes adopted; ONE PULL REQUEST, ONE FULL RUN A SESSION, standing; renames (d2b) and (d2c), three files left
+
+**WOUTER, THROUGH THE QUESTION TOOL, each the recommended answer:** **(1) ONE PULL REQUEST, ONE FULL RUN, STANDING** —
+the push check (#173) refuses a code push no full run vouches for on its exact commit, which met the 2026-10-20 (3)
+ruling *full run once a session* head on: a pull request per piece cost a run each, about an hour. So a session's code
+pieces go on ONE branch as separate commits, one full run on the last commit, one push, one pull request; never a run
+per piece, never the hook's override as routine — the house file's own *the full run once, only before a push*,
+applied. **(2) The three phase-8 data points sent** to the live session named for the runner — this project's
+2026-10-22 side session, it turned out, not the house's, so it could not forward them; they wait in
+`temp/s1023_for_house.md` for Wouter to place. **AND IN WORDS:** *"We are also fixing this in the house tooling sessions
+so please check the plan and charter to avoid double work"* — read: the house's phase 8 owns the run's speed, side by
+side and the git-heavy selftests, and nothing here touches either; then *"go ahead until your context reaches 85%
+without asking questions."*
+
+**CARRIED FROM THE 2026-10-22 MAIN-LINE SESSION, as its handoff asked:** Wouter ruled, through the question tool, that the
+runner speed-up went first and (d2b) waited for its step B; and that **a comment block whose only date sits in a
+citation of a ruling IS a record** — the 2026-10-21 ruling as written, not narrowed (the #170 review's third finding,
+closed; measured roughly: 9 of 196 dated comment blocks in 6 files, holding 3 counted old words, which stay).
+
+**THE HOUSE'S HOOK FIXES, ADOPTED** *(house commit `9283564`)*: `check_checkers.py` v21 and `install_hooks.py` v11 byte for
+byte; in `tools/hooks/pre-push` only the full-run block, the guard above it untouched; reinstalled, byte-identical. **The
+full run on that commit was red on ONE suite, predicted by its review before it ended:** v8+'s selftest renames a scratch
+`tools/` folder, which `test_no_document_moves.py` refuses — declared in ALLOW, keyed (after the branch review) by the
+call's own text so a re-copy that shifts lines still matches, and a stale entry fails. **The block no longer falls back to
+a bare python,** so the project's installer calls the house's `checker_missing()` and `interpreter_missing()` — red first:
+with no interpreter it said "All hooks present" — through a guarded import, so a house rename cannot stop an install.
+**That run took 62.4 minutes against 40.5 quiet on 2026-10-22: 75 of 92 suites slower, median 1.55; the adopted
+selftests add about 2.5 minutes of it** (`install_hooks` 16.7 to 123.6 s, `check_checkers` 12.5 to 55.1 s), the rest
+unexplained, nothing else running when sampled.
+
+**RENAMES (d2b) AND (d2c):** (d2b) the draft's 317 swaps in 24 tools, every tool under the census, the census last by 26
+phrases; (d2c) 274 swaps in 33 tests judged by reading, 54 joined; census 101 of 104 code files, 0 old words. Left:
+`tests/make_fixtures.py` and the probe pre-flight pair. **Two `/code-review`s at xhigh:** the hook commit's, eight
+findings — two fixed, six the house's code or cost, routed to it; the branch's, seven — four fixed, one follow-up (no
+suite runs `install_project_hooks.py`), two the ruled forms. **The full run on the last code commit, `33f1111`: OVERALL PASS, 94 suites and 14 entry points, 2,855.7 s**, recorded through `cycle_evidence.py full`; the pull request is #177.
+
+**JUDGEMENTS TAKEN ALONE.** (a) The draft's five `precommit_gate.py` swaps re-numbered from git's hunks, never by hand.
+(b) The census's 53 self-mentions declared as phrases, six selftest plants put in the one form "a planted ..."; the known
+limit — a phrase declared in its own file always matches — stated beside them. (c) The ast proof reverses each constant
+by the swaps on its own lines and strips a logged row's own quotes: two old headings rightly became one new one, and
+seven constants read "unexplained" for the quotes alone. (d) (d2c) CUT BY FILE: `make_fixtures.py`, whose strings may be
+fixture CONTENT, and the probe pair, coupled and both standing reds. (e) In tests the skill's step, which the census does
+not count, judged by reading: a needle into the skill's text or output keeps `Step 1c`, a label takes `skill Step 1c`.
+(f) A quotation of the build plan's dated headings keeps its words. (g) `test_no_bytecode_in_tree.py` says "that
+sub-step" where "sub-step 7.3" beside "CLAUDE.md" read to the charter-pointer check as a section pointer.

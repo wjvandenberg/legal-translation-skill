@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""CONFIDENTIALITY CHECK on the recovered rev16→rev44 CHANGELOG — the artefact branch 0
+"""CONFIDENTIALITY CHECK on the recovered rev16→rev44 CHANGELOG — the artefact step 0
 plans to commit into `docs/history/`, and the one thing on the commit list nobody had
 checked.
 
@@ -9,7 +9,7 @@ commit (not including the original skill files as we have checked these before).
 WHY IT WAS MISSED. The charter's confidentiality work has always been aimed at the six
 analysis documents and the two skill trees. The changelog is neither: it does not exist as a
 file yet — it is RECOVERED from the CHANGELOG.md carried inside the archived .skill
-revisions, and it is scheduled to be assembled and committed read-only at branch 0. An
+revisions, and it is scheduled to be assembled and committed read-only at step 0. An
 artefact that does not exist yet cannot be scanned, so it never was.
 
 WHAT THIS PRINTS, AND WHAT IT DELIBERATELY DOES NOT. Pattern indices, hit counts and a
@@ -147,5 +147,5 @@ print("=" * 96)
 print("  The recovered changelog is NOT clean and must not be committed as it stands.")
 print("  It is not a defect in the archive — a private working changelog is exactly where")
 print("  real names belong. It is a defect in the PLAN, which scheduled it for docs/history/")
-print("  without a sanitisation step. Branch 0 needs one, or the archive stays private.")
+print("  without a sanitisation step. Step 0 needs one, or the archive stays private.")
 print("=" * 96)

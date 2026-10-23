@@ -1,4 +1,4 @@
-"""test_delivered_check.py - branch 11 slice 1: `validate_apply.py --delivered`, on synthetic input.
+"""test_delivered_check.py - sub-step 11.1: `validate_apply.py --delivered`, on synthetic input.
 
 ONE FAILING INPUT PER CLAIM, AND A CLEAN ONE PROVED QUIET. Every document here is invented and
 built in a temporary directory; nothing is read from the corpus. What each arm asserts:
@@ -37,11 +37,11 @@ built in a temporary directory; nothing is read from the corpus. What each arm a
      changed is REBASED onto the declaration, so what is left is apply's own change, judged as
      usual -- counted when a ruling covers it, blocking when not -- and an edit that lands where
      apply changed the text cannot turn a real difference into a pass.
- 19  SLICE 2a, U+200B (C8): a declared U+200B is scaffolding, so a delivery without it is EXACT;
+ 19  SUB-STEP 2a, U+200B (C8): a declared U+200B is scaffolding, so a delivery without it is EXACT;
      any U+200B in either DELIVERED reading is one finding per paragraph, class zwsp, never a
      text finding as well -- declared or not, in deleted text only, or in a paragraph nothing
      else claims -- while one that REPLACED a visible space is still a lost space too.
- 20  SLICE 2a, BRACKETS ( ) [ ] { }, full-width folded: declared against delivered in each
+ 20  SUB-STEP 2a, BRACKETS ( ) [ ] { }, full-width folded: declared against delivered in each
      reading is a finding; a delivered reading unbalanced where the SAME reading of the SOURCE
      balances is a finding, and quiet where the source is unbalanced too (the naive test's false
      alarm); A15's signature -- accept as the source, the reject reading's brackets changed -- is
@@ -156,7 +156,7 @@ def en(i, s):
 
 A, B, C = "The Parties agree as follows.", "Each notice shall be in writing.", "That that is so."
 print("=" * 88)
-print(f"BRANCH 11 SLICES 1 AND 2a — validate_apply --delivered on synthetic input  [{SCRIPT.parent.parent.name}]")
+print(f"STEP 11's SUB-STEPS 1 AND 2a — validate_apply --delivered on synthetic input  [{SCRIPT.parent.parent.name}]")
 print("=" * 88)
 
 print("\n1  clean")
@@ -376,7 +376,7 @@ noop_plain = dict(noop, en_segments=[dict(s, en=s["en"].replace(Z, "")) for s in
 r, rep = case("collapse-zwsp", [noop_plain, en(1, B)],
               [para("The Parties ", "agree" + Z, " as follows."), para(B)], strict=True)
 ok("...and a delivered reading that GAINS a U+200B still BLOCKS — J1 is not the collapse, and "
-   "since slice 2a the finding is the U+200B assertion's (C8), not the text comparison's",
+   "since sub-step 2a the finding is the U+200B assertion's (C8), not the text comparison's",
    blocks_once(rep, r) and [f["class"] for f in blocking(rep)] == ["zwsp"],
    f"rc={r.returncode} {rep and rep['findings']}")
 
@@ -430,7 +430,7 @@ r, rep = case("rebase-overlap", [en(0, "The colour is red."), en(1, B)], [para("
 ok("an edit landing where apply changed the text cannot turn a real difference into a pass — BLOCKS",
    blocks_once(rep, r), f"rc={r.returncode} {rep and rep['findings']}")
 
-print("\n19  slice 2a, U+200B (C8): a declared one is scaffolding; any in a DELIVERED reading is a finding")
+print("\n19  sub-step 2a, U+200B (C8): a declared one is scaffolding; any in a DELIVERED reading is a finding")
 
 
 def zw(rep):
@@ -478,7 +478,7 @@ r, rep = case("zw-canary", [en(0, canary_z + " here."), en(1, B)], [para(canary_
 ok("the U+200B finding is reported and none of its paragraph's text is printed",
    shapes(rep) == [(0, "zwsp", "acc+rej")] and canary_z not in (r.stdout + r.stderr), r.stdout[-300:])
 
-print("\n20  slice 2a, brackets ( ) [ ] { }, full-width folded: against the declaration and the SOURCE")
+print("\n20  sub-step 2a, brackets ( ) [ ] { }, full-width folded: against the declaration and the SOURCE")
 
 
 def br(rep):
@@ -509,7 +509,7 @@ ok("brackets lost from the DELETED text alone are bracket / declared:rej",
    brs(rep) == [(0, "declared:rej")], str(rep and rep["findings"]))
 
 r, rep = case("br-fold", [en(0, "Pay （the fee） now."), en(1, B)], [para("Pay (the fee) now."), para(B)])
-ok("full-width brackets FOLD: （ ） delivered as ( ) is no bracket finding, only slice 1's text finding",
+ok("full-width brackets FOLD: （ ） delivered as ( ) is no bracket finding, only sub-step 11.1's text finding",
    brs(rep) == [] and len(findings(rep, "changed")) == 1 and br(rep).get("declared") == 0,
    str(rep and (rep["findings"], br(rep))))
 r, rep = case("br-fold-lost", [en(0, "Pay （the fee） now."), en(1, B)], [para("Pay （the fee now."), para(B)])

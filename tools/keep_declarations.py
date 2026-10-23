@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 """KEEP DECLARATIONS — what a compliant KEEP-AS-IS run writes beside the notes for each side part, in ONE place.
 
-WHY ONE PLACE. Step 10's wiring (branch 11, 2026-09-30) put the delivered-document check inside repack, and the
+WHY ONE PLACE. skill Step 10's wiring (step 11, 2026-09-30) put the delivered-document check inside repack, and the
 check reads every side part the ORIGINAL carries against a declaration beside the notes: a part delivered in
 the source's own words with no declaration keeping it is a blocking finding. Every harness that delivers a side
 part as the original's therefore has to declare it kept, as a compliant run does -- and three of them built that
 declaration by hand, three different ways (the glossary in tools/delivered_corpus_arm.py and in
 tests/test_glossary_route.py, the comment and the footnote in tests/test_no_delivered_byte_moves.py), while
 tools/render_diff.py had none at all, so the wired check refused its NEW arm on 5 of 12 real documents, uk and
-us alike, while its OLD arm delivered (register I-34). Review finding 6 of the wiring slice: a declaration built
+us alike, while its OLD arm delivered (register I-34). Review finding 6 of the wiring sub-step: a declaration built
 differently in each harness is a harness that can disagree with the check about what "kept" means, and nobody
 would see which.
 
-WHAT IT WRITES, PER STEP 8 (skill-docs/08-aux-and-quality.md), for each side part the ORIGINAL carries with
+WHAT IT WRITES, PER skill STEP 8 (skill-docs/08-aux-and-quality.md), for each side part the ORIGINAL carries with
 letter-bearing text -- and nothing for a part without:
   headers_footers.json        8b: the script's own `translate_headers_footers.py --extract` scaffold, run from
                               the scripts folder given, with `en` set equal to `text` on every entry -- "for a
                               preserved entry, set en == text".
   comments_translations.json  8c: per comment id, Word's text: a comment of several TEXT PARAGRAPHS (a w:p of
                               the comment whose own w:t text holds anything but whitespace) as those paragraphs
-                              joined by a line break, as --list shows them and Step 8c says to declare; a comment
+                              joined by a line break, as --list shows them and skill Step 8c says to declare; a comment
                               of one as every w:t of it -- the two readings the check compares a keep against.
   footnotes_translations.json,
   endnotes_translations.json,
@@ -52,7 +52,7 @@ from lxml import etree
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 KINDS = ("headers_footers", "comments", "footnotes", "endnotes", "glossary")
 LETTER = re.compile(r"[^\W\d_]")                                     # validate_apply.py's _COMPLETENESS_LETTER
-TEXT_NODE = re.compile(r"<w:(t|delText)(?:\s[^>]*)?>([^<]*)</w:\1>")  # Step 8d's two regexes, as one
+TEXT_NODE = re.compile(r"<w:(t|delText)(?:\s[^>]*)?>([^<]*)</w:\1>")  # skill Step 8d's two regexes, as one
 HF_PART = re.compile(r"word/(?:header|footer)\d*\.xml$")
 NOTE_PARTS = (("footnotes", "word/footnotes.xml", "footnotes_translations.json"),
               ("endnotes", "word/endnotes.xml", "endnotes_translations.json"),
@@ -87,7 +87,7 @@ def write_keep_declarations(original_docx, notes_dir, scripts_dir, kinds=KINDS):
     nothing to declare writes no file and is absent from the result. A file this call WRITES replaces any of
     the same name; a file it does not write is LEFT AS IT IS -- a caller who wants the keep set alone starts
     from a folder holding no declaration (render_diff copies none beside the notes). Raises ValueError on an
-    unknown kind, RuntimeError if Step 8b's --extract fails."""
+    unknown kind, RuntimeError if skill Step 8b's --extract fails."""
     unknown = set(kinds) - set(KINDS)
     if unknown:
         raise ValueError(f"unknown kind(s) {sorted(unknown)}; the kinds are {', '.join(KINDS)}")
@@ -104,7 +104,7 @@ def write_keep_declarations(original_docx, notes_dir, scripts_dir, kinds=KINDS):
                              env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1", PYTHONIOENCODING="utf-8"))
         if res.returncode != 0 or not scaffold.is_file():
             # The script's output is NOT quoted: its warnings can name the document's text.
-            raise RuntimeError(f"Step 8b's translate_headers_footers.py --extract failed (exit {res.returncode})")
+            raise RuntimeError(f"skill Step 8b's translate_headers_footers.py --extract failed (exit {res.returncode})")
         entries = json.loads(scaffold.read_text(encoding="utf-8"))
         for e in entries:
             e["en"] = e.get("text")

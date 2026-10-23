@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 12 SLICE 12c's corpus arm: validate_translations' character-ratio check over the 13 recorded runs, each
-document's TRUE source language declared at Step 1c, the working tree against a pinned BASELINE revision.
+"""SUB-STEP 12.3's corpus arm: validate_translations' character-ratio check over the 13 recorded runs, each
+document's TRUE source language declared at skill Step 1c, the working tree against a pinned BASELINE revision.
 
 READ-ONLY over the logs folder: each run's paragraphs.json is copied to a temporary folder, and the script's
 output - which previews the source and the English of every flagged paragraph - is parsed and never printed.
@@ -13,7 +13,7 @@ THE ACCEPTANCE (Wouter, 2026-10-13, section 3.2 of PLAN-2-step-b.md), on transla
      Wouter's page read (temp/s1013_ratio_expect.py measured it before the script was changed)
   2  D07, declared English, says NOT APPLICABLE and never PASS
   3  no document's verdict reads PASS unscaled - every one was declared
-  4  the BASELINE (the floor of 150, no scaling) flags none of them - the five are this slice's reach, not a
+  4  the BASELINE (the floor of 150, no scaling) flags none of them - the five are this sub-step's reach, not a
      regression it hides
 THE BASELINE IS A REVISION (house hygiene rule 4): by default the merge-base of HEAD and origin/main, and the
 arm is VOID when the baseline's validate_translations.py equals the working tree's.

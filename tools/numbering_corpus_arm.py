@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 12 SLICE 12b's corpus arm: translate_numbering over the 13 recorded runs, the working tree against a
-pinned BASELINE revision, with each document's TRUE source language declared at Step 1c -- and again with nothing
+"""SUB-STEP 12.2's corpus arm: translate_numbering over the 13 recorded runs, the working tree against a
+pinned BASELINE revision, with each document's TRUE source language declared at skill Step 1c -- and again with nothing
 declared, so the guess the skill still acts on is measured too.
 
 Nothing in this repository had ever run translate_numbering over a real document: the delivered-document arm
@@ -10,7 +10,7 @@ READ-ONLY over the logs and corpus folders: every original is copied to a tempor
 output -- which quotes format strings -- is parsed and never printed. PRINTS doc-ids, language names, counts and
 exit codes only (CLAUDE.md 5.6).
 
-THE BASELINE RUN is the revision's script as Step 8a documented it, with --language TRUE (its scripts read no
+THE BASELINE RUN is the revision's script as skill Step 8a documented it, with --language TRUE (its scripts read no
 declaration); the undeclared arm's baseline passes nothing, the guess both versions act on.
 
 THE ACCEPTANCE (Wouter, 2026-10-12, section 3.2 of PLAN-2-step-b.md), DECLARED arm:
@@ -128,7 +128,7 @@ def lvltexts(path):
 
 
 def run_tn(scripts, orig, notes_src, declared, tmp, tag, explicit=None):
-    """One run. `declared` writes the Step 1c declaration; `explicit` passes --language instead -- the
+    """One run. `declared` writes the skill Step 1c declaration; `explicit` passes --language instead -- the
     baseline's form of the same run, its scripts predating the declaration."""
     wd = tmp / tag
     (wd / "final" / "word").mkdir(parents=True)
@@ -197,7 +197,7 @@ def main():
             seen += 1
             true = TRUE_LANGUAGE.get(did)
             for arm, declared in (("declared", true), ("undeclared", None)):
-                # The baseline is TODAY'S DOCUMENTED RUN: Step 8a passed --language, the baseline's scripts
+                # The baseline is TODAY'S DOCUMENTED RUN: skill Step 8a passed --language, the baseline's scripts
                 # reading no declaration -- so the declared arm is compared with that, never with a guess.
                 b = run_tn(base_scripts, orig, notes_path, None, tmp, f"{n}-{arm}-base", explicit=declared)
                 w = run_tn(now_scripts, orig, notes_path, declared, tmp, f"{n}-{arm}-now")

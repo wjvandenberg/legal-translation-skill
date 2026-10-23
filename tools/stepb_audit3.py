@@ -99,7 +99,7 @@ NEW_CLAIMS = [
  ("the central defined term came from the counterparty's English margin comments", "E6", "margin comments"),
  ("that was luck: the counterparty happened to comment in English", "E6", "that was luck"),
  ("found only by grepping the whole tree", "E1", "grepping the whole tree"),
- ("the operator preserved two dates on three stated grounds, then reversed at Step 4",
+ ("the operator preserved two dates on three stated grounds, then reversed at skill Step 4",
   "F4", "reformatting text the counterparty inserted"),
  ("the delivered redline reformats dates the counterparty inserted", "F4", "reformats dates the counterparty inserted"),
  ("document language and theme font language keep the source value", "R1", "themeFontLang"),
@@ -108,7 +108,7 @@ NEW_CLAIMS = [
  ("the skill says what must NOT appear and never what SHOULD", "R1", "never says what SHOULD"),
  ("no size limit, nothing about password-protected, .docm or non-Word", "L5", "password-protected"),
  ("the observed instance bypasses every gate", "L5", "BYPASSES EVERY GATE"),
- ("Step 3 leaves no artefact and is checked by nothing", "C26", "PRODUCES NO ARTEFACT"),
+ ("skill Step 3 leaves no artefact and is checked by nothing", "C26", "PRODUCES NO ARTEFACT"),
  ("the file itself calls partial lexicon reading its most common failure mode",
   "C26", "partial lexicon reading"),
  ("no mechanism can confirm an agent read rather than skimmed", "C26", "read a file rather than skimmed"),
@@ -154,8 +154,8 @@ count_variants("no-compliant-repair count", r"(eighteen|fourteen|thirteen) findi
 count_variants("step count",
                r"(Twenty-three|twenty-three|Twenty|twenty|Nineteen|nineteen) numbered (?:steps|branches)")
 count_variants("total pieces of work", r"(twenty-three|twenty-two|twenty-four) pieces of work")
-# the branch table lives in section 2 ONLY. Spanning to section 4 swallowed section 3's
-# record table and counted its rows as branches -- 29 instead of 20.
+# the step table lives in section 2 ONLY. Spanning to section 4 swallowed section 3's
+# record table and counted its rows as steps -- 29 instead of 20.
 sec4 = doc[doc.index("## 2. The plan of work"):doc.index("## 3. The build brief")]
 nrows = len(re.findall(r"^\| \*\*(\d+)\*\* \|", sec4, re.M))
 drows = len(re.findall(r"^\| \*\*D(\d)\*\* \|", sec4, re.M))

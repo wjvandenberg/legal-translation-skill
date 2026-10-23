@@ -52,9 +52,9 @@ FLAT = re.sub(r"\s+", " ", re.sub(r"[*`]", "", doc)).lower()
 # (id, source, what the source hands to Step B, [>=2-word needles], owning option)
 HARVEST = [
  # ---------------------------------------- CLAUDE.md, Roadmap Phase 3 scoping cautions
- ("SC1", "charter", "post_process needs its own branch",
+ ("SC1", "charter", "post_process needs its own step",
   ["tidy-up script's authority"], "6"),
- ("SC2", "charter", "do NOT auto-convert numbers in a script - a rule in Step 4 and a report, not a transform",
+ ("SC2", "charter", "do NOT auto-convert numbers in a script - a rule in skill Step 4 and a report, not a transform",
   ["not a transform", "auto-convert numbers", "blanket regex"], "4"),
  ("SC3", "charter", "the definitions detector needs REPLACING, not patching; and it has TWO consumers",
   ["replacing, not patching", "two consumers"], "3"),
@@ -114,7 +114,7 @@ HARVEST = [
   ["chart with a title", "symbol-font"], "1"),
  ("P4", "comparison", "password-protected, .docm and size-limit inputs - three synthetic inputs at the admission gate",
   ["password-protected", "input envelope", "accepted-input envelope"], "5"),
- ("P5", "comparison", "install-time behaviour in the host most users use - belongs to Step C",
+ ("P5", "comparison", "install-time behaviour in the host most users use - belongs to phase 3's test",
   ["install-time behaviour", "the host most users"], "8"),
  ("P6", "comparison", "whether the prose REACHES the agent under pressure - 'the central empirical question'",
   ["central empirical question", "step-file reads enforced"], "5"),

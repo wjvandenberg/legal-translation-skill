@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """THE ACCEPTANCE INSTRUMENT FOR EVERY FIX BRANCH — what apply does DIFFERENTLY, on the real corpus.
 
-THE ACCEPTANCE CONDITION OF A FIX BRANCH IS THE OPPOSITE OF EVERY BRANCH BEFORE BRANCH 6.
-Branches 0-5 and branch 14's slice each proved that no delivered byte moved. Branch 6 was the
-first fix branch that CHANGES a delivered document, so "nothing moved" would mean it had
-failed, and branch 7 is the same. The condition is instead:
+THE ACCEPTANCE CONDITION OF A FIX STEP IS THE OPPOSITE OF EVERY STEP BEFORE STEP 6.
+Steps 0-5 and step 14's sub-step each proved that no delivered byte moved. Step 6 was the
+first fix step that CHANGES a delivered document, so "nothing moved" would mean it had
+failed, and step 7 is the same. The condition is instead:
 
     THE BYTES MUST MOVE, AND EVERY MOVEMENT MUST BE EXPLAINED BY A REGISTER ROW.
     Anything that moves which no row predicted is a DEFECT until shown otherwise.
@@ -112,30 +112,30 @@ REF = os.environ.get("LT_BASELINE_REF", "b47603d")
 # open. Forgetting to add a row here produces a LOUD false defect rather than a silent pass,
 # which is the right way round.
 FIX_LANDED = {
-    "C17": "d3c7f19",      # branch 6 slice 4
+    "C17": "d3c7f19",      # sub-step 6.4
     # A16/N1 added the moment slice 1 merged, 2026-09-08, and adding it HERE is the whole
     # point of the table: the container arm's "the fix did not fire" check is now in the
     # baseline exactly as C17's was, so leaving this row out would make it the next
     # guaranteed false defect -- register I-24, for the second time, on the branch that
     # filed it.
-    "CONTAINER": "544f908",   # branch 7 slice 1
+    "CONTAINER": "544f908",   # sub-step 7.1
     # B1 IS DELIBERATELY NOT HERE, AND THE ABSENCE IS REASONED RATHER THAN OVERLOOKED.
     # Register I-24 says a directional "did the fix fire?" check gets its row the moment its
     # fix merges, because the premise dies on merge and the check becomes a guaranteed false
     # defect. THE TEST IS WHETHER SUCH A CHECK EXISTS -- and this map has exactly two
-    # consumers, both in this file, both about APPLY. Branch 10 slice 3a changed
+    # consumers, both in this file, both about APPLY. Step 10's sub-step 3a changed
     # post_process.py, which this tool does not drive at all, so no directional check here
     # has a premise B1's merge could kill. Adding a row would install a suppression for a
     # check that does not exist, which is its own small defect.
     # What DOES watch B1 is tools/postprocess_corpus_arm.py, and its equivalent guard is arm
     # 0: it prints its self-comparison notice and omits the byte column, rather than
     # passing, once the baseline stops differing from the working tree.
-    # B5, B6, F29, B9 AND F45 ARE NOT HERE EITHER, BY THE SAME TEST, RE-ASKED AT SLICE 3b
+    # B5, B6, F29, B9 AND F45 ARE NOT HERE EITHER, BY THE SAME TEST, RE-ASKED AT SUB-STEP 3b
     # RATHER THAN INHERITED: 3b changed post_process.py and translate_numbering.py, this map's
     # two consumers are both about APPLY, and so no directional check here has a premise the
     # merge could kill. The instruments that watch 3b -- the corpus arm and
     # tests/test_lexicon_choice.py -- carry their own guards.
-    # B7 IS NOT HERE EITHER, RE-ASKED AT SLICE 4's CLOSE RATHER THAN INHERITED: slice 4
+    # B7 IS NOT HERE EITHER, RE-ASKED AT SUB-STEP 10.4's CLOSE RATHER THAN INHERITED: sub-step 10.4
     # changed post_process.py and two skill documents, and nothing on the apply side, so the
     # same test gives the same answer. What watches B7 is tests/test_pass_conditions.py, and
     # tools/render_diff.py's --expect-pages-move -- whose premise DOES die with this merge,
@@ -180,10 +180,10 @@ ROW = {
 # RESTORE   must move TOWARD the SOURCE document's count. That is the fix. Moving AWAY is a
 #           defect, and it is the only direction that can be one.
 # HOLD      must not move at all: the negative control (tab stops are not tab characters), the
-#           containers another branch owns, and the rendering cache this branch deliberately
+#           containers another step owns, and the rendering cache this step deliberately
 #           does not carry forward.
 # REPORT    printed and never flagged. Run, paragraph and text-element counts change whenever
-#           runs are split or consolidated, which this branch does by design.
+#           runs are split or consolidated, which this step does by design.
 RESTORE = ("footnoteReference", "endnoteReference", "commentReference",
            "commentRangeStart", "commentRangeEnd", "hyperlink",
            "drawing", "pict", "object", "sym", "br_page",
@@ -199,7 +199,7 @@ RESTORE = ("footnoteReference", "endnoteReference", "commentReference",
 # result has been consumed into the English, so here a count BELOW the source is the fix and a
 # count above it is the defect. Putting these in RESTORE was wrong and the corpus run would
 # have reported the A9 fix as "AWAY FROM SOURCE — DEFECT": the instrument would have called
-# its own branch's intended behaviour a regression.
+# its own step's intended behaviour a regression.
 DELETE = ("fldChar", "instrText")
 # tab_chars WAS IN 'RESTORE' UNTIL WOUTER READ THE PAGES ON 2026-09-01, and that was wrong in
 # BOTH directions. A3 is a PARTIAL row: a tab whose true position survives the collapse is
@@ -350,7 +350,7 @@ def text_delta(old_bytes, new_bytes):
     THE CENSUS COUNTS STRUCTURES. C16 and C17 change TEXT INSIDE AN ELEMENT THAT ALREADY
     EXISTS -- a space restored into a `<w:t>` that was there either way -- so a fully working
     fix produces an EMPTY census delta. Before this arm existed the summary below derived its
-    counts from that delta while printing the word "byte-quiet", so branch 6's fourth slice
+    counts from that delta while printing the word "byte-quiet", so sub-step 6.4
     would have reported `13 byte-quiet` on a run where two documents' bytes had changed.
     CLAUDE.md 5.3's shape exactly: the thing measured was not the thing under review.
 
@@ -371,7 +371,7 @@ def text_delta(old_bytes, new_bytes):
 # tests/test_container_inventory.py is what asserts the shipped copies agree with each other.
 #
 #   w:hyperlink  EXCLUDED, and leaving it in produced a MEASURED FALSE ALARM on the first
-#                acceptance run. Branch 6 already made apply recurse into it, so a
+#                acceptance run. Step 6 already made apply recurse into it, so a
 #                hyperlink's text is translated and its stranded-fragment count CANNOT fall.
 #                On the table-of-contents document that is 34 predicted containers and 53
 #                fragments stable in both arms, which the "did the fix fire?" check read as
@@ -388,7 +388,7 @@ def container_source_text(xml_bytes, src_texts):
     """How many `w:t` INSIDE a container still carry text the SOURCE document had.
 
     THE CENSUS CANNOT ASK THIS, AND NEITHER CAN THE TEXT ARM. The census counts elements, and
-    branch 7 changes neither the number of containers nor the number of w:t. The text arm
+    step 7 changes neither the number of containers nor the number of w:t. The text arm
     compares a paragraph's whole text old against new, which does see the change — but it
     cannot say WHERE, and "some text moved" is not the same claim as "the source-language
     fragment that was stranded inside a content control is gone".
@@ -623,13 +623,13 @@ for wd in wds:
         elif k in PARTIAL:
             if av > sv:
                 verdict = (f"ABOVE the source count ({sv}) — DEFECT until shown otherwise: "
-                           "this branch never adds a tab")
+                           "this step never adds a tab")
                 unexplained.append(f"{label}/{k}: {bv} -> {av}, source {sv} ({verdict})")
             elif av == sv:
                 verdict = f"every tab placeable, and all {sv} restored — A3, in full here"
             else:
                 verdict = (f"{sv - av} of {sv} not placeable, so DROPPED rather than stranded "
-                           "— A3's deferral to branch 16; judge it on render_diff, not here")
+                           "— A3's deferral to step 16; judge it on render_diff, not here")
         elif k in DELETE:
             if av < bv:
                 verdict = (f"DELETED as redundant (source {sv}) — {row or 'no row'}; "
@@ -638,7 +638,7 @@ for wd in wds:
                 verdict = "MORE field structure than before — DEFECT until shown otherwise"
                 unexplained.append(f"{label}/{k}: {bv} -> {av}, source {sv} ({verdict})")
         elif k in CONTAINED:
-            # THE COUNT MUST HOLD AND THE CONTENTS MUST CHANGE. Branch 7 empties a container
+            # THE COUNT MUST HOLD AND THE CONTENTS MUST CHANGE. Step 7 empties a container
             # of its source-language text; it never adds or removes one. So a moved COUNT is
             # a defect here exactly as it was under HOLD, and the contents are scored by the
             # CONTAINER arm below rather than by this number.
@@ -651,33 +651,33 @@ for wd in wds:
         elif k == "trailing_tabs" and av > bv:
             # NOT SCORED, BUT NOT DISMISSED EITHER. A rise here means tabs that were
             # DESTROYED are now preserved but sitting after the collapsed English rather
-            # than between the fragments they separated -- the declared branch-16 deferral,
+            # than between the fragments they separated -- the declared step-16 deferral,
             # because one unbroken `en` string carries no offset saying where the tab
             # belonged. On D06 that is the 40 table-of-contents entries: the links work
             # again and every tab is back, and the entry text and its page number are still
             # not separated on the page. Say it, rather than let "not scored" hide it.
             verdict = (f"+{av - bv} tab(s) preserved-but-after-the-text (source {sv}) — "
-                       "the DECLARED branch-16 deferral, not a loss")
+                       "the DECLARED step-16 deferral, not a loss")
         else:
             verdict = (f"structural, not scored (source {sv}) — CLAUDE.md 5.5: never score "
                        "a run property from element counts")
         print(f"      {k:<20} {bv:>6} -> {av:<6} src {sv:<6} {verdict}")
 
-    # ---- THE TEXT ARM. Added for branch 6's fourth slice, because the census above is
+    # ---- THE TEXT ARM. Added for sub-step 6.4, because the census above is
     # structurally incapable of seeing what C16 and C17 change. ------------------------------
     changed, (di_old, dt_old), (di_new, dt_new) = text_delta(arms["old"][0], arms["new"][0])
     c17_idx, c16_declared = predictors(notes)
     # THE SOURCE'S OWN INTERIOR DOUBLES, because "apply CREATED it" is only true of a double
     # space the source did not already have. Measured on D07: four of its delivered doubles
     # sit in paragraphs whose SOURCE paragraph carried one, so they are INHERITED. Scoring
-    # those against apply would credit this branch with a defect it never had and, worse,
+    # those against apply would credit this step with a defect it never had and, worse,
     # would report a fix as having failed to remove something that was never its to remove.
     with zipfile.ZipFile(src_docx) as z:
         _src_doc_xml = z.read("word/document.xml")
     di_src, _ = _doubles(para_texts_raw(_src_doc_xml))
     n_moved = len([i for i in changed if i >= 0])
 
-    # ---- THE CONTAINER ARM. Branch 7. --------------------------------------------------
+    # ---- THE CONTAINER ARM. Step 7. --------------------------------------------------
     _src_texts = {t.strip() for t in
                   (x.text for x in etree.fromstring(_src_doc_xml).iter(f"{{{W}}}t"))
                   if t and t.strip()}
@@ -693,7 +693,7 @@ for wd in wds:
         if cs_new > cs_old:
             unexplained.append(
                 f"{label}/CONTAINER: {cs_old} -> {cs_new} source-language fragments inside a "
-                f"container — this branch only ever removes them, so a RISE is a defect")
+                f"container — this step only ever removes them, so a RISE is a defect")
         # AND THE OPPOSITE DIRECTION, WHICH "did anything move" CANNOT ASK. A document whose
         # SOURCE carries a text-carrying inline container, and whose stranded fragments did
         # NOT fall, means the fix did not fire where the measurement says it must — which
@@ -701,7 +701,7 @@ for wd in wds:
         #
         # `not SAME` GUARDS IT, AND THAT GUARD IS A DEFECT THIS RUN FOUND IN THIS FILE. On a
         # self-comparison old and new ARE the same code, so nothing can move and this check
-        # was GUARANTEED to fire: the before-branch-7 baseline run printed the note saying an
+        # was GUARANTEED to fire: the before-step-7 baseline run printed the note saying an
         # all-quiet result proves nothing and then reported 2 MOVEMENTS NO REGISTER ROW
         # PREDICTS, from the C17 arm below, for exactly that reason. A harness that reports
         # two defects whenever it is asked to prove it reports none is not usable as evidence.
@@ -715,7 +715,7 @@ for wd in wds:
                       di_old, di_new, dt_old, dt_new, ident))
     if -1 in changed:
         unexplained.append(f"{label}/paragraph count: old and new produced different numbers "
-                           f"of paragraphs — this branch changes text, never structure count")
+                           f"of paragraphs — this step changes text, never structure count")
     if n_moved or c17_idx or di_old != di_new or dt_old != dt_new:
         pred = (f"{len(c17_idx)} C17 instance(s) predicted at idx {c17_idx}"
                 if c17_idx else "no C17 instance predicted")
@@ -733,12 +733,12 @@ for wd in wds:
         # A MOVEMENT NO ROW PREDICTS IS A DEFECT — the same rule the census arm applies, and
         # it has to be applied here too or the text arm is a printout rather than a check.
         # AND THE PREDICTOR HAS TO KNOW ABOUT THE BRANCH THAT IS RUNNING, which the first
-        # acceptance run of branch 7 proved by flagging the fix's own two documents. The text
+        # acceptance run of step 7 proved by flagging the fix's own two documents. The text
         # arm was written for C16 and C17, so a paragraph whose text changed because a
         # stranded container fragment was FREED matched no predictor and was reported as
         # "nothing predicts this". It was predicted -- by the arm three lines below this one.
-        # A per-branch arm added beside an older one has to be wired into the verdict too,
-        # or every branch's acceptance run reports its own work as unexplained.
+        # A per-step arm added beside an older one has to be wired into the verdict too,
+        # or every step's acceptance run reports its own work as unexplained.
         if n_moved and not c17_idx and di_old == di_new and cs_new >= cs_old:
             unexplained.append(
                 f"{label}/TEXT: {n_moved} paragraph(s) changed text with no C17 instance in "
@@ -780,13 +780,13 @@ moved_docs = [d for d, m in rows if m]
 #
 # THIS LINE USED TO READ `{n} moved · {m} byte-quiet` WITH BOTH DERIVED FROM THE CENSUS DELTA,
 # and that is a mislabel with teeth: the census cannot see text, so a document whose delivered
-# bytes had changed was counted and printed as byte-quiet. Branch 6's fourth slice would have
+# bytes had changed was counted and printed as byte-quiet. Sub-step 6.4 would have
 # reported 13 byte-quiet on a run that moved two documents. A number is only as good as the
 # noun attached to it, and nothing checks a noun.
 text_moved = [t[0] for t in text_rows if t[1]]
 byte_identical = [t[0] for t in text_rows if t[9]]
 # FOUR NUMBERS NOW, because the third arm answers a question the first two structurally
-# cannot. Branch 7 changes neither an element count nor, on most documents, a paragraph's
+# cannot. Step 7 changes neither an element count nor, on most documents, a paragraph's
 # whole text — it removes a source-language fragment from inside a container. Counting the
 # fragments is the only arm that can say it happened.
 cont_freed = [c[0] for c in container_rows if c[3] < c[2]]
@@ -822,7 +822,7 @@ if container_rows:
     print("      document's 10 wrap a whole paragraph and were always rebuilt correctly.")
     print("      `stranded` counts delivered w:t inside a container whose text the source")
     print("      also had. The ABSOLUTE number includes fragments that legitimately stay in")
-    print("      the source language, so only the DELTA is attributable to this branch.")
+    print("      the source language, so only the DELTA is attributable to this step.")
 if voided:
     print(f"  {len(voided)} NOT compared — VOID, not clean:")
     for v in voided:
@@ -831,7 +831,7 @@ if SAME and moved_docs:
     print("  HARNESS DEFECT — the two arms are the same code and yet something moved.")
 if unexplained:
     print(f"\n  {len(unexplained)} MOVEMENT(S) NO REGISTER ROW PREDICTS — each is a defect")
-    print("  until shown otherwise, which is this branch's acceptance condition:")
+    print("  until shown otherwise, which is this step's acceptance condition:")
     for u in unexplained:
         print(f"      {u}")
 print("=" * 100)

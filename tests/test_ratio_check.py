@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""THE CHARACTER-RATIO CHECK CAN FIRE - branch 12 slice 12c, registers H2 and H4.
+"""THE CHARACTER-RATIO CHECK CAN FIRE - sub-step 12.3, registers H2 and H4.
 
 validate_translations.py measured every translated paragraph's English against its source only above 150
 characters (H4: 758 of 1,291 translated paragraphs in the 13 recorded runs never examined), with one pair of
 thresholds for every language (a Japanese paragraph had to lose 80% of its English to warn), and printed PASS
 on a source already in English, where the ratio measures nothing (H2). On SYNTHETIC notes, each case in its
-own temporary workdir, the language declared through Step 1c's own route (`--declare`):
+own temporary workdir, the language declared through skill Step 1c's own route (`--declare`):
 
   1  THE FLOOR. A 29-character source whose English lost most of itself BLOCKS - the check must fail it, and
      is asserted to exit 2; a 40-character one with half its English warns; a 19-character one is not
@@ -16,7 +16,7 @@ own temporary workdir, the language declared through Step 1c's own route (`--dec
   3  SOURCE DECLARED ENGLISH. The ratio says NOT APPLICABLE, never PASS, and does not block even at 0.2; the
      batch cap still refuses 36. (Red: it used to say PASS.)
   4  UNDECLARED. Checked against the unscaled thresholds and says so: PASS carries "unscaled", and the reason
-     names Step 1c.
+     names skill Step 1c.
 
     uv run python tests/test_ratio_check.py [--variant us]
 """
@@ -109,7 +109,7 @@ ok("the batch cap still refuses 36 on a source declared English", rc == 2 and "p
 print("\n4   UNDECLARED")
 rc, out = run([para(0, sized(200), sized(180, "e"))])
 ok("no declaration: PASS marked unscaled", rc == 0 and "PASS (unscaled" in out, f"rc={rc}")
-ok("...and the reason names Step 1c", "Step 1c" in out, out[-300:])
+ok("...and the reason names skill Step 1c", "Step 1c" in out, out[-300:])
 rc, out = run([para(0, JA, sized(len(JA), "e"))])
 ok("undeclared Japanese at 1.0: unscaled, so it passes - the declaration is what scales it", rc == 0, f"rc={rc}")
 rc, out = run([para(0, sized(200), sized(180, "e"))], broken_declaration=True)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 11 SLICE 2b — repack's pre-repack U+200B scrub (J1) and its remnant block (C22).
+"""STEP 11's SUB-STEP 2b — repack's pre-repack U+200B scrub (J1) and its remnant block (C22).
 
 WHAT THE ROWS SAY. J1: U+200B is operator scaffolding that survives into the deliverable, and
 "the fix must be a PRE-REPACK SCRUB and must NOT be a prohibition on the device". C22: the one
@@ -7,7 +7,7 @@ check that reads the delivered .docx with the original in hand is advisory by de
 positive source-language hit should BLOCK, "advisory for marker classes it cannot rule on".
 Wouter's plan of 2026-09-25 (section 3.2 of PLAN-2-step-b.md) put both in repack_docx.py.
 
-TWO THINGS THE PLAN'S EXPLORATION DID NOT HAVE, measured at this slice's open and put to Wouter
+TWO THINGS THE PLAN'S EXPLORATION DID NOT HAVE, measured at this sub-step's open and put to Wouter
 before building (both answered on the recommended option):
   1  THE SKILL'S OWN LEXICONS SANCTION SIX RENDERINGS THE BLOCK WOULD REFUSE — "Italian Revenue
      Agency (Agenzia delle Entrate)", "dupla conforme" and four more. So a declared kept-names
@@ -144,7 +144,7 @@ def case(name, lang, en, *, body_xml=None, orig_parts=None, hf=None, comments=No
              for i, (s, e) in enumerate(zip(src, en))]
     nj = d / "paragraphs.json"
     nj.write_bytes(json.dumps(notes, ensure_ascii=False, indent=1).encode("utf-8"))
-    for fname, obj in (decls or {}).items():                # declarations beside the notes (slice 3b)
+    for fname, obj in (decls or {}).items():                # declarations beside the notes (sub-step 3b)
         (d / fname).write_bytes(json.dumps(obj, ensure_ascii=False).encode("utf-8"))
     flags = []
     if hf is not None:
@@ -199,7 +199,7 @@ def zw_in_chardata(data):
 
 
 print("=" * 96)
-print(f"BRANCH 11 SLICE 2b — the U+200B scrub and the remnant block   variant={args.variant}")
+print(f"STEP 11's SUB-STEP 2b — the U+200B scrub and the remnant block   variant={args.variant}")
 print(f"scripts {SCRIPTS}")
 print("=" * 96)
 
@@ -379,7 +379,7 @@ ok("3j CONTROL: no remnant warning and no refusal", "remnant(s)" not in c["blob"
 
 c = case("3k-undetected", None, en_with("Each party shall comply with the obligations della contract."))
 delivered(c, "3k BOUNDARY: no language detected from the original")
-ok("3k: and it SAYS the block did not run — branch 12 owns saying it is guessing",
+ok("3k: and it SAYS the block did not run — step 12 owns saying it is guessing",
    "Remnant block skipped" in c["blob"])
 
 # =============================================================================================
@@ -506,8 +506,8 @@ else:
        uk_r.count(_uk_default) == 1
        and uk_r.replace(_uk_default, _uk_default.replace(b"'uk'", b"'us'"))
        == (ROOT / "us" / "scripts" / "repack_docx.py").read_bytes())
-    # ONE DIFFERENCE PREDATES THIS SLICE AND IS THE VARIANTS' OWN: a docstring's "minimise" /
-    # "minimize". Asserted as exactly that, so any other difference — this slice's included — fails.
+    # ONE DIFFERENCE PREDATES THIS SUB-STEP AND IS THE VARIANTS' OWN: a docstring's "minimise" /
+    # "minimize". Asserted as exactly that, so any other difference — this sub-step's included — fails.
     uk_m = (ROOT / "uk" / "scripts" / "source_language_markers.py").read_bytes()
     ok("5: source_language_markers.py differs between the trees ONLY by HEAD's one variant spelling",
        uk_m.replace(b"to minimise false", b"to minimize false")

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 0's ACCEPTANCE TEST — are the two committed trees byte-identical to the published
+"""STEP 0's ACCEPTANCE TEST — are the two committed trees byte-identical to the published
 archives they came from?
 
-"Commit both published trees unmodified" is branch 0's entire content, so it is worth proving
+"Commit both published trees unmodified" is step 0's entire content, so it is worth proving
 rather than asserting. This does not compare the working tree: it asks GIT what it is holding,
 because the working tree is what was written and the object store is what will be cloned.
 Those are the same thing only if line-ending translation is off, and on Windows it is on by
@@ -47,7 +47,7 @@ def git(*args):
 
 
 print("=" * 92)
-print("BRANCH 0 — are the committed trees byte-identical to the published archives?")
+print("STEP 0 — are the committed trees byte-identical to the published archives?")
 print("=" * 92)
 
 missing = [a for _, a in PAIRS if not (ARCHIVES / a).exists()]
@@ -67,7 +67,7 @@ if rc != 0 or not out.strip():
 #
 # It reads `git ls-files` and `git cat-file`, so an UNSTAGED edit is invisible to it. That is
 # correct for the question it asks — "are the COMMITTED trees byte-identical to the published
-# archives?" — and it is a trap for the session running it. Measured on branch 7 slice 2:
+# archives?" — and it is a trap for the session running it. Measured on sub-step 7.2:
 # eight tree files edited, this suite green, because nothing had been staged; the same eight
 # reported MOVED AGAIN the moment they were. Nothing in the output said which tree it had
 # looked at, so the first PASS was indistinguishable from the second.
@@ -121,7 +121,7 @@ for variant, archive in PAIRS:
         # accepted in silence. The divergence file's own _rule already said the opposite --
         # "an entry whose sha256 no longer matches is a file that moved AGAIN afterwards,
         # and is reported as a separate failure rather than silently re-blessed" -- so the
-        # record described a check that was never written. Found on branch 3, whose first
+        # record described a check that was never written. Found on step 3, whose first
         # edit was to a file already on the list; the run reported "declared change: 2" for
         # a tree it had just been handed two further modifications of.
         recorded = DIVERGENCES[key].get("sha256_now")

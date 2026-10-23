@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 7 SLICE 2 — C19: the glossary part's route IN and route OUT.
+"""SUB-STEP 7.2 — C19: the glossary part's route IN and route OUT.
 
 WHAT THE ROW SAYS AND WHAT WAS MEASURED. C19 says `word/glossary/document.xml` is an aux
 surface the skill does not list and `repack_docx.py` cannot carry, so a translated glossary
@@ -31,10 +31,10 @@ checks fire when a translated file sits in the operator's own WORKDIR: they did 
 lost the flag, so another signal exists. This one fires on the ORIGINAL carrying the part --
 nobody did any work, and on D03B nothing anywhere said so. A warning is what already failed.
 
-THE ACCEPTANCE CONDITION IS NOT SLICE 1's. Slice 1 had to move a delivered byte, and
-tools/apply_corpus_diff.py measured it. That tool drives APPLY, not repack, and this slice
+THE ACCEPTANCE CONDITION IS NOT SUB-STEP 7.1's. Sub-step 7.1 had to move a delivered byte, and
+tools/apply_corpus_diff.py measured it. That tool drives APPLY, not repack, and this sub-step
 changes repack plus an extraction REPORT -- so the corpus arm should report 13 byte-identical
-and 0 unexplained, and THAT ALL-QUIET RESULT PROVES NOTHING WHATEVER ABOUT SLICE 2. The
+and 0 unexplained, and THAT ALL-QUIET RESULT PROVES NOTHING WHATEVER ABOUT SUB-STEP 7.2. The
 acceptance is this file.
 
     uv run --with lxml python tests/test_glossary_route.py
@@ -107,7 +107,7 @@ def run(argv, timeout=900):
 #
 # apply's final pre-apply pass is validate_translations.py, which writes .validate-state.json
 # beside the NOTES file -- so pointing it at the fixtures directory puts run state into the
-# git index. That happened once, on branch 6 slice 3, and it broke `git switch` and therefore
+# git index. That happened once, on sub-step 6.3, and it broke `git switch` and therefore
 # `git bisect`, the one tool the whole test method exists to enable.
 # =========================================================================================
 def stage(name, docx_path, notes_path=None):
@@ -290,7 +290,7 @@ for label, fixture in (("an EMPTY glossary part", empty_fx), ("NO glossary part"
 # =========================================================================================
 # ARM 4 — THE ROUTE OUT. --glossary carries a translated part into the deliverable.
 #
-# The translated part is produced HERE BY THE STEP 8e TEMPLATE ITSELF -- pure regex over
+# The translated part is produced HERE BY THE skill STEP 8e TEMPLATE ITSELF -- pure regex over
 # <w:t>, no ElementTree -- so the test exercises the route the step doc tells operators to
 # use, rather than a route only the test knows about.
 # =========================================================================================
@@ -302,7 +302,7 @@ GLOSS_EN = {GLOSSARY_PROMPTS[GLOSSARY_DATE_PART]: "Enter the date",
 _WT = re.compile(r"(<w:t(?:\s[^>]*)?>)([^<]*)(</w:t>)")
 translated = _WT.sub(lambda m: m.group(1) + GLOSS_EN.get(m.group(2), m.group(2)) + m.group(3),
                      gloss)
-ok("the Step 8e template actually changed the glossary's text",
+ok("the skill Step 8e template actually changed the glossary's text",
    translated != gloss and all(v in translated for v in GLOSS_EN.values()))
 
 src4, notes4 = stage("carry", FIX, NOTES)
@@ -440,6 +440,6 @@ else:
     print(f"\nworkdir kept: {TMP}")
 print()
 print("REMINDER, so a green run is not read as more than it is: tools/apply_corpus_diff.py")
-print("drives APPLY and this slice changes REPACK, so its 13-byte-identical result is a")
+print("drives APPLY and this sub-step changes REPACK, so its 13-byte-identical result is a")
 print("REGRESSION check and proves nothing about C19. THIS FILE is the acceptance.")
 sys.exit(1 if (FAIL or VOIDED) else 0)

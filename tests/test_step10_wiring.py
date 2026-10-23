@@ -1,9 +1,9 @@
-"""test_step10_wiring.py - branch 11, Step 10's wiring slice, on synthetic input and the step documents.
+"""test_step10_wiring.py - step 11, skill Step 10's wiring sub-step, on synthetic input and the step documents.
 
 ONE FAILING INPUT PER CLAIM, AND A CLEAN ONE PROVED QUIET. Nothing is read from the corpus. What each
 arm asserts:
 
-  J2  Step 4's Rule 1 gives the TRUE reason for a U+200B-only seam between two tracked segments: the
+  J2  skill Step 4's Rule 1 gives the TRUE reason for a U+200B-only seam between two tracked segments: the
       markup view does show both, touching, as the source's own redline does, and accepting or
       rejecting reads only one of them. The false premise -- that no rendered reader sits between two
       consecutive tracked segments -- is gone, lines joined, and the prescription is kept word for
@@ -15,7 +15,7 @@ arm asserts:
       EMPTY after a refused run and after a delivered one.
   W3  a clean delivery still delivers, byte-identical to the pin's repack (59981dd, before the
       wiring) on the same input.
-  W4  Step 10's document and SKILL.md say so, both trees.
+  W4  skill Step 10's document and SKILL.md say so, both trees.
   W5  SUB-STEP 3, RULE 5b's WAY OUT: a blocked finding with a matching `accepted_consequences.json`
       entry beside the notes DELIVERS, and repack prints its ACCEPTED CONSEQUENCE block, all five
       lines, for the delivery notes -- accepted, never silent.
@@ -23,9 +23,9 @@ arm asserts:
       class; nothing is written.
   W7  a second, UNDECLARED finding still blocks when the first is declared; nothing is written.
   W8  a malformed entry refuses: attempts 6 (rule 5b's bound is five), and an empty line.
-  W9  Step 10's document and SKILL.md rule 5b name the file and say repack prints the block.
+  W9  skill Step 10's document and SKILL.md rule 5b name the file and say repack prints the block.
   W10 a report the check wrote but that cannot be read refuses with the gate's marker, never a traceback.
-  REVIEW FINDING 2 (branch 11's follow-up, 2026-10-08) -- rule 5b's two other identities, through repack:
+  REVIEW FINDING 2 (step 11's follow-up, 2026-10-08) -- rule 5b's two other identities, through repack:
   W11 a SIDE-PART finding, named by PART AND ID: an undeclared comment kept in its own words is one blocking
       side-comment/undeclared-kept finding of word/comments.xml, id 1; an entry naming it by part and id
       DELIVERS and prints its block, an id given as a number delivers too, and an entry naming id 2 is STALE.
@@ -90,10 +90,10 @@ def joined(path):
 
 
 print("=" * 88)
-print(f"STEP 10's WIRING SLICE — synthetic input and the step documents  [{args.variant}]")
+print(f"skill STEP 10's WIRING SUB-STEP — synthetic input and the step documents  [{args.variant}]")
 print("=" * 88)
 
-print("\nJ2  Step 4's Rule 1: the true reason for a U+200B-only seam, the prescription kept, both trees")
+print("\nJ2  skill Step 4's Rule 1: the true reason for a U+200B-only seam, the prescription kept, both trees")
 RECIPE = ("The recipe in one line: **regular sides carry visible-space + ZWSP; ins↔ins or ins↔del seams "
           "carry ZWSP only.**")
 for v in ("uk", "us"):
@@ -192,11 +192,11 @@ pin = repack_case("delivered-pin", EN, scripts=pin_scripts())
 ok(f"...byte-identical to {REF}'s repack on the same input", pin["out"] is not None and good["out"] == pin["out"],
    f"pin rc={pin['rc']}")
 
-print("\nW4  Step 10's document and SKILL.md say so, both trees")
+print("\nW4  skill Step 10's document and SKILL.md say so, both trees")
 for v in ("uk", "us"):
     s10 = joined(ROOT / v / "skill-docs" / "10-repack-and-validate.md")
     sk = joined(ROOT / v / "SKILL.md")
-    ok(f"[{v}] Step 10: the delivered-document check runs on a check copy BEFORE the file is written, and refuses",
+    ok(f"[{v}] skill Step 10: the delivered-document check runs on a check copy BEFORE the file is written, and refuses",
        all(x in s10 for x in ("validate_apply.py --delivered", "on a check copy", "BEFORE the file is written",
                               "the delivered-document check")))
     ok(f"[{v}] SKILL.md's script table: repack runs validate_apply.py --delivered before it writes",
@@ -255,18 +255,18 @@ for name, bad_e in (("attempts 6", entry(1, attempts=6)), ("an empty line", entr
        mal["rc"] == 1 and DECL_MARKER in mal["blob"] and "malformed" in mal["blob"] and mal["out"] is None,
        f"rc={mal['rc']} {mal['blob'][-400:]}")
 
-print("\nW9  Step 10's document and SKILL.md rule 5b name the file and the printed block, both trees")
+print("\nW9  skill Step 10's document and SKILL.md rule 5b name the file and the printed block, both trees")
 for v in ("uk", "us"):
     s10 = joined(ROOT / v / "skill-docs" / "10-repack-and-validate.md")
     sk = joined(ROOT / v / "SKILL.md")
-    ok(f"[{v}] Step 10: accepted_consequences.json beside the notes, a stale entry refused, the block printed",
+    ok(f"[{v}] skill Step 10: accepted_consequences.json beside the notes, a stale entry refused, the block printed",
        all(x in s10 for x in ("accepted_consequences.json", "beside the notes", "stale",
                               "prints its ACCEPTED CONSEQUENCE block")))
     ok(f"[{v}] SKILL.md rule 5b names accepted_consequences.json",
        re.search(r"\*\*5b\..{0,6000}accepted_consequences\.json", sk) is not None)
     # REVIEW FIX 4 (2026-09-30 (3)): rule 5b (b) asks that repair was ATTEMPTED, bounded at five, and repack
     # accepts attempts 1 to 5 -- so Step 10 must not say five attempts are required.
-    ok(f"[{v}] Step 10 states rule 5b's attempts as SKILL.md and repack do  attempted, at most five",
+    ok(f"[{v}] skill Step 10 states rule 5b's attempts as SKILL.md and repack do  attempted, at most five",
        "five attempts have found no compliant repair" not in s10
        and "your attempts at repair, at most five, have found no compliant one" in s10)
 

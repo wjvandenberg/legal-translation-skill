@@ -2,11 +2,11 @@
 """RETROSPECTIVE REPLAY — does the scope rule address what operators were actually stuck on,
 and how deep did a repair loop really go?
 
-Branch 3 added a rule for a situation the register says arises: a check fires, the operator
+Step 3 added a rule for a situation the register says arises: a check fires, the operator
 cannot tell whether the check or the input is wrong, and nothing in the package says a check
-CAN be wrong. Branch 4 adds the other half -- the check is RIGHT and no compliant repair
+CAN be wrong. Step 4 adds the other half -- the check is RIGHT and no compliant repair
 exists -- and it must state a BOUND on repair attempts. Both are behavioural in the end and
-belong at Step C. **What can be settled now, from evidence already in hand, is whether they
+belong at phase 3's test. **What can be settled now, from evidence already in hand, is whether they
 are aimed at the right thing and whether the bound's number is defensible.**
 
 WHAT IT CANNOT DO, stated first. It cannot show a future operator will apply either rule. It
@@ -20,19 +20,19 @@ It never prints a matched line, a heading, a filename, a path or an argv. There 
 `--show`. The logs stay outside the repository and nothing derived from them enters it except
 the numbers below.
 
-TWO DEFECTS IN THIS TOOL, FOUND ON BRANCH 4 BY RUNNING IT AND FIXED HERE:
+TWO DEFECTS IN THIS TOOL, FOUND ON STEP 4 BY RUNNING IT AND FIXED HERE:
 
   (1) IT WAS COUNTING THE WRONG POPULATION. It globbed `A1/**/*.md`, and each run workspace
       holds a COPY OF THE SKILL TREE -- 462 sub-lexicons, 45 references, 24 step docs. So 536
       of the 593 "log documents" were dictionaries, and **63 of the 210 reported instances
-      (30%) came from lexicon prose rather than operator behaviour.** Branch 3's headline
+      (30%) came from lexicon prose rather than operator behaviour.** Step 3's headline
       figure was inflated by that much. Scoped to the six real log artefacts, the true
-      figure is **147**. The one signature branch 4 depends on -- "found NO compliant repair"
+      figure is **147**. The one signature step 4 depends on -- "found NO compliant repair"
       -- measured 7 in BOTH populations, so the premise was never affected, only the
       headline. `--strict-population` re-runs the old wide glob and prints the delta, so the
       correction stays checkable rather than becoming folklore.
 
-  (2) IT COULD NOT MEASURE DEPTH AT ALL, which is what branch 4 needed. Prose cannot carry
+  (2) IT COULD NOT MEASURE DEPTH AT ALL, which is what step 4 needed. Prose cannot carry
       it: two probes over the narratives produced a false ceiling of 3 because the 3 sat on
       the noun "pass" and 43 higher ordinals existed elsewhere in unrelated senses. The
       `run-D*.jsonl` forensic logs can -- every `type=step` record carries `step_id`,
@@ -83,7 +83,7 @@ SIGNATURES = {
         re.compile(r"whitelist|narrow(?:ed)? the (?:pattern|check|rule)", re.I),
 }
 
-# The six items branch 3 now requires of delivery notes, in the entry file's own words.
+# The six items step 3 now requires of delivery notes, in the entry file's own words.
 SPEC_ITEMS = [
     ("what the file is", re.compile(r"\bsource\b|\bvariant\b|\bdeliverable\b", re.I)),
     ("what the run did beyond translating", re.compile(r"substantive change|what this run",
@@ -110,7 +110,7 @@ SPEC_ITEMS = [
 # which is itself published -- a log is the graded one when its command count matches. Any
 # document where that fails to select exactly one log is REPORTED, never guessed.
 #
-# D03's re-run cell was published as 40 and is 41. Found on branch 4 by this assertion
+# D03's re-run cell was published as 40 and is 41. Found on step 4 by this assertion
 # failing, confirmed by running analyse_log.py itself, and corrected in CLAUDE.md in the same
 # commit. All 35 other machine-produced cells in that table reproduce exactly.
 PUBLISHED = {
@@ -176,7 +176,7 @@ def repair_depth(selected):
     A SEQUENCE is consecutive invocations of one step_id within one document. It OPENS on a
     non-zero rc; its DEPTH is how many further invocations of that step followed; it CLOSES
     SUCCESSFULLY if a later invocation of that step returns 0. An UNCLOSED sequence is a step
-    that never went green -- the deadlock shape branch 4 exists for.
+    that never went green -- the deadlock shape step 4 exists for.
     """
     runs = defaultdict(lambda: defaultdict(list))
     for doc, steps in selected.items():
@@ -272,7 +272,7 @@ def main():
             body = p.read_text(encoding="utf-8", errors="replace")
             for name, pat in SIGNATURES.items():
                 wide[name] += len(pat.findall(body))
-        print(f"\n  POPULATION CHECK — the pre-branch-4 glob counted {sum(wide.values())}, "
+        print(f"\n  POPULATION CHECK — the pre-step-4 glob counted {sum(wide.values())}, "
               f"this counts {addressed}.")
         print(f"  {sum(wide.values()) - addressed} match(es) came from the skill's own "
               f"dictionaries, not from operator behaviour.")
@@ -349,7 +349,7 @@ def main():
     if notes:
         body = notes[0].read_text(encoding="utf-8", errors="replace")
         have = [(n, bool(p.search(body))) for n, p in SPEC_ITEMS]
-        print("  Branch 3's six required items, checked against what a real run produced:")
+        print("  Step 3's six required items, checked against what a real run produced:")
         for n, ok in have:
             print(f"    {'present ' if ok else 'ABSENT  '} {n}")
         print(f"\n  {sum(1 for _, o in have if o)} of {len(SPEC_ITEMS)} specification items "
@@ -363,7 +363,7 @@ def main():
               f"{max(unclosed)} attempts —")
         print("  which is F41's unbounded repair, observed rather than argued.")
     print("  Whether an operator applies either rule is behavioural — §4.1 puts that at "
-          "Step C.")
+          "phase 3's test.")
     print("=" * 96)
     return 0
 

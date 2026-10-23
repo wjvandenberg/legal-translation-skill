@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """THE quality_check FALSE-POSITIVE CENSUS over the recorded corpus.
 
-THE QUESTION. Branch 5 gives `quality_check` an exit code, so from branch 5 onward a finding STOPS
+THE QUESTION. Step 5 gives `quality_check` an exit code, so from step 5 onward a finding STOPS
 the run. Nobody has measured how often those findings are false positives, which is the number
-that decides whether branch 5 is safe to merge ahead of branch 14. CLAUDE.md publishes that 6 of
+that decides whether step 5 is safe to merge ahead of step 14. CLAUDE.md publishes that 6 of
 12 runs saw a non-zero total and that at least 19 of D06's 32 are documented false positives; the
 rate has never been derived.
 
@@ -12,13 +12,13 @@ deliverable, not lifted from the narrative logs -- CLAUDE.md 5.3 rule 1, and 5.6
 the narratives under-report counts (14/12/11 against a real 18/16/11).
 
 HOW L1's SHARE IS ESTABLISHED WITHOUT JUDGEMENT, and this is the heart of it. `check_truncation`
-method A used to do `p = all_p[idx]` -- indexing the DOCUMENT by the JSON's idx. Step 7 permutes
+method A used to do `p = all_p[idx]` -- indexing the DOCUMENT by the JSON's idx. skill Step 7 permutes
 the document first. So for every entry that yields a finding, ask a question that needs no human:
 DOES all_p[idx] ACTUALLY HOLD THE ENGLISH THIS ENTRY DECLARED? If it does not, the rule compared
 two unrelated paragraphs and the finding is a positional artefact BY CONSTRUCTION. No patch, no
 re-run, no reading of any finding's text.
 
-BRANCH 14 FIXED THAT RULE, AND THIS INSTRUMENT NOW REPORTS BOTH SIDES. The positional
+STEP 14 FIXED THAT RULE, AND THIS INSTRUMENT NOW REPORTS BOTH SIDES. The positional
 recomputation below is kept and RELABELLED as the BASELINE: it is computed here, from the recorded
 artefacts, so it stays reproducible for ever regardless of what the script does next -- which is
 what makes "9 of 9 were artefacts" a permanent measurement rather than a claim about a version of
@@ -26,12 +26,12 @@ the code that no longer exists. Beside it is the same computation under the pair
 now. Both columns come from this file, so neither can quietly inherit the other's answer.
 
 READ THE HEADLINE FIGURES THIS WAY, AND NOTE WHAT IS AND IS NOT A BASELINE HERE. `TOTAL` is what
-the CURRENT script reports, so it moves whenever a fix lands -- that is the point of a fix branch,
+the CURRENT script reports, so it moves whenever a fix lands -- that is the point of a fix step,
 not a regression. The only baseline this file recomputes is method A's, in the `A base` column, and
-it is exact: 9 findings, 9 of them on a mispaired entry. The published pre-branch-14 totals of
+it is exact: 9 findings, 9 of them on a mispaired entry. The published pre-step-14 totals of
 D05=8 and D06=32 are NOT recomputed here and cannot be, because the other classes are read from the
 script's own output. To reproduce those, run this against the baseline commit; to see each fix's
-own before-and-after, run `tests/test_check_scoping.py`, which loads the pre-branch scripts out of
+own before-and-after, run `tests/test_check_scoping.py`, which loads the pre-step scripts out of
 git and asserts both directions per rule.
 
 OUTPUT POLICY. Prints rule-class names, counts, and corpus doc-ids. NEVER a finding's text, a
@@ -156,7 +156,7 @@ for pj, dx in workdirs:
     # D06 by six. Recomputing asks the same question a second way, which CLAUDE.md 5.1
     # prescribes for exactly this reason.
     a_candidates, a_on_mispaired, a_now = 0, 0, 0
-    # The pairing the script uses SINCE BRANCH 14: locate the paragraph holding the
+    # The pairing the script uses SINCE STEP 14: locate the paragraph holding the
     # English the entry declared, and fall back to that declared English where it cannot
     # be located uniquely. Recomputed here rather than imported, so this instrument and
     # the script are two independent statements of the same rule and can disagree
@@ -231,12 +231,12 @@ n_l1 = sum(r[7] for r in rows)
 n_dang_all = sum(r[8] for r in rows)
 n_printed = sum(r[9] for r in rows)
 n_now = sum(r[11] for r in rows)
-print(f"\n  DELIVERABLES THAT WOULD STILL BE BLOCKED AT STEP 9: {stops} of {len(rows)} workdir(s)")
+print(f"\n  DELIVERABLES THAT WOULD STILL BE BLOCKED AT skill STEP 9: {stops} of {len(rows)} workdir(s)")
 print(f"  distinct doc-ids blocked                          : "
       f"{len({r[0] for r in rows if r[2]})} of {len({r[0] for r in rows})}")
 print(f"  entries whose all_p[idx] holds the WRONG English   : {sum(r[4] for r in rows)}")
 print(f"  method A under the BASELINE positional pairing     : {n_fired}"
-      f"   (pre-branch-14; recomputed here, not read from the script)")
+      f"   (pre-step-14; recomputed here, not read from the script)")
 print(f"  of those, ON A MISPAIRED ENTRY = L1 artefact       : {n_l1}"
       f"  ({'n/a' if not n_fired else str(round(100 * n_l1 / n_fired)) + '%'})")
 print(f"  method A under the CURRENT text pairing            : {n_now}"
@@ -254,7 +254,7 @@ for k, v in sorted(class_totals.items(), key=lambda kv: -kv[1]):
 # PER DOCUMENT, PER CLASS -- because a class total of 11 could be one document or five,
 # and the answer decides which fix moves which document. The first version of this
 # instrument printed only the totals, and the per-document split had to be rebuilt from
-# scratch to plan branch 14. It belongs here.
+# scratch to plan step 14. It belongs here.
 live = [k for k in sorted(class_totals) if class_totals[k]]
 if live:
     print("\n  BY DOCUMENT AND CLASS  (blank = clean)")
@@ -328,7 +328,7 @@ if _QC is not None:
 
 print("\n  WHAT IS AND IS NOT ESTABLISHED")
 print("    MISPAIRED is measured and needs no judgement: all_p[idx] does not hold the English")
-print("    that entry declared, so the pre-branch-14 truncation rule compared unrelated")
+print("    that entry declared, so the pre-step-14 truncation rule compared unrelated")
 print("    paragraphs. Every finding it produced on such an entry is L1's positional artefact")
 print("    by construction — which is why the `A base` and `A mispd` columns are equal.")
 print("    The other rule classes are COUNTS ONLY. Classifying an individual finding true or")

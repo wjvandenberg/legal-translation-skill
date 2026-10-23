@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 8 — C28, C12 and M1: does the reading-apart step capture everything?
+"""STEP 8 — C28, C12 and M1: does the reading-apart step capture everything?
 
 WHAT THE ROWS SAY. C28: nothing compares the delivered text inventory against the ORIGINAL
 document's, so a defect introduced at extraction passes every gate — every post-production
-check baselines against paragraphs.json, WHICH THE RUN ITSELF WROTE AT STEP 2. C12: Step 2's
+check baselines against paragraphs.json, WHICH THE RUN ITSELF WROTE AT skill STEP 2. C12: skill Step 2's
 mandatory footnote/endnote/comment check is a `zipfile.namelist()` membership test against
 the CONVERTED file, so it asks "does this file have footnotes?" when the question is "did
 the source have footnotes the conversion dropped?". M1: the probes behind it counted aux
@@ -144,7 +144,7 @@ def body_not_captured(out):
 
 
 print("=" * 92)
-print(f"BRANCH 8 — EXTRACTION COMPLETENESS   ({args.variant})")
+print(f"STEP 8 — EXTRACTION COMPLETENESS   ({args.variant})")
 print("=" * 92)
 
 # =========================================================================================
@@ -251,12 +251,12 @@ else:
            f"got {body_not_captured(out)}")
 
 # =========================================================================================
-# ARM 5 — AUXILIARY PARTS BY CONTENT. C12. And the STEP matters: at Step 2 the auxiliary
+# ARM 5 — AUXILIARY PARTS BY CONTENT. C12. And the STEP matters: at skill Step 2 the auxiliary
 # translators have not run, so an uncaptured aux part is work to do and not yet a defect.
 # Building a blocking default here would repeat the false refusal this project measured
 # firing on three of nine real documents.
 # =========================================================================================
-print("\nARM 5 — auxiliary text with no capture is REPORTED at Step 2, not refused")
+print("\nARM 5 — auxiliary text with no capture is REPORTED at skill Step 2, not refused")
 if base is None:
     void("arm 5", "no conforming notes")
 else:
@@ -265,7 +265,7 @@ else:
     ok("the header part is named", "word/header1.xml" in out)
     ok("both are reported unaccounted", out.count("NOT ACCOUNTED FOR") == 2,
        f"count={out.count('NOT ACCOUNTED FOR')}")
-    ok("it is a work list, not a verdict, at Step 2", rc == 0, f"rc={rc}")
+    ok("it is a work list, not a verdict, at skill Step 2", rc == 0, f"rc={rc}")
     ok("and it says which it is", "WORK LIST, not a verdict" in out)
 
     print("\nARM 5b — --strict turns the same report into a verdict, for pre-repack")

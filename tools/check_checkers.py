@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """check_checkers.py - is this project's copy of each standard script current?
-CHECKER VERSION 20 (2026-10-15)
+CHECKER VERSION 21 (2026-10-22)
 
 Every project gets its OWN COPY of the standard scripts in its tools\\ folder. Copies drift:
 the shared one gets fixed and yours does not hear about it, or yours gets edited and the fix
@@ -26,6 +26,17 @@ VERDICTS, one per file:
     MISSING   the shared folder has it, this project does not, and nothing says why - a
               finding, not a decision, and the same distinction FORKED draws against DIVERGED
     UNKNOWN   present in both but neither declares a CHECKER VERSION
+    N/A       the hook row only - nothing of the house's to compare; not a finding
+
+AND ONE ROW FOR THE HOOK, hooks/pre-push, SINCE v21. Until then no report covered a hook at all: a
+whole copy and a project's own hook carrying the house's full-run block both drifted in silence -
+measured on 2026-10-22, six folders held one, and one was an older copy, with no full-run block,
+that nobody had listed. The hook carries no CHECKER VERSION, so OLD is told from EDITED by the house's own history,
+as --adopt does: a file, or a block between its `# >>>` and `# <<<` markers, that the house once
+shipped is STALE; one it never shipped is DIVERGED, or FORKED under a header. A project with no
+hook, or with one of its own and no block, is N/A - whether every project carries the push check
+is the rollout's decision, not drift. --adopt never writes the hook: a whole copy over a combined
+one would delete the project's own guard.
 
 ABSENT AND MISSING WERE ONE VERDICT UNTIL v12, AND THAT MADE THE DOCSTRING BELOW FALSE.
 classify() returned the same ABSENT either way, so --absent changed the wording of a row and
@@ -262,8 +273,8 @@ VERSION_RE = re.compile(r"CHECKER VERSION\s+(\d+)")
 FORK_RE = re.compile(r"^#\s*FORKED FROM\s+\S+\s+v(\d+)\s+ON\s+(\S+)\s+BECAUSE\s+(.+)$",
                      re.I | re.M)
 
-CURRENT, STALE, FORKED, DIVERGED, ABSENT, MISSING, UNKNOWN = (
-    "CURRENT", "STALE", "FORKED", "DIVERGED", "ABSENT", "MISSING", "UNKNOWN")
+CURRENT, STALE, FORKED, DIVERGED, ABSENT, MISSING, UNKNOWN, NA = (
+    "CURRENT", "STALE", "FORKED", "DIVERGED", "ABSENT", "MISSING", "UNKNOWN", "N/A")
 # MISSING JOINED THIS SET IN v12, AND THE PAIR IT COMPLETES IS THE ARGUMENT FOR IT. An absence
 # and a declared absence are as different as DIVERGED and FORKED, and that pair has always been
 # split here: one is a finding, the other is a decision with its reason on the record. Absence
@@ -378,6 +389,93 @@ def run(project: Path, shared: Path, declared_absent):
     return rows
 
 
+# ------------------------------------------------------------------------------ the hook
+
+HOOK = "hooks/pre-push"
+BLOCK_BEGIN = b"# >>> THE FULL RUN AT THE PUSH"
+BLOCK_END = b"# <<< THE FULL RUN AT THE PUSH"
+
+
+def _marker(data: bytes, mark: bytes) -> int:
+    """Where a marker LINE starts, or -1. A marker quoted inside another line is prose about the
+    block, not the block - matched anywhere, one in a comment above it read as inverted markers."""
+    m = re.search(rb"(?m)^" + re.escape(mark), data)
+    return m.start() if m else -1
+
+
+def hook_block(data: bytes):
+    """The full-run block, both marker lines included. None when there is none; b"" when only
+    one marker is there, or they are inverted - a block that cannot be read is not an absent one."""
+    a, b = _marker(data, BLOCK_BEGIN), _marker(data, BLOCK_END)
+    if a == -1 and b == -1:
+        return None
+    if a == -1 or b == -1 or b < a:
+        return b""
+    e = data.find(b"\n", b)
+    return data[a:len(data) if e == -1 else e + 1]
+
+
+def _blob(shared: Path, blob: str) -> bytes:
+    """A blob's exact bytes - _git's decoded and stripped text would spoil a byte comparison."""
+    try:
+        r = subprocess.run(["git", "cat-file", "blob", blob], cwd=shared, capture_output=True)
+    except OSError:
+        return b""
+    return r.stdout if r.returncode == 0 else b""
+
+
+def classify_hook(project: Path, shared: Path):
+    """(verdict, detail) for the project's tools/hooks/pre-push; (None, None) when the house has none.
+
+    THE ORDER IS THE POINT. A whole file the house shipped is checked before the block, so an old
+    whole copy whose block happens to match today's still reads STALE; a FORKED header wins before
+    any history, as in classify(); and without readable history only a byte-equal block can pass.
+    """
+    source = shared / HOOK
+    if not source.is_file():
+        return None, None
+    local = project / "tools" / HOOK
+    if not local.is_file():
+        return NA, "no tools/hooks/pre-push here - nothing to compare"
+    mine, house = local.read_bytes(), source.read_bytes()
+    if mine == house:
+        return CURRENT, ""
+    block, house_block = hook_block(mine), hook_block(house)
+    if block == b"":
+        return UNKNOWN, "a full-run marker without its partner - the block cannot be read"
+    fork = FORK_RE.search(mine.decode("utf-8", "replace"))
+    if fork:
+        return FORKED, f"from v{fork.group(1)} on {fork.group(2)}: {fork.group(3)[:60]}"
+    _, shipped, why = house_record(shared, HOOK)
+    if why is None:
+        rc, blob = _git(shared, "hash-object", f"--path={HOOK}", "--stdin", data=mine)
+        if rc == 0 and blob in shipped:
+            return STALE, f"the house's hook as shipped in {shipped[blob]} - re-copy hooks/pre-push whole"
+    if block is not None and block == house_block:
+        return CURRENT, "the full-run block is the house's; the lines around it are this project's own"
+    if why:
+        return UNKNOWN, f"differs from the house's hook, and {why}"
+    if block is None:
+        return NA, "a hook of this project's own, with no full-run block - nothing to compare"
+    old = {}
+    for b, commit in shipped.items():
+        shipped_block = hook_block(_blob(shared, b))
+        if shipped_block:
+            old[shipped_block] = commit
+    if block in old:
+        return STALE, (f"the full-run block as shipped in {old[block]} - re-copy the lines between its "
+                       f"markers; the rest is this project's own")
+    return DIVERGED, ("the full-run block matches no version the house shipped - an undeclared local "
+                      "edit. Record why with a FORKED FROM header, or re-copy the block")
+
+
+def run_hook(project: Path, shared: Path):
+    """The hook's row, or none when the shared folder holds no hook. Kept out of run(), which
+    --adopt walks: adopt copies whole files, and the hook may be a project's guard around the block."""
+    v, d = classify_hook(project, shared)
+    return [] if v is None else [(HOOK, v, d)]
+
+
 def report(rows, refused=(), stale=()):
     if not rows:
         print("VOID: no tracked scripts found in the shared folder. Is --shared correct?")
@@ -417,6 +515,10 @@ def report(rows, refused=(), stale=()):
         print("            somebody took.")
         print("DECL-STALE -> the file is here after all. Delete the declaration, or the next")
         print("            real change to that file lands behind an exemption nobody rereads.")
+        if any(n == HOOK and v in FAILING for n, v, _ in rows):
+            print("hooks/pre-push -> its row says what to re-copy: the whole file, or only the lines")
+            print("            between its full-run markers where the hook is the project's own.")
+            print("            By hand - --adopt never writes a hook.")
     return 1 if bad else 0
 
 
@@ -755,6 +857,7 @@ def selftest() -> int:
 
         ok &= roster_selftest(tmp, shared)
         ok &= adopt_selftest(tmp)
+        ok &= hook_selftest(tmp)
     finally:
         # git writes its objects read-only, which Windows will not delete without help
         cleanup = "onexc" if sys.version_info >= (3, 12) else "onerror"
@@ -1111,6 +1214,109 @@ def adopt_selftest(tmp: Path) -> bool:
     return ok
 
 
+def hook_selftest(tmp: Path) -> bool:
+    """v21: the hooks/pre-push row, one case per shape a project carries - read red against v20 first.
+
+    v20 printed no hook row at all, so every case MISSES there. Driven through main() and literals
+    only, so a copy without the row reads MISS rather than crashing. The house is a real git
+    repository holding two committed versions of the hook, because STALE is a fact about its history.
+    """
+    print("\nSELFTEST - the hooks/pre-push row, every shape a project carries\n")
+    ok = True
+    house = tmp / "hookhouse"
+    shared = house / "standard-scripts"
+    (shared / "hooks").mkdir(parents=True)
+
+    def git(*args) -> str:
+        r = subprocess.run(["git", "-c", "user.name=selftest", "-c", "user.email=selftest@example.invalid",
+                            "-c", "core.autocrlf=false", *args], cwd=house, capture_output=True)
+        return r.stdout.decode("utf-8", "replace").strip()
+
+    def block(n: int, extra: bytes = b"") -> bytes:
+        return (b"# >>> THE FULL RUN AT THE PUSH - one block\necho v%d\n" % n + extra
+                + b"# <<< THE FULL RUN AT THE PUSH\n")
+
+    head = b"#!/bin/sh\n# the house's own branch guard\nrefs=$(cat)\n"
+    own = b"#!/bin/sh\n# a project's own guard, its own override\nrefs=$(cat)\n"
+    versions = [head + block(1) + b"exit 0\n", head + block(2) + b"exit 0\n"]
+    git("init", "-q")
+    commits = []
+    for v in versions:
+        (shared / "hooks" / "pre-push").write_bytes(v)
+        git("add", "-A")
+        git("commit", "-q", "-m", "hook")
+        commits.append(git("rev-parse", "--short=7", "HEAD"))
+    plain = tmp / "hookplain" / "standard-scripts"
+    (plain / "hooks").mkdir(parents=True)
+    (plain / "hooks" / "pre-push").write_bytes(versions[1])
+    fork = b"# FORKED FROM standard-scripts v1 ON 2026-10-22 BECAUSE a local need\n"
+
+    seq = iter(range(1, 100))
+
+    def drive(hook: bytes | None, where: Path = shared, adopt: bool = False):
+        """(verdict, detail, rc, the hook's bytes afterwards) of one project through main()."""
+        d = tmp / f"hookproj{next(seq)}"
+        (d / "tools").mkdir(parents=True)
+        f = d / "tools" / "hooks" / "pre-push"
+        if hook is not None:
+            f.parent.mkdir()
+            f.write_bytes(hook)
+        buf = io.StringIO()
+        saved = os.environ.get("GIT_CEILING_DIRECTORIES")
+        if where != shared:
+            os.environ["GIT_CEILING_DIRECTORIES"] = str(tmp)
+        try:
+            with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(io.StringIO()):
+                rc = main([*(["--adopt"] if adopt else []), "--project", str(d), "--shared", str(where)])
+        except SystemExit as exc:
+            rc = f"exit {exc.code}"
+        except Exception as exc:          # noqa: BLE001 - a crash is a MISS, reported as one
+            rc = f"crash {type(exc).__name__}"
+        finally:
+            if saved is None:
+                os.environ.pop("GIT_CEILING_DIRECTORIES", None)
+            else:
+                os.environ["GIT_CEILING_DIRECTORIES"] = saved
+        row = next((ln[2:] for ln in buf.getvalue().splitlines() if " hooks/pre-push " in f" {ln[2:]} "), "")
+        parts = row.split(None, 2)
+        return (parts[0] if parts else None, parts[2] if len(parts) > 2 else "", rc,
+                f.read_bytes() if f.is_file() else None)
+
+    cases = [
+        ("no hook in the project", None, shared, "N/A", 0, ""),
+        ("the house's hook, byte for byte", versions[1], shared, "CURRENT", 0, ""),
+        ("the house's hook as it shipped before", versions[0], shared, "STALE", 1, commits[0]),
+        ("its own guard around the house's block", own + block(2) + b"exit 0\n", shared, "CURRENT", 0, "own"),
+        ("its own guard around an older house block", own + block(1) + b"exit 0\n", shared, "STALE", 1,
+         "markers"),
+        ("a block matching nothing shipped", own + block(2, b"echo edited\n") + b"exit 0\n", shared,
+         "DIVERGED", 1, ""),
+        ("...the same under a FORKED FROM header", fork + own + block(2, b"echo edited\n") + b"exit 0\n",
+         shared, "FORKED", 0, ""),
+        ("a hook of its own with no block", own + b"exit 0\n", shared, "N/A", 0, "own"),
+        ("a begin marker with no end", own + block(2).split(b"# <<<")[0], shared, "UNKNOWN", 1, ""),
+        ("a marker quoted inside a comment line is prose",
+         own + b"# the house's block ends at its '# <<< THE FULL RUN AT THE PUSH' line\n" + block(2) + b"exit 0\n",
+         shared, "CURRENT", 0, "own"),
+        ("an older block, no history behind the house", own + block(1) + b"exit 0\n", plain, "UNKNOWN", 1, ""),
+    ]
+    for label, hook, where, want, want_rc, needle in cases:
+        verdict, detail, rc, _ = drive(hook, where)
+        good = verdict == want and rc == want_rc and needle in detail
+        ok &= good
+        print(f"  {'OK  ' if good else 'MISS'} {label:<48} expected {want:<8} got {verdict} rc={rc}"
+              + ("" if needle in detail else f", detail lacks {needle!r}"))
+
+    # --adopt COPIES WHOLE FILES, AND A WHOLE COPY OVER A COMBINED HOOK DELETES THAT PROJECT'S OWN GUARD
+    combined = own + block(1) + b"exit 0\n"
+    verdict, _, rc, after = drive(combined, shared, adopt=True)
+    good = after == combined and verdict == "STALE"
+    ok &= good
+    print(f"  {'OK  ' if good else 'MISS'} {'--adopt never writes the hook':<48} "
+          f"{'untouched' if after == combined else 'WRITTEN'}, row {verdict}, rc={rc}")
+    return ok
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description="Compare this project's checker copies "
                                             "against the shared standard scripts.")
@@ -1200,8 +1406,9 @@ def main(argv=None):
             print("       roster arm on its own, before or after.")
             return 2
         rc_adopt = adopt(project, shared, declared)
-        return max(report(run(project, shared, declared), refused, stale), rc_adopt)
-    rc = report(run(project, shared, declared), refused, stale)
+        return max(report(run(project, shared, declared) + run_hook(project, shared), refused, stale),
+                   rc_adopt)
+    rc = report(run(project, shared, declared) + run_hook(project, shared), refused, stale)
     rows, void = ([], None) if not args.roster else check_roster(Path(args.roster), shared)
     rc_roster = roster_report(rows, void, declared=bool(args.roster))
     # The WORSE code wins, and 2 > 1 > 0 orders them correctly already: "the instrument

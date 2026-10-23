@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-"""THE CORPUS ARM FOR translate_headers_footers.py — what Step 8b does DIFFERENTLY, on the
-real corpus. Branch 7 slice 3, register A19.
+"""THE CORPUS ARM FOR translate_headers_footers.py — what skill Step 8b does DIFFERENTLY, on the
+real corpus. Sub-step 7.3, register A19.
 
 WHY THIS TOOL EXISTS, AND IT IS NOT ABOUT A19's OWN SURFACE. tools/apply_corpus_diff.py
-drives `apply_translations_textmatch.py` over `word/document.xml`. Slice 3 changes
+drives `apply_translations_textmatch.py` over `word/document.xml`. Sub-step 7.3 changes
 `translate_headers_footers.py` and an extraction REPORT, so that tool's two arms are
-byte-identical BY DESIGN and its all-quiet result proves nothing here -- the same shape slice
-2 met and declared. Until this file existed, NOTHING in this repository measured the
+byte-identical BY DESIGN and its all-quiet result proves nothing here -- the same shape sub-step
+7.2 met and declared. Until this file existed, NOTHING in this repository measured the
 header/footer translator against a real document at all.
 
-AND THE THING IT ACTUALLY GUARDS IS THE SCAFFOLD SHAPE, NOT THE ALT TEXT. Slice 3 adds a new
+AND THE THING IT ACTUALLY GUARDS IS THE SCAFFOLD SHAPE, NOT THE ALT TEXT. Sub-step 7.3 adds a new
 kind of entry to `headers_footers.json`. Every one of the frozen scaffolds was written before
 that key existed, so `apply_from_scaffold` must go on treating a `kind`-less entry as a
 paragraph entry -- and if it stopped, every real document's headers and footers would
@@ -62,7 +62,7 @@ from sibling_dirs import corpus_dirs, logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
 
 SCRIPT = "translate_headers_footers.py"
-# THE SECOND SCRIPT IS NOT OPTIONAL AND IT IS EASY TO MISS. Since slice 3 the translator
+# THE SECOND SCRIPT IS NOT OPTIONAL AND IT IS EASY TO MISS. Since sub-step 7.3 the translator
 # IMPORTS the graphic-metadata inventory from extract_paragraphs.py. tools/apply_corpus_diff.py
 # builds its old arm by copying the CURRENT scripts directory and overwriting one file -- so
 # pinning only the translator would leave the OLD translator sitting beside the NEW inventory.

@@ -75,17 +75,22 @@ done
 py=$(git config --get house.python)
 reason="$HOUSE_PUSH_WITHOUT_FULL_RUN"
 
+# Exit 3 is this hook's own "the check cannot be made here", so the refusal below does not send the reader
+# to run the full suite - which cures neither a missing checker nor a missing Python.
 check_push() {
     if [ -z "$checker" ]; then
         echo "  no cycle_evidence.py in tools/ or standard-scripts/, so nothing can vouch for it"
-        return 2
+        return 3
     fi
     if [ -n "$py" ]; then
         "$py" "$checker" check-push "$1"
     elif command -v uv >/dev/null 2>&1; then
         uv run python "$checker" check-push "$1"
     else
-        python "$checker" check-push "$1"
+        echo "  no Python to run cycle_evidence.py: house.python is not set and uv is not on the hook's PATH."
+        echo "  A bare 'python' is not tried - it is whatever the PATH holds. Name one:"
+        echo "    git config house.python <path to python>"
+        return 3
     fi
 }
 
@@ -94,6 +99,19 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     case "$local_sha" in
         *[!0]*) ;;
         *) continue ;;                          # a deletion: all zeros, it carries nothing
+    esac
+
+    # A TAG MOVES NO BRANCH. When the remote already has every commit it reaches, as far as this repository's
+    # remote-tracking refs know, it carries nothing for a full run to vouch for. Not for a branch: one pushed
+    # with the override and then main moved onto it would put unvouched work on main. Any doubt is checked.
+    case "$remote_ref" in
+        refs/tags/*)
+            if new=$(git rev-list --max-count=1 "$local_sha" --not --remotes="$remote" 2>/dev/null) \
+                && [ -z "$new" ]; then
+                echo "pre-push: $local_ref carries no commit '$remote' lacks - a name only, not checked." >&2
+                continue
+            fi
+            ;;
     esac
 
     answer=$(check_push "$local_sha" 2>&1)
@@ -113,8 +131,13 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     echo "  BLOCKED: no full run vouches for $local_ref ($local_sha) on '$remote'." >&2
     printf '%s\n' "$answer" | sed 's/^/  /' >&2
     echo "" >&2
-    echo "  Run the full suite on this commit's CLEAN tree, then push again:" >&2
-    echo "    <python> <path to>/cycle_evidence.py full -- <the full test command>" >&2
+    case "$rc" in
+        3|126|127)                              # the hook's own, or house.python not found or not runnable
+            echo "  The check could not be made here: put right what is named above, then push again." >&2 ;;
+        *)
+            echo "  Run the full suite on this commit's CLEAN tree, then push again:" >&2
+            echo "    <python> <path to>/cycle_evidence.py full -- <the full test command>" >&2 ;;
+    esac
     echo "" >&2
     if [ -n "$reason" ]; then
         echo "  HOUSE_PUSH_WITHOUT_FULL_RUN is set, and too short to be a reason: it takes" >&2

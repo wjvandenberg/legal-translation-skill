@@ -1,4 +1,4 @@
-"""test_keep_declarations.py - branch 11's follow-up, item 1 (register I-34) and review finding 6: the ONE helper
+"""test_keep_declarations.py - step 11's follow-up, item 1 (register I-34) and review finding 6: the ONE helper
 that writes what a compliant KEEP-AS-IS run declares beside the notes, tools/keep_declarations.py, judged by the
 REAL delivered-document check. Synthetic input only; nothing is read from the corpus.
 
@@ -6,7 +6,7 @@ The original carries every side part the check reads: a header with a PAGE field
 escaped ampersand, a comment of two paragraphs and a comment of one text paragraph beside a whitespace-only one,
 a footnote holding a tracked deletion and a letter-free text, an endnote, and a glossary building block.
 
-  D1  the declarations written, file by file, each in Step 8's form: 8b the script's own --extract scaffold with
+  D1  the declarations written, file by file, each in skill Step 8's form: 8b the script's own --extract scaffold with
       en equal to text, the field placeholder kept; 8c a comment's text paragraphs joined by a line break, a
       one-paragraph comment as every w:t of it; 8d/8e every letter-bearing w:t AND w:delText text as the raw XML
       holds it (`&amp;` stays escaped) mapped to itself, a letter-free text absent.
@@ -170,7 +170,7 @@ print("=" * 92)
 ok("tools/keep_declarations.py imports and offers write_keep_declarations",
    write_keep_declarations is not None, repr(IMPORT_ERROR))
 
-print("\nD1  the declarations written, each in Step 8's form")
+print("\nD1  the declarations written, each in skill Step 8's form")
 d1, o1 = stage("d1")
 wrote = write_keep_declarations(o1, d1, SCRIPTS) if write_keep_declarations else {}
 ok("five files written, one per side-part kind the original carries",

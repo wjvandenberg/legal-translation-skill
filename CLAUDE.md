@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c), (d1) and (d2a) merged, #167, #169 and #170; (d2b) the tools and (d2c) the tests next · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177; (d2c)'s last three next · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,23 +578,23 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-21 (2), RENAMES (d1) AND (d2a) MERGED, THE CENSUS READS CODE
+### HANDOFF — 2026-10-23, THE HOUSE'S HOOK FIXES IN, RENAMES (d2b) AND (d2c) BUT THREE FILES, ONE PULL REQUEST
 
-**PURPOSE: MET FOR THE DOCUMENTS, BEGUN FOR THE CODE.** It was *so that every living document reads in phase, step,
-sub-step and skill Step N while dated records keep their words, and the census guards each one*: #169 and #170.
+**PURPOSE: MET FOR THE HOOK AND THE TOOLS, ALL BUT THREE FILES FOR THE TESTS.** It was *so that this project's checkers
+and push hook match the house's, and every living tool and test reads in phase, step, sub-step and skill Step N*: #177.
 
-**BUILT:** #169 — 16 logged swaps in 8 files, reversed byte-identical; 17 documents joined the census, the A3
-analysis and the Opus 5 plan records whole, a document never judged now VOID. #170 — a code arm on Python's tokenizer,
-a dated comment block a record; 34 swaps in 4 files. #171 — the full run's one red, a sibling lookup; the run a
-composed record *(Wouter)*. `cycle_evidence.py` v2 adopted. Rulings and judgements: `DECISIONS-LOG.md`, 2026-10-21 (2).
+**BUILT, ONE BRANCH, ONE FULL RUN** *(Wouter, standing)*: the house's v21, v11 and the hook's full-run block, byte for
+byte, and the two gaps they opened here, red first; (d2b) 317 swaps in 24 tools, the census last by phrases; (d2c) 274
+swaps in 33 tests, 54 joined; a review's four fixes. Census: 101 of 104 code files, 0 old words. The full run on
+`33f1111`: PASS, 94 suites, 2,855.7 s. Rulings and judgements: `DECISIONS-LOG.md`, 2026-10-23.
 
-**SINGLE NEXT ACTION: RENAME (d2b), THE TOOLS**, from `temp/s1021b_rename_d2_plan.md` — `vocabulary_census.py
---list-pending` names the files, the census itself last; then (d2c), the tests; then step 14's remainder.
+**SINGLE NEXT ACTION: RENAME (d2c)'S LAST THREE** — `tests/make_fixtures.py`, its builders read first since a string may
+be fixture CONTENT, and the probe pre-flight pair, its metacheck read first; `vocabulary_census.py --list-pending`
+names them. Then step 14's remainder, in section 2's order.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** adopt the house's `install_hooks.py` v8 at the opening, byte for byte; a
-docstring is living even where a paragraph is dated — only a COMMENT block is a record by its date; the census
-counts only the three shapes it names, so the skill's unprefixed `Step N` is held by reading.
+**WHAT A NEW SESSION WOULD GET WRONG:** ONE branch, ONE full run, ONE pull request a session; in a test, a needle into
+the skill's own text keeps `Step 1c` while its label takes `skill Step 1c`; the run's speed is the house's phase 8, not
+this project's; a re-copy of `install_hooks.py` needs no `ALLOW` change — it is keyed by the call's text.
 
-**Open, none blocking:** Wouter's — is a comment that only cites a dated ruling a record *(the #170 review's third
-finding)*; `check-push` not in the pre-push hook; the house's pointer checker and runner arm; `SKILL.md`'s size.
-**Context: 61% when written, measured.**
+**Open, none blocking:** `temp/s1023_for_house.md`, the slow first run's figures and five house-code findings, waits
+for a home the house reads; no suite runs `install_project_hooks.py`; `SKILL.md`'s size. **Context: 66% when written.**

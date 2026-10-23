@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 12 SLICE 12b — the gaps the declared language exposes.
+"""SUB-STEP 12.2 — the gaps the declared language exposes.
 
 WHAT THE ROWS SAY. S3: translate_numbering reported the absence of DICTIONARY MATCHES as the absence of
 CONTENT — on a Norwegian document it guessed french, then said there were no translatable format strings
 while ten sat in numbering the document uses. E4: no numbering map for Chinese or Japanese, exit 0 with
 "Writing unchanged". C2: no remnant marker list carries a month name, so a surviving source-language date
 scans CLEAN. S1 and H1: translate_numbering's guess is the one 12a left. And the end-of-run diligence audit
-never asks whether Step 1c was done (Wouter, 2026-10-09).
+never asks whether skill Step 1c was done (Wouter, 2026-10-09).
 
 WOUTER'S CHOICES (2026-10-12, section 3.2 of PLAN-2-step-b.md):
-  N  translate_numbering reads the Step 1c declaration through the one policy; a language with no map says
+  N  translate_numbering reads the skill Step 1c declaration through the one policy; a language with no map says
      NOT SUPPORTED and applies none; every format string still carrying a word is listed NOT TRANSLATED;
      it STOPS (exit 1) only on a DECLARED or explicit supported language with such a string in numbering
      the document uses — --custom the way out, mapping a string to itself to keep it. Chinese and Japanese
@@ -20,7 +20,7 @@ WOUTER'S CHOICES (2026-10-12, section 3.2 of PLAN-2-step-b.md):
      lexicons keep are declared kept names.
   H  translate_headers_footers' legacy mode: no guess, NOT SUPPORTED for a language it has no list for,
      and it counts the text it left instead of claiming "all numeric/symbol content".
-  D  verify_diligence has a Step 1c row: supported PASS, declared-unsupported WARN, missing or unreadable
+  D  verify_diligence has a skill Step 1c row: supported PASS, declared-unsupported WARN, missing or unreadable
      FAIL.
 
 RED FIRST: run before 12b's code exists, every arm must fail.
@@ -423,9 +423,9 @@ ok("H4 called with no language it GUESSES NOTHING and says NOT SUPPORTED",
    "Auto-detected" not in out.getvalue() and "NOT SUPPORTED" in out.getvalue(), out.getvalue()[-300:])
 
 # =========================================================================================
-# ARM D — the diligence audit's Step 1c row
+# ARM D — the diligence audit's skill Step 1c row
 # =========================================================================================
-print(f"\nARM D — verify_diligence asks whether Step 1c was done   [{args.variant}]")
+print(f"\nARM D — verify_diligence asks whether skill Step 1c was done   [{args.variant}]")
 
 
 def dil_case(name, decl):
@@ -444,7 +444,7 @@ for name, decl, want in (("supported", b'{"source_language": "dutch"}\n', "PASS"
                          ("missing", None, "FAIL"),
                          ("unreadable", b"{not json", "FAIL")):
     res, row = dil_case(name, decl)
-    ok(f"D1 {name} declaration: the Step 1c row reads {want}", f"[{want}" in row, f"row={row!r} rc={res.returncode}")
+    ok(f"D1 {name} declaration: the skill Step 1c row reads {want}", f"[{want}" in row, f"row={row!r} rc={res.returncode}")
 
 # =========================================================================================
 print("\n" + "=" * 92)

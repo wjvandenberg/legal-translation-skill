@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 14, HEAVY: the PROPERTIES the fixes claim, over many generated inputs.
+"""STEP 14, HEAVY: the PROPERTIES the fixes claim, over many generated inputs.
 
 WHY THIS EXISTS SEPARATELY FROM tests/test_check_scoping.py. That file tests specific
 CASES — this input must fire, that one must not — and cases only ever prove what the author
@@ -51,7 +51,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # PINNED TO A COMMIT, NOT A BRANCH NAME — see the same note in test_check_scoping.py.
 # `origin/main` stopped being the pre-branch code the moment the branch merged, which turned
 # the "OLD code VIOLATES it" half of every property into a comparison of the fix with
-# itself. 2178cce is the commit before branch 14 and does not move.
+# itself. 2178cce is the commit before step 14 and does not move.
 REF = os.environ.get("LT_BASELINE_REF", "2178cce")
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 SEED = 20260821
@@ -114,7 +114,7 @@ from lxml import etree  # noqa: E402
 OLDQC = load(OLD / "quality_check.py", "p_old_qc")
 QC = load(ROOT / "uk" / "scripts" / "quality_check.py", "p_new_qc")
 
-print("BRANCH 14 — PROPERTY TESTS")
+print("STEP 14 — PROPERTY TESTS")
 print(f"baseline: {REF} = {SHA[:12]}   seed: {SEED}")
 print("=" * 96)
 
@@ -163,7 +163,7 @@ def doc_from(bodies):
 # ============================================================================
 print("\nPROPERTY 1 — the truncation verdict is INVARIANT under permutation")
 print("-" * 96)
-print("  This is L1's repair stated as a property. Step 7 permutes the document; the")
+print("  This is L1's repair stated as a property. skill Step 7 permutes the document; the")
 print("  finding set must not care. Checked over generated documents and, for each, many")
 print("  random permutations of its paragraphs.")
 

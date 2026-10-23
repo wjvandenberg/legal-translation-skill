@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 10 SLICE 4 — the principle every tidy-up pass obeys, the page-break pass that now
+"""SUB-STEP 10.4 — the principle every tidy-up pass obeys, the page-break pass that now
 obeys it, and the detector reports that now reach the journal.
 
 WHY THIS SUITE EXISTS. Decision 2c revised says every pass in `post_process` tests the
-condition it assumes, and where it cannot tell, reports and changes nothing. Branch 10 made
+condition it assumes, and where it cannot tell, reports and changes nothing. Step 10 made
 eight passes obey that one at a time; nothing stopped pass thirteen from ignoring it. The
 declared `PASS_CONDITIONS` table in post_process.py is the rule made checkable, and this
 suite is what makes it bind: a pass added without a row turns it RED.
@@ -22,7 +22,7 @@ suite is what makes it bind: a pass added without a row turns it RED.
   ARM 7  THE OTHER DETECTORS' records carry the paragraph index too.
   ARM 8  NO DOCUMENT TEXT IN `detections`, on every record this suite produced.
   ARM 9  THE PARAGRAPH FORMAT RECORD can still catch a w:pPr change -- proved on the
-         recorder, because slice 4 removed the only pass that ever made one.
+         recorder, because sub-step 10.4 removed the only pass that ever made one.
 
 Every input is synthetic and built in a temporary directory. Nothing is written into
 tests/fixtures/ or into either tree.
@@ -152,8 +152,8 @@ for name, row in sorted(table.items()):
        shape and row[0] in statuses)
 # The three DETECTOR rows are the ones this branch turned into detectors -- if a row says
 # DETECTOR, the pass must return 0 fixes on the input the pass exists for. Proved per pass in
-# arms 5 and 7; here only that the set is what branch 10 left.
-ok("the passes declared DETECTOR are exactly the three branch 10 turned into detectors",
+# arms 5 and 7; here only that the set is what step 10 left.
+ok("the passes declared DETECTOR are exactly the three step 10 turned into detectors",
    sorted(n for n, r in table.items() if r[0] == "DETECTOR")
    == ["annex_to_schedule", "double_punctuation", "schedule_page_breaks"],
    f"{sorted(n for n, r in table.items() if r[0] == 'DETECTOR')}")
@@ -384,9 +384,9 @@ else:
 # =========================================================================================
 print("\nARM 9 — the paragraph FORMAT record can still catch a w:pPr change")
 # =========================================================================================
-# WHY THIS ARM EXISTS. Until slice 4 the page-break pass was the one pass that changed a
+# WHY THIS ARM EXISTS. Until sub-step 10.4 the page-break pass was the one pass that changed a
 # w:pPr, so tests/test_change_journal.py arm 9 proved the paragraph-level recorder by catching
-# its imposed break. Slice 4 removed the only subject that arm had, and a recorder nobody has
+# its imposed break. Sub-step 10.4 removed the only subject that arm had, and a recorder nobody has
 # seen record is an instrument that may have stopped working. So it is proved here on the
 # recorder itself: the reading sees a planted pageBreakBefore, and record_pass files it at the
 # right paragraph under the pass that made it.

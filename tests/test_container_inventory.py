@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 7 — THE CONTAINER INVENTORY. The synthetic arm.
+"""STEP 7 — THE CONTAINER INVENTORY. The synthetic arm.
 
 Option 1's second and last branch. Four accountable rows from PLAN-2-step-b.md section 9.3:
 A16 A19 N1 C19. This file covers the APPLY side -- A16 and N1 -- plus the two shapes measured
@@ -38,9 +38,9 @@ WHAT IT DOES NOT COVER, each a declared N/A with its reason rather than an omiss
         A22 is therefore a DEADLOCK rather than a cosmetic duplication -- a sharper statement
         of its severity than a pin -- and a fixture carrying it can never be repacked, so
         every other shape would lose its rendered page. See A22_FIXTURE_OWED below.
-  A19   the graphic-metadata surface is slice 3's, and the fixture carries its alt text and
+  A19   the graphic-metadata surface is sub-step 7.3's, and the fixture carries its alt text and
         chart title so this suite asserts only that apply leaves them alone
-  C19   the glossary part is slice 2's -- repack, not apply
+  C19   the glossary part is sub-step 7.2's -- repack, not apply
   a VML TEXT BOX. Measured CLEAN in temp/probe_container_gaps.py, and the corpus's 8
         txbxContent all sit in headers and footers, which translate_headers_footers.py owns
         and handles correctly through _iter_own_runs. Adding it here would need the VML
@@ -165,7 +165,7 @@ def run_apply(work, source_xml, notes, label, fixture=None, expect_block=False):
     THE INPUT IS COPIED INTO A TEMP DIRECTORY, NEVER READ FROM tests/fixtures/. apply's final
     pre-apply pass is validate_translations.py, which writes .validate-state.json beside the
     NOTES file -- so pointing it at the fixtures directory puts run state into the git index.
-    That happened once, on branch 6 slice 3, and it broke `git switch` and therefore
+    That happened once, on sub-step 6.3, and it broke `git switch` and therefore
     `git bisect`, which is the one tool the whole test method exists to enable.
     """
     work.mkdir(parents=True, exist_ok=True)
@@ -218,7 +218,7 @@ for _lbl, _remnant, _why, _xml in CONTAINER_SHAPES:
     _i += _n
 
 print("=" * 106)
-print(f"BRANCH 7 — THE CONTAINER INVENTORY · synthetic arm · {args.variant}/scripts/"
+print(f"STEP 7 — THE CONTAINER INVENTORY · synthetic arm · {args.variant}/scripts/"
       "apply_translations_textmatch.py")
 print("=" * 106)
 
@@ -418,7 +418,7 @@ PINNED = {
                           "anything"),
     "ruby-in-run": ("LOST",
                     "apply destroys the annotation outright, and putting it back needs the "
-                    "per-run English branch 15 emits — not a container inventory"),
+                    "per-run English step 15 emits — not a container inventory"),
 }
 
 # A DECLARED N/A WITH ITS REASON, NEVER AN OMISSION. Register row A22 -- a `w:fldSimple`
@@ -604,14 +604,14 @@ ok("subdoc keeps its w:subDoc — it carries no text, so a gate firing here woul
    len(OUT_PARAS[_sub_i].findall(f"{{{W}}}subDoc")) == 1)
 
 # =========================================================================================
-# 6. A19 — apply must LEAVE THE GRAPHIC METADATA ALONE. Translating it is slice 3's, and the
+# 6. A19 — apply must LEAVE THE GRAPHIC METADATA ALONE. Translating it is sub-step 7.3's, and the
 #    surfaces are an attribute and a separate part, so apply touching either would be a
 #    defect rather than progress.
 # =========================================================================================
 print("\n6. A19's SURFACES — apply must not touch them, in either direction")
 _src_descr = [el.get("descr") for el in src_root.iter() if el.get("descr")]
 _out_descr = [el.get("descr") for el in out_root.iter() if el.get("descr")]
-ok("the alt text survives apply unchanged (slice 3 owns translating it)",
+ok("the alt text survives apply unchanged (sub-step 7.3 owns translating it)",
    _src_descr == _out_descr and len(_out_descr) == 1,
    f"source {len(_src_descr)}, delivered {len(_out_descr)}")
 ok("the drawing itself survives",

@@ -1,4 +1,4 @@
-"""test_notes_gates.py - branch 11 slice 4b: the four notes-side gates (PLAN-2-step-b.md section 3.2,
+"""test_notes_gates.py - step 11's sub-step 4b: the four notes-side gates (PLAN-2-step-b.md section 3.2,
 blocks "4b - C13, C4, C14" and "SLICE 4b's WRITTEN PLAN"). Every input here is invented and built in
 a temporary directory; nothing is read from the corpus, and no document text is printed.
 
@@ -21,7 +21,7 @@ working tree's has its arms reported VOID, never passed: that is a self-comparis
   11  the definitions presence test: missing en_runs 2, with the flag 1, with tiling runs 0  (unchanged)
   12  a definitions section missing en_runs AND a gap elsewhere, with the flag: still 2
 
-  C4, verify_diligence.py - Step 4 + 4b counts what was DECLARED, validate_translations' own population
+  C4, verify_diligence.py - skill Step 4 + 4b counts what was DECLARED, validate_translations' own population
   13  a declared paragraph kept as the source and missing from the state FAILs
   14  a complete state PASSes and says how many were declared, changed and kept as the source
   15  a changed declared paragraph missing from the state still FAILs                       (unchanged)
@@ -201,7 +201,7 @@ if section("validate_en_runs.py", "C13 - validate_en_runs.py: the spans must TIL
        rc == 2, f"rc={rc}")
 
 # =====================================================================================================
-if section("verify_diligence.py", "C4 - verify_diligence.py: Step 4 + 4b counts what was DECLARED"):
+if section("verify_diligence.py", "C4 - verify_diligence.py: skill Step 4 + 4b counts what was DECLARED"):
     import re as _re
     COVER = _re.compile(r"^\s+(PASS|FAIL|WARN) — (.*(?:translated|declared) paragraphs.*)$", _re.M)
 
@@ -326,7 +326,7 @@ if section("validate_translations.py", "C30 - validate_translations.py: a leftov
     rc, out, state = validate(base + [filled], "vt_filled")
     ok(" 28 the same scaffold filled in passes and records its state                              (unchanged)",
        rc == 0 and state, f"rc={rc}, state written={state}")
-    # Step 3b scaffolds BEFORE translation and this script runs after every batch, so a tracked-change
+    # skill Step 3b scaffolds BEFORE translation and this script runs after every batch, so a tracked-change
     # paragraph due in a later batch still carries its placeholders -- and apply skips a paragraph with no
     # `en`, so none of its segments can reach the document. Refusing it would block batch 1's validation.
     pending = dict(seg_para, idx=5)

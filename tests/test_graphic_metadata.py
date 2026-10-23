@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 7 SLICE 3 — A19: translatable text held in GRAPHIC METADATA.
+"""SUB-STEP 7.3 — A19: translatable text held in GRAPHIC METADATA.
 
-Option 1's last slice, and it closes branch 7. A19's row: image alt text
+Option 1's last sub-step, and it closes step 7. A19's row: image alt text
 (`wp:docPr/@descr`), chart and diagram titles and SmartArt text are neither translated nor
 reported, and NOTHING ACKNOWLEDGES THE GAP -- the third container the skill never enumerates,
 beside A16 (`w:sdt`) and N1 (`w:smartTag`).
@@ -22,11 +22,11 @@ translatable graphic metadata IN ANY FORM, and a fixture result reported beside 
 run reads as corpus evidence -- which is the whole risk this paragraph exists to remove.
 
 THE ACCEPTANCE CONDITION IS THIS FILE, AND NOT tools/apply_corpus_diff.py. That tool drives
-`apply_translations_textmatch.py` over `word/document.xml`. This slice changes
+`apply_translations_textmatch.py` over `word/document.xml`. This sub-step changes
 `translate_headers_footers.py` and an extraction REPORT, so its arms are byte-identical BY
-DESIGN and a 13-of-13-unchanged result proves nothing whatever about A19. Slice 1 had to move
-a delivered byte; slice 2 had to move none and said so; slice 3 moves none through that tool.
-`tools/hf_corpus_diff.py` is this slice's corpus arm, and it reports on the script that
+DESIGN and a 13-of-13-unchanged result proves nothing whatever about A19. Sub-step 7.1 had to move
+a delivered byte; sub-step 7.2 had to move none and said so; sub-step 7.3 moves none through that tool.
+`tools/hf_corpus_diff.py` is this sub-step's corpus arm, and it reports on the script that
 actually changed.
 
 WHAT THIS FILE COVERS, stated because a green suite that quietly covers less than it appears
@@ -34,7 +34,7 @@ to is this project's most frequent failure:
 
   A19 the REPORT   every graphic surface in every part, with the route named or its absence
                    named -- body, header, footer, chart part, diagram part
-  A19 the FIX      alt text in HEADER and FOOTER parts translated through Step 8b's existing
+  A19 the FIX      alt text in HEADER and FOOTER parts translated through skill Step 8b's existing
                    --extract / --apply round-trip, which repack already bundles via
                    --headers-footers-dir
   the HINGE        a scaffold entry with NO `kind` key is still a paragraph entry. All 10
@@ -52,7 +52,7 @@ WHAT IT DOES NOT COVER, each a declared N/A with its reason:
 
   A RENDERED ARM. Neither surface shows on a page. Alt text is SPOKEN by a screen reader, not
         painted; a chart title in a part no body element references is not drawn at all.
-        Measured on slice 2 with a positive control firing that LibreOffice renders no
+        Measured on sub-step 7.2 with a positive control firing that LibreOffice renders no
         glossary placeholder text either, so a three-arm visual diff there was theatre. This
         is proved IN BYTES and said so. tools/render_diff.py's READ-ME says it in terms.
   WORD'S OWN BEHAVIOUR on a bound control. No instrument here has Word in the loop.
@@ -84,7 +84,7 @@ from lxml import etree                                                    # noqa
 
 ROOT = Path(__file__).resolve().parent.parent
 FIX = ROOT / "tests" / "fixtures" / "graphic-metadata.docx"
-# The fixture with NO graphic of any kind. It is the negative control for the whole slice,
+# The fixture with NO graphic of any kind. It is the negative control for the whole sub-step,
 # and it is READ ONLY -- test_no_delivered_byte_moves.py depends on its bytes.
 NOGRAPHIC = ROOT / "tests" / "fixtures" / "headers-footers.docx"
 
@@ -149,8 +149,8 @@ def stage(name, docx_path):
     """Copy a .docx into its own temp subdirectory.
 
     NEVER POINT A SCRIPT'S APPLY AT tests/fixtures/. The final pre-apply pass writes
-    .validate-state.json beside its input, and that reached the git index once on branch 6
-    slice 3 -- which broke `git switch` and therefore `git bisect`, the one tool this whole
+    .validate-state.json beside its input, and that reached the git index once on sub-step
+    6.3 -- which broke `git switch` and therefore `git bisect`, the one tool this whole
     test method exists to make possible.
     """
     d = TMP / name
@@ -170,7 +170,7 @@ if not FIX.is_file():
     sys.exit(3)
 
 print("=" * 96)
-print(f"BRANCH 7 SLICE 3 — A19 graphic metadata   [{args.variant} tree]")
+print(f"SUB-STEP 7.3 — A19 graphic metadata   [{args.variant} tree]")
 print("=" * 96)
 
 SRC = members(FIX)
@@ -238,7 +238,7 @@ else:
     ok("the report names the SURFACE, not just the text (wp:docPr/@descr)",
        "wp:docPr/@descr" in out)
     ok("the report names the VML surface (v:shape/@alt)", "v:shape/@alt" in out)
-    ok("the report sends header and footer surfaces to Step 8b", "Step 8b" in out)
+    ok("the report sends header and footer surfaces to skill Step 8b", "Step 8b" in out)
     ok("the report says in terms that some surfaces have NO ROUTE",
        "NO ROUTE" in out.upper())
     ok("the report cites register A19, so the gap is traceable", "A19" in out)
@@ -256,7 +256,7 @@ else:
        "GRAPHIC METADATA" not in (r2.stdout + r2.stderr).upper())
 
 # =========================================================================================
-# ARM 3 — THE FIX. Header and footer alt text goes round Step 8b's existing trip.
+# ARM 3 — THE FIX. Header and footer alt text goes round skill Step 8b's existing trip.
 # =========================================================================================
 print("\n" + "-" * 96)
 print("ARM 3 — translate_headers_footers.py carries graphic metadata OUT and BACK")
@@ -277,7 +277,7 @@ ok("the scaffold carries graphic-metadata entries at all", bool(gm),
    f"{len(gm)} of {len(entries)} entries")
 ok("exactly the THREE header/footer surfaces are offered for translation", len(gm) == 3,
    f"{len(gm)}: {sorted(e.get('surface', '?') for e in gm)}")
-ok("the body @descr is NOT offered — Step 8b reaches header and footer parts only",
+ok("the body @descr is NOT offered — skill Step 8b reaches header and footer parts only",
    all(e.get("source", "").split("/")[-1].startswith(("header", "footer")) for e in gm))
 _texts = {e.get("text") for e in gm}
 ok("the scaffold offers the header @descr", HDR_DESCR in _texts)
@@ -476,7 +476,7 @@ if (wd3 / "final" / "word" / "footer1.xml").is_file():
        [el.get(f"{{{W}}}prefixMappings") for el in fr.iter(f"{{{W}}}dataBinding")]
        == [el.get(f"{{{W}}}prefixMappings") for el in _src_fr.iter(f"{{{W}}}dataBinding")])
     # AND A BYTE-LEVEL FACT WORTH RECORDING RATHER THAN NOTICING LATER, and it is PRE-EXISTING
-    # rather than slice 3's: this script re-serialises the whole part, so lxml normalises
+    # rather than sub-step 7.3's: this script re-serialises the whole part, so lxml normalises
     # attribute-value escaping. The source's `&apos;` inside @prefixMappings comes back as a
     # literal apostrophe. Legal XML, identical once parsed -- which the two checks above
     # prove -- but the BYTES of a bound control's mappings do move, and no other instrument
@@ -523,7 +523,7 @@ for script in ("translate_headers_footers.py", "extract_paragraphs.py"):
 # ARM 9 — THE STEP DOCUMENT. A route nobody is told about is not a route.
 # =========================================================================================
 print("\n" + "-" * 96)
-print("ARM 9 — Step 8b tells the operator about the alt text")
+print("ARM 9 — skill Step 8b tells the operator about the alt text")
 print("-" * 96)
 for variant in ("uk", "us"):
     f = ROOT / variant / "skill-docs" / "08-aux-and-quality.md"
@@ -531,14 +531,14 @@ for variant in ("uk", "us"):
         void(f"{variant}/skill-docs/08-aux-and-quality.md", "file missing")
         continue
     txt = f.read_text(encoding="utf-8", errors="replace")
-    ok(f"{variant}: Step 8b gains a sub-step for graphic metadata", "8b.2b" in txt)
+    ok(f"{variant}: skill Step 8b gains a sub-step for graphic metadata", "8b.2b" in txt)
     ok(f"{variant}: it names the attribute surfaces",
        "@descr" in txt and "v:shape" in txt)
     ok(f"{variant}: it says a screen reader speaks the alt text",
        "screen reader" in txt.lower())
-    # NO RENUMBERING. Step 8b's sub-steps must read 8b.1 · 8b.2 · 8b.2a · 8b.2b · 8b.3.
+    # NO RENUMBERING. skill Step 8b's sub-steps must read 8b.1 · 8b.2 · 8b.2a · 8b.2b · 8b.3.
     order = [s for s in ("8b.1", "8b.2 ", "8b.2a", "8b.2b", "8b.3") if s in txt]
-    ok(f"{variant}: Step 8b's sub-steps are contiguous and nothing was renumbered",
+    ok(f"{variant}: skill Step 8b's sub-steps are contiguous and nothing was renumbered",
        [txt.index(s) for s in order] == sorted(txt.index(s) for s in order)
        and len(order) == 5, f"found {order}")
 
@@ -559,7 +559,7 @@ print("  A19's evidence is FIXTURE-ONLY. The corpus holds 14 graphics across 3 d
 print("  NOT ONE attribute of prose on any of them (@descr 0, @title 0, v:shape/@alt 0), so")
 print("  there is no real-document instance of translatable graphic metadata in ANY form.")
 print("  tools/apply_corpus_diff.py drives APPLY over word/document.xml and cannot see this")
-print("  slice at all; tools/hf_corpus_diff.py is the arm that reads the script that changed.")
+print("  sub-step at all; tools/hf_corpus_diff.py is the arm that reads the script that changed.")
 print("  NEITHER SURFACE RENDERS ON A PAGE — alt text is spoken, not painted. Proved in bytes.")
 # ONE VOID IS EXPECTED AND IS NOT A FAILURE: arm 7's Word-in-the-loop question. It is
 # recorded as owed, so it must not turn this suite red for ever -- but it must still be

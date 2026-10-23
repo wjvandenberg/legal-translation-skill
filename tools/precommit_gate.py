@@ -339,8 +339,8 @@ head("7. THE PUBLISHED TREES — ADDED LINES ONLY, AGAINST THE BASELINE")
 # WHY THIS SECTION EXISTS, AND WHY IT DIFFS RATHER THAN SCANS.
 #
 # Controls 1 to 6 cover the discovered documents and tools/. THEY DO NOT SCAN uk/ OR us/ AT
-# ALL -- the gate counts their files and stops there. That was defensible while no branch
-# changed them; branch 4 changes eight files, and branches 6, 7, 16 and 17 will change far
+# ALL -- the gate counts their files and stops there. That was defensible while no step
+# changed them; step 4 changes eight files, and steps 6, 7, 16 and 17 will change far
 # more. A confidentiality gate blind to the two directories that actually ship is the wrong
 # blind spot to keep.
 #
@@ -351,7 +351,7 @@ head("7. THE PUBLISHED TREES — ADDED LINES ONLY, AGAINST THE BASELINE")
 # validators -- a control nobody believes.
 #
 # DIFFING TO ADDED LINES DISSOLVES THAT. The pre-existing false positives are in the baseline
-# and cancel out; only what a branch INTRODUCES is judged. Measured on branch 4: the eight
+# and cancel out; only what a branch INTRODUCES is judged. Measured on step 4: the eight
 # whole files give 6 hits, the 102 added lines give 0. Same evidence, readable.
 #
 # It reports VOID rather than CLEAN when it cannot establish a baseline (CLAUDE.md 5.1: a
@@ -447,9 +447,9 @@ else:
                     ("email or phone", r"[\w.\-]+@[\w.\-]+\.\w+"),
                     ("three-part personal name",
                      r"\b[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}\b"),
-                    # NARROWED AT BRANCH 5, and the narrowing is a fix to the check rather
+                    # NARROWED AT STEP 5, and the narrowing is a fix to the check rather
                     # than a concession. The pattern was `[\w\-. ()]{3,}\.(?:docx?|pdf)\b`,
-                    # which fires on ANY prose mentioning a bare extension: branch 5's added
+                    # which fires on ANY prose mentioning a bare extension: step 5's added
                     # lines gave " the .docx" and " through left a partial .docx", neither of
                     # which contains a filename. Section 4 already labels that class benign in
                     # its own legend ("bare .docx extension mentions, no filenames") — but
