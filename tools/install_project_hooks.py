@@ -9,7 +9,16 @@ confidentiality gate and the cycle gate, and this project's own `pre-push`.
 RENAMED FROM `install_hooks.py` ON 2026-09-29 (Wouter). It shared the house script's name and
 nothing else, and `check_checkers.py` v18 began tracking that name, so it read this file as an
 UNKNOWN copy of the house installer -- a comparison of two different programs. The rename
-removes the clash itself; `verify.config.json` declares the house installer absent, with why.
+removes the clash itself. The house installer has sat beside this file in `tools/` since
+2026-09-30 (3), its `--check` an entry point of the full run, and this file calls two of its checks.
+
+A PUSH CHECK THAT CANNOT RUN REFUSES EVERY PUSH, AND SAYS SO HERE (2026-10-23). The pre-push's
+full-run block, the house's, runs `cycle_evidence.py` with `house.python`, else `uv run python`,
+and since the house's v11 never a bare `python` -- so with neither, or with no checker, every
+push is refused, found out only at push time. The house installer warns of both at install
+time; this project installs with this file, so it calls the same two checks rather than
+restating them. Read from THIS process's PATH, which may not be the push's: a warning, not a
+guarantee.
 
 ONLY GIT HOOKS ARE INSTALLED. `tools/hooks/` also holds `evidence_guard.py`, a Claude Code
 PreToolUse hook wired through `.claude/settings.json`, which Git never runs. A hook Git runs is
@@ -35,9 +44,12 @@ import sys
 from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+sys.dont_write_bytecode = True          # importing the house installer must leave no __pycache__ in tools/
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "tools" / "hooks"
 CHECK = "--check" in sys.argv
+sys.path.insert(0, str(ROOT / "tools"))
+from install_hooks import checker_missing, interpreter_missing  # noqa: E402  (the house's, see the docstring)
 
 r = subprocess.run(["git", "rev-parse", "--git-path", "hooks"], capture_output=True,
                    text=True, cwd=ROOT)
@@ -75,6 +87,10 @@ for src in sorted(SRC.iterdir()):
         state = "NOT EXECUTABLE"
     else:
         state = "installed, executable"
+    for why, said in ((checker_missing(ROOT, src), "NO CHECKER"), (interpreter_missing(ROOT, src), "NO PYTHON")):
+        if why:
+            problems.append(why)
+            state += f" - BUT {said} FOR ITS PUSH CHECK: every push will be refused"
     print(f"  {src.name:<14} {state}")
 
 print()
@@ -83,7 +99,8 @@ print("    pre-commit  runs the confidentiality gate and blocks on failure OR on
 print("                that could not run at all.")
 print("    pre-push    refuses a direct push to main, because every branch goes through a")
 print("                reviewed pull request; and refuses any push no full run vouches for -")
-print("                tools/cycle_evidence.py full, on the pushed commit's clean tree.")
+print("                tools/cycle_evidence.py full, on the pushed commit's clean tree. Its check")
+print("                runs with git config house.python, else uv - never a bare python.")
 print("    Both are LOCAL accident guards. They do not travel with a clone and either can")
 print("    be bypassed. Server-side branch protection on main is the real control, live since")
 print("    the repository went public - see the note in tools/hooks/pre-push.")

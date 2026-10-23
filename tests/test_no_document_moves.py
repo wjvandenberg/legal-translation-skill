@@ -11,7 +11,9 @@ WHAT IT REFUSES, AND WHY IT IS WIDER THAN THE RULE. Code cannot show what kind o
 scan refuses a move or rename of ANY file: os.rename, os.renames, os.replace, shutil.move, the same names
 imported with `from ... import`, and a one-argument .rename(x) or .replace(x) with no keywords -- which is
 Path.rename and Path.replace, where str.replace takes two arguments and datetime.replace takes keywords. A
-genuine need to move a file that is not a document goes in ALLOW below, with its reason; the list is empty.
+genuine need to move a file that is not a document goes in ALLOW below, with its reason. AN ENTRY THAT MATCHES NO
+MOVE FAILS TOO: it is keyed by line, so an adopted copy whose lines shifted would otherwise leave a declaration
+standing over nothing while the moved call reads as new.
 
 THE POPULATION IS THE TRACKED SET, enumerated by git with core.quotePath=false (a path git quotes is not a
 path), and every listed file that cannot be read or parsed is REPORTED, never skipped. Untracked scratch in
@@ -33,7 +35,14 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="repla
 sys.dont_write_bytecode = True
 
 ROOT = Path(__file__).resolve().parent.parent
-ALLOW = {}          # {"path/to/file.py:LINE": "why this move of a non-document file is needed"}
+# {"path/to/file.py:LINE": "why this move of a non-document file is needed"}
+ALLOW = {
+    # 2026-10-23, the house's install_hooks.py v11, adopted byte for byte: its selftest's push arm (g) takes the
+    # checker away by renaming a SCRATCH repository's tools/ folder - cycle_evidence.py and house_common.py only -
+    # and back. Never a document, and a re-copy that moves these lines turns this suite red until re-declared.
+    "tools/install_hooks.py:547": "the house selftest renames a scratch repository's tools/ folder away",
+    "tools/install_hooks.py:549": "the house selftest renames that scratch tools/ folder back",
+}
 MODULE_CALLS = {("os", "rename"), ("os", "renames"), ("os", "replace"), ("shutil", "move")}
 
 
@@ -89,15 +98,19 @@ if len(got_planted) != 6 or got_quiet:
 ls = subprocess.run(["git", "-c", "core.quotePath=false", "ls-files", "-z", "--", "*.py"], cwd=str(ROOT),
                     capture_output=True, check=True).stdout.decode("utf-8")
 listed = sorted(n for n in ls.split("\0") if n)
-unread, findings = [], []
+unread, findings, allowed_seen = [], [], set()
 for rel in listed:
     try:
         src = (ROOT / rel).read_text(encoding="utf-8")
         for line, what in moves(src, rel):
             if f"{rel}:{line}" not in ALLOW:
                 findings.append(f"{rel}:{line}  {what}")
+            else:
+                allowed_seen.add(f"{rel}:{line}")
     except (OSError, UnicodeDecodeError, SyntaxError) as exc:
         unread.append(f"{rel}  ({type(exc).__name__})")
+findings += [f"{key}  ALLOW declares a move here and there is none - the declaration is stale"
+             for key in sorted(set(ALLOW) - allowed_seen)]
 print(f"  tracked .py files listed {len(listed)} · read and parsed {len(listed) - len(unread)} · "
       f"not read {len(unread)} · allowed moves declared {len(ALLOW)}")
 for u in unread:
