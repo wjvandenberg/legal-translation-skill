@@ -159,7 +159,7 @@ if WRITE:
                   "text here, but a per-document file inventory is still a description of "
                   "the corpus, so this lives outside the repository with the runs it "
                   "describes.",
-         "_frozen": "These are a BASELINE. Do not edit them. Branches 15 and 16 change the "
+         "_frozen": "These are a BASELINE. Do not edit them. Steps 15 and 16 change the "
                     "notes format and must REGENERATE them from the archived runs, never "
                     "by re-translating -- re-translating moves the baseline, which is the "
                     "one thing a baseline may not do.",

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """PROVE A SCRIPT EDIT CHANGED ONLY TEXT — no control flow, no logic, no behaviour.
 
-CLAUDE.md §5.4: "a change claimed non-behavioural is PROVED byte-for-byte or not claimed". Branch 3 claims
-exactly that about one script edit -- it rewords the Step 6 gate's remedy message and touches
+CLAUDE.md §5.4: "a change claimed non-behavioural is PROVED byte-for-byte or not claimed". Step 3 claims
+exactly that about one script edit -- it rewords the skill Step 6 gate's remedy message and touches
 nothing else. A diff cannot prove it; a reader saying "looks like only a string" is the kind
 of assurance this project has already been bitten by.
 

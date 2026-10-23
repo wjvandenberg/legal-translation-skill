@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""notes_corpus_arm.py - branch 11 slice 4b's corpus acceptance: the four notes-side gates, RUN over the
+"""notes_corpus_arm.py - step 11's sub-step 4b's corpus acceptance: the four notes-side gates, RUN over the
 13 frozen workdirs (PLAN-2-step-b.md section 3.2, block "4b - C13, C4, C14", its CHECKED AGAINST line).
 
 Each workdir's paragraphs.json and .validate-state.json are COPIED into a temporary folder and the
@@ -9,7 +9,7 @@ which quotes the document, is parsed and discarded.
 
   C13  validate_en_runs.py over each copy: every paragraph carrying en_runs TILES en -- pinned 729 of
        729, none refused -- and a second, independent reader of the same JSON must agree with it
-  C4   verify_diligence.py over each copy: Step 4 + 4b PASSes on 13 of 13 by declaration, D07 reading
+  C4   verify_diligence.py over each copy: skill Step 4 + 4b PASSes on 13 of 13 by declaration, D07 reading
        52 declared, 11 changed, 41 kept as the source
   C14  coalesce_fragmented_tcs.py --dry-run over each copy: clusters D04 3, D02 2, D11 1, every other 0,
        and the examined-against-scaffolded line on every run
@@ -179,7 +179,7 @@ else:
        tot == 729 and refused == 0 and all(r["ver_rc"] in (0, 1) for r in rows.values()))
     ok(f"C13: the second reader agrees, {tot2} of {tot}", tot2 == tot)
     passes = [k for k, r in rows.items() if r["c4_sev"] == "PASS" and "declared" in r["c4"]]
-    ok(f"C4: Step 4 + 4b PASSes by declaration on 13 of 13 ({len(passes)})", len(passes) == 13,
+    ok(f"C4: skill Step 4 + 4b PASSes by declaration on 13 of 13 ({len(passes)})", len(passes) == 13,
        f"not: {[k for k in rows if k not in passes]}")
     d07 = rows.get("D07", {}).get("c4", {})
     ok("C4: D07 reads 52 declared, 11 changed, 41 kept as the source",

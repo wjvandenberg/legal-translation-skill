@@ -180,6 +180,88 @@ CODE_SWEPT = {
     "tools/reachability.py": [],
     "tools/stepb_audit.py": [],
     "tests/probe-5b/make_probe_documents.py": [],
+    # rename (d2b), 2026-10-23: every tool of this project's own but the census, which joins last by phrases - 317
+    # logged swaps in 24 of them, the other 18 holding no old word in living text
+    "tools/apply_corpus_diff.py": [],
+    "tools/audit_branches.py": [
+        ("phrase", "audit_branches.py --branch 0", "its usage line: git's own --branch flag"),
+    ],
+    "tools/audit_register.py": [],
+    "tools/changelog_confidentiality.py": [],
+    "tools/check_coverage.py": [],
+    "tools/claudemd_claims.py": [],
+    "tools/claudemd_disposal.py": [],
+    "tools/confirm_failure_chains.py": [],
+    "tools/corpus_fingerprint.py": [],
+    "tools/delivered_corpus_arm.py": [],
+    "tools/descriptor_shape_sweep.py": [],
+    "tools/evidence_ls.py": [],
+    "tools/extraction_corpus_arm.py": [],
+    "tools/freeze_intermediates.py": [],
+    "tools/gate_replay.py": [],
+    "tools/hf_corpus_diff.py": [],
+    "tools/hooks/evidence_guard.py": [],
+    "tools/inplace_guard.py": [],
+    "tools/install_project_hooks.py": [],
+    "tools/keep_declarations.py": [],
+    "tools/leakage_scan.py": [],
+    "tools/md_tables.py": [],
+    "tools/notes_corpus_arm.py": [],
+    "tools/numbering_corpus_arm.py": [],
+    "tools/parity_check.py": [],
+    "tools/postprocess_corpus_arm.py": [],
+    "tools/precommit_gate.py": [],
+    "tools/publication_check.py": [],
+    "tools/qc_census.py": [],
+    "tools/ratio_corpus_arm.py": [],
+    "tools/render_diff.py": [],
+    "tools/scan_trees.py": [],
+    "tools/script_committability.py": [],
+    "tools/sibling_dirs.py": [],
+    "tools/stepb_audit3.py": [],
+    "tools/stepb_harvest.py": [],
+    "tools/stepb_metacheck.py": [
+        ("phrase", "branch 19, the last of the twenty", "a mutation of a dated record line in the build plan"),
+        ("phrase", "branch 27, the last of the twenty", "the same mutation, its planted variant"),
+    ],
+    "tools/stepb_refute.py": [],
+    "tools/string_only_edit.py": [],
+    "tools/verify_charter_continuity.py": [],
+    "tools/xdoc_signs.py": [],
+    "tools/xref_check.py": [],
+    # THE CENSUS LAST, BY PHRASES, NO SWAP: every old word in its own living text is a MENTION - the words it counts,
+    # the register's phrases it keeps, the phrases kept above, and its selftest's plants, all in the one form 'a
+    # planted ...'. Masked in this order, so the longer docstring phrase goes before the shorter one inside it. KNOWN
+    # LIMIT: a phrase declared here always matches its own declaration, so the stale-phrase refusal cannot fire for
+    # this one file - a phrase whose other occurrence is gone stays declared until somebody reads this list.
+    "tools/vocabulary_census.py": [
+        ("phrase", '"slice"', "the word in quotes, as the docstring and a label name it"),
+        ("phrase", "(`branch 7`, `BRANCHES 15`, `branch D2`)", "the docstring's examples of what is counted"),
+        ("phrase", "any `slice`", "the docstring's example"),
+        ("phrase", "the dropped Step C (`Step C`, `the verification run`)", "the docstring's examples"),
+        ("phrase", "|SLICES?)", "the counting pattern itself"),
+        ("phrase", '"Step C"', "the counting pattern's label"),
+        ("phrase", "tooling belong to branch 1", "a record paragraph's anchor in the register"),
+        ("phrase", "APPLY SLICES THE STRIPPED", "a register phrase kept in its own sense"),
+        ("phrase", "then slices *that*", "a register phrase kept in its own sense"),
+        ("phrase", "each span slices its neighbour", "a register phrase kept in its own sense"),
+        ("phrase", "the string apply slices", "a register phrase kept in its own sense"),
+        ("phrase", "OWN slice edge", "a register phrase kept in its own sense"),
+        ("phrase", "onto the translated slice", "a register phrase kept in its own sense"),
+        ("phrase", "*read-only* verification run", "a register phrase kept in its own sense"),
+        ("phrase", "a segment's slice of the string", "the reason given for two of them"),
+        ("phrase", "the dropped Step C", "the reason given for another"),
+        ("phrase", "its 'branch 2' names", "the A3 analysis's record, quoted in its reason"),
+        ("phrase", "audit_branches.py --branch 0", "a phrase kept above, declared here"),
+        ("phrase", "branch 19, the last of the twenty", "a phrase kept above, declared here"),
+        ("phrase", "branch 27, the last of the twenty", "a phrase kept above, declared here"),
+        ("phrase", "a planted branch", "the selftest's plants"),
+        ("phrase", "a planted slice", "the selftest's plants"),
+        ("phrase", "a planted Step C", "the selftest's plants"),
+        ("phrase", "four slices", "a quotation of a dated verdict the selftest anchors on"),
+        ("phrase", "slice(1, 2)", "Python's own built-in, in a planted source"),
+        ("phrase", "slices the text", "Python's own sense, in a planted source"),
+    ],
 }
 _TEXT_TOKENS = {tokenize.STRING} | {getattr(tokenize, n) for n in ("FSTRING_MIDDLE", "TSTRING_MIDDLE")
                                     if hasattr(tokenize, n)}
@@ -416,11 +498,11 @@ def selftest():
         got = len(census("PLAN-2-step-b.md", "\n".join(planted), pspans)[2]) - pbase
         checks.append((f"the plan: {word!r} planted in {where} is {'counted' if want else 'left alone'}", got == want))
     planted = list(plines)
-    planted[row_93] += " branch 7"
+    planted[row_93] += " a planted branch 7"
     got = len(census("PLAN-2-step-b.md", "\n".join(planted), pspans)[2]) - pbase
     checks.append(("the plan: an old word added to a 9.3 row is left alone", got == 0))
     planted = list(plines)
-    planted.insert(order + 1, "| 3 the planted row | branch 7 |")
+    planted.insert(order + 1, "| 3 the planted row | a planted branch 7 |")
     got = len(census("PLAN-2-step-b.md", "\n".join(planted), pspans)[2]) - pbase
     checks.append(("the plan: a 9.3-shaped row OUTSIDE 9.3 is counted (the row span is scoped)", got == 1))
     for label, bad_span in (("a brief-tail whose section has no brief", ("brief-tail", ("### 3.1 ", BRIEF), "x")),
@@ -520,11 +602,11 @@ def selftest():
     src = ('"""A docstring: a planted branch 7."""\n'
            'x = "a planted slice"\n'
            'y = f"a planted Step C {x} beside"\n'
-           '# an undated comment: branch 8\n'
+           '# an undated comment: a planted branch 8\n'
            'branch_7 = slice(1, 2)  # never read: the names on this line\n'
            '\n'
            '# 2026-01-01: a dated note\n'
-           '# whose second line holds branch 9\n'
+           '# whose second line holds a planted branch 9\n'
            'z = "kept: string slicing slices the text"\n')
     keep = [("phrase", "slices the text", "Python's own sense")]
     got = sorted({n for n, _, _ in code_census("synthetic", src, keep)[1]})
@@ -553,9 +635,9 @@ def selftest():
     checks.append(("code: tests/run_tests.py is the project's, in scope; tools/run_tests.py the house's, out",
                    "tests/run_tests.py" in cs and "tools/run_tests.py" not in cs))
     trail = ('x = 1  # 2026-01-01: a dated trailing note\n'
-             'y = 2  # an undated trailing comment: branch 7\n'
+             'y = 2  # an undated trailing comment: a planted branch 7\n'
              '# a standalone note dated 2026-01-01\n'
-             'z = 3  # trailing the next line, undated: branch 8\n')
+             'z = 3  # trailing the next line, undated: a planted branch 8\n')
     tgot = sorted({n for n, _, _ in code_census("synthetic", trail, [])[1]})
     checks.append(("code: a trailing comment is its own unit - a dated neighbour exempts neither", tgot == [2, 4]))
     # the house's copies held against the shared folder: a tools/ script named there and missing here would be swept

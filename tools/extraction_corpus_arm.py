@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 8's CORPUS ARM — the extraction-completeness check over the real documents.
+"""STEP 8's CORPUS ARM — the extraction-completeness check over the real documents.
 
 WHY THIS TOOL EXISTS RATHER THAN A RUN OF apply_corpus_diff.py, AND IT IS DECLARED HERE
-BEFORE ANY RESULT IS READ. `tools/apply_corpus_diff.py` drives APPLY. Branch 8 changes
+BEFORE ANY RESULT IS READ. `tools/apply_corpus_diff.py` drives APPLY. Step 8 changes
 neither apply nor any delivered byte -- it adds a read-only mode to validate_apply and a
 step-document instruction -- so that tool's two arms are byte-identical BY DESIGN and its
 "13 byte-identical, 0 unexplained" is a REGRESSION CHECK that proves nothing whatever about
-this branch. An all-quiet run there would be exactly what a stale pin produces. This file is
+this step. An all-quiet run there would be exactly what a stale pin produces. This file is
 the acceptance instrument; that one is the guard that nothing else moved.
 
 WHAT PLAN-2-step-b.md SECTION 4 PREDICTS, quoted so the result is judged against a
-condition written before it was measured: "Branch 8 is self-verifying against the corpus:
+condition written before it was measured: "Step 8 is self-verifying against the corpus:
 run it over all eleven frozen intermediates and it must report zero loss on every one,
 since the deliverables were graded complete. Any hit is either a real historical loss or a
 bug in the check -- and either result is worth having."
@@ -27,7 +27,7 @@ before the check was written (temp/probe_b8_*.py):
 
 The auxiliary figure is a real historical gap and is register C12's defect stated as a
 measurement. It is REPORTED here, not failed on: these runs froze at different steps, and a
-workdir that never reached Step 8 legitimately has no header/footer capture.
+workdir that never reached skill Step 8 legitimately has no header/footer capture.
 
 THE POSITIVE CONTROL IS NOT OPTIONAL. A body arm that reports zero everywhere has to be
 shown capable of reporting something else, or its zeros are void rather than clean. The
@@ -142,7 +142,7 @@ def parse(out):
 
 
 print("=" * 96)
-print(f"BRANCH 8 CORPUS ARM — extraction completeness over the frozen intermediates "
+print(f"STEP 8 CORPUS ARM — extraction completeness over the frozen intermediates "
       f"({args.variant})")
 print("=" * 96)
 print("  apply_corpus_diff.py CANNOT SEE THIS BRANCH: it drives apply, and nothing here")
@@ -218,7 +218,7 @@ for pid, frac, rc, body, aux, parts, _w in rows:
 
 print("\n" + "-" * 96)
 print("  AUXILIARY — register C12, reported and not failed on: these runs froze at")
-print("  different steps, and a workdir that never reached Step 8 legitimately has no")
+print("  different steps, and a workdir that never reached skill Step 8 legitimately has no")
 print("  header/footer capture.")
 print("-" * 96)
 part_tally = {}

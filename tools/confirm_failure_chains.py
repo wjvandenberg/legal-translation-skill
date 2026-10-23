@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """THE THREE-COMMAND CONFIRMATION — are the two predicted failure chains CLOSED in execution?
 
-**THIS TOOL'S QUESTION INVERTED AT BRANCH 5, AND THE INVERSION IS THE POINT.** It was built
-to prove that two predicted failure chains were real, and it did: branch 5's own work waited
-on that confirmation. Branch 5 then fixed both. A tool that asserts a defect exists becomes a
+**THIS TOOL'S QUESTION INVERTED AT STEP 5, AND THE INVERSION IS THE POINT.** It was built
+to prove that two predicted failure chains were real, and it did: step 5's own work waited
+on that confirmation. Step 5 then fixed both. A tool that asserts a defect exists becomes a
 tool that FAILS when the defect is repaired — so it now asserts the repair instead, and keeps
 failing if either chain ever reopens. The alternative was to delete it, which would have
 thrown away the only standing regression guard on both fixes.
@@ -14,14 +14,14 @@ thrown away the only standing regression guard on both fixes.
   CHAIN 2  In one script the integrity guard was invoked BELOW `if __name__ == "__main__"`,
            so on the only path that exists it fired after the work it protects had run.
            Must now sit ABOVE it, in all twenty scripts.
-  CONTROL  The guard itself works when it is reached. UNCHANGED BY BRANCH 5 and deliberately
+  CONTROL  The guard itself works when it is reached. UNCHANGED BY STEP 5 and deliberately
            left alone: without it the two findings could have been dismissed as "the guard is
            broken anyway", and with the fixes in place it is what proves the repairs did not
            quietly disable the thing they were protecting.
 
 CHAIN 1 IS NOW MEASURED BEHAVIOURALLY RATHER THAN BY PROXY, and that change was forced. The
 original test asked whether 3 appeared in the `block_codes` sets — a sound proxy while that
-was the only mechanism, and a WRONG one afterwards: branch 5 blocks exit 3 in an explicit
+was the only mechanism, and a WRONG one afterwards: step 5 blocks exit 3 in an explicit
 test BEFORE block_codes is consulted, so the sets still omit 3 and the proxy still reported
 the defect as live. Running the helper answers the question the tool's own title asks.
 
@@ -75,7 +75,7 @@ def strip_comments(text):
     A REGEX OVER SOURCE COUNTS A MECHANISM WHEREVER A MESSAGE MERELY DESCRIBES IT, and this
     tool has now been bitten by that twice on the same line. The first pass matched
     `block_codes={set}` in the helper's own DOCSTRING and reported "3 of 3" where the truth
-    was 2 of 2; the digit filter below fixed that. Branch 5 then added a COMMENT explaining
+    was 2 of 2; the digit filter below fixed that. Step 5 then added a COMMENT explaining
     the exit-3 test, which contains the literal `block_codes={2}` -- digits and all -- and
     both this tool and tools/audit_branches.py went straight back to reporting 3 sites.
     Filtering on shape cannot separate code from prose about code; tokenising can.
@@ -247,7 +247,7 @@ print("  Both chains are CLOSED in execution, and the control shows the guard it
 print("  works — which is the half that matters after a repair, because a fix that disabled")
 print("  the detection would look identical to a fix that made the caller respect it.")
 print()
-print("  A REFINEMENT, CORRECTED AT BRANCH 5 — the earlier version of this text")
+print("  A REFINEMENT, CORRECTED AT STEP 5 — the earlier version of this text")
 print("  over-generalised from a single file. A truncated script is always caught, but by")
 print("  two mechanisms and only one of them explains itself: where the truncated file still")
 print("  COMPILES the guard runs and exits 3 with a diagnosis, and where it does not Python")

@@ -5,7 +5,7 @@ The question the build plan says must be answered ONCE, AS A TABLE, before any f
 is built -- "otherwise the harness proves the checks that exist can fire and says nothing
 about the steps that have none."
 
-It has never been asked, and the reason it matters is on the record: Step 4c tells the
+It has never been asked, and the reason it matters is on the record: skill Step 4c tells the
 operator to find every broken cross-reference marker and repair it. The marker string appears
 in exactly one file in the whole package -- the step document describing it -- and in none of
 the twenty scripts. There is nothing to give a failing input to, and nothing that would
@@ -281,7 +281,7 @@ for n in sorted(scripts):
             elif re.fullmatch(r"2 if \w*strict\w* else 1", r):
                 flag = "   <-- CORRECT: matches the documented contract"
             print(f"      return {r}{flag}")
-        # BRANCH 5 IMPLEMENTED THE PRESCRIPTION, so this stopped being advice and became an
+        # STEP 5 IMPLEMENTED THE PRESCRIPTION, so this stopped being advice and became an
         # assertion. Left as a standing check rather than deleted: it is the only thing that
         # would notice the line reverting to `1 if strict else 0`, which is how the defect
         # arrived in the first place — a contract documented in one place and contradicted in

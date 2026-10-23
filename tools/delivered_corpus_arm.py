@@ -1,4 +1,4 @@
-"""delivered_corpus_arm.py - branch 11 slice 1's acceptance, over the real corpus, both arms.
+"""delivered_corpus_arm.py - sub-step 11.1's acceptance, over the real corpus, both arms.
 
 WHY THIS TOOL EXISTS. `validate_apply.py --delivered` compares the DELIVERED document against
 what the notes declared, and nothing already in tools/ can drive it: apply_corpus_diff swaps
@@ -23,7 +23,7 @@ TWO ARMS, STATED BEFORE MEASURING (Wouter, 2026-09-24):
       matched source and the frozen notes, post_process with its journal, then the reorder --
       and every finding printed for a person to explain against a register row.
 
-SLICE 2a (2026-09-25) ADDS, STATED BEFORE MEASURING (PLAN-2-step-b.md section 3.2):
+STEP 11's SUB-STEP 2a (2026-09-25) ADDS, STATED BEFORE MEASURING (PLAN-2-step-b.md section 3.2):
   (a) J1's U+200B at the register's own counts, in the ACCEPT reading -- D01 7, D02 5, D10 11,
       D11 48, D03B 1 -- and none on any other document; D03B 12 the one declared-vs-delivered
       bracket finding; A15's signature at D08 29 and 39 alone, COUNTED; no delivered reading
@@ -33,7 +33,7 @@ SLICE 2a (2026-09-25) ADDS, STATED BEFORE MEASURING (PLAN-2-step-b.md section 3.
       journal, every member of the repacked .docx, by content) and every exit code is compared.
       A REF whose scripts equal the working tree's is a self-comparison and VOID, never a pass.
 
-SLICE 2b (2026-09-25 (3)) CHANGES WHAT (b) ASSERTS, DELIBERATELY, as branch 10 did per slice:
+STEP 11's SUB-STEP 2b (2026-09-25 (3)) CHANGES WHAT (b) ASSERTS, DELIBERATELY, as step 10 did per sub-step:
 repack now scrubs U+200B and blocks on a source-language remnant, so bytes MUST move -- by a
 U+200B removal and nothing else, and only where the pinned tree's delivery carried one. Per
 workdir: every exit code equal; every output identical or, for a .docx member, the pinned
@@ -45,7 +45,7 @@ AND THE CHECK NOW READS THE REPACKED .docx wherever repack produced one: the reo
 read before repack, so it cannot see a scrub that happens inside repack. A stopped document is
 read from the XML, SAID to be stopped, and never counted as a pass.
 
-SLICE 3's EXPLORATION (2026-09-25 (4)) ADDS --sides, WHICH MEASURES AND ASSERTS NOTHING YET: the
+SUB-STEP 11.3's EXPLORATION (2026-09-25 (4)) ADDS --sides, WHICH MEASURES AND ASSERTS NOTHING YET: the
 side parts -- headers, footers, comments, footnotes, endnotes, the glossary -- per document, each
 read with its own script's reader, against the declarations and the ORIGINAL, references counted by
 id in every part; arm (a) on the July deliveries, arm (b) with headers, footers and comments
@@ -54,7 +54,7 @@ handed to repack but the glossary it refuses to go without, and no declaration r
 and their pinned assertions do not run. PLAN-2-step-b.md section 3.2 holds what it found and the
 acceptance the build pins here.
 
-SLICE 3a (2026-09-28) PINS IT. `validate_apply.py --delivered --original` now has a side-part arm,
+STEP 11's SUB-STEP 3a (2026-09-28) PINS IT. `validate_apply.py --delivered --original` now has a side-part arm,
 and --sides runs it beside the measurement -- arm (a) on the July delivery .docx, arm (b) on the
 repacked one, its declarations beside the notes and, under --skip-step8, none -- and asserts the
 acceptance Wouter approved before the build (PLAN-2-step-b.md section 3.2):
@@ -68,13 +68,13 @@ acceptance Wouter approved before the build (PLAN-2-step-b.md section 3.2):
   (c) --skip-step8: a kept-as-source finding on every letter-bearing side paragraph, per document,
       at the counts measured before the build; none on a page-number-only footer; nothing else but
       D08's three orphans.
-  SINCE SLICE 4a, D08's THREE ORPHANS ARE GONE FROM (b) AND (c): they were B10's lost references,
+  SINCE STEP 11's SUB-STEP 4a, D08's THREE ORPHANS ARE GONE FROM (b) AND (c): they were B10's lost references,
   and the guard keeps the wrappers holding them (re-pinned on an assumption put to Wouter -- PIN_B).
-A side finding is kept apart from the body's numbers everywhere below, so slice 1's totals mean
-what they meant. And --ref now asks for NO movement when the pin already carries slice 2b's scrub
+A side finding is kept apart from the body's numbers everywhere below, so sub-step 11.1's totals mean
+what they meant. And --ref now asks for NO movement when the pin already carries sub-step 2b's scrub
 (`git merge-base --is-ancestor`), which is 3a's sense: the check only reads.
 
-SLICE 4a (2026-09-28 (4)) CHANGES WHAT --ref ASSERTS AGAIN, for branch 10's reason: strip_noop now
+STEP 11's SUB-STEP 4a (2026-09-28 (4)) CHANGES WHAT --ref ASSERTS AGAIN, for step 10's reason: strip_noop now
 keeps a tracked-change wrapper whole while it holds anything besides runs, run properties and text
 (register B10), so against a pin from before that guard the bytes MUST move -- on D08 alone, both
 variants, by restored wrappers and nothing else. An XML member moved that way is OURS WITH THE PIN'S
@@ -87,11 +87,11 @@ disagree is VOID. Beside the bytes: D08's comment anchors equal the original's, 
 build; and with --ref the delivered check also reads the PIN's build, so the text-and-anchor
 blocking findings are compared per document -- B10's two gone on D08, nothing gained anywhere.
 
-REGISTER I-36 (2026-10-08 (2)) TEACHES --sides STEP 10's WIRING, which its pins predated. Repack now refuses a
+REGISTER I-36 (2026-10-08 (2)) TEACHES --sides skill STEP 10's WIRING, which its pins predated. Repack now refuses a
 delivery its check finds wrong, so a document stops in one of two places: an EARLIER gate (post_process's drift
-gate, slice 2b's STOP_2B, as before) or the DELIVERED gate, by design -- in (b) D03B, its glossary undeclared, or
+gate, sub-step 2b's STOP_2B, as before) or the DELIVERED gate, by design -- in (b) D03B, its glossary undeclared, or
 nothing once --declare-glossary-kept declares it; in (c) every document whose side parts carry letters (PIN_C),
-because an operator who skips Step 8 declares nothing, and since this change the chain hands repack no declaration
+because an operator who skips skill Step 8 declares nothing, and since this change the chain hands repack no declaration
 either (it had been copying July's beside the notes before repack and deleting them only after). Whether our repack
 carries that gate is settled by ancestry against START_WIRING and by its own source, a disagreement VOID. A refused
 document's findings are read from the REFUSAL -- one line per blocking class, checked against the total it states --
@@ -121,11 +121,11 @@ folder: every input is copied into a temporary directory first.
     uv run --with lxml python tools/delivered_corpus_arm.py --variant us
     uv run --with lxml python tools/delivered_corpus_arm.py --arm a      # one arm
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref 3654842 --doc D02 --doc D03
-    uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref bc9c5d8 --doc D08   # slice 4a
-    uv run --with lxml python tools/delivered_corpus_arm.py --sides --arm a       # slice 3, measured
+    uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref bc9c5d8 --doc D08   # sub-step 4a
+    uv run --with lxml python tools/delivered_corpus_arm.py --sides --arm a       # sub-step 11.3, measured
     uv run --with lxml python tools/delivered_corpus_arm.py --sides --arm b --skip-step8 --doc D02
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref be50e12 --declare-glossary-kept \
-        --declare-language                                                                  # slice 12a
+        --declare-language                                                                  # sub-step 12.1
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref c4639fa --declare-glossary-kept   # 13.2
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref 8ad07c3 --declare-glossary-kept   # 13.5
 """
@@ -163,35 +163,35 @@ ap.add_argument("--arm", choices=("a", "b", "both"), default="both")
 ap.add_argument("--doc", action="append", help="limit to these corpus doc-ids (run in batches)")
 ap.add_argument("--ref", default=None, help="arm (b): also rebuild with this commit's scripts, compare bytes")
 ap.add_argument("--sides", action="store_true",
-                help="slice 3 exploration: MEASURE the side parts per document, report only; "
+                help="sub-step 11.3 exploration: MEASURE the side parts per document, report only; "
                      "the body arms and their pinned assertions do not run")
 ap.add_argument("--skip-step8", action="store_true",
-                help="with --sides --arm b: C6's scenario -- the operator skips Step 8 entirely, so "
+                help="with --sides --arm b: C6's scenario -- the operator skips skill Step 8 entirely, so "
                      "repack gets NO side part but the glossary it refuses to go without, passed "
                      "as the original's (its keep-as-is route)")
 ap.add_argument("--declare-glossary-kept", action="store_true",
-                help="STEP 10's WIRING, sub-step 2: where the original carries a text-bearing glossary, "
+                help="skill STEP 10's WIRING, sub-step 2: where the original carries a text-bearing glossary, "
                      "the workdir declares none, and repack is given the ORIGINAL's own glossary rather "
                      "than July's translation (register I-35), write glossary_translations.json beside the notes "
-                     "with every letter-bearing text mapped to itself -- slice 3b's keep route -- so the "
+                     "with every letter-bearing text mapped to itself -- sub-step 3b's keep route -- so the "
                      "delivered check reads the glossary as DECLARED kept. Counts only are printed")
 ap.add_argument("--declare-language", action="store_true",
-                help="BRANCH 12 SLICE 12a, arm (b): declare each workdir's TRUE source language beside the notes "
-                     "through the tree's own Step 1c command (sub-step 13.4: so D07, english, runs in the "
-                     "variant-conversion mode), run Step 4d and Step 9 as well, and read what every "
+                help="SUB-STEP 12.1, arm (b): declare each workdir's TRUE source language beside the notes "
+                     "through the tree's own skill Step 1c command (sub-step 13.4: so D07, english, runs in the "
+                     "variant-conversion mode), run skill Step 4d and skill Step 9 as well, and read what every "
                      "language-dependent check says from its own lines. With --ref the pin's build is read the same "
                      "way and must FAIL the acceptance it predates -- the acceptance's own red")
 args = ap.parse_args()
 if args.declare_language and args.sides:
     ap.error("--declare-language reads the body arm's chain; it is not wired into --sides.")
 if args.skip_step8 and args.declare_glossary_kept:
-    # I-36: skipping Step 8 is declaring nothing, so a flag that writes a declaration contradicts the scenario.
+    # I-36: skipping skill Step 8 is declaring nothing, so a flag that writes a declaration contradicts the scenario.
     ap.error("--skip-step8 simulates an operator who declares nothing; --declare-glossary-kept writes a "
              "declaration. Run them separately.")
 SCRIPTS = ROOT / args.variant / "scripts"
 TMP = Path(tempfile.mkdtemp(prefix="b11-delivered-"))
 FAIL, CHECKED, VOIDED = [], 0, []
-# BRANCH 12 SLICE 12a: each corpus document's TRUE source language, by doc-id and language only
+# SUB-STEP 12.1: each corpus document's TRUE source language, by doc-id and language only
 # (EVIDENCE-measurement.md section 1). D07 is already English, the target. SUPPORTED is read from the tree's
 # sub-lexicon prefixes, independently of the marker module whose reader is under test.
 TRUE_LANGUAGE = {"D01": "hungarian", "D02": "dutch", "D03": "norwegian", "D03B": "norwegian", "D04": "spanish",
@@ -224,7 +224,7 @@ def void(label, why):
 # A1 says D09 "was caught by rendering and repaired, so the deliverable is intact", which makes
 # D09 a TRUE NEGATIVE; and A15 says D08's repair moved the brackets out of the tracked change
 # IN THE NOTES, so declared and delivered agree and no declared-versus-delivered check can see
-# it -- slice 2's bracket inventory against the SOURCE is what can.
+# it -- sub-step 11.2's bracket inventory against the SOURCE is what can.
 SPACE = ("edge-space", "inner-space")
 
 
@@ -281,10 +281,10 @@ NAMED = [
                 f"original/delivered {anchor(r, 'footnoteReference')}")),
 ]
 OUT_OF_REACH = [("B3 and A15", "D08", "repaired before delivery by moving the brackets out of the "
-                 "tracked change IN THE NOTES, so declared and delivered agree; slice 2a's bracket "
+                 "tracked change IN THE NOTES, so declared and delivered agree; sub-step 2a's bracket "
                  "inventory against the SOURCE owns it -- A15's signature, below")]
 
-# SLICE 2a's EXPECTATIONS. Each names the documents it needs and is VOID, never passed, when a
+# SUB-STEP 2a's EXPECTATIONS. Each names the documents it needs and is VOID, never passed, when a
 # --doc subset leaves one out. J1's counts are the register's, in the accept reading.
 J1 = {"D01": 7, "D02": 5, "D10": 11, "D11": 48, "D03B": 1}
 ALL_DOCS = ("D01", "D02", "D03", "D03B", "D04", "D05", "D06", "D07", "D08", "D09", "D10", "D11")
@@ -413,8 +413,8 @@ def edge_vs_source(rep, notes):
 
 
 def body_only(rep):
-    """The body's findings. Slice 3a's side findings are reported by --sides and kept out of every
-    body total here, so slice 1's and 2's numbers mean what they meant."""
+    """The body's findings. Sub-step 3a's side findings are reported by --sides and kept out of every
+    body total here, so sub-step 11.1's and 11.2's numbers mean what they meant."""
     return [f for f in rep["findings"] if not str(f["class"]).startswith("side-")]
 
 
@@ -436,13 +436,13 @@ def summarise(did, rep, rc):
     sb, sc = len(side_only(rep, True)), len(side_only(rep, False))
     print(f"        blocking {rep['blocking'] - sb if 'blocking' in rep else 'n/a — pre-ruling report'}  "
           f"counted {rep['counted'] - sc if 'counted' in rep else 'n/a — pre-ruling report'}"
-          + (f"  · side parts, kept apart: {sb} blocking, {sc} counted (slice 3a; --sides reports them)"
+          + (f"  · side parts, kept apart: {sb} blocking, {sc} counted (sub-step 3a; --sides reports them)"
              if sb or sc else ""))
     z, b = rep.get("zwsp"), rep.get("brackets")
     print(f"        U+200B accept {z['accept']} reject {z['reject']} in {z['paragraphs']} paragraph(s) · "
           f"brackets declared {b['declared']} unbalanced {b['unbalanced']} a15 {b['a15']} other {b['other']} "
           f"(paired {b['paired']}, no source {b['no_source']})" if z and b
-          else "        U+200B / brackets: n/a — a report written before slice 2a")
+          else "        U+200B / brackets: n/a — a report written before sub-step 2a")
     if shapes:
         print("        " + "  ".join(f"{k}={v}" for k, v in sorted(shapes.items())))
     for a in rep.get("anchors", []):
@@ -458,7 +458,7 @@ def summarise(did, rep, rc):
 
 
 print("=" * 96)
-print(f"BRANCH 11 SLICE 1 — the delivered-document check over the real corpus  [{args.variant}]")
+print(f"SUB-STEP 11.1 — the delivered-document check over the real corpus  [{args.variant}]")
 print("=" * 96)
 if not LOGS.is_dir():
     print("  VOID — the logs root is not present in this clone; said rather than reported clean.")
@@ -480,16 +480,16 @@ REPACK_GATES = (("lexicon", "lexicon_compliance.py --stage pre-repack returned e
                 ("zwsp-survived", "U+200B SURVIVED THE SCRUB"),
                 ("remnant", "SOURCE-LANGUAGE REMNANT"),
                 ("delivered", "THE DELIVERED-DOCUMENT CHECK REFUSED THIS DELIVERY"))
-# SLICE 2b's PINNED PLAN (PLAN-2-step-b.md section 3.2): the workdirs per document whose delivery
+# SUB-STEP 2b's PINNED PLAN (PLAN-2-step-b.md section 3.2): the workdirs per document whose delivery
 # must move, and the documents repack never reaches because post_process's drift gate stops them.
 MOVE_2B = {"uk": {"D01": 2, "D02": 1, "D03B": 1, "D10": 1, "D11": 1},
            "us": {"D01": 2, "D03B": 1, "D11": 1}}
 STOP_2B = {"uk": {"D04", "D05"}, "us": {"D02", "D06", "D09", "D10"}}
-# SLICE 3a's SENSE OF --ref: a pin that already carries slice 2b's scrub (4d3d247) delivers no
+# SUB-STEP 3a's SENSE OF --ref: a pin that already carries sub-step 2b's scrub (4d3d247) delivers no
 # U+200B, so NOTHING may move -- the check added since only reads. Settled by ancestry, never by
 # assuming it: a pin before 2b still asks for 2b's plan.
 SCRUB_2B = "4d3d247"
-# SLICE 4a's PINNED PLAN (PLAN-2-step-b.md section 3.2, block "4a — B10"): a pin at or before the
+# SUB-STEP 4a's PINNED PLAN (PLAN-2-step-b.md section 3.2, block "4a — B10"): a pin at or before the
 # branch's start lacks strip_noop's guard, so D08's two empty insertions come back with the three
 # comment references, two range ends and the bookmark they hold, and nowhere else moves. The
 # findings that go are B10's two; D08's anchors then equal the original's.
@@ -609,7 +609,7 @@ def is_ancestor(a, b):
 
 
 def more_than_text(el):
-    """Slice 4a's condition, read here independently of strip_noop: `el` holds anything besides
+    """Sub-step 4a's condition, read here independently of strip_noop: `el` holds anything besides
     runs, run properties and text -- a w:rPr's own children being run properties."""
     stack = list(el)
     while stack:
@@ -667,7 +667,7 @@ def zstrip(b):
     return ZREF.sub(b"", b.replace(ZW, b""))
 INPUTS = ("paragraphs.json", ".validate-state.json", "comments_translations.json",
           "headers_footers.json", "_boldmap.json",
-          # slice 3b's notes declarations: copied when a workdir has one, as any declaration is
+          # sub-step 3b's notes declarations: copied when a workdir has one, as any declaration is
           "footnotes_translations.json", "endnotes_translations.json", "glossary_translations.json")
 if args.ref and args.arm in ("b", "both"):
     REFTREE = TMP / "ref_scripts"
@@ -685,7 +685,7 @@ if args.ref and args.arm in ("b", "both"):
     if len(same) == len(here) and len(names) == len(here):
         void("the byte comparison", f"{args.ref}'s scripts equal the working tree's — a self-comparison")
         REFTREE = None
-# SLICE 4a's SENSE OF --ref: does the pin carry strip_noop's guard? Asked two ways, and a pin where
+# SUB-STEP 4a's SENSE OF --ref: does the pin carry strip_noop's guard? Asked two ways, and a pin where
 # they disagree -- after the branch's start yet without the guard -- answers neither question.
 PRE_4A, REFREP = None, {}
 if REFTREE is not None:
@@ -693,12 +693,12 @@ if REFTREE is not None:
     by_ancestry = is_ancestor(args.ref, START_4A)
     by_content = pin_sn.is_file() and GUARD_4A not in pin_sn.read_bytes()
     if by_ancestry != by_content:
-        void("the byte comparison", f"{args.ref} is {'at or before' if by_ancestry else 'after'} slice 4a's "
+        void("the byte comparison", f"{args.ref} is {'at or before' if by_ancestry else 'after'} sub-step 4a's "
              f"start {START_4A}, but its strip_noop {'lacks' if by_content else 'carries'} the guard")
         REFTREE = None
     else:
         PRE_4A = by_ancestry
-        print(f"  --ref {args.ref}: {'predates' if PRE_4A else 'carries'} slice 4a's guard "
+        print(f"  --ref {args.ref}: {'predates' if PRE_4A else 'carries'} sub-step 4a's guard "
               f"(by ancestry against {START_4A} and by its own strip_noop, agreeing)")
 # SUB-STEP 2's SENSE OF --ref, asked the same two ways: does the pin's repack carry the delivered gate?
 PRE_WIRING = None
@@ -802,14 +802,14 @@ def gives_original_glossary(d):
 
 def chain(scripts_dir, d, src, wd, today=None, language=None):
     """apply -> post_process -> reorder -> repack in d, inputs copied from wd. Keeps a copy of the
-    reordered XML (the check's input, as in slice 1) before repack runs. Returns (rcs, pp).
-    `today` is side_parts' (--sides only). `language` (--declare-language, slice 12a) is written beside the
-    notes as Step 1c writes it, and Step 4d and Step 9 run too; their output and apply's and repack's are kept
+    reordered XML (the check's input, as in sub-step 11.1) before repack runs. Returns (rcs, pp).
+    `today` is side_parts' (--sides only). `language` (--declare-language, sub-step 12.1) is written beside the
+    notes as skill Step 1c writes it, and skill Step 4d and skill Step 9 run too; their output and apply's and repack's are kept
     in LANG_OUT, in memory only, for the language readings -- never printed, since they can quote the text.
     Neither step writes anything, so the outputs compared under --ref are the same set as without it."""
     (d / "final" / "word").mkdir(parents=True, exist_ok=True)
     shutil.copyfile(src, d / "src.docx")
-    # I-36: an operator who skips Step 8 declares nothing, and since the wiring REPACK reads the declarations beside
+    # I-36: an operator who skips skill Step 8 declares nothing, and since the wiring REPACK reads the declarations beside
     # the notes -- so under --skip-step8 none is copied at all, rather than copied for repack and deleted after it.
     undeclared = set(SIDE_DECL) if (today is not None and args.skip_step8) else set()
     for name in INPUTS:
@@ -818,7 +818,7 @@ def chain(scripts_dir, d, src, wd, today=None, language=None):
     xml, py = d / "final" / "word" / "document.xml", ["uv", "run", "--with", "lxml", "python"]
     said = {}
     if language is not None:
-        # SUB-STEP 13.4: declared through THE TREE'S OWN Step 1c command, as an operator declares - so a tree whose
+        # SUB-STEP 13.4: declared through THE TREE'S OWN skill Step 1c command, as an operator declares - so a tree whose
         # --declare records the variant-conversion mode (english, since 13.4) runs the chain in it, and under --ref
         # the pin declares its own way. A pin older than the command gets the file written as before, and the
         # reading says so. Neither route writes anything the --ref comparison reads.
@@ -894,7 +894,7 @@ def outputs(d):
 
 
 def compare(new, ref):
-    """Slice 2b's sense and slice 4a's: each output identical; or a .docx member that is the PINNED
+    """Sub-step 2b's sense and sub-step 4a's: each output identical; or a .docx member that is the PINNED
     bytes with every U+200B removed and none left; or an XML member that is the pin's with wrappers
     the guard kept restored (`restored`); or a language part `lang_part` names (13.2's styles.xml and
     settings.xml, 13.5's side parts and the glossary's) that is the pin's with only its language values changed
@@ -927,7 +927,7 @@ def compare(new, ref):
 
 
 def txt_blocking(rep):
-    """The delivered check's blocking body findings other than U+200B -- slice 2b's text-and-anchor
+    """The delivered check's blocking body findings other than U+200B -- sub-step 2b's text-and-anchor
     count -- as (class, shape, idx), in a stable order."""
     return sorted(((f["class"], f["shape"], f["idx"]) for f in body_only(rep)
                    if f.get("blocking", True) and f["class"] != "zwsp"), key=str)
@@ -1257,7 +1257,7 @@ def sides_report(did, arm, orig, deliv, hf_decl, cm_decl, thf, note):
     print(f"        PARTS (C6): {len(tp)} text-bearing side part(s) in the original — "
           + ("  ".join(f"{k} {v}" for k, v in sorted(kinds.items())) or "none"))
     if others:
-        print(f"          outside Step 8's list: {' '.join(others)}")
+        print(f"          outside skill Step 8's list: {' '.join(others)}")
     print(f"          missing from the delivery: {gone or 'none'} · byte-identical to the original's: "
           f"{ident or 'none'}")
     added = sorted(n for n in dtp if n not in tp)
@@ -1297,7 +1297,7 @@ def read_json(p):
 # appear.
 # ==========================================================================================
 NOTE_DECL = ("footnotes_translations.json", "endnotes_translations.json", "glossary_translations.json")
-SIDE_DECL = ("headers_footers.json", "comments_translations.json") + NOTE_DECL      # slice 3b adds three
+SIDE_DECL = ("headers_footers.json", "comments_translations.json") + NOTE_DECL      # sub-step 3b adds three
 CHK = {"a": {}, "b": {}}
 PIN_A = {"D02": {("side-ref", "comment:orphaned"): ["55", "56", "72", "73", "94", "101", "115", "124", "126",
                                                      "146", "147", "150", "151", "152"]},
@@ -1340,10 +1340,10 @@ def side_groups(rep, blocking=True):
 def side_lines(key, rep):
     s = rep.get("sides") or {}
     if not s.get("read"):
-        print(f"        THE CHECK (slice 3a): side parts NOT READ — {s.get('why')}")
+        print(f"        THE CHECK (sub-step 3a): side parts NOT READ — {s.get('why')}")
         return
     blk, cnt = side_groups(rep, True), side_groups(rep, False)
-    print(f"        THE CHECK (slice 3a): {sum(map(len, blk.values()))} side finding(s), "
+    print(f"        THE CHECK (sub-step 3a): {sum(map(len, blk.values()))} side finding(s), "
           f"{sum(map(len, cnt.values()))} counted")
     for tag, groups in (("FINDING", blk), ("COUNTED", cnt)):
         for (c, sh), ids in sorted(groups.items()):
@@ -1353,7 +1353,7 @@ def side_lines(key, rep):
         t = (s.get("counts") or {}).get(arm) or {}
         if t:
             print(f"          tally {arm}: " + "  ".join(f"{k} {v}" for k, v in sorted(t.items())))
-    # SLICE 3b: a July run predates the notes declarations, so the corpus measures only the
+    # SUB-STEP 3b: a July run predates the notes declarations, so the corpus measures only the
     # route WITHOUT one -- said per document, from what the check read, never assumed.
     nd = {n: v for n, v in (s.get("declarations") or {}).items() if n in NOTE_DECL}
     seen = {n: v for n, v in nd.items() if v is not None}
@@ -1414,7 +1414,7 @@ def flattened(reps):
 def pin_sides():
     v = args.variant
     if CHK["a"]:
-        print(f"\n  SLICE 3a — ARM (a), THE JULY DELIVERIES, PINNED  [{v}]")
+        print(f"\n  SUB-STEP 3a — ARM (a), THE JULY DELIVERIES, PINNED  [{v}]")
         docs = by_doc(CHK["a"])
         ok(f"(a) the side parts of all {len(CHK['a'])} July deliveries were READ",
            all((r.get("sides") or {}).get("read") for r in CHK["a"].values()))
@@ -1443,10 +1443,10 @@ def pin_sides():
             void("(a) the corpus totals 10 / 7 / 41", "a --doc subset; each document's own pin ran above")
     if CHK["b"]:
         label = "(c) --skip-step8" if args.skip_step8 else "(b) today's output"
-        print(f"\n  SLICE 3a — {label.upper()}, PINNED  [{v}]")
+        print(f"\n  SUB-STEP 3a — {label.upper()}, PINNED  [{v}]")
         docs = by_doc(CHK["b"])
         present = set(docs)
-        # REGISTER I-36: a document stops at an EARLIER gate (slice 2b's STOP_2B, as before) or at the DELIVERED gate,
+        # REGISTER I-36: a document stops at an EARLIER gate (sub-step 2b's STOP_2B, as before) or at the DELIVERED gate,
         # by design since the wiring -- (b) WIRING_STOP, or nothing once the glossary is declared kept; (c) every
         # document whose side parts carry letters, PIN_C, no declaration being written. Whether our repack carries
         # that gate is settled by ancestry AND by its own source, as --ref settles a pin; a disagreement is VOID.
@@ -1459,7 +1459,7 @@ def pin_sides():
         early = {d for d, reps in docs.items() if d not in mixed and where(reps[0]) == "early"}
         refused = {d for d, reps in docs.items() if d not in mixed and where(reps[0]) == "refused"}
         ok(f"{label}: every document's workdirs stopped in the same place", not mixed, f"mixed {sorted(mixed)}")
-        ok(f"{label}: repack STOPPED by an earlier gate exactly where slice 2b's plan says, of the documents in this "
+        ok(f"{label}: repack STOPPED by an earlier gate exactly where sub-step 2b's plan says, of the documents in this "
            f"run ({sorted(STOP_2B[v] & present) or 'none'})", early == STOP_2B[v] & present, f"stopped {sorted(early)}")
         anc = run(["git", "merge-base", "--is-ancestor", "HEAD", START_WIRING]).returncode
         if anc not in (0, 1):
@@ -1558,7 +1558,7 @@ if args.sides:
             void(f"{key}", f"no original matched (best {frac:.0%})")
             continue
         orig = members(src)
-        # An operator who skips Step 8 writes no declaration either, so --skip-step8 reads none:
+        # An operator who skips skill Step 8 writes no declaration either, so --skip-step8 reads none:
         # handing the measurement July's would credit it with a keep-as-is nobody made.
         hf_decl = None if args.skip_step8 else read_json(wd / "headers_footers.json")
         cm_decl = None if args.skip_step8 else read_json(wd / "comments_translations.json")
@@ -1573,7 +1573,7 @@ if args.sides:
                     key, "a", orig, members(dpath), hf_decl, cm_decl, thf,
                     f"July delivery — body {'IS final/word' if exact else f'matches the declared English at {dfrac:.0%}'}"
                     f" · original matched {frac:.0%} · {decl_note}")
-                # SLICE 3a: the check itself, on COPIES -- nothing is written into the logs folder.
+                # SUB-STEP 3a: the check itself, on COPIES -- nothing is written into the logs folder.
                 w = TMP / f"sa{n:02d}"
                 w.mkdir(parents=True, exist_ok=True)
                 for name in ("paragraphs.json",) + SIDE_DECL:
@@ -1590,7 +1590,7 @@ if args.sides:
             b = TMP / f"s{n:02d}"
             today = b / "today"
             (today / "word").mkdir(parents=True, exist_ok=True)
-            regen = ["NOTHING — Step 8 skipped (--skip-step8)"] if args.skip_step8 else []
+            regen = ["NOTHING — skill Step 8 skipped (--skip-step8)"] if args.skip_step8 else []
             py = ["uv", "run", "--with", "lxml", "python"]
             if isinstance(hf_decl, list):
                 r = run(py + [str(SCRIPTS / "translate_headers_footers.py"), str(src), str(today),
@@ -1621,9 +1621,9 @@ if args.sides:
                 f"rc={pp.returncode}{' (drift gate fired)' if gate else ''}, repack rc={rcs['repack']} "
                 f"[{rcs['repack_gate']}; remnant block language {BLOCK_NOTE.get(b.name, ('n/a',))[0]}, "
                 f"advisory {sum(BLOCK_NOTE.get(b.name, ('', Counter()))[1].values())}]; read {how} · {decl_note}")
-            # SLICE 3a: the check on the repacked .docx; a stopped document has none, so the check
+            # SUB-STEP 3a: the check on the repacked .docx; a stopped document has none, so the check
             # reads the XML, its side parts NOT READ, and it is named as stopped -- never a pass.
-            # An operator who skips Step 8 writes no declaration, and chain() copied none (I-36).
+            # An operator who skips skill Step 8 writes no declaration, and chain() copied none (I-36).
             docx_out = b / "delivered.docx"
             journal = b / "post_process_journal.json"
             rep, rc = delivered_check(b / "paragraphs.json", docx_out if docx_out.is_file() else b / "checked.xml",
@@ -1666,7 +1666,7 @@ if args.sides:
     sys.exit(1 if FAIL or VOIDED else 0)
 
 # ---------------------------------------------------------------------------------------------
-# SLICE 12a's READINGS -- what each language-dependent check SAID, from its own lines. Each returns a dict with
+# SUB-STEP 12.1's READINGS -- what each language-dependent check SAID, from its own lines. Each returns a dict with
 # `lang` (the language the check names, or None), `verdict` (NOT SUPPORTED | CLEAN | HITS | not reached | ?) and
 # `said_clean` (the words CLEAN or PASSED appear in that check's own lines). Nothing here is ever printed but
 # these fields: the lines themselves can quote the document.
@@ -1754,7 +1754,7 @@ def readings(said):
 
 
 def acceptance(did, rd):
-    """Slice 12a's acceptance, per document, as (label, passed, detail): a supported language read as itself by
+    """Sub-step 12.1's acceptance, per document, as (label, passed, detail): a supported language read as itself by
     every check that ran; an unsupported one NOT SUPPORTED, never CLEAN or PASSED, by every one; no mismatch."""
     lang = TRUE_LANGUAGE.get(did)
     sup = lang in SUPPORTED
@@ -1771,7 +1771,7 @@ def acceptance(did, rd):
                         r["verdict"] == "NOT SUPPORTED" and not r["said_clean"] and r["lang"] == lang,
                         f"read {r['lang']}, {r['verdict']}, clean/passed {r['said_clean']}"))
     if rd["9"]["verdict"] != "not reached" and not sup:
-        out.append((f"{did} step 9's closing line: never PASSED", not rd["9"]["passed"], "it said PASSED"))
+        out.append((f"{did} skill Step 9's closing line: never PASSED", not rd["9"]["passed"], "it said PASSED"))
     out.append((f"{did} the cross-check: no mismatch", rd["cross"] != "mismatch", rd["cross"]))
     return out
 
@@ -1835,7 +1835,7 @@ for n, wd in enumerate(workdirs, 1):
                 dr = {k: v for k, v in dr.items() if not k.startswith("docx")}
             BYTES[key] = (same_rc, compare(dn, dr), len(dn), rcs, rrcs)
             BYTES_LANG[key] = {k for k in dn if lang_part(k)}
-            # SLICE 4a: the SAME check, today's, reads the pin's build too, so what a change to the
+            # SUB-STEP 4a: the SAME check, today's, reads the pin's build too, so what a change to the
             # pipeline does to the findings is measured, never inferred from the bytes.
             rtarget = rb / "delivered.docx" if (rb / "delivered.docx").is_file() else rb / "checked.xml"
             rjournal = rb / "post_process_journal.json"
@@ -1843,7 +1843,7 @@ for n, wd in enumerate(workdirs, 1):
                                           rjournal if rjournal.is_file() else None, f"r{n:02d}")[0]
             shutil.rmtree(rb, ignore_errors=True)
         journal = b / "post_process_journal.json"
-        # THE REPACKED .docx WHERE REPACK PRODUCED ONE (slice 2b): the reordered XML predates
+        # THE REPACKED .docx WHERE REPACK PRODUCED ONE (sub-step 2b): the reordered XML predates
         # repack, so it cannot see the scrub. A stopped document is read from the XML, and said.
         docx_out = b / "delivered.docx"
         target = docx_out if docx_out.is_file() else b / "checked.xml"
@@ -1879,8 +1879,8 @@ if args.arm in ("a", "both"):
         if passed:
             print(f"        {detail}")
     for row, did, why in OUT_OF_REACH:
-        print(f"  N/A  {row} on {did}: NOT VISIBLE TO SLICE 1 BY CONSTRUCTION — {why}")
-    print("\n  SLICE 2a — U+200B AND BRACKETS, pinned to documents:")
+        print(f"  N/A  {row} on {did}: NOT VISIBLE TO SUB-STEP 11.1 BY CONSTRUCTION — {why}")
+    print("\n  SUB-STEP 2a — U+200B AND BRACKETS, pinned to documents:")
     present = {did_of(k) for k in reports_a}
     for row, needs, what, test in NAMED_2A:
         missing = [d for d in needs if d not in present]
@@ -1923,10 +1923,10 @@ if args.arm in ("b", "both"):
         f"{k}={sum((rep.get(g) or {}).get(k, 0) for rep, _ in reports_b.values())}"
         for g, ks in (("zwsp", ("accept", "reject", "paragraphs")),
                       ("brackets", ("declared", "unbalanced", "a15", "other"))) for k in ks))
-    # SLICE 2b, the delivered check's own numbers: no U+200B where repack ran; the text and anchor
+    # SUB-STEP 2b, the delivered check's own numbers: no U+200B where repack ran; the text and anchor
     # findings, the non-U+200B blocking ones, printed per document; no delivery refused by the
     # remnant block. A stopped document is listed as stopped and asserts nothing.
-    print("\n  SLICE 2b — THE DELIVERED CHECK ON THE REPACKED .docx:")
+    print("\n  SUB-STEP 2b — THE DELIVERED CHECK ON THE REPACKED .docx:")
     for key, (rep, _) in reports_b.items():
         z = rep.get("zwsp") or {}
         txt = sorted((f['class'], f['shape'], f['idx']) for f in body_only(rep)
@@ -1959,7 +1959,7 @@ if args.arm in ("b", "both"):
        f"in this run; our repack {'carries' if OURS_WIRED else 'lacks'} the gate"
        + ("; the glossary declared kept" if args.declare_glossary_kept else "") + ")",
        set(by_wiring) == want_w, f"refused by it {by_wiring}")
-    print("\n  THE WIRING SLICE, SUB-STEP 1 — C16's CLASS COUNTED, ON EVERY DOCUMENT REPACK REACHES:")
+    print("\n  THE WIRING SUB-STEP, ITS SUB-STEP 1 — C16's CLASS COUNTED, ON EVERY DOCUMENT REPACK REACHES:")
     c16_got = defaultdict(int)
     for key, (rep, _) in reports_b.items():
         if rep.get("_read") != "docx":
@@ -1973,7 +1973,7 @@ if args.arm in ("b", "both"):
     got16 = {d: k for d, k in c16_got.items() if k}
     ok(f"the findings counted as c16-space are exactly the measured ones ({args.variant}, of the documents "
        f"in this run: {sum(want16.values())})", got16 == want16, f"counted {dict(got16)}, measured {want16}")
-    # SLICE 4a, today's build whatever the pin: D08's comment anchors equal the original's.
+    # SUB-STEP 4a, today's build whatever the pin: D08's comment anchors equal the original's.
     for d, want in ANCHORS_4A.items():
         for key, (rep, _) in reports_b.items():
             if did_of(key) != d:
@@ -1983,7 +1983,7 @@ if args.arm in ("b", "both"):
                + " ".join(f"{k} {v}" for k, v in want.items()),
                all(got.get(k) == (v, v) for k, v in want.items()), f"original/delivered {got}")
     if REFTREE is not None:
-        print(f"\n  SLICES 2b AND 4a — BYTES MOVE BY U+200B REMOVAL WHERE THE PIN PREDATES 2b's SCRUB AND ITS "
+        print(f"\n  SUB-STEPS 2b AND 4a — BYTES MOVE BY U+200B REMOVAL WHERE THE PIN PREDATES 2b's SCRUB AND ITS "
               f"DELIVERY CARRIED ONE, AND BY A WRAPPER THE GUARD KEPT WHERE THE PIN PREDATES 4a's GUARD; "
               f"NOTHING ELSE — the chain run with {args.ref}'s scripts and the working tree's:")
         moved_by_doc, wmoved_by_doc = defaultdict(int), defaultdict(list)
@@ -1999,7 +1999,7 @@ if args.arm in ("b", "both"):
             tag = LANG_TAG[args.variant].decode()
             if not BYTES_LANG.get(key):
                 # REVIEW FIX: a document with no delivery read is SAID to be unread and never counted as a pass --
-                # slice 2b's rule for a stopped document. (Ours delivering nothing while the pin did is other
+                # sub-step 2b's rule for a stopped document. (Ours delivering nothing while the pin did is other
                 # movement, failed above.)
                 print(f"  --   {key}: no delivery read — 13.2's and 13.5's language checks NOT READ, never counted "
                       f"as a pass")
@@ -2022,7 +2022,7 @@ if args.arm in ("b", "both"):
             if not PRE_4A:
                 ok(f"{key}: no wrapper restored — the pin carries 4a's guard", not wmoved, f"restored {wmoved}")
             if scrubbed:
-                # SLICE 3a's SENSE: the pin already scrubs, so NOTHING may move, whatever it carries.
+                # SUB-STEP 3a's SENSE: the pin already scrubs, so NOTHING may move, whatever it carries.
                 ok(f"{key}: no U+200B removal moved anything — the pin carries 2b's scrub, and the "
                    f"check added since only reads", not moved, f"moved {moved}")
                 if carried:
@@ -2046,11 +2046,11 @@ if args.arm in ("b", "both"):
         want = {d: n for d, n in plan.items() if d in present}
         got = {d: n for d, n in moved_by_doc.items() if n}
         ok(f"the workdirs a U+200B removal moved are exactly the plan's ({args.variant}, of the documents in "
-           f"this run; " + ("the pin carries 2b's scrub, so the plan is NONE" if scrubbed else "slice 2b's plan")
+           f"this run; " + ("the pin carries 2b's scrub, so the plan is NONE" if scrubbed else "sub-step 2b's plan")
            + ")", got == want, f"moved {got}, plan {want}")
         want4 = {d: k for d, k in (MOVE_4A[args.variant] if PRE_4A else {}).items() if d in present}
         got4 = {d: len(v) for d, v in wmoved_by_doc.items()}
-        ok(f"the workdirs where a wrapper came back are exactly slice 4a's plan ({args.variant}, of the "
+        ok(f"the workdirs where a wrapper came back are exactly sub-step 4a's plan ({args.variant}, of the "
            f"documents in this run; " + ("the pin predates the guard" if PRE_4A else
                                           "the pin carries the guard, so the plan is NONE") + ")",
            got4 == want4, f"restored in {got4}, plan {want4}")
@@ -2062,7 +2062,7 @@ if args.arm in ("b", "both"):
                bool(per) and all(set(m) == set(XML_MEMBERS) and set(m.values()) == {k} for m in per),
                f"restored {per}")
         # THE FINDINGS, the pin's build against ours, both read by today's check: what the change did.
-        print(f"\n  SLICE 4a — TEXT-AND-ANCHOR BLOCKING FINDINGS, {args.ref}'s build against the working tree's:")
+        print(f"\n  SUB-STEP 4a — TEXT-AND-ANCHOR BLOCKING FINDINGS, {args.ref}'s build against the working tree's:")
         tot_ref = tot_now = 0
         for key in BYTES:
             rrep, now = REFREP.get(key), reports_b.get(key, (None, None))[0]
@@ -2081,7 +2081,7 @@ if args.arm in ("b", "both"):
         print(f"  compared {len(BYTES)} of {len(reports_b)} rebuilt workdirs")
 
 if args.declare_language and args.arm in ("b", "both"):
-    print(f"\n  SLICE 12a — THE DECLARED SOURCE LANGUAGE: what every language-dependent check SAID, from its own "
+    print(f"\n  SUB-STEP 12.1 — THE DECLARED SOURCE LANGUAGE: what every language-dependent check SAID, from its own "
           f"lines ({args.variant}; supported, from the tree's sub-lexicons: {len(SUPPORTED)})")
     COLS = ("4d", "5", "9", "10 lexicon", "10 remnant")
     pin_bad = pin_all = 0
@@ -2098,15 +2098,15 @@ if args.declare_language and args.arm in ("b", "both"):
               f" 10={rd['10 lexicon'].get('blocking')}")
         for label, passed, detail in acceptance(did, rd):
             ok(label, passed, detail)
-        # SUB-STEP 13.4: OUR build's Step 1c, through the tree's own --declare - english opens the variant-conversion
+        # SUB-STEP 13.4: OUR build's skill Step 1c, through the tree's own --declare - english opens the variant-conversion
         # mode and says so, and no other language does. A fact read off the command's own words, never its text.
         opened = "VARIANT-CONVERSION MODE" in said.get("1c", "")
-        ok(f"{key} step 1c: {'english opens the variant-conversion mode' if lang == 'english' else 'no mode opened'}"
+        ok(f"{key} skill Step 1c: {'english opens the variant-conversion mode' if lang == 'english' else 'no mode opened'}"
            f" (sub-step 13.4)", opened == (lang == "english"), f"mode said: {opened}")
         if rd["10 remnant"]["verdict"] == "not reached":
             # A reading the corpus cannot give is said, and must be explained: repack stops these documents at its
-            # EARLIER gate (slice 2b's STOP_2B), at the pin and today alike, so the remnant block never runs.
-            ok(f"{key} step 10 remnant: NOT REACHED, and only because repack stops it at its earlier gate "
+            # EARLIER gate (sub-step 2b's STOP_2B), at the pin and today alike, so the remnant block never runs.
+            ok(f"{key} skill Step 10 remnant: NOT REACHED, and only because repack stops it at its earlier gate "
                f"(STOP_2B, {args.variant})", did in STOP_2B[args.variant],
                f"{did} not in {sorted(STOP_2B[args.variant])}")
         if rname is not None and rname in LANG_OUT:

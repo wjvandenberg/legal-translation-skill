@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 9's CORPUS ARM — is the change journal COMPLETE on the real documents?
+"""STEP 9's CORPUS ARM — is the change journal COMPLETE on the real documents?
 
 WHY THIS TOOL EXISTS RATHER THAN A RUN OF apply_corpus_diff.py, AND IT IS DECLARED HERE
 BEFORE ANY RESULT IS READ. `tools/apply_corpus_diff.py` swaps `apply_translations_textmatch.py`
-and drives APPLY. Branch 9 changes `post_process.py`, which that tool does not drive at all,
-so its result says nothing whatever about this branch. Worse: at the current pin the apply
+and drives APPLY. Step 9 changes `post_process.py`, which that tool does not drive at all,
+so its result says nothing whatever about this step. Worse: at the current pin the apply
 script is byte-identical to the working tree, so it prints its self-comparison notice and an
 all-quiet run there is what a STALE pin also produces.
 
 AND NOTHING IN THIS REPOSITORY RAN post_process OVER A REAL DOCUMENT BEFORE THIS FILE.
 Measured: `post_process.py` is executed by `tests/probe-5b/preflight.py` and by one
 reachability arm in `tests/test_instruction_rules.py`, and by nothing else; no suite
-byte-compares its output. That is the same gap branch 7 found for the header/footer
+byte-compares its output. That is the same gap step 7 found for the header/footer
 translator, and the answer is the same — a corpus arm of its own.
 
-WHAT IT ASSERTS, and the second one is the point of the branch:
-  1. THE DELIVERED BYTES MOVED -- AND THIS ASSERTION WAS INVERTED AT SLICE 2. For branch 9
-     and slice 1 the acceptance was that NOT ONE delivered byte may move, both being
-     additive. Slice 2 makes four passes conditional, so a byte-identical run now means no
+WHAT IT ASSERTS, and the second one is the point of the step:
+  1. THE DELIVERED BYTES MOVED -- AND THIS ASSERTION WAS INVERTED AT SUB-STEP 10.2. For step 9
+     and sub-step 10.1 the acceptance was that NOT ONE delivered byte may move, both being
+     additive. Sub-step 10.2 makes four passes conditional, so a byte-identical run now means no
      condition fired and is a FAILURE. The inversion is recorded here rather than made
      quietly, because an arm whose sense flips without a note reads as a regression to
      whoever finds it next. What has NOT changed is that a moved byte must be EXPLAINED,
@@ -126,7 +126,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--variant", default="uk", choices=("uk", "us"))
 ap.add_argument("--limit", type=int, default=0, help="examine at most N workdirs")
 ap.add_argument("--from-apply", action="store_true",
-                help="BRANCH 10 SLICE 3b: for a workdir with no pre-post_process snapshot, "
+                help="STEP 10's SUB-STEP 3b: for a workdir with no pre-post_process snapshot, "
                      "REBUILD one by running the working tree's apply over the matched source "
                      ".docx and the frozen notes, instead of feeding the stage its own "
                      "delivered output. Without it 11 of the 13 inputs have already been "
@@ -214,7 +214,7 @@ def _subtree(el):
 
 
 def flat_formats(xml_bytes):
-    """BRANCH 10 SLICE 1's SECOND READER for the FORMAT contract, written from the
+    """SUB-STEP 10.1's SECOND READER for the FORMAT contract, written from the
     contract's words and importing nothing from the script it measures. For each
     text-bearing element, the shape of the w:r carrying it, at the same flat ordinal the
     text record uses."""
@@ -301,24 +301,24 @@ GATE_MARKER = "SKILL GATE FIRED"
 
 def stage_input(ordinal, src_xml, label, notes_src=None):
     """A fresh <workdir>/final/word/document.xml holding a COPY of the frozen input,
-    and -- since slice 3a -- a copy of that workdir's paragraphs.json beside it.
+    and -- since sub-step 3a -- a copy of that workdir's paragraphs.json beside it.
 
     THE NOTES USED TO BE WITHHELD DELIBERATELY, AND THAT BECAME WRONG THE MOMENT A PASS
     STARTED READING THEM. The old reason was sound for what it covered: staging the notes
     makes the post-strip drift gate run, and it RAISES on a document whose notes no longer
     match -- measured here, on 6 of the 13 workdirs, and it fires identically at the
-    pinned baseline, so it is inherited and not slice 3a's doing.
+    pinned baseline, so it is inherited and not sub-step 3a's doing.
 
     But withholding them silently answers a DIFFERENT QUESTION once `fix_spurious_italic_runs`
     is conditional on them. With no notes the pass cannot determine its condition, so it
     changes nothing -- and the delivered bytes MOVE anyway, because the baseline stripped
-    and the new copy did not. Every signal this tool prints would have said the slice
+    and the new copy did not. Every signal this tool prints would have said the sub-step
     worked, while the condition it exists to test was never evaluated once. That is the
     exact shape of a check passing for the wrong reason, and the arm would have been the
     thing that was wrong rather than the deliverable.
 
     So the notes are staged, for BOTH arms, from the SAME source. Symmetry is not
-    decoration here: slice 2 found this tool building its baseline from the pinned script
+    decoration here: sub-step 10.2 found this tool building its baseline from the pinned script
     while taking its siblings from the working tree, so the change under test appeared on
     both sides and CANCELLED. Two arms given different inputs cannot be compared at all.
 
@@ -348,17 +348,17 @@ def gate_fired(result):
 
 
 # =========================================================================================
-# --from-apply: THE INPUT THIS TOOL WAS BLIND WITHOUT, ADDED AT BRANCH 10 SLICE 3b.
+# --from-apply: THE INPUT THIS TOOL WAS BLIND WITHOUT, ADDED AT STEP 10's SUB-STEP 3b.
 #
 # Eleven of the thirteen workdirs kept no pre-post_process snapshot, so this tool fed the
-# stage the DELIVERED document -- already through every pass. That was right for branch 9
-# and slice 1, where the question was "does the journal account for what moved", and it is
+# stage the DELIVERED document -- already through every pass. That was right for step 9
+# and sub-step 10.1, where the question was "does the journal account for what moved", and it is
 # BLIND to a pass that STOPS rewriting: the delivered document holds no Annex left to keep,
 # because the pass it is testing already turned every one into a Schedule. Measured before
-# this flag existed, a delivered input reads as a clean zero for every row slice 3b is about.
+# this flag existed, a delivered input reads as a clean zero for every row sub-step 3b is about.
 #
 # So the genuine input is REBUILT: the WORKING TREE's apply over the matched source .docx and
-# the frozen notes. Apply is not under test here -- no slice of branch 10 touches it -- and
+# the frozen notes. Apply is not under test here -- no sub-step of step 10 touches it -- and
 # BOTH arms are handed the SAME rebuilt file, so whatever apply does it does identically to
 # each. The source is matched by MEASUREMENT (which candidate's paragraph text the notes'
 # `text` field reproduces), never by name, because the corpus filenames carry counterparty
@@ -433,7 +433,7 @@ def rebuild_from_apply(ordinal, wd, corpus):
 
 
 print("=" * 96)
-print(f"BRANCH 9 CORPUS ARM — is the change journal complete on the real documents?  "
+print(f"STEP 9 CORPUS ARM — is the change journal complete on the real documents?  "
       f"[{args.variant}]{'  --from-apply' if args.from_apply else ''}")
 print("=" * 96)
 CORPUS = corpus_dirs() if args.from_apply else []
@@ -465,8 +465,8 @@ BASELINE_DIR = None
 if blob.returncode != 0:
     void("baseline readable", f"cannot read {SCRIPT} at {REF}")
 elif blob.stdout == cur:
-    # A NOTICE, NOT A VOID, AND THE DIFFERENCE IS DELIBERATE. Between branches the pin sits
-    # at the merge of the last branch to touch either tree, so the baseline IS the working
+    # A NOTICE, NOT A VOID, AND THE DIFFERENCE IS DELIBERATE. Between steps the pin sits
+    # at the merge of the last step to touch either tree, so the baseline IS the working
     # tree and this is the expected RESTING state — not a defect and not something to fix.
     # Recording it as VOID would make this tool exit non-zero on every run on `main`, and a
     # permanently-failing instrument is one people learn to scroll past. So it is printed
@@ -477,7 +477,7 @@ elif blob.stdout == cur:
     print(f"  NOTE  {SCRIPT} is BYTE-IDENTICAL to {REF}, so there is nothing to compare and")
     print(f"        the byte-identity column below is OMITTED rather than filled with a")
     print(f"        verdict that would read as evidence. This is the expected state between")
-    print(f"        branches; it starts answering again the moment a branch edits {SCRIPT}.")
+    print(f"        steps; it starts answering again the moment a step edits {SCRIPT}.")
 elif b"\n# === SKILL FILE COMPLETE ===" not in blob.stdout:
     void("baseline usable", "the baseline blob has no integrity sentinel; it exits 3")
 else:
@@ -490,10 +490,10 @@ else:
     #
     # THE SIBLINGS COME FROM THE BASELINE TOO, AND THEY USED TO COME FROM THE WORKING TREE.
     # That was right while only post_process.py ever changed: giving both arms the same
-    # sibling isolated the one script under test. It became WRONG the moment a branch
-    # changed a sibling as well — slice 2 changes `strip_noop_tracked_changes.py` for B3 —
+    # sibling isolated the one script under test. It became WRONG the moment a step
+    # changed a sibling as well — sub-step 10.2 changes `strip_noop_tracked_changes.py` for B3 —
     # because the "old" arm was then running the NEW strip_noop, so B3's effect appeared on
-    # both sides and CANCELLED OUT. Measured on the branch that found it: this tool reported
+    # both sides and CANCELLED OUT. Measured on the step that found it: this tool reported
     # wd9 at 40179 -> 40043 bytes while a second instrument running a fully-baseline arm
     # reported 39848 -> 40043. The verdict was right and the baseline was wrong, which is
     # the shape that gets believed.
@@ -525,7 +525,7 @@ print(f"  {'wd':>4}  {'input':>9}  {'paras':>6}  {'moved':>5}  {'edits':>5}  "
       f"{'strip':>5}  {'nontext':>7}  {'fmt':>5}  {'fmtP':>4}  {'bytes':>9}  verdict")
 
 examined = with_movement = 0
-BYTES_MOVED = []   # slice 2: the documents whose delivered bytes moved, which is now the
+BYTES_MOVED = []   # sub-step 10.2: the documents whose delivered bytes moved, which is now the
                    # thing being asserted rather than the thing being forbidden
 unreadable = []
 GATE_FIRED_ON = []     # rows where the post-strip drift gate fired; reported, not dropped
@@ -617,9 +617,9 @@ for i, wd in enumerate(workdirs):
             ob = oxml.read_bytes()
             byte_note = "identical" if ob == after_bytes else "MOVED"
             if ob != after_bytes:
-                # SLICE 2 INVERTED THIS, AND THE MOVEMENT IS RECORDED RATHER THAN FAILED.
-                # Branches 9 and slice 1 were additive and a moved byte was a failure here.
-                # Slice 2 makes four passes conditional, so a moved byte is the POINT. What
+                # SUB-STEP 10.2 INVERTED THIS, AND THE MOVEMENT IS RECORDED RATHER THAN FAILED.
+                # Step 9 and sub-step 10.1 were additive and a moved byte was a failure here.
+                # Sub-step 10.2 makes four passes conditional, so a moved byte is the POINT. What
                 # a moved byte still has to be is EXPLAINED, and the two completeness arms
                 # above do that job on the same run — they are what stops "the bytes moved"
                 # being satisfied by a pass that broke the document.
@@ -646,10 +646,10 @@ for i, wd in enumerate(workdirs):
         with_movement += 1
         if worst is None or len(moved) > worst[0]:
             worst = (len(moved), src, i)
-    # BRANCH 10 SLICE 1 — THE FORMATTING ARM, read by the second reader above. Before this
-    # slice the `nontext` column to the left was the END of what could be said: a figure
+    # SUB-STEP 10.1 — THE FORMATTING ARM, read by the second reader above. Before this
+    # sub-step the `nontext` column to the left was the END of what could be said: a figure
     # with no location and no pass behind it. These two columns are what turns it into an
-    # account, and slice 3 cannot show a CONDITIONAL pass did the right thing without them.
+    # account, and sub-step 10.3 cannot show a CONDITIONAL pass did the right thing without them.
     (moved_fe, missing_fe, elem_void,
      moved_fp, missing_fp, para_void, fnote) = format_accounted_for(
         before_bytes, after_bytes, jrnl)
@@ -684,14 +684,14 @@ ok("every enumerated workdir was examined or REPORTED as not examined",
    examined + len(unreadable) == len(workdirs),
    f"{examined} + {len(unreadable)} != {len(workdirs)}")
 
-# SLICE 3a — DID THE CONDITIONAL PASS ACTUALLY GET ITS INPUT? This is the arm that stops
+# SUB-STEP 3a — DID THE CONDITIONAL PASS ACTUALLY GET ITS INPUT? This is the arm that stops
 # this tool reporting a clean run over a condition it never evaluated. `post_process`
 # prints a detector line naming "no notes" when it could not consult a declaration at all,
 # so the presence of that phrase is the proof the notes did NOT arrive. It is asserted on
 # the RUN OUTPUT rather than on the staging code, because staging a file and the pass
 # reading it are two different claims and only the second one matters.
 # "INHERITED" USED TO BE PRINTED HERE AS A FACT, AND NOTHING CHECKED IT. It was true when
-# written and a slice that changes which documents the gate fires on -- 3b's whole premise is
+# written and a sub-step that changes which documents the gate fires on -- 3b's whole premise is
 # a pass that stops provoking it -- would have left the sentence standing over a different
 # population. So the baseline arm's firings are now MEASURED, and the word is earned or not.
 print(f"\n  post-strip drift gate fired on {len(GATE_FIRED_ON)} of {examined} "
@@ -707,7 +707,7 @@ if BASELINE_DIR is not None:
              f"{sorted(set(GATE_FIRED_ON) - set(GATE_FIRED_OLD)) or 'none'}"))
     # THE PREMISE IS TESTED PER DOCUMENT, NOT ASSUMED, AND IT FAILED ON ITS FIRST RUN. "A pass
     # that begins provoking the gate has broken the agreement between document and notes"
-    # assumes the INPUT agreed with its notes. Slice 3b's first run found a document where it
+    # assumes the INPUT agreed with its notes. Sub-step 3b's first run found a document where it
     # did not: a pre-post_process snapshot taken BEFORE the operator edited the notes to suit
     # the old rewrite, so the snapshot carries the lexicon's string and the notes the
     # script's. The old arm "agreed" only because its rewrite coincided with notes edited to
@@ -772,7 +772,7 @@ print(f"\n  formatting: {examined - len(fmt_declared)} of {examined} document(s)
 for line in fmt_declared:
     print(f"    {line}")
 if BASELINE_DIR is not None:
-    # SLICE 2's ACCEPTANCE, AND IT IS THE OPPOSITE OF EVERY EARLIER RUN OF THIS TOOL.
+    # SUB-STEP 10.2's ACCEPTANCE, AND IT IS THE OPPOSITE OF EVERY EARLIER RUN OF THIS TOOL.
     # Byte identity used to be the pass; it is now the failure, because four passes became
     # conditional and a run in which none of them fired has proved nothing.
     #
@@ -790,7 +790,7 @@ if BASELINE_DIR is not None:
              else " — the ones whose input predates post_process:"))
     for line in BYTES_MOVED:
         print(f"    {line}")
-    ok(f"at least one document's delivered bytes MOVED against {REF} — slice 2 is "
+    ok(f"at least one document's delivered bytes MOVED against {REF} — sub-step 10.2 is "
        f"BEHAVIOURAL and identity everywhere would mean no condition fired",
        bool(BYTES_MOVED),
        "every document came back byte-identical, so nothing here tested the change")

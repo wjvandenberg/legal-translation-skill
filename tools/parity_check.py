@@ -35,7 +35,7 @@ TWO SPECIFICATION FACTS, both measured, either of which would make a naive check
 A THIRD ARM IS NAMED IN THE ANALYSIS AND DELIBERATELY NOT BUILT HERE: that a US delivery
 contains no "Clause" and a UK delivery no "Section". It inspects a DELIVERED DOCUMENT, so it
 is not a parity check at all and belongs with the delivered-document checks being built at
-branch 11.
+step 11.
 
 WHAT THIS DOES NOT DO: it repairs nothing. The reconciliation is deferred item D1. This
 measures, and from here on it makes every NEW divergence visible as it is introduced.

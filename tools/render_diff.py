@@ -2,7 +2,7 @@
 """THE RENDERED PAGE COMPARISON — CLAUDE.md 5.2's gate, made runnable.
 
 Section 5.2 makes a "rendered PDF visual diff against the source, page by page, BOTH
-documents" a condition of done for every branch, and 2.4 item 4 calls the rendered diff the
+documents" a condition of done for every step, and 2.4 item 4 calls the rendered diff the
 PRIMARY instrument rather than a final check. No tool existed for it. This is that tool.
 (Those two numbers read 5.3 and 2.5 until 2026-09-10: the 2026-09-09 charter mapping moved
 them, and a stale section sign resolves against a real but WRONG section, silently.)
@@ -30,10 +30,10 @@ The gate splits in two:
 
 WHICH COMPARISON ACTUALLY MEANS SOMETHING, because "source against target" cannot be a pixel
 diff. The target is TRANSLATED: nearly every glyph differs, so a pixel comparison against the
-source measures the translation, not the pipeline. What isolates this branch is:
+source measures the translation, not the pipeline. What isolates this step is:
 
   OLD vs NEW deliverable   same document, same notes, same language, ONE variable: the code.
-                           This is the diff that shows what branch 6 changed on the page.
+                           This is the diff that shows what step 6 changed on the page.
   source vs NEW page count a page count that moves is a layout red flag and needs no pixels.
 
 DUPLICATION DECLARED RATHER THAN HIDDEN: the source-matching helpers below are copied from
@@ -251,7 +251,7 @@ def keep_note(stamp, label, variant, ref, post_process, under_review, written, c
         f"document:      {label}",
         f"variant:       {variant}",
         f"pin (-old):    {ref}  -- the scripts tree at that commit; -old is 'before the change under",
-        "               review', never 'before the branch'",
+        "               review', never 'before the step'",
         f"chain run:     {chain}  (each arm, the same chain)",
         f"written:       {stamp}",
         # PER ARM, THE PAGES ACTUALLY WRITTEN -- never the pages asked for: an arm that renders fewer pages
@@ -286,17 +286,17 @@ ap.add_argument("--expect-block", action="append", default=[],
                      "old arm still renders, so the page shows what used to ship; a run "
                      "that produced output anyway is the FAILURE for such a fixture")
 ap.add_argument("--expect-pages-move", action="append", default=[],
-                help="BRANCH 10 SLICE 4: fixture stem whose OLD arm is EXPECTED to have a "
+                help="SUB-STEP 10.4: fixture stem whose OLD arm is EXPECTED to have a "
                      "different page count from the new one, the defect BEING pages the "
                      "source never had. For such a fixture the old->new assertion inverts: "
                      "the counts must DIFFER, and source->new must still match")
 ap.add_argument("--post-process", action="store_true",
-                help="BRANCH 10: drive post_process.py over the fixture instead of apply + "
-                     "repack. Branch 10 changes post_process and nothing else, so without "
+                help="STEP 10: drive post_process.py over the fixture instead of apply + "
+                     "repack. Step 10 changes post_process and nothing else, so without "
                      "this the fixture arms render the SAME apply code twice and an "
                      "all-quiet page is guaranteed — which is a limit of the instrument, "
-                     "not evidence about the branch. Section 5.2's gate needs this arm. "
-                     "BRANCH 11 SLICE 4a: with --doc, each arm runs apply, post_process, the "
+                     "not evidence about the step. Section 5.2's gate needs this arm. "
+                     "STEP 11's SUB-STEP 4a: with --doc, each arm runs apply, post_process, the "
                      "reorder and repack, where without it the --doc arm skips post_process")
 ap.add_argument("--variant", default="uk", choices=("uk", "us"))
 ap.add_argument("--pages", type=int, action="append", default=[],
@@ -354,7 +354,7 @@ def run_post_process_arm(scripts_dir, adir):
     Returns (document.xml path, completed process) or (None, process).
 
     THE LAYOUT MATTERS AND IS NOT DECORATION. `post_process` finds the notes by walking up
-    from <workdir>/final/word/document.xml, and since slice 3a the italic pass READS them.
+    from <workdir>/final/word/document.xml, and since step 10's sub-step 3a the italic pass READS them.
     Staged anywhere else the pass would find nothing, decline to decide, and render a page
     on which the condition was never evaluated -- an all-quiet render that looks exactly
     like a working fix.
@@ -400,11 +400,11 @@ def _gate_line(proc):
 def _repack_bypass(src_docx, doc_xml, out_docx):
     """A .docx built by BYTE-SUBSTITUTING document.xml, used ONLY to render a blocked arm.
 
-    WHY THIS EXISTS, AND WHY IT IS NOT A WAY ROUND A GATE. Branch 6's fourth slice found that
+    WHY THIS EXISTS, AND WHY IT IS NOT A WAY ROUND A GATE. Sub-step 6.4 found that
     the PRE-FIX code cannot be repacked at all on the whitespace fixture: clearing a
     whitespace-only segment glues two words into one, `validate_apply --strict` compares token
     SETS, and a merged token is a token set that no longer matches -- so repack refuses. That
-    is a real finding (the operator who follows Step 4 rule 9 is deadlocked, F41's family) and
+    is a real finding (the operator who follows skill Step 4 rule 9 is deadlocked, F41's family) and
     it is reported as one.
 
     But it also means the DEFECT has no page, and a fix nobody can see is a fix taken on
@@ -432,7 +432,7 @@ _GLOSSARY_TEXT_RE = re.compile(
 def _glossary_passthrough(src_docx, workdir):
     """['--glossary', <path>] when the source carries a text-bearing glossary part, else [].
 
-    ADDED FOR BRANCH 7 SLICE 2, and without it this tool simply FAILS on any document that
+    ADDED FOR SUB-STEP 7.2, and without it this tool simply FAILS on any document that
     has one: repack now REFUSES when the original carries a text-bearing
     word/glossary/document.xml and --glossary is absent (register C19). A renderer that dies
     on a new fixture is the shape "fix the class, not the caller" warns about — so the
@@ -509,7 +509,7 @@ def step_failure(proc):
 
 
 def run_post_process_doc(scripts_dir, adir, xml):
-    """--doc WITH --post-process (branch 11 slice 4a): the applied XML through post_process and
+    """--doc WITH --post-process (step 11's sub-step 4a): the applied XML through post_process and
     the definitions reorder before repack, as the pipeline runs them.
 
     Without it the --doc arm runs apply and repack ONLY, so a change inside post_process --
@@ -549,12 +549,12 @@ def run_post_process_doc(scripts_dir, adir, xml):
 def repack(scripts_dir, src_docx, doc_xml, out_docx, notes_json):
     """repack, with every side part the ORIGINAL carries DECLARED KEPT beside the notes first.
 
-    REGISTER I-34. Since Step 10's wiring (branch 11, 2026-09-30) repack runs the delivered-document check,
+    REGISTER I-34. Since skill Step 10's wiring (step 11, 2026-09-30) repack runs the delivered-document check,
     which reads each text-bearing header, footer, comment, footnote, endnote and glossary part of the original
     against a declaration beside the notes. This tool renders the BODY: every side part is delivered as the
     original's. With no declaration the check rightly refused the NEW arm -- measured 2026-10-08 on 5 of 12 real
     documents, uk and us alike, while the OLD arm, whose repack predates the check, delivered: a render with
-    no new arm. So the side parts are declared KEPT, as a compliant keep-as-is run declares them under Step 8,
+    no new arm. So the side parts are declared KEPT, as a compliant keep-as-is run declares them under skill Step 8,
     by tools/keep_declarations.py -- the one helper every harness uses -- here, in the one place both arms and
     both paths go through, as _glossary_passthrough is. From the WORKING TREE's variant scripts on both arms,
     so the two arms get the same input and the code stays the one variable; the old arm's repack never reads
@@ -580,11 +580,11 @@ def repack(scripts_dir, src_docx, doc_xml, out_docx, notes_json):
 # =========================================================================================
 # SYNTHETIC FIXTURES — renders KEPT, because there is no client text in them.
 # =========================================================================================
-# A PINNED-BASELINE ARM FOR FIXTURES, BUILT ONCE. Added for branch 6's fourth slice.
+# A PINNED-BASELINE ARM FOR FIXTURES, BUILT ONCE. Added for sub-step 6.4.
 #
 # WITHOUT IT A FIXTURE RENDER SHOWS `source` VERSUS `applied-with-whatever-is-in-the-tree`, so
 # the DEFECT is not on any page and the reviewer is asked to take the improvement on trust.
-# Slice 3 hit exactly this and worked around it by hand -- "rendering a third arm from the
+# Sub-step 6.3 hit exactly this and worked around it by hand -- "rendering a third arm from the
 # pre-widening script" -- which is a step nobody can repeat and nothing records. The real
 # corpus path has had this arm since it was written; the fixture path did not, and the
 # asymmetry was invisible because only the corpus path was ever red.
@@ -693,11 +693,11 @@ for stem in args.fixture:
         shutil.copyfile(fx, adir / "source.docx")
         shutil.copyfile(nj, adir / "paragraphs.json")
         if args.post_process:
-            # BRANCH 10 SLICE 3a — THE ARM THAT CLOSES SECTION 5.2's GATE FOR THIS BRANCH.
+            # STEP 10's SUB-STEP 3a — THE ARM THAT CLOSES SECTION 5.2's GATE FOR THIS STEP.
             #
-            # Slices 1 and 2 left the rendered diff undischarged and said why in terms: this
+            # Sub-steps 10.1 and 10.2 left the rendered diff undischarged and said why in terms: this
             # tool's fixture path drives apply and repack and NEVER post_process, so no
-            # slice of branch 10 could reach a page. That was a limit of the instrument and
+            # sub-step of step 10 could reach a page. That was a limit of the instrument and
             # was recorded as a gap rather than waved through as an N/A. This is the arm the
             # previous READ-ME named as what would close it.
             #
@@ -819,23 +819,23 @@ for stem in args.fixture:
         "  new-pN.png       the deliverable with the working tree's code — THE FIX",
         "",
         "The `old` arm is the point. Without it you would be asked to believe the",
-        "improvement rather than see it, which is what happened on the previous slice.",
+        "improvement rather than see it, which is what happened on the previous sub-step.",
         "",
         # THIS BLOCK IS REWRITTEN ON EVERY BRANCH, NEVER APPENDED TO, AND IT STATES NO COUNT OF
-        # HOW OFTEN: it said "each of the last eight" and went stale the slice after, which is
+        # HOW OFTEN: it said "each of the last eight" and went stale the sub-step after, which is
         # every count's fate here. Nothing checks it. Left describing the previous change it
         # sends a reviewer hunting for something that is already in the `old` arm, and a
         # reviewer who cannot find what the text promises reads a correct page as a defect --
-        # which happened on the table-of-contents slice, where two deliberate refusals were read
+        # which happened on the table-of-contents sub-step, where two deliberate refusals were read
         # as damage because nothing on the page said they were deliberate.
         #
         # THE REWRITES ARE NO LONGER A CADENCE, THEY ARE A DESIGN FACT: this text is a
-        # per-branch artefact living in a permanent file, and the only thing keeping it true is
-        # that somebody remembers. Every other per-branch claim in this repository that nothing
+        # per-step artefact living in a permanent file, and the only thing keeping it true is
+        # that somebody remembers. Every other per-step claim in this repository that nothing
         # checks has gone stale at least once.
-        "WHAT THIS BRANCH CHANGED — BRANCH 10 SLICE 4, THE PAGE-BREAK PASS INSERTS NOTHING (B7).",
+        "WHAT THIS STEP CHANGED — SUB-STEP 10.4, THE PAGE-BREAK PASS INSERTS NOTHING (B7).",
         "Render schedule-breaks.docx with --post-process --expect-pages-move schedule-breaks",
-        "AND LT_BASELINE_REF=6d8bbab, the last merge before this slice -- at the default pin",
+        "AND LT_BASELINE_REF=6d8bbab, the last merge before this sub-step -- at the default pin",
         "both arms carry the fix and that flag fails by design -- then compare old-pN.png",
         "against new-pN.png, and new-pN.png against source-pN.png.",
         "",
@@ -862,7 +862,7 @@ for stem in args.fixture:
         "on these pages: every fixture shares one styles part, so it is proved in bytes by",
         "tests/test_pass_conditions.py instead.",
         "",
-        "  WHERE THE REST OF THIS SLICE'S PROOF IS:",
+        "  WHERE THE REST OF THIS SUB-STEP'S PROOF IS:",
         "    tests/test_pass_conditions.py   71 checks on each variant, 0 failures, 0 void, and",
         "      PROVED RED against 6d8bbab on both. It also enforces the PRINCIPLE: a pass",
         "      post_process runs without a PASS_CONDITIONS row turns it red, and its planted",
@@ -872,17 +872,17 @@ for stem in args.fixture:
         "      break pass's count going N -> 0 on each, 11 breaks in all, both variants, and",
         "      0 unexplained.",
         "",
-        "PREVIOUS SLICES, FOR ORIENTATION ONLY — 3b, a mandatory rewrite no longer overrules the",
+        "PREVIOUS SUB-STEPS, FOR ORIENTATION ONLY — 3b, a mandatory rewrite no longer overrules the",
         "lexicon (B5, B6(a), F29, B9, F45); and 3a, the italic strip made conditional on what",
         "the operator declared (B1). Both are in the pinned baseline, so neither is a difference",
         "here. Render lexicon-choice.docx or italic-declared.docx to see their pages.",
         "",
-        "PREVIOUS BRANCH, FOR ORIENTATION ONLY — BRANCH 8, extraction completeness (C28,",
+        "PREVIOUS STEP, FOR ORIENTATION ONLY — STEP 8, extraction completeness (C28,",
         "C12, M1): the one check that reads the ORIGINAL document. That is now in the pinned",
         "baseline, so it is no longer visible as a difference here. It had no page either —",
         "what it reports is an ABSENCE from a JSON file, not a mark on a document.",
         "",
-        "THE SLICE BEFORE THAT, FOR ORIENTATION ONLY — A19, translatable text held in GRAPHIC",
+        "THE SUB-STEP BEFORE THAT, FOR ORIENTATION ONLY — A19, translatable text held in GRAPHIC",
         "METADATA. That is now in the pinned baseline, so it is no longer visible as a",
         "difference here. Neither of its surfaces ever had a page in any renderer: alt text",
         "is an XML attribute a SCREEN READER SPEAKS, never painted in any viewer, and a",
@@ -891,7 +891,7 @@ for stem in args.fixture:
         "Its proof is tests/test_graphic_metadata.py, 95 checks per variant, and",
         "graphic-metadata.docx is deliberately NOT rendered by this tool.",
         "",
-        "THE SLICE BEFORE THAT, FOR ORIENTATION ONLY — C19, the glossary part's route in and out.",
+        "THE SUB-STEP BEFORE THAT, FOR ORIENTATION ONLY — C19, the glossary part's route in and out.",
         "That is now in the pinned baseline, so it is no longer visible as a difference",
         "here. glossary.docx labels its own three rows; its proof was never visual either.",
         "",
@@ -915,7 +915,7 @@ for stem in args.fixture:
         "                          KEPT even when empty, because it renders.",
         "    ruby-in-run           looks the SAME in both arms and is still wrong in both.",
         "                          apply destroys the ruby annotation, and putting it back",
-        "                          needs the per-run English branch 15 emits. Pinned, not",
+        "                          needs the per-run English step 15 emits. Pinned, not",
         "                          fixed — see tests/test_container_inventory.py.",
         "    fldsimple-ref         the clause number appears TWICE in both arms. A9's",
         "                          duplication in the one field form clause 3 cannot see.",
@@ -923,15 +923,15 @@ for stem in args.fixture:
         "",
         "  THE ALT TEXT AND THE CHART TITLE DO NOT SHOW ON ANY PAGE, and that is A19 rather",
         "  than a rendering problem: alt text is an attribute a screen reader speaks, and the",
-        "  chart title lives in its own part. SLICE 3 HAS NOW CLOSED A19, and apply must",
-        "  still leave both alone — the translation route is Step 8b's, which writes header",
+        "  chart title lives in its own part. SUB-STEP 7.3 HAS NOW CLOSED A19, and apply must",
+        "  still leave both alone — the translation route is skill Step 8b's, which writes header",
         "  and footer parts only, so this fixture's BODY alt text is reported and NOT",
         "  translated. test_container_inventory.py asserts apply's hands-off in both",
         "  directions; test_graphic_metadata.py owns the fix.",
         "",
     ] + ([
         # THIS PARAGRAPH SAID "NO post_process" ON EVERY RENDER, INCLUDING THE --post-process
-        # RENDERS THAT ARE NOTHING BUT post_process, for the whole of slice 3a. A sentence
+        # RENDERS THAT ARE NOTHING BUT post_process, for the whole of sub-step 3a. A sentence
         # true of one mode and printed in both is a claim nothing checks, so it follows the
         # mode now rather than being rewritten for whichever one ran last.
         "WHAT THESE PAGES ARE NOT. They come from post_process ALONE, run over the fixture's",
@@ -959,8 +959,8 @@ if args.doc:
     if not LOGS.exists():
         print(f"\n  logs folder not reachable at {LOGS}. SKIP, not a pass.")
         sys.exit(0 if not FAIL else 1)
-    # REF's WHOLE scripts tree, as the fixture arm above and for the same reason (branch 11
-    # slice 2b): this arm runs apply AND repack, and a baseline that swapped apply alone ran the
+    # REF's WHOLE scripts tree, as the fixture arm above and for the same reason (step 11's
+    # sub-step 2b): this arm runs apply AND repack, and a baseline that swapped apply alone ran the
     # working tree's repack on both sides -- VOID for a repack change, never a comparison.
     TMP = Path(tempfile.mkdtemp(prefix="b6-render-"))
     # WHATEVER ENDS THE RUN, the converted .docx and .pdf files of a real document go with it: the rmtree at
@@ -1159,7 +1159,7 @@ if args.doc:
                   "structural and invisible in print. Not a failure; a result.")
         changed_docs.append(label if changed else None)
     ok(f"at least one document re-rendered ({sum(1 for c in changed_docs if c)} of "
-       f"{len(changed_docs)}) \u2014 a branch that moves delivered bytes must change "
+       f"{len(changed_docs)}) \u2014 a step that moves delivered bytes must change "
        "SOME page, though not every document need change one",
        any(changed_docs))
     shutil.rmtree(TMP, ignore_errors=True)

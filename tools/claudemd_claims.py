@@ -400,7 +400,7 @@ head(6, "FILESYSTEM STATE — every claim about what does and does not exist")
 # validators. So the assertions now describe the state the charter CURRENTLY claims, and the
 # two rules that genuinely survive the change are kept and marked.
 FS = [
-    ("`.git` exists — the repository was created at branch 0", (ROOT / ".git").exists()),
+    ("`.git` exists — the repository was created at step 0", (ROOT / ".git").exists()),
     ("`.gitignore` exists", (ROOT / ".gitignore").exists()),
     ("`.gitattributes` exists — it is what stops line-ending translation",
      (ROOT / ".gitattributes").exists()),
@@ -791,8 +791,8 @@ if arch_dir.exists():
 else:
     warn("13", "the claude-md-archive folder was not found")
 
-head(15, "THE NEW CONTENT — §6.3's envisaged tree, and §3's step/branch mapping")
-# §6.3 projects what the build does to the tree. Each row must trace to a branch that
+head(15, "THE NEW CONTENT — §6.3's envisaged tree, and §3's phase/step mapping")
+# §6.3 projects what the build does to the tree. Each row must trace to a step that
 # exists in the plan, and the two numbers it states must be defensible.
 if present("198 files becomes roughly 200 to 205 per variant"):
     manifest_rows = len(re.findall(r"\*\*A manifest per tree\*\*", CMD))
@@ -801,7 +801,7 @@ if present("198 files becomes roughly 200 to 205 per variant"):
            "— the manifest is the only committed +1")
     else:
         fail("15", "§6.3 gives a file-count projection without saying which part is a guess")
-# the branch numbers §3 names must exist in the plan's own table
+# the step numbers §3 names must exist in the plan's own table
 named_branches = set(int(x) for x in re.findall(r"\*\*(\d+) — ", CMD))
 plan_branches = set(int(x) for x in re.findall(r"^\| \*\*(\d+)\*\* \|", sb_branch_table, re.M))
 if named_branches - plan_branches:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""THE BRANCH AUDIT — re-derive every claim branches 0, 1 and 2 make, by routes the tools
+"""THE STEP AUDIT — re-derive every claim steps 0, 1 and 2 make, by routes the tools
 under audit do not use.
 
 WHY THIS IS A COMMITTED TOOL RATHER THAN SCRATCH. Three throwaway audits were written before
@@ -9,7 +9,7 @@ be re-tested. An audit that cannot be re-run is a memory, not a control.
 
 EVERY BUG THOSE THREE HAD IS FIXED HERE, and each fix is commented where it lives:
 
-  1. It ran with the wrong branch checked out, so tools added by a later branch appeared to
+  1. It ran with the wrong branch checked out, so tools added by a later step appeared to
      produce no output at all. Everything now reads from git refs by name.
   2. A line-oriented exit scan missed `sys.exit(...)` split across two lines and MANUFACTURED
      a finding against a script that was fine.
@@ -51,7 +51,7 @@ from pathlib import Path
 def strip_comments(text):
     """Remove comment tokens, keeping code and string literals intact.
 
-    A REGEX OVER SOURCE COUNTS A MECHANISM WHEREVER A MESSAGE MERELY DESCRIBES IT. Branch 5
+    A REGEX OVER SOURCE COUNTS A MECHANISM WHEREVER A MESSAGE MERELY DESCRIBES IT. Step 5
     added a comment to apply_translations_textmatch.py explaining the new exit-3 test, and
     that comment contains the literal `block_codes={2}` -- so the B1.chain1 scan below
     counted three call sites where the code has two. Filtering on shape cannot separate code
@@ -110,7 +110,7 @@ def resolve(ref):
     """The branch ref if it still exists, otherwise `main` — because a MERGED branch is not
     a missing one. Once a branch is squash-merged and deleted, its content lives on main, and
     an audit that SKIPS at that point stops checking exactly when the work goes live. The
-    first version skipped branches 1 and 2 the moment they were merged."""
+    first version skipped steps 1 and 2 the moment they were merged."""
     for cand in (ref, "main"):
         if subprocess.run(["git", "rev-parse", "--verify", "-q", cand],
                           capture_output=True, cwd=ROOT).returncode == 0:
@@ -151,11 +151,11 @@ ZIPS = (("uk", "legal-translation (UK English).skill"),
         ("us", "legal-translation (US English).skill"))
 
 
-# =========================================================================== BRANCH 0
+# =========================================================================== STEP 0
 def audit_b0():
-    head("BRANCH 0 — the baseline")
+    head("STEP 0 — the baseline")
     if not ARCH.exists():
-        SKIP.append("branch 0: publication archives unreachable")
+        SKIP.append("step 0: publication archives unreachable")
         print("  SKIPPED — archives unreachable. This is a skip, not a pass.")
         return
 
@@ -173,7 +173,7 @@ def audit_b0():
     # shipped test, so agreement is evidence rather than an echo.
     #
     # DELIBERATE CHANGES ARE SUBTRACTED, NOT EXCUSED. The trees stopped being byte-identical
-    # the moment a fix branch legitimately edited them. Deleting this comparison would have
+    # the moment a fix step legitimately edited them. Deleting this comparison would have
     # thrown the guarantee away to avoid the paperwork; instead each divergence is named in
     # tests/baselines/baseline-divergences.json, and anything NOT named is still a failure.
     _div = ROOT / "tests" / "baselines" / "baseline-divergences.json"
@@ -198,7 +198,7 @@ def audit_b0():
           (n, len(bad)), (396, 0))
 
     touch = [l for l in git("log", "--all", "--format=%H", "--", "uk", "us").splitlines() if l]
-    # Branch 0 is the only commit that may touch the trees UNTIL a fix branch does so
+    # Step 0 is the only commit that may touch the trees UNTIL a fix step does so
     # deliberately. Report the number rather than asserting one, so a later legitimate
     # change does not read as a regression.
     print(f"  ---- commits touching uk/ or us/ across all refs: {len(touch)}")
@@ -254,7 +254,7 @@ def audit_b0():
           mism, [])
 
 
-# =========================================================================== BRANCH 1
+# =========================================================================== STEP 1
 SENTINEL = 3
 
 
@@ -286,10 +286,10 @@ def script_verdicts(folder):
 
 
 def audit_b1():
-    head("BRANCH 1 — the harness")
+    head("STEP 1 — the harness")
     ref = resolve("feature/test-harness")
     if ref is None:
-        SKIP.append("branch 1: neither its branch nor main could be resolved")
+        SKIP.append("step 1: neither its branch nor main could be resolved")
         print("  SKIPPED — no ref to read from.")
         return
     print(f"  reading from: {ref}")
@@ -337,7 +337,7 @@ def audit_b1():
                                   encoding="utf-8", errors="replace", cwd=ROOT, env=CLEAN_ENV).stdout or ""
             tmp.unlink(missing_ok=True)
         else:
-            SKIP.append("branch 1: check_coverage.py not found on the checkout or the ref")
+            SKIP.append("step 1: check_coverage.py not found on the checkout or the ref")
     m = re.search(r"(\d+) of (\d+) scripts carry a verdict", tool)
     # COMPARE THE TWO DERIVED FIGURES, not each against a literal. This claim is named "the
     # standing coverage tool agrees with this scan" and it compared check_coverage's number
@@ -352,7 +352,7 @@ def audit_b1():
     claim("B1.steps", "5 of 17 pipeline steps have no blocking check",
           (int(m.group(1)), int(m.group(2))) if m else None, (5, 17))
 
-    # BOTH CHAINS WERE CLOSED BY BRANCH 5, so these two claims describe the repair rather
+    # BOTH CHAINS WERE CLOSED BY STEP 5, so these two claims describe the repair rather
     # than the defect. tools/confirm_failure_chains.py is the standing guard on both and
     # measures chain 1 BEHAVIOURALLY; these stay as the cheap static half, because two
     # instruments asking the same question different ways is how this project catches a
@@ -521,10 +521,10 @@ def audit_b1():
         claim("B1.outside", "the catalogue lives OUTSIDE the repository",
               ROOT.resolve() in cat.resolve().parents, False)
     else:
-        SKIP.append("branch 1: frozen-intermediate catalogue unreachable")
+        SKIP.append("step 1: frozen-intermediate catalogue unreachable")
 
 
-# =========================================================================== BRANCH 2
+# =========================================================================== STEP 2
 def table_entries(path, name):
     """Entry count by COUNTING ELEMENTS, not separators. FIXED: counting top-level commas
     was +1 on every table because the source uses trailing commas."""
@@ -542,10 +542,10 @@ def table_entries(path, name):
 
 
 def audit_b2():
-    head("BRANCH 2 — the parity check")
+    head("STEP 2 — the parity check")
     ref = resolve("feature/variant-parity-check")
     if ref is None:
-        SKIP.append("branch 2: neither its branch nor main could be resolved")
+        SKIP.append("step 2: neither its branch nor main could be resolved")
         print("  SKIPPED — no ref to read from.")
         return
     print(f"  reading from: {ref}")
@@ -569,7 +569,7 @@ def audit_b2():
 
     bl = ROOT / "tests" / "baselines" / "known-divergences.json"
     if not bl.exists():
-        SKIP.append("branch 2: divergence baseline not present on this checkout")
+        SKIP.append("step 2: divergence baseline not present on this checkout")
         return
     base = json.loads(bl.read_text(encoding="utf-8"))["divergences"]
     claim("B2.unique", "no duplicate identity in the baseline",
