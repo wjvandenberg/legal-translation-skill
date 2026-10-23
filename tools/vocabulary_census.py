@@ -193,8 +193,8 @@ CODE_SWEPT = {
     "tests/test_graphic_metadata.py": [],
     "tests/test_instruction_rules.py": [],
     "tests/test_stop_deleting.py": [],
-    # rename (d2c), batch 1, 2026-10-23: the tests holding up to nine counted old words and those holding none, the
-    # probe pre-flight pair and the seven largest left for the next session - 150 logged swaps in 27 of these 48
+    # rename (d2c), batch 1, 2026-10-23: the tests holding up to nine counted old words and those holding none - 150
+    # logged swaps in 27 of these 48; the larger tests are batch 2's, above
     "tests/docx_census.py": [],
     "tests/negative_inputs.py": [],
     "tests/run_tests.py": [],
@@ -256,7 +256,7 @@ CODE_SWEPT = {
     # logged swaps in 24 of them, the other 18 holding no old word in living text
     "tools/apply_corpus_diff.py": [],
     "tools/audit_branches.py": [
-        ("phrase", "audit_branches.py --branch 0", "its usage line: git's own --branch flag"),
+        ("phrase", "audit_branches.py --branch 0", "its usage line: the tool's own --branch flag, an identifier"),
     ],
     "tools/audit_register.py": [],
     "tools/changelog_confidentiality.py": [],

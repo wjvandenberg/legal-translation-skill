@@ -49,7 +49,14 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "tools" / "hooks"
 CHECK = "--check" in sys.argv
 sys.path.insert(0, str(ROOT / "tools"))
-from install_hooks import checker_missing, interpreter_missing  # noqa: E402  (the house's, see the docstring)
+try:
+    from install_hooks import checker_missing, interpreter_missing  # noqa: E402  (the house's, see the docstring)
+    CHECKS = ((checker_missing, "NO CHECKER"), (interpreter_missing, "NO PYTHON"))
+except ImportError as exc:
+    # A HOUSE RELEASE THAT RENAMES EITHER MUST NOT STOP THE INSTALL: the hooks still go in, and the gap is a PROBLEM.
+    CHECKS = ()
+    IMPORT_GAP = (f"the push check's two install-time warnings could not be imported from tools/install_hooks.py "
+                  f"({exc}) - whether a push can run its checker was NOT checked")
 
 r = subprocess.run(["git", "rev-parse", "--git-path", "hooks"], capture_output=True,
                    text=True, cwd=ROOT)
@@ -87,7 +94,8 @@ for src in sorted(SRC.iterdir()):
         state = "NOT EXECUTABLE"
     else:
         state = "installed, executable"
-    for why, said in ((checker_missing(ROOT, src), "NO CHECKER"), (interpreter_missing(ROOT, src), "NO PYTHON")):
+    for check, said in CHECKS:
+        why = check(ROOT, src)
         if why:
             problems.append(why)
             state += f" - BUT {said} FOR ITS PUSH CHECK: every push will be refused"
@@ -105,6 +113,8 @@ print("    Both are LOCAL accident guards. They do not travel with a clone and e
 print("    be bypassed. Server-side branch protection on main is the real control, live since")
 print("    the repository went public - see the note in tools/hooks/pre-push.")
 print("=" * 92)
+if not CHECKS:
+    problems.append(IMPORT_GAP)
 if problems:
     for p in problems:
         print(f"  PROBLEM: {p}")
