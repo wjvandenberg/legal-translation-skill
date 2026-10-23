@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 6 — STOP DELETING WHAT YOU DO NOT RECOGNISE. The synthetic arm.
+"""STEP 6 — STOP DELETING WHAT YOU DO NOT RECOGNISE. The synthetic arm.
 
-Option 1's first slice. Seven accountable rows from PLAN-2-step-b.md section 9.3:
-A1 A2 A3 A6 A8 A9 F27. C16, C17 and F16 are a declared follow-on slice (2026-09-01) --
+Option 1's first sub-step. Seven accountable rows from PLAN-2-step-b.md section 9.3:
+A1 A2 A3 A6 A8 A9 F27. C16, C17 and F16 are a declared follow-on sub-step (2026-09-01) --
 they are boundary-whitespace and offset defects in three other functions, not deletions.
 
 THE ACCEPTANCE CONDITION IS THE OPPOSITE OF THE LAST BRANCH'S, AND THAT IS THE POINT.
-tests/test_no_delivered_byte_moves.py proves branch 14 moved no delivered byte. This branch
+tests/test_no_delivered_byte_moves.py proves step 14 moved no delivered byte. This step
 MUST move delivered bytes -- it is the first fix branch that changes a delivered document --
 so the condition is not "nothing moved" but "everything that moved is explained by a register
 row". This file is the synthetic half of that: it asserts the four structures the fixture
@@ -20,7 +20,7 @@ covers less than it appears to is this project's most frequent failure:
   A9                tests/fixtures/cross-reference.docx, section 4. That fixture was BUILT
                     for this branch on 2026-09-01: no existing fixture carried a field
                     skeleton, and PLAN-2-step-b.md section 3.7's own fixture list for
-                    branch 6 does not name one either, so until now A9's only instrument was
+                    step 6 does not name one either, so until now A9's only instrument was
                     the D06 frozen intermediate.
 
 WHAT IT DOES NOT COVER:
@@ -29,7 +29,7 @@ WHAT IT DOES NOT COVER:
        either fixture. Real arm only.
   A3's RELOCATION, as opposed to A3's destruction. See section 2: apply rebuilds from one
        unbroken English string, so a tab that sat between two text atoms cannot be put back
-       between them. Deferred to branch 16 and ASSERTED as the current outcome, so that
+       between them. Deferred to step 16 and ASSERTED as the current outcome, so that
        branch must change this file deliberately rather than silently.
 
 The four mechanisms, measured at HEAD on 2026-09-01 before any fix, all four reproducing:
@@ -148,7 +148,7 @@ src_root = etree.fromstring(SRC)
 SRC_PARAS = list(src_root.iter(f"{{{W}}}p"))
 
 print("=" * 98)
-print(f"BRANCH 6 — STOP DELETING · synthetic arm · {args.variant}/scripts/"
+print(f"STEP 6 — STOP DELETING · synthetic arm · {args.variant}/scripts/"
       "apply_translations_textmatch.py")
 print("=" * 98)
 
@@ -318,9 +318,9 @@ if not d05:
 else:
     i = d05[0]
     src_a, out_a = content_atoms(SRC_PARAS[i]), content_atoms(OUT_PARAS[i])
-    ok(f"A3  the hanging-indent tab is DEFERRED to branch 16   {src_a} -> {out_a}",
+    ok(f"A3  the hanging-indent tab is DEFERRED to step 16   {src_a} -> {out_a}",
        out_a == ["text"],
-       "the outcome changed — if branch 15/16 now supplies per-run English, update this "
+       "the outcome changed — if step 15/16 now supplies per-run English, update this "
        "assertion deliberately; if not, something else moved")
 
 # AND THE OTHER HALF OF THE RULE, WITHOUT WHICH THE ONE ABOVE IS UNFALSIFIABLE. A tab that
@@ -418,7 +418,7 @@ else:
 
 # =========================================================================================
 # 4. A9 — CLAUSE 3, THE ONLY DELETION. A separate fixture, because a REF field skeleton is a
-#    shape no other fixture carries and STEP-B section 3.7's own list for branch 6 omits it.
+#    shape no other fixture carries and STEP-B section 3.7's own list for step 6 omits it.
 # =========================================================================================
 print("\n4. A9 — a consumed cross-reference skeleton must GO; an unevaluated one must STAY")
 print("-" * 98)

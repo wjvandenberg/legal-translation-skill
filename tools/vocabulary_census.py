@@ -180,6 +180,19 @@ CODE_SWEPT = {
     "tools/reachability.py": [],
     "tools/stepb_audit.py": [],
     "tests/probe-5b/make_probe_documents.py": [],
+    # rename (d2c), batch 2, 2026-10-23: six of the seven largest tests, 124 logged swaps; make_fixtures.py and the
+    # probe pre-flight pair left pending
+    "tests/test_change_journal.py": [],
+    "tests/test_delivered_check.py": [],
+    "tests/test_delivered_sides.py": [
+        ("phrase", "SLICE 3's WRITTEN PLAN", "a quotation of the build plan's dated heading, which keeps its words"),
+        ("phrase", "SLICE 3b's WRITTEN PLAN", "a quotation of the build plan's dated heading, which keeps its words"),
+        ("phrase", "SLICE 4c's WRITTEN PLAN", "a quotation of the build plan's dated heading, which keeps its words"),
+        ("phrase", '# SLICE 3a, 2026-09-28', "a needle into a script's dated comment, which keeps its words"),
+    ],
+    "tests/test_graphic_metadata.py": [],
+    "tests/test_instruction_rules.py": [],
+    "tests/test_stop_deleting.py": [],
     # rename (d2c), batch 1, 2026-10-23: the tests holding up to nine counted old words and those holding none, the
     # probe pre-flight pair and the seven largest left for the next session - 150 logged swaps in 27 of these 48
     "tests/docx_census.py": [],
@@ -325,6 +338,10 @@ CODE_SWEPT = {
         ("phrase", "Branch 7 rendered comparison", "a phrase kept for a test, declared here"),
         ("phrase", "a slice of rp.stderr", "a phrase kept for a test, declared here"),
         ("phrase", "own slice edge", "a phrase kept for a test, declared here"),
+        ("phrase", "SLICE 3's WRITTEN PLAN", "a phrase kept for a test, declared here"),
+        ("phrase", "SLICE 3b's WRITTEN PLAN", "a phrase kept for a test, declared here"),
+        ("phrase", "SLICE 4c's WRITTEN PLAN", "a phrase kept for a test, declared here"),
+        ("phrase", "# SLICE 3a, 2026-09-28", "a phrase kept for a test, declared here"),
     ],
 }
 _TEXT_TOKENS = {tokenize.STRING} | {getattr(tokenize, n) for n in ("FSTRING_MIDDLE", "TSTRING_MIDDLE")

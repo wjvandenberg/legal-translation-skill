@@ -1,5 +1,5 @@
-"""test_delivered_sides.py - branch 11 slices 3a and 3b: the SIDE-PART arm of `validate_apply.py
---delivered --original`, and slice 3b's declaration route for footnotes, endnotes and the glossary, on
+"""test_delivered_sides.py - step 11's sub-steps 3a and 3b: the SIDE-PART arm of `validate_apply.py
+--delivered --original`, and sub-step 3b's declaration route for footnotes, endnotes and the glossary, on
 synthetic input. Every document here is invented and built in a temporary directory; nothing is read
 from the corpus.
 
@@ -25,7 +25,7 @@ ONE FAILING INPUT PER ARM, RED FIRST, AND A CLEAN DOCUMENT PROVED QUIET. What ea
       rewrites it too
    9  A MULTI-PARAGRAPH COMMENT DECLARED WITH NO LINE BREAK, THROUGH THE REAL SCRIPT, ARRIVES AS ONE
       PARAGRAPH: COUNTED, never blocking (Wouter, 2026-09-25 (4)), so --strict still exits 0.
-      RE-PINNED 2026-09-29 (4): its declaration carried a line break, which slice 4c now splits,
+      RE-PINNED 2026-09-29 (4): its declaration carried a line break, which sub-step 4c now splits,
       so it keeps its claim on the case choice (6) says stays counted -- a declaration with none
   10  comments with no declaration kept as the source's are undeclared-kept, one per id
   11  a declared comment delivered as the source's is declared-source; one declared kept is quiet
@@ -35,19 +35,19 @@ ONE FAILING INPUT PER ARM, RED FIRST, AND A CLEAN DOCUMENT PROVED QUIET. What ea
   15  references BY ID in every part: an orphaned footnote, a dangling comment; an orphan the
       ORIGINAL already has is inherited, a count and never a finding
   16  a text-bearing part the delivery lacks is missing, and is not reported a second time
-  17  a text-bearing part outside Step 8's six kinds delivered byte-identical is kept-source
+  17  a text-bearing part outside skill Step 8's six kinds delivered byte-identical is kept-source
   18  NOT READ, never a pass: a delivery given as document.xml, and no original
   19  a partial install -- the header/footer script's reader absent -- is a NAMED gap and a
       finding, never a silent skip
  19b  F47, PROVED WITH THE REAL SCRIPT: --list shows the comment as Word shows it, '&' and never
-      '&amp;', so the verbatim copy Step 8c asks for is escaped ONCE and the check is quiet; an
-      escaped copy, what --list showed before slice 4c, is still escaped twice and reported moved.
+      '&amp;', so the verbatim copy skill Step 8c asks for is escaped ONCE and the check is quiet; an
+      escaped copy, what --list showed before sub-step 4c, is still escaped twice and reported moved.
       (Until 2026-09-29 (4) this arm pinned the defect itself: --list showed '&amp;'.)
   20  a declaration file that will not parse, or is the wrong JSON shape, is a finding, never read
       as no declaration; a scaffold entry that matches no paragraph is unmatched, never dropped
   21  --strict turns a side finding into exit 1; without it the run exits 0
 
-SLICE 3b (PLAN-2-step-b.md section 3.2, block "SLICE 3b's WRITTEN PLAN"): Step 8d and 8e save
+SUB-STEP 3b (PLAN-2-step-b.md section 3.2, block "SLICE 3b's WRITTEN PLAN"): skill Step 8d and 8e save
 footnotes_translations.json, endnotes_translations.json and glossary_translations.json beside the
 notes -- source w:t text to English, a text mapped to itself kept (Wouter, 2026-09-28 (2)):
   22  footnotes and endnotes DECLARED KEPT -- every letter-bearing text mapped to itself -- delivered
@@ -66,13 +66,13 @@ notes -- source w:t text to English, a text mapped to itself kept (Wouter, 2026-
   30  a U+200B in the SOURCE, which repack's scrub removes from every side part, hides nothing: a
       footnote, header, comment and glossary paragraph kept as the source's less it are still
       findings, and declared kept each is quiet -- never moved (register I-32)
-  31  STEP 8d's AND 8e's OWN TEMPLATES, run from the step document on a synthetic document, write
+  31  skill STEP 8d's AND 8e's OWN TEMPLATES, run from the step document on a synthetic document, write
       what the check reads: the declared English and the declared keep quiet, a text left out of
       the file shipped in the source's words and reported
-  32  Step 8's wording in both trees: 8b and 8d are MANDATORY whenever the part carries text, no
+  32  skill Step 8's wording in both trees: 8b and 8d are MANDATORY whenever the part carries text, no
       step document gates on source-language text (C7), and the three files are named
 
-SLICE 4c (PLAN-2-step-b.md section 3.2, block "SLICE 4c's WRITTEN PLAN"): A23, a multi-paragraph
+SUB-STEP 4c (PLAN-2-step-b.md section 3.2, block "SLICE 4c's WRITTEN PLAN"): A23, a multi-paragraph
 comment, and F47, the reader's escaping (Wouter, 2026-09-28 (3), choices (6) and (7)). A comment's TEXT
 PARAGRAPH is a w:p whose own w:t text holds anything but whitespace:
   36  comments of 2, 3 and 4 text paragraphs, the 4 with an empty paragraph between, declared with line
@@ -86,7 +86,7 @@ PARAGRAPH is a w:p whose own w:t text holds anything but whitespace:
   39  --list prints each comment's text paragraphs one per line with their count, the empty paragraph
       not printed, and the counts are the ones the check reads
   40  a multi-paragraph KEEP copied from --list is quiet; the same keep delivered changed is moved
-  41  Step 8c's wording, both trees
+  41  skill Step 8c's wording, both trees
 
   33  the check READS ONLY: every input file hashes the same before and after
   34  no document text is printed, only part names, ids, classes and lengths
@@ -94,7 +94,7 @@ PARAGRAPH is a w:p whose own w:t text holds anything but whitespace:
 
     uv run --with lxml python tests/test_delivered_sides.py
     uv run --with lxml python tests/test_delivered_sides.py --variant us
-    uv run --with lxml python tests/test_delivered_sides.py --script <path>   # the pre-slice copy, for RED
+    uv run --with lxml python tests/test_delivered_sides.py --script <path>   # the pre-sub-step copy, for RED
 """
 import argparse
 import hashlib
@@ -334,7 +334,7 @@ FN_DECL, EN_DECL, GL_DECL = ("footnotes_translations.json", "endnotes_translatio
                              "glossary_translations.json")
 
 print("=" * 96)
-print(f"BRANCH 11 SLICES 3a AND 3b — the side-part arm of validate_apply --delivered --original  "
+print(f"STEP 11's SUB-STEPS 3a AND 3b — the side-part arm of validate_apply --delivered --original  "
       f"[{SCRIPT.parent.parent.name}]")
 print("=" * 96)
 
@@ -518,7 +518,7 @@ r, rep = case("part-missing", deliv=swap(DELIV, word__endnotes_xml=None))
 ok("word/endnotes.xml is missing, reported ONCE, beside the reference it leaves dangling",
    sf(rep) == [("side-part", "missing", ENX, None), ("side-ref", "endnote:dangling", None, "1")], str(sf(rep)))
 
-print("\n17  a text-bearing part outside Step 8's six kinds")
+print("\n17  a text-bearing part outside skill Step 8's six kinds")
 r, rep = case("part-outside", orig=with_members(ORIG, {"word/charts/chart1.xml": CHART}),
               deliv=with_members(DELIV, {"word/charts/chart1.xml": CHART}))
 ok("a chart part delivered byte-identical is kept-source",
@@ -556,7 +556,7 @@ lst = script_run("translate_comments --list", [str(SCRIPTS / "translate_comments
                                                "--list"])
 ok("--list shows the operator the comment as Word shows it — '&', never '&amp;'",
    "    Terms & conditions" in lst.stdout.splitlines() and "&amp;" not in lst.stdout, lst.stdout[-200:])
-shown = {"0": "First remark", "1": "Terms & conditions"}            # copied from --list, as Step 8c says
+shown = {"0": "First remark", "1": "Terms & conditions"}            # copied from --list, as skill Step 8c says
 (d19 / "t.json").write_bytes(json.dumps(shown).encode("utf-8"))
 script_run("translate_comments (the copy)", [str(SCRIPTS / "translate_comments.py"), str(d19 / "orig.docx"),
                                             str(d19 / "out"), "--translations", str(d19 / "t.json")])
@@ -566,7 +566,7 @@ ok("...and the script escapes that copy ONCE", b"Terms &amp; conditions" in once
 r, rep = case("cm-escape", orig=swap(ORIG, word__comments_xml=amp), deliv=with_members(DELIV, {CMX: once}), cm=shown)
 ok("the check reads the copy as a KEEP delivered as the source's, and is quiet",
    sf(rep) == [] and tally(rep, "comments").get("declared kept") == 1, f"{sf(rep)} {tally(rep, 'comments')}")
-esc = {"0": "First remark", "1": "Terms &amp; conditions"}          # what --list showed before slice 4c
+esc = {"0": "First remark", "1": "Terms &amp; conditions"}          # what --list showed before sub-step 4c
 (d19 / "t-esc.json").write_bytes(json.dumps(esc).encode("utf-8"))
 script_run("translate_comments (an escaped copy)", [str(SCRIPTS / "translate_comments.py"), str(d19 / "orig.docx"),
                                                    str(d19 / "out-esc"), "--translations", str(d19 / "t-esc.json")])
@@ -603,7 +603,7 @@ def srt(xs):
 
 KEPT_FN_EN = swap(DELIV, word__footnotes_xml=ORIG[FNX], word__endnotes_xml=ORIG[ENX])
 
-print("\n22  SLICE 3b — footnotes and endnotes DECLARED KEPT are quiet")
+print("\n22  SUB-STEP 3b — footnotes and endnotes DECLARED KEPT are quiet")
 r, rep = case("notes-declared-kept", deliv=KEPT_FN_EN, strict=True,
               extra={FN_DECL: {"Przypis jeden": "Przypis jeden"}, EN_DECL: {"Uwaga końcowa": "Uwaga końcowa"}})
 ok("footnote 1 and endnote 1, every letter-bearing text mapped to itself, delivered as the source's: no "
@@ -705,7 +705,7 @@ r, rep = case("zwsp-declared", orig=z_orig, deliv=z_deliv,
               extra={FN_DECL: {f"Przypis{Z}jeden": f"Przypis{Z}jeden"}, GL_DECL: {f"Blok{Z}tekstu": f"Blok{Z}tekstu"}})
 ok("...and each, declared kept, is quiet — never moved", sf(rep) == [], str(sf(rep)))
 
-print("\n31  Step 8d's and 8e's OWN TEMPLATES, run from the step document, write what the check reads")
+print("\n31  skill Step 8d's and 8e's OWN TEMPLATES, run from the step document, write what the check reads")
 doc8 = (ROOT / args.variant / "skill-docs" / "08-aux-and-quality.md").read_text(encoding="utf-8")
 
 
@@ -717,7 +717,7 @@ def template(heading):
 
 
 t8d, t8e = template("#### Step 8d"), template("#### Step 8e")
-ok("Step 8d's template loads its part's translations file, and Step 8e's the glossary's",
+ok("skill Step 8d's template loads its part's translations file, and skill Step 8e's the glossary's",
    "PART = 'footnotes'" in t8d and "_translations.json" in t8d and "glossary_translations.json" in t8e,
    f"8d={len(t8d)} 8e={len(t8e)}")
 d31 = TMP / "templates-real"
@@ -749,7 +749,7 @@ ok("...footnote 1 changed, footnote 2 declared kept, the glossary changed",
    tally(rep, "footnotes").get("changed") == 1 and tally(rep, "footnotes").get("declared kept") == 1
    and tally(rep, "glossary").get("changed") == 1, str({k: tally(rep, k) for k in ("footnotes", "glossary")}))
 
-print("\n32  Step 8's wording, both trees")
+print("\n32  skill Step 8's wording, both trees")
 for v in ("uk", "us"):
     s8 = (ROOT / v / "skill-docs" / "08-aux-and-quality.md").read_text(encoding="utf-8")
     s10 = (ROOT / v / "skill-docs" / "10-repack-and-validate.md").read_text(encoding="utf-8")
@@ -758,10 +758,10 @@ for v in ("uk", "us"):
        "#### Step 8b: Translate headers and footers — MANDATORY (whenever the part carries text)" in s8
        and "#### Step 8d: Translate footnotes / endnotes — MANDATORY (whenever the part carries text)" in s8
        and "if any source-language text" not in s8 and "contain source-language text)" not in s10)
-    ok(f"[{v}] Step 8 names the three translations files", all(n in s8 for n in (FN_DECL, EN_DECL, GL_DECL)))
+    ok(f"[{v}] skill Step 8 names the three translations files", all(n in s8 for n in (FN_DECL, EN_DECL, GL_DECL)))
 
 # ---------------------------------------------------------------------------------------------
-# SLICE 4c. A line break is built with chr(10), never typed as an escape an editing tool could decode.
+# SUB-STEP 4c. A line break is built with chr(10), never typed as an escape an editing tool could decode.
 # ---------------------------------------------------------------------------------------------
 NLC = chr(10)
 REFS3 = (("cref", 0), ("cref", 1), ("cref", 2), ("fref", 1), ("eref", 1))
@@ -819,7 +819,7 @@ def text_paras(xml_bytes):
     return paras, allp
 
 
-print("\n36  SLICE 4c — comments of 2, 3 and 4 text paragraphs, declared with line breaks, through the real script")
+print("\n36  SUB-STEP 4c — comments of 2, 3 and 4 text paragraphs, declared with line breaks, through the real script")
 r36, out36 = tc("split", ORIG36, DECL36)
 ok("the script exits 0 and writes comments.xml", r36.returncode == 0 and out36 is not None,
    (r36.stdout + r36.stderr)[-300:])
@@ -858,7 +858,7 @@ ok("...while the same comment declared with no break is written as before", r.re
    f"rc={r.returncode}")
 
 print("\n38  a break declaration delivered FLATTENED into one run — declared exact, COUNTED, never other")
-# A PIN, green before slice 4c as after it: what the script at 5e0a08e wrote for a break declaration --
+# A PIN, green before sub-step 4c as after it: what the script at 5e0a08e wrote for a break declaration --
 # the whole English, break included, in the first w:t -- is read the same way by the new reading.
 flat38 = comments({0: [P(DECL36["0"]), P("")], 1: [P("Keep this note")]})
 decl38 = {"0": DECL36["0"], "1": "Keep this note"}
@@ -897,12 +897,12 @@ r, rep = case("cm-keep-moved", orig=swap(ORIG, word__comments_xml=KEEP2), deliv=
 ok("...and delivered changed it is moved, and nothing else", sf(rep) == [("side-comment", "moved", CMX, "1")],
    str(sf(rep)))
 
-print("\n41  Step 8c's wording, both trees")
+print("\n41  skill Step 8c's wording, both trees")
 for v in ("uk", "us"):
     s8 = (ROOT / v / "skill-docs" / "08-aux-and-quality.md").read_text(encoding="utf-8")
     a8, b8 = s8.find("#### Step 8c"), s8.find("#### Step 8d")
     c8 = s8[a8:b8] if 0 <= a8 < b8 else ""
-    ok(f"[{v}] Step 8c: --list by paragraph with the count, one line break between paragraphs, a mismatch "
+    ok(f"[{v}] skill Step 8c: --list by paragraph with the count, one line break between paragraphs, a mismatch "
        "refused, a no-break declaration counted flattened, Word's text shown",
        all(x in c8 for x in ("prints each comment's text paragraphs one per line, with their count",
                              "one line break", "refused, naming the comment and both counts",
