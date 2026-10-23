@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 14 — PROVE THE DELIVERED DOCUMENT DOES NOT MOVE.
+"""STEP 14 — PROVE THE DELIVERED DOCUMENT DOES NOT MOVE.
 
 The branch's claim is that it changes what the checks REPORT and nothing a reader of the
 delivered document could see. §5.2 requires a rendered page-by-page comparison of both
@@ -53,7 +53,7 @@ from keep_declarations import write_keep_declarations  # noqa: E402  (review fin
 # PINNED TO A COMMIT, NOT A BRANCH NAME — and this file is the reason to state the rule as
 # "ask what else does the same thing" rather than as three separate fixes. The pin was
 # corrected in test_check_scoping.py and test_check_scoping_properties.py and MISSED HERE,
-# so once branch 14 merged this suite compared the current code against ITSELF and reported
+# so once step 14 merged this suite compared the current code against ITSELF and reported
 # twelve green assertions for a comparison it was no longer making. Byte-identity is the
 # worst place for that to happen: comparing a thing with itself is trivially identical, so
 # the vacuous case looks exactly like the passing case. §5.1's second failure shape, in the
@@ -77,7 +77,7 @@ if r.returncode != 0:
     print(f"VOID — baseline ref {REF} does not resolve. Nothing compared, nothing passed.")
     sys.exit(1)
 SHA = r.stdout.strip()
-print("BRANCH 14 — NO DELIVERED BYTE MOVES")
+print("STEP 14 — NO DELIVERED BYTE MOVES")
 print(f"baseline: {REF} = {SHA[:12]}")
 print("=" * 96)
 
@@ -296,12 +296,12 @@ if FAIL:
     print("=" * 96)
     sys.exit(1)
 # "THIS BRANCH" WAS THE WRONG WORD AND IT WENT STALE THE FIRST TIME IT WAS READ ON ANOTHER
-# ONE. This file is BRANCH 14's proof, over FOUR NAMED SCRIPTS, and it says nothing whatever
-# about whatever branch happens to be running it — branch 10 slice 2 changes delivered bytes
+# ONE. This file is STEP 14's proof, over FOUR NAMED SCRIPTS, and it says nothing whatever
+# about whatever branch happens to be running it — sub-step 10.2 changes delivered bytes
 # by design and this suite is green, correctly, because it does not watch post_process.py.
 # A pass message that reads as a claim about the reader's own work is a check borrowing
 # authority it does not have.
-print(f"PASS — {CHECKED} assertions. None of BRANCH 14's four scripts reaches a delivered")
+print(f"PASS — {CHECKED} assertions. None of STEP 14's four scripts reaches a delivered")
 print("byte: the two reporters write nothing at all, and the two scripts that DO write")
 print(f"produce byte-identical output against {REF} = {SHA[:12]}.")
 print("This is a statement about those four scripts ONLY — never about the current branch.")

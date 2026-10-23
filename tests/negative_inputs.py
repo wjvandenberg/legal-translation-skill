@@ -169,7 +169,7 @@ def _vra(tmp):
 #    THE KNOWN LIMIT, and the suite states it rather than hiding it: --strict compares
 #    TOKEN SETS. No order, no punctuation, not even a multiset, and it polices only MISSING
 #    tokens, never extra ones. A negative input therefore has to REMOVE a word; reordering
-#    or repunctuating passes. That limit is branch 11's whole reason for existing.
+#    or repunctuating passes. That limit is step 11's whole reason for existing.
 # ---------------------------------------------------------------------------
 @case("validate_apply.py", "declared English that never reached the XML",
       args="{in} {xml} --strict")
@@ -267,7 +267,7 @@ def _vd(tmp):
     (good / "word").mkdir(parents=True, exist_ok=True)
     _write(good, "paragraphs.json",
            [_para(i, f"Bron {i}.", f"Source {i}.", batch=1) for i in range(4)])
-    # Step 1c declared, as a compliant run does: since branch 12 slice 12b the audit FAILs a run that
+    # skill Step 1c declared, as a compliant run does: since sub-step 12.2 the audit FAILs a run that
     # skipped it, and this arm is the clean one.
     _write(good, "source_language.json", {"source_language": "dutch"})
     # The state file's real shape, taken from an actual run rather than invented:
@@ -282,7 +282,7 @@ def _vd(tmp):
     shutil.copyfile(FIXTURES / "anchors-and-tabs.docx", good / "final.docx")
     with zipfile.ZipFile(FIXTURES / "anchors-and-tabs.docx") as z:
         z.extractall(good / "final")
-    # THE CLEAN ARM USES THE FIXTURE'S OWN document.xml AGAIN — BRANCH 14 GAVE IT BACK.
+    # THE CLEAN ARM USES THE FIXTURE'S OWN document.xml AGAIN — STEP 14 GAVE IT BACK.
     #
     # This arm exists to prove verify_diligence can tell a workdir where the pipeline ran
     # from one where it did not, and it used the anchors-and-tabs fixture's own
@@ -292,15 +292,15 @@ def _vd(tmp):
     # them. A FALSE POSITIVE on an entirely ordinary legal-document construct:
     # register G10.
     #
-    # It never showed, because quality_check had no exit code: Step 9 reported PASS on
-    # every document whatever it found (register C3). Branch 5 gave it one, the verdict
+    # It never showed, because quality_check had no exit code: skill Step 9 reported PASS on
+    # every document whatever it found (register C3). Step 5 gave it one, the verdict
     # reached verify_diligence, and this arm started failing on a defect that was always
-    # there. Branch 5 substituted a hand-written quality-clean document.xml here and
-    # left a note saying the rule's scoping belonged to branch 14 -- narrowing a check
+    # there. Step 5 substituted a hand-written quality-clean document.xml here and
+    # left a note saying the rule's scoping belonged to step 14 -- narrowing a check
     # outside the branch that owns it, with no test proving it still catches the true
     # positive, is the failure that cluster G exists to record.
     #
-    # BRANCH 14 HAS NOW DONE IT, with both directions tested in
+    # STEP 14 HAS NOW DONE IT, with both directions tested in
     # tests/test_check_scoping.py. So the substitution is REMOVED and the arm reads the
     # fixture it was written for. That is not tidying up: this arm passing on the real
     # fixture is an independent confirmation of the G10 fix, on a document nobody built

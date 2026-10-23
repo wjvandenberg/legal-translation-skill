@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 14 — every narrowed check must still catch its true positive.
+"""STEP 14 — every narrowed check must still catch its true positive.
 
-WHY THIS FILE EXISTS AND WHAT IT IS GUARDING AGAINST. Branch 14 makes eight checks
+WHY THIS FILE EXISTS AND WHAT IT IS GUARDING AGAINST. Step 14 makes eight checks
 report less. That is the entire change, and it is also the entire risk: a pattern
 narrowed until it fires on nothing is not a fix, it is a bypass with extra steps, and
 nothing in a green test run would tell the difference. So every fix here is tested in
@@ -59,7 +59,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # eleventh logged case of a check passing for the wrong reason, and this file exists to
 # argue against exactly that.
 #
-# 2178cce is the commit before branch 14. It is a historical fact and it does not move.
+# 2178cce is the commit before step 14. It is a historical fact and it does not move.
 # Override with LT_BASELINE_REF when re-pointing this suite at a different comparison.
 BASELINE = os.environ.get("LT_BASELINE_REF", "2178cce")
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -160,7 +160,7 @@ def load_new(script):
     return mod
 
 
-print(f"BRANCH 14 — CHECK SCOPING, BOTH DIRECTIONS")
+print(f"STEP 14 — CHECK SCOPING, BOTH DIRECTIONS")
 print(f"baseline: {REF} = {SHA[:12]}")
 print("=" * 96)
 
@@ -229,7 +229,7 @@ print("\nL1 — method A must pair by text, not by position")
 print("-" * 96)
 
 # A permuted document: the notes declare entry idx=0 -> LONG_EN and idx=1 -> SHORT_EN,
-# but Step 7 has swapped the two paragraphs. Positionally, entry 0's long source is
+# but skill Step 7 has swapped the two paragraphs. Positionally, entry 0's long source is
 # compared against the SHORT paragraph, so the ratio collapses and the rule fires on a
 # translation that is complete. Paired by text, entry 0 finds its own long English.
 LONG_SRC = ("Die Verkoper verbindt zich om alle rechten en verplichtingen uit hoofde "
@@ -344,7 +344,7 @@ ok("M1 without --original: behaviour UNCHANGED, still fires", new_no_src == old_
    f"(new={new_no_src}, old={old_n})")
 
 # TRUE POSITIVE: an anomaly in the delivered body that the source did not have -- what
-# a Step 7 permutation breaking a numbered block would look like.
+# a skill Step 7 permutation breaking a numbered block would look like.
 CLEAN_SRC = doc(numbered(3, 0, "Articolo 1") + numbered(3, 1, "Articolo 1.1"))
 new_n = len(NEW_QC.check_numbering(JUMP_DEL, False, CLEAN_SRC))
 ok("M1 TRUE POSITIVE jump absent from the source: still fires", new_n > 0,

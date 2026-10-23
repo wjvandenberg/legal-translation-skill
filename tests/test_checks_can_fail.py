@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""ACCEPTANCE TEST FOR BRANCH 5 — "checks can fail". Register C3 C23 C25 W3 W4 L4.
+"""ACCEPTANCE TEST FOR STEP 5 — "checks can fail". Register C3 C23 C25 W3 W4 L4.
 
-Branch 5 is the first branch in step 2 that changes BEHAVIOUR: runs that used to finish now
-stop. PLAN-2-step-b.md §3.2 gives slices 1, 3 and 4 a *Done when* line and gives slice 2
+Step 5 is the first step in phase 2 that changes BEHAVIOUR: runs that used to finish now
+stop. PLAN-2-step-b.md §3.2 gives sub-steps 5.1, 5.3 and 5.4 a *Done when* line and gives sub-step 5.2
 none, so the condition asserted here is the one the plan's own logic implies and §5.1 states
 in general: **where a check is meant to catch known defects, its first run must reproduce
 them.** Seven changes, each with an input built to make its new block fire AND a conforming
@@ -178,7 +178,7 @@ for paras in (DIRTY, CLEAN):
     agree.append((t is not None) and ((t > 0) == (r.returncode == 2)))
 record("C3 printed TOTAL agrees with the exit code, both arms", all(agree))
 
-# L4 rides on C3: Step 7's only cover in the whole tree is quality_check's definition_order
+# L4 rides on C3: skill Step 7's only cover in the whole tree is quality_check's definition_order
 # check, and it could not reach verify_diligence while the exit code was missing. Assert the
 # check still exists, so a later branch cannot remove the thing C3 reconnected.
 for t in TREES:
@@ -398,10 +398,10 @@ head("6. THE WARN CONTRACT — verify_diligence NO LONGER REPORTS WARN AS PASS")
 # ======================================================================================
 # INDUCING A WARN AND NOT A FAIL IS THE WHOLE DIFFICULTY, and the first attempt got it
 # wrong in a way worth keeping: it removed quality_check.py from the scripts directory,
-# which does make Step 9 report WARN -- but the workdir was also missing
-# .validate-state.json, so Steps 4/4b and 5 reported FAIL and the OVERALL verdict was FAIL.
+# which does make skill Step 9 report WARN -- but the workdir was also missing
+# .validate-state.json, so skill Steps 4/4b and 5 reported FAIL and the OVERALL verdict was FAIL.
 # The assertion "the induced condition really is a WARN" then PASSED, because it searched
-# the output for the substring "WARN", which appears in the Step 9 line of a FAILing report.
+# the output for the substring "WARN", which appears in the skill Step 9 line of a FAILing report.
 # That is §5.3 rule 6 -- never a two-word needle -- committed in this branch's own test.
 # It now asserts the report's OWN verdict line.
 #
@@ -416,7 +416,7 @@ for t in TREES:
     wd = wtmp / "wd"
     (wd / "final" / "word").mkdir(parents=True)
     (wd / "paragraphs.json").write_text("[]", encoding="utf-8")
-    # Step 1c declared: since branch 12 slice 12b a missing declaration is a FAIL, which would
+    # skill Step 1c declared: since sub-step 12.2 a missing declaration is a FAIL, which would
     # outrank the WARN this section induces.
     (wd / "source_language.json").write_text('{"source_language": "dutch"}', encoding="utf-8")
     (wd / ".validate-state.json").write_text(
@@ -470,7 +470,7 @@ for rel, needle in MARKERS:
 # ======================================================================================
 head("8. THE INVERTED INSTRUMENT CAN STILL FAIL — negative tests on tools/")
 # ======================================================================================
-# tools/confirm_failure_chains.py was built to assert the two defects EXIST. Branch 5 fixed
+# tools/confirm_failure_chains.py was built to assert the two defects EXIST. Step 5 fixed
 # them, so it now asserts they are CLOSED. An inverted check that cannot fail is worth
 # nothing, and this project has logged sixteen instances of a check passing for the wrong
 # reason — four of them found in one session, all of them previously reporting a PASS.

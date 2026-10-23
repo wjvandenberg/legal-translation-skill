@@ -27,13 +27,13 @@ decided to widen. Both now expect PLACED, and the rows say so in place rather th
 reading as though they always had.
 
 AND IT GREW AGAIN TO TWENTY-SIX ON 2026-09-02, BECAUSE HE ASKED THE SAME QUESTION A SECOND
-TIME — "did you cover all types of TOCs?" — after branch 6 had closed. **Eighteen of eighteen
+TIME — "did you cover all types of TOCs?" — after step 6 had closed. **Eighteen of eighteen
 agreeing could not answer that, and the reason is this file's own argument turned on itself: a
 sweep proves coverage of its POPULATION and of nothing else.** 18 of 18 over a list I wrote is
 the same kind of claim as 26 of 26 over D06's house style.
 
 **THE EIGHT NEW SHAPES FOUND FOUR SILENT IMPROVEMENTS AND TWO UNRECORDED OPEN EDGES.** Run
-against apply at `79a8c14`, the commit before branch 6 began, **all eight declined and none
+against apply at `79a8c14`, the commit before step 6 began, **all eight declined and none
 placed**; now a roman ENTRY number, a lower-case `a-3` and the five-atom shape **inside a table
 cell** all place, and an indented sub-entry keeps a leading tab the old code destroyed. And a
 page **range** `4-7` and a trailing full stop `4.` decline **by decision**, which took the
@@ -274,7 +274,7 @@ CASES = [
      "9.1Scope25", "9.1Scope EN25",
      "DECLINED", "SIX atoms, not five, so the rule does not reach it -- an indented "
                  "sub-entry on a multi-level contents page is still glued. BUT IT NOW KEEPS "
-                 "ITS LEADING TAB, which branch 6 clause 2 preserves and the old code "
+                 "ITS LEADING TAB, which step 6 clause 2 preserves and the old code "
                  "destroyed, so the line is indented-but-glued rather than flush-and-glued. "
                  "That is what forced the DECLINED test below to stop meaning "
                  "`atoms == ['text']`"),
@@ -298,13 +298,13 @@ CASES = [
      entry("IV.", "Governing law", "26"),
      "IV.Governing law26", "IV.Governing law EN26",
      "PLACED", "the widening was about the PAGE number; an entry number only has to survive "
-               "translation, and `IV.` does. Was DECLINED before branch 6"),
+               "translation, and `IV.` does. Was DECLINED before step 6"),
 
     ("single-letter LOWER-case prefix `a-3`",
      entry("12", "Schedule of rates", "a-3"),
      "12Schedule of ratesa-3", "12Schedule of rates ENa-3",
      "PLACED", "one letter plus separator plus digits is inside the widened pattern, and the "
-               "sweep had only ever tested the UPPER-case `A-3`. Was DECLINED before branch 6"),
+               "sweep had only ever tested the UPPER-case `A-3`. Was DECLINED before step 6"),
 
     ("NO page number at all",
      p(f'<w:hyperlink r:id="rId9"><w:r>{t("13")}</w:r><w:r><w:tab/></w:r>'
@@ -321,7 +321,7 @@ CASES = [
      "14Dispute resolution27", "14Dispute resolution EN27",
      "PLACED", "a contents page laid out as a TABLE is a real house style, and apply is "
                "required to recurse into table cells (.claude/rules/ooxml.md). Was DECLINED "
-               "before branch 6, so this is a silent improvement now pinned down"),
+               "before step 6, so this is a silent improvement now pinned down"),
 ]
 
 TMP = Path(tempfile.mkdtemp(prefix="toc-variants-"))

@@ -5,7 +5,7 @@ THE DEFECT. Python writes bytecode beside the module it imported, so a script th
 SIBLING script puts `scripts/__pycache__/` into whatever directory it was run from -- which,
 for this skill, is the operator's installed copy. The release packager zips that tree.
 
-HOW IT SURFACED, and it is the argument for a check rather than a habit. Branch 7 slice 3
+HOW IT SURFACED, and it is the argument for a check rather than a habit. Sub-step 7.3
 made translate_headers_footers.py import the graphic-metadata inventory from
 extract_paragraphs.py, and `tools/precommit_gate.py` check 6 caught a
 `uk/scripts/__pycache__/extract_paragraphs.cpython-312.pyc` on the very commit that added the
@@ -13,7 +13,7 @@ import. That gate catches the ARTEFACT -- a .pyc that happens to be sitting ther
 runs. This file catches the CAUSE.
 
 AND IT IS DELIBERATELY A CHECK OVER THE WHOLE TREE RATHER THAN A TEST OF FOUR FILES.
-CLAUDE.md: *prefer an assertion that catches caller N+1 to a patch on caller N.* When slice 3
+CLAUDE.md: *prefer an assertion that catches caller N+1 to a patch on caller N.* When that sub-step
 found the defect, FIVE tree scripts imported a sibling and exactly one of them guarded -- the
 one just written. Patching the four would have covered the callers that exist today and none
 of the ones that do not. So arm 1 DISCOVERS the population by reading the tree, and a script

@@ -4,7 +4,7 @@
 H3, Wouter's finding on D07: a document already in English met the full translation pipeline, every language
 check inert and printing CLEAN, 35 minutes and 28 commands to change 11 paragraphs; the job is legitimate - "give
 me the US version of this English contract" - and it deserves a mode of its own. Declaring `english` at skill
-Step 1c now OPENS the variant-conversion mode, recorded in source_language.json beside the language; only that
+skill Step 1c now OPENS the variant-conversion mode, recorded in source_language.json beside the language; only that
 declaration opens it; the diligence audit reads it; every gate still runs.
 
 WHAT IS ASSERTED, per tree, through the tree's own scripts:
@@ -14,12 +14,12 @@ WHAT IS ASSERTED, per tree, through the tree's own scripts:
      written by hand or before 13.4 (English, no key), a key beside another language, nothing declared and an
      unreadable file all open NO mode; read_declared_language() is unchanged by the key, so every language-
      dependent check still says NOT SUPPORTED on English;
-  V  the diligence audit's Step 1c: PASS on the mode, naming it; WARN on English without it, saying to declare
+  V  the diligence audit's skill Step 1c: PASS on the mode, naming it; WARN on English without it, saying to declare
      again; PASS on a supported language; FAIL with nothing declared;
   S  a SYNTHETIC English source (UK spelling) through the operator's path - extract, the English written as the
      source in the delivered variant, apply, post_process, repack: the delivered text is the declared English
      paragraph for paragraph; where the English IS the source (every paragraph in the uk tree's own variant)
-     the delivered paragraph's XML is the source's, byte for byte; and the audit's Step 1c reads the mode.
+     the delivered paragraph's XML is the source's, byte for byte; and the audit's skill Step 1c reads the mode.
 
 RED FIRST: against the scripts before 13.4 (--scripts, a copy of main's), D, M and V fail - no mode is recorded,
 there is no reader, and the audit WARNs on English (measured 2026-10-20 (2)).
@@ -139,7 +139,7 @@ if callable(reader):
     lang, state, _why = M.read_declared_language(str(workdir("m-lang", '{"source_language": "english", "mode": "variant-conversion"}')))
     ok("M7: read_declared_language is unchanged by the key: english, unsupported", (lang, state) == ("english", "unsupported"))
 
-print("\nARM V - the diligence audit's Step 1c")
+print("\nARM V - the diligence audit's skill Step 1c")
 for label, decl, sev, needle in [
         ("the mode", '{"source_language": "english", "mode": "variant-conversion"}', "PASS", "variant-conversion"),
         ("English without the mode", '{"source_language": "english"}', "WARN", "--declare english"),
@@ -191,7 +191,7 @@ if dlv.is_file():
        "byte for byte", len(sp) == len(dp) and all(sp[i] == dp[i] for i in same),
        f"source {len(sp)} paragraph(s), delivered {len(dp)}; differing: {[i for i in same if i < len(dp) and sp[i] != dp[i]]}")
 got, text = step_1c(w)
-ok("S8: the audit's Step 1c reads the mode on the run's own workdir", got == "PASS" and "variant-conversion" in text,
+ok("S8: the audit's skill Step 1c reads the mode on the run's own workdir", got == "PASS" and "variant-conversion" in text,
    f"{got}: {text[:200]!r}")
 
 shutil.rmtree(TMP, ignore_errors=True)

@@ -1,4 +1,4 @@
-"""test_strip_noop_guard.py - branch 11 slice 4a, register B10: none of
+"""test_strip_noop_guard.py - step 11's sub-step 4a, register B10: none of
 `strip_noop_tracked_changes.py`'s three removing passes removes a wrapper WHOLE while it holds
 anything besides runs, run properties and text, the phantom pass's own nested wrappers excepted
 (PLAN-2-step-b.md section 3.2, block "4a - B10"). Every document here is invented and built in a

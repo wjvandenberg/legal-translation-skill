@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 6, FOURTH SLICE — C17 · C16 · F16, the three arms, each with its negative.
+"""SUB-STEP 6.4 — C17 · C16 · F16, the three arms, each with its negative.
 
 THE THREE ROWS HAVE ONE THING IN COMMON AND IT IS NOT WHITESPACE: in every one, apply reaches
 a boundary it cannot describe and resolves the ambiguity SILENTLY, in the direction that
@@ -7,13 +7,13 @@ destroys something.
 
   C17  a segment whose declared `en` is one SPACE strips to `""`, is falsy, and lands in the
        branch commented "Explicit empty-string request". It was not a request; it was a space.
-       Step 4 rule 9 tells the operator to mirror source whitespace, so the manual instructs
+       skill Step 4 rule 9 tells the operator to mirror source whitespace, so the manual instructs
        them to create precisely this input.
   C16  `distribute_text_across_elements` restores the source's ENTIRE boundary-whitespace run
        over whatever the operator authored, so a source run carrying two spaces re-appears as
        two spaces in the English and NO edit to `en` can remove it -- which is what the row
        means by "there is no input-side fix".
-  F16  Step 4c tells the operator to shorten `en` and says nothing about `en_runs`, so every
+  F16  skill Step 4c tells the operator to shorten `en` and says nothing about `en_runs`, so every
        authored offset shifts. Python's slicing then CLAMPS instead of complaining, and the
        emphasis lands on the wrong words.
 
@@ -56,7 +56,7 @@ sys.path.insert(0, str(ROOT / "tests"))
 # IMPORTED BEFORE ANY STDOUT WRAPPING. `make_fixtures` rebinds sys.stdout to a fresh
 # TextIOWrapper over sys.stdout.buffer at module level; installing a second wrapper over the
 # same buffer means the first is collected and CLOSES it, so the script does its whole job and
-# then dies on its closing print. Two runs were lost to that on the previous slice.
+# then dies on its closing print. Two runs were lost to that on the previous sub-step.
 from make_fixtures import main as build_fixtures  # noqa: E402,F401
 from lxml import etree  # noqa: E402
 
@@ -105,7 +105,7 @@ def run_apply(src, notes, out, scripts=SCRIPTS):
 
     NEVER POINT THIS AT tests/fixtures/. Apply invokes `validate_translations.py` as its final
     pre-apply pass and that writes `<workdir>/.validate-state.json`, where workdir is wherever
-    the NOTES file lives. On the previous slice that reached the git index: a dirty tree on
+    the NOTES file lives. On the previous sub-step that reached the git index: a dirty tree on
     what reads as a read-only check, `git switch` then refusing, `git bisect` broken, and one
     `git add -A` from committing run state to a public repository.
     """
@@ -144,7 +144,7 @@ def ok(label, passed, detail=""):
 
 TMP = Path(tempfile.mkdtemp(prefix="b6-ws-"))
 print("=" * 100)
-print("BRANCH 6, SLICE 4 — C17 · C16 · F16")
+print("SUB-STEP 6.4 — C17 · C16 · F16")
 print("=" * 100)
 
 # =========================================================================================

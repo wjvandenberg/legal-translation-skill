@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""ONE DEFINITION OF WHAT COUNTS, SHARED BY BRANCH 6's TWO ARMS.
+"""ONE DEFINITION OF WHAT COUNTS, SHARED BY STEP 6's TWO ARMS.
 
-Branch 6 is measured two ways -- a synthetic fixture in the repository
+Step 6 is measured two ways -- a synthetic fixture in the repository
 (tests/test_stop_deleting.py) and the thirteen frozen intermediates outside it
 (tools/apply_corpus_diff.py). THE COUNTING RULES LIVE HERE RATHER THAN IN BOTH, because
 this project has already been bitten by a hazard fixed in one caller and left in another:
@@ -23,7 +23,7 @@ THE TWO RULES A COPY WOULD GET WRONG:
      the defect: the bodies are in the package and unreachable.
 
 This module counts. It never decides whether a movement is acceptable -- that is the
-caller's job, and for branch 6 the answer must come from a register row.
+caller's job, and for step 6 the answer must come from a register row.
 
 No client text is read here, and nothing is printed. Callers own their output policy.
 """
@@ -45,7 +45,7 @@ TAGS = (
     "fldChar", "instrText",
     # Already whitelisted today; counted so a fix cannot quietly regress them.
     "drawing", "pict", "lastRenderedPageBreak",
-    # Branch 7's containers. Counted, NOT asserted here -- naming them keeps branch 6
+    # Step 7's containers. Counted, NOT asserted here -- naming them keeps step 6
     # honest about what it is not fixing (A16, A19, N1).
     "sdt", "smartTag", "object", "sym",
     # Structure.
@@ -54,7 +54,7 @@ TAGS = (
 
 
 def census(xml_bytes):
-    """Count the structures branch 6 must preserve, plus the order-sensitive ones.
+    """Count the structures step 6 must preserve, plus the order-sensitive ones.
 
     Returns a plain dict of int. Order-sensitive entries:
 

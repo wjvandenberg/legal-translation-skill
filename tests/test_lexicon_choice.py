@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""BRANCH 10 SLICE 3b — does a mandatory rewrite still overrule the LEXICON?
+"""STEP 10's SUB-STEP 3b — does a mandatory rewrite still overrule the LEXICON?
 
 Register rows B5, B6(a) and F29 are one defect three times: `post_process` overwrote a
 string that a lexicon in the skill tells the operator to write, and the drift gate then
@@ -233,7 +233,7 @@ def stale_citations(tree_root, pp, table):
 # =========================================================================================
 print(f"ARM 1 — every lexicon-sanctioned rewrite is shielded or declared   [{args.variant}]")
 # A TREE WITHOUT THE TABLE IS A FAILURE NAMED AS SUCH, NEVER A CRASH. The red-first harness
-# runs this suite against the code BEFORE this slice, and a traceback there would hide every
+# runs this suite against the code BEFORE this sub-step, and a traceback there would hide every
 # behaviour arm below it -- the arms that most need to be seen going red.
 HAS_TABLE = {t: hasattr(PP[t], "LEXICON_SANCTIONED") and hasattr(PP[t], "_LEXICON_SANCTIONED_RE")
              for t in TREES}
@@ -461,7 +461,7 @@ CASES = [
 ]
 for name, en, custom, explicit, want, said in CASES:
     r, vals = run_tn(name, en, custom, explicit)
-    ok(f"[{name}] exits 0 — a label choice never stops the run (since branch 12 slice 12b the script "
+    ok(f"[{name}] exits 0 — a label choice never stops the run (since sub-step 12.2 the script "
        "stops only on a word left in numbering the document uses)",
        r.returncode == 0, f"rc={r.returncode} {(r.stderr or '')[-200:]}")
     ok(f"[{name}] the label is {want!r}", want in vals, f"got {vals}")

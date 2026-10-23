@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """A MISSING OR HALF-CUT LANGUAGE MODULE EXITS AS A BROKEN INSTALL - NEVER AS A TRACEBACK, NEVER AS A GATE.
 
-`source_language_markers.py` is imported by eight scripts in each tree (branch 12 onward). Every script checks
+`source_language_markers.py` is imported by eight scripts in each tree (step 12 onward). Every script checks
 ITSELF for truncation and exits 3 with the FILE INTEGRITY banner SKILL.md rule 6 answers by re-installing - but
 the module it imports was nobody's to check. Deleted, cut mid-statement, or cut cleanly before its own check
 runs, it gave a raw traceback and exit 1; and repack_docx.py carried the failure down to its remnant block and
