@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan PROPOSED in §3.14, awaiting Wouter's go, no step-14 code before it; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-26 (HOP 1 OF RUN d2c-last-hop1) — SESSION PURPOSE — what · how · purpose:** the one unattended hop: rename (d2c)'s last three test files, `tests/make_fixtures.py` and the probe pre-flight pair, then the one full run on the last code commit, then step 14 explored and its plan written as a proposal — the 2026-10-23 method, the census red first, every hit judged by reading and proved in memory, no fixture byte moved, `/code-review` before the full run, a synthetic probe per open step-14 row in `temp/`, no step-14 code, every lone judgement in the decisions log and every question in the questions file · **so that every living test file reads in the house's words, the git branch `feature/d2c-last-three-step14-plan` is pushable on one full run, and Wouter can approve step 14's plan before any of its code exists** *(written immediately after the tag `rollback-2026-10-26-hop1-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; its code starts at 14.2; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-26 (3) — SESSION PURPOSE — what · how · purpose:** the attended close of run `d2c-last-hop1`: the hop's twelve questions put to Wouter through the question tool, ten answered there — eight confirming the hop, two overturning it, G12 to a text-free tool as 14.9 and the missed `of the` alarm into 14.4 — and the merge answered in his words; his answers folded into section 3.14 byte-exact and recorded in the decisions log, VERIFY and TEST through the cycle gate, the push riding the hop's full run, the one pull request, `/code-review` presented, the squash-merge on his go · **so that the run's work reaches `main` only as Wouter approved it, and step 14 starts from 14.2 on a plan he has approved** *(written immediately after the tag `rollback-2026-10-26c-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -1892,14 +1892,15 @@ document, scored on the four known-answer judgement calls rather than on the gra
 n=1 a small effect is indistinguishable from none — the same weakness that makes the batch finding *probable*
 rather than *confirmed*.
 
-### 3.14 Check scoping — step 14 · *options 2 and 5* · **PROPOSED 2026-10-26, AWAITING WOUTER'S GO — no step-14 code until he says go**
+### 3.14 Check scoping — step 14 · *options 2 and 5* · **APPROVED 2026-10-26 by Wouter, his answers folded in — code from 14.2**
 
-> **FOR THE BUILD — A PROPOSAL, NOT YET A BRIEF.** Written by the unattended hop of run `d2c-last-hop1` from the
+> **FOR THE BUILD — THE BRIEF, APPROVED 2026-10-26.** Written by the unattended hop of run `d2c-last-hop1` from the
 > register rows section 9.3 gives step 14, each re-read in full and measured against BOTH trees as they are
-> today. **Nothing in `uk/`, `us/`, `tools/` or `tests/` changes for step 14 until Wouter approves this block
-> or changes it.** It sits after 3.13, out of section 2's order, because it was written last; section 2 owns
-> the order, and moving the block is his call.
-> **Needs first:** Wouter's go on this block. **Unblocks:** nothing — steps 15 to 22 do not wait on it.
+> today, then **APPROVED by Wouter through the question tool on 2026-10-26, two of the hop's answers
+> overturned** — G12 gets a text-free tool as 14.9, and the missed `of the` alarm folds into 14.4
+> *(`DECISIONS-LOG.md`, 2026-10-26 (3))*. It sits after 3.13, out of section 2's order, because it was written
+> last; Wouter kept it there, and section 2 owns the order.
+> **Needs first:** nothing — his go is given. **Unblocks:** nothing — steps 15 to 22 do not wait on it.
 > **Done when:** every open row below is CLOSED or disposed of by name, each fix proved by its own true-positive
 > and false-positive controls against the code before it, and the corpus gaining no finding.
 
@@ -1907,8 +1908,8 @@ rather than *confirmed*.
 proving it still catches the true positive. Its first sub-step, **14.1, the `quality_check` sub-step**, was built
 and merged where section 2's fourth sequencing fact placed it, straight after step 5; it closed G5, G10, G11
 and half of G9, and four rows other steps own — L1, M1, C9's input half and F15. **What remains is planned
-here as 14.2 to 14.8.** *(14.1 was never numbered when it was built; naming it so keeps the sequence
-contiguous, and is the hop's judgement, put to Wouter.)*
+here as 14.2 to 14.9.** *(14.1 was never numbered when it was built; naming it so keeps the sequence
+contiguous — the hop's judgement, confirmed by Wouter.)*
 
 **Measured 2026-10-26, both trees, against today's scripts** — `temp/s1026h_probe14.py`, gitignored: one
 invented false-positive input and one true-positive control per row, printing only whether each fired. **24
@@ -1945,13 +1946,16 @@ to fire before and after. And each counts the corpus before and after — `tools
   (`recante`, `entitled` and their kin), is exempt. *TP:* a quoted multi-word project name missing from the
   English still warns; a quoted third-party title with no marker still warns. *FP:* the elision pair, the
   marker, the title. **G7's third shape, a quoted contractual phrase, has NO pattern that tells it from a quoted
-  name** — measured firing; proposed as a declared residual of a WARN that blocks nothing, Wouter's call.
+  name** — measured firing; a declared residual of a WARN that blocks nothing, by Wouter's answer of 2026-10-26.
 - **14.4 — `lexicon_compliance.py`: G2 and G8.** The legislation look-ahead takes `of Legislative Decree` and the
   decree and law forms beside it, and lets a `, <ordinal> paragraph,` or `, paragraph N,` sit between the number
   and a legislation tail. *TP:* `Article 7 above` still warns. *FP:* both measured shapes quiet; `of the Civil
-  Code` stays quiet. **Not touched:** the existing `of the` exemption, which measurably reaches internal
-  references too — `Article 7 of the Agreement` is silent where `of this Agreement` warns, both trees — since
-  narrowing it is a different change, a false negative rather than this row's false positive; put to Wouter.
+  Code` stays quiet. **And the missed alarm, folded in by Wouter on 2026-10-26:** the existing `of the`
+  exemption measurably reaches internal references too — `Article 7 of the Agreement` is silent where `of this
+  Agreement` warns, both trees — so it is narrowed to the legislation forms it exists for, the look-ahead edited
+  once. *TP:* `Article 7 of the Agreement` now warns. *FP:* `of the Civil Code` and the decree forms stay quiet.
+  A false NEGATIVE closed, so the check fires more and never less; the sub-step files it as a register row and
+  closes it.
 - **14.5 — `quality_check.py`: G3 and G13.** `LIST_CONNECTOR_RE` takes `and/or`. The remnant check reads
   `LEXICON_KEPT_NAMES` through `source_language_markers`, the table repack's block already reads — one call, not
   a second list. *TP:* a dangling "at the" still flags; a real remnant beside a kept name still flags. *FP:* a
@@ -1961,14 +1965,21 @@ to fire before and after. And each counts the corpus before and after — `tools
 - **14.7 — `verify_diligence.py`: C10.** The skill Step 8 presence check asks for a translated copy only of a
   part that CARRIES TEXT — the condition skill Step 8's own wording took when C7 closed. *TP:* a text-bearing
   header with no copy still FAILS. *FP:* an empty header with no copy does not.
-- **14.8 — option 5's share, below** — planned only once Wouter says whether it rides with this step.
+- **14.8 — option 5's share, below** — it rides with this step *(Wouter, 2026-10-26)*: each of the 17 rows
+  measured against both trees first, the instruction fixes then planned from that measurement.
+- **14.9 — G12's text-free route** *(Wouter, 2026-10-26, overturning the hop's answer that he read them)*. A
+  new instrument reporting each of G12's 16 unaccounted `quality_check` findings (its row's count of 2026-08-21,
+  not re-measured) by the SHAPE of its citation, never a word of its text, so that Claude classifies them by
+  shape and never reads them. MEDIUM, touching no shipped file; its own negative tests first — a planted shape it
+  must report, a planted string it must never print — and its design is its own explore-and-plan at the
+  sub-step's start. *Done when:* each of the 16 is classified by shape, and each class closed, filed or routed.
 
 **What every sub-step must NOT touch:** no gate weakened — a rule stays a rule, a WARN stays a WARN, a block
 stays a block, and no exit code moves; no true positive silenced; no other script; the anti-drift safeguards;
 and no register row filed or closed except by the sub-step that measures it.
 
-**Every row 9.3 gives step 14, accounted for: 17 of 17** — 10 to the sub-steps above (F10, F5, G1, G7, G2, G8,
-G3, G13, G4, C10) and 7 disposed of below (G5, G10, G11, G9, G6, G12, C7); 14.1's four other rows are their
+**Every row 9.3 gives step 14, accounted for: 17 of 17** — 11 to the sub-steps above (F10, F5, G1, G7, G2, G8,
+G3, G13, G4, C10, G12) and 6 disposed of below (G5, G10, G11, G9, G6, C7); 14.1's four other rows are their
 own steps'.
 
 **Disposed of here, because none is a pattern change:**
@@ -1977,22 +1988,20 @@ own steps'.
 - **G9's first half — step 15's.** The check reads `en_segments`, which carry only `type` and `en` (412 of 412
   segments, its row's measurement); seeing apply's boundary-whitespace restoration needs the source text in
   the notes, a SCHEMA change.
-- **G6 — an observation, not a defect:** evidence for this step's worth, proposed closed with the step.
-- **G12 — not a script's to take.** Its 16 unaccounted `quality_check` findings (its row's count of 2026-08-21,
-  not re-measured) are classified by Wouter, or counted by a sanitised route that reports a citation's SHAPE
-  without its text; never by Claude reading them.
+- **G6 — an observation, not a defect:** evidence for this step's worth, closed with the step *(Wouter, 2026-10-26)*.
 - **C7 — CLOSED** by step 11's sub-step 3b, 2026-09-28; what it left is C10, 14.7's.
 
-**Option 5's share — the question this exploration raised.** Section 3.4 says option 5's *"share of the wrong
+**Option 5's share — 14.8's, by Wouter's answer of 2026-10-26.** Section 3.4 says option 5's *"share of the wrong
 instructions and the conflict rules rides with step 14"*, and section 9.3 names none of them. **Measured: 17 of
 option 5's 49 rows have no step accountable for them in 9.3** — C26, C29, F2, F3, F4, F6, F9, F11, F14, F18,
 F20, F21, F23, F32, F36, F37, F38 (C29 is named in step 6's row only to be disowned) — **16 carry no CLOSED in
 their severity cell** (C26's own text says PARTIAL) and F6's does; **none is in section 12's no-compliant-repair
-set**, which step 4's row routes through. They were not explored here. If they ride with step 14, 14.8
+set**, which step 4's row routes through. They were not explored here; riding with step 14, 14.8
 measures each against both trees first, and the instruction fixes follow as their own sub-steps.
 
 **Size:** six HEAVY sub-steps, 14.2 to 14.7 — **two to three sessions**, each one branch, one full run and one
-pull request; **one or two more** if option 5's share rides here; G12 by Wouter's route.
+pull request; **one or two more** for 14.8, option 5's share; **one** MEDIUM session for 14.9's tool — about
+four to six in all.
 
 **VERIFY, per sub-step:** its controls red against the pinned old code and green now; the parity check; the
 corpus count before and after, every move attributed; the three confidentiality controls. **TEST:**

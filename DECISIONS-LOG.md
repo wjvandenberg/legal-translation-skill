@@ -2122,3 +2122,27 @@ section 2's row first set in italics like a quotation was made plain prose befor
 
 **Context: not measured** — a headless hop has no usage tool. **Ran as** Opus 5.5 (`claude-opus-5-5`); the
 effort level is not visible from inside the session — the runner reads it back.
+
+## 2026-10-26 (3) — Wouter's answers to the hop's twelve questions: step 14's plan approved, two answers overturned
+
+**WOUTER, THROUGH THE QUESTION TOOL,** the hop's answer offered as the recommended option to confirm or overturn
+*(`temp/d2c-last-hop1-questions.md`, numbered as there)*: **(1) step 14's plan APPROVED**, his answers folded into
+section 3.14, now the brief; **(3)** it stays a new 3.14 at the end; **(4)** the merged `quality_check` work is 14.1,
+the rest from 14.2; **(5) option 5's 17 unowned rows RIDE WITH STEP 14** as 14.8, each measured in both trees first;
+**(6)** G7's third shape a declared residual of a WARN; **(8)** G6 closes with step 14; **(9)** G4's and G13's refined
+measurements go into their rows as each sub-step closes them; **(10)** the review's six findings in the house's
+runner go to the house — written for him to hand over in `temp/s1026_for_house.md`. **TWO OVERTURNED: (7) G12** —
+not Wouter reading the 16 but a TEXT-FREE TOOL reporting each citation's shape, 14.9, MEDIUM, Claude classifying by
+shape and never by text; **(11) the missed `of the` alarm FOLDS INTO 14.4**, the look-ahead edited once, a register
+row filed and closed by that sub-step. **(2), THE MERGE, IN HIS WORDS:** *"push, open the pull request, run
+/code-review and ask me for the merge."*
+
+**(12), FOR INFORMATION — THE ARMING SESSION'S POINTER WAS WRONG:** the state file sent the hop to "the 2026-08-21
+entries" of this log for how step 14's first sub-step was run; the log has no heading of that date, its dated
+entries beginning on 2026-08-24. The pointer was written without probing where it led — the house's hygiene rule 18
+— and the hop read the method from `tests/test_check_scoping.py` and `tools/qc_census.py` instead.
+
+**RE-MEASURED BEFORE ASKING:** the hop's probe, `temp/s1026h_probe14.py`, run again in the attended close: 30 arms
+over the two trees, 24 OPEN, 6 controls quiet, 0 VOID — the figure the plan records. **AND THE ORDER:** the branch
+was pushed and #178 opened before this record, so the record could name it; the push rode the hop's full run on
+`d38f313`, every later commit documents only.
