@@ -353,10 +353,10 @@ CODE_SWEPT = {
         ("phrase", "SLICE 3b's WRITTEN PLAN", "a phrase kept for a test, declared here"),
         ("phrase", "SLICE 4c's WRITTEN PLAN", "a phrase kept for a test, declared here"),
         ("phrase", "# SLICE 3a, 2026-09-28", "a phrase kept for a test, declared here"),
-        ("phrase", 'run offsets do not slice', "a phrase kept for a test, declared here"),
-        ("phrase", '`runs` SLICES `text`', "a phrase kept for a test, declared here"),
-        ("phrase", 'actually slices', "a phrase kept for a test, declared here"),
-        ("phrase", 'and slices characters', "a phrase kept for a test, declared here"),
+        ("phrase", 'run offsets do not slice', "a phrase kept above, declared here"),
+        ("phrase", '`runs` SLICES `text`', "a phrase kept above, declared here"),
+        ("phrase", 'actually slices', "a phrase kept above, declared here"),
+        ("phrase", 'and slices characters', "a phrase kept above, declared here"),
     ],
 }
 _TEXT_TOKENS = {tokenize.STRING} | {getattr(tokenize, n) for n in ("FSTRING_MIDDLE", "TSTRING_MIDDLE")

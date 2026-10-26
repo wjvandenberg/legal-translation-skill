@@ -207,7 +207,7 @@ if phantom_present and n_ins == 1 and stripped and gate and tokens_are_phantom:
     print("     skill Step 5 apply   -> exit 0, wrappers intact, the apply-time gate PASSES")
     print("     skill Step 6 strip   -> strip_noop removes the phantom wrapper, as designed")
     print("     skill Step 6 gate    -> validate_apply --strict finds the declared English gone")
-    print("                       and post_process raises SKILL GATE FIRED")
+    print("                             and post_process raises SKILL GATE FIRED")
     print()
     print("  AND THERE IS NO COMPLIANT REPAIR, which is what makes it a deadlock rather than")
     print("  an error. skill Step 4 forbids leaving the segment unfilled. strip_noop's")

@@ -1193,7 +1193,7 @@ GRAPHIC_SHAPES = [
     ("body-drawing-descr", "document", False,
      "REPORT ONLY, AND THE HONEST RESIDUE. A body drawing carrying alt text. The corpus has "
      "ZERO body graphics, and the translation route is skill Step 8b's, which reaches header and "
-     "footer parts only -- so this surface is REPORTED and not translated. The step's own "
+     "footer parts only -- so this surface is REPORTED and not translated. Step 7's own "
      "rule is that anything outside the inventory fails loudly rather than shipping "
      "silently, and a report is that loudness where a block would have no compliant exit"),
     ("hdr-plain", "header1", False,
@@ -1441,7 +1441,7 @@ def _italic_declared(path):
          "name containing Annex), beside two rewrites no lexicon sanctions that must STILL "
          "fire. Ships its own lexicon-choice.notes.json")
 def _lexicon_choice(path):
-    """The page sub-step 3b is judged on, and why the rows are shaped the way they are.
+    """The page step 10's sub-step 3b is judged on, and why the rows are shaped the way they are.
 
     EVERY ROW BEGINS WITH ITS OWN LABEL, and that is load-bearing twice. It lets a reader of
     the render see which rows must differ between the arms and which must not. And it keeps
@@ -1627,7 +1627,7 @@ def _table(path):
 @fixture("definitions.docx",
          "a definitions block whose source-language alphabetical order is NOT English "
          "alphabetical order — and properties must be matched BY TERM, never by index, "
-         "because this step permutes the block")
+         "because skill Step 7 permutes the block")
 def _definitions(path):
     body = (
         p(r("1. Definitions")) +
