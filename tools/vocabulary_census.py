@@ -174,6 +174,17 @@ HOUSE_COPIES = {"verify_md.py", "verify_charter.py", "verify_code.py", "verify_d
                 "house_common.py", "trace_instructions.py"}
 SHARED = beside("templates") / "standard-scripts"   # beside the MAIN checkout, a worktree too (register I-40)
 CODE_SWEPT = {
+    # rename (d2c), batch 3, 2026-10-26 (hop 1 of run d2c-last-hop1): make_fixtures.py and the probe pre-flight
+    # pair, 57 logged swaps; with them every project Python file in tools/ and tests/ is swept
+    "tests/make_fixtures.py": [
+        ("phrase", 'run offsets do not slice', "Python's own sense: a run's offsets cut `text` by index"),
+        ("phrase", '`runs` SLICES `text`', "Python's own sense: a run's offsets cut `text` by index"),
+        ("phrase", 'OWN slice edge', "a segment's string bounds, the guard's own subject"),
+        ("phrase", 'actually slices', "Python's own sense: apply cuts `en` by the declared offsets"),
+        ("phrase", 'and slices characters', "Python's own sense: a shifted span cuts its neighbour's characters"),
+    ],
+    "tests/probe-5b/preflight.py": [],
+    "tests/probe-5b/preflight_metacheck.py": [],
     # rename (d2a), 2026-10-21 (2): the four files the 2026-10-21 close named - stepb_verify's printed labels beside
     # its needles, and the three whose comments restated a phrase rename (c) changed
     "tools/stepb_verify.py": [],
@@ -342,6 +353,10 @@ CODE_SWEPT = {
         ("phrase", "SLICE 3b's WRITTEN PLAN", "a phrase kept for a test, declared here"),
         ("phrase", "SLICE 4c's WRITTEN PLAN", "a phrase kept for a test, declared here"),
         ("phrase", "# SLICE 3a, 2026-09-28", "a phrase kept for a test, declared here"),
+        ("phrase", 'run offsets do not slice', "a phrase kept for a test, declared here"),
+        ("phrase", '`runs` SLICES `text`', "a phrase kept for a test, declared here"),
+        ("phrase", 'actually slices', "a phrase kept for a test, declared here"),
+        ("phrase", 'and slices characters', "a phrase kept for a test, declared here"),
     ],
 }
 _TEXT_TOKENS = {tokenize.STRING} | {getattr(tokenize, n) for n in ("FSTRING_MIDDLE", "TSTRING_MIDDLE")

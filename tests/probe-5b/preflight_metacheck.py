@@ -14,8 +14,8 @@ So each mutation below attacks a claim rather than the code that reports it:
   A  THE NESTING IS LOAD-BEARING. Rebuild the phantom as two siblings — the shape the rig
      carried until 2026-08-18 — and the run must go quiet. If it does not, `ins_then_del` was
      never what made the chain run.
-  B  OBEYING STEP 4 IS WHAT CAUSES THE DEADLOCK. Declare the phantom segment empty, which is
-     both F1's proposed fix and a disobedience of Step 4's "always fill these in", and the
+  B  OBEYING SKILL STEP 4 IS WHAT CAUSES THE DEADLOCK. Declare the phantom segment empty, which is
+     both F1's proposed fix and a disobedience of skill Step 4's "always fill these in", and the
      gate must stop firing. This is the mutation that turns the rig from "a run that blocks"
      into "a run that blocks BECAUSE the manual was followed" — the whole claim of arm 1.
   C  THE MARKER WORDS MUST BE UNIQUE TO THE PHANTOM. Give the phantom an English rendering
@@ -92,7 +92,7 @@ MUTATIONS = [
      MAKER,
      needle(MAKER, *NESTED_PHANTOM),
      needle(MAKER, *SIBLING_PHANTOM)),
-    ("B  obeying Step 4 is the cause — declare the phantom segment empty",
+    ("B  obeying skill Step 4 is the cause — declare the phantom segment empty",
      PREFLIGHT,
      needle(PREFLIGHT, '{"type": "ins_then_del", "en": PHANTOM}]'),
      needle(PREFLIGHT, '{"type": "ins_then_del", "en": ""}]')),

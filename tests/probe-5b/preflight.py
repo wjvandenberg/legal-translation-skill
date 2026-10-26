@@ -56,7 +56,7 @@ import tempfile                                                              # n
 WORK = Path(tempfile.mkdtemp(prefix="lt-preflight-"))
 
 # ======================================================================================
-head("ARM 1 — TRUE DEADLOCK (register F1): does obeying Step 4 produce a blocked run?")
+head("ARM 1 — TRUE DEADLOCK (register F1): does obeying skill Step 4 produce a blocked run?")
 # ======================================================================================
 A1 = {0: "SERVICES AGREEMENT",
       1: "This agreement is made between the parties named below.",
@@ -110,7 +110,7 @@ if not phantom_present:
 for e in paras:
     i = e.get("idx")
     if e.get("tc_segments"):
-        # Step 4's instruction, obeyed literally: "Always fill these in; leaving the source
+        # skill Step 4's instruction, obeyed literally: "Always fill these in; leaving the source
         # language there is the single most common silent remnant in tracked-change
         # documents" (04-translate.md:488). The phantom renders empty in BOTH the accept-all
         # and the reject-all view, so `en` and `en_deleted` carry the regular text only —
@@ -161,8 +161,8 @@ n_ins = len(re.findall(r"<w:ins[ >]", applied))
 n_del = len(re.findall(r"<w:del[ >]", applied))
 print(f"  tracked changes surviving apply: w:ins {n_ins} · w:del {n_del}")
 
-# The apply-time gate must PASS. F1's whole shape is that the run looks clean at Step 5 and
-# blocks at the end of Step 6, so an arm that blocked at apply would be a different finding.
+# The apply-time gate must PASS. F1's whole shape is that the run looks clean at skill Step 5 and
+# blocks at the end of skill Step 6, so an arm that blocked at apply would be a different finding.
 stripped = gate = tokens_are_phantom = False
 po = ""
 if r.returncode == 0:
@@ -195,7 +195,7 @@ if r.returncode == 0:
           f"before strip {sorted(t for t in marker_toks if t in before) or '(none)'}")
 else:
     print("  (apply itself blocked, so post_process was not reached — and an apply-time")
-    print("   block is NOT F1: F1 passes Step 5 and fails at the end of Step 6.)")
+    print("   block is NOT F1: F1 passes skill Step 5 and fails at the end of skill Step 6.)")
 
 print()
 # CONFIRMED means all four links of F1's chain ran, in order, and nothing else did the
@@ -203,20 +203,20 @@ print()
 # finding's reason measures that finding.
 if phantom_present and n_ins == 1 and stripped and gate and tokens_are_phantom:
     print("  ARM 1 RIG CONFIRMED — and confirmed as F1's chain rather than merely as a block:")
-    print("     Step 4 obeyed  -> the phantom's English is declared, as the step doc requires")
-    print("     Step 5 apply   -> exit 0, wrappers intact, the apply-time gate PASSES")
-    print("     Step 6 strip   -> strip_noop removes the phantom wrapper, as designed")
-    print("     Step 6 gate    -> validate_apply --strict finds the declared English gone")
+    print("     skill Step 4 obeyed  -> the phantom's English is declared, as the step doc requires")
+    print("     skill Step 5 apply   -> exit 0, wrappers intact, the apply-time gate PASSES")
+    print("     skill Step 6 strip   -> strip_noop removes the phantom wrapper, as designed")
+    print("     skill Step 6 gate    -> validate_apply --strict finds the declared English gone")
     print("                       and post_process raises SKILL GATE FIRED")
     print()
     print("  AND THERE IS NO COMPLIANT REPAIR, which is what makes it a deadlock rather than")
-    print("  an error. Step 4 forbids leaving the segment unfilled. strip_noop's")
+    print("  an error. skill Step 4 forbids leaving the segment unfilled. strip_noop's")
     print("  --keep-phantom-tcs flag is UNREACHABLE: post_process invokes the script with the")
     print("  xml path and nothing else, so using it means wrapping or patching a script, and")
     print("  anti-drift rule 5 forbids both. Editing paragraphs.json to drop the declared")
     print("  English is the repair the gate's own message names as the WRONG one. Rule 5b is")
     print("  the only sanctioned end.")
-    FINDINGS.append(("arm 1 rig", True, "F1's chain runs end to end and blocks at Step 6"))
+    FINDINGS.append(("arm 1 rig", True, "F1's chain runs end to end and blocks at skill Step 6"))
 else:
     print("  ARM 1 RIG **NOT** CONFIRMED. Which link failed, so the next session starts from")
     print("  a fact rather than from a re-derivation:")
@@ -259,7 +259,7 @@ def def_runs(en):
     Authored because `validate_en_runs.py` BLOCKS apply on any detected definitions section
     whose paragraphs carry no `en_runs` — it exists to stop the bold-off override from
     stripping the style-provided emphasis that marks a defined term. A real operator writes
-    these; the first version of this pre-flight did not, so arm 2 stopped at Step 5 and the
+    these; the first version of this pre-flight did not, so arm 2 stopped at skill Step 5 and the
     reported cause ("blocks at apply") named the symptom rather than the gate.
     """
     close = en.index("”") + 1
@@ -303,7 +303,7 @@ if r.returncode == 0:
     if r.returncode == 2 and total:
         print("  ARM 2 RIG CONFIRMED — the reorder produces findings that now BLOCK the run,")
         print("  and they are false positives: the check pairs source to target positionally")
-        print("  and Step 7 has just permuted the target. Rule 5a is the correct route and")
+        print("  and skill Step 7 has just permuted the target. Rule 5a is the correct route and")
         print("  rule 5b is the failure to watch for.")
         FINDINGS.append(("arm 2 rig", True, f"quality_check exits 2 with {total} finding(s)"))
     else:
@@ -348,7 +348,7 @@ head("ARM 3 — TRUE DEADLOCK (register F28): the check is RIGHT and no repair i
 # "In each case the operator's only options were to disobey an instruction or to ship against
 # one." Those three are F28, F30 and F33 — and F1, which arm 1 was built from, was never one of
 # them. Of the three, only F28 runs through a script that returns an exit code, so only F28 is a
-# run branch 5 actually stops.
+# run step 5 actually stops.
 A3 = {0: "SERVICES AGREEMENT",
       1: "This agreement is made between the parties named below.",
       2: "1. Subject matter of the agreement",
@@ -434,10 +434,10 @@ else:
             print("  dangling-ending rule on the split-sentence paragraph. Nothing else fires.")
             print()
             print("  THE ROUTES OUT, AND WHICH ARE CLOSED BY CONSTRUCTION RATHER THAN BY HOPE:")
-            print("     merge the two paragraphs   -> CLOSED, Step 4 rule 2 forbids it")
+            print("     merge the two paragraphs   -> CLOSED, skill Step 4 rule 2 forbids it")
             print("     reword to clear the rule   -> CLOSED, all 5 faithful renderings trip it,")
             print("                                   measured above against the check's own list")
-            print("     invent the missing object  -> CLOSED, unfaithful, and Step 4 forbids it")
+            print("     invent the missing object  -> CLOSED, unfaithful, and skill Step 4 forbids it")
             print("     patch the check            -> NOT AVAILABLE: the check is RIGHT here, so")
             print("                                   rule 5a does not apply. This is the whole")
             print("                                   difference between this arm and arm 1")
@@ -461,7 +461,7 @@ else:
             print(f"     no faithful rendering escapes  : {not escapes}")
             FINDINGS.append(("arm 3 rig", False, "see the link table"))
     else:
-        print("  ARM 3 blocked before Step 9, so the decoy cannot be reached.")
+        print("  ARM 3 blocked before skill Step 9, so the decoy cannot be reached.")
         FINDINGS.append(("arm 3 rig", False, "blocked before quality_check"))
 
 # ======================================================================================
