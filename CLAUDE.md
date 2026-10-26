@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177; (d2c)'s last three next · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three on the unmerged git branch of run `d2c-last-hop1` · 14's `quality_check` sub-step merged, its remainder PROPOSED in section 3.14 of the build plan, awaiting Wouter's go · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,23 +578,23 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-23, THE HOUSE'S HOOK FIXES IN, RENAMES (d2b) AND (d2c) BUT THREE FILES, ONE PULL REQUEST
+### HANDOFF — 2026-10-26, ONE UNATTENDED HOP: (d2c) WHOLE, ONE FULL RUN, STEP 14'S PLAN PROPOSED
 
-**PURPOSE: MET FOR THE HOOK AND THE TOOLS, ALL BUT THREE FILES FOR THE TESTS.** It was *so that this project's checkers
-and push hook match the house's, and every living tool and test reads in phase, step, sub-step and skill Step N*: #177.
+**PURPOSE: MET** — *every living test file in the house's words, the git branch pushable on one full run, step 14's
+plan before its code*: hop 1 of run `d2c-last-hop1`, armed the same day; `DECISIONS-LOG.md`, 2026-10-26 and (2).
 
-**BUILT, ONE BRANCH, ONE FULL RUN** *(Wouter, standing)*: the house's v21, v11 and the hook's full-run block, byte for
-byte, and the two gaps they opened here, red first; (d2b) 317 swaps in 24 tools, the census last by phrases; (d2c) 274
-swaps in 33 tests, 54 joined; a review's four fixes. Census: 101 of 104 code files, 0 old words. The full run on
-`33f1111`: PASS, 94 suites, 2,855.7 s. Rulings and judgements: `DECISIONS-LOG.md`, 2026-10-23.
+**BUILT ON `feature/d2c-last-three-step14-plan`, NOT PUSHED:** the house's runner v8 (`890b49e`, the arming); (d2c)'s
+last three files, 57 logged swaps, census 104 of 104 code files and 0 old words, no fixture byte moved (`45ea469`);
+`/code-review`'s five in-scope fixes (`d38f313`); the full run on `d38f313`, OVERALL PASS, 94 suites, 1,785.8 s;
+then documents only: step 14's plan, PROPOSED as section 3.14 of the build plan (`8a752e1`), 17 of 17 rows placed.
 
-**SINGLE NEXT ACTION: RENAME (d2c)'S LAST THREE** — `tests/make_fixtures.py`, its builders read first since a string may
-be fixture CONTENT, and the probe pre-flight pair, its metacheck read first; `vocabulary_census.py --list-pending`
-names them. Then step 14's remainder, in section 2's order.
+**SINGLE NEXT ACTION: PUT `temp/d2c-last-hop1-questions.md` TO WOUTER** through the question tool, the hop's answer
+as the recommended option, to confirm or overturn; then the push, the ONE pull request, `/code-review` and his go
+for the squash-merge; then step 14 from 14.2, by section 3.14 as he approves it.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** ONE branch, ONE full run, ONE pull request a session; in a test, a needle into
-the skill's own text keeps `Step 1c` while its label takes `skill Step 1c`; the run's speed is the house's phase 8, not
-this project's; a re-copy of `install_hooks.py` needs no `ALLOW` change — it is keyed by the call's text.
+**WHAT A NEW SESSION WOULD GET WRONG:** step 14 has a PLAN and no go — no step-14 code before Wouter approves 3.14;
+(d2c) is done but not merged; the review's six findings in `tools/auto_mode_headless.py` are the house's, routed;
+17 of option 5's rows have no step in the build plan's section 9.3, and whether they ride with step 14 is his.
 
-**Open, none blocking:** `temp/s1023_for_house.md`, the slow first run's figures and five house-code findings, waits
-for a home the house reads; no suite runs `install_project_hooks.py`; `SKILL.md`'s size. **Context: 66% when written.**
+**Open, none blocking:** `temp/s1023_for_house.md` waits for a home the house reads; no suite runs
+`install_project_hooks.py`; `SKILL.md`'s size. **Context: not measured** — a headless hop has no usage tool.

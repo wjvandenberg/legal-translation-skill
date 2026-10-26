@@ -2071,3 +2071,54 @@ lines, 1 in `tests/probe-5b/preflight.py`, 0 in its metacheck — a planted cont
 of the build plan names G1 to G13, C7, C10, F5 and F10; G5, G10 and G11 read fixed by its earlier `quality_check`
 sub-step, G9 half closed, G12 routed to Wouter by its own text. **The hop's state file is `AUTO-MODE-RUN.md`,
 gitignored; the 2026-09-30 run's copy is kept as `temp/AUTO-MODE-RUN-2026-09-30-wiring-hop1.md`.**
+
+## 2026-10-26 (2) — d2c-last-hop1 hop 1: (d2c) whole, the review's five fixes, one full run, step 14 explored and its plan proposed
+
+**THE HOP, UNATTENDED, ON THE ARMING SESSION'S RULINGS** *(this log's 2026-10-26 entry; R1 to R5 of the state
+file)*: claimed at 10:55, every question answered on its recommended option and carried to
+`temp/d2c-last-hop1-questions.md` for the next attended session to confirm or overturn — twelve entries, two of
+them the ones the state file asked to be carried. Nothing pushed, no pull request, no step-14 code.
+
+**B1, RENAME (d2c) WHOLE** (`45ea469`): `tests/make_fixtures.py` and the probe pre-flight pair, re-measured at 36
+counted old words (35, 1, 0, a control firing in each); the census red first at 31, then 20 documents and 104 code
+files, 0 old words, none pending; 57 logged swaps, the sweep re-proved against HEAD's bytes and by the ast proof;
+the 24 fixtures rebuilt, each rewritten, not one byte moved; the probe pair compared by content, only the
+relabelled lines moving. **`/code-review` at xhigh, before the full run, returned thirteen findings:** five on the
+swept files fixed as their own commit (`d38f313`); six in `tools/auto_mode_headless.py`, the house's runner
+adopted byte for byte, routed to the house (question 10); two the charter's and the build plan's stale status,
+which this hop's close replaces. **B2, THE ONE FULL RUN** on `d38f313`, through `cycle_evidence.py full`: OVERALL PASS, 94 suites and 14 entry
+points, 1,785.8 s, no row failing, void or judged; `check-push` allows the push, and after B3 still does, every
+path changed since ending in `.md`.
+
+**B3, STEP 14 EXPLORED, ITS PLAN PROPOSED** (`8a752e1`) — section 3.14 of the build plan, headed *awaiting Wouter's go*:
+every row section 9.3 gives the step read in full and measured against both trees with an invented probe per open
+row, 24 arms open and 0 void; 17 of 17 rows accounted for. **The audit gate found two real errors in the draft
+before it was committed:** the count of option 5's rows with no accountable step was 16 and is 17 — C29 is named
+in step 6's row only to be disowned, and the first count took a mention for ownership; and a sentence tied the
+`of the` exemption to "the known miss G8 names", which is C11, a lexicon calque — replaced by the measurement
+(`Article 7 of the Agreement` silent, `of this Agreement` warning, both trees).
+
+**JUDGEMENTS TAKEN ALONE.** (a) Beyond the 30 counted words, 27 uncounted swaps judged by reading, the 2026-10-23
+method's: a bare "branch" meaning this project's step became "step", one meaning a code path kept its word, and
+the skill's own step in a label or comment took "skill Step N"; `STEP-B §4` kept, a document's name. (b) A numbered
+sub-step written N.M (sub-step 7.2), a lettered one kept under its step ("STEP 10's SUB-STEP 3a"), as batch 2
+wrote them; the whitespace fixture's "slice 3" read as sub-step 6.3, its comment sitting in step 6's fourth. (c)
+Five uses of the word in Python's own sense — a string cut by index — kept as declared phrases, each with its
+reason. (d) The pre-flight's printed labels relabelled, its output moving on those lines alone; the review then
+re-aligned one continuation line. (e) Of the review's thirteen findings, five fixed before the full run, which a
+fix after it would have cost again. (f) The step-14 block placed as a new 3.14 at the end of section 3, so
+nothing is renumbered (question 3); the merged `quality_check` sub-step named 14.1 and the rest 14.2 to 14.8
+(question 4); option 5's seventeen unassigned rows proposed to ride with step 14, because section 3.4, the brief,
+says so (question 5); G7's quoted contractual phrase proposed as a declared residual (question 6); G12 left to
+Wouter's classification (question 7); G6 proposed closed with the step (question 8); two measurements that
+refine G4 and G13 written into the plan, not the register (question 9); the `of the` false negative recorded,
+not folded in (question 11). (g) The state file sent B3 to "the 2026-08-21 entries" of this log; it holds none
+of that date, so the sub-step's method was read from `tests/test_check_scoping.py` and `tools/qc_census.py`.
+(h) The probe's first true-positive control for G13, a whole Italian sentence, fired nothing — the remnant check
+keys on marker words, not on a sentence's language — so it was replaced by the first of four invented
+candidates that fires, the arm VOID until then. (i) `stepb_audit.py` counts every quotation in the build plan's section 3 as a spoken
+verdict, unverifiable; the block adds one, a quotation of section 3.4 proved verbatim, and a paraphrase of
+section 2's row first set in italics like a quotation was made plain prose before the commit.
+
+**Context: not measured** — a headless hop has no usage tool. **Ran as** Opus 5.5 (`claude-opus-5-5`); the
+effort level is not visible from inside the session — the runner reads it back.
