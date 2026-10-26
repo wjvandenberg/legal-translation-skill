@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177; (d2c)'s last three next · 14's `quality_check` sub-step merged · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14's `quality_check` sub-step merged as 14.1, its remainder APPROVED in section 3.14 of the build plan, 2026-10-26, code from 14.2 · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,23 +578,23 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-23, THE HOUSE'S HOOK FIXES IN, RENAMES (d2b) AND (d2c) BUT THREE FILES, ONE PULL REQUEST
+### HANDOFF — 2026-10-26 (3), THE HOP'S CLOSE: (d2c) WHOLE, STEP 14'S PLAN APPROVED, ALL IN #178
 
-**PURPOSE: MET FOR THE HOOK AND THE TOOLS, ALL BUT THREE FILES FOR THE TESTS.** It was *so that this project's checkers
-and push hook match the house's, and every living tool and test reads in phase, step, sub-step and skill Step N*: #177.
+**PURPOSE: MET UP TO THE MERGE, WHICH IS WOUTER'S** — *the run's work reaching `main` only as he approved it, step 14
+from 14.2 on an approved plan*: armed, run and closed in one day; `DECISIONS-LOG.md`, 2026-10-26, (2) and (3).
 
-**BUILT, ONE BRANCH, ONE FULL RUN** *(Wouter, standing)*: the house's v21, v11 and the hook's full-run block, byte for
-byte, and the two gaps they opened here, red first; (d2b) 317 swaps in 24 tools, the census last by phrases; (d2c) 274
-swaps in 33 tests, 54 joined; a review's four fixes. Census: 101 of 104 code files, 0 old words. The full run on
-`33f1111`: PASS, 94 suites, 2,855.7 s. Rulings and judgements: `DECISIONS-LOG.md`, 2026-10-23.
+**IN #178, `feature/d2c-last-three-step14-plan`:** the house's runner v8 (`890b49e`); (d2c)'s last three files, census
+104 of 104 code files and 0 old words, no fixture byte moved (`45ea469`); the review's five fixes (`d38f313`), the
+full run on it OVERALL PASS, 94 suites; step 14's plan, section 3.14 of the build plan, APPROVED with Wouter's twelve
+answers folded in — G12 to a text-free tool as 14.9, the missed `of the` alarm into 14.4, option 5's 17 rows as 14.8.
 
-**SINGLE NEXT ACTION: RENAME (d2c)'S LAST THREE** — `tests/make_fixtures.py`, its builders read first since a string may
-be fixture CONTENT, and the probe pre-flight pair, its metacheck read first; `vocabulary_census.py --list-pending`
-names them. Then step 14's remainder, in section 2's order.
+**SINGLE NEXT ACTION: SUB-STEP 14.2**, once #178 is merged — `validate_segment_shapes.py`, F10 and F5's sentence,
+both trees, by section 3.14; its own explore and written plan first, its controls pinned to the code before it as
+`tests/test_check_scoping.py` does.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** ONE branch, ONE full run, ONE pull request a session; in a test, a needle into
-the skill's own text keeps `Step 1c` while its label takes `skill Step 1c`; the run's speed is the house's phase 8, not
-this project's; a re-copy of `install_hooks.py` needs no `ALLOW` change — it is keyed by the call's text.
+**WHAT A NEW SESSION WOULD GET WRONG:** 3.14 is APPROVED — the brief, never re-planned; one HEAVY sub-step a session,
+one branch, one full run, one pull request; 14.4 now makes a check fire MORE as well; 14.9's tool never prints a
+finding's text; the review's six findings in the house's runner are the house's, in `temp/s1026_for_house.md`.
 
-**Open, none blocking:** `temp/s1023_for_house.md`, the slow first run's figures and five house-code findings, waits
-for a home the house reads; no suite runs `install_project_hooks.py`; `SKILL.md`'s size. **Context: 66% when written.**
+**Open, none blocking:** `temp/s1023_for_house.md` and `temp/s1026_for_house.md` wait for Wouter to hand to the house;
+no suite runs `install_project_hooks.py`; `SKILL.md`'s size. **Context: 37% when written.**

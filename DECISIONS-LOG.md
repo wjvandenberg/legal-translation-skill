@@ -2043,3 +2043,115 @@ fixture CONTENT, and the probe pair, coupled and both standing reds. (e) In test
 not count, judged by reading: a needle into the skill's text or output keeps `Step 1c`, a label takes `skill Step 1c`.
 (f) A quotation of the build plan's dated headings keeps its words. (g) `test_no_bytecode_in_tree.py` says "that
 sub-step" where "sub-step 7.3" beside "CLAUDE.md" read to the charter-pointer check as a section pointer.
+
+## 2026-10-26 — one unattended hop armed: (d2c)'s last three files, the full run, step 14 explored and planned
+
+**WOUTER, AT THE OPENING, ASKED FOR THE WORK *"VIA AUTO HEADLESS MODE"*** — AUTO MODE by name — and answered four
+questions through the question tool: **(1) SCOPE: the renames, then step 14 EXPLORED AND PLANNED, NO STEP-14 CODE**, the
+recommended answer — step 14 is material, edits the shipped checks in both variants, and has no brief in section 3 of
+the build plan, so its plan comes to him before any of its code; **(2) ONE HOP**, recommended; **(3) THREE HOURS a hop,
+as on 2026-09-30**, over the four recommended — the close begun by WOKE + 2 h 30, released by 3 h 00, the runner's
+backstop cut at 3 h 15; **(4) the runner started by the arming session in a Terminal tab**, recommended. **AND IN WORDS,
+mid-turn:** *"Do it in Opus 5.5 extra!"* — read: the hop on Opus 5.5 at `xhigh`, the CLI's levels being low, medium,
+high, xhigh and max and the arming session running at `xhigh`; so the state file's EFFORT says `xhigh`, and the runner
+pins the model as well, `--model=claude-opus-5-5`.
+
+**THE MERGE, STATED RATHER THAN ASKED:** a hop may not push, open or merge a pull request — the guard refuses each at
+the tool call — and the house's definition of done asks, in AUTO MODE, for a pull request Wouter approves. So the
+2026-10-23 prompt's *"merge the pull request yourself"* gives way for this run: the next attended session pushes, opens
+the one pull request, runs `/code-review` and asks him for the squash-merge.
+
+**THE HOUSE'S RUNNER, ADOPTED AT THE OPENING:** `tools/auto_mode_headless.py` was v7 (2026-10-14) against the house's
+v8 (2026-10-21), whose hand-back says whether the run's branch can be pushed; `check_checkers.py` does not track the
+runner, so its all-current verdict could not show it. Copied byte for byte, one git object id both sides, its selftest
+the one entry-point run: 30 of 30 cases proved both ways.
+
+**MEASURED BEFORE ASKING:** the three pending files hold 36 counted old words — 35 in `tests/make_fixtures.py` on 26
+lines, 1 in `tests/probe-5b/preflight.py`, 0 in its metacheck — a planted control firing. Step 14's row in section 9.3
+of the build plan names G1 to G13, C7, C10, F5 and F10; G5, G10 and G11 read fixed by its earlier `quality_check`
+sub-step, G9 half closed, G12 routed to Wouter by its own text. **The hop's state file is `AUTO-MODE-RUN.md`,
+gitignored; the 2026-09-30 run's copy is kept as `temp/AUTO-MODE-RUN-2026-09-30-wiring-hop1.md`.**
+
+## 2026-10-26 (2) — d2c-last-hop1 hop 1: (d2c) whole, the review's five fixes, one full run, step 14 explored and its plan proposed
+
+**THE HOP, UNATTENDED, ON THE ARMING SESSION'S RULINGS** *(this log's 2026-10-26 entry; R1 to R5 of the state
+file)*: claimed at 10:55, every question answered on its recommended option and carried to
+`temp/d2c-last-hop1-questions.md` for the next attended session to confirm or overturn — twelve entries, two of
+them the ones the state file asked to be carried. Nothing pushed, no pull request, no step-14 code.
+
+**B1, RENAME (d2c) WHOLE** (`45ea469`): `tests/make_fixtures.py` and the probe pre-flight pair, re-measured at 36
+counted old words (35, 1, 0, a control firing in each); the census red first at 31, then 20 documents and 104 code
+files, 0 old words, none pending; 57 logged swaps, the sweep re-proved against HEAD's bytes and by the ast proof;
+the 24 fixtures rebuilt, each rewritten, not one byte moved; the probe pair compared by content, only the
+relabelled lines moving. **`/code-review` at xhigh, before the full run, returned thirteen findings:** five on the
+swept files fixed as their own commit (`d38f313`); six in `tools/auto_mode_headless.py`, the house's runner
+adopted byte for byte, routed to the house (question 10); two the charter's and the build plan's stale status,
+which this hop's close replaces. **B2, THE ONE FULL RUN** on `d38f313`, through `cycle_evidence.py full`: OVERALL PASS, 94 suites and 14 entry
+points, 1,785.8 s, no row failing, void or judged; `check-push` allows the push, and after B3 still does, every
+path changed since ending in `.md`.
+
+**B3, STEP 14 EXPLORED, ITS PLAN PROPOSED** (`8a752e1`) — section 3.14 of the build plan, headed *awaiting Wouter's go*:
+every row section 9.3 gives the step read in full and measured against both trees with an invented probe per open
+row, 24 arms open and 0 void; 17 of 17 rows accounted for. **The audit gate found two real errors in the draft
+before it was committed:** the count of option 5's rows with no accountable step was 16 and is 17 — C29 is named
+in step 6's row only to be disowned, and the first count took a mention for ownership; and a sentence tied the
+`of the` exemption to "the known miss G8 names", which is C11, a lexicon calque — replaced by the measurement
+(`Article 7 of the Agreement` silent, `of this Agreement` warning, both trees).
+
+**JUDGEMENTS TAKEN ALONE.** (a) Beyond the 30 counted words, 27 uncounted swaps judged by reading, the 2026-10-23
+method's: a bare "branch" meaning this project's step became "step", one meaning a code path kept its word, and
+the skill's own step in a label or comment took "skill Step N"; `STEP-B §4` kept, a document's name. (b) A numbered
+sub-step written N.M (sub-step 7.2), a lettered one kept under its step ("STEP 10's SUB-STEP 3a"), as batch 2
+wrote them; the whitespace fixture's "slice 3" read as sub-step 6.3, its comment sitting in step 6's fourth. (c)
+Five uses of the word in Python's own sense — a string cut by index — kept as declared phrases, each with its
+reason. (d) The pre-flight's printed labels relabelled, its output moving on those lines alone; the review then
+re-aligned one continuation line. (e) Of the review's thirteen findings, five fixed before the full run, which a
+fix after it would have cost again. (f) The step-14 block placed as a new 3.14 at the end of section 3, so
+nothing is renumbered (question 3); the merged `quality_check` sub-step named 14.1 and the rest 14.2 to 14.8
+(question 4); option 5's seventeen unassigned rows proposed to ride with step 14, because section 3.4, the brief,
+says so (question 5); G7's quoted contractual phrase proposed as a declared residual (question 6); G12 left to
+Wouter's classification (question 7); G6 proposed closed with the step (question 8); two measurements that
+refine G4 and G13 written into the plan, not the register (question 9); the `of the` false negative recorded,
+not folded in (question 11). (g) The state file sent B3 to "the 2026-08-21 entries" of this log; it holds none
+of that date, so the sub-step's method was read from `tests/test_check_scoping.py` and `tools/qc_census.py`.
+(h) The probe's first true-positive control for G13, a whole Italian sentence, fired nothing — the remnant check
+keys on marker words, not on a sentence's language — so it was replaced by the first of four invented
+candidates that fires, the arm VOID until then. (i) `stepb_audit.py` counts every quotation in the build plan's section 3 as a spoken
+verdict, unverifiable; the block adds one, a quotation of section 3.4 proved verbatim, and a paraphrase of
+section 2's row first set in italics like a quotation was made plain prose before the commit.
+
+**Context: not measured** — a headless hop has no usage tool. **Ran as** Opus 5.5 (`claude-opus-5-5`); the
+effort level is not visible from inside the session — the runner reads it back.
+
+## 2026-10-26 (3) — Wouter's answers to the hop's twelve questions: step 14's plan approved, two answers overturned
+
+**WOUTER, THROUGH THE QUESTION TOOL,** the hop's answer offered as the recommended option to confirm or overturn
+*(`temp/d2c-last-hop1-questions.md`, numbered as there)*: **(1) step 14's plan APPROVED**, his answers folded into
+section 3.14, now the brief; **(3)** it stays a new 3.14 at the end; **(4)** the merged `quality_check` work is 14.1,
+the rest from 14.2; **(5) option 5's 17 unowned rows RIDE WITH STEP 14** as 14.8, each measured in both trees first;
+**(6)** G7's third shape a declared residual of a WARN; **(8)** G6 closes with step 14; **(9)** G4's and G13's refined
+measurements go into their rows as each sub-step closes them; **(10)** the review's six findings in the house's
+runner go to the house — written for him to hand over in `temp/s1026_for_house.md`. **TWO OVERTURNED: (7) G12** —
+not Wouter reading the 16 but a TEXT-FREE TOOL reporting each citation's shape, 14.9, MEDIUM, Claude classifying by
+shape and never by text; **(11) the missed `of the` alarm FOLDS INTO 14.4**, the look-ahead edited once, a register
+row filed and closed by that sub-step. **(2), THE MERGE, IN HIS WORDS:** *"push, open the pull request, run
+/code-review and ask me for the merge."*
+
+**(12), FOR INFORMATION — THE ARMING SESSION'S POINTER WAS WRONG:** the state file sent the hop to "the 2026-08-21
+entries" of this log for how step 14's first sub-step was run; the log has no heading of that date, its dated
+entries beginning on 2026-08-24. The pointer was written without probing where it led — the house's hygiene rule 18
+— and the hop read the method from `tests/test_check_scoping.py` and `tools/qc_census.py` instead.
+
+**RE-MEASURED BEFORE ASKING:** the hop's probe, `temp/s1026h_probe14.py`, run again in the attended close: 30 arms
+over the two trees, 24 OPEN, 6 controls quiet, 0 VOID — the figure the plan records. **AND THE ORDER:** the branch
+was pushed and #178 opened before this record, so the record could name it; the push rode the hop's full run on
+`d38f313`, every later commit documents only.
+
+**AND ON THE REVIEW OF #178,** `/code-review` at xhigh, ten findings: six the hop's in the house's runner,
+re-confirmed against the code and left routed (answer 10); three in this entry's own fold of section 3.14 - its
+Done-when and method forbade the findings 14.4 now adds by design, 14.4's false-positive controls named only the
+Civil Code and the decree forms where the bare `of the` also silences an Act, a Treaty or a Regulation, and the
+sub-steps paragraph called 14.8 and 14.9 HEAVY one-script steps - and one ruling. **WOUTER, THROUGH THE QUESTION
+TOOL:** *fix the three plan findings, then merge* - fixed before the merge, documents only; and the lettered names
+the rename wrote for slices built with letters ("step 10's sub-step 3a") KEPT, the house's no-letters rule
+binding new plans, not history.

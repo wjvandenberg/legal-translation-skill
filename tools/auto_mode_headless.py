@@ -1,4 +1,4 @@
-r"""auto_mode_headless.py - run an unattended chain of hops in a loop.  CHECKER VERSION 7 (2026-10-14)
+r"""auto_mode_headless.py - run an unattended chain of hops in a loop.  CHECKER VERSION 8 (2026-10-21)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -90,6 +90,14 @@ start a run whose state file names none, passes --effort to the pre-flight and t
 prints it on the flags line, and READS BACK the effort each session actually ran at from its
 own log (effort_check). The pre-flight must be CONFIRMED or nothing starts; a hop at another
 level is an EFFORT MISMATCH and halts the chain; a log it cannot read says NOT CHECKED.
+
+AND WHETHER THE RUN'S BRANCH CAN BE PUSHED (v8). The full suite runs once, before a push, and a
+pre-push hook refuses a push no full run vouches for; a hop never pushes, so the LAST hop runs
+the full suite after its final commit and the person pushes. Every end of a run now says, in
+one line, whether cycle_evidence's check-push would allow the run's BRANCH as it stands -
+ALLOWED, REFUSED with the reason, or NOT CHECKED with why. REPORTED, NOT HALTED: see
+push_report. Before v8 the hand-back was silent on it, so a last hop that skipped its full run
+was found only when the push was refused.
 
     uv run python tools/auto_mode_headless.py --dry-run  # what it WOULD do; launches nothing
     uv run python tools/auto_mode_headless.py --check    # pre-flight only, start nothing
@@ -619,6 +627,64 @@ def loop(state: Path, launcher: list[str], flags: list[str], cwd: Path,
          transcripts: Path, timeout: float | None, require_cycle: bool = True,
          expect_models: list[str] | None = None, expect_effort: str | None = None,
          logs: Path | None = None) -> tuple[int, list[str]]:
+    """Run the hops, then say whether the run's branch can be pushed - at EVERY end of a run,
+    the hand-back being where a person decides to push (v8). See _hops and push_report."""
+    rc, lines = _hops(state, launcher, flags, cwd, transcripts, timeout, require_cycle,
+                      expect_models, expect_effort, logs)
+    lines.append(push_report(cwd, state))
+    return rc, lines
+
+
+def push_report(root: Path, state: Path) -> str:
+    """One line: may the run's BRANCH be pushed as it stands? REPORTED, NEVER HALTED (v8).
+
+    THE BRANCH, NEVER HEAD. The run's work is on the branch its state file names; whatever is
+    checked out when the run ends - a person may have switched - says nothing about it.
+
+    THE ANSWER IS cycle_evidence.check_push's, imported rather than re-derived, for the reason
+    the store's loader is: two readers of one record come to disagree. A copy of cycle_evidence
+    older than v2 has no check_push, and one project held exactly that beside this runner when
+    it was written - so the import is made HERE, and its absence is NOT CHECKED. A runner that
+    could not start because a report line could not be built would lose the whole run.
+
+    WHY IT NEVER CHANGES THE EXIT CODE. The run is over, so there is nothing left to halt, and
+    the pre-push hook refuses the push itself. A project whose state file predates the last
+    hop's full run, or that has no hook, would otherwise see exit 1 on every correct run - and
+    a check that fails on correct work is a check people delete, as a model change is reported
+    and not halted. A branch that is no commit is NOT CHECKED, never allowed.
+    """
+    try:
+        fields, _raw, _term = read_state(state)
+    except Void as e:
+        return (f"  PUSH NOT CHECKED - the state file can no longer be read, so no branch is "
+                f"named - {e}")
+    branch = fields.get("BRANCH", "").strip()
+    if not branch:
+        return "  PUSH NOT CHECKED - the state file names no BRANCH"
+    try:
+        from cycle_evidence import check_push                    # noqa: PLC0415
+    except ImportError:
+        return ("  PUSH NOT CHECKED - the cycle_evidence.py beside this runner has no check-push "
+                "(it is older than v2): re-copy it, and the pre-push hook with it")
+    try:
+        # refs/heads/, NEVER THE BARE NAME: git resolves a bare name tag-first, so a tag that
+        # shares the branch's name would be answered for instead of the branch.
+        ok, why = check_push(root, store_path(root, load_cycle_config(root)),
+                             f"refs/heads/{branch}")
+    except (OSError, ValueError) as e:
+        return f"  PUSH NOT CHECKED - the evidence store could not be read - {e}"
+    if ok is None:
+        return f"  PUSH NOT CHECKED - {branch}: {why}"
+    if ok:
+        return f"  PUSH ALLOWED - {branch}: {why}"
+    return (f"  PUSH REFUSED - {branch}: {why}. The pre-push hook will refuse it too, so run "
+            f"`cycle_evidence.py full` on its tip before pushing. Reported, not halted.")
+
+
+def _hops(state: Path, launcher: list[str], flags: list[str], cwd: Path,
+          transcripts: Path, timeout: float | None, require_cycle: bool = True,
+          expect_models: list[str] | None = None, expect_effort: str | None = None,
+          logs: Path | None = None) -> tuple[int, list[str]]:
     """Run hops until the state file stops us. Returns (exit code, report lines).
 
     IT CANNOT LOOP FOR EVER, AND THE GUARD THAT MATTERS IS NOT THE COUNTER. A hop that
@@ -1176,7 +1242,9 @@ def _selftest() -> int:
                         d / "tr", 120, require_cycle=False, expect_models=[_PRE_MODEL])
         if any("MODEL CHANGE" in ln for ln in out):
             return "REPORTED"
-        return "NOT CHECKED" if any("NOT CHECKED" in ln for ln in out) else "QUIET"
+        # THE MODEL'S OWN LINE: since v8 the push line can say NOT CHECKED too, and a bare
+        # match read that as the model's verdict on two good arms.
+        return "NOT CHECKED" if any("model NOT CHECKED" in ln for ln in out) else "QUIET"
 
     def build(body):
         def make(d: Path, body=body):
@@ -1361,6 +1429,77 @@ def _selftest() -> int:
         Case("a timeout is NAMED and cuts the whole tree", timeout_verdict,
              bad=build(_SLEEPER), good=build(_PLAIN_CRASH),
              want="TIMEOUT/in time", good_want="GENERIC/in time"),
+    ]
+
+    # ---- WHETHER THE BRANCH CAN BE PUSHED, v8. A REAL repository, because the answer is git's:
+    #      the run's branch carries the work, with or without a full run recorded on its tip -
+    #      and HEAD is then moved to ANOTHER branch with a code change, so a runner that read
+    #      HEAD instead of the run's branch is refused on the arm that must be allowed.
+    def pushable(full: bool, drop_check_push: bool = False, tag: bool = False):
+        def make(d: Path):
+            from cycle_evidence import DEFAULT_CONFIG, git_bytes, record_full  # noqa: PLC0415
+            d.mkdir(parents=True, exist_ok=True)
+            for args in (("init", "-q"), ("config", "user.email", "noreply@example.invalid"),
+                         ("config", "user.name", "selftest"),
+                         ("config", "commit.gpgsign", "false"),
+                         ("checkout", "-q", "-b", "session/t")):
+                git_bytes(d, *args)
+            (d / ".gitignore").write_bytes(b"temp/\ntr/\n")
+            state_at(d, n=1, k=0)
+            stub = _stub(d, "stub.py", _GOOD)
+            git_bytes(d, "add", "-A")
+            git_bytes(d, "commit", "-q", "-m", "the run's work")
+            if full:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    got = record_full(d, store_path(d, DEFAULT_CONFIG), [sys.executable, "-c", "pass"])
+                if got != 0:                     # a FIXTURE that failed, never a runner defect
+                    raise RuntimeError(f"the fixture's full run did not record (rc={got})")
+            git_bytes(d, "checkout", "-q", "-b", "elsewhere")
+            (d / "other.py").write_bytes(b"x = 1\n")
+            git_bytes(d, "add", "-A")
+            git_bytes(d, "commit", "-q", "-m", "not the run's")
+            if tag:                              # a TAG of the branch's name, on unrecorded code
+                git_bytes(d, "tag", "session/t")
+            return (d, stub, drop_check_push)
+        return make
+
+    def push_verdict(pair) -> str:
+        """What the hand-back says about pushing the run's branch, and the exit code - which a
+        refused push must leave alone: reported, not halted. A fixture may take check_push out
+        of cycle_evidence for the length of the run - a copy older than v2 - and a crash then is
+        the verdict, never an escape from the case."""
+        import cycle_evidence                                         # noqa: PLC0415
+        d, stub, *drop = pair
+        os.environ["STUB_CWD"] = str(d)
+        saved = cycle_evidence.check_push
+        try:
+            if drop and drop[0]:
+                del cycle_evidence.check_push
+            rc, out = loop(d / "AUTO-MODE-RUN.md", [sys.executable, str(stub)], [], d,
+                           d / "tr", 120, require_cycle=False)
+        except Exception as e:                                        # noqa: BLE001
+            return f"CRASHED ({type(e).__name__})"
+        finally:
+            cycle_evidence.check_push = saved
+        seen = ("ALLOWED" if any("PUSH ALLOWED" in ln for ln in out)
+                else "REFUSED" if any("PUSH REFUSED" in ln for ln in out)
+                else "NOT CHECKED" if any("PUSH NOT CHECKED" in ln for ln in out)
+                else "SILENT")
+        return f"{seen}/rc={rc}"
+
+    cases += [
+        Case("the hand-back says if the BRANCH can be pushed", push_verdict,
+             bad=pushable(full=False), good=pushable(full=True),
+             want="REFUSED/rc=0", good_want="ALLOWED/rc=0"),
+        Case("...a branch naming no commit is NOT CHECKED", push_verdict,
+             bad=build(_GOOD), good=pushable(full=True),
+             want="NOT CHECKED/rc=0", good_want="ALLOWED/rc=0"),
+        Case("...and no check_push is NOT CHECKED, no crash", push_verdict,
+             bad=pushable(full=True, drop_check_push=True), good=pushable(full=True),
+             want="NOT CHECKED/rc=0", good_want="ALLOWED/rc=0"),
+        Case("...and a TAG of the branch's name is not read", push_verdict,
+             bad=pushable(full=False, tag=True), good=pushable(full=True, tag=True),
+             want="REFUSED/rc=0", good_want="ALLOWED/rc=0"),
     ]
 
     ok_cases, paired, unpaired = run_cases(cases, tmp, width=44)

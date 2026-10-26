@@ -247,14 +247,14 @@ def fixture(name, why):
 
 
 # ---------------------------------------------------------------------------
-# Branch 6 — things the writing-back step deletes because it does not recognise them.
+# Step 6 — things the writing-back step deletes because it does not recognise them.
 # Three of these four reproduce from the corpus; they are built anyway so the suite is
 # self-contained and runnable by someone with no access to the corpus at all.
 # ---------------------------------------------------------------------------
 @fixture("anchors-and-tabs.docx",
          "footnote anchor, comment anchor, hyperlink wrapping a tab-only run, a run carrying "
          "text THEN a tab, and a hanging-indent item whose tab PRECEDES its text — the five "
-         "shapes branch 6 must preserve, plus a tab STOP as the negative control")
+         "shapes step 6 must preserve, plus a tab STOP as the negative control")
 def _anchors(path):
     footnotes = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:footnotes {W}><w:footnote w:id="1"><w:p>{r("A note on the preceding clause.")}</w:p>
@@ -469,10 +469,10 @@ def _note(idx, text, en, spans):
 def _notes_from_document(path, shapes, en_map):
     """Build one note per w:p BY READING THE DOCUMENT BACK, not from the shape table.
 
-    PARAMETERISED ON 2026-09-09, branch 7 slice 2, and the alternative was worse. It read
+    PARAMETERISED ON 2026-09-09, sub-step 7.2, and the alternative was worse. It read
     CONTAINER_SHAPES and CONTAINER_EN as module globals, so the glossary fixture needed either
     a second copy of this reader or a hardcoded reference to the wrong tables. A second copy is
-    exactly the defect slice 1 filed twice -- two definitions of one rule in one file will
+    exactly the defect sub-step 7.1 filed twice -- two definitions of one rule in one file will
     disagree, and the one that loses is silent. There is deliberately NO DEFAULT for either
     argument: a default is a hidden second place for a caller to be wrong.
 
@@ -599,7 +599,7 @@ def _toc_widened(path):
     WHY A SECOND TOC FIXTURE RATHER THAN SIX MORE ROWS IN `toc.docx`. That one is the
     instrument `tests/test_stop_deleting.py` section 5 counts against -- four placeable, two
     declining, twelve tab characters, twelve tab stops, six hyperlinks. Adding rows would move
-    every one of those numbers and force an edit to a suite this branch must not touch. A new
+    every one of those numbers and force an edit to a suite this step must not touch. A new
     fixture costs two committed files and breaks nothing.
 
     AND THE LAST TWO ENTRIES ARE THE POINT OF IT. A fixture carrying only the shapes a rule
@@ -739,7 +739,7 @@ def _crossref(path):
 
 
 # ---------------------------------------------------------------------------
-# Branch 7 — the container inventory. NONE of these four is reproducible from any corpus
+# Step 7 — the container inventory. NONE of these four is reproducible from any corpus
 # document, which is the entire reason they exist.
 # ---------------------------------------------------------------------------
 _SDTPR = '<w:sdtPr><w:id w:val="{n}"/><w:alias w:val="Field {n}"/></w:sdtPr>'
@@ -837,7 +837,7 @@ CONTAINER_SHAPES = [
      "w:ruby INSIDE a run, and this one is WORSE than a remnant: measured, apply destroys "
      "ruby, rubyBase and rt outright, 1->0 each, while extraction has already glued the "
      "phonetic reading to its base in `text`. Zero corpus instances -- and the corpus has a "
-     "Japanese document. ASSERTED AS THE CURRENT OUTCOME so a later branch must change it "
+     "Japanese document. ASSERTED AS THE CURRENT OUTCOME so a later step must change it "
      "deliberately rather than silently",
      p(r("The defined term "),
        '<w:r><w:ruby><w:rubyPr/><w:rt><w:r><w:t>yomi</w:t></w:r></w:rt>'
@@ -858,7 +858,7 @@ CONTAINER_SHAPES = [
     # explicit: never work around a gate.
     #
     # So A22 keeps its register row and the 20-shape probe as its evidence, and the fixture
-    # is DECLARED as owed by whichever branch fixes it -- which must then decide clause 3's
+    # is DECLARED as owed by whichever step fixes it -- which must then decide clause 3's
     # keyword question first. tests/test_container_inventory.py names the gap rather than
     # leaving it silent.
     ("ins-mixed", False,
@@ -952,7 +952,7 @@ def _containers(path):
     # Built without them, LibreOffice refused the whole package -- "source file could not be
     # loaded" -- and the shape that did it was the content control holding a
     # `w:footnoteReference w:id="2"` pointing at a footnotes part that did not exist.
-    # I-17 is the SAME DEFECT on anchors-and-tabs.docx, found on branch 14, and that
+    # I-17 is the SAME DEFECT on anchors-and-tabs.docx, found on step 14, and that
     # fixture's own comment says it in terms: a hyperlink `r:id` referring to a relationship
     # that does not exist "is enough for a consumer to reject the package". Nothing checked
     # it, so it came straight back on the next fixture to carry a pointer.
@@ -995,7 +995,7 @@ def _containers(path):
 
 
 # ---------------------------------------------------------------------------
-# Branch 7 slice 2 — C19, word/glossary/document.xml.
+# Sub-step 7.2 — C19, word/glossary/document.xml.
 #
 # WHY THIS FIXTURE CARRIES A SHAPE THE ROW DOES NOT NAME. C19 says the delivered document.xml
 # "still referenced its docPart for the cover-page date control", which reads as
@@ -1011,8 +1011,8 @@ def _containers(path):
 # about how, and the effect it describes is slightly worse than stated -- ten controls, each
 # able to display source-language prompt text, from a part no check in either tree reads.
 #
-# THIS IS THE SECOND TIME ON THIS BRANCH that a fixture built from a register row's own words
-# carried the wrong shape; slice 1's carried the `w:sdt` BLOCK form, which A16 calls correct.
+# THIS IS THE SECOND TIME ON THIS STEP that a fixture built from a register row's own words
+# carried the wrong shape; sub-step 7.1's carried the `w:sdt` BLOCK form, which A16 calls correct.
 # Hence the rule this fixture is built under: take the shape from the MEASUREMENT.
 #
 # The corpus names its docParts with 32-character GUIDs. The names here are readable instead,
@@ -1186,20 +1186,20 @@ GRAPHIC_SHAPES = [
     ("ftr-sdt-databinding", "footer1", False,
      "OWED MEASUREMENT (b), Wouter 2026-09-09. A content control BOUND to customXml. "
      "Measured: 3 such elements across 2 corpus documents, ALL IN FOOTERS -- so the question "
-     "lands on the very script this slice edits, which is sharper than the decision log "
+     "lands on the very script this sub-step edits, which is sharper than the decision log "
      "says. Word can repopulate a bound control's text from the customXml part when the "
      "document is opened, so a correct XML edit may be undone on the page. PINNED at the "
      "current outcome; settling it needs Word in the loop, which no instrument here has"),
     ("body-drawing-descr", "document", False,
      "REPORT ONLY, AND THE HONEST RESIDUE. A body drawing carrying alt text. The corpus has "
-     "ZERO body graphics, and the translation route is Step 8b's, which reaches header and "
-     "footer parts only -- so this surface is REPORTED and not translated. The branch's own "
+     "ZERO body graphics, and the translation route is skill Step 8b's, which reaches header and "
+     "footer parts only -- so this surface is REPORTED and not translated. Step 7's own "
      "rule is that anything outside the inventory fails loudly rather than shipping "
      "silently, and a report is that loudness where a block would have no compliant exit"),
     ("hdr-plain", "header1", False,
      "THE QUIET CONTROL. A header paragraph with text and no graphic of any kind. If the "
      "report ever names this, it has reached something it has no business in -- and if the "
-     "translated header XML moves for this paragraph, the scaffold change broke Step 8b"),
+     "translated header XML moves for this paragraph, the scaffold change broke skill Step 8b"),
 ]
 
 # The two surfaces that live in their own PART, reachable by part path rather than by any
@@ -1274,7 +1274,7 @@ def _graphic_metadata(path):
            + ' w:xpath="/ns0:ref[1]/ns0:kenmerk[1]" w:storeItemID="{00000000-0000-0000-0000-'
            + '000000000001}"/></w:sdtPr>'
            # THE REFERENCE CODE IS INVENTED, AND THE FIRST VERSION OF THIS LINE WAS NOT.
-           # It was copied out of Step 8b.2's own worked example, and `leakage_scan.py`
+           # It was copied out of skill Step 8b.2's own worked example, and `leakage_scan.py`
            # caught it on pattern #46 with the SAME sha as that step document's
            # long-standing, already-judged hit. Inheriting a judgement is not the test:
            # CLAUDE.md 5.6 requires every fixture string to be INVENTED FOR THE PURPOSE,
@@ -1284,7 +1284,7 @@ def _graphic_metadata(path):
            + '<w:sdtContent>' + p(r("Kenmerk: ZZ-0000-00")) + '</w:sdtContent></w:sdt>'
            + '</w:ftr>')
 
-    # 5. body-drawing-descr — reported, never translated. The route is Step 8b's and Step 8b
+    # 5. body-drawing-descr — reported, never translated. The route is skill Step 8b's and skill Step 8b
     #    reaches header and footer parts only.
     body = (p(r("De goedkeuringsvolgorde is hieronder weergegeven: "),
               drawing("2", "Afbeelding 2",
@@ -1363,17 +1363,17 @@ def _emphasis(path):
 
 
 @fixture("italic-declared.docx",
-         "BRANCH 10 SLICE 3a — the four italic runs B1 turns on: one the operator DECLARED "
+         "STEP 10's SUB-STEP 3a — the four italic runs B1 turns on: one the operator DECLARED "
          "italic in en_runs, one the notes cover and do NOT declare, one untranslated and "
          "italic in the SOURCE runs, and a two-word run that was never a candidate. Ships "
          "its own italic-declared.notes.json, because the declaration IS the input")
 def _italic_declared(path):
     """The fixture the rendered-diff arm needs, and the reason it needs one.
 
-    Section 5.2's rendered-diff gate went undischarged on slices 1 and 2 and was recorded
+    Section 5.2's rendered-diff gate went undischarged on sub-steps 10.1 and 10.2 and was recorded
     as a real gap rather than an N/A: `render_diff`'s fixture path drives apply and repack
-    and never `post_process`, so no slice of branch 10 could appear on a page. B1's damage
-    is the first in this branch that HAS a page — italic lost across a definitions block —
+    and never `post_process`, so no sub-step of step 10 could appear on a page. B1's damage
+    is the first in this step that HAS a page — italic lost across a definitions block —
     so the arm is worth building here, and the fixture is synthetic, which is what makes
     the render lookable-at at all.
 
@@ -1435,20 +1435,20 @@ def _italic_declared(path):
 
 
 @fixture("lexicon-choice.docx",
-         "BRANCH 10 SLICE 3b — five strings a LEXICON in the skill presents as correct and a "
+         "STEP 10's SUB-STEP 3b — five strings a LEXICON in the skill presents as correct and a "
          "mandatory rewrite used to overwrite (Annex twice, a sub-lexicon heading, the "
          "reference's own term, a benchmark name SPLIT ACROSS TWO RUNS, a lexicon-listed "
          "name containing Annex), beside two rewrites no lexicon sanctions that must STILL "
          "fire. Ships its own lexicon-choice.notes.json")
 def _lexicon_choice(path):
-    """The page slice 3b is judged on, and why the rows are shaped the way they are.
+    """The page step 10's sub-step 3b is judged on, and why the rows are shaped the way they are.
 
     EVERY ROW BEGINS WITH ITS OWN LABEL, and that is load-bearing twice. It lets a reader of
     the render see which rows must differ between the arms and which must not. And it keeps
     every row out of the page-break pass, which fires on a paragraph that STARTS with
     Annex or Schedule: a heading here would gain a page break in the working arm and not in
     the source, and the source-to-new page count would move for B7's reason rather than this
-    slice's.
+    sub-step's.
 
     THE NOTES ARE MODELLED AS THE OTHER NOTES-BEARING FIXTURES ARE: `text` must equal the
     document's own paragraph text, which `_write_notes` asserts, so `text` == `en` here and
@@ -1484,7 +1484,7 @@ def _lexicon_choice(path):
 
 
 @fixture("schedule-breaks.docx",
-         "BRANCH 10 SLICE 4 — three schedule headings, each labelling what its SOURCE does: "
+         "SUB-STEP 10.4 — three schedule headings, each labelling what its SOURCE does: "
          "one the source runs on under the body text, one the source starts with a page "
          "break at the head of the heading, and a control that carries its own "
          "pageBreakBefore. Ships its own schedule-breaks.notes.json")
@@ -1534,7 +1534,7 @@ def _schedule_breaks(path):
 
 
 @fixture("noop-wrappers.docx",
-         "BRANCH 11 SLICE 4a — register B10: empty tracked insertions holding a tab, a line "
+         "STEP 11's SUB-STEP 4a — register B10: empty tracked insertions holding a tab, a line "
          "break and Word's _GoBack bookmark, which strip_noop used to remove with everything "
          "inside them and now keeps whole, beside two controls it still removes. Ships its "
          "own noop-wrappers.notes.json")
@@ -1627,7 +1627,7 @@ def _table(path):
 @fixture("definitions.docx",
          "a definitions block whose source-language alphabetical order is NOT English "
          "alphabetical order — and properties must be matched BY TERM, never by index, "
-         "because this step permutes the block")
+         "because skill Step 7 permutes the block")
 def _definitions(path):
     body = (
         p(r("1. Definitions")) +
@@ -1689,7 +1689,7 @@ def _empty(path):
 def _whitespace_arms(path):
     """Three rows that must change, one that must not, each labelled on the page.
 
-    THE LABELS ARE NOT DECORATION. Shown slice 3's render, Wouter read two deliberately-flat
+    THE LABELS ARE NOT DECORATION. Shown sub-step 6.3's render, Wouter read two deliberately-flat
     lines as damage -- a fair reading, because nothing on the page said they were refusals. A
     reviewer should not need the author standing beside the picture. Labels are ordinary
     paragraphs with `en == text`, so apply's skip-same-text branch leaves them alone and they
@@ -1815,7 +1815,7 @@ def _whitespace_arms(path):
 # ---------------------------------------------------------------------------
 @fixture("en-runs-offsets.docx",
          "a definitions paragraph whose en_runs offsets were authored against the LONGER "
-         "pre-Step-4c `en` -- so the last span's `end` points past the end of the string apply "
+         "`en` from before skill Step 4c -- so the last span's `end` points past the end of the string apply "
          "actually slices. Python clamps silently, so the emphasis lands on the wrong words "
          "and nothing reports it. Ships its own en-runs-offsets.notes.json")
 def _en_runs_offsets(path):
@@ -1827,18 +1827,18 @@ def _en_runs_offsets(path):
     needs the marker to sit in the MIDDLE, so every span after it is shifted by the length the
     edit removed and slices characters that belong to its neighbour.
     """
-    # Step 4c's dead field marker, verbatim from the step document's own example.
+    # skill Step 4c's dead field marker, verbatim from the step document's own example.
     marker = "Error: Reference source not found"
     term = '"Delivery Date"'
     mid = " means the date set out in Clause "
     tail = ", as adjusted."
 
-    # The SOURCE still carries the broken field, which is what Step 4c tells the operator to
+    # The SOURCE still carries the broken field, which is what skill Step 4c tells the operator to
     # scan `text` for. Invented, and deliberately not any real language's legal phrasing.
     text = f'{term} betekent de datum genoemd in artikel {marker}{tail}'
-    # What the operator authored BEFORE Step 4c, and what the offsets were measured against.
+    # What the operator authored BEFORE skill Step 4c, and what the offsets were measured against.
     en_pre = f"{term}{mid}{marker}{tail}"
-    # What Step 4c leaves behind: the marker replaced, `text` untouched, `en_runs` NOT re-derived.
+    # What skill Step 4c leaves behind: the marker replaced, `text` untouched, `en_runs` NOT re-derived.
     en_post = f"{term}{mid}8.1{tail}"
 
     # Authored against `en_pre`: bold term, plain lead-in, bold clause reference, plain tail.
@@ -1886,10 +1886,10 @@ def _en_runs_offsets(path):
 
 
 # ---------------------------------------------------------------------------
-# Branch 8 — extraction completeness. C28, C12 and M1.
+# Step 8 — extraction completeness. C28, C12 and M1.
 #
 # WHY THIS FIXTURE EXISTS AT ALL, when the corpus has eleven real documents. The check it
-# feeds compares the ORIGINAL document against what Step 2 captured, and the corpus proves
+# feeds compares the ORIGINAL document against what skill Step 2 captured, and the corpus proves
 # the BODY arm is already complete — measured over every reachable frozen intermediate,
 # zero paragraphs uncaptured. A suite of only-passing cases produces tests that pass
 # because nothing is being tested, so the failing inputs have to be built.
@@ -1956,7 +1956,7 @@ def _extraction_completeness(path):
 
 
 # ---------------------------------------------------------------------------
-# Branch 11 slice 2b — J1's U+200B scaffolding, so the pre-repack scrub has a PAGE. No
+# Step 11's sub-step 2b — J1's U+200B scaffolding, so the pre-repack scrub has a PAGE. No
 # fixture carried one (measured: 0 in every fixture member and every notes file), so section
 # 5.2's rendered diff had nothing to render. Invented wording, per CLAUDE.md 5.6; the source
 # is Italian so the remnant block runs, and the English is clean so it stays quiet.
@@ -1987,7 +1987,7 @@ ZWSP_JUSTIFIED = (
 @fixture("zwsp-scaffolding.docx",
          "U+200B in the English beside a space, INSIDE a defined term (D11's shape, which made "
          "a term unsearchable), before a full stop and at a paragraph's end -- J1's shapes -- so "
-         "branch 11 slice 2b's scrub can be seen on a page: the old repack ships every one, the "
+         "the scrub of step 11's sub-step 2b can be seen on a page: the old repack ships every one, the "
          "new one removes them, and the page must not move. Ships its own "
          "zwsp-scaffolding.notes.json")
 def _zwsp_scaffolding(path):
