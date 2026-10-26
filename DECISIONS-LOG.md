@@ -2043,3 +2043,31 @@ fixture CONTENT, and the probe pair, coupled and both standing reds. (e) In test
 not count, judged by reading: a needle into the skill's text or output keeps `Step 1c`, a label takes `skill Step 1c`.
 (f) A quotation of the build plan's dated headings keeps its words. (g) `test_no_bytecode_in_tree.py` says "that
 sub-step" where "sub-step 7.3" beside "CLAUDE.md" read to the charter-pointer check as a section pointer.
+
+## 2026-10-26 — one unattended hop armed: (d2c)'s last three files, the full run, step 14 explored and planned
+
+**WOUTER, AT THE OPENING, ASKED FOR THE WORK *"VIA AUTO HEADLESS MODE"*** — AUTO MODE by name — and answered four
+questions through the question tool: **(1) SCOPE: the renames, then step 14 EXPLORED AND PLANNED, NO STEP-14 CODE**, the
+recommended answer — step 14 is material, edits the shipped checks in both variants, and has no brief in section 3 of
+the build plan, so its plan comes to him before any of its code; **(2) ONE HOP**, recommended; **(3) THREE HOURS a hop,
+as on 2026-09-30**, over the four recommended — the close begun by WOKE + 2 h 30, released by 3 h 00, the runner's
+backstop cut at 3 h 15; **(4) the runner started by the arming session in a Terminal tab**, recommended. **AND IN WORDS,
+mid-turn:** *"Do it in Opus 5.5 extra!"* — read: the hop on Opus 5.5 at `xhigh`, the CLI's levels being low, medium,
+high, xhigh and max and the arming session running at `xhigh`; so the state file's EFFORT says `xhigh`, and the runner
+pins the model as well, `--model=claude-opus-5-5`.
+
+**THE MERGE, STATED RATHER THAN ASKED:** a hop may not push, open or merge a pull request — the guard refuses each at
+the tool call — and the house's definition of done asks, in AUTO MODE, for a pull request Wouter approves. So the
+2026-10-23 prompt's *"merge the pull request yourself"* gives way for this run: the next attended session pushes, opens
+the one pull request, runs `/code-review` and asks him for the squash-merge.
+
+**THE HOUSE'S RUNNER, ADOPTED AT THE OPENING:** `tools/auto_mode_headless.py` was v7 (2026-10-14) against the house's
+v8 (2026-10-21), whose hand-back says whether the run's branch can be pushed; `check_checkers.py` does not track the
+runner, so its all-current verdict could not show it. Copied byte for byte, one git object id both sides, its selftest
+the one entry-point run: 30 of 30 cases proved both ways.
+
+**MEASURED BEFORE ASKING:** the three pending files hold 36 counted old words — 35 in `tests/make_fixtures.py` on 26
+lines, 1 in `tests/probe-5b/preflight.py`, 0 in its metacheck — a planted control firing. Step 14's row in section 9.3
+of the build plan names G1 to G13, C7, C10, F5 and F10; G5, G10 and G11 read fixed by its earlier `quality_check`
+sub-step, G9 half closed, G12 routed to Wouter by its own text. **The hop's state file is `AUTO-MODE-RUN.md`,
+gitignored; the 2026-09-30 run's copy is kept as `temp/AUTO-MODE-RUN-2026-09-30-wiring-hop1.md`.**
