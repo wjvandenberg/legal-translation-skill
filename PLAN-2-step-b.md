@@ -1902,7 +1902,8 @@ rather than *confirmed*.
 > last; Wouter kept it there, and section 2 owns the order.
 > **Needs first:** nothing — his go is given. **Unblocks:** nothing — steps 15 to 22 do not wait on it.
 > **Done when:** every open row below is CLOSED or disposed of by name, each fix proved by its own true-positive
-> and false-positive controls against the code before it, and the corpus gaining no finding.
+> and false-positive controls against the code before it, and the corpus gaining no finding — save those
+> 14.4's missed alarm adds by design, each counted and attributed to its own new register row.
 
 **What step 14 is.** Section 2's row calls it the false-positive fixes, each a pattern change that needs a test
 proving it still catches the true positive. Its first sub-step, **14.1, the `quality_check` sub-step**, was built
@@ -1928,12 +1929,15 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 | G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | OPEN, and it fires INSIDE the form itself — `B.V`, `S.p`, `p.A` — whatever follows it, where the row says "followed by a capital" | 14.6 |
 | C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | OPEN; a text part, copied, passes | 14.7 |
 
-**The sub-steps.** Each edits one script — and 14.2 one step document as well — **in both trees, so each is
-HEAVY.** Each makes its fix as a PATTERN change, the rule still running. Each adds its controls to
+**The sub-steps.** 14.2 to 14.7 each edit one script — and 14.2 one step document as well — **in both trees,
+so each is HEAVY.** Each makes its fix as a PATTERN change, the rule still running. Each adds its controls to
 `tests/test_check_scoping.py`, whose method is 14.1's and is kept: the old script read out of git at a pinned
 `LT_BASELINE_REF`, every false-positive control proved to have FIRED there, every true-positive control proved
 to fire before and after. And each counts the corpus before and after — `tools/qc_census.py` or
-`tools/gate_replay.py`, counts only — every removed finding attributed to its row and none added.
+`tools/gate_replay.py`, counts only — every removed finding attributed to its row and none added, save 14.4's
+missed alarm, whose added findings are counted and attributed to its own new row. **14.8 and 14.9 are
+otherwise:** 14.8 edits step documents once its measurement says which, and 14.9 is a MEDIUM new instrument
+with negative tests of its own, touching no shipped file.
 
 - **14.2 — `validate_segment_shapes.py`: F10, and F5's sentence.** The alpha-collision rule returns nothing
   across a del↔ins pair in either order, the scoping the double-space rule beside it already has (G9's closed
@@ -1953,9 +1957,11 @@ to fire before and after. And each counts the corpus before and after — `tools
   Code` stays quiet. **And the missed alarm, folded in by Wouter on 2026-10-26:** the existing `of the`
   exemption measurably reaches internal references too — `Article 7 of the Agreement` is silent where `of this
   Agreement` warns, both trees — so it is narrowed to the legislation forms it exists for, the look-ahead edited
-  once. *TP:* `Article 7 of the Agreement` now warns. *FP:* `of the Civil Code` and the decree forms stay quiet.
-  A false NEGATIVE closed, so the check fires more and never less; the sub-step files it as a register row and
-  closes it.
+  once. *TP:* `Article 7 of the Agreement` now warns. *FP:* every legislation form the bare `of the` silences
+  today stays quiet — the Civil Code, the decree forms, and an Act, a Treaty, a Regulation, a Directive or a
+  Constitution named after `of the` — the set measured against the corpus before the edit, so the narrowing
+  cannot bring back G2's and G8's class. A false NEGATIVE closed, so the check fires more and never less; the
+  sub-step files it as a register row and closes it.
 - **14.5 — `quality_check.py`: G3 and G13.** `LIST_CONNECTOR_RE` takes `and/or`. The remnant check reads
   `LEXICON_KEPT_NAMES` through `source_language_markers`, the table repack's block already reads — one call, not
   a second list. *TP:* a dangling "at the" still flags; a real remnant beside a kept name still flags. *FP:* a

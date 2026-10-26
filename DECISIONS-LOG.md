@@ -2146,3 +2146,12 @@ entries beginning on 2026-08-24. The pointer was written without probing where i
 over the two trees, 24 OPEN, 6 controls quiet, 0 VOID — the figure the plan records. **AND THE ORDER:** the branch
 was pushed and #178 opened before this record, so the record could name it; the push rode the hop's full run on
 `d38f313`, every later commit documents only.
+
+**AND ON THE REVIEW OF #178,** `/code-review` at xhigh, ten findings: six the hop's in the house's runner,
+re-confirmed against the code and left routed (answer 10); three in this entry's own fold of section 3.14 - its
+Done-when and method forbade the findings 14.4 now adds by design, 14.4's false-positive controls named only the
+Civil Code and the decree forms where the bare `of the` also silences an Act, a Treaty or a Regulation, and the
+sub-steps paragraph called 14.8 and 14.9 HEAVY one-script steps - and one ruling. **WOUTER, THROUGH THE QUESTION
+TOOL:** *fix the three plan findings, then merge* - fixed before the merge, documents only; and the lettered names
+the rename wrote for slices built with letters ("step 10's sub-step 3a") KEPT, the house's no-letters rule
+binding new plans, not history.
