@@ -105,7 +105,7 @@ def assert_baseline_differs(script, tree="uk"):
         print(f"VOID — cannot read {tree}/{script} at {REF}. Nothing compared, nothing passed.")
         sys.exit(1)
     if b.stdout == (ROOT / tree / "scripts" / script).read_bytes():
-        print(f"VOID — {script} at {REF} is BYTE-IDENTICAL to the working tree, so every")
+        print(f"VOID — {tree}/{script} at {REF} is BYTE-IDENTICAL to the working tree, so every")
         print("before/after assertion below would compare the fix against itself. That is")
         print("not a pass. Point LT_BASELINE_REF at a commit that predates the change.")
         sys.exit(1)
@@ -430,6 +430,28 @@ F10_PARA = [{"idx": 0, "text": "invented", "en": "the Agreement shall",
 F10_JSON = TMP / "f10-paragraphs.json"
 F10_JSON.write_text(json.dumps(F10_PARA), encoding="utf-8")
 F10_ENV = dict(os.environ, PYTHONIOENCODING="utf-8")
+# THE JOINS A VIEW RENDERS ACROSS A TRACKED CHANGE -- true positives the del<->ins exemption
+# must not take with it, found by 14.2's review. With the del dropped, accept-all reads
+# "theAgreement"; with the ins dropped, reject-all does. The old code caught each only by
+# accident, firing on the del<->ins pair beside it; the new code must catch it as the join.
+F10_JOINS = (
+    ("accept-all", [{"type": "regular", "en": "the"}, {"type": "del", "en": " old"},
+                    {"type": "ins", "en": "Agreement"}]),
+    ("reject-all", [{"type": "regular", "en": "the"}, {"type": "ins", "en": " new"},
+                    {"type": "del", "en": "Agreement"}]),
+)
+# And a del/ins pair that is NOT byte-identical, both views clean ("the Agreement", "the old"):
+# the old code fired on the pair all the same.
+F10_CLEAN = [{"type": "regular", "en": "the "}, {"type": "del", "en": "old"},
+             {"type": "ins", "en": "Agreement"}]
+
+
+def alpha_where(mod, segs, name):
+    """Where validate() reports an alpha collision for one invented paragraph."""
+    p = TMP / f"f10-{name}.json"
+    p.write_text(json.dumps([{"idx": 0, "en_segments": segs}]), encoding="utf-8")
+    return [w for e in mod.validate(str(p))[0] for _k, w, h in e["hits"]
+            if h[0] == "alpha_collision_at_boundary"]
 
 
 def strict_run(script_path):
@@ -464,6 +486,19 @@ for tree in ("uk", "us"):
        new_rc == 0 and "alpha_collision_at_boundary" not in new_out, f"(rc={new_rc})")
     ok(f"F10 {tree} --strict on the obeying paragraph: PROVED it blocked before",
        old_rc == 1 and "alpha_collision_at_boundary" in old_out, f"(rc={old_rc})")
+    for view, segs in F10_JOINS:
+        old_w = alpha_where(old_vss, segs, f"old-{tree}-{view}")
+        new_w = alpha_where(new_vss, segs, f"new-{tree}-{view}")
+        ok(f"F10 {tree} TRUE POSITIVE run-together join in the {view} view: still fires, "
+           f"as that join", any(f"({view})" in w for w in new_w), f"({new_w})")
+        ok(f"F10 {tree} TRUE POSITIVE run-together join in the {view} view: fired before too",
+           bool(old_w), f"({old_w})")
+    old_w = alpha_where(old_vss, F10_CLEAN, f"old-{tree}-clean")
+    new_w = alpha_where(new_vss, F10_CLEAN, f"new-{tree}-clean")
+    ok(f"F10 {tree} differing del/ins pair, both views clean: silent now", not new_w,
+       f"({new_w})")
+    ok(f"F10 {tree} differing del/ins pair, both views clean: PROVED it fired before",
+       bool(old_w), f"({old_w})")
 
 # =============================================================================
 print("\nF15 — a scaffold preserved verbatim IS filled in")

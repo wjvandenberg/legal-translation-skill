@@ -68,7 +68,7 @@
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/step14-2-segment-shapes",
    "commit_subject": "Step 14.2 - validate_segment_shapes stops reporting an alpha collision across a del/ins pair, which no reading can show and which Step 4 mandates (F10); 04-translate.md rule 14 says apply runs it --strict, so a finding stops apply (F5)",
-   "sha256_now": "2c5a5b86f0b25a8ee5d8cb6ab3a876a4024139ba7706338596f9be5661c26bf5"
+   "sha256_now": "eafb1eda65345c21ec741b86e2279e25d982f740863513220750fad6fdd9778b"
   },
   "uk/scripts/verify_diligence.py": {
    "changed_by": "feature/step13-4-variant-conversion",
@@ -168,7 +168,7 @@
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/step14-2-segment-shapes",
    "commit_subject": "Step 14.2 - validate_segment_shapes stops reporting an alpha collision across a del/ins pair, which no reading can show and which Step 4 mandates (F10); 04-translate.md rule 14 says apply runs it --strict, so a finding stops apply (F5)",
-   "sha256_now": "02b47b5ebaffc9ac0e92f614f23fab34580c17ced4f552e4e41cc2acc59c3d8c"
+   "sha256_now": "4284ec0d3a251ececfc2d81a01512b2b1d4438b4070144c7a94bbecfe3ec1ebb"
   },
   "us/scripts/verify_diligence.py": {
    "changed_by": "feature/step13-4-variant-conversion",

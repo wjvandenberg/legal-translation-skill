@@ -474,6 +474,42 @@ def _scan_pair(left, right):
             hits.append(r)
     return hits
 
+# The two rendered views, by segment type — the contract validate_reject_all's
+# _reconstruct states: accept-all keeps regular + ins, reject-all keeps
+# regular + del, and the phantom ins_then_del shows in neither.
+_VIEWS = (('accept-all', ('regular', 'ins')), ('reject-all', ('regular', 'del')))
+
+def _view_indices(segs, kept):
+    """Indices of the segments a view renders, in order — non-empty text only."""
+    return [i for i, s in enumerate(segs) if _seg_type(s) in kept and _seg_text(s)]
+
+def _scan_rendered_junctions(segs):
+    """The alpha-collision rule over the joins only a rendered view creates.
+
+    Register F10's other half. The pair scan reads LIST neighbours, but a
+    reader sees a view: with the del dropped, the regular before it meets the
+    ins after it. Exempting a del↔ins pair from the alpha-collision rule
+    silenced the only check that ever saw that join — by accident, since it
+    fired on the del's last letter. Scanning each view's own joins sees it on
+    purpose. List neighbours are skipped: _scan_pair has read them already.
+
+    The double-space rule is deliberately not run here: whether a view's join
+    shows two spaces depends on apply's boundary-whitespace restoration, which
+    these notes do not carry (register G9).
+    """
+    hits = []
+    for view, kept in _VIEWS:
+        shown = _view_indices(segs, kept)
+        for a, b in zip(shown, shown[1:]):
+            if b == a + 1:
+                continue
+            left, right = segs[a], segs[b]
+            r = _rule_alpha_collision_no_space(left, right)
+            if r:
+                hits.append((f'{_seg_type(left)}→{_seg_type(right)} '
+                             f'across a tracked change ({view})', r))
+    return hits
+
 def _scan_segment(seg):
     hits = []
     for rule in (
@@ -518,6 +554,9 @@ def validate(paragraphs_json_path):
             left, right = segs[i], segs[i + 1]
             for h in _scan_pair(left, right):
                 para_hits.append(('pair', f'{_seg_type(left)}→{_seg_type(right)}', h))
+        # Scan the joins only a rendered view creates (register F10).
+        for where, h in _scan_rendered_junctions(segs):
+            para_hits.append(('pair', where, h))
 
         if para_hits:
             hits_by_para.append({

@@ -2033,6 +2033,16 @@ the edited script, and the full run once, before the push.
 > check, both divergences re-recorded, the three confidentiality controls, VERIFY and TEST through
 > `tools/cycle_evidence.py`. **No render, declared:** a validator's verdict decides whether apply runs, never what it
 > writes, and rule 14 is an instruction. **Done when:** F10 and F5 are CLOSED in the register on that evidence.
+> **AMENDED AT REVIEW, 2026-10-29, before the full run.** `/code-review` at high found that the exemption also
+> silenced a TRUE positive: a regular segment running into the far side of a del/ins pair — `the`, del ` old`, ins
+> `Agreement` reads "theAgreement" in accept-all, and the mirror in reject-all — which the old code caught only by
+> accident, on the pair. **Fixed at its depth:** `validate()` also runs the alpha-collision rule over the joins each
+> rendered view creates (accept-all keeps regular + ins, reject-all regular + del — `validate_reject_all`'s
+> `_reconstruct` contract, a property asserting the two readers agree), list neighbours skipped. **The double-space
+> rule is NOT run at a view's join:** it measured 7 candidates in one frozen workdir, each hanging on apply's
+> boundary-whitespace restoration, which the notes do not carry (G9's first half) — an open item, not a new block.
+> Controls added, both trees: both joins firing now and at `2178cce`, PROVED silent at the first commit `349dd8d`;
+> a differing del/ins pair with both views clean, silent now and PROVED to have fired. Corpus re-counted: 0 added.
 
 ---
 

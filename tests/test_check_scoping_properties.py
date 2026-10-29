@@ -487,6 +487,30 @@ ok(f"F10 {n_del_ins} del<->ins pairs: silent now", del_ins_firing == 0,
 ok(f"F10 the old code fired on {fired_before} of them (the property is not vacuous)",
    fired_before > 0)
 
+# THE VIEWS F10's JOIN SCAN READS ARE THE VIEWS validate_reject_all RECONSTRUCTS. The scan keeps
+# its own reader, because it needs to know WHICH segments meet and _reconstruct returns only the
+# joined text; two readers of one contract must be asserted to agree, or one drifts unseen.
+VRA = load(ROOT / "uk" / "scripts" / "validate_reject_all.py", "p_new_vra")
+disagree, n_lists = [], 0
+for _ in range(2000):
+    segs = []
+    for _ in range(rng.randint(1, 7)):
+        roll = rng.random()
+        if roll < 0.05:
+            segs.append(rng.choice((None, "loose text", 7)))            # malformed items
+        elif roll < 0.1:
+            segs.append({"type": rng.choice(TYPES), "en": None})
+        else:
+            segs.append({"type": rng.choice(TYPES + ("unknown",)), "en": frag(rng)})
+    n_lists += 1
+    for view, kept in VSS._VIEWS:
+        mine = "".join(VSS._seg_text(segs[i]) for i in VSS._view_indices(segs, kept))
+        theirs = VRA._reconstruct(segs, view.split("-")[0])
+        if mine != theirs:
+            disagree.append((view, [s.get("type") if isinstance(s, dict) else s for s in segs]))
+ok(f"F10 the join scan's two views equal validate_reject_all's reconstruction ({n_lists} lists)",
+   not disagree, f"{len(disagree)} disagree, e.g. {disagree[:2]}")
+
 shutil.rmtree(TMP, ignore_errors=True)
 print()
 print("=" * 96)
