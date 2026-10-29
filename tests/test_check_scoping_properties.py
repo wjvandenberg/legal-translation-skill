@@ -13,6 +13,8 @@ thought to write down. The fixes here claim something stronger and more useful:
     G10             a rendered break between two runs suppresses the adjacency finding
                     wherever it sits, and a tab STOP never does.
     M1              the anomaly comparison is a MULTISET difference, over random multisets.
+    F10             the alpha-collision verdict moves ONLY on a del<->ins pair, over
+                    thousands of generated pairs -- and the old code fired on some.
     all             none of them crashes on malformed, empty, or extreme input, and all of
                     them are deterministic.
 
@@ -430,6 +432,60 @@ for name, path in cases:
         raised.append(f"{name}: {type(exc).__name__}: {exc}")
 ok(f"{len(cases)} hostile containers: never raises, always str or None", not raised,
    f"{raised[:3]}")
+
+# ============================================================================
+print("\nPROPERTY 8 — F10: the alpha-collision verdict moves ONLY on a del<->ins pair")
+print("-" * 96)
+# 14.2's fix is a scoping: across a del<->ins pair the rule returns nothing, and everywhere
+# else it must return EXACTLY what the old code returned -- a regular<->tracked-change
+# boundary, an ins_then_del, two dels, two regulars. Two hand-built pairs cannot show the
+# narrowing stopped there; thousands of generated ones can.
+blob = subprocess.run(["git", "show", f"{REF}:uk/scripts/validate_segment_shapes.py"],
+                      capture_output=True, cwd=ROOT)
+if blob.returncode != 0 or blob.stdout == (ROOT / "uk" / "scripts"
+                                           / "validate_segment_shapes.py").read_bytes():
+    print(f"VOID — validate_segment_shapes.py at {REF} is unreadable or BYTE-IDENTICAL to the")
+    print("working tree, so the 'old code fired' half of this property compares nothing.")
+    sys.exit(1)
+(OLD / "validate_segment_shapes.py").write_bytes(blob.stdout)
+OLDVSS = load(OLD / "validate_segment_shapes.py", "p_old_vss")
+VSS = load(ROOT / "uk" / "scripts" / "validate_segment_shapes.py", "p_new_vss")
+
+TYPES = ("regular", "ins", "del", "ins_then_del")
+FRAGS = WORDS + ["Agreement", "5", "B.V", "agreement-", "", "契約",
+                 "договор"]
+
+
+def frag(rng):
+    w = rng.choice(FRAGS)
+    if rng.random() < 0.25:
+        w = " " + w
+    if rng.random() < 0.25:
+        w = w + " "
+    return w
+
+
+rng = random.Random(SEED + 8)
+moved_elsewhere, del_ins_firing, fired_before, n_del_ins = [], 0, 0, 0
+for _ in range(4000):
+    left = {"type": rng.choice(TYPES), "en": frag(rng)}
+    right = {"type": rng.choice(TYPES), "en": frag(rng)}
+    if rng.random() < 0.3:                      # the byte-identical pair skill Step 4 mandates
+        right["en"] = left["en"]
+    o = OLDVSS._rule_alpha_collision_no_space(left, right)
+    n = VSS._rule_alpha_collision_no_space(left, right)
+    if {left["type"], right["type"]} == {"del", "ins"}:
+        n_del_ins += 1
+        fired_before += o is not None
+        del_ins_firing += n is not None
+    elif n != o:
+        moved_elsewhere.append((left["type"], right["type"]))
+ok(f"F10 every other pairing of types: verdict identical to {REF[:12]} (4000 pairs)",
+   not moved_elsewhere, f"{len(moved_elsewhere)} moved, e.g. {moved_elsewhere[:3]}")
+ok(f"F10 {n_del_ins} del<->ins pairs: silent now", del_ins_firing == 0,
+   f"{del_ins_firing} still fire")
+ok(f"F10 the old code fired on {fired_before} of them (the property is not vacuous)",
+   fired_before > 0)
 
 shutil.rmtree(TMP, ignore_errors=True)
 print()

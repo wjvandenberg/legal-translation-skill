@@ -227,8 +227,10 @@ Translate **every non-empty paragraph** by filling in the `"en"` field in the JS
     of one or two letters may follow the digit directly (`5km`, `10kg`, `500ml`, `24h`); and
     well-known acronym-plus-digit tokens are written solid (`A4`, `MP3`, `H2O`, `B2B`, `3G`).
     Everything else takes the space. When in doubt, insert the space — the pre-apply linter
-    (`validate_segment_shapes.py`) flags the most common violations but only as warnings;
-    the primary defense against this class of defect is getting it right at translation time.
+    (`validate_segment_shapes.py`) flags the most common violations, in paragraphs carrying
+    tracked changes only, and apply runs it `--strict`: any finding stops apply until the
+    English is fixed. The primary defense against this class of defect is getting it right
+    at translation time.
 
 **Design stage terminology (critical for construction/EPC contracts):**
 

@@ -216,10 +216,21 @@ def _rule_alpha_collision_no_space(left, right):
     character classes interacted unpredictably with `fix_spacing` (Cyrillic,
     Greek, Arabic, Hebrew, Devanagari), and the translator filled in
     English text that concatenates two words into one.
+
+    EXCEPT ACROSS A del↔ins BOUNDARY, WHICH CANNOT PRODUCE ONE. Register F10.
+    Accept-all renders the ins and drops the del, reject-all the reverse, so
+    no reading ever shows the two side by side. Step 4 MANDATES byte-identical
+    English on both sides of an orthographic-only change, so the del ends with
+    a letter and the ins starts with one — and apply runs this script
+    --strict, so a translation obeying that rule was a hard block. The same
+    scoping as the double-space rule below (register G9, second half).
     """
     lt = _seg_text(left)
     rt = _seg_text(right)
     if not lt or not rt:
+        return None
+    pair = {_seg_type(left), _seg_type(right)}
+    if pair == {'del', 'ins'}:
         return None
     if lt[-1].isspace() or rt[0].isspace():
         return None
@@ -290,8 +301,8 @@ def _rule_double_space_across_boundary(left, right):
     not exist in any rendering of the document.
 
     This is the same scoping fix as F10, which is the identical mistake in the
-    reject-all validator: a rule reasoning about the concatenation of two segments
-    that are never concatenated.
+    alpha-collision rule above: a rule reasoning about the concatenation of two
+    segments that are never concatenated.
     """
     lt = _seg_text(left)
     rt = _seg_text(right)

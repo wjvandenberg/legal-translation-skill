@@ -66,9 +66,9 @@
    "sha256_now": "aa280a377a3434831934c38dc76a82baa5ad643c83da7452e948c4b6418fc03a"
   },
   "uk/scripts/validate_segment_shapes.py": {
-   "changed_by": "feature/check-scoping-quality-check",
-   "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-   "sha256_now": "d36afd7da2d703dde74202bcc293335fe31d0317d2ab4aca2d19f4fd787597e2"
+   "changed_by": "feature/step14-2-segment-shapes",
+   "commit_subject": "Step 14.2 - validate_segment_shapes stops reporting an alpha collision across a del/ins pair, which no reading can show and which Step 4 mandates (F10); 04-translate.md rule 14 says apply runs it --strict, so a finding stops apply (F5)",
+   "sha256_now": "2c5a5b86f0b25a8ee5d8cb6ab3a876a4024139ba7706338596f9be5661c26bf5"
   },
   "uk/scripts/verify_diligence.py": {
    "changed_by": "feature/step13-4-variant-conversion",
@@ -166,9 +166,9 @@
    "sha256_now": "605254e29dc9277b262b407282e7f251e0c92b13722d86d22c25c12f1437376f"
   },
   "us/scripts/validate_segment_shapes.py": {
-   "changed_by": "feature/check-scoping-quality-check",
-   "commit_subject": "Branch 14 - check scoping: eight false-positive fixes, each with a test proving it still catches the true positive. quality_check pairs source to target by TEXT instead of by position (L1), exempts a dangling ending only where the source paragraph also lacks terminal punctuation (G11) and where the paragraph is an execution-block lead-in (G5), sees a rendered w:tab or w:br between two runs as a separator (G10), and with --original reports only numbering anomalies the source did not already have (M1). validate_segment_shapes stops reporting a double space across a del/ins boundary that no reading can show (G9). translate_headers_footers counts a scaffold entry preserved verbatim as filled in, which Step 8b mandates (F15). repack_docx detects the source language from the ORIGINAL and only when two independent detectors agree, and passes it to the pre-repack lexicon scan (C9)",
-   "sha256_now": "14167da617e929d80bbe294a51ebd4673379662e258c45d61edf6d470104a770"
+   "changed_by": "feature/step14-2-segment-shapes",
+   "commit_subject": "Step 14.2 - validate_segment_shapes stops reporting an alpha collision across a del/ins pair, which no reading can show and which Step 4 mandates (F10); 04-translate.md rule 14 says apply runs it --strict, so a finding stops apply (F5)",
+   "sha256_now": "02b47b5ebaffc9ac0e92f614f23fab34580c17ced4f552e4e41cc2acc59c3d8c"
   },
   "us/scripts/verify_diligence.py": {
    "changed_by": "feature/step13-4-variant-conversion",
@@ -231,9 +231,9 @@
    "sha256_now": "02b8d5c3c4b430419a707d86e77d1734fa6a8e568a3ba0e70308cc0fbcdacbd3"
   },
   "uk/skill-docs/04-translate.md": {
-   "changed_by": "feature/step13-4-variant-conversion",
-   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
-   "sha256_now": "88f933b8a8c7319517bc4d27c7dc223b2e2ccd37944f1059bf1b457be52b984c"
+   "changed_by": "feature/step14-2-segment-shapes",
+   "commit_subject": "Step 14.2 - validate_segment_shapes stops reporting an alpha collision across a del/ins pair, which no reading can show and which Step 4 mandates (F10); 04-translate.md rule 14 says apply runs it --strict, so a finding stops apply (F5)",
+   "sha256_now": "52dad1e3018025bcee4e0ccd4782204df49a99370b698b224c797cc63c7d0e85"
   },
   "us/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/branch11-slice4b",
@@ -251,9 +251,9 @@
    "sha256_now": "c34927055febc10a448a93af3b5998252b29d466286ef07cf187eb4217ae6c5f"
   },
   "us/skill-docs/04-translate.md": {
-   "changed_by": "feature/step13-4-variant-conversion",
-   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
-   "sha256_now": "f01fb3d4c3ac335d596493887d75520582eee0daed301a949ff1fdc3c897f9c4"
+   "changed_by": "feature/step14-2-segment-shapes",
+   "commit_subject": "Step 14.2 - validate_segment_shapes stops reporting an alpha collision across a del/ins pair, which no reading can show and which Step 4 mandates (F10); 04-translate.md rule 14 says apply runs it --strict, so a finding stops apply (F5)",
+   "sha256_now": "a4b9d39024a7941325d634a93bb3089eeaa4877b54805d651bf6a3a62967f283"
   },
   "uk/scripts/translate_comments.py": {
    "changed_by": "feature/branch11-slice4c",

@@ -92,19 +92,19 @@ def resolve_baseline():
     return (BASELINE, r.stdout.strip()) if r.returncode == 0 else (None, None)
 
 
-def assert_baseline_differs(script):
+def assert_baseline_differs(script, tree="uk"):
     """The baseline copy of `script` must NOT be the working-tree copy.
 
     A comparison that established nothing has not passed. If a rebase, a squash or a moved
     pin makes the two identical, this suite must say VOID and exit non-zero rather than
     report a green before/after it never made.
     """
-    b = subprocess.run(["git", "show", f"{REF}:uk/scripts/{script}"],
+    b = subprocess.run(["git", "show", f"{REF}:{tree}/scripts/{script}"],
                        capture_output=True, cwd=ROOT)
     if b.returncode != 0:
-        print(f"VOID — cannot read {script} at {REF}. Nothing compared, nothing passed.")
+        print(f"VOID — cannot read {tree}/{script} at {REF}. Nothing compared, nothing passed.")
         sys.exit(1)
-    if b.stdout == (ROOT / "uk" / "scripts" / script).read_bytes():
+    if b.stdout == (ROOT / tree / "scripts" / script).read_bytes():
         print(f"VOID — {script} at {REF} is BYTE-IDENTICAL to the working tree, so every")
         print("before/after assertion below would compare the fix against itself. That is")
         print("not a pass. Point LT_BASELINE_REF at a commit that predates the change.")
@@ -126,16 +126,21 @@ for name in ("source_language_markers.py", "lexicon_compliance.py"):
     shutil.copyfile(ROOT / "uk" / "scripts" / name, OLD_DIR / name)
 
 
-def load_old(script):
-    """Import the pre-branch version of a uk/scripts file under its own name."""
-    blob = subprocess.run(["git", "show", f"{REF}:uk/scripts/{script}"],
+def tag(tree):
+    """'' for uk, 'us_' for us -- keeps a us module and file from shadowing the uk one."""
+    return "" if tree == "uk" else f"{tree}_"
+
+
+def load_old(script, tree="uk"):
+    """Import the pre-branch version of a <tree>/scripts file under its own name."""
+    blob = subprocess.run(["git", "show", f"{REF}:{tree}/scripts/{script}"],
                           capture_output=True, cwd=ROOT)
     if blob.returncode != 0:
-        print(f"VOID — cannot read {script} at {REF}")
+        print(f"VOID — cannot read {tree}/{script} at {REF}")
         sys.exit(1)
-    path = OLD_DIR / script
+    path = OLD_DIR / (tag(tree) + script)
     path.write_bytes(blob.stdout)
-    modname = "old_" + script[:-3]
+    modname = "old_" + tag(tree) + script[:-3]
     spec = importlib.util.spec_from_file_location(modname, path)
     mod = importlib.util.module_from_spec(spec)
     sys.modules[modname] = mod
@@ -147,16 +152,16 @@ def load_old(script):
     return mod
 
 
-def load_new(script):
-    sys.path.insert(0, str(ROOT / "uk" / "scripts"))
+def load_new(script, tree="uk"):
+    sys.path.insert(0, str(ROOT / tree / "scripts"))
     try:
         spec = importlib.util.spec_from_file_location(
-            "new_" + script[:-3], ROOT / "uk" / "scripts" / script)
+            "new_" + tag(tree) + script[:-3], ROOT / tree / "scripts" / script)
         mod = importlib.util.module_from_spec(spec)
-        sys.modules["new_" + script[:-3]] = mod
+        sys.modules["new_" + tag(tree) + script[:-3]] = mod
         spec.loader.exec_module(mod)
     finally:
-        sys.path.remove(str(ROOT / "uk" / "scripts"))
+        sys.path.remove(str(ROOT / tree / "scripts"))
     return mod
 
 
@@ -169,6 +174,8 @@ from lxml import etree  # noqa: E402
 for _s in ("quality_check.py", "validate_segment_shapes.py",
            "translate_headers_footers.py"):
     assert_baseline_differs(_s)
+# 14.2 runs its F10 controls over the us tree as well, so its baseline must differ there too.
+assert_baseline_differs("validate_segment_shapes.py", "us")
 
 OLD_QC = load_old("quality_check.py")
 NEW_QC = load_new("quality_check.py")
@@ -397,6 +404,66 @@ for pair, label in ((({"type": "del", "en": "a "}, {"type": "del", "en": " b"}),
                      "ins->ins")):
     new_h = NEW_VSS._rule_double_space_across_boundary(*pair)
     ok(f"G9 TRUE POSITIVE {label} double space: still fires", new_h is not None)
+
+# =============================================================================
+print("\nF10 — a del/ins pair cannot run two words together in either reading")
+print("-" * 96)
+
+# skill Step 4 MANDATES byte-identical English on both sides of an orthographic-only
+# change, so the del ends with a letter and the ins begins with one -- and apply runs this
+# scanner --strict, so the pair was a hard block on a translation that obeyed the rule.
+# Accept-all renders the ins and drops the del, reject-all the reverse: no reading ever
+# shows the two side by side. Register F10; 14.2 of PLAN-2-step-b.md section 3.14.
+F10_DEL = {"type": "del", "en": "Agreement"}
+F10_INS = {"type": "ins", "en": "Agreement"}
+F10_TP = (
+    ("regular 'the' before an ins 'Agreement', no space",
+     {"type": "regular", "en": "the"}, {"type": "ins", "en": "Agreement"}),
+    ("del->regular collision, G9's open half",
+     {"type": "del", "en": "Agreement"}, {"type": "regular", "en": "shall"}),
+)
+# A whole paragraph as apply hands it over: the del->ins pair is its ONLY finding, so the
+# --strict exit apply reads moves on F10 alone.
+F10_PARA = [{"idx": 0, "text": "invented", "en": "the Agreement shall",
+             "en_segments": [{"type": "regular", "en": "the "}, F10_DEL, F10_INS,
+                             {"type": "regular", "en": " shall"}]}]
+F10_JSON = TMP / "f10-paragraphs.json"
+F10_JSON.write_text(json.dumps(F10_PARA), encoding="utf-8")
+F10_ENV = dict(os.environ, PYTHONIOENCODING="utf-8")
+
+
+def strict_run(script_path):
+    """rc and stdout of the scanner run as apply runs it: --strict, on the paragraph above."""
+    r = subprocess.run([sys.executable, str(script_path), str(F10_JSON), "--strict"],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       env=F10_ENV, cwd=TMP)
+    return r.returncode, r.stdout + r.stderr
+
+
+for tree in ("uk", "us"):
+    old_vss = OLD_VSS if tree == "uk" else load_old("validate_segment_shapes.py", tree)
+    new_vss = NEW_VSS if tree == "uk" else load_new("validate_segment_shapes.py", tree)
+    for left, right, label in ((F10_DEL, F10_INS, "del->ins"), (F10_INS, F10_DEL, "ins->del")):
+        old_h = old_vss._rule_alpha_collision_no_space(left, right)
+        new_h = new_vss._rule_alpha_collision_no_space(left, right)
+        ok(f"F10 {tree} byte-identical {label}: silent now", new_h is None, f"({new_h})")
+        ok(f"F10 {tree} byte-identical {label}: PROVED it fired before",
+           old_h is not None and old_h[0] == "alpha_collision_at_boundary", f"({old_h})")
+    for label, left, right in F10_TP:
+        old_h = old_vss._rule_alpha_collision_no_space(left, right)
+        new_h = new_vss._rule_alpha_collision_no_space(left, right)
+        ok(f"F10 {tree} TRUE POSITIVE {label}: still fires",
+           new_h is not None and new_h[0] == "alpha_collision_at_boundary", f"({new_h})")
+        ok(f"F10 {tree} TRUE POSITIVE {label}: fired before too",
+           old_h is not None and old_h[0] == "alpha_collision_at_boundary", f"({old_h})")
+    # THE EXIT APPLY READS, judged by CONTENT as well as rc: a run that crashed would also
+    # exit 1, and would then read as "it blocked before" for the wrong reason.
+    old_rc, old_out = strict_run(OLD_DIR / (tag(tree) + "validate_segment_shapes.py"))
+    new_rc, new_out = strict_run(ROOT / tree / "scripts" / "validate_segment_shapes.py")
+    ok(f"F10 {tree} --strict on the obeying paragraph: exits 0 now",
+       new_rc == 0 and "alpha_collision_at_boundary" not in new_out, f"(rc={new_rc})")
+    ok(f"F10 {tree} --strict on the obeying paragraph: PROVED it blocked before",
+       old_rc == 1 and "alpha_collision_at_boundary" in old_out, f"(rc={old_rc})")
 
 # =============================================================================
 print("\nF15 — a scaffold preserved verbatim IS filled in")
