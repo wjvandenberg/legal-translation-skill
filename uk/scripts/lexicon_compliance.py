@@ -142,8 +142,10 @@ def _c(pat: str) -> "re.Pattern[str]":
 # civil-law statute. Now the tail must END on a head noun naming an outside instrument, after
 # 'the', 'that' or 'those' and at most three naming words, none of them a connective, 'the', a
 # pronoun or an inward pointer -- so an internal reference warns whatever stands before it, and
-# the tail cannot bridge from 'the Agreement and' or 'the Agreement that' to a code. Between the number and the tail may sit the shapes
-# measured on the corpus: a -bis suffix, a paragraph or letter, a list of further articles.
+# the tail cannot bridge from 'the Agreement and' or 'the Agreement that' to a code. A naming
+# word may be a year ('the 1998 Act') or a dotted abbreviation, but never end on a full stop, so
+# the tail cannot cross a sentence. Between the number and the tail may sit the shapes measured
+# on the corpus: a -bis suffix, a paragraph or letter, a list of further articles.
 _ART_ORDINAL = r"(?:first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|last|\d+(?:st|nd|rd|th))"
 _ART_ITEM = r"(?:\d+[a-z]?|\(?[a-z]\))"
 _ART_SUFFIX = r"(?:\s*-?\s*(?:bis|ter|quater|quinquies|sexies|septies|octies|novies|decies)\b)?"
@@ -154,12 +156,13 @@ _ART_LIST = (r"(?:\s*,?\s*(?:and|or)\s+(?:Articles?\s+)?" + _ART_NUMBER
              + r"(?:\s*(?:,|and|or)\s*" + _ART_NUMBER + r")*)*")
 _ART_GAP = _ART_SUFFIX + _ART_SUBDIV + _ART_LIST + r"\s*,?\s*"
 _ART_HEAD = (r"(?:Codes?|Acts?|Treat(?:y|ies)|Regulations?|Directives?|Constitution|Decrees?(?:-Laws?)?|Laws?"
-             r"|Resolutions?|Statutes?|Conventions?|Charter|Ordinances?|Rules|Articles\s+of\s+Association|By-?laws"
-             r"|GDPR|TFEU|TEU)\b")
+             r"|Resolutions?|Statutes?|Conventions?|Charter(?!\s*-?\s*part)|Ordinances?|Rules"
+             r"|Articles\s+of\s+Association|By-?laws|GDPR|TFEU|TEU"
+             r"|D\.\s*Lgs|D\.\s*P\.\s*C\.\s*M|D\.\s*P\.\s*R|D\.\s*M|D\.\s*L)\b")
 _ART_STOP = (r"(?:and|or|nor|but|to|of|in|on|at|by|for|with|from|under|between|as|than|which|that|this|these|those"
              r"|the|its|their|his|her|our|present|hereof|herein|hereto|hereunder|thereof|above|below)\b")
-_ART_TAIL = (r"of\s+(?:(?:the|that|those)\s+)?(?:(?!" + _ART_STOP + r")[^\W\d_][\w'’.-]*\s+){0,3}"
-             + _ART_HEAD)
+_ART_TAIL = (r"of\s+(?:(?:the|that|those)\s+)?(?:(?!" + _ART_STOP + r")[^\W_][\w'’-]*(?:(?:\.[\w'’-]+)+\.?)?\s+)"
+             r"{0,3}" + _ART_HEAD)
 
 RULES: List[Rule] = [
     # ------ Language-agnostic (from references/general-legal.md) ------

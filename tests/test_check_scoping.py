@@ -678,6 +678,8 @@ LC_FP = (
      "Article 5, paragraph 1, and Article 9, paragraph 2, of the Catering Decree apply."),
     ("G8 a list of further articles",
      "Article 1600, second paragraph, or Articles 1601 and 1602 of the Civil Code apply."),
+    # The review's finding, 2026-10-30: an abbreviated decree is a decree.
+    ("G2 an abbreviated decree with no 'the'", "Article 5 of D.Lgs. 9/2001 governs the office lease."),
 )
 # Quiet BEFORE as well: the legislation forms the bare 'of the' silenced, which the narrowing must not bring back --
 # the brief's seven, the three measured on the corpus, and the outside instruments that number by Article.
@@ -688,7 +690,10 @@ LC_KEPT = tuple("Article 5 " + tail + " applies to the canteen." for tail in (
     "of the Data Regulation", "of the Services Directive", "of the Constitution", "of the Law", "of the Statute",
     "of the Vienna Convention", "of the Charter", "of the Ordinance", "of the Arbitration Rules",
     "of the Articles of Association", "of the By-laws", "of the GDPR", "of the TFEU", "of the TEU",
-    "of the European Union", "of Book 6 of the Civil Code", "of Law No. 9"))
+    "of the European Union", "of Book 6 of the Civil Code", "of Law No. 9",
+    # The review's findings, 2026-10-30: a year or an abbreviation before the instrument is still legislation.
+    "of the 1998 Act", "of the 2016 Regulation", "of the U.K. Companies Act", "of the D.Lgs. 9/2001",
+    "of the D.P.R. No. 7"))
 # Firing before AND after: an internal reference, with or without something between the number and its tail.
 LC_TP = (
     ("an internal locator", "Article 7 above applies to the Client."),
@@ -716,6 +721,10 @@ LC_ALARM = (
     ("G14 'of these', which the bare 'of the' matched as a prefix",
      "The Contractor acts under Article 7 of these Rules."),
     ("G14 'of their', which it matched the same way", "The Parties act under Article 7 of their Agreement."),
+    # The review's findings, 2026-10-30: a naming word ending on a full stop let the tail cross a sentence, and the
+    # head 'Charter' read a charterparty -- the parties' own contract -- as an outside instrument.
+    ("G14 no bridge across a full stop", "The Buyer pays under Article 7 of the Agreement. Law 9 applies too."),
+    ("G14 a charterparty is a contract", "The Owner acts under Article 7 of the Charter Party."),
 )
 # --- 14.4 cases: end
 
@@ -741,6 +750,9 @@ def lc_run(script_dir, name, text, *flags):
 for tree in ("uk", "us"):
     old_lc = load_old("lexicon_compliance.py", tree)
     new_lc = load_new("lexicon_compliance.py", tree)
+    # load_old wrote the pinned uk copy over the WORKING-TREE copy placed in OLD_DIR above for the old modules to
+    # import; put that back, so what a later section imports never depends on where this one sits (the review, 2026-10-30).
+    shutil.copyfile(ROOT / "uk" / "scripts" / "lexicon_compliance.py", OLD_DIR / "lexicon_compliance.py")
     for label, text in LC_FP:
         ok(f"{label} ({tree}): silent now", not art_warns(new_lc, text), f"({art_warns(new_lc, text)})")
         ok(f"{label} ({tree}): PROVED it fired before", bool(art_warns(old_lc, text)))
