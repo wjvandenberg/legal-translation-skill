@@ -238,9 +238,12 @@ GROUPS = {
  # ends any process doing so ends the run while it can still look finished -- a run that says it worked.
 # C30 ADDED 2026-09-29 (3) (branch 11 slice 4b): no gate refused a scaffold placeholder left in `en` or
 # a segment, so one would have printed as literal text past every check reporting clean.
+# G14 ADDED 2026-10-30 (sub-step 14.4): lexicon_compliance's 'Article N' warning was silent on an internal
+# reference written 'of the' -- a check whose silence said the document was right when it was not.
  "3 says it worked when it did not": """
    C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 G1 G2 G3 G4 G5 G6 G7 G8 G9
    G10 G11 G12 G13 S1 S2 H1 H2 H4 L1 L4 L6 W3 W4 X1 X2 X4 X6 W5 C30
+   G14
    """,
  # E15 ADDED 2026-10-09 (fix/lexicon-table-widths): two shipped sub-lexicons carried table rows wider
  # or narrower than their header, and nothing read the shipped trees' tables -- the dictionary data's
@@ -315,6 +318,7 @@ OPTIONS = {
  # nobody has taken.
 # F48 ADDED 2026-10-12 beside S3 and E4: the numbering translator's dictionary miss, now listed and, on a
 # declared language, stopped -- this option's 'say what was left' principle.
+# G14 ADDED 2026-10-30: filed and closed by sub-step 14.4 beside G2 and G8, the same rule's scoping.
 # C30 ADDED 2026-09-29 (3): filed and closed by branch 11 slice 4b beside C4, C13 and C14, the
 # notes-side gates this option's branch 11 carried.
  "2 check against the original": """
@@ -322,6 +326,7 @@ OPTIONS = {
    G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 S1 S2 S3 H1 H2 H4 L1 L4 L6 E4 J1 M1 B8 D2 D5 U1 V1
    B10 A23 A24 A25 F47 C30
    F48
+   G14
    """,
  # A3 AND A6 BOTH ARRIVED HERE 2026-09-02. A3 is deliberately in TWO options -- the header
  # above says a row may need more than one, and A3 genuinely does: option 1 closed the
