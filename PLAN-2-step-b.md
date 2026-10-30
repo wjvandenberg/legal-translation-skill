@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, and 14.3 as #180, 2026-10-30; 14.4 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-30 — SESSION PURPOSE — what · how · purpose:** sub-step 14.3 by section 3.14: `validate_translations.py` given G1's and G7's fixes in both trees, and `uv.toml`'s comment pointed at the signed Python's new folder; its own written plan first, red first against the pinned baseline, the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-10-30: the conductor chain, unattended)* · **so that the translation checks fire only on what they exist to catch, and a firing check can be trusted** *(written immediately after the tag `rollback-2026-10-30-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, and 14.3 as #180, 2026-10-30; 14.4 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-30 — SESSION PURPOSE — what · how · purpose:** sub-step 14.4 by section 3.14: `lexicon_compliance.py` given G2's and G8's fixes and the missed `of the` alarm, in both trees; its own written plan first, red first against the pinned baseline, the legislation forms and the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-10-30: the conductor chain, unattended)* · **so that the lexicon check warns on an internal `Article N` and never on a citation of legislation, and a warning can be trusted** *(written immediately after the tag `rollback-2026-10-30b-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -2097,6 +2097,51 @@ the edited script, and the full run once, before the push.
 > PASS, its first try lost to the evidence guard's stale environment (`DECISIONS-LOG.md`, 2026-10-30); G1 and G7
 > CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain; 2026-10-30,
 > unattended)*.
+> **14.4 — ITS OWN WRITTEN PLAN, 2026-10-30, before any edit, on `feature/step14-4-lexicon-article`.**
+> **Measured first, `main` at `0752696`, both trees alike** (`temp/s1030c_art_shape_probe.py`, counts and shape labels
+> only): the 13 frozen workdirs' English holds 44 `Article N` references, all on D05 and D06; the rule fires at 14,
+> which the scan reports as 12 warnings (7 on D05, 5 on D06 — G8's five), and **every one cites legislation, 0 an
+> internal reference:** 2 a decree with no `the` before it, one of them a `-bis` (G2's first shape), and 12 with
+> something between the number and the tail — a `, paragraph N,` or `, <ordinal> paragraph,` (the brief's two), a
+> `letter a)` or `letters a) and b)`, or a list running on to further articles (`, and Article 9, paragraph 2,`; `or
+> Articles 8 and 9`) — G2's comma form, and G8. The bare `of the` silences 28 more, every one legislation: 19 a Code
+> (the civil code, the code of civil procedure), 7 a named Decree and 2 a regulator's Resolution — the set that must
+> stay quiet. The rule, `scan()` and the two helpers it uses are identical at `2178cce` and `0752696` in both trees, so
+> the pin is a true "before". **Changes,** both trees' `lexicon_compliance.py`, the rule still a WARN with its message,
+> no exit moved: (1) the look-ahead's bare `of the` becomes a LEGISLATION TAIL — `of`, an optional `the`, up to three
+> words naming the instrument, then a head noun from a closed list: Code, Act, Treaty, Regulation, Directive,
+> Constitution, Decree (and Decree-Law), Law, and Resolution, measured; and, quiet today and kept quiet as outside
+> instruments that number by Article, Statute, Convention, Charter, Ordinance, Rules, Articles of Association,
+> By-laws, GDPR, TFEU and TEU. No naming word may be a connective, `the`, a pronoun or an inward pointer (`this`,
+> `present`, `hereof`), so the tail cannot bridge from an internal document to a code named after it. The same tail
+> without `the` takes G2's `of Legislative Decree` and its kin; `of Book`, `BW`, `of Directive`, `of Regulation`, `of
+> Law`, `of the EU` and `of the European` are kept verbatim. (2) Between the number and any tail may sit the measured
+> shapes: a `-bis` family suffix; `, <ordinal> paragraph`, `, paragraph N`, `, letter a)` and `, letters a) and b)`,
+> each comma optional; and a list running on to further articles. A parenthesised `7(1)` and `point (5)`, unmeasured,
+> are NOT built. (3) **The defect beside the false one,** asked of every exemption: each gap and each tail ends on the
+> legislation head noun, so an internal reference stays a warning whatever stands before it — `Article 7, paragraph
+> 2, of this Agreement`, `Article 7 and Article 9 of the Agreement`, `Article 7-bis of the Contract`, `Article 7 of the
+> Agreement and the Code`. **Controls,** `tests/test_check_scoping.py`, both trees, the rule read through the module's
+> own `scan()`: *FP* — each measured shape, silent now and PROVED to have fired at `2178cce`; and every legislation
+> form the bare `of the` silences — the brief's seven, the measured three, the outside instruments — PROVED quiet at
+> `2178cce` and quiet now; *TP* — `Article 7 above` and `of this Agreement`, firing now and before; the missed alarm,
+> `of the Agreement`, `of the Caterers' Agreement`, `of the Deed` and the bridge above, firing now and PROVED
+> silent at `2178cce`; and the whole script's exit judged by content — rc 0 with the warning and without it, a WARN
+> staying a WARN, and under `--warnings-are-errors` 1 then 0 on G2, 0 then 1 on the alarm.
+> `tests/test_check_scoping_properties.py`: one property over generated references, each population chosen by the
+> generator's own record — with no legislation tail and no `of the` the verdict is identical to `2178cce`'s; an
+> internal tail after any gap always warns; a listed legislation tail after any gap never does; the old code fired on
+> some G2/G8 shapes and missed some internal tails, each count printed; and a long hostile list finishes in time.
+> **Must not touch:** any other rule, the message, `scan()`, the extraction, any exit code, any other script —
+> `post_process.py`'s own Article reader, which also reads `of the Agreement` as external, is measured and NOT changed;
+> the anti-drift safeguards. **Corpus:** old (`0752696`) against new over the 13 frozen workdirs, both trees, by
+> `temp/s1030c_lc_census.py` — declared, because no committed tool counts this rule — **expected: 12 warnings to 0 in
+> each tree, 14 positions removed (2 G2, 12 G8), 0 added**, every removal attributed by the census's own reader of the
+> shapes and any addition to the new row, a planted set proving the count moves. **Then** the parity check, both
+> divergences re-recorded, the three confidentiality controls, mutants, VERIFY and TEST through
+> `tools/cycle_evidence.py`; and the missed alarm filed as register row G14 and closed, its id checked free first.
+> **No render, declared:** a WARN decides nothing apply writes. **Done when:** G2, G8 and G14 are CLOSED in the register
+> on that evidence.
 
 ---
 

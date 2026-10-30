@@ -286,14 +286,14 @@
    "sha256_now": "e8dd91e2d4b4dd8dfd64efd26ae4b9aaebe365d191c92ac6dff7bf0eb525f344"
   },
   "uk/scripts/lexicon_compliance.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "46d598f18e0f818117286199090fc6eb81abc58b585c4cc6a855fd32dbd6374d"
+   "changed_by": "feature/step14-4-lexicon-article",
+   "commit_subject": "Step 14.4 - lexicon_compliance's Article N warning is quiet on a citation of legislation, a decree with no article before it (G2) and a paragraph or a list before the code (G8), and warns on an internal reference the bare of-the hid (G14)",
+   "sha256_now": "cb25c32a0a6314ec7c32eeef3f26713d4185ee8a4f66c988beebd504d52c1401"
   },
   "us/scripts/lexicon_compliance.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "6fb48401754c275f0cdedeb65298844d8944cb382027598f21e342ac2d1bb081"
+   "changed_by": "feature/step14-4-lexicon-article",
+   "commit_subject": "Step 14.4 - lexicon_compliance's Article N warning is quiet on a citation of legislation, a decree with no article before it (G2) and a paragraph or a list before the code (G8), and warns on an internal reference the bare of-the hid (G14)",
+   "sha256_now": "b4c4046179841c50eccb0a1876227c0874fab5f1e13e09479aeea3c8b359e187"
   }
  }
 }
