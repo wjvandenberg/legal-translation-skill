@@ -2284,3 +2284,13 @@ seconds, and the second full run on the same commit is the one the push rides.
 **THE CORPUS, AS STATED BEFORE THE COUNT RAN:** the rule's 12 warnings to 0 in each tree, 14 firing positions removed —
 2 G2, 12 G8 — and 0 added; no recorded run wrote an internal reference as `Article N of the …`, so G14 closes on
 synthetic input, declared.
+
+## 2026-10-30 (3) — Wouter: G7's marker and title exemptions in every language, the sub-step after 14.4
+
+**WOUTER, IN HIS WORDS, ANSWERING 14.3's OPEN CHOICE (3)** — *"Italian and English markers only"* — in 14.3's
+session: *"3: for all languages we should do this"*, and on where it goes: *"something for after 14.4"*. Relayed to
+14.4's session by 14.3's after #181 merged, and checked against 14.3's transcript before it was acted on. So the
+sub-step straight after 14.4 extends 14.3's defined-term-marker and title-verb exemptions in
+`validate_translations.py` to every supported language; by the house's rule 4b it takes the number 14.5, and the old
+14.5 to 14.9 renumber, which that session does in its own plan. Choice (3) of 2026-10-30 is overturned by it, and
+the prompt 14.4 had written for `quality_check.py` was replaced by 14.3's for this sub-step.
