@@ -134,37 +134,49 @@ _QUOTE_PAIRS_DOUBLE = [
     ('«', '»'),      # « » guillemets
 ]
 
-# Step 14.3, register G1: a straight apostrophe with a LETTER on both sides is
-# an elision or a contraction (dell'articolo, l'Acquirente, don't) and never a
-# quote mark. Pairing two of them declared the text between a missing quoted
-# phrase on most long Italian, French, Spanish or Catalan paragraphs. A digit
-# is not a letter, so l'80% still delimits, as before.
+# Step 14.3, register G1: a straight apostrophe AFTER a letter never opens a
+# quotation, and one BEFORE a letter never closes one. So an elision or a
+# contraction (dell'articolo, l'Acquirente, don't) is never a quote mark and may
+# sit inside one, and a plural possessive (the Parties' rights) may close a
+# quotation but never open one. Pairing two elisions declared the text between
+# them a missing quoted phrase on most long Italian, French, Spanish or Catalan
+# paragraphs. A digit is not a letter: l'80% may close a quotation, not open one.
 _LETTER = r'[^\W\d_]'
-_ELISION = r'(?<=' + _LETTER + r")'(?=" + _LETTER + r')'
-_APOSTROPHE_QUOTE = r'(?:(?<!' + _LETTER + r")'|'(?!" + _LETTER + r'))'
+_APOSTROPHE_OPEN = r'(?<!' + _LETTER + r")'"
+_APOSTROPHE_CLOSE = r"'(?!" + _LETTER + r')'
+_APOSTROPHE_INNER = r"(?:[^']|'(?=" + _LETTER + r'))'
 
 # Step 14.3, register G7: two shapes in which a quoted span is TRANSLATED by
 # design, so its absence from the English is no sign of loss. A defined term
 # in its marker — `(il "X")`, `(di seguito, il "X")`, `(the "X")`: the
-# parenthesis, an optional lead-in from the list below, a definite article,
-# the span, and the parenthesis closing straight after it. And a title straight
-# after a title verb — `recante "X"`, `entitled "X"`. The NAMING verbs
-# (denominato, named, called) are deliberately not title verbs: they introduce
-# the names this check exists to keep. Italian and English, the shapes
-# measured; another language's marker is checked as before.
-_MARKER_LEADIN = (
-    'di', 'seguito', 'in', 'nel', 'anche', "d'ora", 'avanti', 'innanzi', 'poi',
-    'breviter', 'congiuntamente', 'collettivamente', 'singolarmente',
-    'rispettivamente', 'ciascuna', 'ciascuno', 'entrambe', 'entrambi', 'insieme',
-    'denominato', 'denominata', 'denominati', 'denominate', 'definito',
-    'definita', 'definiti', 'definite', 'indicato', 'indicata', 'indicati',
-    'indicate', 'hereinafter', 'hereafter', 'referred', 'to', 'as', 'also',
-    'together', 'jointly', 'collectively', 'individually', 'each',
-    'respectively', 'called', 'defined',
+# parenthesis, an optional lead-in, a definite article, the span, and the
+# parenthesis closing straight after it. A lead-in must BEGIN with a marker
+# phrase or adverb (di seguito, hereinafter, congiuntamente…); the generic words
+# after it (to, as, defined…) may not begin one, or a cross-reference — (as
+# defined in the "X") — would pass for a marker. And a title straight after a
+# title verb — `recante "X"`, `entitled "X"`. The NAMING verbs (denominato,
+# named, called) are deliberately not title verbs: they introduce the names
+# this check exists to keep. Italian and English, the shapes measured; another
+# language's marker is checked as before.
+_MARKER_ADVERBS = (
+    'congiuntamente', 'collettivamente', 'singolarmente', 'rispettivamente',
+    'ciascuna', 'ciascuno', 'entrambe', 'entrambi', 'insieme', 'together',
+    'jointly', 'collectively', 'individually', 'respectively', 'each',
 )
+_MARKER_LEADIN_START = (
+    r'di\s+seguito', r'in\s+seguito', r'nel\s+seguito',
+    r"d['’]ora\s+in\s+(?:avanti|poi|innanzi)", 'hereinafter', 'hereafter',
+    'breviter',
+) + _MARKER_ADVERBS
+_MARKER_LEADIN_MORE = (
+    'anche', 'denominato', 'denominata', 'denominati', 'denominate', 'definito',
+    'definita', 'definiti', 'definite', 'indicato', 'indicata', 'indicati',
+    'indicate', 'referred', 'to', 'as', 'also', 'called', 'defined',
+) + _MARKER_ADVERBS
 _MARKER_BEFORE = re.compile(
-    r'\(\s*(?:(?:' + '|'.join(w.replace("'", "['’]") for w in _MARKER_LEADIN)
-    + r")\b[\s,:]*)*(?:(?:the|il|lo|la|i|gli|le)\s+|l['’]\s*)\Z", re.IGNORECASE)
+    r'\(\s*(?:(?:' + '|'.join(_MARKER_LEADIN_START) + r')\b(?:[\s,:]+(?:'
+    + '|'.join(_MARKER_LEADIN_MORE) + r')\b)*[\s,:]*)?'
+    r"(?:(?:the|il|lo|la|i|gli|le)\s+|l['’]\s*)\Z", re.IGNORECASE)
 _MARKER_AFTER = re.compile(r'\s*\)')
 _TITLE_BEFORE = re.compile(
     r'\b(?:recante|recanti|intitolat[oaie]|entitled|titled)\s*[:,]?\s*\Z',
@@ -174,13 +186,13 @@ _TITLE_BEFORE = re.compile(
 def _quoted_spans(text, opener, closer):
     """Yield the match of every <opener>…<closer> pair in text; group(1) is
     the content. The character-class-excluded inner pattern makes back-to-back
-    quotations match independently. The ASCII apostrophe opens or closes a
-    span only where it can be a quote mark: one with a letter on both sides is
-    an elision (G1), so it may sit INSIDE a span — 'Villa dell'Orto' is read
-    whole — and never pairs with another."""
+    quotations match independently. The ASCII apostrophe opens only where no
+    letter precedes it and closes only where no letter follows it (G1), so an
+    elision may sit INSIDE a span — 'Villa dell'Orto' is read whole — and
+    never pairs with another."""
     if opener == closer == "'":
-        pat = (_APOSTROPHE_QUOTE + r"((?:[^']|" + _ELISION + r')+)'
-               + _APOSTROPHE_QUOTE)
+        pat = (_APOSTROPHE_OPEN + '(' + _APOSTROPHE_INNER + '+)'
+               + _APOSTROPHE_CLOSE)
     else:
         # Escape for regex; if opener == closer this is fine, the pattern
         # `<opener>([^<closer>]+)<closer>` matches the shortest enclosed text.
@@ -197,8 +209,10 @@ def _quoted_span_count(s):
 
 def _translated_by_design(text, m):
     """True where span m sits in a defined-term marker or follows a title verb
-    (G7) — see _MARKER_BEFORE and _TITLE_BEFORE."""
-    return bool((_MARKER_BEFORE.search(text, 0, m.start())
+    (G7) — see _MARKER_BEFORE and _TITLE_BEFORE. A marker opens at the last
+    parenthesis before the span, so the search starts there."""
+    k = text.rfind('(', 0, m.start())
+    return bool((k >= 0 and _MARKER_BEFORE.match(text, k, m.start())
                  and _MARKER_AFTER.match(text, m.end()))
                 or _TITLE_BEFORE.search(text, 0, m.start()))
 

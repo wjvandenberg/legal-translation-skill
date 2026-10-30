@@ -533,7 +533,8 @@ VT = load(ROOT / "uk" / "scripts" / "validate_translations.py", "p_new_vt")
 
 QWORDS = ["contratto", "Cliente", "Centro", "Servizi", "Delta", "Nord", "delle", "Mense",
           "agreement", "Contractor", "Office", "Lift", "5", "2030"]
-ENWORDS = ["the", "Seller", "shall", "deliver", "plant", "works", "Buyer", "terms"]
+# The plural possessives: an English holding them must never seem to keep its quotes.
+ENWORDS = ["the", "Seller", "shall", "deliver", "plant", "works", "Buyer", "terms", "Parties'", "Sellers'"]
 ELISIONS = ["dell'Accordo", "l'impianto", "all'Acquirente", "nell'ambito"]
 QUOTES = (("'", "'"), ("‘", "’"), ('"', '"'), ("“", "”"), ("«", "»"))
 # prefix, and whether the shape is one 14.3 exempts
@@ -543,7 +544,8 @@ PREFIXES = (("", False), ("(il ", True), ("(di seguito, il ", True), ("(the ", T
 
 def gen_case(rng, elide):
     src, en, n_quoted_en, shaped = [], [], 0, False
-    for _ in range(rng.randint(1, 3)):
+    n_src = rng.randint(1, 3)
+    for _ in range(n_src):
         o, c = rng.choice(QUOTES)
         pre, exempt = rng.choice(PREFIXES)
         words = [rng.choice(QWORDS) for _ in range(rng.randint(1, 7))]
@@ -564,7 +566,7 @@ def gen_case(rng, elide):
         else:                                            # dropped, quotes and all
             en.append(rng.choice(ENWORDS))
         en.append(rng.choice(ENWORDS))
-    return " ".join(src), " ".join(en), n_quoted_en, shaped
+    return " ".join(src), " ".join(en), n_quoted_en, n_src, shaped
 
 
 rng = random.Random(SEED + 9)
@@ -572,8 +574,8 @@ moved_plain, moved_short, n_plain, n_short, silenced_g7, silenced_g1 = [], [], 0
 fired_plain = fired_short = 0     # an "identical" verdict proves nothing where both are silent
 for k in range(6000):
     elide = k % 3 == 0
-    src, en, n_quoted_en, shaped = gen_case(rng, elide)
-    n_spans = sum(1 for o, c in QUOTES for _ in VT._quoted_spans(src, o, c))
+    # The spans this case WROTE, counted by the generator: never by the code under test.
+    src, en, n_quoted_en, n_spans, shaped = gen_case(rng, elide)
     has_elision = re.search(r"[^\W\d_]'[^\W\d_]", src) is not None
     o = OLDVT._check_quoted_phrase_retention({"text": src, "en": en})
     n = VT._check_quoted_phrase_retention({"text": src, "en": en})

@@ -539,6 +539,10 @@ G1G7_FP = (
     ("G7 a title after entitled",
      "The parties shall follow the procedure entitled \"Inspection of Office Lifts and Escalators Each Month\".",
      "The parties shall follow the procedure entitled \"Monthly Inspection of Lifts and Escalators in Offices\"."),
+    # An apostrophe after a letter never OPENS a quotation -- the review's finding, 2026-10-30.
+    ("G1 two plural possessives paired as a quote",
+     "The Parties' rights under clause 5 and the Sellers' duties remain in force.",
+     "The rights of the Parties under clause 5 and the duties of the Sellers remain in force."),
 )
 # (label, source, English, the phrase the new code must report)
 G1G7_TP = (
@@ -582,17 +586,28 @@ G1G7_TP = (
      "Le opere sono eseguite \"secondo le migliori pratiche del settore\" dall'Appaltatore.",
      "The works are performed in line with \"industry best practice\" by the Contractor.",
      "secondo le migliori pratiche del settore"),
+    # The review's two findings, 2026-10-30: possessives once counted as a quoted span in the
+    # English, so the quote-count condition held over a marker dropped with its quotes; and a
+    # lead-in could BEGIN with a generic word, so a cross-reference passed for a marker.
+    ("a marker dropped, the English holding plural possessives",
+     "Il Cliente e l'Appaltatore stipulano il presente contratto (il \"Contratto Quadro per i Servizi di Pulizia\").",
+     "The Parties' rights and the Sellers' duties are set out in this cleaning contract.",
+     "Contratto Quadro per i Servizi di Pulizia"),
+    ("a cross-reference is no marker",
+     "The works follow the procedure (as defined in the \"Regional Rules for Public Works Tenders\").",
+     "The works follow the procedure (as defined in the \"Regional Public Works Tendering Rules\").",
+     "Regional Rules for Public Works Tenders"),
 )
 # --- 14.3 cases: end
 
 
-def vt_run(script_dir, name):
-    """rc and output of validate_translations run as skill Step 4 runs it, on the G1 paragraph alone,
+def vt_run(script_dir, name, case):
+    """rc and output of validate_translations run as skill Step 4 runs it, on one paragraph alone,
     in a workdir of its own (the script writes its batch state beside the notes)."""
     wd = TMP / f"vt-{name}"
     wd.mkdir()
     pj = wd / "paragraphs.json"
-    pj.write_text(json.dumps([{"idx": 0, "text": G1G7_FP[0][1], "en": G1G7_FP[0][2]}]), encoding="utf-8")
+    pj.write_text(json.dumps([{"idx": 0, "text": case[1], "en": case[2]}]), encoding="utf-8")
     r = subprocess.run([sys.executable, str(script_dir / "validate_translations.py"), str(pj)],
                        capture_output=True, text=True, encoding="utf-8", errors="replace",
                        env=F10_ENV, cwd=wd)
@@ -624,12 +639,13 @@ for tree in ("uk", "us"):
     for name in ("validate_translations.py", "source_language_markers.py"):
         (old_dir / name).write_bytes(subprocess.run(["git", "show", f"{REF}:{tree}/scripts/{name}"],
                                                     capture_output=True, cwd=ROOT, check=True).stdout)
-    old_rc, old_out = vt_run(old_dir, f"old-{tree}")
-    new_rc, new_out = vt_run(ROOT / tree / "scripts", f"new-{tree}")
-    ok(f"G1 {tree} the elision paragraph: exits 0 now, PASS and no quoted-phrase WARN",
-       new_rc == 0 and "PASS" in new_out and "Quoted source phrases" not in new_out, f"(rc={new_rc})")
-    ok(f"G1 {tree} the elision paragraph: PROVED it warned before",
-       old_rc == 1 and "Quoted source phrases NOT found" in old_out, f"(rc={old_rc})")
+    for row, case in (("G1", G1G7_FP[0]), ("G7", G1G7_FP[1])):
+        old_rc, old_out = vt_run(old_dir, f"old-{tree}-{row}", case)
+        new_rc, new_out = vt_run(ROOT / tree / "scripts", f"new-{tree}-{row}", case)
+        ok(f"{row} {tree} {case[0]}, the whole script: exits 0 now, PASS and no quoted-phrase WARN",
+           new_rc == 0 and "PASS" in new_out and "Quoted source phrases" not in new_out, f"(rc={new_rc})")
+        ok(f"{row} {tree} {case[0]}, the whole script: PROVED it warned before",
+           old_rc == 1 and "Quoted source phrases NOT found" in old_out, f"(rc={old_rc})")
 
 # =============================================================================
 print("\nF15 — a scaffold preserved verbatim IS filled in")

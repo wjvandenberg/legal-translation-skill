@@ -223,7 +223,7 @@
   "uk/scripts/validate_translations.py": {
    "changed_by": "feature/step14-3-validate-translations",
    "commit_subject": "Step 14.3 - validate_translations reads a straight apostrophe between two letters as an elision, never a quote (G1), and exempts a defined term in its marker or a title after a title verb while the English keeps its quotes (G7)",
-   "sha256_now": "c686f5f3bf68f45016fc9139fcd7950eb57fe7e86d1720121d0bf89d5157bc17"
+   "sha256_now": "2cc224080a37b6beb76e24184aef09cb02c497de8d38f6f117208af776420ae1"
   },
   "uk/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/step13-4-variant-conversion",
@@ -243,7 +243,7 @@
   "us/scripts/validate_translations.py": {
    "changed_by": "feature/step14-3-validate-translations",
    "commit_subject": "Step 14.3 - validate_translations reads a straight apostrophe between two letters as an elision, never a quote (G1), and exempts a defined term in its marker or a title after a title verb while the English keeps its quotes (G7)",
-   "sha256_now": "c686f5f3bf68f45016fc9139fcd7950eb57fe7e86d1720121d0bf89d5157bc17"
+   "sha256_now": "2cc224080a37b6beb76e24184aef09cb02c497de8d38f6f117208af776420ae1"
   },
   "us/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/step13-4-variant-conversion",

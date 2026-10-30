@@ -2080,6 +2080,18 @@ the edited script, and the full run once, before the push.
 > confidentiality controls, VERIFY and TEST through `tools/cycle_evidence.py`; and `uv.toml`'s comment pointed at the
 > signed Python's new folder, riding the one full run. **No render, declared:** a WARN decides nothing apply writes.
 > **Done when:** G1 and G7 are CLOSED in the register on that evidence, G7's third shape a declared residual.
+> **AMENDED AT REVIEW, 2026-10-30, before the full run.** `/code-review` at high, on `c07effc`: six findings, all
+> fixed. (1) The quote-count condition counted two English plural possessives (*the Parties' … the Sellers'*) as a
+> quoted span, so it could hold over a marker dropped with its quotes — the true positive it exists to keep. (2) A
+> lead-in could begin with a generic word, so a cross-reference — *(as defined in the "X")* — passed for a marker: a
+> lead-in now begins with a marker phrase or adverb. (3) The root of (1): an apostrophe AFTER a letter now never
+> OPENS a quotation and one BEFORE a letter never closes one — G1's elision rule kept, and a possessive pair quiet
+> too, in the source as in the English. (4) The property's second arm counts the spans its generator wrote, never the
+> code under test, and its English holds possessives. (5) The whole script's exit is judged on a G7 marker as well as
+> on G1. (6) The marker search starts at the last parenthesis. Controls added, both trees: the possessive pair silent
+> now and PROVED to fire at `2178cce`; a marker dropped beside English possessives and a cross-reference, firing now
+> and before — and PROVED missed at `c07effc`, where 2 of 14 false-positive controls fired and 20 of 24 true-positive
+> ones. Six mutants, each caught. The corpus re-counted, unchanged: 7 of 9 removed in each tree, 0 added.
 
 ---
 
