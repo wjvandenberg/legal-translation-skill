@@ -2155,3 +2155,53 @@ sub-steps paragraph called 14.8 and 14.9 HEAVY one-script steps - and one ruling
 TOOL:** *fix the three plan findings, then merge* - fixed before the merge, documents only; and the lettered names
 the rename wrote for slices built with letters ("step 10's sub-step 3a") KEPT, the house's no-letters rule
 binding new plans, not history.
+
+## 2026-10-29 — sub-step 14.2 built and merged (#179); Wouter's three answers: build at 99%, a conductor chain, merge on green
+
+**WOUTER, THROUGH THE QUESTION TOOL, AT THE OPENING** — three answers, each to a question the session put because of
+what it measured or was asked. The weekly usage limit for all models read **99%**, resetting 2026-10-30 06:00 UTC;
+and he asked, in his own words, *"Can you continue any next session when you close as nested session yourself
+automatically?"* and *"Can you ask all questions either in the beginning or the very end of the session?"*
+
+**(1) BUILD ANYWAY**, over the recommended *park until the reset*: 14.2 was started and carried as far as the limit
+allowed, the work safe on its own branch had the limit stopped it. It did not.
+
+**(2) A CONDUCTOR CHAIN TO STEP 14's END** — the recommended option. The app lets a session start a linked session,
+but a session started that way cannot start the next one itself — on a turn another session's message began, the app
+only lets it propose a card. So the session he asked in stays open as the CONDUCTOR: when each sub-step's session
+ends, the app wakes it, it checks that session's pull request merged, and it starts the next with the prompt that
+session left. 14.3 to 14.9, one session each, at the conductor's model and effort, in this checkout. It stops early on
+a failed check that cannot be fixed, a blocking question, or usage above 90% on either limit; the app also pauses it
+after an unstated number of wake-ups with no message from him. **A timed wake cannot restart it** — the app refuses a
+start on a turn an automated event began — so a chain stopped by a limit resumes on his next message.
+
+**(3) MERGE ON GREEN** — the recommended option, the ruling of 2026-10-14 (2) applied to the chain: each sub-step's
+session squash-merges its own pull request once VERIFY, TEST, the one full run and `/code-review` are green, the diff
+and the findings shown in its chat first; any red, or a finding it cannot fix, stops the chain for him. For step 14's
+chain this replaces the per-request *"ask me for the merge"* of 2026-10-26 (3). **And his standing ask, restated:**
+every question at a session's start or its very end — the house's two input points.
+
+**THE REVIEW CHANGED THE BUILD, AND THAT IS THE RECORD WORTH KEEPING:** `/code-review` at high found that exempting
+a del↔ins pair also silenced a TRUE positive — a regular segment running into the pair's far side, "theAgreement" in
+one view — which the old code had caught only by accident, on the pair. The brief's controls could not see it: every
+true positive they named was a LIST neighbour. Fixed at its depth, before the full run: the rule also reads each
+rendered view's joins, on `validate_reject_all`'s reconstruction contract, a property asserting the two readers agree.
+The double-space rule was deliberately kept off that scan — 7 candidates in one frozen workdir, each hanging on
+whitespace the notes do not carry (G9's first half) — an open item, not a new block. The register's F10 and F5 rows
+and section 3.14's 14.2 block own the evidence.
+
+**ONE STALE POINTER FOUND, NOT FIXED:** `tests/probe-5b/preflight.py` and `SCORING.md` cite `04-translate.md:488`
+for *"Always fill these in"* — already wrong on `main` (497 UK, 532 US), two lines further now. Outside 14.2's brief.
+
+**AND ON 2026-10-30, WOUTER, IN HIS WORDS, AWAY FOR FOUR HOURS:** *"start any new session directly in nested
+sub-session, I cannot answer any questions for the next 4 hours, so just continue and follow your own
+recommendations. Also push and merge as you want"*, and *"Also start the other session directly as nested
+sessions"*. The weekly limit had reset to 0%, so the conductor merged #179 on green and started 14.3 at once;
+every later sub-step's session starts the same way, the stop conditions of (2) unchanged.
+
+**AND THE MACHINE MOVED ITS PYTHON, MEASURED 2026-10-30:** the signed Python 3.14 was reinstalled under
+the system's program-files folder (3.14.10, its Python Software Foundation signature Valid), and its old folder
+keeps only leftovers — so this project's `.venv` and the shared `Coding` environment, both homed
+there, failed every `uv run`. This project's `.venv` was rebuilt on the new path by `uv.toml`'s own procedure,
+`lxml` 6.1.3; `uv.toml`'s comment still names the old path, 14.3's to correct; the shared environment and the
+house file's hazard 20, which names the old folder, are the house's, for Wouter.
