@@ -2205,3 +2205,43 @@ keeps only leftovers — so this project's `.venv` and the shared `Coding` envir
 there, failed every `uv run`. This project's `.venv` was rebuilt on the new path by `uv.toml`'s own procedure,
 `lxml` 6.1.3; `uv.toml`'s comment still names the old path, 14.3's to correct; the shared environment and the
 house file's hazard 20, which names the old folder, are the house's, for Wouter.
+
+## 2026-10-30 — sub-step 14.3 built and merged (#180), unattended; the review changed the build again
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS OF THE MORNING** — *"just continue and follow your own recommendations.
+Also push and merge as you want"* (the entry above) — so each choice below is THE SESSION'S, taken on its own
+recommendation and carried here for him to confirm or overturn at his return; none is his ruling.
+
+**(1) EACH G7 EXEMPTION IS CONDITIONAL**, past the brief's bare "is exempt": a span in a marker or after a title verb is
+exempt only while the English keeps at least as many quoted spans as the source, because a term or a title dropped
+with its quotes is the true positive a bare exemption silences — 14.2's review question, asked before the build this
+time. **(2) THE APOSTROPHE RULE GOES ONE STEP PAST G1's WORDING**, at the review's finding: an apostrophe after a
+letter never opens a quotation and one before a letter never closes one, so a plural possessive is quiet too — the
+same class, and the root of the review's first finding. **(3) ITALIAN AND ENGLISH MARKERS ONLY**, the shapes measured;
+French and Spanish, unmeasured, are not built, since every change points at an observed failure. **(4) THE NAMING
+VERBS ARE NOT TITLE VERBS** — `denominato`, `named` and `called` introduce the names the check exists for.
+**(5) `uv.toml` NAMES NO ABSOLUTE PATH:** the publication check refused one, so the signed Python's new folder is
+written `$env:ProgramFiles\Python314`, which also clears the two standing findings the old path carried.
+
+**THE REVIEW CHANGED THE BUILD, AND THE MUTANTS CHANGED THE TESTS.** `/code-review` at high, on `c07effc`, found the
+quote-count condition fooled by English possessives and the lead-in wide enough to take a cross-reference — both true
+positives the exemptions had silenced — fixed before the full run, each new control PROVED missed at `c07effc`. And a
+mutation run found a control that could not fail: the naming-verb control's English carried no quotes, so the
+quote-count condition re-checked the span by itself and a naming verb wrongly made a title verb went unseen. **An
+exemption's control must keep the condition beside it satisfied, or that condition hides the rule under test.**
+
+**THE CORPUS, AS STATED BEFORE THE COUNT RAN:** 9 findings to 2 in each tree, 4 G1 and 3 G7 removed, 0 added; the two
+left are G7's declared residual and one D05 span in plain prose, outside both rows. The register's G1 and G7 rows and
+section 3.14's 14.3 block own the evidence. **And the invented test strings were re-themed** from wind turbines to
+office services before the first commit, the shape sweep having flagged them: an invented example that echoes the
+corpus's own subject matter is the shape the confidentiality rules exist for.
+
+**AND THE EVIDENCE GUARD HAD BEEN FAILING OPEN, FOUND BY THE FIRST FULL RUN.** The hook runs
+`tools/hooks/evidence_guard.py` through a bare `uv run`, and the script's inline metadata gives it a uv-cached
+environment of its own — built on the old signed Python, so after the reinstall every call exited 103 where a block
+is 2, and Claude Code lets a command through on any other exit. The full run's `evidence_guard` suite, which executes
+the configured command itself, went red; that run was lost to the machine's setup, not to the change, and is recorded
+here as the house asks. The environment was rebuilt in place on the new Python, nothing deleted; the live hook then
+blocked this session's own probe, the suite passed 28 of 28, and the second full run on `7a7ad64` passed whole. **No
+command in this session aimed at an evidence folder.** Other projects' script hooks may carry the same fault — for
+the house; the note is in the conductor's shared notes folder.
