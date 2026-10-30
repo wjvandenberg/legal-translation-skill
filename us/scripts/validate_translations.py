@@ -134,18 +134,73 @@ _QUOTE_PAIRS_DOUBLE = [
     ('«', '»'),      # « » guillemets
 ]
 
+# Step 14.3, register G1: a straight apostrophe with a LETTER on both sides is
+# an elision or a contraction (dell'articolo, l'Acquirente, don't) and never a
+# quote mark. Pairing two of them declared the text between a missing quoted
+# phrase on most long Italian, French, Spanish or Catalan paragraphs. A digit
+# is not a letter, so l'80% still delimits, as before.
+_LETTER = r'[^\W\d_]'
+_ELISION = r'(?<=' + _LETTER + r")'(?=" + _LETTER + r')'
+_APOSTROPHE_QUOTE = r'(?:(?<!' + _LETTER + r")'|'(?!" + _LETTER + r'))'
 
-def _extract_quoted_phrases(text, opener, closer):
-    """Yield content of every <opener>…<closer> pair in text. Uses a
-    non-greedy character-class-excluded inner pattern so back-to-back
-    quotations match independently. ASCII apostrophes inside English
-    contractions (don't, Paul's) match only when surrounded by another
-    apostrophe — the word-count filter at the call site rejects those."""
-    # Escape for regex; if opener == closer this is fine, the pattern
-    # `<opener>([^<closer>]+)<closer>` matches the shortest enclosed text.
-    pat = re.escape(opener) + r'([^' + re.escape(closer) + r']+)' + re.escape(closer)
-    for m in re.finditer(pat, text):
-        yield m.group(1)
+# Step 14.3, register G7: two shapes in which a quoted span is TRANSLATED by
+# design, so its absence from the English is no sign of loss. A defined term
+# in its marker — `(il "X")`, `(di seguito, il "X")`, `(the "X")`: the
+# parenthesis, an optional lead-in from the list below, a definite article,
+# the span, and the parenthesis closing straight after it. And a title straight
+# after a title verb — `recante "X"`, `entitled "X"`. The NAMING verbs
+# (denominato, named, called) are deliberately not title verbs: they introduce
+# the names this check exists to keep. Italian and English, the shapes
+# measured; another language's marker is checked as before.
+_MARKER_LEADIN = (
+    'di', 'seguito', 'in', 'nel', 'anche', "d'ora", 'avanti', 'innanzi', 'poi',
+    'breviter', 'congiuntamente', 'collettivamente', 'singolarmente',
+    'rispettivamente', 'ciascuna', 'ciascuno', 'entrambe', 'entrambi', 'insieme',
+    'denominato', 'denominata', 'denominati', 'denominate', 'definito',
+    'definita', 'definiti', 'definite', 'indicato', 'indicata', 'indicati',
+    'indicate', 'hereinafter', 'hereafter', 'referred', 'to', 'as', 'also',
+    'together', 'jointly', 'collectively', 'individually', 'each',
+    'respectively', 'called', 'defined',
+)
+_MARKER_BEFORE = re.compile(
+    r'\(\s*(?:(?:' + '|'.join(w.replace("'", "['’]") for w in _MARKER_LEADIN)
+    + r")\b[\s,:]*)*(?:(?:the|il|lo|la|i|gli|le)\s+|l['’]\s*)\Z", re.IGNORECASE)
+_MARKER_AFTER = re.compile(r'\s*\)')
+_TITLE_BEFORE = re.compile(
+    r'\b(?:recante|recanti|intitolat[oaie]|entitled|titled)\s*[:,]?\s*\Z',
+    re.IGNORECASE)
+
+
+def _quoted_spans(text, opener, closer):
+    """Yield the match of every <opener>…<closer> pair in text; group(1) is
+    the content. The character-class-excluded inner pattern makes back-to-back
+    quotations match independently. The ASCII apostrophe opens or closes a
+    span only where it can be a quote mark: one with a letter on both sides is
+    an elision (G1), so it may sit INSIDE a span — 'Villa dell'Orto' is read
+    whole — and never pairs with another."""
+    if opener == closer == "'":
+        pat = (_APOSTROPHE_QUOTE + r"((?:[^']|" + _ELISION + r')+)'
+               + _APOSTROPHE_QUOTE)
+    else:
+        # Escape for regex; if opener == closer this is fine, the pattern
+        # `<opener>([^<closer>]+)<closer>` matches the shortest enclosed text.
+        pat = (re.escape(opener) + r'([^' + re.escape(closer) + r']+)'
+               + re.escape(closer))
+    return re.finditer(pat, text)
+
+
+def _quoted_span_count(s):
+    """How many quoted spans of any style and length s holds."""
+    return sum(1 for o, c in _QUOTE_PAIRS_SINGLE + _QUOTE_PAIRS_DOUBLE
+               for _ in _quoted_spans(s, o, c))
+
+
+def _translated_by_design(text, m):
+    """True where span m sits in a defined-term marker or follows a title verb
+    (G7) — see _MARKER_BEFORE and _TITLE_BEFORE."""
+    return bool((_MARKER_BEFORE.search(text, 0, m.start())
+                 and _MARKER_AFTER.match(text, m.end()))
+                or _TITLE_BEFORE.search(text, 0, m.start()))
 
 
 def _check_quoted_phrase_retention(p):
@@ -169,6 +224,12 @@ def _check_quoted_phrase_retention(p):
     on legitimate defined-term substitutions like
     `"Acuerdo" significa el contrato dated…` → `"Agreement" means the
     agreement dated…` where the source quoted term gets replaced.
+
+    Step 14.3: an elision apostrophe is never a quote mark (G1), and a span in
+    a defined-term marker or after a title verb is exempt (G7) — but ONLY while
+    the English keeps at least as many quoted spans as the source. A term or a
+    title dropped together with its quotes is a real loss, and it is checked
+    exactly as before.
     """
     text = (p.get('text') or '').strip()
     en = (p.get('en') or '').strip()
@@ -193,36 +254,37 @@ def _check_quoted_phrase_retention(p):
         # leading quoted defined term.
         # Implementation: extract the leading quoted term and remove
         # it from the candidate set.
+        # (`text` is stripped, so a leading span starts at 0.)
         leading_quoted = None
         for opener, closer in _QUOTE_PAIRS_SINGLE + _QUOTE_PAIRS_DOUBLE:
-            patt = (re.escape(opener) + r'([^' + re.escape(closer)
-                    + r']+)' + re.escape(closer))
-            m = re.match(r'\s*' + patt, text)
-            if m:
+            m = next(_quoted_spans(text, opener, closer), None)
+            if m is not None and m.start() == 0:
                 leading_quoted = m.group(1)
                 break
     else:
         leading_quoted = None
 
     findings = []
-    for opener, closer in _QUOTE_PAIRS_SINGLE:
-        for phrase in _extract_quoted_phrases(text, opener, closer):
-            phrase_stripped = phrase.strip()
-            if leading_quoted is not None and phrase_stripped == leading_quoted:
-                continue
-            if len(phrase_stripped.split()) < QUOTE_SINGLE_MIN_WORDS:
-                continue
-            if phrase_stripped not in en:
-                findings.append(('single', phrase_stripped))
-    for opener, closer in _QUOTE_PAIRS_DOUBLE:
-        for phrase in _extract_quoted_phrases(text, opener, closer):
-            phrase_stripped = phrase.strip()
-            if leading_quoted is not None and phrase_stripped == leading_quoted:
-                continue
-            if len(phrase_stripped.split()) < QUOTE_DOUBLE_MIN_WORDS:
-                continue
-            if phrase_stripped not in en:
-                findings.append(('double', phrase_stripped))
+    keeps_quotes = None   # G7's condition, counted once and only if needed
+    for style, pairs, min_words in (
+            ('single', _QUOTE_PAIRS_SINGLE, QUOTE_SINGLE_MIN_WORDS),
+            ('double', _QUOTE_PAIRS_DOUBLE, QUOTE_DOUBLE_MIN_WORDS)):
+        for opener, closer in pairs:
+            for m in _quoted_spans(text, opener, closer):
+                phrase_stripped = m.group(1).strip()
+                if leading_quoted is not None and phrase_stripped == leading_quoted:
+                    continue
+                if len(phrase_stripped.split()) < min_words:
+                    continue
+                if phrase_stripped in en:
+                    continue
+                if _translated_by_design(text, m):
+                    if keeps_quotes is None:
+                        keeps_quotes = (_quoted_span_count(en)
+                                        >= _quoted_span_count(text))
+                    if keeps_quotes:
+                        continue
+                findings.append((style, phrase_stripped))
     return findings
 
 def _state_path(json_path):
