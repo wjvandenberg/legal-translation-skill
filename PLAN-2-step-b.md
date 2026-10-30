@@ -1923,7 +1923,7 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 | F5 | `04-translate.md` says that scanner flags "only as warnings"; apply runs it `--strict` on every tracked-change document | **CLOSED 2026-10-29**, both trees, #179 | 14.2 |
 | G1 | `validate_translations.py`: the quoted-phrase retention check pairs an elision apostrophe as a quote | **CLOSED 2026-10-30**, both trees, #180 | 14.3 |
 | G7 | the same check: a defined term in its `(the "X")` marker, a title after `recante`, a quoted contractual phrase | **CLOSED 2026-10-30** but for the third shape, a declared residual; both trees, #180 | 14.3 |
-| G2 · G8 · G14 | `lexicon_compliance.py`: the `Article N` warning on `of Legislative Decree` and on the comma form, and its silence on `of the Agreement` | **CLOSED 2026-10-30**, both trees | 14.4 |
+| G2 · G8 · G14 | `lexicon_compliance.py`: the `Article N` warning on `of Legislative Decree` and on the comma form, and its silence on `of the Agreement` | **CLOSED 2026-10-30**, both trees, #181 | 14.4 |
 | G3 | `quality_check.py`: the list-connective whitelist misses `; and/or` | OPEN; `; or` already quiet | 14.5 |
 | G13 | `quality_check.py`: the remnant check on the lexicon's kept names | OPEN: 5 of the 10 `LEXICON_KEPT_NAMES` entries fire in an English sentence, where the row says six — reconciled at 14.5 | 14.5 |
 | G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | OPEN, and it fires INSIDE the form itself — `B.V`, `S.p`, `p.A` — whatever follows it, where the row says "followed by a capital" | 14.6 |
@@ -2167,6 +2167,10 @@ the edited script, and the full run once, before the push.
 > it is open for Wouter. Controls added, both trees, each PROVED missed at `d14a4fd`, where 2 of 24 false-positive
 > controls fired, 8 of 64 kept legislation forms fired and 20 of 24 missed-alarm controls fired; three mutants added,
 > eleven of eleven caught. The corpus re-counted, unchanged: 12 to 0 in each tree, 0 added.
+> **BUILT AND MERGED, 2026-10-30, as #181:** `d14a4fd` the fix, `8b79b4a` the review's five, `3b19ce0` the filing;
+> VERIFY 18 of 18, 19 of 19 and 21 of 21, TEST 13 of 13, 13 of 13 and 7 of 7, through the cycle gate; the one full run
+> on `3b19ce0`, OVERALL PASS; G2, G8 and G14 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the
+> conductor chain; 2026-10-30, unattended)*.
 
 ---
 
