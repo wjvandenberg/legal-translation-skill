@@ -221,9 +221,9 @@
    "sha256_now": "a26044f1fbf2df0c89ab4af4af6c844c97fa2792b2ea130a62e42628704aac74"
   },
   "uk/scripts/validate_translations.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "a4753f3c514ddf3fd4f015673c97673faf624db19d143fef97d7eb90f3a247ec"
+   "changed_by": "feature/step14-3-validate-translations",
+   "commit_subject": "Step 14.3 - validate_translations reads a straight apostrophe between two letters as an elision, never a quote (G1), and exempts a defined term in its marker or a title after a title verb while the English keeps its quotes (G7)",
+   "sha256_now": "2cc224080a37b6beb76e24184aef09cb02c497de8d38f6f117208af776420ae1"
   },
   "uk/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/step13-4-variant-conversion",
@@ -241,9 +241,9 @@
    "sha256_now": "b1e10bf5b6cf4ebd990ada6df0cc082876be8af72df64221373de342a619ab94"
   },
   "us/scripts/validate_translations.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "a4753f3c514ddf3fd4f015673c97673faf624db19d143fef97d7eb90f3a247ec"
+   "changed_by": "feature/step14-3-validate-translations",
+   "commit_subject": "Step 14.3 - validate_translations reads a straight apostrophe between two letters as an elision, never a quote (G1), and exempts a defined term in its marker or a title after a title verb while the English keeps its quotes (G7)",
+   "sha256_now": "2cc224080a37b6beb76e24184aef09cb02c497de8d38f6f117208af776420ae1"
   },
   "us/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/step13-4-variant-conversion",

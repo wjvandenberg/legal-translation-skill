@@ -32,6 +32,7 @@ import importlib.util
 import io
 import os
 import random
+import re
 import shutil
 import subprocess
 import sys
@@ -510,6 +511,95 @@ for _ in range(2000):
             disagree.append((view, [s.get("type") if isinstance(s, dict) else s for s in segs]))
 ok(f"F10 the join scan's two views equal validate_reject_all's reconstruction ({n_lists} lists)",
    not disagree, f"{len(disagree)} disagree, e.g. {disagree[:2]}")
+
+# ============================================================================
+print("\nPROPERTY 9 — G1 and G7: the retention verdict moves ONLY where an elision, a marker or a title sits")
+print("-" * 96)
+# 14.3's fix re-reads the straight apostrophe and adds two exemptions. Away from those shapes
+# the check must return EXACTLY what the old code returned -- a naming verb and a parenthesis
+# with no article included; and where the English keeps FEWER quoted spans than the source the
+# exemptions must not apply at all, so a term or a title dropped with its quotes is never
+# silenced. Thousands of generated paragraphs, not a handful of hand-built ones. Invented words.
+blob = subprocess.run(["git", "show", f"{REF}:uk/scripts/validate_translations.py"],
+                      capture_output=True, cwd=ROOT)
+if blob.returncode != 0 or blob.stdout == (ROOT / "uk" / "scripts"
+                                           / "validate_translations.py").read_bytes():
+    print(f"VOID — validate_translations.py at {REF} is unreadable or BYTE-IDENTICAL to the")
+    print("working tree, so the 'old code fired' half of this property compares nothing.")
+    sys.exit(1)
+(OLD / "validate_translations.py").write_bytes(blob.stdout)
+OLDVT = load(OLD / "validate_translations.py", "p_old_vt")
+VT = load(ROOT / "uk" / "scripts" / "validate_translations.py", "p_new_vt")
+
+QWORDS = ["contratto", "Cliente", "Centro", "Servizi", "Delta", "Nord", "delle", "Mense",
+          "agreement", "Contractor", "Office", "Lift", "5", "2030"]
+# The plural possessives: an English holding them must never seem to keep its quotes.
+ENWORDS = ["the", "Seller", "shall", "deliver", "plant", "works", "Buyer", "terms", "Parties'", "Sellers'"]
+ELISIONS = ["dell'Accordo", "l'impianto", "all'Acquirente", "nell'ambito"]
+QUOTES = (("'", "'"), ("‘", "’"), ('"', '"'), ("“", "”"), ("«", "»"))
+# prefix, and whether the shape is one 14.3 exempts
+PREFIXES = (("", False), ("(il ", True), ("(di seguito, il ", True), ("(the ", True),
+            ("recante ", True), ("entitled ", True), ("denominato ", False), ("(see ", False))
+
+
+def gen_case(rng, elide):
+    src, en, n_quoted_en, shaped = [], [], 0, False
+    n_src = rng.randint(1, 3)
+    for _ in range(n_src):
+        o, c = rng.choice(QUOTES)
+        pre, exempt = rng.choice(PREFIXES)
+        words = [rng.choice(QWORDS) for _ in range(rng.randint(1, 7))]
+        if elide and rng.random() < 0.3:
+            words.insert(rng.randrange(len(words) + 1), rng.choice(ELISIONS))
+        close = ")" if pre.startswith("(") and rng.random() < 0.8 else " e altro)" if pre.startswith("(") else ""
+        shaped |= exempt
+        src += [rng.choice(QWORDS), pre + o + " ".join(words) + c + close]
+        if elide and rng.random() < 0.4:
+            src.append(rng.choice(ELISIONS))
+        roll = rng.random()
+        if roll < 0.3:                                   # kept verbatim, quotes and all
+            en.append(o + " ".join(words) + c)
+            n_quoted_en += 1
+        elif roll < 0.65:                                # translated, inside quotes
+            en.append('"' + " ".join(rng.choice(ENWORDS) for _ in words) + '"')
+            n_quoted_en += 1
+        else:                                            # dropped, quotes and all
+            en.append(rng.choice(ENWORDS))
+        en.append(rng.choice(ENWORDS))
+    return " ".join(src), " ".join(en), n_quoted_en, n_src, shaped
+
+
+rng = random.Random(SEED + 9)
+moved_plain, moved_short, n_plain, n_short, silenced_g7, silenced_g1 = [], [], 0, 0, 0, 0
+fired_plain = fired_short = 0     # an "identical" verdict proves nothing where both are silent
+for k in range(6000):
+    elide = k % 3 == 0
+    # The spans this case WROTE, counted by the generator: never by the code under test.
+    src, en, n_quoted_en, n_spans, shaped = gen_case(rng, elide)
+    has_elision = re.search(r"[^\W\d_]'[^\W\d_]", src) is not None
+    o = OLDVT._check_quoted_phrase_retention({"text": src, "en": en})
+    n = VT._check_quoted_phrase_retention({"text": src, "en": en})
+    if not has_elision and not shaped:
+        n_plain += 1
+        fired_plain += bool(o)
+        if n != o:
+            moved_plain.append((src, en))
+    if not has_elision and n_quoted_en < n_spans:
+        n_short += 1
+        fired_short += bool(o)
+        if n != o:
+            moved_short.append((src, en))
+    if o and not n:
+        silenced_g1 += has_elision and not shaped
+        silenced_g7 += shaped and not has_elision
+ok(f"G1/G7 no elision, no marker, no title: verdict identical to {REF[:12]} ({n_plain} paragraphs, "
+   f"{fired_plain} firing)", fired_plain > 0 and not moved_plain,
+   f"{len(moved_plain)} moved, e.g. {moved_plain[:1]}")
+ok(f"G1/G7 English keeping fewer quoted spans than the source: verdict identical ({n_short} "
+   f"paragraphs, {fired_short} firing)", fired_short > 0 and not moved_short,
+   f"{len(moved_short)} moved, e.g. {moved_short[:1]}")
+ok(f"G1/G7 the old code fired where the new is silent: {silenced_g1} elision and {silenced_g7} "
+   f"marker or title paragraphs (the property is not vacuous)", silenced_g1 > 0 and silenced_g7 > 0)
 
 shutil.rmtree(TMP, ignore_errors=True)
 print()

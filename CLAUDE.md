@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, and 14.2 as #179, 2026-10-29; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26, 14.3 next · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, and 14.3 as #180, 2026-10-30; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26, 14.4 next · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,23 +578,23 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-29, SUB-STEP 14.2 MERGED AS #179; THE CONDUCTOR STARTS 14.3
+### HANDOFF — 2026-10-30, SUB-STEP 14.3 MERGED AS #180; THE CONDUCTOR STARTS 14.4
 
-**PURPOSE: MET** — *the shape gate fires only on what it exists to catch*: F10 and F5 CLOSED in the register, both
-trees; `DECISIONS-LOG.md`, 2026-10-29, owns the session's three rulings.
+**PURPOSE: MET** — *the translation checks fire only on what they exist to catch*: G1 CLOSED, G7 CLOSED but for its
+declared third shape, both trees; `DECISIONS-LOG.md`, 2026-10-30, owns the session's five choices.
 
-**PRODUCED, CODE:** `349dd8d` silences the alpha-collision rule across a del↔ins pair and corrects rule 14 of both
-`04-translate.md`; `95228ce`, the review's finding — the exemption had also silenced a TRUE positive — makes
-`validate()` read each rendered view's own joins. 84 assertions and 15 properties, each red at its pin; the corpus 0
-added, 13 of 13, both trees; one full run on `95228ce`, OVERALL PASS; squash-merged on green.
+**PRODUCED, CODE:** `c07effc` makes `validate_translations.py` read an elision as no quote and exempt a kept marker or
+title; `7a7ad64`, the review's six. 172 assertions, 18 properties, six mutants caught; the corpus 9 findings to 2 in
+each tree, 0 added; one full run on `7a7ad64`, OVERALL PASS; `uv.toml` names the new Python folder; merged on green.
 
-**SINGLE NEXT ACTION: SUB-STEP 14.3**, `validate_translations.py`, G1 and G7, its prompt `temp/s1029_next_prompt.md`.
-The conductor (this session) starts it as a nested session once #179 merges — Wouter, 2026-10-30, away four
-hours: *"start any new session directly"*; a red, a blocking question or usage over 90% stops the chain.
+**SINGLE NEXT ACTION: SUB-STEP 14.4**, `lexicon_compliance.py`, G2, G8 and the missed `of the` alarm, its prompt
+`temp/s1030_next_prompt.md`. The conductor starts it as a nested session once #180 merges *(Wouter, 2026-10-30)*;
+a red, a blocking question or usage over 90% stops the chain.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** a session the conductor starts never starts the next — it closes, the
-conductor does; measure line endings with `git ls-files --eol`; 14.2's controls and census are 14.3's model.
+**WHAT A NEW SESSION WOULD GET WRONG:** a session the conductor starts never starts the next; 14.4 ADDS findings by
+design, so its census attributes each addition to its new row rather than asserting none; and an exemption's control
+must keep the condition beside it satisfied, or that condition hides the rule under test — 14.3's naming-verb control.
 
-**Open, none blocking:** 7 double-space candidates at a view's join in one frozen workdir (G9's first half decides
-them); the alpha rule still fires beside an `ins_then_del`, which no view renders; `tests/probe-5b/` cites
-`04-translate.md:488`, stale before today; the two `for_house` notes in `temp/`. **Context: 37% when written.**
+**Open, none blocking:** the five choices for Wouter to confirm; the evidence guard FAILED OPEN from the Python
+move until this session rebuilt its uv script environment — other projects' script hooks may too, the shared
+notes folder; D05's prose finding stays; `tests/probe-5b/`'s stale pointer. **Context: 42% when written.**

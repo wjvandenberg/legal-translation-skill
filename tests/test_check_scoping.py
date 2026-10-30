@@ -176,6 +176,9 @@ for _s in ("quality_check.py", "validate_segment_shapes.py",
     assert_baseline_differs(_s)
 # 14.2 runs its F10 controls over the us tree as well, so its baseline must differ there too.
 assert_baseline_differs("validate_segment_shapes.py", "us")
+# And 14.3 its G1 and G7 controls, over both trees.
+for _t in ("uk", "us"):
+    assert_baseline_differs("validate_translations.py", _t)
 
 OLD_QC = load_old("quality_check.py")
 NEW_QC = load_new("quality_check.py")
@@ -499,6 +502,150 @@ for tree in ("uk", "us"):
        f"({new_w})")
     ok(f"F10 {tree} differing del/ins pair, both views clean: PROVED it fired before",
        bool(old_w), f"({old_w})")
+
+# =============================================================================
+print("\nG1 and G7 — an elision is no quote mark; a defined term or a title is translated by design")
+print("-" * 96)
+
+# skill Step 4's validate_translations warns when a quoted source span (2+ words in single
+# quotes, 5+ in double) is not found verbatim in the English. G1: a straight apostrophe
+# between two letters -- dell'articolo -- was paired as a quote mark, and the text between
+# two of them read as a missing phrase. G7: a defined term in its (il "X") marker and a
+# title after recante are translated by design, so they warned on every well-drafted
+# contract. EACH EXEMPTION HOLDS ONLY WHILE THE ENGLISH KEEPS AS MANY QUOTED SPANS AS THE
+# SOURCE: a term or a title dropped together with its quotes is the true positive a bare
+# exemption would silence -- 14.2's review lesson, asked of every exemption here. Register G1
+# and G7; 14.3 of PLAN-2-step-b.md section 3.14. Every string INVENTED.
+# --- 14.3 cases: begin
+G1G7_FP = (
+    ("G1 two elisions paired as a quote",
+     "Ai fini dell'articolo 5 e nel rispetto delle condizioni dell'Accordo, il Venditore consegna i beni.",
+     "For the purposes of clause 5 and subject to the conditions of the Agreement, the Seller delivers the goods."),
+    ("G7 a defined term in its (il \"X\") marker",
+     "Il Cliente e l'Appaltatore stipulano il presente contratto (il \"Contratto Quadro per i Servizi di Pulizia\").",
+     "The Client and the Contractor enter into this contract (the \"Cleaning Services Framework Contract\")."),
+    ("G7 a marker with a lead-in, (di seguito, congiuntamente, gli \"X\")",
+     "Le parti hanno sottoscritto due accordi (di seguito, congiuntamente, gli \"Accordi Quadro per la Manutenzione "
+     "degli Uffici\").",
+     "The parties have signed two agreements (hereinafter, together, the \"Office Upkeep Framework Arrangements\")."),
+    ("G7 an English (the \"X\") marker",
+     "The Contractor shall perform the services (the \"Long Term Office Cleaning and Catering Works\").",
+     "The Contractor shall perform the services (the \"Long-Term Office Cleaning and Catering Works\")."),
+    ("G7 a title after recante",
+     "Si applica il Decreto Legislativo n. 99 del 2001, recante \"Disposizioni per la tutela dei giardini storici "
+     "urbani\", come modificato.",
+     "Legislative Decree No. 99 of 2001, laying down \"Provisions for the protection of historic urban gardens\", as "
+     "amended, applies."),
+    ("G7 a title after entitled",
+     "The parties shall follow the procedure entitled \"Inspection of Office Lifts and Escalators Each Month\".",
+     "The parties shall follow the procedure entitled \"Monthly Inspection of Lifts and Escalators in Offices\"."),
+    # An apostrophe after a letter never OPENS a quotation -- the review's finding, 2026-10-30.
+    ("G1 two plural possessives paired as a quote",
+     "The Parties' rights under clause 5 and the Sellers' duties remain in force.",
+     "The rights of the Parties under clause 5 and the duties of the Sellers remain in force."),
+)
+# (label, source, English, the phrase the new code must report)
+G1G7_TP = (
+    ("a quoted project name dropped",
+     "Il Cliente realizza il progetto 'Centro Servizi Delta Nord' entro il 2030.",
+     "The Client builds the service centre project by 2030.", "Centro Servizi Delta Nord"),
+    ("a third-party title with no marker",
+     "L'Appaltatore rispetta il documento \"Linee Guida per la Gestione delle Mense Aziendali\" del Cliente.",
+     "The Contractor complies with the canteen guidelines of the Client.",
+     "Linee Guida per la Gestione delle Mense Aziendali"),
+    ("a name holding an elision, dropped: now read WHOLE",
+     "Il sito del progetto 'Residenza dell'Orto Fiorito' resta invariato.",
+     "The project site remains unchanged.", "Residenza dell'Orto Fiorito"),
+    ("a name after an elision, dropped: now checked ITSELF",
+     "Ai fini dell'immobile il progetto 'Centro Servizi Delta Sud' resta invariato.",
+     "For the purposes of the building the project remains unchanged.", "Centro Servizi Delta Sud"),
+    ("a marker dropped with its quotes",
+     "Il Cliente e l'Appaltatore stipulano il presente contratto (il \"Contratto Quadro per i Servizi di Pulizia\").",
+     "The Client and the Contractor enter into this cleaning contract.", "Contratto Quadro per i Servizi di Pulizia"),
+    ("a title dropped with its quotes",
+     "Si applica il Decreto Legislativo n. 99 del 2001, recante \"Disposizioni per la tutela dei giardini storici "
+     "urbani\", come modificato.",
+     "Legislative Decree No. 99 of 2001, as amended, applies.",
+     "Disposizioni per la tutela dei giardini storici urbani"),
+    ("a name beside a kept marker, the name dropped with its quotes",
+     "Il Cliente noleggia l'attrezzatura 'Centro Servizi Delta Nord' (il \"Contratto di Noleggio dell'Attrezzatura "
+     "da Ufficio\").",
+     "The Client hires the equipment (the \"Office Equipment Hire Contract\").", "Centro Servizi Delta Nord"),
+    # The English keeps a quoted span, so the quote-count condition holds and only the verb
+    # decides: with the English unquoted, the condition alone re-checks the span, and a naming
+    # verb wrongly made a title verb went unseen -- caught by mutation on 2026-10-30.
+    ("a NAMING verb is not a title verb",
+     "Il progetto denominato \"Centro Servizi del Quartiere Alto Verde\" è autorizzato.",
+     "The project \"Upper Green District Service Centre\" is authorised.",
+     "Centro Servizi del Quartiere Alto Verde"),
+    ("a marker left open is no marker",
+     "Le opere comprendono (il \"Contratto Quadro per i Servizi di Pulizia\" e i relativi allegati).",
+     "The works include (the \"Cleaning Services Framework Contract\" and its annexes).",
+     "Contratto Quadro per i Servizi di Pulizia"),
+    ("G7's DECLARED RESIDUAL, a quoted contractual phrase",
+     "Le opere sono eseguite \"secondo le migliori pratiche del settore\" dall'Appaltatore.",
+     "The works are performed in line with \"industry best practice\" by the Contractor.",
+     "secondo le migliori pratiche del settore"),
+    # The review's two findings, 2026-10-30: possessives once counted as a quoted span in the
+    # English, so the quote-count condition held over a marker dropped with its quotes; and a
+    # lead-in could BEGIN with a generic word, so a cross-reference passed for a marker.
+    ("a marker dropped, the English holding plural possessives",
+     "Il Cliente e l'Appaltatore stipulano il presente contratto (il \"Contratto Quadro per i Servizi di Pulizia\").",
+     "The Parties' rights and the Sellers' duties are set out in this cleaning contract.",
+     "Contratto Quadro per i Servizi di Pulizia"),
+    ("a cross-reference is no marker",
+     "The works follow the procedure (as defined in the \"Regional Rules for Public Works Tenders\").",
+     "The works follow the procedure (as defined in the \"Regional Public Works Tendering Rules\").",
+     "Regional Rules for Public Works Tenders"),
+)
+# --- 14.3 cases: end
+
+
+def vt_run(script_dir, name, case):
+    """rc and output of validate_translations run as skill Step 4 runs it, on one paragraph alone,
+    in a workdir of its own (the script writes its batch state beside the notes)."""
+    wd = TMP / f"vt-{name}"
+    wd.mkdir()
+    pj = wd / "paragraphs.json"
+    pj.write_text(json.dumps([{"idx": 0, "text": case[1], "en": case[2]}]), encoding="utf-8")
+    r = subprocess.run([sys.executable, str(script_dir / "validate_translations.py"), str(pj)],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       env=F10_ENV, cwd=wd)
+    return r.returncode, r.stdout + r.stderr
+
+
+for tree in ("uk", "us"):
+    old_vt = load_old("validate_translations.py", tree)
+    new_vt = load_new("validate_translations.py", tree)
+    for label, src, en in G1G7_FP:
+        old_f = old_vt._check_quoted_phrase_retention({"text": src, "en": en})
+        new_f = new_vt._check_quoted_phrase_retention({"text": src, "en": en})
+        ok(f"{label} ({tree}): silent now", not new_f, f"({new_f})")
+        ok(f"{label} ({tree}): PROVED it fired before", bool(old_f), f"({old_f})")
+    for label, src, en, phrase in G1G7_TP:
+        old_f = old_vt._check_quoted_phrase_retention({"text": src, "en": en})
+        new_f = new_vt._check_quoted_phrase_retention({"text": src, "en": en})
+        ok(f"G1/G7 {tree} TRUE POSITIVE {label}: still fires, on that phrase",
+           phrase in [p for _s, p in new_f], f"({new_f})")
+        ok(f"G1/G7 {tree} TRUE POSITIVE {label}: fired before too", bool(old_f), f"({old_f})")
+    # The elision TP pair shows what the old pairing did to a real name: it was never read as itself.
+    for label, src, en, phrase in G1G7_TP[2:4]:
+        old_f = old_vt._check_quoted_phrase_retention({"text": src, "en": en})
+        ok(f"G1/G7 {tree} {label}: the old code never read that phrase",
+           phrase not in [p for _s, p in old_f], f"({old_f})")
+    # THE EXIT skill Step 4 reads, judged by CONTENT as well as rc: a crash also exits non-zero.
+    old_dir = TMP / f"old_vt_{tree}"
+    old_dir.mkdir()
+    for name in ("validate_translations.py", "source_language_markers.py"):
+        (old_dir / name).write_bytes(subprocess.run(["git", "show", f"{REF}:{tree}/scripts/{name}"],
+                                                    capture_output=True, cwd=ROOT, check=True).stdout)
+    for row, case in (("G1", G1G7_FP[0]), ("G7", G1G7_FP[1])):
+        old_rc, old_out = vt_run(old_dir, f"old-{tree}-{row}", case)
+        new_rc, new_out = vt_run(ROOT / tree / "scripts", f"new-{tree}-{row}", case)
+        ok(f"{row} {tree} {case[0]}, the whole script: exits 0 now, PASS and no quoted-phrase WARN",
+           new_rc == 0 and "PASS" in new_out and "Quoted source phrases" not in new_out, f"(rc={new_rc})")
+        ok(f"{row} {tree} {case[0]}, the whole script: PROVED it warned before",
+           old_rc == 1 and "Quoted source phrases NOT found" in old_out, f"(rc={old_rc})")
 
 # =============================================================================
 print("\nF15 — a scaffold preserved verbatim IS filled in")

@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, and 14.3 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-29 — SESSION PURPOSE — what · how · purpose:** sub-step 14.2 by section 3.14: `validate_segment_shapes.py` given F10's fix in both trees and F5's sentence written into both trees' `04-translate.md`; its own explore and written plan first, red first against the pinned baseline, the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, today)* · **so that the shape gate fires only on what it exists to catch, and a firing gate can be trusted** *(written immediately after the tag `rollback-2026-10-29-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, and 14.3 as #180, 2026-10-30; 14.4 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-30 — SESSION PURPOSE — what · how · purpose:** sub-step 14.3 by section 3.14: `validate_translations.py` given G1's and G7's fixes in both trees, and `uv.toml`'s comment pointed at the signed Python's new folder; its own written plan first, red first against the pinned baseline, the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-10-30: the conductor chain, unattended)* · **so that the translation checks fire only on what they exist to catch, and a firing check can be trusted** *(written immediately after the tag `rollback-2026-10-30-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -1921,8 +1921,8 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 |---|---|---|---|
 | F10 | `validate_segment_shapes.py`: the alpha-collision rule across a del/ins pair | **CLOSED 2026-10-29**, both trees, #179 | 14.2 |
 | F5 | `04-translate.md` says that scanner flags "only as warnings"; apply runs it `--strict` on every tracked-change document | **CLOSED 2026-10-29**, both trees, #179 | 14.2 |
-| G1 | `validate_translations.py`: the quoted-phrase retention check pairs an elision apostrophe as a quote | OPEN | 14.3 |
-| G7 | the same check: a defined term in its `(the "X")` marker, a title after `recante`, a quoted contractual phrase | OPEN, all three shapes | 14.3 |
+| G1 | `validate_translations.py`: the quoted-phrase retention check pairs an elision apostrophe as a quote | **CLOSED 2026-10-30**, both trees, #180 | 14.3 |
+| G7 | the same check: a defined term in its `(the "X")` marker, a title after `recante`, a quoted contractual phrase | **CLOSED 2026-10-30** but for the third shape, a declared residual; both trees, #180 | 14.3 |
 | G2 · G8 | `lexicon_compliance.py`: the `Article N` warning on `of Legislative Decree` and on the comma form | OPEN, both shapes; `of the Civil Code` already quiet | 14.4 |
 | G3 | `quality_check.py`: the list-connective whitelist misses `; and/or` | OPEN; `; or` already quiet | 14.5 |
 | G13 | `quality_check.py`: the remnant check on the lexicon's kept names | OPEN: 5 of the 10 `LEXICON_KEPT_NAMES` entries fire in an English sentence, where the row says six — reconciled at 14.5 | 14.5 |
@@ -2046,6 +2046,57 @@ the edited script, and the full run once, before the push.
 > **BUILT AND MERGED, 2026-10-29, as #179:** `349dd8d` the fix and F5, `95228ce` the review's join scan; VERIFY
 > 14 of 14 and TEST 17 of 17 through the cycle gate on each; the one full run on `95228ce`, OVERALL PASS; F10 and
 > F5 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29)*.
+> **14.3 — ITS OWN WRITTEN PLAN, 2026-10-30, before any edit, on `feature/step14-3-validate-translations`.**
+> **Measured first, `main` at `653e85a`, both trees alike:** the retention check makes 9 findings over the 13 frozen
+> workdirs, counts only (`temp/s1030b_vt_shape_probe.py`) — 4 an elision pair (G1); 1 a title after `recante`, 2 a
+> `(di seguito, il "X")` marker with a lead-in, and 1 a quoted contractual phrase (G7's three shapes); and 1 on D05
+> in plain prose, outside both rows. The rule is byte-identical at `2178cce` and `653e85a` in both trees, so the pin
+> is a true "before". **Changes,** both trees' `validate_translations.py`, the rule still running and still a WARN:
+> (1) a straight apostrophe with a letter on both sides is never a quote delimiter, in the extraction and in the
+> definition-body skip alike, so a quoted name holding an elision is read whole; (2) a span is exempt when its
+> opener follows `(`, an optional lead-in from a fixed list (`di seguito`, `hereinafter` and their kin) and a
+> definite article (`the`, `il`, `lo`, `la`, `l'`, `i`, `gli`, `le`), and a `)` follows its closer — or when its opener
+> straight follows a title verb (`recante`, `intitolato` and its forms, `entitled`, `titled`); the naming verbs
+> (`denominato`, `named`, `called`) deliberately NOT, because they introduce the names this check exists for;
+> (3) **the defect beside the false one, asked of each exemption as 14.2's review taught:** an English that drops
+> the term or the title together with its quotes is the true positive a bare exemption would silence — so both
+> exemptions hold only while the English carries at least as many quoted spans as the source, and otherwise the
+> span is checked as today. **Controls,** `tests/test_check_scoping.py`, both trees: *FP* — the elision pair, the
+> marker with and without a lead-in, an English `(the "X")`, a title after `recante` and after `entitled`, each
+> silent now and PROVED to have fired at `2178cce`; *TP* — a quoted project name dropped, a third-party title with
+> no marker, a name holding an elision (now read whole), a name after an elision (now checked itself), a marker and
+> a title dropped with their quotes, a naming verb, a marker left open, and G7's residual, the quoted contractual
+> phrase, each firing now and before; the script's exit judged by content as well as rc.
+> `tests/test_check_scoping_properties.py`: one property over generated paragraphs — with no elision, marker or
+> title the verdict is identical to `2178cce`'s, and with fewer quoted spans in the English than in the source it is
+> identical too; the old code proved to fire on the shaped cases. **Must not touch:** the thresholds, the
+> definition-body predicates, the ratio check, the batch cap, the placeholder refusal, any exit code, any other
+> script, the typographic and guillemet pairing, the anti-drift safeguards; French and Spanish markers, unmeasured,
+> are NOT built. **Corpus:** old (`653e85a`) against new over the 13 frozen workdirs, both trees, counts only, by
+> `temp/s1030b_vt_census.py` — declared, as 14.2's was, because neither tool the brief names runs this check —
+> **expected 7 removed of 9 in each tree**, every removal attributed to G1 or G7 by the census's own classifier, a
+> second reader of the shapes; an addition allowed only where the old pairing hid a span behind an elision, each
+> counted; a planted set proving the count moves. **Then** the parity check, both divergences re-recorded, the three
+> confidentiality controls, VERIFY and TEST through `tools/cycle_evidence.py`; and `uv.toml`'s comment pointed at the
+> signed Python's new folder, riding the one full run. **No render, declared:** a WARN decides nothing apply writes.
+> **Done when:** G1 and G7 are CLOSED in the register on that evidence, G7's third shape a declared residual.
+> **AMENDED AT REVIEW, 2026-10-30, before the full run.** `/code-review` at high, on `c07effc`: six findings, all
+> fixed. (1) The quote-count condition counted two English plural possessives (*the Parties' … the Sellers'*) as a
+> quoted span, so it could hold over a marker dropped with its quotes — the true positive it exists to keep. (2) A
+> lead-in could begin with a generic word, so a cross-reference — *(as defined in the "X")* — passed for a marker: a
+> lead-in now begins with a marker phrase or adverb. (3) The root of (1): an apostrophe AFTER a letter now never
+> OPENS a quotation and one BEFORE a letter never closes one — G1's elision rule kept, and a possessive pair quiet
+> too, in the source as in the English. (4) The property's second arm counts the spans its generator wrote, never the
+> code under test, and its English holds possessives. (5) The whole script's exit is judged on a G7 marker as well as
+> on G1. (6) The marker search starts at the last parenthesis. Controls added, both trees: the possessive pair silent
+> now and PROVED to fire at `2178cce`; a marker dropped beside English possessives and a cross-reference, firing now
+> and before — and PROVED missed at `c07effc`, where 2 of 14 false-positive controls fired and 20 of 24 true-positive
+> ones. Six mutants, each caught. The corpus re-counted, unchanged: 7 of 9 removed in each tree, 0 added.
+> **BUILT AND MERGED, 2026-10-30, as #180:** `c07effc` the fix and `uv.toml`, `7a7ad64` the review's six;
+> VERIFY 17 of 17 and 18 of 18, TEST 17 of 17 on each, through the cycle gate; the full run on `7a7ad64`, OVERALL
+> PASS, its first try lost to the evidence guard's stale environment (`DECISIONS-LOG.md`, 2026-10-30); G1 and G7
+> CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain; 2026-10-30,
+> unattended)*.
 
 ---
 
