@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26, 14.5 next · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; next, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,7 +578,7 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-10-30, SUB-STEP 14.4 MERGED AS #181; THE CONDUCTOR STARTS 14.5
+### HANDOFF — 2026-10-30, SUB-STEP 14.4 MERGED AS #181; NEXT, G7 IN EVERY LANGUAGE
 
 **PURPOSE: MET** — *the lexicon check warns on an internal `Article N` and never on a citation of legislation*: G2
 and G8 CLOSED, G14 filed and CLOSED, both trees; `DECISIONS-LOG.md`, 2026-10-30 (2), owns the session's five choices.
@@ -587,9 +587,9 @@ and G8 CLOSED, G14 filed and CLOSED, both trees; `DECISIONS-LOG.md`, 2026-10-30 
 `8b79b4a`, the review's five; `3b19ce0` files G14 and moves the counts it touches. 308 assertions, 22 properties,
 eleven mutants caught; the corpus 12 warnings to 0 in each tree, 0 added; one full run on `3b19ce0`, OVERALL PASS.
 
-**SINGLE NEXT ACTION: SUB-STEP 14.5**, `quality_check.py`, G3 and G13, its prompt `temp/s1030c_next_prompt.md`.
-The conductor starts it as a nested session once #181 merges *(Wouter, 2026-10-30)*; a red, a blocking question
-or usage over 90% stops the chain.
+**SINGLE NEXT ACTION: G7 IN EVERY LANGUAGE**, `validate_translations.py` — Wouter's new sub-step after 14.4,
+numbered 14.5 by rule 4b, the old 14.5 to 14.9 renumbered by that session; its prompt `temp/s1030c_next_prompt.md`.
+The conductor starts it *(Wouter, 2026-10-30)*; a red, a blocking question or usage over 90% stops the chain.
 
 **WHAT A NEW SESSION WOULD GET WRONG:** a stated corpus count that comes out otherwise is a finding — 14.4's 12-to-1
 was one `that`; a property finds shapes a brief never names — the bare `of the` also matched `of these`; and a
