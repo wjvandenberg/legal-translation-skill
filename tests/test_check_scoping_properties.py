@@ -15,6 +15,8 @@ thought to write down. The fixes here claim something stronger and more useful:
     M1              the anomaly comparison is a MULTISET difference, over random multisets.
     F10             the alpha-collision verdict moves ONLY on a del<->ins pair, over
                     thousands of generated pairs -- and the old code fired on some.
+    G2 / G8 / G14   'Article N' warns on every internal tail and on no legislation tail,
+                    whatever sits between the number and the tail -- both ways moved.
     all             none of them crashes on malformed, empty, or extreme input, and all of
                     them are deterministic.
 
@@ -37,7 +39,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import zipfile
+from collections import Counter
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -600,6 +604,100 @@ ok(f"G1/G7 English keeping fewer quoted spans than the source: verdict identical
    f"{len(moved_short)} moved, e.g. {moved_short[:1]}")
 ok(f"G1/G7 the old code fired where the new is silent: {silenced_g1} elision and {silenced_g7} "
    f"marker or title paragraphs (the property is not vacuous)", silenced_g1 > 0 and silenced_g7 > 0)
+
+# ============================================================================
+print("\nPROPERTY 10 — G2, G8 and G14: 'Article N' warns on every internal tail and on no legislation tail")
+print("-" * 96)
+# 14.4's fix moves the warning both ways: quiet on a citation of legislation whatever sits between the number and
+# the code (G2, G8), firing on an internal reference the bare 'of the' hid (G14). So over thousands of generated
+# references -- a number, a GAP, a TAIL, each drawn and RECORDED by the generator, never read back from the code
+# under test -- an internal tail always warns, a listed legislation tail never does, and every other tail keeps the
+# old verdict exactly. Invented words.
+blob = subprocess.run(["git", "show", f"{REF}:uk/scripts/lexicon_compliance.py"], capture_output=True, cwd=ROOT)
+if blob.returncode != 0 or blob.stdout == (ROOT / "uk" / "scripts" / "lexicon_compliance.py").read_bytes():
+    print(f"VOID — lexicon_compliance.py at {REF} is unreadable or BYTE-IDENTICAL to the")
+    print("working tree, so the 'old code fired' half of this property compares nothing.")
+    sys.exit(1)
+(OLD / "lexicon_compliance.py").write_bytes(blob.stdout)
+OLDLC = load(OLD / "lexicon_compliance.py", "p_old_lc")
+LC = load(ROOT / "uk" / "scripts" / "lexicon_compliance.py", "p_new_lc")
+
+# (text, kind): none -- straight to the tail; suffix -- a -bis; sub -- a paragraph or letter; list -- more articles
+GAPS = (("", "none"), ("-bis", "suffix"), (" ter", "suffix"), (", paragraph 2,", "sub"), (", paragraph 2", "sub"),
+        (", second paragraph,", "sub"), (", letter a),", "sub"), (", letters a) and b)", "sub"),
+        (", paragraph 1, and Article 9, paragraph 2,", "list"), (" and Article 9", "list"), (" and 8", "list"),
+        (", second paragraph, or Articles 8 and 9", "list"))
+# (text, kind): leg -- a listed legislation tail; int -- an internal 'of the' tail; kept -- an alternative the old
+# look-ahead named and the new keeps verbatim; other -- no legislation tail at all
+TAILS = (("of the Civil Code", "leg"), ("of the Italian Civil Code", "leg"), ("of Legislative Decree No. 9", "leg"),
+         ("of Presidential Decree No. 7", "leg"), ("of the Catering Decree", "leg"), ("of that Presidential Decree", "leg"),
+         ("of the Authority Resolution", "leg"), ("of the Companies Act", "leg"), ("of the Treaty", "leg"),
+         ("of the Data Regulation", "leg"), ("of the Services Directive", "leg"), ("of the Constitution", "leg"),
+         ("of the said Decree", "leg"), ("of the Decree-Law", "leg"), ("of the Arbitration Rules", "leg"),
+         ("of the Articles of Association", "leg"), ("of the GDPR", "leg"),
+         ("of the Agreement", "int"), ("of the Deed", "int"), ("of the Cleaning Contract", "int"),
+         ("of the Caterers' Agreement", "int"), ("of the Lease", "int"), ("of the Agreement and the Code", "int"),
+         ("of the Agreement that Regulation 5 mentions", "int"), ("of the Agreement and Regulation 5", "int"),
+         # The bare 'of the' had no word boundary, so it matched 'of these' and 'of their' as a prefix -- found by
+         # this property on 2026-10-30, when 'of these Rules' sat in 'other' and the verdict moved.
+         ("of these Rules", "int"), ("of their Agreement", "int"),
+         ("of Book 6", "kept"), ("BW", "kept"), ("of Directive 2019/1", "kept"), ("of the EU", "kept"),
+         ("of the European Union", "kept"), ("of Law No. 9", "kept"),
+         ("above", "other"), ("below", "other"), ("hereof", "other"), ("of this Agreement", "other"),
+         ("of Schedule 2", "other"), ("of Annex 1", "other"), ("of those parties", "other"), ("", "other"))
+LEADS = ("", "Under ", "The Client relies on ", "Subject to ")
+ENDS = (" applies.", ", and the Contractor pays.", "; the canteen stays open.", ".")
+
+
+def art_fires(mod, text):
+    _b, warns = mod.scan([("en", 0, text)], "*")
+    return any("'Article N'" in w for w in warns)
+
+
+rng = random.Random(SEED + 10)
+moved_other, int_quiet, leg_firing = [], [], []
+n = Counter()
+for _ in range(6000):
+    gap, gk = rng.choice(GAPS)
+    tail, tk = rng.choice(TAILS)
+    if gk == "suffix" and tk == "other" and not tail:
+        continue                        # 'Article 5-bis.' -- no tail at all, the suffix alone; not a shape here
+    text = rng.choice(LEADS) + f"Article {rng.randint(1, 2999)}" + gap + (" " + tail if tail else "") + rng.choice(ENDS)
+    o, w = art_fires(OLDLC, text), art_fires(LC, text)
+    if tk == "other" or (tk == "kept" and gk == "none"):
+        n["same"] += 1
+        n["same_fire"] += o
+        if o != w:
+            moved_other.append(text)
+    elif tk == "int":
+        n["int"] += 1
+        n["int_old_quiet"] += not o
+        if not w:
+            int_quiet.append(text)
+    elif tk == "leg" or tk == "kept":
+        n["leg"] += 1
+        n["leg_old_fire"] += o
+        if w:
+            leg_firing.append(text)
+ok(f"G2/G8/G14 no legislation tail and no internal 'of the': verdict identical to {REF[:12]} ({n['same']} references, "
+   f"{n['same_fire']} firing)", n["same_fire"] > 0 and n["same"] > n["same_fire"] and not moved_other,
+   f"{len(moved_other)} moved, e.g. {moved_other[:2]}")
+ok(f"G14 an internal tail the bare 'of the' could hide, after any gap: warns every time ({n['int']} references; "
+   f"the old code was "
+   f"silent on {n['int_old_quiet']})", n["int_old_quiet"] > 0 and not int_quiet,
+   f"{len(int_quiet)} quiet, e.g. {int_quiet[:2]}")
+ok(f"G2/G8 a listed legislation tail after any gap: never warns ({n['leg']} references; the old code fired on "
+   f"{n['leg_old_fire']})", n["leg_old_fire"] > 0 and not leg_firing,
+   f"{len(leg_firing)} warn, e.g. {leg_firing[:2]}")
+# A long list must not cost the scan its time: each pattern part consumes text, so the work stays polynomial.
+hostile = ("Article 1" + ", paragraph 1, and Article 2, letters a) and b)" * 400 + " of the Agreement.",
+           "Article 1 and Articles " + ", ".join(str(i) for i in range(2, 3000)) + " of the Deed.",
+           "Article 1" + ", second paragraph" * 2000 + " above.")
+t0 = time.perf_counter()
+fired = [art_fires(LC, h) for h in hostile]
+took = time.perf_counter() - t0
+ok(f"G2/G8/G14 three hostile lists scanned in {took:.2f}s, each still warning on its internal tail",
+   took < 5 and all(fired), f"(fired {fired})")
 
 shutil.rmtree(TMP, ignore_errors=True)
 print()

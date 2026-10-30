@@ -2245,3 +2245,42 @@ here as the house asks. The environment was rebuilt in place on the new Python, 
 blocked this session's own probe, the suite passed 28 of 28, and the second full run on `7a7ad64` passed whole. **No
 command in this session aimed at an evidence folder.** Other projects' script hooks may carry the same fault — for
 the house; the note is in the conductor's shared notes folder.
+
+## 2026-10-30 (2) — sub-step 14.4 built and merged (#181), unattended; G14 filed and closed; the census, a property, a mutant and the review each moved the build
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS OF THE MORNING** — *"just continue and follow your own recommendations.
+Also push and merge as you want"* — so each choice below is THE SESSION'S, taken on its own recommendation and carried
+here for him to confirm or overturn; none is his ruling.
+
+**(1) THE BARE `of the` BECOMES A CLOSED LIST OF HEAD NOUNS**, the brief's "narrowed to the legislation forms it exists
+for" read as an allow-list rather than a deny-list of contract nouns: the tail must end on Code, Act, Treaty,
+Regulation, Directive, Constitution, Decree, Law — the brief's seven — or on Resolution, measured on the corpus.
+**(2) THE OUTSIDE INSTRUMENTS THAT NUMBER BY ARTICLE STAY QUIET TOO** — Statute, Convention, Charter, Ordinance, Rules,
+Articles of Association, By-laws, GDPR, TFEU, TEU and the abbreviated Italian decree forms — because the bare `of the`
+silenced them and none is an internal reference; narrowing past them would add a false positive the brief's controls
+could not see. **(3) THE GAP TAKES EVERY SHAPE MEASURED FIRING ON THE CORPUS**, past the brief's two: a letter, a
+`-bis`, a list of further articles; a parenthesised `7(1)` and `point (5)`, unmeasured, are not built. **(4) `this`,
+`these` AND `present` STAY INWARD POINTERS**, so `of this Law` warns as it did, and `of these Rules` and `of the
+present Law`, which the bare `of the` hid, now warn with it. **(5) `post_process.py` IS NOT CHANGED:** its own Article
+reader keeps `of the Agreement` as external, measured in both trees — the same shape of miss in a second reader, but
+no other script is this sub-step's; it is open, for Wouter.
+
+**WHAT MOVED THE BUILD, EACH RECORDED AS IT HAPPENED.** The census came out 12 to 1 against the 12 to 0 stated before
+it ran; the survivor cited `of that Presidential Decree`, so `that` and `those` may open a tail. A property found a
+second shape of G14 the brief did not name — the bare `of the` had no word boundary and matched `of these` and `of
+their` — and the generator had filed it as unchanged. A mutant passed: the bridge control `of the Agreement and the
+Code` was also stopped by `the`, so allowing `and` changed nothing it could see — **14.3's lesson met again: an
+exemption's control must keep every condition beside it satisfied.** And `/code-review` at high found five more,
+fixed before the full run: a naming word could end on a full stop and cross a sentence, a year could not name an
+instrument, the abbreviated decree forms newly warned, `Charter` read a charterparty, and the suite's load of the
+pinned script overwrote a copy later sections import. `PLAN-2-step-b.md` section 3.14's 14.4 block and the register's
+G2, G8 and G14 rows own the evidence.
+
+**THE FIRST FULL RUN ON `3b19ce0` WAS LOST TO THE MACHINE, RECORDED AS THE HOUSE ASKS.** The computer shut down
+mid-run; the run was paused rather than killed, finished, and read OVERALL: FAIL on one row alone — `cycle_evidence
+--selftest`, "timed out after 900s", the runner's wall-clock limit crossed by the pause. Run alone it passed in 59
+seconds, and the second full run on the same commit is the one the push rides.
+
+**THE CORPUS, AS STATED BEFORE THE COUNT RAN:** the rule's 12 warnings to 0 in each tree, 14 firing positions removed —
+2 G2, 12 G8 — and 0 added; no recorded run wrote an internal reference as `Article N of the …`, so G14 closes on
+synthetic input, declared.

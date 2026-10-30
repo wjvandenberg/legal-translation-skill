@@ -176,9 +176,10 @@ for _s in ("quality_check.py", "validate_segment_shapes.py",
     assert_baseline_differs(_s)
 # 14.2 runs its F10 controls over the us tree as well, so its baseline must differ there too.
 assert_baseline_differs("validate_segment_shapes.py", "us")
-# And 14.3 its G1 and G7 controls, over both trees.
+# And 14.3 its G1 and G7 controls, over both trees; and 14.4 its G2, G8 and G14 controls.
 for _t in ("uk", "us"):
     assert_baseline_differs("validate_translations.py", _t)
+    assert_baseline_differs("lexicon_compliance.py", _t)
 
 OLD_QC = load_old("quality_check.py")
 NEW_QC = load_new("quality_check.py")
@@ -646,6 +647,147 @@ for tree in ("uk", "us"):
            new_rc == 0 and "PASS" in new_out and "Quoted source phrases" not in new_out, f"(rc={new_rc})")
         ok(f"{row} {tree} {case[0]}, the whole script: PROVED it warned before",
            old_rc == 1 and "Quoted source phrases NOT found" in old_out, f"(rc={old_rc})")
+
+# =============================================================================
+print("\nG2, G8 and G14 — 'Article N' warns on an internal reference, never on a citation of legislation")
+print("-" * 96)
+
+# lexicon_compliance's WARN that 'Article N' for an internal reference should read 'Clause N'.
+# G2 and G8: it fired on nearly every civil-law statute -- a decree with no 'the' before it, and
+# a citation with a paragraph, a letter or a list between the number and the code. G14, the
+# missed alarm, runs the OTHER way: a bare 'of the' read as legislation, so 'Article 7 of the
+# Agreement' was silent where 'of this Agreement' warned. So this section asserts four sets:
+# the measured false positives silent now and PROVED to have fired; every legislation form the
+# bare 'of the' silenced, quiet then and quiet now; the true positives firing then and now; and
+# the missed alarm firing now and PROVED silent then. Register G2, G8 and G14; 14.4 of
+# PLAN-2-step-b.md section 3.14. Every string INVENTED.
+# --- 14.4 cases: begin
+LC_FP = (
+    ("G2 a decree with no 'the'", "Article 5 of Legislative Decree No. 9 of 2001 governs the office lease."),
+    ("G2 a -bis article of a decree", "Article 5-bis of Legislative Decree No. 9 of 2001 governs the office lease."),
+    ("G8 ', <ordinal> paragraph,' before the Civil Code",
+     "Article 1600, second paragraph, of the Civil Code applies to the cleaning terms."),
+    ("G8 ', paragraph N,' before a named Decree", "Article 5, paragraph 2, of the Catering Decree applies."),
+    ("G8 ', paragraph N' with no second comma", "Article 5, paragraph 2 of the Catering Decree applies."),
+    ("G8 a paragraph before a decree with no 'the'",
+     "Article 5, second paragraph, of Presidential Decree No. 7 applies."),
+    ("G8 'that' pointing back to a decree", "Article 5, second paragraph, of that Presidential Decree applies."),
+    ("G8 a paragraph and a letter", "Article 5, paragraph 1, letter a), of Legislative Decree No. 9 applies."),
+    ("G8 two letters", "Article 5, letters a) and b) of the Catering Decree apply."),
+    ("G8 a list running on to a further article",
+     "Article 5, paragraph 1, and Article 9, paragraph 2, of the Catering Decree apply."),
+    ("G8 a list of further articles",
+     "Article 1600, second paragraph, or Articles 1601 and 1602 of the Civil Code apply."),
+    # The review's finding, 2026-10-30: an abbreviated decree is a decree.
+    ("G2 an abbreviated decree with no 'the'", "Article 5 of D.Lgs. 9/2001 governs the office lease."),
+)
+# Quiet BEFORE as well: the legislation forms the bare 'of the' silenced, which the narrowing must not bring back --
+# the brief's seven, the three measured on the corpus, and the outside instruments that number by Article.
+LC_KEPT = tuple("Article 5 " + tail + " applies to the canteen." for tail in (
+    "of the Civil Code", "of the Italian Civil Code", "of the Italian Code of Civil Procedure",
+    "of the Legislative Decree No. 9", "of the Catering Decree", "of the said Decree", "of the Decree-Law",
+    "of the Authority Resolution", "of the Companies Act 2006", "of the Treaty on the Functioning of the European Union",
+    "of the Data Regulation", "of the Services Directive", "of the Constitution", "of the Law", "of the Statute",
+    "of the Vienna Convention", "of the Charter", "of the Ordinance", "of the Arbitration Rules",
+    "of the Articles of Association", "of the By-laws", "of the GDPR", "of the TFEU", "of the TEU",
+    "of the European Union", "of Book 6 of the Civil Code", "of Law No. 9",
+    # The review's findings, 2026-10-30: a year or an abbreviation before the instrument is still legislation.
+    "of the 1998 Act", "of the 2016 Regulation", "of the U.K. Companies Act", "of the D.Lgs. 9/2001",
+    "of the D.P.R. No. 7"))
+# Firing before AND after: an internal reference, with or without something between the number and its tail.
+LC_TP = (
+    ("an internal locator", "Article 7 above applies to the Client."),
+    ("an inward 'this'", "Article 7 of this Agreement applies to the Client."),
+    ("a paragraph before an inward 'this'", "Article 7, paragraph 2, of this Agreement applies to the Client."),
+    ("a list before an inward 'this'", "Article 7 and Article 9 of this Agreement apply to the Client."),
+    ("a -bis article of the contract", "Article 7-bis of the Contract applies to the Client."),
+    ("a paragraph before the agreement", "Article 7, paragraph 2, of the Agreement applies to the Client."),
+    ("a list before the agreement", "Article 7 and Article 9 of the Agreement apply to the Client."),
+)
+# G14, THE MISSED ALARM: silent before, firing now -- and the bridges a looser tail would have let through.
+LC_ALARM = (
+    ("G14 'of the Agreement'", "The Contractor acts under Article 7 of the Agreement."),
+    ("G14 a possessive before the agreement", "The Contractor acts under Article 7 of the Caterers' Agreement."),
+    ("G14 'of the Deed'", "The Contractor acts under Article 7 of the Deed."),
+    ("G14 a named contract", "The Contractor acts under Article 7 of the Cleaning Contract."),
+    ("G14 no bridge across 'and' to a code", "Article 7 of the Agreement and the Code apply to the Client."),
+    # With no 'the' after the connective, so the stop on 'the' cannot hide the stop on 'and' -- the case above
+    # passed against a mutant that let 'and' and 'or' through, caught by mutation on 2026-10-30.
+    ("G14 no bridge across 'and' to a regulation", "Under Article 7 of the Agreement and Regulation 5, the Client pays."),
+    ("G14 no bridge across 'or' to a regulation", "Under Article 7 of the Agreement or Regulation 5, the Client pays."),
+    ("G14 no bridge across 'that' to a regulation",
+     "Under Article 7 of the Agreement that Regulation 5 mentions, the Client pays."),
+    # The bare 'of the' had no word boundary: it read 'of these' and 'of their' as legislation too.
+    ("G14 'of these', which the bare 'of the' matched as a prefix",
+     "The Contractor acts under Article 7 of these Rules."),
+    ("G14 'of their', which it matched the same way", "The Parties act under Article 7 of their Agreement."),
+    # The review's findings, 2026-10-30: a naming word ending on a full stop let the tail cross a sentence, and the
+    # head 'Charter' read a charterparty -- the parties' own contract -- as an outside instrument.
+    ("G14 no bridge across a full stop", "The Buyer pays under Article 7 of the Agreement. Law 9 applies too."),
+    ("G14 a charterparty is a contract", "The Owner acts under Article 7 of the Charter Party."),
+)
+# --- 14.4 cases: end
+
+
+def art_warns(mod, text):
+    """The 'Article N' warnings the module's own scan() makes on one English paragraph."""
+    _blocks, warns = mod.scan([("en", 0, text)], "*")
+    return [w for w in warns if "'Article N'" in w]
+
+
+def lc_run(script_dir, name, text, *flags):
+    """rc and output of lexicon_compliance run as skill Step 4 runs it, on one paragraph, in a workdir of its own."""
+    wd = TMP / f"lc-{name}"
+    wd.mkdir()
+    pj = wd / "paragraphs.json"
+    pj.write_text(json.dumps([{"idx": 0, "text": "Testo.", "en": text}]), encoding="utf-8")
+    r = subprocess.run([sys.executable, str(script_dir / "lexicon_compliance.py"), str(pj), "--stage", "pre-apply",
+                        "--language", "none", *flags],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace", env=F10_ENV, cwd=wd)
+    return r.returncode, r.stdout + r.stderr
+
+
+for tree in ("uk", "us"):
+    old_lc = load_old("lexicon_compliance.py", tree)
+    new_lc = load_new("lexicon_compliance.py", tree)
+    # load_old wrote the pinned uk copy over the WORKING-TREE copy placed in OLD_DIR above for the old modules to
+    # import; put that back, so what a later section imports never depends on where this one sits (the review, 2026-10-30).
+    shutil.copyfile(ROOT / "uk" / "scripts" / "lexicon_compliance.py", OLD_DIR / "lexicon_compliance.py")
+    for label, text in LC_FP:
+        ok(f"{label} ({tree}): silent now", not art_warns(new_lc, text), f"({art_warns(new_lc, text)})")
+        ok(f"{label} ({tree}): PROVED it fired before", bool(art_warns(old_lc, text)))
+    quiet_new = [t for t in LC_KEPT if art_warns(new_lc, t)]
+    quiet_old = [t for t in LC_KEPT if art_warns(old_lc, t)]
+    ok(f"G14 {tree} {len(LC_KEPT)} legislation forms the bare 'of the' silenced: every one quiet now",
+       not quiet_new, f"({quiet_new})")
+    ok(f"G14 {tree} the same {len(LC_KEPT)}: every one PROVED quiet before (the set is the one it silenced)",
+       not quiet_old, f"({quiet_old})")
+    for label, text in LC_TP:
+        ok(f"G2/G8 {tree} TRUE POSITIVE {label}: still fires", bool(art_warns(new_lc, text)))
+        ok(f"G2/G8 {tree} TRUE POSITIVE {label}: fired before too", bool(art_warns(old_lc, text)))
+    for label, text in LC_ALARM:
+        ok(f"{label} ({tree}): fires now", bool(art_warns(new_lc, text)))
+        ok(f"{label} ({tree}): PROVED silent before -- the alarm that was missed", not art_warns(old_lc, text))
+    # THE EXIT skill Step 4 reads, judged by CONTENT as well as rc: a WARN stays a WARN, so rc 0 both ways, and only
+    # --warnings-are-errors turns the warning into the exit -- 1 then 0 on G2, 0 then 1 on the alarm.
+    old_dir = TMP / f"old_lc_{tree}"
+    old_dir.mkdir()
+    for name in ("lexicon_compliance.py", "source_language_markers.py"):
+        (old_dir / name).write_bytes(subprocess.run(["git", "show", f"{REF}:{tree}/scripts/{name}"],
+                                                    capture_output=True, cwd=ROOT, check=True).stdout)
+    for row, text, before, after in (("G2", LC_FP[0][1], 1, 0), ("G14", LC_ALARM[0][1], 0, 1)):
+        o_rc, o_out = lc_run(old_dir, f"old-{tree}-{row}", text)
+        n_rc, n_out = lc_run(ROOT / tree / "scripts", f"new-{tree}-{row}", text)
+        ok(f"{row} {tree} the whole script, as run: rc 0 before and after, {before} then {after} warning, PASSED",
+           o_rc == 0 and n_rc == 0 and f"warnings:            {before}" in o_out
+           and f"warnings:            {after}" in n_out and "PASSED" in o_out and "PASSED" in n_out,
+           f"(rc {o_rc}/{n_rc})")
+        o_rc, o_out = lc_run(old_dir, f"old-{tree}-{row}-wae", text, "--warnings-are-errors")
+        n_rc, n_out = lc_run(ROOT / tree / "scripts", f"new-{tree}-{row}-wae", text, "--warnings-are-errors")
+        ok(f"{row} {tree} the whole script under --warnings-are-errors: rc {before} then {after}, by content",
+           (o_rc, n_rc) == (before, after)
+           and ("'Article N'" in o_out and "BLOCKED" in o_out) == bool(before)
+           and ("'Article N'" in n_out and "BLOCKED" in n_out) == bool(after), f"(rc {o_rc}/{n_rc})")
 
 # =============================================================================
 print("\nF15 — a scaffold preserved verbatim IS filled in")

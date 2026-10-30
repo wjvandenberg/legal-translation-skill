@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, and 14.3 as #180, 2026-10-30; 14.4 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-30 — SESSION PURPOSE — what · how · purpose:** sub-step 14.3 by section 3.14: `validate_translations.py` given G1's and G7's fixes in both trees, and `uv.toml`'s comment pointed at the signed Python's new folder; its own written plan first, red first against the pinned baseline, the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-10-30: the conductor chain, unattended)* · **so that the translation checks fire only on what they exist to catch, and a firing check can be trusted** *(written immediately after the tag `rollback-2026-10-30-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, and 14.3 as #180, 2026-10-30; 14.4 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-30 — SESSION PURPOSE — what · how · purpose:** sub-step 14.4 by section 3.14: `lexicon_compliance.py` given G2's and G8's fixes and the missed `of the` alarm, in both trees; its own written plan first, red first against the pinned baseline, the legislation forms and the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-10-30: the conductor chain, unattended)* · **so that the lexicon check warns on an internal `Article N` and never on a citation of legislation, and a warning can be trusted** *(written immediately after the tag `rollback-2026-10-30b-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -1923,7 +1923,7 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 | F5 | `04-translate.md` says that scanner flags "only as warnings"; apply runs it `--strict` on every tracked-change document | **CLOSED 2026-10-29**, both trees, #179 | 14.2 |
 | G1 | `validate_translations.py`: the quoted-phrase retention check pairs an elision apostrophe as a quote | **CLOSED 2026-10-30**, both trees, #180 | 14.3 |
 | G7 | the same check: a defined term in its `(the "X")` marker, a title after `recante`, a quoted contractual phrase | **CLOSED 2026-10-30** but for the third shape, a declared residual; both trees, #180 | 14.3 |
-| G2 · G8 | `lexicon_compliance.py`: the `Article N` warning on `of Legislative Decree` and on the comma form | OPEN, both shapes; `of the Civil Code` already quiet | 14.4 |
+| G2 · G8 · G14 | `lexicon_compliance.py`: the `Article N` warning on `of Legislative Decree` and on the comma form, and its silence on `of the Agreement` | **CLOSED 2026-10-30**, both trees, #181 | 14.4 |
 | G3 | `quality_check.py`: the list-connective whitelist misses `; and/or` | OPEN; `; or` already quiet | 14.5 |
 | G13 | `quality_check.py`: the remnant check on the lexicon's kept names | OPEN: 5 of the 10 `LEXICON_KEPT_NAMES` entries fire in an English sentence, where the row says six — reconciled at 14.5 | 14.5 |
 | G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | OPEN, and it fires INSIDE the form itself — `B.V`, `S.p`, `p.A` — whatever follows it, where the row says "followed by a capital" | 14.6 |
@@ -1984,7 +1984,7 @@ with negative tests of its own, touching no shipped file.
 stays a block, and no exit code moves; no true positive silenced; no other script; the anti-drift safeguards;
 and no register row filed or closed except by the sub-step that measures it.
 
-**Every row 9.3 gives step 14, accounted for: 17 of 17** — 11 to the sub-steps above (F10, F5, G1, G7, G2, G8,
+**Every row 9.3 gives step 14, accounted for: 18 of 18** — 12 to the sub-steps above (F10, F5, G1, G7, G2, G8, G14,
 G3, G13, G4, C10, G12) and 6 disposed of below (G5, G10, G11, G9, G6, C7); 14.1's four other rows are their
 own steps'.
 
@@ -2097,6 +2097,80 @@ the edited script, and the full run once, before the push.
 > PASS, its first try lost to the evidence guard's stale environment (`DECISIONS-LOG.md`, 2026-10-30); G1 and G7
 > CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain; 2026-10-30,
 > unattended)*.
+> **14.4 — ITS OWN WRITTEN PLAN, 2026-10-30, before any edit, on `feature/step14-4-lexicon-article`.**
+> **Measured first, `main` at `0752696`, both trees alike** (`temp/s1030c_art_shape_probe.py`, counts and shape labels
+> only): the 13 frozen workdirs' English holds 44 `Article N` references, all on D05 and D06; the rule fires at 14,
+> which the scan reports as 12 warnings (7 on D05, 5 on D06 — G8's five), and **every one cites legislation, 0 an
+> internal reference:** 2 a decree with no `the` before it, one of them a `-bis` (G2's first shape), and 12 with
+> something between the number and the tail — a `, paragraph N,` or `, <ordinal> paragraph,` (the brief's two), a
+> `letter a)` or `letters a) and b)`, or a list running on to further articles (`, and Article 9, paragraph 2,`; `or
+> Articles 8 and 9`) — G2's comma form, and G8. The bare `of the` silences 28 more, every one legislation: 19 a Code
+> (the civil code, the code of civil procedure), 7 a named Decree and 2 a regulator's Resolution — the set that must
+> stay quiet. The rule, `scan()` and the two helpers it uses are identical at `2178cce` and `0752696` in both trees, so
+> the pin is a true "before". **Changes,** both trees' `lexicon_compliance.py`, the rule still a WARN with its message,
+> no exit moved: (1) the look-ahead's bare `of the` becomes a LEGISLATION TAIL — `of`, an optional `the`, up to three
+> words naming the instrument, then a head noun from a closed list: Code, Act, Treaty, Regulation, Directive,
+> Constitution, Decree (and Decree-Law), Law, and Resolution, measured; and, quiet today and kept quiet as outside
+> instruments that number by Article, Statute, Convention, Charter, Ordinance, Rules, Articles of Association,
+> By-laws, GDPR, TFEU and TEU. No naming word may be a connective, `the`, a pronoun or an inward pointer (`this`,
+> `present`, `hereof`), so the tail cannot bridge from an internal document to a code named after it. The same tail
+> without `the` takes G2's `of Legislative Decree` and its kin; `of Book`, `BW`, `of Directive`, `of Regulation`, `of
+> Law`, `of the EU` and `of the European` are kept verbatim. (2) Between the number and any tail may sit the measured
+> shapes: a `-bis` family suffix; `, <ordinal> paragraph`, `, paragraph N`, `, letter a)` and `, letters a) and b)`,
+> each comma optional; and a list running on to further articles. A parenthesised `7(1)` and `point (5)`, unmeasured,
+> are NOT built. (3) **The defect beside the false one,** asked of every exemption: each gap and each tail ends on the
+> legislation head noun, so an internal reference stays a warning whatever stands before it — `Article 7, paragraph
+> 2, of this Agreement`, `Article 7 and Article 9 of the Agreement`, `Article 7-bis of the Contract`, `Article 7 of the
+> Agreement and the Code`. **Controls,** `tests/test_check_scoping.py`, both trees, the rule read through the module's
+> own `scan()`: *FP* — each measured shape, silent now and PROVED to have fired at `2178cce`; and every legislation
+> form the bare `of the` silences — the brief's seven, the measured three, the outside instruments — PROVED quiet at
+> `2178cce` and quiet now; *TP* — `Article 7 above` and `of this Agreement`, firing now and before; the missed alarm,
+> `of the Agreement`, `of the Caterers' Agreement`, `of the Deed` and the bridge above, firing now and PROVED
+> silent at `2178cce`; and the whole script's exit judged by content — rc 0 with the warning and without it, a WARN
+> staying a WARN, and under `--warnings-are-errors` 1 then 0 on G2, 0 then 1 on the alarm.
+> `tests/test_check_scoping_properties.py`: one property over generated references, each population chosen by the
+> generator's own record — with no legislation tail and no `of the` the verdict is identical to `2178cce`'s; an
+> internal tail after any gap always warns; a listed legislation tail after any gap never does; the old code fired on
+> some G2/G8 shapes and missed some internal tails, each count printed; and a long hostile list finishes in time.
+> **Must not touch:** any other rule, the message, `scan()`, the extraction, any exit code, any other script —
+> `post_process.py`'s own Article reader, which also reads `of the Agreement` as external, is measured and NOT changed;
+> the anti-drift safeguards. **Corpus:** old (`0752696`) against new over the 13 frozen workdirs, both trees, by
+> `temp/s1030c_lc_census.py` — declared, because no committed tool counts this rule — **expected: 12 warnings to 0 in
+> each tree, 14 positions removed (2 G2, 12 G8), 0 added**, every removal attributed by the census's own reader of the
+> shapes and any addition to the new row, a planted set proving the count moves. **Then** the parity check, both
+> divergences re-recorded, the three confidentiality controls, mutants, VERIFY and TEST through
+> `tools/cycle_evidence.py`; and the missed alarm filed as register row G14 and closed, its id checked free first.
+> **No render, declared:** a WARN decides nothing apply writes. **Done when:** G2, G8 and G14 are CLOSED in the register
+> on that evidence.
+> **AMENDED IN THE BUILD AND AT REVIEW, 2026-10-30, before the full run.** Three measurements moved the build, each
+> recorded as it happened. (1) **The census came out 12 to 1 against the 12 to 0 stated:** the one survivor, read by
+> a probe that prints a word only from the rule's own stop list, cites `of that Presidential Decree` — `that` pointing
+> back to a decree named before — so the tail's first word may be `the`, `that` or `those`, while `that` stays a stop
+> word everywhere later, where it is a relative pronoun that could bridge `the Agreement that Regulation 5 …`;
+> re-counted, 12 to 0 in each tree, as stated. (2) **The property found a second shape of G14 the brief did not
+> name:** the bare `of the` had no word boundary, so it matched `of these` and `of their` as a prefix — `Article 7 of
+> these Rules` moved from silent to warning while the generator had filed it as unchanged; it is G14's, and two
+> controls hold it. (3) **A mutant passed:** with `and` and `or` allowed as naming words both suites stayed green,
+> because the bridge control `of the Agreement and the Code` was also stopped by `the` — 14.3's lesson met again; a
+> control with no `the` after the connective, and its `or` twin, now catch it. The invented strings were re-themed
+> before the first commit: `Supply Contract` and `Shareholders' Agreement`, which the shape sweep listed, to office
+> services, and a civil-code article number the corpus cites to an arbitrary one. **`/code-review` at high, on
+> `d14a4fd`: seven findings, five fixed, one declared.** (1) A naming word could end on a full stop, so `of the
+> Agreement. Law 9 applies` crossed a sentence and silenced an internal reference — a naming word may now hold inner
+> dots, an abbreviation, but never end on one. (2) A naming word had to begin with a letter, so `of the 1998 Act` and
+> `of the 2016 Regulation`, quiet under the bare `of the`, newly warned — a year may now name an instrument. (3) The
+> abbreviated decree forms `D.Lgs.`, `D.P.R.`, `D.P.C.M.`, `D.M.` and `D.L.` are heads, quiet with or without `the`.
+> (4) The head `Charter` read a charterparty, the parties' own contract, as an outside instrument — it is no head
+> before `party`. (5) The suite's own load of the pinned script overwrote the working-tree copy later sections
+> import; it is put back. A long comment line was rewrapped. **Declared, not fixed:** `post_process.py`'s own Article
+> reader is a second classifier that keeps `of the Agreement` as external — no other script is this sub-step's, so
+> it is open for Wouter. Controls added, both trees, each PROVED missed at `d14a4fd`, where 2 of 24 false-positive
+> controls fired, 8 of 64 kept legislation forms fired and 20 of 24 missed-alarm controls fired; three mutants added,
+> eleven of eleven caught. The corpus re-counted, unchanged: 12 to 0 in each tree, 0 added.
+> **BUILT AND MERGED, 2026-10-30, as #181:** `d14a4fd` the fix, `8b79b4a` the review's five, `3b19ce0` the filing;
+> VERIFY 18 of 18, 19 of 19 and 21 of 21, TEST 13 of 13, 13 of 13 and 7 of 7, through the cycle gate; the one full run
+> on `3b19ce0`, OVERALL PASS; G2, G8 and G14 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the
+> conductor chain; 2026-10-30, unattended)*.
 
 ---
 
@@ -2334,7 +2408,7 @@ a **blank page** in a delivered contract. **[measured]**
 empty-paragraph page breaks and manual line breaks alike. Preserving *how many* there are does not preserve
 *what they do* once the English is 30% longer than the source.
 
-### 5.3 Things that say it worked when it did not — 47 findings
+### 5.3 Things that say it worked when it did not — 48 findings
 
 **The strictest check compares bags of words.** No order, no punctuation, not even a count — so a word can
 be deleted and the check still passes, as long as the same word occurs somewhere else in the paragraph.
@@ -2752,7 +2826,7 @@ failures that were previously invisible — which is the point."*
 
 | pros | cons | what it would break | what it does NOT fix |
 |---|---|---|---|
-| Detects or closes **62 findings, 7 of them the worst grade** — more than any other option · It is the only option that **changes what the project can find next time**; every other one fixes what we already found · It is the only route to the never-regress rule you require and that is unenforceable today · The extraction-completeness half is a **same-language exact comparison**: cheap, deterministic, and it closes the one blind spot the planned gate leaves open · The one-line exit-code fix has independent confirmation from two methods with nothing in common · Reuses eight lines that already exist and get the language right where another script gets it wrong | Cost **low-to-medium**, risk **low** *(inference)* — one new program plus wiring, no change to how anything translates · **The real risk is scope creep into a second grader.** It must stay strictly mechanical: text inventories, character diffs, reference counts, span counts, bracket balance, invisible-character sweeps. The moment it starts judging whether English reads well, it stops being repeatable and cannot be a regression gate · The character-exact half **cannot be built** until the tidy-up script declares what it changed — see option 6 | **This is the big one, and it is a sequencing fact rather than an objection.** Making the checks discerning converts silent defects into **blocked runs** — and **18 findings say in their own text that no compliant repair exists**, three of them requirements that already cannot be met at all. Turn on a discerning check before the repair or the escape hatch exists and the pipeline **deadlocks on real documents.** So this option cannot ship without option 5's cheap half beside it · It will also fire on legitimate output until the false-positive scoping is done | **Every defect itself.** It detects; it does not repair. Nothing in the content-loss, formatting, layout or dictionary groups is *closed* by it · It cannot see whether a dictionary row is *wrong* — only whether the text moved · It cannot ask whether the English suits the instrument class, which is what the human review is for |
+| Detects or closes **63 findings, 7 of them the worst grade** — more than any other option · It is the only option that **changes what the project can find next time**; every other one fixes what we already found · It is the only route to the never-regress rule you require and that is unenforceable today · The extraction-completeness half is a **same-language exact comparison**: cheap, deterministic, and it closes the one blind spot the planned gate leaves open · The one-line exit-code fix has independent confirmation from two methods with nothing in common · Reuses eight lines that already exist and get the language right where another script gets it wrong | Cost **low-to-medium**, risk **low** *(inference)* — one new program plus wiring, no change to how anything translates · **The real risk is scope creep into a second grader.** It must stay strictly mechanical: text inventories, character diffs, reference counts, span counts, bracket balance, invisible-character sweeps. The moment it starts judging whether English reads well, it stops being repeatable and cannot be a regression gate · The character-exact half **cannot be built** until the tidy-up script declares what it changed — see option 6 | **This is the big one, and it is a sequencing fact rather than an objection.** Making the checks discerning converts silent defects into **blocked runs** — and **18 findings say in their own text that no compliant repair exists**, three of them requirements that already cannot be met at all. Turn on a discerning check before the repair or the escape hatch exists and the pipeline **deadlocks on real documents.** So this option cannot ship without option 5's cheap half beside it · It will also fire on legitimate output until the false-positive scoping is done | **Every defect itself.** It detects; it does not repair. Nothing in the content-loss, formatting, layout or dictionary groups is *closed* by it · It cannot see whether a dictionary row is *wrong* — only whether the text moved · It cannot ask whether the English suits the instrument class, which is what the human review is for |
 
 ---
 
@@ -3697,10 +3771,10 @@ rewriting stage at all. By construction that addresses options 1, 2, 3 and 6.
 **What it would not touch, and this is the decisive part of the arithmetic.** It does nothing for the
 furniture and dictionary work (content, not architecture), nothing for the instruction substrate (the
 instructions still have to be written, and they are 50 findings), nothing for the two-tree problem, nothing
-for truncation, and nothing for the false claims. **On the measured numbers a rebuild addresses at most 110 of
-the 193 findings and leaves 83 exactly where they are** *(re-derived 2026-09-30 from the option map in
+for truncation, and nothing for the false claims. **On the measured numbers a rebuild addresses at most 111 of
+the 194 findings and leaves 83 exactly where they are** *(re-derived 2026-09-30 from the option map in
 `tools/stepb_verify.py`, which is what generates §9's appendix: the union of what options 1, 2, 3 and 6
-close is **109** — A23, A24, A25 and F47, filed 2026-09-28, are in option 2, and B10, filed 2026-09-24, is in options 2 and 6; W5, filed 2026-09-28 (4), is in option 8, which a rebuild does not touch; C30, filed 2026-09-29 (3), is in option 2; J2, filed 2026-09-30, is in option 9 alone, so the union holds at 109 and what it leaves moves to 80; E15 and E16, filed 2026-10-09, are in options 8 and 4, which a rebuild does not touch, so the union holds again and what it leaves moves to 82; F48, filed 2026-10-12, is in option 2, so the union moves to 110 and what it leaves holds at 82; R2, filed 2026-10-20, is in option 5 alone, so the union holds at 110 and what it leaves moves to 83. **It read 98 of 177, and 177 minus 98 is 79, not the 77 beside it**: the union had reached
+close is **109** — A23, A24, A25 and F47, filed 2026-09-28, are in option 2, and B10, filed 2026-09-24, is in options 2 and 6; W5, filed 2026-09-28 (4), is in option 8, which a rebuild does not touch; C30, filed 2026-09-29 (3), is in option 2; J2, filed 2026-09-30, is in option 9 alone, so the union holds at 109 and what it leaves moves to 80; E15 and E16, filed 2026-10-09, are in options 8 and 4, which a rebuild does not touch, so the union holds again and what it leaves moves to 82; F48, filed 2026-10-12, is in option 2, so the union moves to 110 and what it leaves holds at 82; R2, filed 2026-10-20, is in option 5 alone, so the union holds at 110 and what it leaves moves to 83; G14, filed 2026-10-30, is in option 2, so the union moves to 111 and what it leaves holds at 83. **It read 98 of 177, and 177 minus 98 is 79, not the 77 beside it**: the union had reached
 100 and the first figure was never re-derived, because `tools/stepb_audit.py`'s check 6 searched for the
 literal "the 160 findings", never found it, and reported the arithmetic as reproducing — fixed in the
 same commit to find the claim by its shape, to fail when it cannot, and to fail on a second live copy. This
@@ -3847,11 +3921,11 @@ plain English above becoming hand-waving.**
 |---|---|---|---|
 | 1 | loses content | A1 A2 A3 A6 A8 A9 A15 A16 A19 A24 A25 B3 B8 B10 C2 C12 C13 C14 C16 C17 C19 C23 C28 E4 F16 F27 F48 J1 M1 N1 S3 | CRITICAL:7 HIGH:16 MED:7 LOW:1 |
 | 2 | looks wrong on the page | A4 A5 A7 A10 A11 A12 A13 A14 A17 A18 A20 A21 A22 A23 B1 B7 C20 D1 D2 D3 D4 D5 D6 E9 E12 F7 F13 F19 F22 O1 R1 R2 | HIGH:16 MED:13 LOW:3 |
-| 3 | says it worked when it did not | C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 C30 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 H1 H2 H4 L1 L4 L6 S1 S2 W3 W4 W5 X1 X2 X4 X6 | CRITICAL:4 HIGH:23 MED:16 LOW:3 —:1 |
+| 3 | says it worked when it did not | C1 C3 C4 C5 C6 C7 C8 C9 C10 C11 C15 C18 C21 C22 C24 C25 C26 C27 C30 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 G14 H1 H2 H4 L1 L4 L6 S1 S2 W3 W4 W5 X1 X2 X4 X6 | CRITICAL:4 HIGH:23 MED:17 LOW:3 —:1 |
 | 4 | hard to keep correct | E1 E2 E3 E5 E6 E10 E11 E13 E14 E15 F21 F23 F32 F36 F37 F38 L2 L3 Q1 T1 T2 T3 T4 T5 T6 U1 V1 V2 W1 W2 Y1 | CRITICAL:1 HIGH:8 MED:16 LOW:4 POS:2 |
 | 5 | the manual is wrong | B2 B4 B5 B6 B9 C29 E7 E8 E16 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F17 F18 F20 F28 F29 F30 F31 F33 F34 F35 F39 F40 F41 F42 F43 F44 F45 F46 F47 H3 J2 K1 K2 K3 L5 X3 X5 Y2 Y3 Y4 | HIGH:18 MED:25 LOW:9 |
 
-**31 + 32 + 47 + 31 + 52 = 193 ✓**
+**31 + 32 + 48 + 31 + 52 = 194 ✓**
 
 > **THIS LINE WAS STALE BY TWO, AND IT HAD BEEN FOR SOME TIME.** *(Corrected 2026-08-21 on
 > branch 14.)* It read **27 + 27 + 41 + 30 + 43 = 168** while the table directly above it
@@ -3870,7 +3944,7 @@ plain English above becoming hand-waving.**
 | option | what it is | findings it closes or detects | severity mix |
 |---|---|---|---|
 | 1 | preserve-by-default in apply | A1 A2 A3 A8 A9 A16 A19 A21 A22 C16 C17 C19 D4 F16 F27 N1 T1 T6 | CRITICAL:4 HIGH:10 MED:3 POS:1 |
-| 2 | check against the original | A23 A24 A25 B8 B10 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28 C30 D2 D5 E4 F47 F48 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 H1 H2 H4 J1 L1 L4 L6 M1 S1 S2 S3 U1 V1 | CRITICAL:7 HIGH:24 MED:26 LOW:4 —:1 |
+| 2 | check against the original | A23 A24 A25 B8 B10 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C14 C15 C18 C20 C21 C22 C23 C24 C25 C26 C27 C28 C30 D2 D5 E4 F47 F48 G1 G2 G3 G4 G5 G6 G7 G8 G9 G10 G11 G12 G13 G14 H1 H2 H4 J1 L1 L4 L6 M1 S1 S2 S3 U1 V1 | CRITICAL:7 HIGH:24 MED:27 LOW:4 —:1 |
 | 3 | say what the formatting is | A3 A4 A5 A6 A7 A10 A11 A12 A13 A14 A17 A18 A20 A21 C13 C20 D6 F7 F13 F19 F22 L2 L3 O1 | HIGH:17 MED:6 LOW:1 |
 | 4 | a home for document furniture | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 E16 F17 F31 F33 | CRITICAL:1 HIGH:5 MED:9 LOW:2 |
 | 5 | one authority, one way out, more than one gear | A15 C5 C7 C26 C29 D3 D5 E5 E10 F1 F2 F3 F4 F5 F6 F8 F9 F10 F11 F12 F14 F15 F18 F20 F21 F23 F28 F29 F30 F31 F32 F33 F34 F35 F36 F37 F38 F41 F45 F46 H1 H2 H3 K1 K2 K3 L5 R1 R2 | CRITICAL:1 HIGH:17 MED:24 LOW:7 |
@@ -3925,7 +3999,7 @@ generator because the TABLES are generated and this SENTENCE was typed.)*
 | 11 the delivered-document check | 2 | C1 C4 C6 C8 C13 C14 C18 C22 J1 **B10** **A23 A24 A25 F47** **C30** *(C30 filed and closed 2026-09-29 (3) by slice 4b, beside C4, C13 and C14, which the slice closed too)* **J2** *(option 9's, added 2026-09-30: the wiring slice corrects the reason Step 4's Rule 1 gives, Wouter's)* *(added 2026-09-28: slice 3a's side-part arm sees all four; A23's fix is slice 4's fifth one-script fix, Wouter's, F47's joined it in 4c on 2026-09-28 (3), and A24 and A25 have no decided fix)* *(**PLANNED 2026-09-24 in four slices, §3.2.** **L1 LEFT THIS ROW CLOSED** — branch 14's `quality_check` slice fixed it and its register row says so. **C20 LEFT FOR 15–17** *(Wouter)*, which already carried it and whose per-run formatting its fix needs. C13 stays here as well as there: slice 4 adds the range assertion EARLIER, in `validate_en_runs.py`, apply having refused an out-of-range offset since branch 6 slice 4. **SLICE 1 MERGED `7c5725e`, 2026-09-24, REPORT-ONLY** — `validate_apply.py --delivered`; §3.2 owns what it found, including D08's 3 unreachable comment anchors today and the 104 trailing-whitespace findings, which Wouter ruled are counted and never block.)* *(**B10 FILED 2026-09-24 from slice 1's arm (b)**: `strip_noop` removes a whole tracked-change wrapper whose text is a no-op and takes three of D08's comment anchors with it — the loss A2 recorded for D08 was one apply's and three this pass's. Detected by this branch; its fix is option 6's principle, and **Wouter placed it in slice 4 at the close**, so it is in this row's accountable list.)* *(**THE CLOSE PASS, 2026-10-08, Wouter's: C1 C6 C18 CLOSED on Step 10's wiring, C8 and J1 marked CLOSED, C22 CLOSED for this branch with its detection half branch 12's; A24 and A25 DEFERRED out of this row — the first real document carrying a tracked change in a side part, or Step D, whichever comes first. BRANCH 11 IS CLOSED.**)* |
 | 12 declare the language | 2 | S1 S2 S3 H1 H2 H4 C9 C2 E4 **F48** *(plus C22's detection half, which branch 11's row hands here, 2026-10-08; F48 filed and closed by slice 12b, 2026-10-12)* |
 | 13 declared modes | 5 | H3 L5 R1 R2 — and the runtime problem |
-| 14 check scoping | 2 | G1 G2 G3 G4 G5 G6 G7 G8 G9 **G10 G11 G12 G13** C7 C10 F5 F10 *(G13 added 2026-09-25: `quality_check`'s remnant check fails Step 9 on six renderings the lexicons prescribe; slice 2b of branch 11 declared them for repack, and this branch reads the same table)* *(G10 added 2026-08-12: `quality_check`'s missing-space rule fires across a `w:tab` element, and branch 5's exit code turned that false positive into a blocked run. Same shape as G4 — an adjacency rule that cannot see what sits between the two runs.)* *(**G11 and G12 added 2026-08-21.** G11 is `check_truncation`'s method B ignoring the `source_data` method A uses in the same function, found by the rule-5b probe's arm 3 and never added to this row. G12 is the residue branch 14's slice leaves behind, measured and deliberately unclassified.)* **THE `quality_check` SLICE IS BUILT, and it fixed FOUR rows this row does not own** — L1 (branch 11's), M1 (branch 8's), C9's input half (branch 12's) and F15 (branch 4's, reassigned to branch 14 by its own row on 2026-08-19). **That is the fourth sequencing fact executing, not a scope grab:** §2 owns the order and puts the slice immediately after branch 5, while this column owns row-level accountability. The two disagreed for four rows and the disagreement is recorded rather than resolved by editing one of them. **G9 is HALF closed** — the del/ins double-space scoping is fixed; the alpha-collision half is measured UNFIXABLE by scoping, because `en_segments` carry only `type` and `en` and the source text the rule would need is not in the file it reads. |
+| 14 check scoping | 2 | G1 G2 G3 G4 G5 G6 G7 G8 G9 **G10 G11 G12 G13 G14** C7 C10 F5 F10 *(G14 added 2026-10-30 at sub-step 14.4: `lexicon_compliance`'s `Article N` warning was silent on an internal reference written `of the` — the missed alarm Wouter folded into 14.4 on 2026-10-26, filed and closed there.)* *(G13 added 2026-09-25: `quality_check`'s remnant check fails Step 9 on six renderings the lexicons prescribe; slice 2b of branch 11 declared them for repack, and this branch reads the same table)* *(G10 added 2026-08-12: `quality_check`'s missing-space rule fires across a `w:tab` element, and branch 5's exit code turned that false positive into a blocked run. Same shape as G4 — an adjacency rule that cannot see what sits between the two runs.)* *(**G11 and G12 added 2026-08-21.** G11 is `check_truncation`'s method B ignoring the `source_data` method A uses in the same function, found by the rule-5b probe's arm 3 and never added to this row. G12 is the residue branch 14's slice leaves behind, measured and deliberately unclassified.)* **THE `quality_check` SLICE IS BUILT, and it fixed FOUR rows this row does not own** — L1 (branch 11's), M1 (branch 8's), C9's input half (branch 12's) and F15 (branch 4's, reassigned to branch 14 by its own row on 2026-08-19). **That is the fourth sequencing fact executing, not a scope grab:** §2 owns the order and puts the slice immediately after branch 5, while this column owns row-level accountability. The two disagreed for four rows and the disagreement is recorded rather than resolved by editing one of them. **G9 is HALF closed** — the del/ins double-space scoping is fixed; the alpha-collision half is measured UNFIXABLE by scoping, because `en_segments` carry only `type` and `en` and the source text the rule would need is not in the file it reads. |
 | 15–17 formatting, parts 1–3 | 3 | A4 A5 **A6** A7 A10 A11 A12 A13 A14 A17 A18 O1 C13 C20 D6 F7 F13 F19 F22 L2 L3 · **plus A3's REMAINDER** *(both arrived 2026-09-02 from branch 6's row. **A6** is glued bullets on D05 — a marker separated from its text by a destroyed tab, in a paragraph shape option 1 never reached. **A3's remainder** is every tab whose position cannot be proved from the source: D02's two tables, D05's hanging-indent notices clause, D11's mid-phrase tabs. Branch 15's per-run English is what makes those knowable; the table-of-contents case did not need it, because a clause number and a page number translate to themselves.)* |
 | 18 layout: detect and disclose | 2, 5 | D1 D2 D3 D4 D5 |
 | 19 furniture and prohibition | 4 | E1 E2 E3 E5 E6 E7 E8 E9 E10 E11 E12 E13 E14 F17 F31 F33 |
@@ -3999,7 +4073,7 @@ call** rather than twice.
 | rank | option | why here |
 |---|---|---|
 | **1** | **Stop deleting what you do not recognise** (option 1) | Every argument points the same way and none points away. Four of the six worst content losses, closed outright rather than detected. One file. No data-format change. Provable by comparing bytes. Nothing depends on it. **The cheapest high-severity work in the project**, and the register's own headline is that this is a content-loss project |
-| **2** | **Check against the original** (option 2) | Highest total value — 62 findings, seven of them worst-grade — and the only option that changes what we can find next time. Ranked second rather than first for one reason: it **detects** rather than repairs, and the deadlock finding means its discerning half cannot land before rank 3. Its instrument half (one failing input per check) belongs with the harness and should go first |
+| **2** | **Check against the original** (option 2) | Highest total value — 63 findings, seven of them worst-grade — and the only option that changes what we can find next time. Ranked second rather than first for one reason: it **detects** rather than repairs, and the deadlock finding means its discerning half cannot land before rank 3. Its instrument half (one failing input per check) belongs with the harness and should go first |
 | **3** | **One authority, one way out, more than one gear** (option 5, cheap half first) | Promoted from A3's fifth place, on a fact A3 did not have: **it is a precondition for rank 2.** Eighteen findings have no compliant repair, so a discerning check without an escape hatch stops the pipeline permanently. It also contains the cheapest fix in the project and the only sanctioned speed lever. Do the scope rule and the exception channel **before** the checks get teeth |
 | **4** | **Take the tidy-up script's authority** (option 6) | The strongest single piece of evidence in the register, and — newly — **option 2's character-exact check cannot be built until this stage declares its changes.** The journal is small and should land early even if the shape decision takes longer |
 | **5** | **Say what the formatting is** (option 3) | The biggest quality gain on the page: 24 findings, 17 visible. Ranked fifth only because it is the most expensive and the riskiest, it needs rank 2 underneath it to be believed, and its own claim on the layout group is refuted. **This is the leap.** It is fifth in *order*, not in importance |
