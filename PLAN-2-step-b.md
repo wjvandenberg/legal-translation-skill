@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-02 — SESSION PURPOSE — what · how · purpose:** sub-step 14.7, `validate_reject_all.py`'s G4 in both trees: the missing-space rule skips a dot inside a dotted abbreviation; built in the conductor's own session after 14.6, the app starting no session from an automated turn; its own written plan first, red first against the pinned baseline, the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-11-02: the conductor chain, unattended)* · **so that a dotted company form such as `B.V.` or `S.p.A.` raises no false missing-space finding, while a real missing space after a full stop still does** *(written immediately after the tag `rollback-2026-11-02d-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-02 — SESSION PURPOSE — what · how · purpose:** sub-step 14.8, `verify_diligence.py`'s C10 in both trees: the skill Step 8 audit asks for a translated copy only of a part that carries text; built in the conductor's own session after 14.7, the app starting no session from an automated turn; its own written plan first, red first against the pinned baseline, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-11-02: the conductor chain, unattended)* · **so that an operator who rightly leaves an empty part alone is not failed at skill Step 11, while a part that carries text and has no translated copy still fails** *(written immediately after the tag `rollback-2026-11-02e-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -1928,7 +1928,7 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 | G3 | `quality_check.py`: the list-connective whitelist misses `; and/or` | **CLOSED 2026-11-02**, both trees, #184 | 14.6 |
 | G13 | `quality_check.py`: the remnant check on the lexicon's kept names | **CLOSED 2026-11-02**, both trees, #184 — all ten, 10 of 10 firing before, each name in its own language | 14.6 |
 | G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | **CLOSED 2026-11-02**, both trees, #185 — inside the form whatever followed it, as this row said | 14.7 |
-| C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | OPEN; a text part, copied, passes | 14.8 |
+| C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | **CLOSED 2026-11-02**, both trees, #186 — an empty part needs no copy; one that carries text, however little, still does | 14.8 |
 
 **The sub-steps.** 14.2 to 14.8 each edit one script — and 14.2 one step document as well — **in both trees,
 so each is HEAVY.** Each makes its fix as a PATTERN change, the rule still running. Each adds its controls to
@@ -2341,6 +2341,43 @@ the edited script, and the full run once, before the push.
 > **BUILT AND MERGED, 2026-11-02, as #185:** `598c62c` the fix, reviewed before its commit, then the filing; VERIFY 30
 > of 30 and TEST 15 of 15 through the cycle gate; the one full run on `598c62c`, OVERALL PASS; G4 CLOSED in the
 > register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain; 2026-11-02, unattended)*.
+> **14.8 — ITS OWN WRITTEN PLAN, 2026-11-02, before any edit, on `feature/step14-8-diligence-empty-parts`.** Built in
+> the conductor's own session after 14.7. **Measured first, `main` at `9a4ab3c`, both trees alike**
+> (`temp/s1102e_c10_probe.py`, counts only): `check_step_8` is byte-identical at `2178cce` and `9a4ab3c`, so the pin is
+> a true "before". It FAILS whenever an auxiliary part of the source — numbering, a header or footer, comments,
+> footnotes, endnotes — has no copy in `<workdir>/final/word/`, whatever the part holds; skill Step 8 has asked since C7
+> closed for a copy only of a part that carries text. Over the 13 frozen workdirs every listed part of every container
+> has a copy in `final/word/`, 0 absent, so **the corpus cannot reach C10's shape and the row closes on synthetic
+> controls alone — declared**; the corpus count is 0 to 0. **Changes,** both trees' `verify_diligence.py`, no exit
+> code moved for any part that carries text: a header, footer, comments, footnotes or endnotes part with no copy is
+> required only when it carries text — a `w:t` or a `w:delText` holding a non-space character, anywhere in the part,
+> a text box or a table included — and a part with none is reported as not required, by name and count; numbering
+> stays required whenever it exists, as Step 8a's own heading says. **The defect beside the false one,** asked of it: a
+> footer whose only text is a page-number field's result, a header whose only text is a deletion, a header whose only
+> text sits in a text box, and a part that will not parse each stay REQUIRED and still fail without a copy; a part that
+> is required and present still passes. **Controls,** `tests/test_check_scoping.py`, both trees, the check read
+> through the module's own `check_step_8` and `Report`: *FP* — an empty header and a footnotes part holding only Word's
+> separators, each with no copy, PASS now and PROVED to FAIL at `2178cce`; *TP* — a text-bearing header, the page-number
+> footer, the deletion-only header, the text-box header, an empty numbering part and an unparseable header, each with
+> no copy, FAIL now and before; and the whole script judged by content. **Must not touch:** the other steps' checks,
+> numbering's rule, the exits, any other script, the anti-drift safeguards. **Corpus:** 0 to 0, declared above. **Then**
+> the parity check, both divergences re-recorded from the INDEX, the three confidentiality controls, VERIFY and TEST
+> through `tools/cycle_evidence.py`, mutants, `/code-review` before the one full run. **No render, declared:** an audit
+> verdict decides nothing apply writes. **Done when:** C10 is CLOSED in the register on that evidence.
+> **AMENDED IN THE BUILD AND AT REVIEW, 2026-11-02, before the full run** — reviewed on the uncommitted fix, as 14.7
+> was. A property was added, property 13: 400 generated parts, each required exactly when the generator wrote a visible
+> text, the old code failing on every one, both trees. **`/code-review` at high: four findings, three fixed, one
+> declared.** Fixed: (1) the whole-script control the plan named was missing — added, the rendered Step 8 group read
+> PASS with the empty part named, FAIL before; (2) a picture's alt text or title is text — a part whose only words are
+> alt text stays required, a control and a mutant beside it; (3) the PASS line now counts the parts accounted for, the
+> present and the empty apart. Declared: the part is read with the standard library's parser, entity limits left to
+> expat. **A mutant found a control passing for the wrong reason:** reading only the listed parts left numbering
+> unread, so its control failed on the unread part and not on numbering's rule — numbering is now read, and the
+> mutant caught. 982 assertions, 43 properties, six mutants, each caught.
+> **BUILT AND MERGED, 2026-11-02, as #186:** the fix, reviewed before its commit, then the filing; VERIFY 29 of 29 and
+> TEST 21 of 21 through the cycle gate, the TEST on its third run after two lost to a transient fixture lock; the one
+> full run on the fix, OVERALL PASS; C10 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the
+> conductor chain; 2026-11-02, unattended)*.
 
 ---
 
