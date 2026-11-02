@@ -2370,6 +2370,10 @@ same paragraphs struck through and the us tree. Declared, each the session's cho
 untranslated paragraph below the FULL threshold, its other markers still findings; the exemption is case-folded and
 blind to the declared language, as repack's reading of the same table is; and choice (6) above.
 
+**THE CORPUS, AS STATED BEFORE THE COUNT RAN:** with the notes, as skill Step 9 runs the check, 27 findings to 27 in
+each tree; without them, 32 to 27 — the 5 `; and/or` endings, every one G3 — 0 added. No workdir holds a kept name, so
+G13 closes on synthetic controls alone, declared.
+
 ## 2026-11-02 (4) — sub-step 14.7 built and merged (#185), unattended: validate_reject_all's G4; five choices the session's own
 
 **NO QUESTION WAS ASKED, BY WOUTER'S WORDS OF THIS MORNING** — each choice below is THE SESSION'S, taken on its own
@@ -2388,6 +2392,26 @@ check refused the first controls' invented company names — a capitalised word 
 so each form now follows a lower-case word, the gate unchanged. **THE CORPUS, AS STATED BEFORE THE COUNT RAN:** 25
 missing-space findings to 5 in each tree, both views, 20 removed, every one G4, 0 added.
 
-**THE CORPUS, AS STATED BEFORE THE COUNT RAN:** with the notes, as skill Step 9 runs the check, 27 findings to 27 in
-each tree; without them, 32 to 27 — the 5 `; and/or` endings, every one G3 — 0 added. No workdir holds a kept name, so
-G13 closes on synthetic controls alone, declared.
+## 2026-11-02 (5) — sub-step 14.8 built and merged (#186), unattended: verify_diligence's C10; five choices the session's own
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS OF THIS MORNING** — each choice below is THE SESSION'S, taken on its own
+recommendation and carried here for him to confirm or overturn; none is his ruling.
+
+**(1) 14.8 WAS BUILT IN THE CONDUCTOR'S SESSION TOO,** after 14.7, the context at 55% and the step small. **(2) "CARRIES
+TEXT" IS READ LITERALLY AND CAUTIOUSLY:** any non-space character in a `w:t` or a `w:delText`, or a picture's alt text or
+title — so a footer holding only a page number stays required, as before; only a part with nothing at all is exempt.
+**(3) NUMBERING STAYS REQUIRED WHENEVER IT EXISTS,** Step 8a's heading saying so, though Step 8's opening says "whenever
+its part carries text" — the two step-document sentences disagree, open for Wouter. **(4) A PART THAT WILL NOT PARSE STAYS
+REQUIRED,** never waved through as empty. **(5) THE PART IS READ WITH THE STANDARD LIBRARY'S PARSER,** for reading only,
+the script gaining no third-party import; its entity limits are expat's, declared.
+
+**WHAT MOVED THE BUILD.** The corpus probe found every listed part already copied in all 13 frozen workdirs, so the
+corpus cannot reach C10's shape — 0 to 0, declared. `/code-review` found the plan's whole-script control missing, alt
+text read as no text, and a PASS line miscounting — all three fixed. **And a mutant found a control passing for the
+wrong reason:** reading only the listed parts had left numbering unread, so its control failed on the unread part
+rather than on numbering's own rule; numbering is read now, and the mutant is caught. Two TEST runs were lost to a
+transient lock on a freshly written fixture — the rebuild stopped partway, then a fixture refused its write — and
+the third ran clean; the security agent's log held 0 entries across it, so the agent was not the cause.
+
+**AND ONE REPAIR TO THIS LOG, A MOVE ONLY:** entry (4), appended by 14.7's filing after entry (3)'s review paragraph,
+had split (3) from its closing corpus paragraph; the paragraph is back under (3), not a word changed.

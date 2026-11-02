@@ -1928,7 +1928,7 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 | G3 | `quality_check.py`: the list-connective whitelist misses `; and/or` | **CLOSED 2026-11-02**, both trees, #184 | 14.6 |
 | G13 | `quality_check.py`: the remnant check on the lexicon's kept names | **CLOSED 2026-11-02**, both trees, #184 — all ten, 10 of 10 firing before, each name in its own language | 14.6 |
 | G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | **CLOSED 2026-11-02**, both trees, #185 — inside the form whatever followed it, as this row said | 14.7 |
-| C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | OPEN; a text part, copied, passes | 14.8 |
+| C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | **CLOSED 2026-11-02**, both trees, #186 — an empty part needs no copy; one that carries text, however little, still does | 14.8 |
 
 **The sub-steps.** 14.2 to 14.8 each edit one script — and 14.2 one step document as well — **in both trees,
 so each is HEAVY.** Each makes its fix as a PATTERN change, the rule still running. Each adds its controls to
@@ -2374,6 +2374,10 @@ the edited script, and the full run once, before the push.
 > expat. **A mutant found a control passing for the wrong reason:** reading only the listed parts left numbering
 > unread, so its control failed on the unread part and not on numbering's rule — numbering is now read, and the
 > mutant caught. 982 assertions, 43 properties, six mutants, each caught.
+> **BUILT AND MERGED, 2026-11-02, as #186:** the fix, reviewed before its commit, then the filing; VERIFY 29 of 29 and
+> TEST 21 of 21 through the cycle gate, the TEST on its third run after two lost to a transient fixture lock; the one
+> full run on the fix, OVERALL PASS; C10 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the
+> conductor chain; 2026-11-02, unattended)*.
 
 ---
 
