@@ -476,6 +476,9 @@ def _kept_name_re(name):
 
 
 _KEPT_NAME_RES = [(n, _kept_name_re(n)) for n in LEXICON_KEPT_NAMES]
+# How remnant_verdict's reason for a kept name begins. quality_check drops that class by it
+# (register G13), so the wording lives here once.
+KEPT_NAME_WHY = 'inside the kept name'
 
 
 def remnant_verdict(text, source_language):
@@ -507,7 +510,7 @@ def remnant_verdict(text, source_language):
             elif pat in _MONTH_PATTERNS and not month_is_dated(text, start, end):
                 why = BARE_MONTH_WHY
             else:
-                why = next((f'inside the kept name "{n}" — {LEXICON_KEPT_NAMES[n]}'
+                why = next((f'{KEPT_NAME_WHY} "{n}" — {LEXICON_KEPT_NAMES[n]}'
                             for (s, e), n in kept if s <= start and end <= e), None)
             if why:
                 advisory.append((pat, context, why))

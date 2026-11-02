@@ -2280,6 +2280,22 @@ the edited script, and the full run once, before the push.
 > the parity check, both divergences re-recorded, the three confidentiality controls, VERIFY and TEST through
 > `tools/cycle_evidence.py`. **No render, declared:** a quality_check finding decides whether skill Step 9 passes,
 > never what apply writes. **Done when:** G3 and G13 are CLOSED in the register on that evidence.
+> **AMENDED IN THE BUILD AND AT REVIEW, 2026-11-02, before the full run.** Three measurements moved the build, each
+> recorded as it happened. (1) **One planned false positive was none:** a capitalised `; AND/OR` never fired at either
+> pin, the dangling-ending rule reading lower case only — the control was dropped, and that case-blindness, a false
+> negative older than step 14, is open. (2) One true-positive sentence held too few Italian marker words outside its
+> kept name to stay a FULL paragraph; it was rebuilt from the checker's own list, the code unchanged. (3) Two controls
+> were added so that every changed line has one — three kept names in a deletion, a kept name in a numbering level's
+> text. **`/code-review` at high, on `2610699`: six findings, three fixed, three declared.** (1) The kept-name class was
+> told by the prefix of `remnant_verdict`'s reason text, typed again in `quality_check.py` — `source_language_markers.py`
+> now owns that wording as `KEPT_NAME_WHY`, read by both, so the plan's must-not-touch on that module is amended by one
+> constant, its use and the corrected comment, no verdict moved. (2) Each view's hits were scanned twice, once for the
+> findings and once for the dense count — scanned once now. (3) Property 11 read the uk body alone — it now reads the
+> same paragraphs struck through and asserts the us tree's findings identical. **Declared, not fixed:** a kept name
+> can take a whole untranslated paragraph below the FULL threshold, its other markers still each a finding — a kept name
+> is not source text; the exemption is case-folded and blind to the declared language, as repack's reading of the same
+> table is; and `; and/or` is quiet whatever its source ends on, as `; and` and `; or` are. Controls unchanged in
+> number, 868 assertions; 35 properties; one mutant added, 12 of 12 caught.
 
 ---
 

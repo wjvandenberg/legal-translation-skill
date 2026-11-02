@@ -70,6 +70,7 @@ try:
     from source_language_markers import (  # noqa: E402
         scan_remnants,
         remnant_verdict,
+        KEPT_NAME_WHY,
         bare_month_hits,
         detect_language,
         SUPPORTED_LANGUAGES,
@@ -422,14 +423,12 @@ def _note_bare_months(text, lang, where, sink):
 # the same call, so the names live in one list. Only a hit whose own span lies inside such a name is
 # dropped: the same marker word beside it still counts, and the CJK and company-form classes,
 # advisory in repack, stay issues here. The hits keep scan_remnants' order, so the display cap shows
-# the findings it showed before.
-_KEPT_NAME_WHY = 'inside the kept name '    # the reason remnant_verdict gives that class
-
-
+# the findings it showed before. The class is told by KEPT_NAME_WHY, the module's own opening of
+# that reason, so the wording lives in one place.
 def _remnant_hits(text, lang):
     """scan_remnants(text, lang, bare_months=False)'s hits, less those inside a kept name."""
     kept = Counter((marker, context) for marker, context, why in remnant_verdict(text, lang)[1]
-                   if why.startswith(_KEPT_NAME_WHY))
+                   if why.startswith(KEPT_NAME_WHY + ' '))
     hits = []
     for hit in scan_remnants(text, lang, bare_months=False):
         if kept[hit]:
@@ -469,10 +468,10 @@ def check_source_remnants(root, verbose, source_language=None, bare_months=None)
     label = lang.capitalize()
     extra_filter_italian = (lang == 'italian')
 
-    def _filtered_issues(full_text, view_tag):
+    def _filtered_issues(full_text, view_tag, hits):
         out = []
         _note_bare_months(full_text, lang, f"{label} month name ({view_tag})", bare_months)
-        for _marker, context in _remnant_hits(full_text, lang):
+        for _marker, context in hits:
             ctx_stripped = context.strip()
             # Italian-specific legacy filters kept for backwards compatibility.
             if extra_filter_italian:
@@ -490,19 +489,19 @@ def check_source_remnants(root, verbose, source_language=None, bare_months=None)
         full_del = ''.join(dt.text or '' for dt in p.iter(f'{{{W}}}delText'))
 
         if full_t.strip() and len(full_t.split()) >= 3:
-            issues.extend(_filtered_issues(full_t, 'accept-all'))
+            hits = _remnant_hits(full_t, lang)
+            issues.extend(_filtered_issues(full_t, 'accept-all', hits))
             # Full source-language paragraphs (high density of source function words)
-            dense_hits = len(_remnant_hits(full_t, lang))
-            if dense_hits >= 3:
+            if len(hits) >= 3:
                 issues.append(f"FULL {label.upper()} PARAGRAPH (accept-all): '{full_t[:100]}'")
 
         if full_del.strip() and len(full_del.split()) >= 1:
             # delText is almost always a short strike-through fragment, so the
             # 3-word minimum used for accept-all text would filter out most
             # legitimate remnants. Require only one word.
-            issues.extend(_filtered_issues(full_del, 'reject-all / markup'))
-            dense_hits_del = len(_remnant_hits(full_del, lang))
-            if dense_hits_del >= 3:
+            hits_del = _remnant_hits(full_del, lang)
+            issues.extend(_filtered_issues(full_del, 'reject-all / markup', hits_del))
+            if len(hits_del) >= 3:
                 issues.append(f"FULL {label.upper()} PARAGRAPH (reject-all / markup): '{full_del[:100]}'")
 
     return issues

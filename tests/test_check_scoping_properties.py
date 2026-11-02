@@ -818,7 +818,16 @@ ok("PROPERTY 11's generator: every kept name is at least one hit alone, every pl
                                for lang, ms in OUTSIDE.items() for m in ms), f"({alone})")
 ok("PROPERTY 11's generator covers exactly the names LEXICON_KEPT_NAMES declares",
    [k for k, _l in KEPT_GEN] == list(SLM.LEXICON_KEPT_NAMES))
-moved13, wrong, gen_off = [], [], []
+USQC = load(ROOT / "us" / "scripts" / "quality_check.py", "p_us_qc")
+
+
+def del_doc(text):
+    return etree.fromstring(
+        (f'<w:document xmlns:w="{W}"><w:body><w:p><w:del w:id="1" w:author="A"><w:r><w:delText xml:space="preserve">'
+         + text + "</w:delText></w:r></w:del></w:p></w:body></w:document>").encode("utf-8"))
+
+
+moved13, wrong, gen_off, wrong_del, us_apart = [], [], [], [], []
 for _ in range(3000):
     lang = rng.choice(("italian", "french", "portuguese"))
     words = [rng.choice(WORDS) for _ in range(rng.randint(3, 14))]
@@ -833,6 +842,13 @@ for _ in range(3000):
     w_hits = [i for i in w if not i.startswith("FULL")]
     if len(o_hits) != len(marks) + sum(alone[k] for k in kept):
         gen_off.append(text)
+    # the same paragraph struck through: the deletion view reads the one list; and the us tree agrees
+    wd = QC.check_source_remnants(del_doc(text), False, lang)
+    if (sum(1 for i in wd if not i.startswith("FULL")) != len(marks)
+            or any(i.startswith("FULL") for i in wd) != (len(marks) >= 3)):
+        wrong_del.append(text)
+    if USQC.check_source_remnants(doc_from([text]), False, lang) != w:
+        us_apart.append(text)
     if not kept:
         n["none"] += 1
         n["none_fire"] += bool(o)
@@ -853,6 +869,10 @@ ok(f"G13 each planted kept name removes exactly the hits it carries alone, the r
    f"finding on the rest alone ({n['kept']} paragraphs; {PRE} fired on {n['kept_pre_fire']}, FULL on "
    f"{n['kept_full_pre']})", n["kept_pre_fire"] > 0 and n["kept_full_pre"] > 0 and not wrong,
    f"{len(wrong)} wrong, e.g. {wrong[:2]}")
+ok(f"G13 the same paragraphs in a deletion: only the planted marker words count, the FULL finding on them alone "
+   f"({n['none'] + n['kept']} paragraphs)", not wrong_del, f"{len(wrong_del)} wrong, e.g. {wrong_del[:2]}")
+ok(f"G13 the us tree's findings identical to the uk tree's on every paragraph ({n['none'] + n['kept']})",
+   not us_apart, f"{len(us_apart)} apart, e.g. {us_apart[:2]}")
 
 shutil.rmtree(TMP, ignore_errors=True)
 print()

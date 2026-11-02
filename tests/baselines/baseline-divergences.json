@@ -33,7 +33,7 @@
   "uk/scripts/quality_check.py": {
    "changed_by": "feature/step14-6-qc-and-or-kept-names",
    "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
-   "sha256_now": "4f29b9d43a2c3a9e44bd32082c0fa578b1b0a03b31819cee9293cc67f62ae1d8"
+   "sha256_now": "4c8f114186370d9aa6c6dc1a5b86434efa6a0c1fc5e37472adf3429fd9869e60"
   },
   "uk/scripts/repack_docx.py": {
    "changed_by": "feature/step13-5-side-part-language",
@@ -43,7 +43,7 @@
   "uk/scripts/source_language_markers.py": {
    "changed_by": "feature/step14-6-qc-and-or-kept-names",
    "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
-   "sha256_now": "e07cef3e7ac623a1b9f29278534f70e2fc346931b2a707b1660f90b8086109c7"
+   "sha256_now": "aa9d922ba28e98f7b2e632592f05d47444c939c2a60cea4f9be2ee601a4794c5"
   },
   "uk/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch11-slice4a",
@@ -133,7 +133,7 @@
   "us/scripts/quality_check.py": {
    "changed_by": "feature/step14-6-qc-and-or-kept-names",
    "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
-   "sha256_now": "2ad6db8ef1fc6ac89a1b0d7b59a4682f80618e50d17da13ad263cba19dcaab15"
+   "sha256_now": "b7b1fcc6303c2344fd30abd5f0c4542e3e0b0b7e42e82da6642e09a115d4f45f"
   },
   "us/scripts/repack_docx.py": {
    "changed_by": "feature/step13-5-side-part-language",
@@ -143,7 +143,7 @@
   "us/scripts/source_language_markers.py": {
    "changed_by": "feature/step14-6-qc-and-or-kept-names",
    "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
-   "sha256_now": "b0f88bb64d1c0ec8951aa96c0df4d99b6c93f547b061266420e809c8973313aa"
+   "sha256_now": "803c37f1a2df1a7dd51917c39c762e0e02f1cc83a53b7f12ae126ba1cfa8a81d"
   },
   "us/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch11-slice4a",
