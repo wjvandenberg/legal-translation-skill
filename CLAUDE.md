@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, and 14.6, `quality_check`'s G3 and G13, as #184, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; next, 14.7 · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, and 14.7, `validate_reject_all`'s G4, as #185, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; next, 14.8 · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,22 +578,22 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-02, SUB-STEP 14.6 MERGED AS #184; NEXT, 14.7 (`validate_reject_all.py`, G4)
+### HANDOFF — 2026-11-02, SUB-STEP 14.7 MERGED AS #185; NEXT, 14.8 (`verify_diligence.py`, C10)
 
-**PURPOSE: MET** — *`; and/or` between list items and a name the lexicon keeps raise no false quality warning, while a
-real remnant and a real list-break still do*: G3 and G13 CLOSED, both trees; `DECISIONS-LOG.md`, 2026-11-02 (3), owns
-the nine choices, all taken unattended, in the conductor's own session.
+**PURPOSE: MET** — *a dotted company form such as `B.V.` or `S.p.A.` raises no false missing-space finding, while a real
+missing space after a full stop still does*: G4 CLOSED, both trees; `DECISIONS-LOG.md`, 2026-11-02 (4), owns the five
+choices, all taken unattended in the conductor's session, after 14.6 (#184, 2026-11-02 (3)).
 
-**PRODUCED, CODE:** `2610699` the fix; `44cf034` the review's three; then the filing. 868 assertions, 35 properties, 12
-mutants; corpus 27 to 27 with the notes and 32 to 27 without, every removal G3, 0 added; full run OVERALL PASS.
+**PRODUCED, CODE:** `598c62c` the fix, reviewed before its commit; then the filing. 940 assertions, 40 properties, 4
+mutants; corpus 25 to 5 per tree, both views, every removal G4, 0 added; full run OVERALL PASS.
 
-**SINGLE NEXT ACTION: SUB-STEP 14.7**, `validate_reject_all.py`, G4, its prompt `temp/s1102c_next_prompt.md`. The app
-starts no session from an automated turn, so it waits for Wouter's word or a session that has context to spare.
+**SINGLE NEXT ACTION: SUB-STEP 14.8**, `verify_diligence.py`, C10, its prompt `temp/s1102d_next_prompt.md`. The app
+starts no session from an automated turn, so it waits for Wouter's word or a session with context to spare.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** a planned false positive must be PROVED to fire before — 14.6's capitalised
-`; AND/OR` never had, the dangling-ending rule reading lower case only; a brief's count can come from a probe that
-judged every case in one language — measure each in its own.
+**WHAT A NEW SESSION WOULD GET WRONG:** a planned false positive must be PROVED to fire before; the publication check
+reads a capitalised word before `B.V.` as a real company, so an invented form follows a lower-case word; a brief's
+count can come from a probe that judged every case in one language.
 
-**Open, none blocking:** the nine choices for Wouter (`temp/s1102_questions_answered.md`); the dangling-ending rule's
-case-blindness; apply's own remnant warning still listing a kept name; 14.5's and 14.4's open items stand. **Context:
-50% when written.**
+**Open, none blocking:** 14.6's and 14.7's choices for Wouter (`temp/s1102_questions_answered.md`); the
+dangling-ending rule's case-blindness; apply's remnant warning still listing a kept name; 14.5's and 14.4's open items.
+**Context: 55% when written.**

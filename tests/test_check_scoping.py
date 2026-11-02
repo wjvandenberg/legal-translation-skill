@@ -1394,6 +1394,79 @@ for tree in ("uk", "us"):
            old_rc == 2 and "*** FAILED" in old_out, f"(rc={old_rc})")
 
 # =============================================================================
+print("\nG4 — validate_reject_all: a dot inside a dotted form is no missing space")
+print("-" * 96)
+
+# The missing-space rule -- punctuation after a non-space, a letter straight after it -- fired INSIDE a dotted
+# form, on `B.V`, `S.p` and `p.A`, whatever followed. So a dot between two lone letters each followed by a dot
+# is skipped; the dot AFTER the form, and punctuation after a word, a digit or a bracket, still fires. Each false
+# positive silent now and PROVED to have fired at the pinned baseline; each true positive beside it firing now
+# and before. 14.7 of PLAN-2-step-b.md section 3.14; every string INVENTED, on office services.
+# --- 14.7 cases: begin
+G4_FP = (
+    ("`B.V.`", "The cleaning contract binds a local B.V. and its staff."),
+    ("`S.p.A.`", "The canteen is run by a catering S.p.A. under the lease."),
+    ("`S.à r.l.`", "The lifts are kept by a small S.à r.l. on weekdays."),
+    ("`S.r.l.`", "The invoices go to the cleaning S.r.l. every month."),
+    ("`N.V.`", "The cleaning staff work for a local N.V. from Monday."),
+    ("`U.S.A.`", "The office printers come from the U.S.A. in spring."),
+    ("`e.g.`", "Small repairs, e.g. a broken handle, are paid by the tenant."),
+)
+G4_TP = (
+    ("a word run into the next sentence", "The keys stay with the Buyer.The office opens at nine."),
+    ("the dot AFTER a dotted form", "The contract binds a local B.V.The staff sign it."),
+    ("the dot after `e.g.`", "Small repairs, e.g.The broken handle, are paid by the tenant."),
+    ("a dotted form run into a word", "The canteen is run by a catering S.p.A.and the tenant pays."),
+    ("a section number run into a word", "The tenant reads clause 3.2.The office closes at six."),
+    ("a comma with no space", "The keys stay with the Seller,the office opens at nine."),
+    ("an initial run into a surname", "The office manager J.Smith signs the cleaning invoice."),
+    ("a word run into an initial", "The keys stay with the Buyer.A. Smith collects them on Monday."),
+    ("a numbered annex run into an initial", "The tenant reads Annex 3A.B. Smith signs it on Monday."),
+)
+# --- 14.7 cases: end
+
+
+def g4_fires(mod, text):
+    return [s for n, s in mod._scan_view(text, []) if n == "missing_space_between_words"]
+
+
+def g4_run(script, text, *flags):
+    wd = TMP / f"g4-run-{next(_G13_N)}"
+    wd.mkdir()
+    (wd / "paragraphs.json").write_text(json.dumps([{"idx": 0, "text": "x", "en_segments": [
+        {"type": "regular", "en": text + " "}, {"type": "ins", "en": "The tenant agrees."}]}]), encoding="utf-8")
+    r = subprocess.run([sys.executable, str(script), str(wd / "paragraphs.json"), *flags], capture_output=True,
+                       text=True, encoding="utf-8", errors="replace", env=F10_ENV, cwd=wd)
+    return r.returncode, r.stdout + r.stderr
+
+
+for tree in ("uk", "us"):
+    assert_baseline_differs("validate_reject_all.py", tree)
+    old_vra = load_old("validate_reject_all.py", tree)
+    new_vra = load_new("validate_reject_all.py", tree)
+    for label, text in G4_FP:
+        n, o = g4_fires(new_vra, text), g4_fires(old_vra, text)
+        ok(f"G4 {tree} {label}: silent now", not n, f"({n})")
+        ok(f"G4 {tree} {label}: PROVED it fired before", bool(o), f"({o})")
+    for label, text in G4_TP:
+        n, o = g4_fires(new_vra, text), g4_fires(old_vra, text)
+        ok(f"G4 {tree} TRUE POSITIVE {label}: still fires", bool(n), f"({n})")
+        ok(f"G4 {tree} TRUE POSITIVE {label}: fired before too", bool(o), f"({o})")
+    # THE EXIT a --strict run reads, by content, on a tracked-change paragraph: a dotted form 1 then 0; a run-in 1, 1.
+    old_file = OLD_DIR / (tag(tree) + "validate_reject_all.py")
+    for row, text, quiet_now in (("G4", G4_FP[1][1], True), ("G4-TP", G4_TP[0][1], False)):
+        new_rc, new_out = g4_run(ROOT / tree / "scripts" / "validate_reject_all.py", text, "--strict")
+        old_rc, old_out = g4_run(old_file, text, "--strict")
+        if quiet_now:
+            ok(f"{row} {tree}, the whole script --strict: exits 0 and PASS now",
+               new_rc == 0 and "PASS: all 1 tracked-change paragraphs" in new_out, f"(rc={new_rc})")
+        else:
+            ok(f"{row} {tree}, the whole script --strict: exits 1 on the missing space now",
+               new_rc == 1 and "[missing_space_between_words]" in new_out, f"(rc={new_rc})")
+        ok(f"{row} {tree}, the whole script --strict: PROVED it exited 1 on the missing space before",
+           old_rc == 1 and "[missing_space_between_words]" in old_out, f"(rc={old_rc})")
+
+# =============================================================================
 shutil.rmtree(TMP, ignore_errors=True)
 print()
 print("=" * 96)

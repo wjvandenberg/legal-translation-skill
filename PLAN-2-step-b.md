@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-02 — SESSION PURPOSE — what · how · purpose:** sub-step 14.6, `quality_check.py`'s G3 and G13 in both trees: the list-connective whitelist takes `and/or`, and the remnant check reads the lexicon's kept names through `source_language_markers`, the one call the table repack already makes; built in the conductor's own session, the app having refused to start a new one from an automated turn; its own written plan first, red first against the pinned baseline, the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-11-02: the conductor chain, unattended)* · **so that `; and/or` between list items and a name the lexicon keeps in the source language raise no false quality warning, while a real untranslated remnant and a real list-break still do** *(written immediately after the tag `rollback-2026-11-02c-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-02 — SESSION PURPOSE — what · how · purpose:** sub-step 14.7, `validate_reject_all.py`'s G4 in both trees: the missing-space rule skips a dot inside a dotted abbreviation; built in the conductor's own session after 14.6, the app starting no session from an automated turn; its own written plan first, red first against the pinned baseline, the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-11-02: the conductor chain, unattended)* · **so that a dotted company form such as `B.V.` or `S.p.A.` raises no false missing-space finding, while a real missing space after a full stop still does** *(written immediately after the tag `rollback-2026-11-02d-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -1927,7 +1927,7 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 | G7 | the same check's marker and title exemptions, Italian and English only — taken to every language by Wouter, 2026-10-30 | **CLOSED 2026-11-02**, both trees, #183 — Japanese, Chinese and Finnish's own quote declared, not built | 14.5 |
 | G3 | `quality_check.py`: the list-connective whitelist misses `; and/or` | **CLOSED 2026-11-02**, both trees, #184 | 14.6 |
 | G13 | `quality_check.py`: the remnant check on the lexicon's kept names | **CLOSED 2026-11-02**, both trees, #184 — all ten, 10 of 10 firing before, each name in its own language | 14.6 |
-| G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | OPEN, and it fires INSIDE the form itself — `B.V`, `S.p`, `p.A` — whatever follows it, where the row says "followed by a capital" | 14.7 |
+| G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | **CLOSED 2026-11-02**, both trees, #185 — inside the form whatever followed it, as this row said | 14.7 |
 | C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | OPEN; a text part, copied, passes | 14.8 |
 
 **The sub-steps.** 14.2 to 14.8 each edit one script — and 14.2 one step document as well — **in both trees,
@@ -2300,6 +2300,47 @@ the edited script, and the full run once, before the push.
 > 33 of 33 and 33 of 33, TEST 30 of 30 and 30 of 30, through the cycle gate; the one full run on `44cf034`, OVERALL
 > PASS; G3 and G13 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain;
 > 2026-11-02, unattended)*.
+> **14.7 — ITS OWN WRITTEN PLAN, 2026-11-02, before any edit, on `feature/step14-7-reject-all-dotted-forms`.** Built
+> in the conductor's own session after 14.6. **Measured first, `main` at `0bf3505`, both trees alike**
+> (`temp/s1102d_ra_probe.py`, counts only): the rule, `_scan_view` and `_reconstruct` are identical at `2178cce` and
+> `0bf3505` in both trees, so the pin is a true "before". **G4's shape reconciled:** the rule — punctuation after a
+> non-space, a letter straight after it — fires INSIDE a dotted form, on `B.V`, `S.p` and `p.A`, whatever follows the
+> form, as the table says; the register's "followed by a capital" names only one of its cases. Over the 13 frozen
+> workdirs, 81 paragraphs carry a tracked change, and their two views hold **25 missing-space findings, 20 of them on a
+> dot inside a dotted form** (D07 16, D02 2, D11 2). apply runs this validator without `--strict`, so a finding is a
+> warning there, and the script exits 1 under `--strict` alone. **Changes,** both trees' `validate_reject_all.py`, the
+> rule still running, no exit moved: the missing-space rule skips a dot that sits between two lone letters each
+> followed by a dot — a letter not preceded by a letter, a dot, a letter, a dot — as in `B.V.`, `S.p.A.`, `S.r.l.`,
+> `N.V.`, `U.S.A.` and `e.g.`; `S.à r.l.`'s `S.à` never fired, the rule's look-ahead being ASCII. **The defect beside the
+> false one,** asked of it: the dot AFTER a dotted form still fires — `B.V.The`, `e.g.The`, `S.p.A.and` — as does a
+> word, a digit or a bracket before the punctuation (`Buyer.The`, `3.2.The`, `Seller,the`) and an initial before a
+> surname (`J.Smith`). Declared: a sentence ending on a lone letter run into a lone initial (`Plan B.A. Smith`) reads
+> as a dotted form and is quiet. **Controls,** `tests/test_check_scoping.py`, both trees, the rule read through the
+> module's own `_scan_view`: *FP* — each dotted form above in a sentence, silent now and PROVED to fire at `2178cce`;
+> *TP* — each defect above, firing now and before; and the whole script judged by content on a tracked-change
+> paragraph, under `--strict` rc 1 then 0 on a dotted form and rc 1 at both on `Buyer.The`.
+> `tests/test_check_scoping_properties.py`: one property over generated sentences, each population chosen by the
+> generator's own record — with no lone-letter dot the findings are identical to `2178cce`'s; every dot inside a
+> generated dotted form is quiet and every punctuation the generator wrote straight before a letter elsewhere fires;
+> both trees and both views; firing counts printed. A mutant per new condition. **Must not touch:** any other rule,
+> the forbidden collocations, `_reconstruct`, the exits, apply, any other script, the anti-drift safeguards.
+> **Corpus:** old (`0bf3505`) against new over the 13 frozen workdirs, both trees, both views, by
+> `temp/s1102d_ra_census.py`, counts only — declared, because no committed tool counts this validator — **expected:
+> 25 missing-space findings to 5 in each tree, 20 removed, every one G4 by the census's own reader, 0 added**, a
+> planted set proving the count moves. **Then** the parity check, two new divergence entries recorded from the INDEX,
+> the three confidentiality controls, VERIFY and TEST through `tools/cycle_evidence.py`. **No render, declared:** a
+> readability finding decides nothing apply writes. **Done when:** G4 is CLOSED in the register on that evidence.
+> **AMENDED IN THE BUILD AND AT REVIEW, 2026-11-02, before the full run** — the review run on the uncommitted fix, so
+> one cycle record carries both. A control was added so that the lone-letter test has one: a word run into an
+> initial, `Buyer.A. Smith`, firing now and before. **`/code-review` at high: three findings, one fixed, two
+> declared.** Fixed: a letter straight after a digit counted as lone, so `Annex 3A.B. Smith` would have gone quiet — a
+> lone letter now has neither a letter nor a digit before it, and that run-in is a control. Declared: `Plan B.A.
+> Smith`, as planned; and the rule's operator-facing FIX text, which does not mention the exemption, unchanged as
+> output no gate reads. 936 assertions became 940, the properties 40; four mutants, each caught; the corpus
+> re-counted, 25 to 5 in each tree, 20 removed, every one G4, 0 added.
+> **BUILT AND MERGED, 2026-11-02, as #185:** `598c62c` the fix, reviewed before its commit, then the filing; VERIFY 30
+> of 30 and TEST 15 of 15 through the cycle gate; the one full run on `598c62c`, OVERALL PASS; G4 CLOSED in the
+> register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain; 2026-11-02, unattended)*.
 
 ---
 
