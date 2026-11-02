@@ -2404,6 +2404,10 @@ the edited script, and the full run once, before the push.
 > by one. **C26 is Wouter's:** its own row says no mechanism can prove a read; the remedy it names — a position-
 > dependent quote the operator cannot predict — is a design choice, put to him, never built unasked. **Done when:** each
 > of 14.9.1 to 14.9.4 closes its rows on its own evidence, and C26 has Wouter's answer.
+> **WOUTER, 2026-11-02, at the report:** every choice of the day confirmed; **C26 is a READ RECEIPT** — a script names
+> random line numbers in the lexicon files read at skill Step 3, the operator quotes them into a receipt, and skill
+> Step 5 refuses to start without a matching one — **planned as 14.9.5**, after 14.9.4; then the small loose ends and
+> the language widenings, `DECISIONS-LOG.md`, 2026-11-02 (7).
 
 ---
 

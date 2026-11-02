@@ -2430,3 +2430,14 @@ present is the defect still present; a fix session re-measures its own rows at d
 SUB-STEPS, GROUPED BY THE PART OF THE SKILL THEY EDIT** — C29's code; skill Steps 1 and 11; skill Step 4's rules; the
 claims about the skill — so that each session edits one area of the shipped tree. **(3) C26 GOES TO WOUTER, NOT TO A
 SUB-STEP:** its row concedes that no mechanism can prove a read, and the remedy it names is a design choice.
+
+## 2026-11-02 (7) — Wouter's answers at the 17:30 report: every choice confirmed; the order after 14.9.1; C26 a read receipt
+
+**WOUTER, THROUGH THE QUESTION TOOL, AT THE REPORT:** *"Confirm all"* - every choice the sessions took on his behalf
+today, entries (2) to (6), now stands as HIS. **The order after 14.9.1:** 14.9.2 to 14.9.4 as planned; C26; the small
+loose ends (apply's remnant warning, `post_process.py`'s Article reader, the dangling-ending rule's case-blindness,
+Step 8 against 8a on numbering); and the language widenings (Finnish quotes, a Japanese and Chinese word count, the
+unmeasured words sourced from published law). **C26, his choice of three:** *"A read receipt"* - after skill Step 3's
+read, a script names a few random line numbers in the lexicon files read, the operator quotes those lines into a
+receipt, and skill Step 5 refuses to start without a matching receipt; it proves the files were opened at those
+places, not that every line was read. Planned as 14.9.5, its own session, after 14.9.4.
