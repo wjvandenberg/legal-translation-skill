@@ -31,6 +31,7 @@ All test content is INVENTED. No client text, no corpus material -- CLAUDE.md 5.
 import importlib.util
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -925,6 +926,316 @@ got_args = recorded[0][1] if recorded else []
 ok("C9 on detector disagreement, no --language and no --guessed is passed",
    "--language" not in got_args and "--guessed" not in got_args,
    f"(args tail: {got_args[-4:] if got_args else []})")
+
+# =============================================================================
+print("\nG7 in every language — each language's marker and title translated by design; the low opening quote read")
+print("-" * 96)
+
+# 14.3 exempted a defined term in its marker and a title after a title word in Italian and English
+# only. Wouter, 2026-10-30: "for all languages we should do this". So each language's marker and
+# title form is silent now and PROVED to have fired at the pinned baseline; the same term or title
+# dropped with its quotes, a naming verb and a cross-reference still fire, now and before. The
+# low opening quote (Polish, Hungarian, Dutch; German) was never read, so a marker in it is proved
+# through its typographic twin, and a name dropped in it fires now and was PROVED silent before.
+# Japanese and Chinese spans hold no space, so are one word under every threshold: their marker is
+# moot, and a name dropped in them is not seen -- a declared blind spot, pinned here so that
+# reading it one day turns this red on purpose. Every exemption still holds only while the
+# English keeps as many quoted spans as the source. 14.5 of PLAN-2-step-b.md section 3.14; every
+# string INVENTED, on office services.
+# --- 14.5 cases: begin
+KEEP = 'The parties enter into this contract (the "Office Cleaning Services Contract").'
+DROP = "The parties enter into this office cleaning contract."
+TKEEP = 'The Contractor follows the procedure entitled "Monthly inspection of lifts and escalators".'
+TDROP = "The Contractor follows the monthly lift inspection procedure."
+# (language, shape, source, the span) -- each FP silent with KEEP/TKEEP, each span firing with DROP/TDROP
+G7L = (
+    ("Italian", "a lead-in, no article",
+     'Le parti stipulano il contratto (di seguito "Contratto Quadro per i Servizi di Pulizia").',
+     "Contratto Quadro per i Servizi di Pulizia"),
+    ("English", "a lead-in, no article",
+     'The parties enter into a contract (hereinafter "Long Term Office Cleaning and Catering Contract").',
+     "Long Term Office Cleaning and Catering Contract"),
+    ("English", "an indefinite article",
+     'The parties enter into a contract (each a "Party to the Office Upkeep Arrangement").',
+     "Party to the Office Upkeep Arrangement"),
+    ("French", "marker",
+     "Les parties concluent le présent contrat (ci-après dénommé le « Contrat de Services de Nettoyage des "
+     "Bureaux »).", "Contrat de Services de Nettoyage des Bureaux"),
+    ("French", "marker with an adverb",
+     "Les sociétés signent le contrat (ci-après ensemble les « Parties au Contrat de Nettoyage des Bureaux »).",
+     "Parties au Contrat de Nettoyage des Bureaux"),
+    ("French", "title",
+     "Le Prestataire applique la procédure intitulée « Contrôle mensuel des ascenseurs et des escaliers "
+     "mécaniques ».", "Contrôle mensuel des ascenseurs et des escaliers mécaniques"),
+    ("Spanish", "marker",
+     "Las partes celebran el presente contrato (en adelante, el “Contrato de Servicios de Limpieza de "
+     "Oficinas”).", "Contrato de Servicios de Limpieza de Oficinas"),
+    ("Spanish", "title",
+     "El Contratista sigue el procedimiento titulado “Inspección mensual de ascensores y escaleras "
+     "mecánicas”.", "Inspección mensual de ascensores y escaleras mecánicas"),
+    ("Portuguese", "marker",
+     "As partes celebram o presente contrato (doravante designado “Contrato de Serviços de Limpeza de "
+     "Escritórios”).", "Contrato de Serviços de Limpeza de Escritórios"),
+    ("Portuguese", "title",
+     "O Prestador segue o procedimento intitulado “Inspeção mensal de elevadores e escadas rolantes”.",
+     "Inspeção mensal de elevadores e escadas rolantes"),
+    ("German", "marker, a participle closing it",
+     'Die Parteien schließen den Vertrag (nachfolgend "Vertrag über die Reinigung der Büroräume" genannt).',
+     "Vertrag über die Reinigung der Büroräume"),
+    ("German", "marker in the low opening quote",
+     "Die Parteien schließen den Vertrag (im Folgenden „Vertrag über die Reinigung der Büroräume“).",
+     "Vertrag über die Reinigung der Büroräume"),
+    ("German", "title",
+     'Der Auftragnehmer befolgt das Verfahren mit dem Titel "Monatliche Prüfung der Aufzüge und Fahrtreppen".',
+     "Monatliche Prüfung der Aufzüge und Fahrtreppen"),
+    ("Dutch", "marker",
+     "Partijen sluiten de overeenkomst (hierna te noemen: “Overeenkomst inzake de Schoonmaak van "
+     "Kantoren”).", "Overeenkomst inzake de Schoonmaak van Kantoren"),
+    ("Dutch", "title",
+     "De Opdrachtnemer volgt de procedure getiteld “Maandelijkse keuring van liften en roltrappen”.",
+     "Maandelijkse keuring van liften en roltrappen"),
+    ("Polish", "marker",
+     'Strony zawierają umowę (zwaną dalej "Umową o Świadczenie Usług Sprzątania Biur").',
+     "Umową o Świadczenie Usług Sprzątania Biur"),
+    ("Polish", "marker in the low opening quote",
+     "Strony zawierają umowę (dalej: „Umowa o Świadczenie Usług Sprzątania Biur”).",
+     "Umowa o Świadczenie Usług Sprzątania Biur"),
+    ("Polish", "title",
+     'Wykonawca stosuje procedurę pod tytułem "Comiesięczny przegląd wind i schodów ruchomych".',
+     "Comiesięczny przegląd wind i schodów ruchomych"),
+    ("Hungarian", "marker",
+     'A Felek megkötik a szerződést (a továbbiakban: "Irodatakarítási Szolgáltatási Szerződés a Központi '
+     'Épületre").', "Irodatakarítási Szolgáltatási Szerződés a Központi Épületre"),
+    ("Hungarian", "marker in the low opening quote",
+     "A Felek megkötik a szerződést (a továbbiakban: „Irodatakarítási Szolgáltatási Szerződés a Központi "
+     "Épületre”).", "Irodatakarítási Szolgáltatási Szerződés a Központi Épületre"),
+    ("Hungarian", "title, the title word after it",
+     'A Vállalkozó a "Liftek és mozgólépcsők havi ellenőrzésének eljárása" című eljárást követi.',
+     "Liftek és mozgólépcsők havi ellenőrzésének eljárása"),
+    ("Finnish", "marker",
+     'Osapuolet tekevät sopimuksen (jäljempänä "Toimistojen Siivouspalveluja Koskeva Sopimus '
+     'Keskusrakennuksessa").', "Toimistojen Siivouspalveluja Koskeva Sopimus Keskusrakennuksessa"),
+    ("Finnish", "title",
+     'Toimittaja noudattaa menettelyä otsikolla "Hissien ja liukuportaiden kuukausittainen tarkastus '
+     'toimistoissa".', "Hissien ja liukuportaiden kuukausittainen tarkastus toimistoissa"),
+    ("Norwegian", "marker",
+     'Partene inngår avtalen (heretter kalt "Avtale om Renhold av Kontorlokaler i Sentrum").',
+     "Avtale om Renhold av Kontorlokaler i Sentrum"),
+    # The review's findings, 2026-11-02: the measured Dutch article after a lead-in, the other two
+    # participles, and the other Hungarian title word, each had no control.
+    ("Dutch", "marker, an article after the lead-in (measured)",
+     "Partijen sluiten de overeenkomst (hierna: de “Overeenkomst inzake de Schoonmaak van Kantoren”).",
+     "Overeenkomst inzake de Schoonmaak van Kantoren"),
+    ("Dutch", "marker, a participle closing it",
+     "Partijen sluiten de overeenkomst (hierna “Overeenkomst inzake de Schoonmaak van Kantoren” genoemd).",
+     "Overeenkomst inzake de Schoonmaak van Kantoren"),
+    ("German", "marker, an article and another participle",
+     'Die Parteien schließen den Vertrag (nachstehend der "Vertrag über die Reinigung der Büroräume" bezeichnet).',
+     "Vertrag über die Reinigung der Büroräume"),
+    ("Hungarian", "title, the other title word after it",
+     'A Vállalkozó a "Liftek és mozgólépcsők havi ellenőrzésének eljárása" címmel kiadott eljárást követi.',
+     "Liftek és mozgólépcsők havi ellenőrzésének eljárása"),
+)
+# AN ARTICLE ALONE is the DECLARED language's: one language's article is another's preposition, and
+# "(de X)" in Spanish is a reference -- the review's finding, 2026-11-02. (declared language, source,
+# the span, whether it must be quiet with that language declared)
+G7L_ALONE = (
+    ("dutch", "Partijen sluiten de overeenkomst (de “Overeenkomst inzake de Schoonmaak van Kantoren”).",
+     "Overeenkomst inzake de Schoonmaak van Kantoren", True),
+    ("hungarian", 'A Felek megkötik a szerződést (a "Irodatakarítási Szolgáltatási Szerződés a Központi Épületre").',
+     "Irodatakarítási Szolgáltatási Szerződés a Központi Épületre", True),
+    ("german", 'Die Parteien schließen den Vertrag (der "Vertrag über die Reinigung der Büroräume").',
+     "Vertrag über die Reinigung der Büroräume", True),
+    ("portuguese", "As partes celebram o contrato (o “Contrato de Serviços de Limpeza de Escritórios”).",
+     "Contrato de Serviços de Limpeza de Escritórios", True),
+    ("english", 'The parties enter into a contract (a "Party to the Office Upkeep Arrangement").',
+     "Party to the Office Upkeep Arrangement", True),
+    ("spanish", "Se aplica el Real Decreto 5/2020 (de “Medidas urgentes para la limpieza de oficinas públicas”).",
+     "Medidas urgentes para la limpieza de oficinas públicas", False),
+    ("italian", 'Come previsto dal capitolato (a "Specifiche Tecniche dei Servizi di Pulizia").',
+     "Specifiche Tecniche dei Servizi di Pulizia", False),
+    (None, "Se aplica el Real Decreto 5/2020 (de “Medidas urgentes para la limpieza de oficinas públicas”).",
+     "Medidas urgentes para la limpieza de oficinas públicas", False),
+)
+# A German closer is the English opener: in "„A“ … „B”" the old typographic pair read a phantom span
+# from A's closer to B's closer -- found by the twin property at the review, 2026-11-02. Both
+# quoted spans kept in the English, the phantom alone fired.
+G7L_PHANTOM = ("Die Parteien vereinbaren „Büroreinigung im Gebäude Nord Eins“ und danach „Kantinenbetrieb "
+               "im Gebäude Süd Zwei”.",
+               "The parties agree „Büroreinigung im Gebäude Nord Eins“ and then „Kantinenbetrieb im Gebäude "
+               "Süd Zwei”.")
+# An abbreviation is no title word -- the review's finding: 'Pt.' once read as the Polish 'pt.'.
+G7L_PT = ('The rates are set out in Pt. "Schedule of Office Cleaning Services Rates".',
+          'The rates are set out in Part "Office Cleaning Rates Schedule".', "Schedule of Office Cleaning Services Rates")
+# (language, shape, source, English keeping a quoted span, the span the new code must still report)
+G7L_TP = (
+    ("French", "a naming verb", "Le projet dénommé « Centre de Services du Quartier Haut Vert » est autorisé.",
+     'The project "Upper Green District Service Centre" is authorised.', "Centre de Services du Quartier Haut Vert"),
+    ("French", "a cross-reference",
+     "Les travaux suivent la procédure (telle que définie dans le « Règlement Régional des Marchés de Travaux "
+     "Publics »).", 'The works follow the procedure (as defined in the "Regional Public Works Procurement Rules").',
+     "Règlement Régional des Marchés de Travaux Publics"),
+    ("Spanish", "a naming verb", "El proyecto denominado “Centro de Servicios del Barrio Alto Verde” queda autorizado.",
+     'The project "Upper Green District Service Centre" is authorised.', "Centro de Servicios del Barrio Alto Verde"),
+    ("Spanish", "a cross-reference",
+     "Las obras siguen el procedimiento (según se define en el “Reglamento Regional de Contratos de Obras "
+     "Públicas”).", 'The works follow the procedure (as defined in the "Regional Public Works Contract Rules").',
+     "Reglamento Regional de Contratos de Obras Públicas"),
+    ("Portuguese", "a naming verb", "O projeto denominado “Centro de Serviços do Bairro Alto Verde” fica autorizado.",
+     'The project "Upper Green District Service Centre" is authorised.', "Centro de Serviços do Bairro Alto Verde"),
+    ("Portuguese", "a cross-reference",
+     "As obras seguem o procedimento (conforme definido no “Regulamento Regional de Contratos de Obras "
+     "Públicas”).", 'The works follow the procedure (as defined in the "Regional Public Works Contract Rules").',
+     "Regulamento Regional de Contratos de Obras Públicas"),
+    ("German", "a naming verb", 'Das Projekt namens "Servicezentrum im oberen grünen Viertel Nord" ist genehmigt.',
+     'The project "Upper Green District Service Centre" is authorised.', "Servicezentrum im oberen grünen Viertel Nord"),
+    ("German", "a cross-reference",
+     'Die Arbeiten folgen dem Verfahren (wie definiert in der "Regionalen Ordnung für öffentliche Bauaufträge").',
+     'The works follow the procedure (as defined in the "Regional Public Works Contract Rules").',
+     "Regionalen Ordnung für öffentliche Bauaufträge"),
+    ("Dutch", "a naming verb", "Het project genaamd “Dienstencentrum van de Hoge Groene Wijk” is goedgekeurd.",
+     'The project "Upper Green District Service Centre" is authorised.', "Dienstencentrum van de Hoge Groene Wijk"),
+    ("Dutch", "a cross-reference",
+     "De werken volgen de procedure (zoals gedefinieerd in de “Regionale Regeling voor Openbare Aanbesteding van "
+     "Werken”).", 'The works follow the procedure (as defined in the "Regional Public Works Contract Rules").',
+     "Regionale Regeling voor Openbare Aanbesteding van Werken"),
+    ("Polish", "a naming verb", 'Projekt zwany "Centrum Usług Biurowych Górnej Zielonej Dzielnicy" jest zatwierdzony.',
+     'The project "Upper Green District Service Centre" is authorised.',
+     "Centrum Usług Biurowych Górnej Zielonej Dzielnicy"),
+    ("Polish", "a cross-reference",
+     'Prace przebiegają według procedury (zgodnie z definicją w "Regionalnym Regulaminie Zamówień na Roboty '
+     'Publiczne").', 'The works follow the procedure (as defined in the "Regional Public Works Contract Rules").',
+     "Regionalnym Regulaminie Zamówień na Roboty Publiczne"),
+    ("Hungarian", "a naming word after the name",
+     'A "Felső Zöld Negyed Szolgáltató Központja Projekt" nevű projektet jóváhagyták.',
+     'The "Upper Green District Service Centre" project has been approved.',
+     "Felső Zöld Negyed Szolgáltató Központja Projekt"),
+    ("Hungarian", "a cross-reference",
+     'Az eljárás (a "Regionális Szabályzat a Középítési Munkák Megrendeléséről" szerint) zajlik.',
+     'The procedure runs (under the "Regional Public Works Contract Rules").',
+     "Regionális Szabályzat a Középítési Munkák Megrendeléséről"),
+    ("Finnish", "a naming verb", 'Hanke nimeltään "Ylemmän Vihreän Kaupunginosan Palvelukeskus Uusi" on hyväksytty.',
+     'The project "Upper Green District Service Centre" is approved.',
+     "Ylemmän Vihreän Kaupunginosan Palvelukeskus Uusi"),
+    ("Finnish", "a cross-reference",
+     'Työt noudattavat menettelyä (kuten määritelty "Alueellisessa Julkisten Rakennusurakoiden Hankintaohjeessa '
+     'Nykyisin").', 'The works follow the procedure (as defined in the "Regional Public Works Contract Rules").',
+     "Alueellisessa Julkisten Rakennusurakoiden Hankintaohjeessa Nykyisin"),
+    ("Norwegian", "a naming verb", 'Prosjektet kalt "Servicesenter for Det Øvre Grønne Strøket" er godkjent.',
+     'The project "Upper Green District Service Centre" is approved.', "Servicesenter for Det Øvre Grønne Strøket"),
+    ("Norwegian", "a cross-reference",
+     'Arbeidet følger prosedyren (som definert i "Regionalt Regelverk for Offentlige Byggekontrakter i Fylket").',
+     'The works follow the procedure (as defined in the "Regional Public Works Contract Rules").',
+     "Regionalt Regelverk for Offentlige Byggekontrakter i Fylket"),
+    # A follow-on word (par, por) may come after a lead-in but never begin one: "(by the X)" is a reference.
+    ("French", "a follow-on word is no lead-in",
+     "Les travaux sont régis (par le « Règlement Régional des Marchés de Travaux Publics »).",
+     'The works are governed (by the "Regional Public Works Procurement Rules").',
+     "Règlement Régional des Marchés de Travaux Publics"),
+    ("Spanish", "a follow-on word is no lead-in",
+     "Las obras se rigen (por el “Reglamento Regional de Contratos de Obras Públicas”).",
+     'The works are governed (by the "Regional Public Works Contract Rules").',
+     "Reglamento Regional de Contratos de Obras Públicas"),
+    # A bare bracket is no marker: a quoted name in brackets takes that shape too.
+    ("English", "a bare bracket",
+     'The parties signed the contract ("Long Term Office Cleaning and Catering Contract").',
+     'The parties signed the contract ("Long-Term Office Cleaning and Catering Contract").',
+     "Long Term Office Cleaning and Catering Contract"),
+)
+# The widening's own true positive: a name dropped in the low opening quote, never read before.
+G7L_WIDE = (
+    ("Polish", "Strony realizują projekt „Centrum Usług Biurowych Delta Północ Nowa” w terminie.",
+     "The parties carry out the project on time.", "Centrum Usług Biurowych Delta Północ Nowa"),
+    ("German", "Die Parteien verwirklichen das Projekt „Bürozentrum am Alten Markt Nummer Eins“ fristgerecht.",
+     "The parties carry out the project on time.", "Bürozentrum am Alten Markt Nummer Eins"),
+)
+# Moot: a span with no space is one word. The marker is silent then and now -- and so, DECLARED BLIND,
+# is a name dropped in it.
+G7L_MOOT = (
+    ("Japanese marker", "当事者は本契約（以下「事務所清掃業務委託契約」という。）を締結する。", KEEP),
+    ("Chinese marker", "双方签订本合同（以下简称“办公室清洁服务合同”）。", KEEP),
+    ("Japanese name dropped, DECLARED BLIND", "当事者は「事務所清掃センター北棟」の業務を実施する。",
+     "The parties carry out the services."),
+)
+# --- 14.5 cases: end
+
+
+def low9_twin(s):
+    """The same paragraph with each low-opening-quote span in typographic quotes, which the old code read."""
+    return re.sub("„([^„”“]+)[”“]", lambda m: "“" + m.group(1) + "”", s)
+
+
+for tree in ("uk", "us"):
+    old_vt = load_old("validate_translations.py", tree)
+    new_vt = load_new("validate_translations.py", tree)
+
+    def fired(mod, src, en):
+        return [p for _s, p in mod._check_quoted_phrase_retention({"text": src, "en": en})]
+
+    for lang, shape, src, span in G7L:
+        keep, drop = (TKEEP, TDROP) if "title" in shape else (KEEP, DROP)
+        twin = low9_twin(src)
+        new_f, old_f = fired(new_vt, src, keep), fired(old_vt, twin, keep)
+        ok(f"G7 {tree} {lang} {shape}: silent now", not new_f, f"({new_f})")
+        ok(f"G7 {tree} {lang} {shape}: PROVED it fired before" + (" (its typographic twin)" if twin != src else ""),
+           span in old_f, f"({old_f})")
+        new_f, old_f = fired(new_vt, src, drop), fired(old_vt, twin, drop)
+        ok(f"G7 {tree} {lang} {shape} dropped with its quotes: still fires, on that span", span in new_f, f"({new_f})")
+        ok(f"G7 {tree} {lang} {shape} dropped with its quotes: fired before too", span in old_f, f"({old_f})")
+    for lang, shape, src, en, span in G7L_TP:
+        new_f, old_f = fired(new_vt, src, en), fired(old_vt, src, en)
+        ok(f"G7 {tree} {lang} TRUE POSITIVE {shape}: still fires, on that span", span in new_f, f"({new_f})")
+        ok(f"G7 {tree} {lang} TRUE POSITIVE {shape}: fired before too", span in old_f, f"({old_f})")
+    for lang, src, en, span in G7L_WIDE:
+        new_f, old_f = fired(new_vt, src, en), fired(old_vt, src, en)
+        ok(f"G7 {tree} {lang} a name dropped in the low opening quote: fires now", span in new_f, f"({new_f})")
+        ok(f"G7 {tree} {lang} a name dropped in the low opening quote: PROVED unread before", not old_f, f"({old_f})")
+    for label, src, en in G7L_MOOT:
+        new_f, old_f = fired(new_vt, src, en), fired(old_vt, src, en)
+        ok(f"G7 {tree} {label}: silent now and before (moot)", not new_f and not old_f, f"({new_f}, {old_f})")
+    for lang, src, span, quiet in G7L_ALONE:
+        new_f = [p for _s, p in new_vt._check_quoted_phrase_retention({"text": src, "en": KEEP}, lang)]
+        old_f = fired(old_vt, src, KEEP)
+        if quiet:
+            ok(f"G7 {tree} an article alone, {lang} declared: silent now", not new_f, f"({new_f})")
+        else:
+            ok(f"G7 {tree} TRUE POSITIVE an article alone, {lang} declared: still fires", span in new_f, f"({new_f})")
+        ok(f"G7 {tree} an article alone, {lang} declared: fired before", span in old_f, f"({old_f})")
+    new_f, old_f = fired(new_vt, *G7L_PHANTOM), fired(old_vt, *G7L_PHANTOM)
+    ok(f"G7 {tree} a German closer opens no phantom span: silent now", not new_f, f"({new_f})")
+    ok(f"G7 {tree} a German closer opens no phantom span: PROVED it fired before", bool(old_f), f"({old_f})")
+    new_f, old_f = fired(new_vt, G7L_PT[0], G7L_PT[1]), fired(old_vt, G7L_PT[0], G7L_PT[1])
+    ok(f"G7 {tree} TRUE POSITIVE an abbreviation is no title word: fires now and before",
+       G7L_PT[2] in new_f and G7L_PT[2] in old_f, f"({new_f}, {old_f})")
+    # THE DECLARATION REACHES THE CHECK: the whole script on a Dutch "(de X)", declared Dutch at Step 1c
+    # and undeclared -- quiet the first way, warning the second.
+    for decl, want_quiet in (("dutch", True), (None, False)):
+        wd = TMP / f"vt-decl-{tree}-{decl}"
+        wd.mkdir()
+        (wd / "paragraphs.json").write_text(json.dumps([{"idx": 0, "text": G7L_ALONE[0][1], "en": KEEP}]),
+                                            encoding="utf-8")
+        if decl:
+            (wd / "source_language.json").write_text(json.dumps({"source_language": decl}), encoding="utf-8")
+        r = subprocess.run([sys.executable, str(ROOT / tree / "scripts" / "validate_translations.py"),
+                            str(wd / "paragraphs.json")], capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", env=F10_ENV, cwd=wd)
+        warned = "Quoted source phrases NOT found" in r.stdout + r.stderr
+        ok(f"G7 {tree} the whole script, a Dutch article alone, {decl or 'nothing'} declared: "
+           f"{'no' if want_quiet else 'a'} quoted-phrase WARN", warned != want_quiet, f"(rc={r.returncode})")
+    # THE EXIT skill Step 4 reads, by content: a French marker exits 0 now and PROVED it warned before;
+    # a Polish name dropped in the low opening quote warns now and PROVED it passed before.
+    old_dir = TMP / f"old_vt_{tree}"     # written by the G1/G7 section above
+    for row, case, now_warns in (("G7-fr", (None, G7L[3][2], KEEP), False), ("G7-pl", G7L_WIDE[0][:3], True)):
+        old_rc, old_out = vt_run(old_dir, f"old-{tree}-{row}", case)
+        new_rc, new_out = vt_run(ROOT / tree / "scripts", f"new-{tree}-{row}", case)
+        warned_now = new_rc == 1 and "Quoted source phrases NOT found" in new_out
+        passed_now = new_rc == 0 and "PASS" in new_out and "Quoted source phrases" not in new_out
+        warned_old = old_rc == 1 and "Quoted source phrases NOT found" in old_out
+        passed_old = old_rc == 0 and "PASS" in old_out and "Quoted source phrases" not in old_out
+        ok(f"{row} {tree}, the whole script: {'warns' if now_warns else 'exits 0 and PASS'} now",
+           warned_now if now_warns else passed_now, f"(rc={new_rc})")
+        ok(f"{row} {tree}, the whole script: PROVED it {'passed' if now_warns else 'warned'} before",
+           passed_old if now_warns else warned_old, f"(rc={old_rc})")
 
 # =============================================================================
 shutil.rmtree(TMP, ignore_errors=True)

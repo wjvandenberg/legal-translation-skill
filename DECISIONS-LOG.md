@@ -2294,3 +2294,43 @@ sub-step straight after 14.4 extends 14.3's defined-term-marker and title-verb e
 `validate_translations.py` to every supported language; by the house's rule 4b it takes the number 14.5, and the old
 14.5 to 14.9 renumber, which that session does in its own plan. Choice (3) of 2026-10-30 is overturned by it, and
 the prompt 14.4 had written for `quality_check.py` was replaced by 14.3's for this sub-step.
+
+## 2026-11-02 — Wouter: seven unattended hours, every recommendation followed, the questions at 16:00 to 17:00
+
+**WOUTER, IN HIS WORDS, TO THE CONDUCTOR AT 10:12:** *"Continue, for the next 7 hours, with all the next branches and
+steps. Start new sessions after closing directly as nested branches. Follow all your recommendations and only at 16/17h
+give me all the questions you answered. I don't want to see anything until then, you should ALWAYS continue without
+me."* So no session asks him anything until then: each takes its own recommendation, and records every question it
+answered in `temp/s1102_questions_answered.md` (gitignored), here and in its last message, for him to confirm or
+overturn.
+
+## 2026-11-02 (2) — sub-step 14.5 built and merged (#183), unattended: G7 in every language; nine choices the session's own
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS ABOVE** — so each choice below is THE SESSION'S, taken on its own
+recommendation and carried here for him to confirm or overturn; none is his ruling.
+
+**(1) THE NEW SUB-STEP IS 14.5, AND THE OLD 14.5 TO 14.9 ARE NOW 14.6 TO 14.10**, by rule 4b: the census by listing
+found every live citation in section 3.14 of the plan and two register rows, a documents-only sweep; entries in this
+log dated before today keep their old numbers, read through that mapping. **(2) NORWEGIAN IS IN, ON ITS MEASURED
+LEAD-IN ALONE** (`heretter`): unsupported, but the check runs on its test document all the same; no Norwegian title word
+could be sourced. **(3) THE LOW OPENING QUOTE `„` IS READ** — the one widening, measured first at 0 added on the corpus;
+without it no Polish, German or Hungarian marker could be exempted, and a name dropped in that style was never caught.
+Finnish `”…”` and Japanese and Chinese `「…」` are not read, each declared. **(4) THE WORDS NO LEXICON OR TEST DOCUMENT
+GIVES ARE EACH LANGUAGE'S USUAL DRAFTING FORMULA**, labelled unmeasured; a research pass on published legislation is
+the alternative, open. **(5) A LEAD-IN MARKS A TERM ON ITS OWN**, in every language. **(6) A BARE `("X")` STAYS
+CHECKED.** **(7) LEAD-INS AND TITLE WORDS ARE ONE LIST; AN ARTICLE ALONE IS THE DECLARED LANGUAGE'S** — the review's
+correction of the first build. **(8) FINNISH'S OWN QUOTE STAYS UNREAD**, declared. **(9) THE REVIEW'S EIGHT FINDINGS:
+seven fixed, the Finnish one declared.**
+
+**WHAT MOVED THE BUILD, EACH RECORDED AS IT HAPPENED.** The opening probe found the corpus's retention findings at 2,
+both Italian, so no language beyond 14.3's could be measured moving — stated before the census ran, and the census
+came out 2 to 2 in each tree. The census first refused itself on its planted control: its own reader missed Polish
+`zwaną` and Spanish `titulado` — the reader was fixed, never the control. The twin property first failed on ORDER
+alone, a low-quote finding listed after the guillemet ones — compared as a multiset, reordered is not changed. And
+`/code-review` at high found what the controls could not see: **pooled, one language's article is another's
+preposition**, so Spanish `(de "X")`, a reference, passed for a marker — 14.3's lesson, an exemption silencing the true
+positive beside it, met a third time; and, its property widened to German-closed spans, **a phantom span the check had
+always read** in `„A“ … „B”`. `PLAN-2-step-b.md` section 3.14's 14.5 block and the register's G7 row own the evidence.
+
+**THE CORPUS, AS STATED BEFORE THE COUNT RAN:** 2 findings to 2 in each tree, 0 removed, 0 added — every language
+beyond 14.3's closes on synthetic controls, declared.

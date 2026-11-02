@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, and 14.3 as #180, 2026-10-30; 14.4 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-10-30 — SESSION PURPOSE — what · how · purpose:** sub-step 14.4 by section 3.14: `lexicon_compliance.py` given G2's and G8's fixes and the missed `of the` alarm, in both trees; its own written plan first, red first against the pinned baseline, the legislation forms and the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-10-30: the conductor chain, unattended)* · **so that the lexicon check warns on an internal `Article N` and never on a citation of legislation, and a warning can be trusted** *(written immediately after the tag `rollback-2026-10-30b-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-02 — SESSION PURPOSE — what · how · purpose:** the sub-step after 14.4, numbered 14.5 by rule 4b: `validate_translations.py`'s defined-term-marker and title exemptions (G7) taken from Italian and English to every supported source language, in both trees; its own written plan first and the old 14.5 to 14.9 renumbered, each language's words sourced from the skill's own lexicons, red first against the pinned baseline, the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-10-30 and 2026-11-02: the conductor chain, unattended)* · **so that a defined term or a title kept in quotes, in any supported language, raises no false missing-phrase warning, while one dropped with its quotes still does** *(written immediately after the tag `rollback-2026-11-02b-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -1897,7 +1897,7 @@ rather than *confirmed*.
 > **FOR THE BUILD — THE BRIEF, APPROVED 2026-10-26.** Written by the unattended hop of run `d2c-last-hop1` from the
 > register rows section 9.3 gives step 14, each re-read in full and measured against BOTH trees as they are
 > today, then **APPROVED by Wouter through the question tool on 2026-10-26, two of the hop's answers
-> overturned** — G12 gets a text-free tool as 14.9, and the missed `of the` alarm folds into 14.4
+> overturned** — G12 gets a text-free tool as 14.10, and the missed `of the` alarm folds into 14.4
 > *(`DECISIONS-LOG.md`, 2026-10-26 (3))*. It sits after 3.13, out of section 2's order, because it was written
 > last; Wouter kept it there, and section 2 owns the order.
 > **Needs first:** nothing — his go is given. **Unblocks:** nothing — steps 15 to 22 do not wait on it.
@@ -1909,7 +1909,7 @@ rather than *confirmed*.
 proving it still catches the true positive. Its first sub-step, **14.1, the `quality_check` sub-step**, was built
 and merged where section 2's fourth sequencing fact placed it, straight after step 5; it closed G5, G10, G11
 and half of G9, and four rows other steps own — L1, M1, C9's input half and F15. **What remains is planned
-here as 14.2 to 14.9.** *(14.1 was never numbered when it was built; naming it so keeps the sequence
+here as 14.2 to 14.10.** *(14.1 was never numbered when it was built; naming it so keeps the sequence
 contiguous — the hop's judgement, confirmed by Wouter.)*
 
 **Measured 2026-10-26, both trees, against today's scripts** — `temp/s1026h_probe14.py`, gitignored: one
@@ -1924,19 +1924,20 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 | G1 | `validate_translations.py`: the quoted-phrase retention check pairs an elision apostrophe as a quote | **CLOSED 2026-10-30**, both trees, #180 | 14.3 |
 | G7 | the same check: a defined term in its `(the "X")` marker, a title after `recante`, a quoted contractual phrase | **CLOSED 2026-10-30** but for the third shape, a declared residual; both trees, #180 | 14.3 |
 | G2 · G8 · G14 | `lexicon_compliance.py`: the `Article N` warning on `of Legislative Decree` and on the comma form, and its silence on `of the Agreement` | **CLOSED 2026-10-30**, both trees, #181 | 14.4 |
-| G3 | `quality_check.py`: the list-connective whitelist misses `; and/or` | OPEN; `; or` already quiet | 14.5 |
-| G13 | `quality_check.py`: the remnant check on the lexicon's kept names | OPEN: 5 of the 10 `LEXICON_KEPT_NAMES` entries fire in an English sentence, where the row says six — reconciled at 14.5 | 14.5 |
-| G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | OPEN, and it fires INSIDE the form itself — `B.V`, `S.p`, `p.A` — whatever follows it, where the row says "followed by a capital" | 14.6 |
-| C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | OPEN; a text part, copied, passes | 14.7 |
+| G7 | the same check's marker and title exemptions, Italian and English only — taken to every language by Wouter, 2026-10-30 | **CLOSED 2026-11-02**, both trees, #183 — Japanese, Chinese and Finnish's own quote declared, not built | 14.5 |
+| G3 | `quality_check.py`: the list-connective whitelist misses `; and/or` | OPEN; `; or` already quiet | 14.6 |
+| G13 | `quality_check.py`: the remnant check on the lexicon's kept names | OPEN: 5 of the 10 `LEXICON_KEPT_NAMES` entries fire in an English sentence, where the row says six — reconciled at 14.6 | 14.6 |
+| G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | OPEN, and it fires INSIDE the form itself — `B.V`, `S.p`, `p.A` — whatever follows it, where the row says "followed by a capital" | 14.7 |
+| C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | OPEN; a text part, copied, passes | 14.8 |
 
-**The sub-steps.** 14.2 to 14.7 each edit one script — and 14.2 one step document as well — **in both trees,
+**The sub-steps.** 14.2 to 14.8 each edit one script — and 14.2 one step document as well — **in both trees,
 so each is HEAVY.** Each makes its fix as a PATTERN change, the rule still running. Each adds its controls to
 `tests/test_check_scoping.py`, whose method is 14.1's and is kept: the old script read out of git at a pinned
 `LT_BASELINE_REF`, every false-positive control proved to have FIRED there, every true-positive control proved
 to fire before and after. And each counts the corpus before and after — `tools/qc_census.py` or
 `tools/gate_replay.py`, counts only — every removed finding attributed to its row and none added, save 14.4's
-missed alarm, whose added findings are counted and attributed to its own new row. **14.8 and 14.9 are
-otherwise:** 14.8 edits step documents once its measurement says which, and 14.9 is a MEDIUM new instrument
+missed alarm, whose added findings are counted and attributed to its own new row. **14.9 and 14.10 are
+otherwise:** 14.9 edits step documents once its measurement says which, and 14.10 is a MEDIUM new instrument
 with negative tests of its own, touching no shipped file.
 
 - **14.2 — `validate_segment_shapes.py`: F10, and F5's sentence.** The alpha-collision rule returns nothing
@@ -1962,18 +1963,22 @@ with negative tests of its own, touching no shipped file.
   Constitution named after `of the` — the set measured against the corpus before the edit, so the narrowing
   cannot bring back G2's and G8's class. A false NEGATIVE closed, so the check fires more and never less; the
   sub-step files it as a register row and closes it.
-- **14.5 — `quality_check.py`: G3 and G13.** `LIST_CONNECTOR_RE` takes `and/or`. The remnant check reads
+- **14.5 — `validate_translations.py`: G7 in every language** *(Wouter, 2026-10-30: "for all languages we should
+  do this", inserted after 14.4)*. 14.3's marker and title exemptions, Italian and English, taken to every language
+  the skill supports. *TP:* in each language, a term or a title dropped with its quotes, a naming verb and a
+  cross-reference still warn. *FP:* each language's marker and title form quiet.
+- **14.6 — `quality_check.py`: G3 and G13.** `LIST_CONNECTOR_RE` takes `and/or`. The remnant check reads
   `LEXICON_KEPT_NAMES` through `source_language_markers`, the table repack's block already reads — one call, not
   a second list. *TP:* a dangling "at the" still flags; a real remnant beside a kept name still flags. *FP:* a
   paragraph ending "; and/or", and each kept name inside an English sentence, quiet.
-- **14.6 — `validate_reject_all.py`: G4.** The missing-space rule skips a dot inside a dotted abbreviation — a
+- **14.7 — `validate_reject_all.py`: G4.** The missing-space rule skips a dot inside a dotted abbreviation — a
   letter, a dot, a letter, a dot. *TP:* "Buyer.The" still fires. *FP:* `B.V.`, `S.p.A.`, `S.à r.l.` quiet.
-- **14.7 — `verify_diligence.py`: C10.** The skill Step 8 presence check asks for a translated copy only of a
+- **14.8 — `verify_diligence.py`: C10.** The skill Step 8 presence check asks for a translated copy only of a
   part that CARRIES TEXT — the condition skill Step 8's own wording took when C7 closed. *TP:* a text-bearing
   header with no copy still FAILS. *FP:* an empty header with no copy does not.
-- **14.8 — option 5's share, below** — it rides with this step *(Wouter, 2026-10-26)*: each of the 17 rows
+- **14.9 — option 5's share, below** — it rides with this step *(Wouter, 2026-10-26)*: each of the 17 rows
   measured against both trees first, the instruction fixes then planned from that measurement.
-- **14.9 — G12's text-free route** *(Wouter, 2026-10-26, overturning the hop's answer that he read them)*. A
+- **14.10 — G12's text-free route** *(Wouter, 2026-10-26, overturning the hop's answer that he read them)*. A
   new instrument reporting each of G12's 16 unaccounted `quality_check` findings (its row's count of 2026-08-21,
   not re-measured) by the SHAPE of its citation, never a word of its text, so that Claude classifies them by
   shape and never reads them. MEDIUM, touching no shipped file; its own negative tests first — a planted shape it
@@ -1995,19 +2000,19 @@ own steps'.
   segments, its row's measurement); seeing apply's boundary-whitespace restoration needs the source text in
   the notes, a SCHEMA change.
 - **G6 — an observation, not a defect:** evidence for this step's worth, closed with the step *(Wouter, 2026-10-26)*.
-- **C7 — CLOSED** by step 11's sub-step 3b, 2026-09-28; what it left is C10, 14.7's.
+- **C7 — CLOSED** by step 11's sub-step 3b, 2026-09-28; what it left is C10, 14.8's.
 
-**Option 5's share — 14.8's, by Wouter's answer of 2026-10-26.** Section 3.4 says option 5's *"share of the wrong
+**Option 5's share — 14.9's, by Wouter's answer of 2026-10-26.** Section 3.4 says option 5's *"share of the wrong
 instructions and the conflict rules rides with step 14"*, and section 9.3 names none of them. **Measured: 17 of
 option 5's 49 rows have no step accountable for them in 9.3** — C26, C29, F2, F3, F4, F6, F9, F11, F14, F18,
 F20, F21, F23, F32, F36, F37, F38 (C29 is named in step 6's row only to be disowned) — **16 carry no CLOSED in
 their severity cell** (C26's own text says PARTIAL) and F6's does; **none is in section 12's no-compliant-repair
-set**, which step 4's row routes through. They were not explored here; riding with step 14, 14.8
+set**, which step 4's row routes through. They were not explored here; riding with step 14, 14.9
 measures each against both trees first, and the instruction fixes follow as their own sub-steps.
 
-**Size:** six HEAVY sub-steps, 14.2 to 14.7 — **two to three sessions**, each one branch, one full run and one
-pull request; **one or two more** for 14.8, option 5's share; **one** MEDIUM session for 14.9's tool — about
-four to six in all.
+**Size:** seven HEAVY sub-steps, 14.2 to 14.8 — **one session each, as built**, each one branch, one full run and one
+pull request; **one or two more** for 14.9, option 5's share; **one** MEDIUM session for 14.10's tool — about
+nine or ten in all.
 
 **VERIFY, per sub-step:** its controls red against the pinned old code and green now; the parity check; the
 corpus count before and after, every move attributed; the three confidentiality controls. **TEST:**
@@ -2025,7 +2030,7 @@ the edited script, and the full run once, before the push.
 > regular "the" before an ins "Agreement", and a del→regular collision (G9's open half), firing at both. In
 > `tests/test_check_scoping_properties.py`, one property over generated pairs: the rule's verdict moves ONLY on a
 > del↔ins pair, the old code proved to fire on some. **Must not touch:** any other rule or script, any exit code,
-> apply, the scanner's standalone exit 0 (F10's factor (b), F36's class, 14.8's), a regular↔tracked-change
+> apply, the scanner's standalone exit 0 (F10's factor (b), F36's class, 14.9's), a regular↔tracked-change
 > boundary, the anti-drift safeguards. **Corpus:** the old rule (`main`, `21317f5`) and the new over all 13 frozen
 > workdirs, both trees, counts only, by `temp/s1029_vss_census.py` — declared, because neither tool the brief names
 > runs this scanner (`qc_census.py` reads `quality_check`, `gate_replay.py` the logs): every removed finding a
@@ -2171,6 +2176,69 @@ the edited script, and the full run once, before the push.
 > VERIFY 18 of 18, 19 of 19 and 21 of 21, TEST 13 of 13, 13 of 13 and 7 of 7, through the cycle gate; the one full run
 > on `3b19ce0`, OVERALL PASS; G2, G8 and G14 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the
 > conductor chain; 2026-10-30, unattended)*.
+> **14.5 — ITS OWN WRITTEN PLAN, 2026-11-02, before any edit, on `feature/step14-5-g7-every-language`.** Inserted
+> after 14.4 by Wouter on 2026-10-30 — *"for all languages we should do this"* — so by rule 4b it takes the number
+> 14.5 and the old 14.5 to 14.9 are now 14.6 to 14.10: every forward citation in this section and in the register
+> renumbered in this change, after a census of `14.5` to `14.10` across the tracked files by listing; the decisions
+> log's dated entries keep their words, read through this mapping. **Measured first, `main` at `61d97e2`, both trees
+> alike** (`temp/s1102b_vt_lang_probe.py`, counts and the probe's own candidate words only): the retention check
+> makes 2 findings over the 13 frozen workdirs, G7's residual and D05's prose, so **no corpus finding can move, and
+> every language beyond 14.3's rests on synthetic controls alone — declared.** The source paragraphs bracket a quoted
+> span after Dutch `hierna` and `hierna te noemen` (22 and 4), after Polish `zwana dalej` inside `„…”` (2), after
+> Norwegian `heretter` (2), and in Japanese as `（以下「X」という。）` (9); the Hungarian documents hold no quoted span at
+> all, and English `(a "X")` was measured once. **Where each word comes from:** measured on the corpus, as above; the
+> lexicons — French `ci-après` and `ci-dessous`, German `nachstehend`, Dutch `hieronder`, each the lexicon's own
+> "below"; every other word is its language's standard drafting formula, **unmeasured, its controls synthetic.**
+> **Changes,** both trees' `validate_translations.py`, the rule still a WARN, no exit moved: (1) the lead-in, the
+> article and the title lists take French, Spanish, Portuguese, German, Dutch, Polish, Hungarian and Finnish, and
+> Norwegian — unsupported, but in the corpus — on its measured `heretter`; one list for all languages, as 14.3's,
+> because the function sees no language. (2) **A lead-in identifies a marker on its own**, the article optional after
+> it, because four of these languages have no article — so Italian `(di seguito "X")` and English `(hereinafter "X")`,
+> which 14.3 left warning, are exempt too; a bare `("X")` stays checked in every language, being the shape a quoted
+> name in brackets also takes. (3) A German or Dutch participle may close the marker — `(nachfolgend "X" genannt)` —
+> and a Hungarian title word FOLLOWS the title — `"X" című`. (4) **One quote style more is read** *(the session's own
+> recommendation, taken while Wouter is away — `DECISIONS-LOG.md`, 2026-11-02)*: the low opening quote `„`, closed by
+> `”` or `“` — Polish, German, Hungarian and Dutch — as a double quote, so that those languages' own markers are
+> reached at all; measured first, 2 such spans in the corpus, neither firing. **Not read, each declared:** Finnish
+> `”…”`, one character on both sides, which pairs across `“A” … “B”` (24 such phantom pairs on the Italian documents);
+> `‚…‘`, `‹…›` and `»…«`; and Japanese and Chinese `「…」` — where a span holding no space is also one word, under every
+> threshold, so their marker exemption is MOOT, a control proving it. (5) **The defect beside the false one,** kept
+> from 14.3: every exemption holds only while the English keeps at least as many quoted spans as the source; no
+> language's naming verb (`dénommé`, `denominado`, `genannt`, `genaamd`, `zwany`, `nevű`, `nimeltään`) is a title word;
+> and a lead-in must begin with a marker phrase, so a cross-reference cannot pass for a marker. **Controls,**
+> `tests/test_check_scoping.py`, both trees, per language: *FP* — its marker and its title form, silent now and PROVED
+> to fire at `2178cce` and at `61d97e2` (a `„…”` form proved through its `“…”` twin); *TP* — the term and the title
+> dropped with their quotes, a naming verb and a cross-reference, firing now and before; the widening's own, a `„…”`
+> name dropped, firing now and PROVED silent at `2178cce`; and the moot CJK marker silent then and now.
+> `tests/test_check_scoping_properties.py`: property 9 given every language's shapes, and a `„…”` span read exactly as
+> its `“…”` twin. A mutant per new list. **Must not touch:** G1's apostrophe rule, the thresholds, the definition-body
+> skip, the ratio, the batch cap, the placeholder refusal, any exit code, any other script, the anti-drift safeguards.
+> **Corpus:** old (`61d97e2`) against new over the 13 frozen workdirs, both trees, by `temp/s1102b_vt_census.py`,
+> counts only — **expected: 2 to 2 in each tree, 0 removed, 0 added** — a planted set proving the count moves, any
+> move attributed by the census's own reader and any addition to the widened quote. **Then** the parity check, both
+> divergences re-recorded, the three confidentiality controls, VERIFY and TEST through `tools/cycle_evidence.py`. **No
+> render, declared:** a WARN decides nothing apply writes. **Done when:** G7's row is amended in the register, every
+> supported language built or declared moot, its residual unchanged.
+> **AMENDED AT REVIEW, 2026-11-02, before the full run.** `/code-review` at high, on `1c01e3b`: eight findings, seven
+> fixed, one declared. (1) **The pooled article list let one language's preposition pass for another's article** —
+> Dutch `de` is Spanish "of", Hungarian `a` Italian "to" — so a bracketed reference, Spanish `(de "X")`, was exempted:
+> 14.3's lesson met a third time. An article standing ALONE in the bracket now counts only in the language declared at
+> skill Step 1c, which `validate()` already reads and now passes to the check — 14.3's Italian and English set when
+> none is declared; after a lead-in any article still stands, the lead-in having marked the term. That was also the
+> altitude finding, the union taken back to where the language is known. (2) The measured Dutch article after a
+> lead-in, the participles `bezeichnet` and `genoemd`, and the Hungarian `címmel` had no control — added. (3) `pt.` read
+> any `Pt.` abbreviation as a Polish title word — removed. (4) The docstring said "after a title verb" — corrected.
+> (5) The twin property skipped every German-closed span; widened, it found that in `„A“ … „B”` the typographic pair
+> read a phantom span from A's German closer to B's closer — a typographic span no longer runs across a low opening
+> quote. **Declared, not built:** Finnish's own `”…”` is not read, so the Finnish exemption reaches only a document typed
+> with ordinary quotes — reading it when Finnish is declared is a second widening, unmeasured, open for Wouter.
+> Controls added, both trees, each review true positive PROVED missed at `1c01e3b` (0 of 10) and held now; five
+> mutants added, 24 of 24 caught; 680 assertions and 25 properties. The corpus re-counted: 2 to 2 in each tree, 0
+> added.
+> **BUILT AND MERGED, 2026-11-02, as #183:** `1c01e3b` the fix and the renumbering, `0df8c3d` the review's seven,
+> `58206c1` the filing; VERIFY 30 of 30, 32 of 32 and 18 of 18, TEST 22 of 22, 22 of 22 and 6 of 6, through the cycle
+> gate; the one full run on `58206c1`, 94 suites, OVERALL PASS; G7's row amended in the register; squash-merged on green
+> *(Wouter, 2026-10-29, the conductor chain; 2026-11-02, unattended)*.
 
 ---
 
