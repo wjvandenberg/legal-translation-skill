@@ -1925,8 +1925,8 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 | G7 | the same check: a defined term in its `(the "X")` marker, a title after `recante`, a quoted contractual phrase | **CLOSED 2026-10-30** but for the third shape, a declared residual; both trees, #180 | 14.3 |
 | G2 · G8 · G14 | `lexicon_compliance.py`: the `Article N` warning on `of Legislative Decree` and on the comma form, and its silence on `of the Agreement` | **CLOSED 2026-10-30**, both trees, #181 | 14.4 |
 | G7 | the same check's marker and title exemptions, Italian and English only — taken to every language by Wouter, 2026-10-30 | **CLOSED 2026-11-02**, both trees, #183 — Japanese, Chinese and Finnish's own quote declared, not built | 14.5 |
-| G3 | `quality_check.py`: the list-connective whitelist misses `; and/or` | OPEN; `; or` already quiet | 14.6 |
-| G13 | `quality_check.py`: the remnant check on the lexicon's kept names | OPEN: 5 of the 10 `LEXICON_KEPT_NAMES` entries fire in an English sentence, where the row says six — reconciled at 14.6 | 14.6 |
+| G3 | `quality_check.py`: the list-connective whitelist misses `; and/or` | **CLOSED 2026-11-02**, both trees, #184 | 14.6 |
+| G13 | `quality_check.py`: the remnant check on the lexicon's kept names | **CLOSED 2026-11-02**, both trees, #184 — all ten, 10 of 10 firing before, each name in its own language | 14.6 |
 | G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | OPEN, and it fires INSIDE the form itself — `B.V`, `S.p`, `p.A` — whatever follows it, where the row says "followed by a capital" | 14.7 |
 | C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | OPEN; a text part, copied, passes | 14.8 |
 
@@ -2296,6 +2296,10 @@ the edited script, and the full run once, before the push.
 > is not source text; the exemption is case-folded and blind to the declared language, as repack's reading of the same
 > table is; and `; and/or` is quiet whatever its source ends on, as `; and` and `; or` are. Controls unchanged in
 > number, 868 assertions; 35 properties; one mutant added, 12 of 12 caught.
+> **BUILT AND MERGED, 2026-11-02, as #184:** `2610699` the fix, `44cf034` the review's three, then the filing; VERIFY
+> 33 of 33 and 33 of 33, TEST 30 of 30 and 30 of 30, through the cycle gate; the one full run on `44cf034`, OVERALL
+> PASS; G3 and G13 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain;
+> 2026-11-02, unattended)*.
 
 ---
 
