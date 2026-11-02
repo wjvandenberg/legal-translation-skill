@@ -31,9 +31,9 @@
    "sha256_now": "7a4064265a13db83d9bc9dd00319cc3df278ce5704f1ca52996d7fc1c9d6b8c1"
   },
   "uk/scripts/quality_check.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "c0414f93e2034ef19b032766aeb8d605e07fddd10733145f3e804e174795b77c"
+   "changed_by": "feature/step14-6-qc-and-or-kept-names",
+   "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
+   "sha256_now": "4c8f114186370d9aa6c6dc1a5b86434efa6a0c1fc5e37472adf3429fd9869e60"
   },
   "uk/scripts/repack_docx.py": {
    "changed_by": "feature/step13-5-side-part-language",
@@ -41,9 +41,9 @@
    "sha256_now": "85ad27ca9c2b2695188dec8f2d5eeef8c7336c8d58c7119e5ccfcb7d5f3feda5"
   },
   "uk/scripts/source_language_markers.py": {
-   "changed_by": "feature/step13-4-variant-conversion",
-   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
-   "sha256_now": "810daa47f9246b32bf055ea824a0c70fbd8801dd6ea3fe19d01e1182bdce512f"
+   "changed_by": "feature/step14-6-qc-and-or-kept-names",
+   "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
+   "sha256_now": "aa9d922ba28e98f7b2e632592f05d47444c939c2a60cea4f9be2ee601a4794c5"
   },
   "uk/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch11-slice4a",
@@ -131,9 +131,9 @@
    "sha256_now": "1211578c21f75a42ea81489889142b68d0932871202f4df6ab4f2f1040a011ba"
   },
   "us/scripts/quality_check.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "19c79bf4472de82a5cd74d22c7d549b7519224cfda5a49d4418297a8a78ea283"
+   "changed_by": "feature/step14-6-qc-and-or-kept-names",
+   "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
+   "sha256_now": "b7b1fcc6303c2344fd30abd5f0c4542e3e0b0b7e42e82da6642e09a115d4f45f"
   },
   "us/scripts/repack_docx.py": {
    "changed_by": "feature/step13-5-side-part-language",
@@ -141,9 +141,9 @@
    "sha256_now": "c02cc1d98213540989a607baf7375b4dab2cce42c580293513433613f7ec7bac"
   },
   "us/scripts/source_language_markers.py": {
-   "changed_by": "feature/step13-4-variant-conversion",
-   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
-   "sha256_now": "94ddd04218a209b16e87fef658b409ab2fb31fd0cb52eaef9247a97bfb4948d8"
+   "changed_by": "feature/step14-6-qc-and-or-kept-names",
+   "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
+   "sha256_now": "803c37f1a2df1a7dd51917c39c762e0e02f1cc83a53b7f12ae126ba1cfa8a81d"
   },
   "us/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/branch11-slice4a",

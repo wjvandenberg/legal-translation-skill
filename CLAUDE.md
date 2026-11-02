@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; next, 14.6 · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, and 14.6, `quality_check`'s G3 and G13, as #184, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; next, 14.7 · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,22 +578,22 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-02, SUB-STEP 14.5 MERGED AS #183; NEXT, 14.6 (`quality_check.py`, G3 AND G13)
+### HANDOFF — 2026-11-02, SUB-STEP 14.6 MERGED AS #184; NEXT, 14.7 (`validate_reject_all.py`, G4)
 
-**PURPOSE: MET** — *a defined term or a title kept in quotes, in any supported language, raises no false missing-phrase
-warning, while one dropped with its quotes still does*: G7 amended, both trees; CJK and Finnish's own quote declared;
-`DECISIONS-LOG.md`, 2026-11-02 (2), owns the nine choices, all taken unattended.
+**PURPOSE: MET** — *`; and/or` between list items and a name the lexicon keeps raise no false quality warning, while a
+real remnant and a real list-break still do*: G3 and G13 CLOSED, both trees; `DECISIONS-LOG.md`, 2026-11-02 (3), owns
+the nine choices, all taken unattended, in the conductor's own session.
 
-**PRODUCED, CODE:** `1c01e3b` the fix and the renumbering (old 14.5–14.9 now 14.6–14.10); `0df8c3d` the review's seven;
-`58206c1` the filing. 680 assertions, 25 properties, 24 mutants; corpus 2 to 2 per tree, 0 added; full run OVERALL PASS.
+**PRODUCED, CODE:** `2610699` the fix; `44cf034` the review's three; then the filing. 868 assertions, 35 properties, 12
+mutants; corpus 27 to 27 with the notes and 32 to 27 without, every removal G3, 0 added; full run OVERALL PASS.
 
-**SINGLE NEXT ACTION: SUB-STEP 14.6**, `quality_check.py`, G3 and G13, its prompt `temp/s1102b_next_prompt.md`; the
-conductor starts it *(Wouter, 2026-11-02)*; a red or usage over 90% stops the chain.
+**SINGLE NEXT ACTION: SUB-STEP 14.7**, `validate_reject_all.py`, G4, its prompt `temp/s1102c_next_prompt.md`. The app
+starts no session from an automated turn, so it waits for Wouter's word or a session that has context to spare.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** one language's article is another's preposition — pooled, Spanish `(de "X")`
-passed for a marker, so key anything language-shaped on the declared language; a census's own reader can be what is
-wrong — fix it, never the planted control; a property narrowed to stay green hides a shape.
+**WHAT A NEW SESSION WOULD GET WRONG:** a planned false positive must be PROVED to fire before — 14.6's capitalised
+`; AND/OR` never had, the dangling-ending rule reading lower case only; a brief's count can come from a probe that
+judged every case in one language — measure each in its own.
 
-**Open, none blocking:** the nine choices for Wouter (`temp/s1102_questions_answered.md`); reading Finnish `”…”` and a
-CJK word count, both unmeasured widenings; sourcing the unmeasured words; 14.4's `post_process.py` reader. **Context:
-56% when written.**
+**Open, none blocking:** the nine choices for Wouter (`temp/s1102_questions_answered.md`); the dangling-ending rule's
+case-blindness; apply's own remnant warning still listing a kept name; 14.5's and 14.4's open items stand. **Context:
+50% when written.**

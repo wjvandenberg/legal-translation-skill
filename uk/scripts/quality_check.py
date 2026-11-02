@@ -69,6 +69,8 @@ def _sibling_integrity_exit(name, exc):
 try:
     from source_language_markers import (  # noqa: E402
         scan_remnants,
+        remnant_verdict,
+        KEPT_NAME_WHY,
         bare_month_hits,
         detect_language,
         SUPPORTED_LANGUAGES,
@@ -220,10 +222,12 @@ TRUNCATION_ENDINGS = [
     r'\ba\s*$', r'\ban\s*$',
 ]
 
-# List-connective whitelist: "; and", ", and", "; or", ", or" are legal-English
-# list connectives, NOT truncation. Short-circuits the truncation flag without
-# weakening detection of genuine truncations (which lack the ;/, prefix).
-LIST_CONNECTOR_RE = re.compile(r'(?:[;,]\s*)(?:and|or)\s*$', re.IGNORECASE)
+# List-connective whitelist: "; and", ", and", "; or", ", or" and "; and/or" are
+# legal-English list connectives, NOT truncation. Short-circuits the truncation flag
+# without weakening detection of genuine truncations (which lack the ;/, prefix).
+# `and/or` came last, register G3: the pattern stopped one character short of it, so
+# a list item ending "; and/or" read as a sentence cut off on "or".
+LIST_CONNECTOR_RE = re.compile(r'(?:[;,]\s*)(?:and\s*/\s*or|and|or)\s*$', re.IGNORECASE)
 
 # Terminal punctuation, for the source-side test the dangling-ending rule needs.
 # A source paragraph that itself ends mid-sentence cannot have a faithful English
@@ -411,6 +415,29 @@ def _note_bare_months(text, lang, where, sink):
         sink.append(f"{where}: '{context.strip()[:100]}'")
 
 
+# A NAME THE LEXICON KEEPS IN THE SOURCE LANGUAGE IS NO REMNANT (register G13). The skill's own
+# lexicons tell the operator to write a few names untranslated -- "Agenzia delle Entrate", a French
+# statute by its date -- and each holds a marker word, so this check failed skill Step 9 on a
+# translation that followed the lexicon. repack's block already reads those names from
+# source_language_markers.LEXICON_KEPT_NAMES through remnant_verdict; this check reads them through
+# the same call, so the names live in one list. Only a hit whose own span lies inside such a name is
+# dropped: the same marker word beside it still counts, and the CJK and company-form classes,
+# advisory in repack, stay issues here. The hits keep scan_remnants' order, so the display cap shows
+# the findings it showed before. The class is told by KEPT_NAME_WHY, the module's own opening of
+# that reason, so the wording lives in one place.
+def _remnant_hits(text, lang):
+    """scan_remnants(text, lang, bare_months=False)'s hits, less those inside a kept name."""
+    kept = Counter((marker, context) for marker, context, why in remnant_verdict(text, lang)[1]
+                   if why.startswith(KEPT_NAME_WHY + ' '))
+    hits = []
+    for hit in scan_remnants(text, lang, bare_months=False):
+        if kept[hit]:
+            kept[hit] -= 1
+        else:
+            hits.append(hit)
+    return hits
+
+
 def check_source_remnants(root, verbose, source_language=None, bare_months=None):
     """Check 8: untranslated source-language words and paragraphs.
 
@@ -424,6 +451,10 @@ def check_source_remnants(root, verbose, source_language=None, bare_months=None)
     </w:ins> shape that renders as empty under accept-all but is still visible
     with "Show Markup" on. The two views are reported under distinct labels so
     a reviewer knows where to look.
+
+    A name the lexicon keeps in the source language is not a remnant (register
+    G13): its hits are dropped by _remnant_hits, in both views and in the dense
+    count alike.
     """
     issues = []
     if not source_language:
@@ -437,10 +468,10 @@ def check_source_remnants(root, verbose, source_language=None, bare_months=None)
     label = lang.capitalize()
     extra_filter_italian = (lang == 'italian')
 
-    def _filtered_issues(full_text, view_tag):
+    def _filtered_issues(full_text, view_tag, hits):
         out = []
         _note_bare_months(full_text, lang, f"{label} month name ({view_tag})", bare_months)
-        for _marker, context in scan_remnants(full_text, lang, bare_months=False):
+        for _marker, context in hits:
             ctx_stripped = context.strip()
             # Italian-specific legacy filters kept for backwards compatibility.
             if extra_filter_italian:
@@ -458,19 +489,19 @@ def check_source_remnants(root, verbose, source_language=None, bare_months=None)
         full_del = ''.join(dt.text or '' for dt in p.iter(f'{{{W}}}delText'))
 
         if full_t.strip() and len(full_t.split()) >= 3:
-            issues.extend(_filtered_issues(full_t, 'accept-all'))
+            hits = _remnant_hits(full_t, lang)
+            issues.extend(_filtered_issues(full_t, 'accept-all', hits))
             # Full source-language paragraphs (high density of source function words)
-            dense_hits = len(scan_remnants(full_t, lang, bare_months=False))
-            if dense_hits >= 3:
+            if len(hits) >= 3:
                 issues.append(f"FULL {label.upper()} PARAGRAPH (accept-all): '{full_t[:100]}'")
 
         if full_del.strip() and len(full_del.split()) >= 1:
             # delText is almost always a short strike-through fragment, so the
             # 3-word minimum used for accept-all text would filter out most
             # legitimate remnants. Require only one word.
-            issues.extend(_filtered_issues(full_del, 'reject-all / markup'))
-            dense_hits_del = len(scan_remnants(full_del, lang, bare_months=False))
-            if dense_hits_del >= 3:
+            hits_del = _remnant_hits(full_del, lang)
+            issues.extend(_filtered_issues(full_del, 'reject-all / markup', hits_del))
+            if len(hits_del) >= 3:
                 issues.append(f"FULL {label.upper()} PARAGRAPH (reject-all / markup): '{full_del[:100]}'")
 
     return issues
@@ -1040,7 +1071,7 @@ def _scan_aux_xml_for_remnants(xml_path, source_language, label, bare_months=Non
         if not text.strip():
             continue
         _note_bare_months(text, lang, f"{label_capped} month name in {label}", bare_months)
-        for _marker, context in scan_remnants(text, lang, bare_months=False):
+        for _marker, context in _remnant_hits(text, lang):
             issues.append(
                 f"{label_capped} remnant in {label}: '{context.strip()[:100]}'"
             )
@@ -1052,7 +1083,7 @@ def _scan_aux_xml_for_remnants(xml_path, source_language, label, bare_months=Non
         if not val or not val.strip():
             continue
         _note_bare_months(val, lang, f"{label_capped} month name in {label} lvlText", bare_months)
-        for _marker, context in scan_remnants(val, lang, bare_months=False):
+        for _marker, context in _remnant_hits(val, lang):
             issues.append(
                 f"{label_capped} remnant in {label} lvlText: "
                 f"'{context.strip()[:100]}'"

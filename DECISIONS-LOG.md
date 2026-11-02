@@ -2334,3 +2334,42 @@ always read** in `„A“ … „B”`. `PLAN-2-step-b.md` section 3.14's 14.5 b
 
 **THE CORPUS, AS STATED BEFORE THE COUNT RAN:** 2 findings to 2 in each tree, 0 removed, 0 added — every language
 beyond 14.3's closes on synthetic controls, declared.
+
+## 2026-11-02 (3) — sub-step 14.6 built and merged (#184), unattended: quality_check's G3 and G13; nine choices the session's own
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS OF THIS MORNING** — so each choice below is THE SESSION'S, taken on its own
+recommendation and carried here for him to confirm or overturn; none is his ruling.
+
+**(1) 14.6 WAS BUILT IN THE CONDUCTOR'S OWN SESSION:** the app refused to start a new session from an automated turn,
+and the session that built 14.5 stood at 55% of its context, too full for a heavy step; a proposal card would have
+waited for Wouter until 16:00. **(2) G13 CLOSES FOR ALL TEN KEPT NAMES, NOT THE REGISTER'S SIX:** measured 10 of 10 at
+`13f52a7`, each name in its own lexicon's language; the brief's five judged every name as Italian. **(3) THE CHECK
+READS THE NAMES THROUGH `remnant_verdict`, DROPPING ITS KEPT-NAME CLASS ALONE,** out of `scan_remnants`' own hits in
+their own order — not repack's blocking list wholesale, which would also silence the CJK and company-form classes and
+the bare months, and not a new function in the shared module. **(4) THE WHOLE REMNANT CHECK, NOT THE BODY ALONE:** both
+views, the dense-paragraph count and the auxiliary parts read the one list. **(5) `and / or` WITH SPACES IS A
+CONNECTIVE TOO.** **(6) A LIST ITEM ENDING `; and/or` IS QUIET WHATEVER ITS SOURCE ENDS ON,** as `; and` and `; or`
+have been since rev34 — a source test in the whitelist would move those two as well, which is not this sub-step's;
+method A's ratio still guards a cut-short item. **(7) APPLY'S OWN REMNANT WARNING IS NOT CHANGED** — another script,
+and it still lists a kept name: open. **(8) ONE COMMENT IN `source_language_markers.py` IS CORRECTED,** which named
+quality_check among the scripts that never call `remnant_verdict`; no code there moved. **(9) THE CORPUS IS COUNTED BY
+A NEW TWIN IN `temp/`,** old against new in both trees, with and without the notes — `tools/qc_census.py` runs one
+tree's working copy alone.
+
+**WHAT MOVED THE BUILD, EACH RECORDED AS IT HAPPENED.** The first red run showed that one planned false positive — a
+capitalised `; AND/OR` — had never fired: the dangling-ending rule reads lower case only, so the control was dropped,
+and that case-blindness, a false negative older than step 14, is open. One true-positive sentence held too few Italian
+marker words outside its kept name to stay a FULL paragraph — the control was rebuilt from the checker's own word list,
+the code unchanged. Two controls were added so that every changed line has one: three kept names in a deletion, and a
+kept name in a numbering level's text.
+
+**`/code-review` AT HIGH, ON `2610699`: SIX FINDINGS, THREE FIXED, THREE DECLARED.** Fixed: the kept-name class was
+told by retyping the opening of `remnant_verdict`'s reason, so `source_language_markers.py` now owns that wording as
+`KEPT_NAME_WHY`; each view's hits were scanned twice, now once; property 11 read the uk body alone, and now reads the
+same paragraphs struck through and the us tree. Declared, each the session's choice: a kept name can take an
+untranslated paragraph below the FULL threshold, its other markers still findings; the exemption is case-folded and
+blind to the declared language, as repack's reading of the same table is; and choice (6) above.
+
+**THE CORPUS, AS STATED BEFORE THE COUNT RAN:** with the notes, as skill Step 9 runs the check, 27 findings to 27 in
+each tree; without them, 32 to 27 — the 5 `; and/or` endings, every one G3 — 0 added. No workdir holds a kept name, so
+G13 closes on synthetic controls alone, declared.
