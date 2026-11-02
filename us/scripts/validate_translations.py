@@ -112,7 +112,7 @@ PLACEHOLDER = "<<TRANSLATE:"   # Step 3b's scaffold marker; never allowed to rea
 # Single quotes (' ' / ' '): typically wrap project names, brand names,
 # place designations that are preserved verbatim in legal translation.
 # Threshold 2+ words catches "Wind Farm Foo", "Compañía Acme S.A.", etc.
-# Double quotes (" " / " " / « »): typically wrap defined terms (1–4 words,
+# Double quotes (" " / " " / « » / „ ”): typically wrap defined terms (1–4 words,
 # legitimately replaced by the English equivalent during translation) OR
 # statute / treaty / long entity names (5+ words, usually preserved verbatim
 # or kept parenthetically). Threshold 5+ words keeps short defined-term
@@ -132,6 +132,12 @@ _QUOTE_PAIRS_DOUBLE = [
     ('"', '"'),                # ASCII double (U+0022)
     ('“', '”'),      # " " typographic double
     ('«', '»'),      # « » guillemets
+    # Step 14.5: the low opening quote, closed by ” (Polish, Hungarian, Dutch)
+    # or by “ (German) — the two closers in one string; see _quoted_spans.
+    # Not read: Finnish ”…”, one mark on both sides, which would pair across
+    # “A” … “B”; and Japanese or Chinese 「…」, where a span with no space is
+    # one word, under every threshold.
+    ('„', '”“'),
 ]
 
 # Step 14.3, register G1: a straight apostrophe AFTER a letter never opens a
@@ -146,41 +152,81 @@ _APOSTROPHE_OPEN = r'(?<!' + _LETTER + r")'"
 _APOSTROPHE_CLOSE = r"'(?!" + _LETTER + r')'
 _APOSTROPHE_INNER = r"(?:[^']|'(?=" + _LETTER + r'))'
 
-# Step 14.3, register G7: two shapes in which a quoted span is TRANSLATED by
-# design, so its absence from the English is no sign of loss. A defined term
-# in its marker — `(il "X")`, `(di seguito, il "X")`, `(the "X")`: the
-# parenthesis, an optional lead-in, a definite article, the span, and the
-# parenthesis closing straight after it. A lead-in must BEGIN with a marker
-# phrase or adverb (di seguito, hereinafter, congiuntamente…); the generic words
-# after it (to, as, defined…) may not begin one, or a cross-reference — (as
-# defined in the "X") — would pass for a marker. And a title straight after a
-# title verb — `recante "X"`, `entitled "X"`. The NAMING verbs (denominato,
-# named, called) are deliberately not title verbs: they introduce the names
-# this check exists to keep. Italian and English, the shapes measured; another
-# language's marker is checked as before.
+# Step 14.3, register G7, and 14.5 for every language: two shapes in which a
+# quoted span is TRANSLATED by design, so its absence from the English is no
+# sign of loss. A defined term in its marker — `(il "X")`, `(di seguito, il
+# "X")`, `(the "X")`, `(zwana dalej "X")`: the parenthesis, a lead-in or an
+# article or both, the span, and the parenthesis closing straight after it, a
+# German or Dutch participle allowed between — `(nachfolgend "X" genannt)`. A
+# lead-in must BEGIN with a marker phrase or adverb (di seguito, hereinafter,
+# ci-après, en adelante, hierna, zwana dalej…) and marks the term on its own,
+# four of these languages having no article; the generic words after it (to,
+# as, defined…) may not begin one, or a cross-reference — (as defined in the
+# "X") — would pass for a marker. A bare ("X") is no marker: a quoted name in
+# brackets takes that shape too. And a title straight after a title word —
+# `recante "X"`, `entitled "X"`, `intitulé « X »` — or, in Hungarian, straight
+# before one: `"X" című`. The NAMING verbs (denominato, named, dénommé,
+# genannt, zwany, nevű…) are deliberately not title words: they introduce the
+# names this check exists to keep. One list for every language, as this
+# function is told none. Measured on the recorded runs: the Italian and English
+# shapes, Dutch hierna, Polish zwana dalej, Norwegian heretter; from the
+# lexicons: ci-après, ci-dessous, nachstehend, hieronder; every other word is
+# its language's usual drafting formula, unmeasured, its controls synthetic.
 _MARKER_ADVERBS = (
     'congiuntamente', 'collettivamente', 'singolarmente', 'rispettivamente',
     'ciascuna', 'ciascuno', 'entrambe', 'entrambi', 'insieme', 'together',
     'jointly', 'collectively', 'individually', 'respectively', 'each',
+    # 14.5: French, Spanish, Portuguese, German, Dutch, Polish, Hungarian,
+    # Finnish and Norwegian.
+    'ensemble', 'conjointement', 'collectivement', 'individuellement',
+    'chacune?', 'conjuntamente', 'colectivamente', 'coletivamente',
+    'individualmente', 'gemeinsam', 'zusammen', 'einzeln', 'jeweils',
+    'gezamenlijk', 'tezamen', 'afzonderlijk', 'ieder', 'elk', 'łącznie',
+    'odpowiednio', 'każd[aey]', 'együttesen', 'külön-külön', 'egyenként',
+    'yhdessä', 'erikseen', 'kumpikin', 'samlet',
 )
 _MARKER_LEADIN_START = (
     r'di\s+seguito', r'in\s+seguito', r'nel\s+seguito',
     r"d['’]ora\s+in\s+(?:avanti|poi|innanzi)", 'hereinafter', 'hereafter',
     'breviter',
+    # 14.5
+    'ci-après', 'ci-dessous', r'en\s+adelante', r'en\s+lo\s+sucesivo',
+    'doravante', r'a\s+seguir', 'adiante', 'nachfolgend', 'nachstehend',
+    r'im\s+Folgenden', r'im\s+Weiteren', 'hierna', 'hieronder',
+    r'zwan\w*\s+dalej', 'dalej', r'(?:a\s+)?továbbiakban',
+    'jäljempänä', 'heretter',
 ) + _MARKER_ADVERBS
 _MARKER_LEADIN_MORE = (
     'anche', 'denominato', 'denominata', 'denominati', 'denominate', 'definito',
     'definita', 'definiti', 'definite', 'indicato', 'indicata', 'indicati',
     'indicate', 'referred', 'to', 'as', 'also', 'called', 'defined',
+    # 14.5
+    r'd[ée]nomm[ée]e?s?', r'd[ée]sign[ée]e?s?', r'appel[ée]e?s?', 'par',
+    r'denominad[oa]s?', r'designad[oa]s?', r'llamad[oa]s?', 'como',
+    'simplesmente', 'abreviadamente', 'por', 'genannt', 'bezeichnet', 'kurz',
+    'auch', 'als', r'te\s+noemen', 'genoemd', 'ook',
+    r'zwan\w*', 'dalej', 'także', 'również', 'myös', 'kalt',
+    'benevnt',
 ) + _MARKER_ADVERBS
+# The definite and indefinite articles of every language that has them.
+_MARKER_ARTICLE = (
+    r'(?:(?:the|an?|il|lo|la|i|gli|le|uno?|una|les|une|el|los|las|o|os|as|um'
+    r"|uma|der|die|das|den|dem|eine?|de|het|een|az|egy)\s+|(?:l|un)['’]\s*)")
 _MARKER_BEFORE = re.compile(
     r'\(\s*(?:(?:' + '|'.join(_MARKER_LEADIN_START) + r')\b(?:[\s,:]+(?:'
-    + '|'.join(_MARKER_LEADIN_MORE) + r')\b)*[\s,:]*)?'
-    r"(?:(?:the|il|lo|la|i|gli|le)\s+|l['’]\s*)\Z", re.IGNORECASE)
-_MARKER_AFTER = re.compile(r'\s*\)')
+    + '|'.join(_MARKER_LEADIN_MORE) + r')\b)*[\s,:]*' + _MARKER_ARTICLE
+    + r'?|' + _MARKER_ARTICLE + r')\Z', re.IGNORECASE)
+_MARKER_AFTER = re.compile(r'\s*(?:(?:genannt|bezeichnet|genoemd)\s*)?\)',
+                           re.IGNORECASE)
 _TITLE_BEFORE = re.compile(
-    r'\b(?:recante|recanti|intitolat[oaie]|entitled|titled)\s*[:,]?\s*\Z',
+    r'\b(?:recante|recanti|intitolat[oaie]|entitled|titled'
+    # 14.5: French, Spanish, Portuguese, German, Dutch, Polish and Finnish.
+    r'|intitul[ée]e?s?|titulad[oa]s?|intitulad[oa]s?|betitelt\w*'
+    r'|(?:mit|unter)\s+dem\s+Titel|getiteld|(?:met|onder)\s+de\s+titel'
+    r'|pod\s+tytułem|pt\.|zatytułowan\w*|otsikolla|otsikoltaan)\s*[:,]?\s*\Z',
     re.IGNORECASE)
+# Hungarian names a title AFTER it: `"X" című`, `"X" címmel` (14.5).
+_TITLE_AFTER = re.compile(r'\s*(?:című|címmel)\b', re.IGNORECASE)
 
 
 def _quoted_spans(text, opener, closer):
@@ -193,6 +239,11 @@ def _quoted_spans(text, opener, closer):
     if opener == closer == "'":
         pat = (_APOSTROPHE_OPEN + '(' + _APOSTROPHE_INNER + '+)'
                + _APOSTROPHE_CLOSE)
+    elif len(closer) > 1:
+        # Step 14.5: an opener closed by any one of several marks — „ by ” or
+        # by “ — none of them, nor the opener, inside the span.
+        pat = (re.escape(opener) + r'([^' + re.escape(opener + closer)
+               + r']+)[' + re.escape(closer) + r']')
     else:
         # Escape for regex; if opener == closer this is fine, the pattern
         # `<opener>([^<closer>]+)<closer>` matches the shortest enclosed text.
@@ -208,13 +259,14 @@ def _quoted_span_count(s):
 
 
 def _translated_by_design(text, m):
-    """True where span m sits in a defined-term marker or follows a title verb
-    (G7) — see _MARKER_BEFORE and _TITLE_BEFORE. A marker opens at the last
-    parenthesis before the span, so the search starts there."""
+    """True where span m sits in a defined-term marker or beside a title word
+    (G7) — see _MARKER_BEFORE, _TITLE_BEFORE and _TITLE_AFTER. A marker opens
+    at the last parenthesis before the span, so the search starts there."""
     k = text.rfind('(', 0, m.start())
     return bool((k >= 0 and _MARKER_BEFORE.match(text, k, m.start())
                  and _MARKER_AFTER.match(text, m.end()))
-                or _TITLE_BEFORE.search(text, 0, m.start()))
+                or _TITLE_BEFORE.search(text, 0, m.start())
+                or _TITLE_AFTER.match(text, m.end()))
 
 
 def _check_quoted_phrase_retention(p):

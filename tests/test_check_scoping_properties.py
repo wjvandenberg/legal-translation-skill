@@ -15,6 +15,9 @@ thought to write down. The fixes here claim something stronger and more useful:
     M1              the anomaly comparison is a MULTISET difference, over random multisets.
     F10             the alpha-collision verdict moves ONLY on a del<->ins pair, over
                     thousands of generated pairs -- and the old code fired on some.
+    G1 / G7         the retention verdict moves ONLY where an elision, a marker or a title
+                    sits, in every language, and a span in the low opening quote is read
+                    exactly as its typographic twin.
     G2 / G8 / G14   'Article N' warns on every internal tail and on no legislation tail,
                     whatever sits between the number and the tail -- both ways moved.
     all             none of them crashes on malformed, empty, or extreme input, and all of
@@ -540,10 +543,31 @@ QWORDS = ["contratto", "Cliente", "Centro", "Servizi", "Delta", "Nord", "delle",
 # The plural possessives: an English holding them must never seem to keep its quotes.
 ENWORDS = ["the", "Seller", "shall", "deliver", "plant", "works", "Buyer", "terms", "Parties'", "Sellers'"]
 ELISIONS = ["dell'Accordo", "l'impianto", "all'Acquirente", "nell'ambito"]
-QUOTES = (("'", "'"), ("‘", "’"), ('"', '"'), ("“", "”"), ("«", "»"))
-# prefix, and whether the shape is one 14.3 exempts
-PREFIXES = (("", False), ("(il ", True), ("(di seguito, il ", True), ("(the ", True),
-            ("recante ", True), ("entitled ", True), ("denominato ", False), ("(see ", False))
+QUOTES = (("'", "'"), ("‘", "’"), ('"', '"'), ("“", "”"), ("«", "»"),
+          # 14.5: the low opening quote, closed as Polish (”) or as German (“) closes it
+          ("„", "”"), ("„", "“"))
+# prefix, whether the shape is one 14.3 or 14.5 exempts, and what follows the closing quote
+PREFIXES = (("", False, ""), ("(il ", True, ""), ("(di seguito, il ", True, ""), ("(the ", True, ""),
+            ("recante ", True, ""), ("entitled ", True, ""), ("denominato ", False, ""), ("(see ", False, ""),
+            # 14.5, every language: markers, a participle closing one, titles before and after
+            ("(di seguito ", True, ""), ("(hereinafter ", True, ""), ("(each a ", True, ""),
+            ("(ci-après dénommé le ", True, ""), ("(en adelante, el ", True, ""), ("(doravante designado ", True, ""),
+            ("(nachfolgend ", True, " genannt"), ("(im Folgenden ", True, ""), ("(hierna te noemen: ", True, ""),
+            ("(zwaną dalej ", True, ""), ("(dalej: ", True, ""), ("(a továbbiakban: ", True, ""),
+            ("(jäljempänä ", True, ""), ("(heretter kalt ", True, ""),
+            ("intitulée ", True, ""), ("titulado ", True, ""), ("intitulado ", True, ""), ("mit dem Titel ", True, ""),
+            ("getiteld ", True, ""), ("pod tytułem ", True, ""), ("otsikolla ", True, ""), ("", True, " című"),
+            # ... and what they must NOT exempt: naming words, cross-references, a bare bracket
+            ("dénommé ", False, ""), ("denominado ", False, ""), ("namens ", False, ""), ("genaamd ", False, ""),
+            ("zwany ", False, ""), ("", False, " nevű"), ("nimeltään ", False, ""), ("kalt ", False, ""),
+            ("(telle que définie dans le ", False, ""), ("(según se define en el ", False, ""),
+            ("(wie definiert in der ", False, ""), ("(zgodnie z definicją w ", False, ""), ("(", False, ""),
+            ("(der Vertrag ", False, ""))
+
+
+def low9_twin(s):
+    """The same text with each low-opening-quote span in typographic quotes."""
+    return re.sub("„([^„”“]+)[”“]", lambda m: "“" + m.group(1) + "”", s)
 
 
 def gen_case(rng, elide):
@@ -551,11 +575,12 @@ def gen_case(rng, elide):
     n_src = rng.randint(1, 3)
     for _ in range(n_src):
         o, c = rng.choice(QUOTES)
-        pre, exempt = rng.choice(PREFIXES)
+        pre, exempt, post = rng.choice(PREFIXES)
         words = [rng.choice(QWORDS) for _ in range(rng.randint(1, 7))]
         if elide and rng.random() < 0.3:
             words.insert(rng.randrange(len(words) + 1), rng.choice(ELISIONS))
-        close = ")" if pre.startswith("(") and rng.random() < 0.8 else " e altro)" if pre.startswith("(") else ""
+        close = (post + ")" if pre.startswith("(") and rng.random() < 0.8
+                 else " e altro)" if pre.startswith("(") else post)
         shaped |= exempt
         src += [rng.choice(QWORDS), pre + o + " ".join(words) + c + close]
         if elide and rng.random() < 0.4:
@@ -576,23 +601,38 @@ def gen_case(rng, elide):
 rng = random.Random(SEED + 9)
 moved_plain, moved_short, n_plain, n_short, silenced_g7, silenced_g1 = [], [], 0, 0, 0, 0
 fired_plain = fired_short = 0     # an "identical" verdict proves nothing where both are silent
-for k in range(6000):
+moved_twin, n_twin, fired_twin, unread_low9 = [], 0, 0, 0
+for k in range(12000):
     elide = k % 3 == 0
     # The spans this case WROTE, counted by the generator: never by the code under test.
     src, en, n_quoted_en, n_spans, shaped = gen_case(rng, elide)
     has_elision = re.search(r"[^\W\d_]'[^\W\d_]", src) is not None
+    # 14.5 reads the low opening quote, which the old code never did: those paragraphs are judged
+    # against their typographic twin instead.
+    low9 = "„" in src
     o = OLDVT._check_quoted_phrase_retention({"text": src, "en": en})
     n = VT._check_quoted_phrase_retention({"text": src, "en": en})
-    if not has_elision and not shaped:
+    if not has_elision and not shaped and not low9:
         n_plain += 1
         fired_plain += bool(o)
         if n != o:
             moved_plain.append((src, en))
-    if not has_elision and n_quoted_en < n_spans:
+    if not has_elision and n_quoted_en < n_spans and not low9:
         n_short += 1
         fired_short += bool(o)
         if n != o:
             moved_short.append((src, en))
+    # A German closer (“) can open a pre-existing typographic pair across the paragraph, in the old code
+    # and the new alike, so the twin is compared where every low opening quote closes as Polish does.
+    if low9 and "“" not in src:
+        n_twin += 1
+        t = VT._check_quoted_phrase_retention({"text": low9_twin(src), "en": low9_twin(en)})
+        fired_twin += bool(t)
+        # The findings come out style by style, so a twin moves a finding's PLACE in the list: compared as a
+        # multiset, reordered is not changed.
+        if Counter(n) != Counter(t):
+            moved_twin.append((src, en))
+        unread_low9 += bool(n) and not o and not shaped and not has_elision
     if o and not n:
         silenced_g1 += has_elision and not shaped
         silenced_g7 += shaped and not has_elision
@@ -604,6 +644,19 @@ ok(f"G1/G7 English keeping fewer quoted spans than the source: verdict identical
    f"{len(moved_short)} moved, e.g. {moved_short[:1]}")
 ok(f"G1/G7 the old code fired where the new is silent: {silenced_g1} elision and {silenced_g7} "
    f"marker or title paragraphs (the property is not vacuous)", silenced_g1 > 0 and silenced_g7 > 0)
+ok(f"G7 a span in the low opening quote is read exactly as its typographic twin ({n_twin} paragraphs, "
+   f"{fired_twin} firing)", n_twin > 0 and fired_twin > 0 and not moved_twin,
+   f"{len(moved_twin)} moved, e.g. {moved_twin[:1]}")
+ok(f"G7 the old code never read the low opening quote: {unread_low9} plain paragraphs fire now and did not "
+   f"before (the widening is real)", unread_low9 > 0)
+# A hostile bracket -- a lead-in followed by thousands of follow-on words and no closing quote -- must not
+# make the marker search crawl.
+hostile = ("Le parti (di seguito " + "anche denominato " * 1500 + " , :" * 3000 + "x il "
+           + '"Servizio di Pulizia degli Uffici Centrali" ' + "e " * 2000 + ").")
+t0 = time.time()
+VT._check_quoted_phrase_retention({"text": hostile, "en": "The parties."})
+ok(f"G7 a hostile bracket of {len(hostile)} characters is judged in {time.time() - t0:.2f} s (under 2 s)",
+   time.time() - t0 < 2.0)
 
 # ============================================================================
 print("\nPROPERTY 10 — G2, G8 and G14: 'Article N' warns on every internal tail and on no legislation tail")
