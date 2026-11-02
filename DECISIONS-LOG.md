@@ -2415,3 +2415,18 @@ the third ran clean; the security agent's log held 0 entries across it, so the a
 
 **AND ONE REPAIR TO THIS LOG, A MOVE ONLY:** entry (4), appended by 14.7's filing after entry (3)'s review paragraph,
 had split (3) from its closing corpus paragraph; the paragraph is back under (3), not a word changed.
+
+## 2026-11-02 (6) — Wouter on 14.5's Norwegian choice, overturned then restored; sub-step 14.9 measured (#187)
+
+**WOUTER, IN HIS WORDS, IN 14.5's SESSION:** first *"2) Norwegian should be out"* and *"Only supported languages"*, and
+on English *"Ok, build into English than as well"*; then, while that session was building the removal, *"Keep the
+Norwegian in, it is fine. Skip this session so we can continue with 4.9. It is only 4 words."* So 14.5's choice (2)
+stands as merged in #183 — Norwegian's lead-in words and English both stay in G7 — **now by his ruling, not the
+session's**; the removal was discarded uncommitted.
+
+**14.9, MEASURED, DOCUMENTS ONLY, IN THE CONDUCTOR'S SESSION** — three choices the session's own, for him to confirm or
+overturn: **(1) THE MEASUREMENT IS EACH ROW'S OWN QUOTED WORDING, COUNTED IN BOTH TREES,** and C29 run — a wording still
+present is the defect still present; a fix session re-measures its own rows at depth. **(2) THE FIXES ARE FOUR
+SUB-STEPS, GROUPED BY THE PART OF THE SKILL THEY EDIT** — C29's code; skill Steps 1 and 11; skill Step 4's rules; the
+claims about the skill — so that each session edits one area of the shipped tree. **(3) C26 GOES TO WOUTER, NOT TO A
+SUB-STEP:** its row concedes that no mechanism can prove a read, and the remedy it names is a design choice.
