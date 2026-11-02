@@ -2304,7 +2304,7 @@ me."* So no session asks him anything until then: each takes its own recommendat
 answered in `temp/s1102_questions_answered.md` (gitignored), here and in its last message, for him to confirm or
 overturn.
 
-## 2026-11-02 (2) — sub-step 14.5 built, unattended: G7 in every language; nine choices the session's own
+## 2026-11-02 (2) — sub-step 14.5 built and merged (#183), unattended: G7 in every language; nine choices the session's own
 
 **NO QUESTION WAS ASKED, BY WOUTER'S WORDS ABOVE** — so each choice below is THE SESSION'S, taken on its own
 recommendation and carried here for him to confirm or overturn; none is his ruling.
