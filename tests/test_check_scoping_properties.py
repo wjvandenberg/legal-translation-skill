@@ -952,6 +952,67 @@ ok(f"G4 both views, each read across a segment join, find exactly the run-ins ({
    not view4, f"{len(view4)} wrong, e.g. {view4[:2]}")
 ok(f"G4 the us tree identical to the uk tree on every sentence", not us4, f"{len(us4)} apart, e.g. {us4[:2]}")
 
+# =============================================================================
+print("\nPROPERTY 13 — C10: a part with no copy is required exactly when it carries text")
+print("-" * 96)
+# check_step_8 did not move between 2178cce and the commit before 14.8. Generated header, footer and footnotes parts,
+# built from pieces the generator records -- empty paragraphs, spaces, separators, a field's instruction, a tab, and
+# now and then a visible text in a run, a deletion, a text box or a table cell -- each with no copy in final/word.
+# Required (FAIL) exactly when the generator wrote a visible text; the old code FAILED on every one; both trees.
+import zipfile as _zf  # noqa: E402
+blob = subprocess.run(["git", "show", f"{REF}:uk/scripts/verify_diligence.py"], capture_output=True, cwd=ROOT)
+if blob.returncode != 0 or blob.stdout == (ROOT / "uk" / "scripts" / "verify_diligence.py").read_bytes():
+    print(f"VOID — verify_diligence.py at {REF} is unreadable or BYTE-IDENTICAL to the working tree.")
+    sys.exit(1)
+(OLD / "verify_diligence.py").write_bytes(blob.stdout)
+OLDVD = load(OLD / "verify_diligence.py", "p_old_vd")
+VD = load(ROOT / "uk" / "scripts" / "verify_diligence.py", "p_new_vd")
+USVD = load(ROOT / "us" / "scripts" / "verify_diligence.py", "p_us_vd")
+NSW = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
+QUIET = ("<w:p/>", "<w:p><w:r><w:t> </w:t></w:r></w:p>", "<w:p><w:r><w:separator/></w:r></w:p>",
+         "<w:p><w:r><w:instrText> PAGE </w:instrText></w:r></w:p>", "<w:p><w:r><w:tab/></w:r></w:p>",
+         '<w:p><w:r><w:t xml:space="preserve">   </w:t></w:r></w:p>')
+VISIBLE = ("<w:p><w:r><w:t>Room {}</w:t></w:r></w:p>",
+           '<w:p><w:del w:id="1" w:author="A"><w:r><w:delText>Draft {}</w:delText></w:r></w:del></w:p>',
+           "<w:p><w:r><w:txbxContent><w:p><w:r><w:t>Desk {}</w:t></w:r></w:p></w:txbxContent></w:r></w:p>",
+           "<w:tbl><w:tr><w:tc><w:p><w:r><w:t>Floor {}</w:t></w:r></w:p></w:tc></w:tr></w:tbl>")
+PARTS = (("word/header1.xml", "w:hdr"), ("word/footer2.xml", "w:ftr"), ("word/footnotes.xml", "w:footnotes"))
+rng = random.Random(SEED + 13)
+n = Counter()
+wrong13, old13, us13 = [], [], []
+for i in range(400):
+    part, root = rng.choice(PARTS)
+    body = [rng.choice(QUIET) for _ in range(rng.randint(1, 5))]
+    visible = rng.random() < 0.5
+    if visible:
+        body.insert(rng.randint(0, len(body)), rng.choice(VISIBLE).format(rng.randint(1, 99)))
+    xml = f"<{root} {NSW}>" + "".join(body) + f"</{root}>"
+    d = TMP / f"c10p{i}"
+    (d / "final" / "word").mkdir(parents=True)
+    (d / "final" / "word" / "document.xml").write_text(f"<w:document {NSW}><w:body/></w:document>", encoding="utf-8")
+    with _zf.ZipFile(d / "o.docx", "w") as z:
+        z.writestr("word/document.xml", f"<w:document {NSW}><w:body/></w:document>")
+        z.writestr(part, xml)
+
+    def verdict(mod):
+        rep = mod.Report()
+        mod.check_step_8(rep, str(d), str(d / "o.docx"))
+        return [s for _a, s, _b, _c in rep.findings]
+
+    v, o = verdict(VD), verdict(OLDVD)
+    n["visible" if visible else "empty"] += 1
+    if v != (["FAIL"] if visible else ["PASS"]):
+        wrong13.append(xml)
+    if o != ["FAIL"]:
+        old13.append(xml)
+    if verdict(USVD) != v:
+        us13.append(xml)
+ok(f"C10 a part with no copy FAILS exactly when the generator wrote a visible text ({n['visible']} with, "
+   f"{n['empty']} without)", n["visible"] > 0 and n["empty"] > 0 and not wrong13,
+   f"{len(wrong13)} wrong, e.g. {wrong13[:2]}")
+ok(f"C10 the old code FAILED on every one of the {n['visible'] + n['empty']}", not old13, f"{len(old13)} passed")
+ok("C10 the us tree identical to the uk tree on every part", not us13, f"{len(us13)} apart")
+
 shutil.rmtree(TMP, ignore_errors=True)
 print()
 print("=" * 96)

@@ -72,6 +72,7 @@ import json
 import argparse
 import subprocess
 import zipfile
+import xml.etree.ElementTree as ET   # READING only, never to write OOXML
 
 def _check_self_integrity():
     """Detect install-time truncation by sentinel marker."""
@@ -392,6 +393,10 @@ def check_step_8(report, workdir, orig_docx):
     try:
         with zipfile.ZipFile(orig_docx) as zf:
             src_names = set(zf.namelist())
+            src_parts = {n: zf.read(n) for n in src_names       # the parts Step 8 lists, alone
+                         if n.endswith('.xml') and (n.startswith(('word/header', 'word/footer'))
+                                                    or n in ('word/numbering.xml', 'word/comments.xml',
+                                                             'word/footnotes.xml', 'word/endnotes.xml'))}
     except (zipfile.BadZipFile, OSError) as e:
         report.add(label, WARN,
                    f'cannot inspect source .docx: {e}')
@@ -417,14 +422,24 @@ def check_step_8(report, workdir, orig_docx):
                    'comments / footnotes / endnotes) — Step 8 N/A')
         return
 
+    # A PART THAT CARRIES NO TEXT NEEDS NO TRANSLATED COPY (register C10). Skill Step 8
+    # asks for a copy of a part only "whenever the part carries text" (C7, branch 11
+    # slice 3b), so an operator who rightly left an empty header, or a footnotes part
+    # holding only Word's separators, alone was failed here for skipping the step.
+    # Numbering is the exception: Step 8a is mandatory whenever numbering.xml exists.
     missing = []
     present = []
+    empty = []
     for src_path, kind in aux_to_check:
         out_path = os.path.join(workdir, 'final', src_path)
         if os.path.isfile(out_path):
             present.append((src_path, kind))
+        elif kind != 'numbering' and not _part_carries_text(src_parts.get(src_path, b'')):
+            empty.append((src_path, kind))
         else:
             missing.append((src_path, kind))
+    not_required = (f'; {len(empty)} part(s) carrying no text need no copy: '
+                    f'{", ".join(p for p, _ in empty[:10])}' if empty else '')
 
     if missing:
         kinds = sorted(set(k for _, k in missing))
@@ -434,12 +449,28 @@ def check_step_8(report, workdir, orig_docx):
                    f'{len(missing)} aux file(s) missing from '
                    f'<workdir>/final/word/ — Step 8 substep skipped for: '
                    f'{", ".join(kinds)}',
-                   f'missing: {names}{more}')
+                   f'missing: {names}{more}{not_required}')
     else:
         kinds = sorted(set(k for _, k in present))
         report.add(label, PASS,
-                   f'all {len(present)} source-side aux file(s) present in '
-                   f'<workdir>/final/word/ ({", ".join(kinds)})')
+                   f'all {len(present) + len(empty)} source-side aux file(s) accounted for: {len(present)} present in '
+                   f'<workdir>/final/word/ ({", ".join(kinds) or "none"}){not_required}')
+
+
+def _part_carries_text(raw):
+    """True when an auxiliary part holds a non-space character in any w:t or w:delText,
+    anywhere in it -- a text box or a table included -- or in a picture's alt text or
+    title (a descr, title or alt attribute), or when it will not parse, so that a damaged
+    part is never waved through as empty. Read with the standard library and never
+    written back."""
+    try:
+        root = ET.fromstring(raw)
+    except ET.ParseError:
+        return True
+    w = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+    if any((el.text or '').strip() for tag in ('t', 'delText') for el in root.iter(w + tag)):
+        return True
+    return any((el.get(a) or '').strip() for el in root.iter() for a in ('descr', 'title', 'alt'))
 
 
 def check_step_9(report, workdir, variant):

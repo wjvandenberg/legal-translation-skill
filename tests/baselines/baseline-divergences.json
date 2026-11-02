@@ -71,9 +71,9 @@
    "sha256_now": "eafb1eda65345c21ec741b86e2279e25d982f740863513220750fad6fdd9778b"
   },
   "uk/scripts/verify_diligence.py": {
-   "changed_by": "feature/step13-4-variant-conversion",
-   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
-   "sha256_now": "bf9778d3f582073efb896353d242f6add668132b75d8f31c2304068a77f1ac28"
+   "changed_by": "feature/step14-8-diligence-empty-parts",
+   "commit_subject": "Step 14.8 - verify_diligence's skill Step 8 audit asks for a translated copy only of a part that carries text (C10)",
+   "sha256_now": "f4fced10af5c485eb1bd40bf1e1a82477f9addbbfe3eed90a9a014bb8084b3ea"
   },
   "uk/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/step13-4-variant-conversion",
@@ -171,9 +171,9 @@
    "sha256_now": "4284ec0d3a251ececfc2d81a01512b2b1d4438b4070144c7a94bbecfe3ec1ebb"
   },
   "us/scripts/verify_diligence.py": {
-   "changed_by": "feature/step13-4-variant-conversion",
-   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
-   "sha256_now": "3bb5ed10f42429b57bd81b756d4e7c7058a0475816a2876a9c4a4b642122019c"
+   "changed_by": "feature/step14-8-diligence-empty-parts",
+   "commit_subject": "Step 14.8 - verify_diligence's skill Step 8 audit asks for a translated copy only of a part that carries text (C10)",
+   "sha256_now": "e7d75ed6e073da90d0f582c5770864b4fac4956d02df27ea1952a433f76fc599"
   },
   "us/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/step13-4-variant-conversion",

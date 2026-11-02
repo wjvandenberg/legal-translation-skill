@@ -1467,6 +1467,100 @@ for tree in ("uk", "us"):
            old_rc == 1 and "[missing_space_between_words]" in old_out, f"(rc={old_rc})")
 
 # =============================================================================
+print("\nC10 — verify_diligence: skill Step 8 asks for a copy only of a part that carries text")
+print("-" * 96)
+
+# The Step 8 audit FAILED whenever a source auxiliary part had no copy in final/word, whatever the part held, while
+# skill Step 8 has asked since C7 closed for a copy only of a part that carries text. So a header, footer, comments,
+# footnotes or endnotes part with no text anywhere is not required; numbering stays required whenever it exists.
+# Each false positive PASSES now and is PROVED to have FAILED at the pinned baseline; each part that carries text --
+# however little, wherever it sits -- or will not parse still FAILS without a copy, now and before. 14.8 of
+# PLAN-2-step-b.md section 3.14; every string INVENTED.
+# --- 14.8 cases: begin
+_NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"'
+C10_FP = (
+    ("an empty header", "word/header1.xml", f"<w:hdr {_NS}><w:p/></w:hdr>"),
+    ("a footnotes part holding only Word's separators", "word/footnotes.xml",
+     f'<w:footnotes {_NS}><w:footnote w:type="separator" w:id="-1"><w:p><w:r><w:separator/></w:r></w:p></w:footnote>'
+     f'<w:footnote w:type="continuationSeparator" w:id="0"><w:p><w:r><w:continuationSeparator/></w:r></w:p>'
+     "</w:footnote></w:footnotes>"),
+)
+C10_TP = (
+    ("a header that carries text", "word/header1.xml",
+     f"<w:hdr {_NS}><w:p><w:r><w:t>Office cleaning schedule</w:t></w:r></w:p></w:hdr>"),
+    ("a footer whose only text is a page-number field's result", "word/footer1.xml",
+     f'<w:ftr {_NS}><w:p><w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText> PAGE </w:instrText></w:r>'
+     '<w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:t>1</w:t></w:r><w:r><w:fldChar w:fldCharType="end"/>'
+     "</w:r></w:p></w:ftr>"),
+    ("a header whose only text is a deletion", "word/header2.xml",
+     f'<w:hdr {_NS}><w:p><w:del w:id="1" w:author="A"><w:r><w:delText>Draft</w:delText></w:r></w:del></w:p></w:hdr>'),
+    ("a header whose only text sits in a text box", "word/header3.xml",
+     f"<w:hdr {_NS}><w:p><w:r><w:txbxContent><w:p><w:r><w:t>Room 4</w:t></w:r></w:p></w:txbxContent></w:r></w:p>"
+     "</w:hdr>"),
+    ("a numbering part with no words", "word/numbering.xml",
+     f'<w:numbering {_NS}><w:abstractNum w:abstractNumId="0"><w:lvl w:ilvl="0"><w:lvlText w:val="%1."/></w:lvl>'
+     "</w:abstractNum></w:numbering>"),
+    ("a header that will not parse", "word/header4.xml", f"<w:hdr {_NS}><w:p>"),
+    ("a footer whose only words are a picture's alt text", "word/footer2.xml",
+     f'<w:ftr {_NS} xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:p><w:r>'
+     '<w:drawing><wp:inline><wp:docPr id="1" name="Picture 1" descr="Office floor plan"/></wp:inline></w:drawing>'
+     "</w:r></w:p></w:ftr>"),
+)
+# --- 14.8 cases: end
+
+
+def c10_case(name, part, xml, copied=False):
+    d = TMP / f"c10-{next(_G13_N)}"
+    (d / "final" / "word").mkdir(parents=True)
+    (d / "final" / "word" / "document.xml").write_text(f"<w:document {_NS}><w:body/></w:document>", encoding="utf-8")
+    if copied:
+        (d / "final" / part).write_text(xml, encoding="utf-8")
+    orig = d / "orig.docx"
+    with zipfile.ZipFile(orig, "w") as z:
+        z.writestr("word/document.xml", f"<w:document {_NS}><w:body/></w:document>")
+        z.writestr(part, xml)
+    return d, orig
+
+
+def c10_verdict(mod, d, orig):
+    rep = mod.Report()
+    mod.check_step_8(rep, str(d), str(orig))
+    return [sev for _s, sev, _m, _d in rep.findings]
+
+
+for tree in ("uk", "us"):
+    assert_baseline_differs("verify_diligence.py", tree)
+    old_vd = load_old("verify_diligence.py", tree)
+    new_vd = load_new("verify_diligence.py", tree)
+    for label, part, xml in C10_FP:
+        d, orig = c10_case(label, part, xml)
+        n, o = c10_verdict(new_vd, d, orig), c10_verdict(old_vd, d, orig)
+        ok(f"C10 {tree} {label}, no copy: PASSES now", n == ["PASS"], f"({n})")
+        ok(f"C10 {tree} {label}, no copy: PROVED it FAILED before", o == ["FAIL"], f"({o})")
+    for label, part, xml in C10_TP:
+        d, orig = c10_case(label, part, xml)
+        n, o = c10_verdict(new_vd, d, orig), c10_verdict(old_vd, d, orig)
+        ok(f"C10 {tree} TRUE POSITIVE {label}, no copy: still FAILS", n == ["FAIL"], f"({n})")
+        ok(f"C10 {tree} TRUE POSITIVE {label}, no copy: FAILED before too", o == ["FAIL"], f"({o})")
+    d, orig = c10_case("copied", *C10_TP[0][1:], copied=True)
+    n, o = c10_verdict(new_vd, d, orig), c10_verdict(old_vd, d, orig)
+    ok(f"C10 {tree} a header that carries text, copied: passes now and before", n == o == ["PASS"], f"({n}, {o})")
+    # THE WHOLE SCRIPT, by content: the rendered Step 8 group reads PASS with the empty header named as needing no
+    # copy, where it read FAIL before.
+    d, orig = c10_case("whole", *C10_FP[0][1:])
+    for which, script in (("now", ROOT / tree / "scripts" / "verify_diligence.py"),
+                          ("before", OLD_DIR / (tag(tree) + "verify_diligence.py"))):
+        r = subprocess.run([sys.executable, str(script), str(d), "--orig-docx", str(orig), "--report-only"],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", env=F10_ENV, cwd=d)
+        line = next((ln for ln in r.stdout.splitlines() if ln.strip().endswith("Step 8: aux-file translation")), "")
+        if which == "now":
+            ok(f"C10 {tree}, the whole script: Step 8 reads PASS and names the empty header",
+               "[PASS]" in line and "need no copy: word/header1.xml" in r.stdout, f"(rc={r.returncode}) {line!r}")
+        else:
+            ok(f"C10 {tree}, the whole script: PROVED Step 8 read FAIL before", "[FAIL]" in line,
+               f"(rc={r.returncode}) {line!r}")
+
+# =============================================================================
 shutil.rmtree(TMP, ignore_errors=True)
 print()
 print("=" * 96)
