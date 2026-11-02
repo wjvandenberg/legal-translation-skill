@@ -874,6 +874,84 @@ ok(f"G13 the same paragraphs in a deletion: only the planted marker words count,
 ok(f"G13 the us tree's findings identical to the uk tree's on every paragraph ({n['none'] + n['kept']})",
    not us_apart, f"{len(us_apart)} apart, e.g. {us_apart[:2]}")
 
+# =============================================================================
+print("\nPROPERTY 12 — G4: a dot inside a dotted form is no missing space; every run-in still is")
+print("-" * 96)
+# The rule did not move between 2178cce and the commit before 14.7, so the pinned REF is its true "before". Each
+# population is chosen by the generator's own record: the dotted forms it wrote and the dots inside them, the run-ins
+# it wrote -- never by the code under test. Each sentence is split at a random point across a tracked change, so the
+# accept-all and reject-all views both read it across a segment join; both trees. Invented words.
+blob = subprocess.run(["git", "show", f"{REF}:uk/scripts/validate_reject_all.py"], capture_output=True, cwd=ROOT)
+if blob.returncode != 0 or blob.stdout == (ROOT / "uk" / "scripts" / "validate_reject_all.py").read_bytes():
+    print(f"VOID — validate_reject_all.py at {REF} is unreadable or BYTE-IDENTICAL to the working")
+    print("tree, so this property would compare the fix with itself.")
+    sys.exit(1)
+(OLD / "validate_reject_all.py").write_bytes(blob.stdout)
+OLDVRA = load(OLD / "validate_reject_all.py", "p_old_vra")
+USVRA = load(ROOT / "us" / "scripts" / "validate_reject_all.py", "p_us_vra")
+LETTERS = "ABCDEGKLMNPRSTVabcdeglmnprstv"
+RUNIN_WORDS = ["Buyer", "tenant", "office", "invoice", "Seller", "3", "2026", "(a)"]
+
+
+def ms(mod, text):
+    return sum(1 for nm, _s in mod._scan_view(text, []) if nm == "missing_space_between_words")
+
+
+rng = random.Random(SEED + 12)
+n = Counter()
+moved4, wrong4, off4, view4, us4 = [], [], [], [], []
+for _ in range(3000):
+    toks, inside, runins = [], 0, 0
+    for _w in range(rng.randint(4, 12)):
+        r = rng.random()
+        if r < 0.2:                                  # a dotted form, 2 to 4 lone letters, each with its dot
+            k = rng.randint(2, 4)
+            form = "".join(rng.choice(LETTERS) + "." for _ in range(k))
+            inside += k - 1
+            if rng.random() < 0.3:                   # run straight into a word: its last dot is a real missing space
+                form += rng.choice(WORDS)
+                runins += 1
+            toks.append(form)
+        elif r < 0.35:                               # a run-in: a word, a punctuation mark, a word, no space
+            toks.append(rng.choice(RUNIN_WORDS) + rng.choice(".,;:") + rng.choice(WORDS))
+            runins += 1
+        elif r < 0.4:                                # an initial before a surname: a run-in too
+            toks.append(rng.choice("JKMR") + "." + rng.choice(("Smith", "Brown", "Rossi")))
+            runins += 1
+        else:
+            toks.append(rng.choice(WORDS))
+    text = "The " + " ".join(toks) + " ends here."
+    o, w = ms(OLDVRA, text), ms(VRA, text)
+    if o != inside + runins:
+        off4.append(text)
+    if not inside:
+        n["plain"] += 1
+        n["plain_fire"] += bool(o)
+        if o != w:
+            moved4.append(text)
+    else:
+        n["dotted"] += 1
+        n["dotted_old"] += o
+        if w != runins:
+            wrong4.append(text)
+    cut = rng.randint(0, len(text))
+    acc = [{"type": "regular", "en": text[:cut]}, {"type": "ins", "en": text[cut:]}, {"type": "del", "en": " old."}]
+    rej = [{"type": "regular", "en": text[:cut]}, {"type": "del", "en": text[cut:]}, {"type": "ins", "en": " new."}]
+    if ms(VRA, VRA._reconstruct(acc, "accept")) != runins or ms(VRA, VRA._reconstruct(rej, "reject")) != runins:
+        view4.append(text)
+    if ms(USVRA, text) != w:
+        us4.append(text)
+ok(f"PROPERTY 12's generator record matches {REF[:12]}'s count on every sentence ({n['plain'] + n['dotted']})",
+   not off4, f"{len(off4)} off, e.g. {off4[:2]}")
+ok(f"G4 no dotted form: findings identical to {REF[:12]} ({n['plain']} sentences, {n['plain_fire']} firing)",
+   n["plain_fire"] > 0 and n["plain"] > n["plain_fire"] and not moved4,
+   f"{len(moved4)} moved, e.g. {moved4[:2]}")
+ok(f"G4 every dot inside a dotted form quiet and every run-in firing ({n['dotted']} sentences; {REF[:12]} found "
+   f"{n['dotted_old']})", n["dotted_old"] > 0 and not wrong4, f"{len(wrong4)} wrong, e.g. {wrong4[:2]}")
+ok(f"G4 both views, each read across a segment join, find exactly the run-ins ({n['plain'] + n['dotted']})",
+   not view4, f"{len(view4)} wrong, e.g. {view4[:2]}")
+ok(f"G4 the us tree identical to the uk tree on every sentence", not us4, f"{len(us4)} apart, e.g. {us4[:2]}")
+
 shutil.rmtree(TMP, ignore_errors=True)
 print()
 print("=" * 96)

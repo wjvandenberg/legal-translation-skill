@@ -120,7 +120,11 @@ _RULES = [
     ),
     (
         'missing_space_between_words',
-        re.compile(r'\S[.,;:)](?=[A-Za-z])'),
+        # NOT a dot inside a dotted form -- a lone letter (no letter or digit before it), a dot, a lone
+        # letter, a dot, as in B.V., S.p.A., S.r.l. or e.g. (register G4): the rule fired inside the form
+        # itself, whatever followed it. The dot AFTER the form still fires ("B.V.The", "e.g.The"), as
+        # does punctuation after a word, a digit or a bracket.
+        re.compile(r'(?!(?<![^\W_])[^\W\d_]\.[^\W\d_]\.)\S[.,;:)](?=[A-Za-z])'),
         'Punctuation immediately followed by a letter with no space. '
         'Usually two defined-term phrases colliding because a deleted '
         'phrase abuts a regular phrase without whitespace.',
