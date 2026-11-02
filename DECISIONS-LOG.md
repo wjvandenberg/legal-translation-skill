@@ -2370,6 +2370,24 @@ same paragraphs struck through and the us tree. Declared, each the session's cho
 untranslated paragraph below the FULL threshold, its other markers still findings; the exemption is case-folded and
 blind to the declared language, as repack's reading of the same table is; and choice (6) above.
 
+## 2026-11-02 (4) — sub-step 14.7 built and merged (#185), unattended: validate_reject_all's G4; five choices the session's own
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS OF THIS MORNING** — each choice below is THE SESSION'S, taken on its own
+recommendation and carried here for him to confirm or overturn; none is his ruling.
+
+**(1) 14.7 WAS BUILT IN THE CONDUCTOR'S SESSION TOO,** straight after 14.6, the context then at 46% and the step
+judged to close under the house's 75%. **(2) THE EXEMPTION IS THE SHAPE, NOT A LIST OF COMPANY FORMS:** a dot between
+two lone letters each followed by a dot, so `B.V.`, `S.p.A.`, `U.S.A.` and `e.g.` alike — a list of forms would miss
+the next country's. **(3) A LONE LETTER HAS NEITHER A LETTER NOR A DIGIT BEFORE IT** — the review's one fix, so
+`Annex 3A.B. Smith` still fires. **(4) `Plan B.A. Smith` IS QUIET, DECLARED:** no pattern tells a sentence ending on a
+lone letter run into an initial from a two-letter form. **(5) THE RULE'S OPERATOR-FACING FIX TEXT IS UNCHANGED** — it
+does not mention the exemption; output no gate reads.
+
+**WHAT MOVED THE BUILD.** The review ran on the uncommitted fix, so one cycle record carries both. The publication
+check refused the first controls' invented company names — a capitalised word before `B.V.` reads as a real company —
+so each form now follows a lower-case word, the gate unchanged. **THE CORPUS, AS STATED BEFORE THE COUNT RAN:** 25
+missing-space findings to 5 in each tree, both views, 20 removed, every one G4, 0 added.
+
 **THE CORPUS, AS STATED BEFORE THE COUNT RAN:** with the notes, as skill Step 9 runs the check, 27 findings to 27 in
 each tree; without them, 32 to 27 — the 5 `; and/or` endings, every one G3 — 0 added. No workdir holds a kept name, so
 G13 closes on synthetic controls alone, declared.

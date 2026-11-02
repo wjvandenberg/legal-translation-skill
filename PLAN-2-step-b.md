@@ -1927,7 +1927,7 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 | G7 | the same check's marker and title exemptions, Italian and English only — taken to every language by Wouter, 2026-10-30 | **CLOSED 2026-11-02**, both trees, #183 — Japanese, Chinese and Finnish's own quote declared, not built | 14.5 |
 | G3 | `quality_check.py`: the list-connective whitelist misses `; and/or` | **CLOSED 2026-11-02**, both trees, #184 | 14.6 |
 | G13 | `quality_check.py`: the remnant check on the lexicon's kept names | **CLOSED 2026-11-02**, both trees, #184 — all ten, 10 of 10 firing before, each name in its own language | 14.6 |
-| G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | OPEN, and it fires INSIDE the form itself — `B.V`, `S.p`, `p.A` — whatever follows it, where the row says "followed by a capital" | 14.7 |
+| G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | **CLOSED 2026-11-02**, both trees, #185 — inside the form whatever followed it, as this row said | 14.7 |
 | C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | OPEN; a text part, copied, passes | 14.8 |
 
 **The sub-steps.** 14.2 to 14.8 each edit one script — and 14.2 one step document as well — **in both trees,
@@ -2338,6 +2338,9 @@ the edited script, and the full run once, before the push.
 > Smith`, as planned; and the rule's operator-facing FIX text, which does not mention the exemption, unchanged as
 > output no gate reads. 936 assertions became 940, the properties 40; four mutants, each caught; the corpus
 > re-counted, 25 to 5 in each tree, 20 removed, every one G4, 0 added.
+> **BUILT AND MERGED, 2026-11-02, as #185:** `598c62c` the fix, reviewed before its commit, then the filing; VERIFY 30
+> of 30 and TEST 15 of 15 through the cycle gate; the one full run on `598c62c`, OVERALL PASS; G4 CLOSED in the
+> register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain; 2026-11-02, unattended)*.
 
 ---
 
