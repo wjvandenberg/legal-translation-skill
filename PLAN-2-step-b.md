@@ -2219,6 +2219,22 @@ the edited script, and the full run once, before the push.
 > divergences re-recorded, the three confidentiality controls, VERIFY and TEST through `tools/cycle_evidence.py`. **No
 > render, declared:** a WARN decides nothing apply writes. **Done when:** G7's row is amended in the register, every
 > supported language built or declared moot, its residual unchanged.
+> **AMENDED AT REVIEW, 2026-11-02, before the full run.** `/code-review` at high, on `1c01e3b`: eight findings, seven
+> fixed, one declared. (1) **The pooled article list let one language's preposition pass for another's article** —
+> Dutch `de` is Spanish "of", Hungarian `a` Italian "to" — so a bracketed reference, Spanish `(de "X")`, was exempted:
+> 14.3's lesson met a third time. An article standing ALONE in the bracket now counts only in the language declared at
+> skill Step 1c, which `validate()` already reads and now passes to the check — 14.3's Italian and English set when
+> none is declared; after a lead-in any article still stands, the lead-in having marked the term. That was also the
+> altitude finding, the union taken back to where the language is known. (2) The measured Dutch article after a
+> lead-in, the participles `bezeichnet` and `genoemd`, and the Hungarian `címmel` had no control — added. (3) `pt.` read
+> any `Pt.` abbreviation as a Polish title word — removed. (4) The docstring said "after a title verb" — corrected.
+> (5) The twin property skipped every German-closed span; widened, it found that in `„A“ … „B”` the typographic pair
+> read a phantom span from A's German closer to B's closer — a typographic span no longer runs across a low opening
+> quote. **Declared, not built:** Finnish's own `”…”` is not read, so the Finnish exemption reaches only a document typed
+> with ordinary quotes — reading it when Finnish is declared is a second widening, unmeasured, open for Wouter.
+> Controls added, both trees, each review true positive PROVED missed at `1c01e3b` (0 of 10) and held now; five
+> mutants added, 24 of 24 caught; 680 assertions and 25 properties. The corpus re-counted: 2 to 2 in each tree, 0
+> added.
 
 ---
 
