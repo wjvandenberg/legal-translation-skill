@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-02 — SESSION PURPOSE — what · how · purpose:** the sub-step after 14.4, numbered 14.5 by rule 4b: `validate_translations.py`'s defined-term-marker and title exemptions (G7) taken from Italian and English to every supported source language, in both trees; its own written plan first and the old 14.5 to 14.9 renumbered, each language's words sourced from the skill's own lexicons, red first against the pinned baseline, the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-10-30 and 2026-11-02: the conductor chain, unattended)* · **so that a defined term or a title kept in quotes, in any supported language, raises no false missing-phrase warning, while one dropped with its quotes still does** *(written immediately after the tag `rollback-2026-11-02b-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-02 — SESSION PURPOSE — what · how · purpose:** sub-step 14.6, `quality_check.py`'s G3 and G13 in both trees: the list-connective whitelist takes `and/or`, and the remnant check reads the lexicon's kept names through `source_language_markers`, the one call the table repack already makes; built in the conductor's own session, the app having refused to start a new one from an automated turn; its own written plan first, red first against the pinned baseline, the corpus counted before and after, VERIFY and TEST through the cycle gate, one branch, one full run, one pull request, `/code-review`, the squash-merge on green *(Wouter, 2026-11-02: the conductor chain, unattended)* · **so that `; and/or` between list items and a name the lexicon keeps in the source language raise no false quality warning, while a real untranslated remnant and a real list-break still do** *(written immediately after the tag `rollback-2026-11-02c-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -2239,6 +2239,47 @@ the edited script, and the full run once, before the push.
 > `58206c1` the filing; VERIFY 30 of 30, 32 of 32 and 18 of 18, TEST 22 of 22, 22 of 22 and 6 of 6, through the cycle
 > gate; the one full run on `58206c1`, 94 suites, OVERALL PASS; G7's row amended in the register; squash-merged on green
 > *(Wouter, 2026-10-29, the conductor chain; 2026-11-02, unattended)*.
+> **14.6 — ITS OWN WRITTEN PLAN, 2026-11-02, before any edit, on `feature/step14-6-qc-and-or-kept-names`.** Built in
+> the conductor's own session, the app having refused to start a new one from an automated turn. **Measured first,
+> `main` at `13f52a7`, both trees alike** (`temp/s1102c_qc_probe.py`, `temp/s1102c_probe_nosrc.py` and
+> `temp/s1102c_kept_fire.py`, counts only): over the 13 frozen workdirs' delivered bodies, 5 paragraphs end on
+> `; and/or` (D05 2, D06 3); with `--with-source`, as skill Step 9 and `tools/qc_census.py` run the check, none fires
+> — G11's source exemption already holds each, its source ending on its own connective — and without it all 5 fire,
+> the only dangling-ending findings there are. No workdir holds any of the ten kept names, in its body, its deletions
+> or an auxiliary part, so **G13 rests on synthetic controls alone — declared.** **G13's count reconciled:** in an
+> invented English sentence, each name judged in its own lexicon's language, **10 of the 10** entries fire at
+> `13f52a7` and 6 at `2178cce` — the register's six, the four French statutes firing since the dated month names of
+> 2026-10-12 — while the 2026-10-26 probe's five judged every name as Italian, which the Portuguese and French names
+> are not. **The code moved:** `quality_check.py` and `source_language_markers.py` both changed between `2178cce` and
+> `13f52a7`, so every control is proved at both. **Changes,** both trees' `quality_check.py`, the rules still running,
+> no exit code moved: (1) G3 — `LIST_CONNECTOR_RE` takes `and/or`, a space allowed either side of the slash, still
+> only after a `;` or `,` at the paragraph's end. (2) G13 — the remnant check, in the body's two views and in the
+> auxiliary parts, drops a hit lying inside a name the lexicon keeps in the source language, read through
+> `remnant_verdict`, the call repack's block makes, so the names stay in `LEXICON_KEPT_NAMES` alone; the hit list is
+> otherwise `scan_remnants`' own, in its order, and the dense-paragraph count is taken from the same list. Only the
+> kept-name class is dropped: the CJK and company-form advisories stay findings here and the bare-month warning stays
+> a warning. (3) **The defect beside the false one,** asked of each: `and/or` with no `;` or `,` before it, `; and/or
+> the` and a dangling `at the` still flag; the same marker word just outside a kept name, a name cut short and a whole
+> source paragraph holding a kept name still flag; and the company-form advisory still flags in this check.
+> **Controls,** `tests/test_check_scoping.py`, both trees: *FP* — `; and/or`, `, and/or` and `; and / or` ending a
+> paragraph; each of the ten kept names in an English sentence, in its own language, in the body, in a deletion and in
+> a header; three kept names in one sentence, which the dense count read as a FULL paragraph — each silent now and
+> PROVED to fire at `2178cce` and at `13f52a7`; *TP* — each defect above, firing now and at both; and the whole script
+> judged by content, rc 2 and FAILED at both pins, rc 0 and PASSED now, on a `; and/or` paragraph and on a kept name.
+> `tests/test_check_scoping_properties.py`: one property over generated paragraphs, each population chosen by the
+> generator's own record — with no kept name and no `and/or` ending, both rules' findings identical to `13f52a7`'s; a
+> list-connective `and/or` ending never flags and a bare one always does; each planted kept name removes exactly the
+> hits that name carries alone, the rest kept as a multiset; the firing counts printed. A mutant per new condition.
+> **Must not touch:** `source_language_markers.py` and its table, `remnant_verdict`, repack, apply's own remnant
+> warning (a second reader of the same hits — measured, NOT changed, open for Wouter), the thresholds, the Italian
+> legacy filters, the bare-month warning, method A, G5's and G11's exemptions, any exit code, any other script, the
+> anti-drift safeguards. **Corpus:** old (`13f52a7`) against new over the 13 frozen workdirs, both trees, by
+> `temp/s1102c_qc_census.py`, counts only — declared, because `tools/qc_census.py` runs one tree's working copy alone —
+> **expected: with `--with-source`, every class 0 removed and 0 added; without it, 5 dangling endings to 0, every one
+> G3, 0 added**, each removal attributed by the census's own reader, a planted set proving the count moves. **Then**
+> the parity check, both divergences re-recorded, the three confidentiality controls, VERIFY and TEST through
+> `tools/cycle_evidence.py`. **No render, declared:** a quality_check finding decides whether skill Step 9 passes,
+> never what apply writes. **Done when:** G3 and G13 are CLOSED in the register on that evidence.
 
 ---
 

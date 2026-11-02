@@ -1238,6 +1238,162 @@ for tree in ("uk", "us"):
            passed_old if now_warns else warned_old, f"(rc={old_rc})")
 
 # =============================================================================
+print("\nG3 and G13 — quality_check: `; and/or` is a list connective; a name the lexicon keeps is no remnant")
+print("-" * 96)
+
+# G3: the list-connective whitelist stopped one character short of `and/or`, so a list item ending
+# `; and/or` read as a sentence cut off on `or`. G13: the remnant check failed skill Step 9 on the
+# names the skill's own lexicons tell the operator to keep in the source language -- repack's block
+# already read them from source_language_markers.LEXICON_KEPT_NAMES, and now this check does too,
+# through the same call. Each false positive is silent now and PROVED to have fired at the pinned
+# baseline (main's proof is temp/s1102c_red_first.py's); each true positive beside it -- the defect
+# a bare exemption would also silence -- fires now and before. 14.6 of PLAN-2-step-b.md section
+# 3.14; every string INVENTED, on office services.
+# --- 14.6 cases: begin
+G3_FP = (
+    ("`; and/or`", "the Contractor shall clean the offices every week; and/or"),
+    ("`, and/or`", "the Contractor shall clean the meeting rooms every day, and/or"),
+    ("`; and / or`, spaced", "the Contractor shall replace the light bulbs promptly; and / or"),
+)
+G3_TP = (
+    ("`and/or` with no `;` or `,` before it", "the Contractor shall clean the windows and the doors and/or"),
+    ("`; and/or the`", "the Contractor shall clean the offices every week; and/or the"),
+    ("a dangling `at the`", "the Contractor shall deliver the cleaning products at the"),
+)
+# the ten names LEXICON_KEPT_NAMES declares, typed here with the language of the lexicon each cites
+G13_KEPT = (
+    ("Agenzia delle Entrate", "italian"),
+    ("Società Italiana degli Autori ed Editori", "italian"),
+    ("Mercato Elettronico della Pubblica Amministrazione", "italian"),
+    ("Codice della Crisi d'Impresa e dell'Insolvenza", "italian"),
+    ("Codice delle Assicurazioni Private", "italian"),
+    ("dupla conforme", "portuguese"),
+    ("Loi du 25 juin 2008", "french"),
+    ("Loi du 6 juillet 1989", "french"),
+    ("Loi du 23 décembre 1986", "french"),
+    ("Loi du 10 juillet 1965", "french"),
+)
+G13_SENT = "The office manager writes to the {} about the cleaning invoice each month."
+G13_DENSE = ("The office manager writes to the Agenzia delle Entrate, the Mercato Elettronico della Pubblica "
+             "Amministrazione and the Codice delle Assicurazioni Private each month.")
+# (label, language, paragraph, what must hold now): "one fewer" -- the old count less the one hit inside
+# the name, at least one left; "full" -- the dense FULL paragraph finding; "fires" -- any finding
+G13_TP = (
+    ("the same marker word just outside a kept name", "italian",
+     "The office manager writes to the Agenzia delle Entrate and delle Dogane each month.", "one fewer"),
+    ("a kept name cut short", "italian",
+     "The office manager writes to the Agenzia delle office about the cleaning invoice each month.", "fires"),
+    ("a whole Italian paragraph holding a kept name", "italian",
+     "Il Committente versa all'Agenzia delle Entrate le imposte della società e delle sue controllate, "
+     "nonché quelle sulla sede, ai sensi della legge.", "full"),
+    ("a French company form, an advisory in repack and a finding here", "french",
+     "The office manager writes to the Société about the cleaning invoice each month.", "fires"),
+    ("a Japanese word, an advisory in repack and a finding here", "japanese",
+     "The office manager signs the 契約 for the cleaning invoice each month.", "fires"),
+)
+G13_BARE = ("french", "The office manager closes the office for the whole of juillet each year.")
+# --- 14.6 cases: end
+_G13_N = iter(range(10 ** 6))
+
+
+def g13_del(text):
+    return (f'<w:p><w:del w:id="1" w:author="A"><w:r><w:delText xml:space="preserve">{text}</w:delText>'
+            '</w:r></w:del></w:p>')
+
+
+def g13_aux(mod, text, lang, part="header"):
+    d = TMP / f"g13-aux-{next(_G13_N)}"
+    (d / "word").mkdir(parents=True)
+    if part == "header":
+        (d / "word" / "header1.xml").write_text(
+            f'<w:hdr xmlns:w="{W}"><w:p><w:r><w:t xml:space="preserve">{text}</w:t></w:r></w:p></w:hdr>',
+            encoding="utf-8")
+    else:                                          # a numbering level's own text, read from its w:val
+        (d / "word" / "numbering.xml").write_text(
+            f'<w:numbering xmlns:w="{W}"><w:abstractNum w:abstractNumId="0"><w:lvl w:ilvl="0">'
+            f'<w:lvlText w:val="{text} %1"/></w:lvl></w:abstractNum></w:numbering>', encoding="utf-8")
+    return [i for v in mod.check_aux_files(str(d), lang).values() for i in v]
+
+
+def qc_run(script, text, lang):
+    wd = TMP / f"qc-run-{next(_G13_N)}"
+    wd.mkdir()
+    (wd / "document.xml").write_text(
+        f'<w:document xmlns:w="{W}"><w:body>{para(text)}</w:body></w:document>', encoding="utf-8")
+    r = subprocess.run([sys.executable, str(script), str(wd / "document.xml"), "--language", lang],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace", env=F10_ENV, cwd=wd)
+    return r.returncode, r.stdout + r.stderr
+
+
+for tree in ("uk", "us"):
+    assert_baseline_differs("quality_check.py", tree)
+    old_qc = OLD_QC if tree == "uk" else load_old("quality_check.py", "us")
+    new_qc = NEW_QC if tree == "uk" else load_new("quality_check.py", "us")
+
+    def trunc(mod, text):
+        return [i for i in mod.check_truncation(doc(para(text)), False, None) if i.startswith("Dangling ending")]
+
+    for label, text in G3_FP:
+        n, o = trunc(new_qc, text), trunc(old_qc, text)
+        ok(f"G3 {tree} {label}: silent now", not n, f"({n})")
+        ok(f"G3 {tree} {label}: PROVED it fired before", bool(o), f"({o})")
+    for label, text in G3_TP:
+        n, o = trunc(new_qc, text), trunc(old_qc, text)
+        ok(f"G3 {tree} TRUE POSITIVE {label}: still fires", bool(n), f"({n})")
+        ok(f"G3 {tree} TRUE POSITIVE {label}: fired before too", bool(o), f"({o})")
+
+    # THE POPULATION IS THE TABLE ITSELF: a name added to LEXICON_KEPT_NAMES without a control here turns this red.
+    slm = load_new("source_language_markers.py", tree)
+    ok(f"G13 {tree} the controls cover exactly the names LEXICON_KEPT_NAMES declares",
+       [n for n, _l in G13_KEPT] == list(slm.LEXICON_KEPT_NAMES), f"({list(slm.LEXICON_KEPT_NAMES)})")
+
+    def rem(mod, body, lang):
+        return mod.check_source_remnants(doc(body), False, lang)
+
+    for name, lang in G13_KEPT:
+        s = G13_SENT.format(name)
+        for view, n, o in (("the body", rem(new_qc, para(s), lang), rem(old_qc, para(s), lang)),
+                           ("a deletion", rem(new_qc, g13_del(s), lang), rem(old_qc, g13_del(s), lang)),
+                           ("a header", g13_aux(new_qc, s, lang), g13_aux(old_qc, s, lang))):
+            ok(f"G13 {tree} {name}, {lang}, in {view}: silent now", not n, f"({n})")
+            ok(f"G13 {tree} {name}, {lang}, in {view}: PROVED it fired before", bool(o), f"({o})")
+    s = G13_SENT.format(G13_KEPT[0][0])
+    n, o = g13_aux(new_qc, s, "italian", "numbering"), g13_aux(old_qc, s, "italian", "numbering")
+    ok(f"G13 {tree} a kept name in a numbering level's text: silent now", not n, f"({n})")
+    ok(f"G13 {tree} a kept name in a numbering level's text: PROVED it fired before", bool(o), f"({o})")
+    for view, body in (("the body", para(G13_DENSE)), ("a deletion", g13_del(G13_DENSE))):
+        n, o = rem(new_qc, body, "italian"), rem(old_qc, body, "italian")
+        ok(f"G13 {tree} three kept names in one sentence, in {view}: silent now", not n, f"({n})")
+        ok(f"G13 {tree} three kept names in one sentence, in {view}: PROVED the dense count read a FULL "
+           f"paragraph before", any(i.startswith("FULL") for i in o), f"({o})")
+    for label, lang, text, want in G13_TP:
+        n, o = rem(new_qc, para(text), lang), rem(old_qc, para(text), lang)
+        if want == "one fewer":
+            now = bool(n) and len(n) == len(o) - 1
+        elif want == "full":
+            now = any(i.startswith("FULL") for i in n)
+        else:
+            now = bool(n)
+        before = any(i.startswith("FULL") for i in o) if want == "full" else bool(o)
+        ok(f"G13 {tree} TRUE POSITIVE {label}: still fires"
+           + (", only the hit inside the name removed" if want == "one fewer" else ""),
+           now, f"({len(n)} now, {len(o)} before)")
+        ok(f"G13 {tree} TRUE POSITIVE {label}: fired before too", before, f"({len(o)} before)")
+    sink = []
+    n = new_qc.check_source_remnants(doc(para(G13_BARE[1])), False, G13_BARE[0], sink)
+    ok(f"G13 {tree} a bare month name: still a warning and never an issue", bool(sink) and not n,
+       f"({len(sink)} warnings, {len(n)} issues)")
+
+    # THE EXIT skill Step 9 reads, by content: rc 2 and FAILED before, rc 0 and PASSED now.
+    for row, text, lang in (("G3", G3_FP[0][1], "italian"), ("G13", G13_SENT.format(G13_KEPT[0][0]), "italian")):
+        new_rc, new_out = qc_run(ROOT / tree / "scripts" / "quality_check.py", text, lang)
+        old_rc, old_out = qc_run(OLD_DIR / (tag(tree) + "quality_check.py"), text, lang)
+        ok(f"{row} {tree}, the whole script: exits 0 and PASSED now",
+           new_rc == 0 and "*** PASSED" in new_out and "*** FAILED" not in new_out, f"(rc={new_rc})")
+        ok(f"{row} {tree}, the whole script: PROVED it exited 2 and FAILED before",
+           old_rc == 2 and "*** FAILED" in old_out, f"(rc={old_rc})")
+
+# =============================================================================
 shutil.rmtree(TMP, ignore_errors=True)
 print()
 print("=" * 96)

@@ -754,6 +754,106 @@ took = time.perf_counter() - t0
 ok(f"G2/G8/G14 three hostile lists scanned in {took:.2f}s, each still warning on its internal tail",
    took < 5 and all(fired), f"(fired {fired})")
 
+# =============================================================================
+print("\nPROPERTY 11 — G3 and G13: `; and/or` ends a list item; a name the lexicon keeps is no remnant")
+print("-" * 96)
+# Against main as 14.6 found it -- 13f52a7, pinned, the commit before that sub-step -- because quality_check
+# moved between 2178cce and there for reasons that are not 14.6's. Each population is chosen by the generator's
+# own record: the ending it wrote, the kept names and the marker words it planted -- never by the code under
+# test. Invented words.
+PRE = "13f52a7"
+blob = subprocess.run(["git", "show", f"{PRE}:uk/scripts/quality_check.py"], capture_output=True, cwd=ROOT)
+if blob.returncode != 0 or blob.stdout == (ROOT / "uk" / "scripts" / "quality_check.py").read_bytes():
+    print(f"VOID — quality_check.py at {PRE} is unreadable or BYTE-IDENTICAL to the working")
+    print("tree, so this property would compare the fix with itself.")
+    sys.exit(1)
+(OLD / "pre146_quality_check.py").write_bytes(blob.stdout)
+PREQC = load(OLD / "pre146_quality_check.py", "p_pre146_qc")
+SLM = load(ROOT / "uk" / "scripts" / "source_language_markers.py", "p_slm")
+
+# (ending, kind): list -- a `;` or `,` then `and/or`; bare -- `and/or` with neither; other -- anything else
+ENDINGS = (("; and/or", "list"), (", and/or", "list"), ("; and / or", "list"), (";and/or", "list"),
+           (",  and/or ", "list"), (" and/or", "bare"), (" and / or", "bare"), ("; and/or the", "other"),
+           ("; and", "other"), (", or", "other"), (" at the", "other"), (" of", "other"), (".", "other"),
+           ("; and/", "other"), (" and/or.", "other"), ("", "other"))
+rng = random.Random(SEED + 11)
+n = Counter()
+listed, bare_quiet, moved3 = [], [], []
+for _ in range(3000):
+    end, kind = rng.choice(ENDINGS)
+    text = "the " + " ".join(rng.choice(WORDS) for _ in range(rng.randint(4, 12))) + end
+    o = [i for i in PREQC.check_truncation(doc_from([text]), False, None) if i.startswith("Dangling ending")]
+    w = [i for i in QC.check_truncation(doc_from([text]), False, None) if i.startswith("Dangling ending")]
+    n[kind] += 1
+    if kind == "list":
+        n["list_pre"] += bool(o)
+        if w:
+            listed.append(text)
+    elif kind == "bare":
+        if not w:
+            bare_quiet.append(text)
+    else:
+        n["other_fire"] += bool(o)
+        if o != w:
+            moved3.append(text)
+ok(f"G3 a list-connective `and/or` ending never flags ({n['list']} paragraphs; {PRE} flagged {n['list_pre']})",
+   n["list_pre"] > 0 and not listed, f"{len(listed)} flag, e.g. {listed[:2]}")
+ok(f"G3 a bare `and/or` ending always flags ({n['bare']} paragraphs)", n["bare"] > 0 and not bare_quiet,
+   f"{len(bare_quiet)} quiet, e.g. {bare_quiet[:2]}")
+ok(f"G3 every other ending: verdict identical to {PRE} ({n['other']} paragraphs, {n['other_fire']} firing)",
+   n["other_fire"] > 0 and n["other"] > n["other_fire"] and not moved3, f"{len(moved3)} moved, e.g. {moved3[:2]}")
+
+# the ten names LEXICON_KEPT_NAMES declares, typed with their lexicon's language; marker words that are one hit each
+KEPT_GEN = (("Agenzia delle Entrate", "italian"), ("Società Italiana degli Autori ed Editori", "italian"),
+            ("Mercato Elettronico della Pubblica Amministrazione", "italian"),
+            ("Codice della Crisi d'Impresa e dell'Insolvenza", "italian"),
+            ("Codice delle Assicurazioni Private", "italian"), ("dupla conforme", "portuguese"),
+            ("Loi du 25 juin 2008", "french"), ("Loi du 6 juillet 1989", "french"),
+            ("Loi du 23 décembre 1986", "french"), ("Loi du 10 juillet 1965", "french"))
+OUTSIDE = {"italian": ("della", "nonché", "qualora", "pertanto"), "french": ("toutefois", "néanmoins", "ledit"),
+           "portuguese": ("outrossim", "mediante")}
+alone = {k: len(SLM.scan_remnants(f"the {k} the", lang, bare_months=False)) for k, lang in KEPT_GEN}
+ok("PROPERTY 11's generator: every kept name is at least one hit alone, every planted marker word exactly one",
+   all(alone.values()) and all(len(SLM.scan_remnants(f"the {m} the", lang, bare_months=False)) == 1
+                               for lang, ms in OUTSIDE.items() for m in ms), f"({alone})")
+ok("PROPERTY 11's generator covers exactly the names LEXICON_KEPT_NAMES declares",
+   [k for k, _l in KEPT_GEN] == list(SLM.LEXICON_KEPT_NAMES))
+moved13, wrong, gen_off = [], [], []
+for _ in range(3000):
+    lang = rng.choice(("italian", "french", "portuguese"))
+    words = [rng.choice(WORDS) for _ in range(rng.randint(3, 14))]
+    kept = [rng.choice([k for k, kl in KEPT_GEN if kl == lang]) for _ in range(rng.choice((0, 0, 1, 1, 2, 3)))]
+    marks = [rng.choice(OUTSIDE[lang]) for _ in range(rng.choice((0, 1, 2, 3)))]
+    for tok in kept + marks:
+        words.insert(rng.randint(0, len(words)), tok)
+    text = "The " + " ".join(words) + "."
+    o = PREQC.check_source_remnants(doc_from([text]), False, lang)
+    w = QC.check_source_remnants(doc_from([text]), False, lang)
+    o_hits = [i for i in o if not i.startswith("FULL")]
+    w_hits = [i for i in w if not i.startswith("FULL")]
+    if len(o_hits) != len(marks) + sum(alone[k] for k in kept):
+        gen_off.append(text)
+    if not kept:
+        n["none"] += 1
+        n["none_fire"] += bool(o)
+        if o != w:
+            moved13.append(text)
+    else:
+        n["kept"] += 1
+        n["kept_pre_fire"] += bool(o)
+        n["kept_full_pre"] += any(i.startswith("FULL") for i in o)
+        if (len(w_hits) != len(marks) or Counter(w_hits) - Counter(o_hits)
+                or any(i.startswith("FULL") for i in w) != (len(marks) >= 3)):
+            wrong.append(text)
+ok(f"PROPERTY 11's generator record matches {PRE}'s count on every paragraph ({n['none'] + n['kept']} paragraphs)",
+   not gen_off, f"{len(gen_off)} off, e.g. {gen_off[:2]}")
+ok(f"G13 no kept name: findings identical to {PRE}, in their order ({n['none']} paragraphs, {n['none_fire']} firing)",
+   n["none_fire"] > 0 and n["none"] > n["none_fire"] and not moved13, f"{len(moved13)} moved, e.g. {moved13[:2]}")
+ok(f"G13 each planted kept name removes exactly the hits it carries alone, the rest kept as a multiset, the FULL "
+   f"finding on the rest alone ({n['kept']} paragraphs; {PRE} fired on {n['kept_pre_fire']}, FULL on "
+   f"{n['kept_full_pre']})", n["kept_pre_fire"] > 0 and n["kept_full_pre"] > 0 and not wrong,
+   f"{len(wrong)} wrong, e.g. {wrong[:2]}")
+
 shutil.rmtree(TMP, ignore_errors=True)
 print()
 print("=" * 96)

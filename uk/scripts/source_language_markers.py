@@ -421,8 +421,9 @@ def bare_month_hits(text, source_language):
 # ──────────────────────────────────────────────────────────────────────
 # THE REMNANT VERDICT — which of scan_remnants' hits STOP a delivery and which
 # only warn. repack_docx.py refuses on a BLOCKING hit (register C22, branch 11
-# slice 2b, Wouter 2026-09-25); apply and quality_check do not call this and
-# are unchanged. A hit is ADVISORY only for a class the scan cannot rule on:
+# slice 2b, Wouter 2026-09-25); quality_check reads the kept-name class alone,
+# and drops those hits (register G13, step 14.6); apply does not call this.
+# A hit is ADVISORY only for a class the scan cannot rule on:
 #   * a CJK character marker — a kept name may stand in its own script;
 #   * a marker in REMNANT_ADVISORY, each with its reason;
 #   * a month name with no number beside it (MONTH NAMES above, BARE_MONTH_WHY);
