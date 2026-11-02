@@ -167,8 +167,9 @@ _APOSTROPHE_INNER = r"(?:[^']|'(?=" + _LETTER + r'))'
 # `recante "X"`, `entitled "X"`, `intitulé « X »` — or, in Hungarian, straight
 # before one: `"X" című`. The NAMING verbs (denominato, named, dénommé,
 # genannt, zwany, nevű…) are deliberately not title words: they introduce the
-# names this check exists to keep. One list for every language, as this
-# function is told none. Measured on the recorded runs: the Italian and English
+# names this check exists to keep. One list of lead-ins and title words for
+# every language; an article alone follows the declared language, see
+# _ARTICLES. Measured on the recorded runs: the Italian and English
 # shapes, Dutch hierna, Polish zwana dalej, Norwegian heretter; from the
 # lexicons: ci-après, ci-dessous, nachstehend, hieronder; every other word is
 # its language's usual drafting formula, unmeasured, its controls synthetic.
@@ -208,14 +209,45 @@ _MARKER_LEADIN_MORE = (
     r'zwan\w*', 'dalej', 'także', 'również', 'myös', 'kalt',
     'benevnt',
 ) + _MARKER_ADVERBS
-# The definite and indefinite articles of every language that has them.
-_MARKER_ARTICLE = (
-    r'(?:(?:the|an?|il|lo|la|i|gli|le|uno?|una|les|une|el|los|las|o|os|as|um'
-    r"|uma|der|die|das|den|dem|eine?|de|het|een|az|egy)\s+|(?:l|un)['’]\s*)")
+# The definite and indefinite articles of each language that has them. After a
+# lead-in any of them may stand, the lead-in having marked the term. Alone in
+# the bracket, only the DECLARED language's count, with English `the`: one
+# language's article is another's preposition — Dutch `de` is Spanish "of",
+# Hungarian `a` is Italian "to" — and `(de "X")` is a reference, not a marker.
+# With no language declared, 14.3's Italian and English set.
+_ARTICLES = {
+    'english': ('the', 'an?'),
+    'italian': ('il', 'lo', 'la', 'i', 'gli', 'le', 'uno?', 'una', "l['’]", "un['’]"),
+    'french': ('le', 'la', 'les', 'une?', "l['’]"),
+    'spanish': ('el', 'la', 'los', 'las', 'una?'),
+    'portuguese': ('o', 'a', 'os', 'as', 'um', 'uma'),
+    'german': ('der', 'die', 'das', 'den', 'dem', 'eine?'),
+    'dutch': ('de', 'het', 'een'),
+    'hungarian': ('az?', 'egy'),
+}
+_UNDECLARED_ARTICLES = ('the', 'il', 'lo', 'la', 'i', 'gli', 'le', "l['’]")
+
+
+def _article(words):
+    """One article from words, then a space — or, an elided one, straight on."""
+    elided = [w for w in words if w.endswith("['’]")]
+    plain = [w for w in words if w not in elided]
+    return (r'(?:(?:' + '|'.join(plain) + r')\s+'
+            + (r'|(?:' + '|'.join(elided) + r')\s*' if elided else '') + ')')
+
+
+def _article_only(words):
+    return re.compile(r'\(\s*' + _article(words) + r'\Z', re.IGNORECASE)
+
+
+_MARKER_ARTICLE = _article(sorted({w for ws in _ARTICLES.values() for w in ws}))
 _MARKER_BEFORE = re.compile(
-    r'\(\s*(?:(?:' + '|'.join(_MARKER_LEADIN_START) + r')\b(?:[\s,:]+(?:'
-    + '|'.join(_MARKER_LEADIN_MORE) + r')\b)*[\s,:]*' + _MARKER_ARTICLE
-    + r'?|' + _MARKER_ARTICLE + r')\Z', re.IGNORECASE)
+    r'\(\s*(?:' + '|'.join(_MARKER_LEADIN_START) + r')\b(?:[\s,:]+(?:'
+    + '|'.join(_MARKER_LEADIN_MORE) + r')\b)*[\s,:]*' + _MARKER_ARTICLE + r'?\Z',
+    re.IGNORECASE)
+_ARTICLE_ONLY = {lang: _article_only(ws + ('the',)) for lang, ws in _ARTICLES.items()}
+_ARTICLE_ONLY[None] = _article_only(_UNDECLARED_ARTICLES)
+_THE_ONLY = _article_only(('the',))   # a declared language with no article
 _MARKER_AFTER = re.compile(r'\s*(?:(?:genannt|bezeichnet|genoemd)\s*)?\)',
                            re.IGNORECASE)
 _TITLE_BEFORE = re.compile(
@@ -223,7 +255,7 @@ _TITLE_BEFORE = re.compile(
     # 14.5: French, Spanish, Portuguese, German, Dutch, Polish and Finnish.
     r'|intitul[ée]e?s?|titulad[oa]s?|intitulad[oa]s?|betitelt\w*'
     r'|(?:mit|unter)\s+dem\s+Titel|getiteld|(?:met|onder)\s+de\s+titel'
-    r'|pod\s+tytułem|pt\.|zatytułowan\w*|otsikolla|otsikoltaan)\s*[:,]?\s*\Z',
+    r'|pod\s+tytułem|zatytułowan\w*|otsikolla|otsikoltaan)\s*[:,]?\s*\Z',
     re.IGNORECASE)
 # Hungarian names a title AFTER it: `"X" című`, `"X" címmel` (14.5).
 _TITLE_AFTER = re.compile(r'\s*(?:című|címmel)\b', re.IGNORECASE)
@@ -247,7 +279,11 @@ def _quoted_spans(text, opener, closer):
     else:
         # Escape for regex; if opener == closer this is fine, the pattern
         # `<opener>([^<closer>]+)<closer>` matches the shortest enclosed text.
-        pat = (re.escape(opener) + r'([^' + re.escape(closer) + r']+)'
+        # Step 14.5: a typographic span never runs across a low opening quote,
+        # or in „A“ … „B” the German closer of A would open a phantom span
+        # ending at B's closer.
+        inner = closer + ('„' if opener == '“' else '')
+        pat = (re.escape(opener) + r'([^' + re.escape(inner) + r']+)'
                + re.escape(closer))
     return re.finditer(pat, text)
 
@@ -258,18 +294,21 @@ def _quoted_span_count(s):
                for _ in _quoted_spans(s, o, c))
 
 
-def _translated_by_design(text, m):
+def _translated_by_design(text, m, language=None):
     """True where span m sits in a defined-term marker or beside a title word
-    (G7) — see _MARKER_BEFORE, _TITLE_BEFORE and _TITLE_AFTER. A marker opens
-    at the last parenthesis before the span, so the search starts there."""
+    (G7) — see _MARKER_BEFORE, _ARTICLE_ONLY, _TITLE_BEFORE and _TITLE_AFTER.
+    A marker opens at the last parenthesis before the span, so the search
+    starts there; a marker of an article alone reads the declared language's."""
     k = text.rfind('(', 0, m.start())
-    return bool((k >= 0 and _MARKER_BEFORE.match(text, k, m.start())
+    alone = _ARTICLE_ONLY.get(language, _THE_ONLY)
+    return bool((k >= 0 and (_MARKER_BEFORE.match(text, k, m.start())
+                             or alone.match(text, k, m.start()))
                  and _MARKER_AFTER.match(text, m.end()))
                 or _TITLE_BEFORE.search(text, 0, m.start())
                 or _TITLE_AFTER.match(text, m.end()))
 
 
-def _check_quoted_phrase_retention(p):
+def _check_quoted_phrase_retention(p, language=None):
     """Return list of (style, phrase) for source-quoted phrases that do
     NOT appear in the English translation.
 
@@ -292,10 +331,12 @@ def _check_quoted_phrase_retention(p):
     agreement dated…` where the source quoted term gets replaced.
 
     Step 14.3: an elision apostrophe is never a quote mark (G1), and a span in
-    a defined-term marker or after a title verb is exempt (G7) — but ONLY while
+    a defined-term marker or beside a title word is exempt (G7) — but ONLY while
     the English keeps at least as many quoted spans as the source. A term or a
     title dropped together with its quotes is a real loss, and it is checked
-    exactly as before.
+    exactly as before. Step 14.5: every supported language's markers and title
+    words, and the low opening quote read; `language`, the one declared at
+    Step 1c, decides which articles may make a marker on their own.
     """
     text = (p.get('text') or '').strip()
     en = (p.get('en') or '').strip()
@@ -344,7 +385,7 @@ def _check_quoted_phrase_retention(p):
                     continue
                 if phrase_stripped in en:
                     continue
-                if _translated_by_design(text, m):
+                if _translated_by_design(text, m, language):
                     if keeps_quotes is None:
                         keeps_quotes = (_quoted_span_count(en)
                                         >= _quoted_span_count(text))
@@ -513,7 +554,7 @@ def validate(json_path, accept_large_batch=False):
         # names, statute names) silently fail to appear in the English.
         # See `_check_quoted_phrase_retention` docstring for thresholds
         # and definition-paragraph skipping.
-        qp_missing = _check_quoted_phrase_retention(p)
+        qp_missing = _check_quoted_phrase_retention(p, language if declared else None)
         if qp_missing:
             quoted_phrase_warnings.append({
                 'idx': p.get('idx', '?'),

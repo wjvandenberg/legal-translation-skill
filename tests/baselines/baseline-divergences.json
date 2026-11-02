@@ -223,7 +223,7 @@
   "uk/scripts/validate_translations.py": {
    "changed_by": "feature/step14-5-g7-every-language",
    "commit_subject": "Step 14.5 - validate_translations exempts a defined term in its marker and a title beside its title word in every supported language, and reads the low opening quote (G7)",
-   "sha256_now": "1452862eb61cd9899c6a1d9e1bf912613a56a0cbff7a12bc9b56a34a103e929c"
+   "sha256_now": "7301436e09551d63a8ef8b50a7a13460356786c45b2a5e3b14a771920e6e0db5"
   },
   "uk/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/step13-4-variant-conversion",
@@ -243,7 +243,7 @@
   "us/scripts/validate_translations.py": {
    "changed_by": "feature/step14-5-g7-every-language",
    "commit_subject": "Step 14.5 - validate_translations exempts a defined term in its marker and a title beside its title word in every supported language, and reads the low opening quote (G7)",
-   "sha256_now": "1452862eb61cd9899c6a1d9e1bf912613a56a0cbff7a12bc9b56a34a103e929c"
+   "sha256_now": "7301436e09551d63a8ef8b50a7a13460356786c45b2a5e3b14a771920e6e0db5"
   },
   "us/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/step13-4-variant-conversion",

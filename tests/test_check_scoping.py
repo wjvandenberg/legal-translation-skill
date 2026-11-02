@@ -1021,7 +1021,52 @@ G7L = (
     ("Norwegian", "marker",
      'Partene inngår avtalen (heretter kalt "Avtale om Renhold av Kontorlokaler i Sentrum").',
      "Avtale om Renhold av Kontorlokaler i Sentrum"),
+    # The review's findings, 2026-11-02: the measured Dutch article after a lead-in, the other two
+    # participles, and the other Hungarian title word, each had no control.
+    ("Dutch", "marker, an article after the lead-in (measured)",
+     "Partijen sluiten de overeenkomst (hierna: de “Overeenkomst inzake de Schoonmaak van Kantoren”).",
+     "Overeenkomst inzake de Schoonmaak van Kantoren"),
+    ("Dutch", "marker, a participle closing it",
+     "Partijen sluiten de overeenkomst (hierna “Overeenkomst inzake de Schoonmaak van Kantoren” genoemd).",
+     "Overeenkomst inzake de Schoonmaak van Kantoren"),
+    ("German", "marker, an article and another participle",
+     'Die Parteien schließen den Vertrag (nachstehend der "Vertrag über die Reinigung der Büroräume" bezeichnet).',
+     "Vertrag über die Reinigung der Büroräume"),
+    ("Hungarian", "title, the other title word after it",
+     'A Vállalkozó a "Liftek és mozgólépcsők havi ellenőrzésének eljárása" címmel kiadott eljárást követi.',
+     "Liftek és mozgólépcsők havi ellenőrzésének eljárása"),
 )
+# AN ARTICLE ALONE is the DECLARED language's: one language's article is another's preposition, and
+# "(de X)" in Spanish is a reference -- the review's finding, 2026-11-02. (declared language, source,
+# the span, whether it must be quiet with that language declared)
+G7L_ALONE = (
+    ("dutch", "Partijen sluiten de overeenkomst (de “Overeenkomst inzake de Schoonmaak van Kantoren”).",
+     "Overeenkomst inzake de Schoonmaak van Kantoren", True),
+    ("hungarian", 'A Felek megkötik a szerződést (a "Irodatakarítási Szolgáltatási Szerződés a Központi Épületre").',
+     "Irodatakarítási Szolgáltatási Szerződés a Központi Épületre", True),
+    ("german", 'Die Parteien schließen den Vertrag (der "Vertrag über die Reinigung der Büroräume").',
+     "Vertrag über die Reinigung der Büroräume", True),
+    ("portuguese", "As partes celebram o contrato (o “Contrato de Serviços de Limpeza de Escritórios”).",
+     "Contrato de Serviços de Limpeza de Escritórios", True),
+    ("english", 'The parties enter into a contract (a "Party to the Office Upkeep Arrangement").',
+     "Party to the Office Upkeep Arrangement", True),
+    ("spanish", "Se aplica el Real Decreto 5/2020 (de “Medidas urgentes para la limpieza de oficinas públicas”).",
+     "Medidas urgentes para la limpieza de oficinas públicas", False),
+    ("italian", 'Come previsto dal capitolato (a "Specifiche Tecniche dei Servizi di Pulizia").',
+     "Specifiche Tecniche dei Servizi di Pulizia", False),
+    (None, "Se aplica el Real Decreto 5/2020 (de “Medidas urgentes para la limpieza de oficinas públicas”).",
+     "Medidas urgentes para la limpieza de oficinas públicas", False),
+)
+# A German closer is the English opener: in "„A“ … „B”" the old typographic pair read a phantom span
+# from A's closer to B's closer -- found by the twin property at the review, 2026-11-02. Both
+# quoted spans kept in the English, the phantom alone fired.
+G7L_PHANTOM = ("Die Parteien vereinbaren „Büroreinigung im Gebäude Nord Eins“ und danach „Kantinenbetrieb "
+               "im Gebäude Süd Zwei”.",
+               "The parties agree „Büroreinigung im Gebäude Nord Eins“ and then „Kantinenbetrieb im Gebäude "
+               "Süd Zwei”.")
+# An abbreviation is no title word -- the review's finding: 'Pt.' once read as the Polish 'pt.'.
+G7L_PT = ('The rates are set out in Pt. "Schedule of Office Cleaning Services Rates".',
+          'The rates are set out in Part "Office Cleaning Rates Schedule".', "Schedule of Office Cleaning Services Rates")
 # (language, shape, source, English keeping a quoted span, the span the new code must still report)
 G7L_TP = (
     ("French", "a naming verb", "Le projet dénommé « Centre de Services du Quartier Haut Vert » est autorisé.",
@@ -1148,6 +1193,35 @@ for tree in ("uk", "us"):
     for label, src, en in G7L_MOOT:
         new_f, old_f = fired(new_vt, src, en), fired(old_vt, src, en)
         ok(f"G7 {tree} {label}: silent now and before (moot)", not new_f and not old_f, f"({new_f}, {old_f})")
+    for lang, src, span, quiet in G7L_ALONE:
+        new_f = [p for _s, p in new_vt._check_quoted_phrase_retention({"text": src, "en": KEEP}, lang)]
+        old_f = fired(old_vt, src, KEEP)
+        if quiet:
+            ok(f"G7 {tree} an article alone, {lang} declared: silent now", not new_f, f"({new_f})")
+        else:
+            ok(f"G7 {tree} TRUE POSITIVE an article alone, {lang} declared: still fires", span in new_f, f"({new_f})")
+        ok(f"G7 {tree} an article alone, {lang} declared: fired before", span in old_f, f"({old_f})")
+    new_f, old_f = fired(new_vt, *G7L_PHANTOM), fired(old_vt, *G7L_PHANTOM)
+    ok(f"G7 {tree} a German closer opens no phantom span: silent now", not new_f, f"({new_f})")
+    ok(f"G7 {tree} a German closer opens no phantom span: PROVED it fired before", bool(old_f), f"({old_f})")
+    new_f, old_f = fired(new_vt, G7L_PT[0], G7L_PT[1]), fired(old_vt, G7L_PT[0], G7L_PT[1])
+    ok(f"G7 {tree} TRUE POSITIVE an abbreviation is no title word: fires now and before",
+       G7L_PT[2] in new_f and G7L_PT[2] in old_f, f"({new_f}, {old_f})")
+    # THE DECLARATION REACHES THE CHECK: the whole script on a Dutch "(de X)", declared Dutch at Step 1c
+    # and undeclared -- quiet the first way, warning the second.
+    for decl, want_quiet in (("dutch", True), (None, False)):
+        wd = TMP / f"vt-decl-{tree}-{decl}"
+        wd.mkdir()
+        (wd / "paragraphs.json").write_text(json.dumps([{"idx": 0, "text": G7L_ALONE[0][1], "en": KEEP}]),
+                                            encoding="utf-8")
+        if decl:
+            (wd / "source_language.json").write_text(json.dumps({"source_language": decl}), encoding="utf-8")
+        r = subprocess.run([sys.executable, str(ROOT / tree / "scripts" / "validate_translations.py"),
+                            str(wd / "paragraphs.json")], capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", env=F10_ENV, cwd=wd)
+        warned = "Quoted source phrases NOT found" in r.stdout + r.stderr
+        ok(f"G7 {tree} the whole script, a Dutch article alone, {decl or 'nothing'} declared: "
+           f"{'no' if want_quiet else 'a'} quoted-phrase WARN", warned != want_quiet, f"(rc={r.returncode})")
     # THE EXIT skill Step 4 reads, by content: a French marker exits 0 now and PROVED it warned before;
     # a Polish name dropped in the low opening quote warns now and PROVED it passed before.
     old_dir = TMP / f"old_vt_{tree}"     # written by the G1/G7 section above

@@ -622,9 +622,11 @@ for k in range(12000):
         fired_short += bool(o)
         if n != o:
             moved_short.append((src, en))
-    # A German closer (“) can open a pre-existing typographic pair across the paragraph, in the old code
-    # and the new alike, so the twin is compared where every low opening quote closes as Polish does.
-    if low9 and "“" not in src:
+    # A German closer (“) can open the typographic pair across the paragraph when another typographic span
+    # follows, in the old code and the new alike, so the twin is compared wherever no typographic mark
+    # stands outside the low-opening-quote spans -- German-closed ones included (the review, 2026-11-02).
+    rest = re.sub("„[^„”“]+[”“]", "", src)
+    if low9 and "“" not in rest and "”" not in rest:
         n_twin += 1
         t = VT._check_quoted_phrase_retention({"text": low9_twin(src), "en": low9_twin(en)})
         fired_twin += bool(t)
