@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-03 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.1, C29, resumed where 2026-11-02 parked it: the corpus count, the mutants, VERIFY and TEST through the cycle gate, the review, the one full run and the merge, C29 closed; no questions to Wouter *(Wouter, 2026-11-03: continue with everything)* · **so that an operator on an ordinary Windows console is never told that a crash is a deliberate block** *(written immediately after the tag `rollback-2026-11-03-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-03 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.2, skill Steps 1 and 11, F11, F9, F21 and F20, both trees: the `.doc` conversion command proved on a synthetic `.doc`, the closing checklists made to ask only what is true at the step they close, and Step 11b's tracked-change line; measured before and after, then the cycle gate, the one full run and the merge; no questions to Wouter *(Wouter, 2026-11-03: continue with everything)* · **so that an operator who follows skill Steps 1 and 11 to the letter is never told to do the wrong thing** *(written immediately after the tag `rollback-2026-11-03b-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -2487,6 +2487,41 @@ the edited script, and the full run once, before the push.
 > first refused a leakage row expecting CLEAN over 12 standing hits, every one at `HEAD`; the one full run on
 > `7e9fa69`, OVERALL PASS, 109 rows; C29 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the
 > conductor chain; 2026-11-03, unattended)*.
+> **14.9.2 — ITS OWN WRITTEN PLAN, 2026-11-03, before any edit, on `feature/step14-9-2-steps-1-and-11`.** F11, F9,
+> F21 and F20, by 14.9's block above; **no question put to Wouter, each choice the recommended option, recorded**
+> *(Wouter, 2026-11-03: continue with everything; `DECISIONS-LOG.md`, 2026-11-03 (2))*. **Measured first, pinned to
+> `213e3f4`, both trees alike** (`temp/s1103b_red_first.py`, exact counts over `SKILL.md`, `skill-docs/`,
+> `references/` and `scripts/`): `--format docx` 1, in 01 alone; "No tracked changes visible" 1, in 10 alone; 01's
+> item "inspected … output and did not run it on a redline" 1, and its untagged "You produced `paragraphs.json`" 1.
+> **And a class the rows undercount:** SKILL.md's per-step instruction — walk the checklist "before moving to the
+> next step" — meets a list headed "Before moving to the next step, confirm:" in all eight step files, and FOUR of
+> them close two steps with one list — 01 (1, 2), 06 (6, 7), 08 (8, 9) and 10 (10, 11) — where F21 names two, one of
+> them 03, whose 3b is a sub-step. **F11, by running it** (`temp/s1103b_f11_proof.py`, a synthetic Word 97 `.doc`
+> that LibreOffice makes from two invented lines, the security agent's log unchanged): the docx skill's wrapper hands
+> its arguments to `soffice` unchanged (its line 191, read) and on Windows cannot start at all, its Linux sandbox
+> probe asking for `AF_UNIX`, so it runs with that probe alone answered (`temp/s1103b_f11_wrap.py`, declared); the
+> corrected `--headless --convert-to docx --outdir <workdir> <input>.doc` exits 0 in 10 s and writes
+> `<workdir>/synthetic-1b.docx`, a Word file holding both lines, which `clean_conversion_artifacts.py` then reads by
+> that name; the old form converts nothing — here it hangs without `--headless` until ended, in Cowork it printed
+> the usage screen *(D06)*.
+> **Changes, both trees, wording only, no step renumbered** *(charter 6.3)*: **(1) F11** — the command as above, and
+> the path sentence says where the wrapper is, that it hands its arguments to LibreOffice unchanged, and where the
+> output lands: the `<converted>.docx` the next command takes. **(2) F21, the class** — the four two-step lists head
+> "Confirm each item once the step it names has run:" and each item of a file's second step names it, as 06's first
+> two items already did; the four one-step files keep their header. **(3) F9** — 01's two conversion items become one,
+> conditional and saying so: a `.doc` only, N/A for a `.docx` source; soffice, NOT pandoc; the cleanup script run only
+> on a document meant to be clean, what it printed read, and skipped on a redline. **(4) F20** — "No spurious tracked
+> changes": the source's own revisions all there, a redline's translated, and no others, the "Changed to English
+> (UK)" annotation and track changes OFF kept; F30's Step 11b half, a revision the pipeline may not touch, is the same
+> sentence's, and F30 stays open. **Controls,** `tests/test_instruction_rules.py`, both trees: each corrected phrase
+> REQUIRED, each wrong one FORBIDDEN, the old header forbidden in the four two-step files alone — red first against
+> `213e3f4`, every new entry failing there. **Must not touch:** a step number, an anti-drift sentence, an existing
+> needle, the one-step files, any script. **Size:** what the model reads rises by the least the four fixes take,
+> measured. **Then** the house's `auto_mode.py` v4 and `auto_mode_headless.py` v9, adopted byte for byte at the
+> opening, both selftests green; the parity check; every changed file's divergence re-recorded from the INDEX; the
+> three confidentiality controls; VERIFY and TEST through `tools/cycle_evidence.py`; `/code-review` on the test's
+> change; the one full run. **No render, declared:** nothing reaches a delivered document. **Done when:** F11, F9,
+> F21 and F20 are CLOSED in the register on that evidence.
 
 ---
 

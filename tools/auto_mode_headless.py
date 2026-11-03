@@ -1,4 +1,4 @@
-r"""auto_mode_headless.py - run an unattended chain of hops in a loop.  CHECKER VERSION 8 (2026-10-21)
+r"""auto_mode_headless.py - run an unattended chain of hops in a loop.  CHECKER VERSION 9 (2026-11-03)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -99,6 +99,10 @@ ALLOWED, REFUSED with the reason, or NOT CHECKED with why. REPORTED, NOT HALTED:
 push_report. Before v8 the hand-back was silent on it, so a last hop that skipped its full run
 was found only when the push was refused.
 
+THE PER-HOP CYCLE CHECK LIVES IN auto_mode.py SINCE v9, unchanged, and is imported from there:
+a conductor session that starts hops through the desktop app asks the same check with
+auto_mode.py --hop-check, and two copies of one gate are how the two come to disagree.
+
     uv run python tools/auto_mode_headless.py --dry-run  # what it WOULD do; launches nothing
     uv run python tools/auto_mode_headless.py --check    # pre-flight only, start nothing
     uv run python tools/auto_mode_headless.py --run      # pre-flight, then loop
@@ -129,10 +133,8 @@ if str(HERE) not in sys.path:
 # THE STATE FILE IS READ WITH auto_mode's OWN READER AND NEVER A SECOND PARSER. A second
 # parser for something already parsed is how the two come to disagree - and this one would
 # disagree about whether a run is live. Same rule for the cycle store one import down.
-from auto_mode import (BLOCKED, RUNNING, Void, effort_level_error,        # noqa: E402
-                       find_state_file, normal_effort, read_state)
-from cycle_evidence import PHASES                                          # noqa: E402
-from cycle_evidence import load as load_evidence                           # noqa: E402
+from auto_mode import (BLOCKED, RUNNING, Void, cycle_recorded,            # noqa: E402
+                       effort_level_error, find_state_file, normal_effort, read_state)
 from cycle_evidence import load_config as load_cycle_config                # noqa: E402
 from cycle_evidence import store_path                                      # noqa: E402
 
@@ -534,76 +536,6 @@ def preflight(guard: Path, launcher: list[str], flags: list[str],
 
 
 # ------------------------------------------------------------------- did the hop VERIFY?
-
-def cycle_recorded(root: Path, since: str) -> tuple[bool, str]:
-    """Did THIS hop actually record VERIFY and TEST, and did both pass?
-
-    WHY NOT `cycle_evidence check`, WHICH IS THE OBVIOUS ANSWER AND THE WRONG ONE. That
-    command asks *"is the recorded evidence still valid for the CURRENT worktree?"*, which is
-    the right question before a commit and the wrong one after. A hop that has just committed
-    leaves a clean tree, so the content hash has moved and BOTH phases read STALE - for a
-    reason that is not a defect at all. Wiring it in would have produced a check that fails on
-    every correct hop, and a check that fails on correct work is a check people delete.
-
-    THE QUESTION HERE IS DIFFERENT: did this hop RUN them, inside its own window, and did
-    they exit 0? That is a claim about the WORK rather than about the tree, which is what the
-    cycle gate is for in the first place.
-
-    IT TURNS AN INSTRUCTION INTO A REFUSAL. The state file TELLS a hop to verify and test;
-    nothing caught a hop that skipped them or reported a run it had not done, which is the
-    failure this whole phase kept finding. Now the chain halts.
-
-    A PHASE DECLARED N/A WITH A REASON COUNTS AS DONE - that is the house's own discipline,
-    and refusing it here would push a hop towards running something irrelevant to look busy.
-
-    The store is read with cycle_evidence's OWN loader: a second parser for a file something
-    already parses is how the two come to disagree.
-
-    DO NOT "SIMPLIFY" THIS TO A PRESENCE CHECK. THE `since` WINDOW IS THE WHOLE CONTROL, and the
-    reason is that the store is keyed by BRANCH (see cycle_evidence.declare_na), not by run or
-    hop - so a run's branch can already hold both phases, recorded by somebody else, before the
-    first hop ever claims. MEASURED, not supposed: on run chain-c-2026-09-02 the branch held
-    verify at 10:32:28 and test at 10:35:44, both from the attended session, two to five minutes
-    before the hop claimed at 10:37. A gate asking merely "does this branch have both?" WOULD
-    HAVE PASSED THAT HOP, and the run built to prove this gate bites would have proved nothing.
-    The window is what answers no. Keeping it - rather than re-keying the store per hop - was
-    decided deliberately: re-keying changes a stored format every project's copy inherits, to
-    buy a property one comparison already has.
-    """
-    try:
-        cfg = load_cycle_config(root)
-        store = store_path(root, cfg)
-        record = load_evidence(store)
-    except (OSError, ValueError) as e:
-        return False, f"the evidence store could not be read - {e}"
-    if not record:
-        return False, "the evidence store is empty: this hop recorded no verify and no test"
-
-    # ANY BRANCH, and deliberately: a hop commits on the run's branch, but it may record
-    # evidence before or after that commit, and pinning to one branch name would make the
-    # answer depend on when in the hop the gate was wrapped.
-    missing, stale, failed = [], [], []
-    for phase in PHASES:
-        entries = [v for b in record.values() if isinstance(b, dict)
-                   for k, v in b.items() if k == phase and isinstance(v, dict)]
-        if not entries:
-            missing.append(phase)
-            continue
-        fresh = [e for e in entries if str(e.get("when", "")) >= since]
-        if not fresh:
-            stale.append(phase)
-            continue
-        if not any(e.get("declared_na") or e.get("exit") == 0 for e in fresh):
-            failed.append(phase)
-    if missing:
-        return False, f"no record at all for: {', '.join(missing)}"
-    if stale:
-        return False, (f"the only record for {', '.join(stale)} predates this hop "
-                       f"(before {since}) - it belongs to an earlier session")
-    if failed:
-        return False, f"recorded but did not pass: {', '.join(failed)}"
-    return True, "verify and test both recorded inside this hop, both passing"
-
 
 # -------------------------------------------------------------------------------- the loop
 

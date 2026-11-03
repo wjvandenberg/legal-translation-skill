@@ -288,12 +288,12 @@ just review the dry-run output to confirm the real definitions are the ones bein
 
 ## Internal compliance check — 06-postprocess-and-reorder
 
-Before moving to the next step, confirm:
+Confirm each item once the step it names has run, one naming no step at the first step's close:
 
 - [ ] You ran `post_process.py` (Step 6) on the applied document
 - [ ] You ran `reorder_definitions.py` (Step 7) if the document has a definitions section
 - [ ] You did NOT skip post-processing on the assumption that translations are already perfect
-- [ ] For documents WITHOUT a definitions section, you confirmed `reorder_definitions.py --dry-run` returns zero detections
+- [ ] For documents WITHOUT a definitions section, you confirmed `reorder_definitions.py --dry-run` (Step 7) returns zero detections
 
 If any check is uncertain, STOP. Re-read this file. Do not proceed.
 

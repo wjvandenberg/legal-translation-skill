@@ -39,6 +39,8 @@ TREES = ("uk", "us")
 # --------------------------------------------------------------------------------------
 # WHAT MUST BE PRESENT — register row -> (file, phrase). Both trees, every row.
 # --------------------------------------------------------------------------------------
+# The header of a list that closes TWO skill steps (F21), and when an item naming no step is confirmed.
+HEAD_TWO_STEP = "Confirm each item once the step it names has run, one naming no step at the first step's close:"
 REQUIRED = [
     # K1 + X3 — the scope rule. The cheapest fix in the project, and the one X3 says must
     # ADD a rule rather than soften one.
@@ -141,6 +143,42 @@ REQUIRED = [
     # answer to a false positive, which is the one reading that turns it into a bypass.
     ("F41", "skill-docs/08-aux-and-quality.md", "governs: fix the check, and never alter"),
     ("F41", "skill-docs/08-aux-and-quality.md", "no compliant repair exists"),
+
+    # ---- STEP 14.9.2 — skill Steps 1 and 11 -----------------------------------------
+    # F11: the conversion command an operator copies. The wrapper hands every argument to
+    # soffice unchanged, so the needle is the whole working argument list, output folder too.
+    ("F11", "skill-docs/01-setup-and-extract.md",
+     "soffice.py --headless --convert-to docx --outdir <workdir> <input>.doc"),
+    ("F11", "skill-docs/01-setup-and-extract.md", "hands its arguments to LibreOffice unchanged"),
+    # LibreOffice writes only the base name into --outdir, whatever folder the input sits in.
+    ("F11", "skill-docs/01-setup-and-extract.md", "writes the input's name, ending `.docx`, into `<workdir>`"),
+    # F9: the conversion items say when they apply, and what to do on the case that must not run.
+    ("F9", "skill-docs/01-setup-and-extract.md", "N/A for a `.docx` source"),
+    ("F9", "skill-docs/01-setup-and-extract.md", "on a redline you skipped it"),
+    # F21, the class: every file that closes TWO skill steps with one list, not the two the row
+    # named. The per-step loop walks that list at each step's close, so the header must say an
+    # item waits for its step, and the second step's items must name it.
+    ("F21", "skill-docs/01-setup-and-extract.md", HEAD_TWO_STEP),
+    ("F21", "skill-docs/06-postprocess-and-reorder.md",
+     HEAD_TWO_STEP),
+    ("F21", "skill-docs/08-aux-and-quality.md", HEAD_TWO_STEP),
+    ("F21", "skill-docs/10-repack-and-validate.md",
+     HEAD_TWO_STEP),
+    # Every second-step item, one needle each: a list naming only some of them is the defect again.
+    ("F21", "skill-docs/01-setup-and-extract.md",
+     "You produced `paragraphs.json` with `extract_paragraphs.py` (Step 2)"),
+    ("F21", "skill-docs/01-setup-and-extract.md",
+     "`validate_apply.py --extraction-completeness` (Step 2)"),
+    ("F21", "skill-docs/01-setup-and-extract.md", "the auxiliary parts it listed (Step 2)"),
+    ("F21", "skill-docs/06-postprocess-and-reorder.md", "`reorder_definitions.py --dry-run` (Step 7)"),
+    ("F21", "skill-docs/08-aux-and-quality.md", "You ran `quality_check.py` (Step 9)"),
+    ("F21", "skill-docs/08-aux-and-quality.md", "remnants `quality_check.py` flagged (Step 9)"),
+    ("F21", "skill-docs/08-aux-and-quality.md", "If QC (Step 9) flagged a paragraph"),
+    # F20: the last list before delivery keeps a redline's revisions instead of stripping them.
+    ("F20", "skill-docs/10-repack-and-validate.md", "**No spurious tracked changes**"),
+    ("F20", "skill-docs/10-repack-and-validate.md", "the source's own revisions are all there"),
+    # ...and a count lower than the source's is no loss when Step 3b merged a fragmented cluster.
+    ("F20", "skill-docs/10-repack-and-validate.md", "(Step 3b may merge its fragments)"),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -153,6 +191,19 @@ FORBIDDEN = [
      "The scripts are not crashing, not truncated, and not buggy"),
     # K2: the remedy that told the operator to edit one side without asking which was wrong.
     ("K2", "scripts/post_process.py", "Fix paragraphs.json and re-run from Step 5"),
+    # Step 14.9.2. F11: a flag LibreOffice does not have, which printed its usage and converted nothing.
+    ("F11", "skill-docs/01-setup-and-extract.md", "--format docx"),
+    ("F11", "SKILL.md", "--format docx"),
+    # F9: an item asking to confirm output of a script it also says must not run.
+    ("F9", "skill-docs/01-setup-and-extract.md", "output and did not run it on a redline"),
+    # F21: the header that asked at the close of the FIRST step for the second's work. The four
+    # one-step files keep it, so it is forbidden in the two-step files alone.
+    ("F21", "skill-docs/01-setup-and-extract.md", "Before moving to the next step, confirm:"),
+    ("F21", "skill-docs/06-postprocess-and-reorder.md", "Before moving to the next step, confirm:"),
+    ("F21", "skill-docs/08-aux-and-quality.md", "Before moving to the next step, confirm:"),
+    ("F21", "skill-docs/10-repack-and-validate.md", "Before moving to the next step, confirm:"),
+    # F20: the sentence that, on a redline, meant stripping the revisions just translated.
+    ("F20", "skill-docs/10-repack-and-validate.md", "No tracked changes visible"),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -253,6 +304,17 @@ for label, rel, start, end in [
      "**THE REPAIR LOOP IS BOUNDED AT FIVE ATTEMPTS", "\nWarnings are printed"),
     ("the bounded loop at skill Step 9", "skill-docs/08-aux-and-quality.md",
      "**THAT LOOP IS BOUNDED AT FIVE ATTEMPTS", "\n**Do NOT silently strip"),
+    # Step 14.9.2's prose, which no other check compares across the trees.
+    ("the skill Step 1b conversion command", "skill-docs/01-setup-and-extract.md",
+     "If the input is `.doc`, convert first:", "**After `.doc` → `.docx` conversion:**"),
+    ("the skill Steps 1-2 closing list", "skill-docs/01-setup-and-extract.md",
+     "## Internal compliance check — 01", "**Next:**"),
+    ("the skill Steps 6-7 closing list", "skill-docs/06-postprocess-and-reorder.md",
+     "## Internal compliance check — 06", "**Next:**"),
+    ("the skill Steps 8-9 closing list", "skill-docs/08-aux-and-quality.md",
+     "## Internal compliance check — 08", "**Next:**"),
+    ("skill Step 11b and the Steps 10-11 closing list", "skill-docs/10-repack-and-validate.md",
+     "#### Step 11b — Visual checks", "If any check is uncertain, STOP."),
 ]:
     blocks = {}
     for t in TREES:

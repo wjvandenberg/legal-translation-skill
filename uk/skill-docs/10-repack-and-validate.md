@@ -257,8 +257,9 @@ If `--variant us` was used at Step 6, pass `--variant us` here too — otherwise
 
 Verify:
 - No "unreadable content" error on open
-- **No tracked changes visible** — the document should open clean, with no revision
-  marks, no "Changed to English (UK)" annotations, and track changes OFF
+- **No spurious tracked changes** — the source's own revisions are all there, a redline's
+  translated (Step 3b may merge its fragments), and no others: no "Changed to English (UK)"
+  annotations, track changes OFF
 - **Title and heading text fits within page margins** — cover-page titles in particular
   must not overflow the right margin (check visually or verify that the translated title
   is not significantly longer in character count than the source)
@@ -273,7 +274,7 @@ Verify:
 
 ## Internal compliance check — 10-repack-and-validate
 
-Before moving to the next step, confirm:
+Confirm each item once the step it names has run, one naming no step at the first step's close:
 
 - [ ] You completed the MANDATORY PRE-REPACK CHECKLIST in full
 - [ ] You ran `repack_docx.py` and let it auto-invoke validate_apply --strict and the delivered-document check
