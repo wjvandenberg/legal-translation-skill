@@ -48,10 +48,11 @@ mkdir -p <workdir>
 
 If the input is `.doc`, convert first:
 ```bash
-python <docx-skill-path>/scripts/office/soffice.py <input>.doc --format docx
+python <docx-skill-path>/scripts/office/soffice.py --headless --convert-to docx --outdir <workdir> <input>.doc
 ```
 
-The docx skill path is at `mnt/.claude/skills/docx/scripts/office/`.
+The wrapper, in `mnt/.claude/skills/docx/scripts/office/`, hands its arguments to LibreOffice unchanged; it
+writes the input's name, ending `.docx`, into `<workdir>` — the `<converted>.docx` below.
 
 **After `.doc` → `.docx` conversion:** LibreOffice may introduce revision markup (`<w:ins>`,
 `<w:del>` elements) that was not visible in the original `.doc`. These conversion artifacts
@@ -205,18 +206,19 @@ subject to the same 35-paragraph batch limit. Include them in validation runs.
 
 ## Internal compliance check — 01-setup-and-extract
 
-Before moving to the next step, confirm:
+Confirm each item once the step it names has run, one naming no step at the first step's close:
 
-- [ ] You converted .doc → .docx (if needed) using soffice, NOT pandoc
-- [ ] You inspected `clean_conversion_artifacts.py`'s author/ratio output and did not run it on a redline
+- [ ] **Step 1b — N/A for a `.docx` source:** you converted the `.doc` with soffice, NOT pandoc, and ran
+      `clean_conversion_artifacts.py` only on a document meant to be clean, reading what it printed —
+      on a redline you skipped it
 - [ ] **You declared the source language at Step 1c** — `source_language.json` is in the workdir,
       and you noted whether the command called it supported or NOT SUPPORTED — or, for a source
       already in English, that it opened the variant-conversion mode
-- [ ] You produced `paragraphs.json` with `extract_paragraphs.py`
-- [ ] **You ran `validate_apply.py --extraction-completeness` and its BODY count is zero.**
+- [ ] You produced `paragraphs.json` with `extract_paragraphs.py` (Step 2)
+- [ ] **You ran `validate_apply.py --extraction-completeness` (Step 2) and its BODY count is zero.**
       A non-zero body count means extraction did not read a paragraph, and nothing later in
       the run can discover that — every other check baselines against the file this step wrote
-- [ ] You noted the auxiliary parts it listed, so each has a capture before repack
+- [ ] You noted the auxiliary parts it listed (Step 2), so each has a capture before repack
 - [ ] You did NOT manually edit document.xml or skip Step 1's integrity check
 - [ ] **If this is your second or later document this session:** you re-`Read('SKILL.md')` and you will re-`Read()` each step file as you arrive at it; you did NOT skip the per-document refresh on the assumption that the previous document's reads are still active
 

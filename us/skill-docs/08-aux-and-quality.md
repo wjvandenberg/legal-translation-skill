@@ -445,13 +445,13 @@ Common Pitfalls — "Translator alters source-faithful translation to satisfy a 
 
 ## Internal compliance check — 08-aux-and-quality
 
-Before moving to the next step, confirm:
+Confirm each item once the step it names has run, one naming no step at the first step's close:
 
 - [ ] You translated every auxiliary XML file (headers, footers, comments, footnotes, endnotes) flagged in Step 8
-- [ ] You ran `quality_check.py` and it ran cleanly (no integrity-check failure, no Python error). If it didn't run cleanly, you did NOT proceed to delivery — you re-installed or fixed the input.
-- [ ] You acted on any source-language remnants `quality_check.py` flagged
+- [ ] You ran `quality_check.py` (Step 9) and it ran cleanly (no integrity-check failure, no Python error). If it didn't run cleanly, you did NOT proceed to delivery — you re-installed or fixed the input.
+- [ ] You acted on any source-language remnants `quality_check.py` flagged (Step 9)
 - [ ] You did NOT decide an aux file was "trivial" and skip translating it
-- [ ] If QC flagged a paragraph and you "fixed" it, the fix preserves source fidelity (you did NOT silently strip a connective, preposition, defined term, or other semantic content to satisfy the linter)
+- [ ] If QC (Step 9) flagged a paragraph and you "fixed" it, the fix preserves source fidelity (you did NOT silently strip a connective, preposition, defined term, or other semantic content to satisfy the linter)
 
 If any check is uncertain, STOP. Re-read this file. Do not proceed.
 

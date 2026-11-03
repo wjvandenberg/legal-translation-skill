@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""auto_mode.py - the counter an unattended chain of sessions runs on.  CHECKER VERSION 3 (2026-09-30)
+"""auto_mode.py - the counter an unattended chain of sessions runs on.  CHECKER VERSION 4 (2026-11-03)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -40,7 +40,20 @@ hop halts on arrival and says so instead of racing.
                                                  # not answer alone. STOPPED is a person
                                                  # intervening; BLOCKED is the chain saying
                                                  # it will not guess. Kept apart on purpose.
+    uv run python tools/auto_mode.py --hop-check --hop 2  # THE CONDUCTOR'S check after the
+                                                 # hop it started: claimed, released, and
+                                                 # verify and test recorded inside the
+                                                 # hop's own window (v4)
     uv run python tools/auto_mode.py --selftest   # every refusal proved BOTH ways
+
+THE CONDUCTOR'S CHECK (v4). A run's hops can be started by a CONDUCTOR - the attended session
+that armed it, starting each hop through the desktop app when the last one ends - instead of
+by the headless runner. The runner checked every hop before starting the next; --hop-check is
+that same check as one command, the function moved here from the runner, which imports it
+back. It draws the hop's window from WOKE, so --claim now writes WOKE to the second: to the
+minute, compared as text with the cycle store's own times, every record of the day fell inside.
+And --hop names the hop the conductor started, since one that never claimed leaves the last
+hop's fields in place, and the check would otherwise pass them and restart it on every wake.
 
 THE EFFORT A HOP RUNS AT (v3), AND WHY ARMING REFUSES WITHOUT IT. Measured 2026-09-30: a
 desktop session at `xhigh` armed a run, the runner was started from a plain terminal, and the
@@ -61,6 +74,7 @@ EXIT CODES.  0 = done.  1 = REFUSED, and the refusal is the answer: halt.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import sys
@@ -204,7 +218,8 @@ def as_int(fields: dict, key: str) -> int:
 
 
 def now() -> str:
-    return datetime.now().strftime("%Y-%m-%d %H:%M local")
+    # TO THE SECOND SINCE v4: --hop-check draws a hop's window from it (hop_window_start).
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S local")
 
 
 # --------------------------------------------------------------------------- the actions
@@ -327,6 +342,143 @@ def act_blocked(fields: dict) -> tuple[int, list[str], bool]:
                    "  reason. Any hop waking after this is refused."], True
 
 
+def hop_window_start(woke: str) -> str:
+    """The hop's claim time, written the way the cycle store writes its own: 2026-11-03T10:37:05.
+
+    THE TWO ARE COMPARED AS TEXT, SO THE FORMAT IS THE CONTROL. WOKE read "2026-11-03 10:37
+    local" before v4, and against "2026-11-03T10:32:28" the 'T' sorts after the space - so every
+    record of the same day, made before the claim or after it, fell inside the window, and the
+    check would have passed the very hop it exists to refuse. --claim writes seconds since v4;
+    a claim time without them is VOID here rather than rounded, since rounding down to the
+    minute lets in a record made in the seconds before the claim.
+    """
+    m = re.fullmatch(r"(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}) local", woke.strip())
+    if not m:
+        raise Void(f"WOKE is {woke!r}, not a claim time to the second - no hop has claimed, or "
+                   f"an older copy of this script claimed it - so the hop's window cannot be "
+                   f"drawn")
+    return f"{m.group(1)}T{m.group(2)}"
+
+
+def cycle_recorded(root: Path, since: str) -> tuple[bool, str]:
+    """Did THIS hop actually record VERIFY and TEST, and did both pass?
+
+    MOVED HERE FROM auto_mode_headless.py IN v4, unchanged, so a conductor session can ask it
+    too (--hop-check); the runner imports it from here, so there is still one copy.
+
+    WHY NOT `cycle_evidence check`, WHICH IS THE OBVIOUS ANSWER AND THE WRONG ONE. That
+    command asks *"is the recorded evidence still valid for the CURRENT worktree?"*, which is
+    the right question before a commit and the wrong one after. A hop that has just committed
+    leaves a clean tree, so the content hash has moved and BOTH phases read STALE - for a
+    reason that is not a defect at all. Wiring it in would have produced a check that fails on
+    every correct hop, and a check that fails on correct work is a check people delete.
+
+    THE QUESTION HERE IS DIFFERENT: did this hop RUN them, inside its own window, and did
+    they exit 0? That is a claim about the WORK rather than about the tree, which is what the
+    cycle gate is for in the first place.
+
+    IT TURNS AN INSTRUCTION INTO A REFUSAL. The state file TELLS a hop to verify and test;
+    nothing caught a hop that skipped them or reported a run it had not done, which is the
+    failure this whole phase kept finding. Now the chain halts.
+
+    A PHASE DECLARED N/A WITH A REASON COUNTS AS DONE - that is the house's own discipline,
+    and refusing it here would push a hop towards running something irrelevant to look busy.
+
+    The store is read with cycle_evidence's OWN loader: a second parser for a file something
+    already parses is how the two come to disagree.
+
+    DO NOT "SIMPLIFY" THIS TO A PRESENCE CHECK. THE `since` WINDOW IS THE WHOLE CONTROL, and the
+    reason is that the store is keyed by BRANCH (see cycle_evidence.declare_na), not by run or
+    hop - so a run's branch can already hold both phases, recorded by somebody else, before the
+    first hop ever claims. MEASURED, not supposed: on run chain-c-2026-09-02 the branch held
+    verify at 10:32:28 and test at 10:35:44, both from the attended session, two to five minutes
+    before the hop claimed at 10:37. A gate asking merely "does this branch have both?" WOULD
+    HAVE PASSED THAT HOP, and the run built to prove this gate bites would have proved nothing.
+    The window is what answers no. Keeping it - rather than re-keying the store per hop - was
+    decided deliberately: re-keying changes a stored format every project's copy inherits, to
+    buy a property one comparison already has.
+    """
+    # IMPORTED HERE AND NOT AT THE TOP: auto_mode_guard imports this module on every tool
+    # call, and a guard that cannot start exits like a refusal and blocks everything - so
+    # nothing it loads may gain a dependency only this check needs.
+    try:
+        from cycle_evidence import PHASES                                 # noqa: PLC0415
+        from cycle_evidence import load as load_evidence                  # noqa: PLC0415
+        from cycle_evidence import load_config as load_cycle_config       # noqa: PLC0415
+        from cycle_evidence import store_path                             # noqa: PLC0415
+    except ImportError as e:
+        return False, f"cycle_evidence.py could not be imported beside this script - {e}"
+    try:
+        cfg = load_cycle_config(root)
+        store = store_path(root, cfg)
+        record = load_evidence(store)
+    except (OSError, ValueError) as e:
+        return False, f"the evidence store could not be read - {e}"
+    if not record:
+        return False, "the evidence store is empty: this hop recorded no verify and no test"
+
+    # ANY BRANCH, and deliberately: a hop commits on the run's branch, but it may record
+    # evidence before or after that commit, and pinning to one branch name would make the
+    # answer depend on when in the hop the gate was wrapped.
+    missing, stale, failed = [], [], []
+    for phase in PHASES:
+        entries = [v for b in record.values() if isinstance(b, dict)
+                   for k, v in b.items() if k == phase and isinstance(v, dict)]
+        if not entries:
+            missing.append(phase)
+            continue
+        fresh = [e for e in entries if str(e.get("when", "")) >= since]
+        if not fresh:
+            stale.append(phase)
+            continue
+        if not any(e.get("declared_na") or e.get("exit") == 0 for e in fresh):
+            failed.append(phase)
+    if missing:
+        return False, f"no record at all for: {', '.join(missing)}"
+    if stale:
+        return False, (f"the only record for {', '.join(stale)} predates this hop "
+                       f"(before {since}) - it belongs to an earlier session")
+    if failed:
+        return False, f"recorded but did not pass: {', '.join(failed)}"
+    return True, "verify and test both recorded inside this hop, both passing"
+
+
+def act_hop_check(fields: dict, root: Path, started: int) -> tuple[int, list[str]]:
+    """THE CONDUCTOR'S CHECK AFTER EVERY HOP (v4). Read-only.
+
+    A conductor - the attended session that armed the run and starts each hop through the
+    desktop app - is woken when a hop ends and must decide whether to start the next. The
+    headless runner asks two questions at that point, and this asks the same two in one
+    command: did the hop RELEASE, a claim still held being a hop that died mid-way; and did it
+    record VERIFY and TEST inside its own window, both passing. The window opens at the hop's
+    own claim, WOKE - a mechanism, so no conductor has to note a time by hand.
+
+    AND THE CONDUCTOR SAYS WHICH HOP IT STARTED. A hop that fails to start, or exits before
+    --claim, leaves the LAST hop's K, WOKE and release in place - so without the number this
+    check would pass the last hop's evidence and name the same hop again on every wake, for
+    ever. The runner stops that case by seeing K not advance; a command with no memory has to
+    be told, and a mismatch is a refusal.
+    """
+    k, n = as_int(fields, "K"), as_int(fields, "N")
+    if k != started:
+        return RC_REFUSED, [f"REFUSED: you started hop {started}, and the counter reads K = {k} - "
+                            f"that hop never",
+                            "         claimed. Starting it again would repeat it on every wake.",
+                            "         Halt and hand back."]
+    if fields["HOP_ACTIVE"].lower() == "yes":
+        return RC_REFUSED, [f"REFUSED: hop {k} still holds its claim (woke {fields['WOKE']}) - it",
+                            "         never released, so it did not finish. Halt and hand",
+                            "         back; do not start the next hop."]
+    ok, why = cycle_recorded(root, hop_window_start(fields["WOKE"]))
+    if not ok:
+        return RC_REFUSED, [f"REFUSED: hop {k} cycle evidence MISSING - {why}.",
+                            "         A hop that did not verify and test is not a hop whose",
+                            "         work can be built on. Halt and hand back."]
+    nxt = (f"  -> start hop {k + 1} of {n}." if fields["STATUS"].upper() == RUNNING and k < n
+           else f"  -> the run is {fields['STATUS']}: hand back, starting nothing.")
+    return RC_OK, [f"  hop {k} of {n} released, and {why}.", nxt]
+
+
 def normal_effort(value: str | None) -> str:
     """An effort as both scripts compare it: stripped and lower-cased, '' for none."""
     return (value or "").strip().lower()
@@ -421,6 +573,11 @@ def main(argv) -> int:
     ap.add_argument("--blocked", action="store_true",
                     help="THE HOP'S OWN halt: a question it may not answer alone")
     ap.add_argument("--arm", action="store_true")
+    ap.add_argument("--hop-check", action="store_true",
+                    help="THE CONDUCTOR'S check after every hop: released, and verify and "
+                         "test recorded inside its own window")
+    ap.add_argument("--hop", type=int,
+                    help="--hop-check: the number of the hop the conductor started")
     ap.add_argument("--run-id")
     ap.add_argument("--hops", type=int)
     ap.add_argument("--branch")
@@ -432,10 +589,11 @@ def main(argv) -> int:
     if a.selftest:
         return selftest()
 
-    chosen = [n for n in ("status", "claim", "release", "stop", "blocked", "arm")
+    chosen = [n for n in ("status", "claim", "release", "stop", "blocked", "arm", "hop_check")
               if getattr(a, n)]
     if len(chosen) != 1:
-        print("  say exactly one of --status --claim --release --stop --blocked --arm")
+        print("  say exactly one of --status --claim --release --stop --blocked --arm "
+              "--hop-check")
         return RC_COULD_NOT_RUN
 
     f = find_state_file(a.file)
@@ -468,6 +626,12 @@ def main(argv) -> int:
             rc, lines, dirty = act_stop(fields)
         elif a.blocked:
             rc, lines, dirty = act_blocked(fields)
+        elif a.hop_check:
+            if a.hop is None:
+                print("  --hop-check needs --hop, the number of the hop you started")
+                return RC_COULD_NOT_RUN
+            rc, lines = act_hop_check(fields, f.parent, a.hop)
+            dirty = False
         else:
             rc, lines = act_status(fields)
             dirty = False
@@ -610,6 +774,51 @@ def selftest() -> int:
              bad=lambda d: (_state(d), "xhigh", None, 5),
              good=lambda d: (_state(d), "xhigh", None, None),
              want="REFUSED", good_want="ARMED xhigh"),
+        # THE CONDUCTOR'S CHECK AFTER EVERY HOP (v4) - the gate the headless runner makes,
+        # asked with one command. Each pair differs in ONE thing.
+        Case("a hop that recorded no verify+test is refused", _probe_hop_check,
+             bad=lambda d: _hop_state(d, recorded=None),
+             good=lambda d: _hop_state(d, recorded=(_AFTER, 0, False)),
+             want="REFUSED", good_want="OK"),
+        # THE WINDOW IS THE WHOLE CONTROL: a record made before the hop claimed belongs to
+        # somebody else - measured once, the attended session's own, minutes before.
+        Case("...and one whose records PREDATE its claim", _probe_hop_check,
+             bad=lambda d: _hop_state(d, recorded=(_BEFORE, 0, False)),
+             good=lambda d: _hop_state(d, recorded=(_AFTER, 0, False)),
+             want="REFUSED", good_want="OK"),
+        Case("a DECLARED N/A is done, a failed phase is not", _probe_hop_check,
+             bad=lambda d: _hop_state(d, recorded=(_AFTER, 1, False)),
+             good=lambda d: _hop_state(d, recorded=(_AFTER, 1, True)),
+             want="REFUSED", good_want="OK"),
+        Case("a hop still holding its claim is refused", _probe_hop_check,
+             bad=lambda d: _hop_state(d, active="yes", recorded=(_AFTER, 0, False)),
+             good=lambda d: _hop_state(d, recorded=(_AFTER, 0, False)),
+             want="REFUSED", good_want="OK"),
+        # A CLAIM TIME TO THE MINUTE CANNOT DRAW THE WINDOW: compared as text with the store's
+        # own times, every record of the same day would fall inside it.
+        Case("a claim time without seconds is VOID", _probe_hop_check,
+             bad=lambda d: _hop_state(d, woke="2026-11-03 10:37 local",
+                                      recorded=(_AFTER, 0, False)),
+             good=lambda d: _hop_state(d, recorded=(_AFTER, 0, False)),
+             want="VOID", good_want="OK"),
+        # ...AND THE TIME --claim WRITES IS ONE IT CAN DRAW, which is what joins the two.
+        Case("the time --claim writes draws the window", _probe_window,
+             bad=lambda d: "2026-11-03 10:37 local",
+             good=lambda d: now(),
+             want="VOID", good_want="DRAWN"),
+        # A HOP THAT NEVER CLAIMED leaves the last hop's K, WOKE and release in place, so the
+        # check would pass the LAST hop's evidence and name the same hop again on every wake -
+        # the runner's "K did not advance" stop, which a command with no memory must be told.
+        Case("a hop that never CLAIMED is refused", _probe_hop_started,
+             bad=lambda d: (_hop_state(d, recorded=(_AFTER, 0, False)), 2),
+             good=lambda d: (_hop_state(d, recorded=(_AFTER, 0, False)), 1),
+             want="REFUSED", good_want="OK"),
+        # THE COMMAND LINE ITSELF: the flag, --hop and the store read beside the state file,
+        # none of which a case calling the action directly can see.
+        Case("--hop-check through the command line", _probe_hop_cli,
+             bad=lambda d: _hop_state(d, recorded=None),
+             good=lambda d: _hop_state(d, recorded=(_AFTER, 0, False)),
+             want="REFUSED", good_want="OK"),
     ]
     ok_cases, paired, unpaired = run_cases(cases, tmp)
     ok &= ok_cases
@@ -776,6 +985,59 @@ def _probe_void(f: Path) -> str:
     except Void:
         return "VOID"
     return "READ"
+
+
+_WOKE = "2026-11-03 10:37:05 local"
+_BEFORE, _AFTER = "2026-11-03T10:32:28", "2026-11-03T10:41:10"
+
+
+def _hop_state(d: Path, woke=_WOKE, active="no", recorded=None) -> Path:
+    """Hop 1 of 2, claimed at `woke`, and a cycle store holding verify and test recorded at
+    `recorded` = (when, exit, declared_na) - or no store at all. Written the way
+    cycle_evidence writes it, keyed by branch."""
+    f = _bad_block(d, f"RUN_ID: r\nN: 2\nK: 1\nSTATUS: {RUNNING}\nBRANCH: session/x\n"
+                      f"HOP_ACTIVE: {active}\nWOKE: {woke}\n")
+    if recorded is not None:
+        when, rc, na = recorded
+        store = d / "temp" / ".cycle-evidence.json"
+        store.parent.mkdir(parents=True, exist_ok=True)
+        rec = {"session/x": {p: {"command": "x", "cwd": ".", "exit": rc, "content": "h",
+                                 "when": when, "declared_na": na} for p in ("verify", "test")}}
+        store.write_bytes((json.dumps(rec, indent=1) + "\n").encode("utf-8"))
+    return f
+
+
+def _probe_hop_check(f: Path) -> str:
+    """--hop-check driven through the real action, against the store beside the file, by a
+    conductor that started hop 1 - the hop every _hop_state fixture has claimed."""
+    return _probe_hop_started((f, 1))
+
+
+def _probe_hop_started(args) -> str:
+    """(state file, the hop the conductor started) through the real action."""
+    f, started = args
+    try:
+        rc, _lines = act_hop_check(read_state(f)[0], f.parent, started)
+    except Void:
+        return "VOID"
+    return "OK" if rc == RC_OK else "REFUSED"
+
+
+def _probe_hop_cli(f: Path) -> str:
+    """main() itself, its report swallowed: the flag, --hop and the store root beside the file."""
+    import contextlib
+    import io
+    with contextlib.redirect_stdout(io.StringIO()):
+        rc = main(["--hop-check", "--hop", "1", "--file", str(f)])
+    return {RC_OK: "OK", RC_REFUSED: "REFUSED"}.get(rc, f"rc {rc}")
+
+
+def _probe_window(woke: str) -> str:
+    try:
+        hop_window_start(woke)
+    except Void:
+        return "VOID"
+    return "DRAWN"
 
 
 if __name__ == "__main__":
