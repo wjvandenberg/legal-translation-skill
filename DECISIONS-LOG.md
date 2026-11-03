@@ -2484,3 +2484,31 @@ with it, its two required sentences kept; **(8)** the review's finding of the sa
 post_process's two runners and repack's two — is fixed here, both trees, rather than filed; **(9)** with
 the five-hour usage limit at 87% against the 90% stop and only the filing left, the close waited for the limit to
 reset rather than run across it, a half-filed record being worse than a later one.
+
+## 2026-11-03 (2) — sub-step 14.9.2 built and merged (#189), unattended: skill Steps 1 and 11, F11, F9, F21, F20; eight choices the session's own
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS IN 2026-11-03 (1)** — each choice below is THE SESSION'S, taken on its own
+recommendation and carried here for him to confirm or overturn; none is his ruling.
+
+**(1) F21 IS FIXED AS A CLASS, IN FOUR FILES:** 01, 06, 08 and 10 each close two skill steps with one list, where the
+row names two files, one of them 03, whose 3b is a sub-step; the plan's line named 01 alone. **(2) F11 IS PROVED BY
+RUNNING IT, NOT BY A COMMITTED TEST:** no synthetic `.doc` is tracked, and the docx skill's wrapper, another skill's
+file outside this repository, cannot start on Windows; so a throwaway `.doc` in `temp/` and the wrapper's own code
+with its Linux sandbox probe alone answered, a committed test holding a machine dependency. **(3) THE WORDING IS
+LOCKED IN `tests/test_instruction_rules.py`,** required and forbidden phrases and five cross-tree spans, so the pull
+request carries a test change. **(4) THE HOUSE'S `auto_mode.py` v4 AND `auto_mode_headless.py` v9 WERE ADOPTED AT
+THE OPENING,** byte for byte, as the house rule says, two code files in a pull request that needed its one full run
+anyway. **(5) F9's TWO ITEMS BECAME ONE,** the condition stated once. **(6) F30 IS NOTED, NOT CLOSED:** the new Step
+11b sentence answers its Step 11b half, and its detection half was not measured here. **(7) THE "Changed to English
+(UK)" EXAMPLE STAYS IN BOTH TREES,** the name `05-apply.md` and a script comment use. **(8) THE CHARTER WAS HELD AT ITS
+CAP BY PAYING IN PLACE:** it stood at exactly its wrapped cap and the filing added three lines, so the 3.1 cell's
+14.9.1 entry now reads *"14.9.1 as #188"*, the cell's form for a pair, the row it closed being the register's and the
+build record's, and this session's own section 7 was tightened; no cap raised, nothing relocated.
+
+**WHAT MOVED THE BUILD.** The first line-ending count, Git Bash's `grep -c` for a carriage return, called every LF
+line CRLF, and was caught only because the prompt said the step files were LF. The first proof's clean-up ended
+every process whose command line held its folder's name, its own shell among them; it now ends LibreOffice's alone.
+The old command, run as the skill gave it, without `--headless`, opened LibreOffice's window on Wouter's screen for
+about a minute each of the two times it ran; he asked about it and was told, and its run is now opt-in.
+`/code-review` at high found four, all fixed. The machine crashed during TEST at 11 of 25; nothing was left
+half-restored, and TEST ran whole again.

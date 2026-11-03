@@ -2522,6 +2522,24 @@ the edited script, and the full run once, before the push.
 > three confidentiality controls; VERIFY and TEST through `tools/cycle_evidence.py`; `/code-review` on the test's
 > change; the one full run. **No render, declared:** nothing reaches a delivered document. **Done when:** F11, F9,
 > F21 and F20 are CLOSED in the register on that evidence.
+> **AMENDED IN THE BUILD, 2026-11-03, before the full run.** **(1) Five more needles and five cross-tree spans,**
+> found by asking what each mutant would leave standing: five of the seven step tags added had no needle, and the
+> parity check compares no Markdown, so a one-tree edit of the new prose passed unseen; each now has one. **(2) A
+> needle split by a line wrap** — "on a redline you skipped it" — failed the first green run; the item is rewrapped.
+> **(3) `/code-review` at high: four findings, all fixed** — "all there" could be read as a count where Step 3b merges
+> fragments, now said; the header now says when an item naming no step is confirmed, "one naming no step at the first
+> step's close"; LibreOffice writes the input's name into `--outdir`, not `<input>.docx` where the input carries a
+> folder; and `--format docx` is forbidden in `SKILL.md` too. **(4) The line-ending count was wrong first:** `grep -c`
+> on a carriage return in Git Bash counted every LF line as CRLF; `git ls-files --eol` measured the step files LF.
+> **Size:** +572 bytes per tree of the 237,605 and 240,876 the model reads, 0.24%, the clearer header the larger part.
+> **Red first:** the instrument's first run, before a step document moved, 104 of 123, its 19 failures every one a
+> new entry; at the pin 40 of 40 expectations held; 26 of 26 mutants caught, each on exactly its own rows, in `us/`
+> because the test's own negatives hold `uk/` files under the in-place guard.
+> **BUILT AND MERGED, 2026-11-03, as #189:** `3f394b2` the fix with the review's four, reviewed before its commit,
+> then the filing; VERIFY 34 of 34 and TEST 25 of 25 through the cycle gate, the TEST on its second run after the
+> machine crashed at 11 of 25, nothing left half-restored; the one full run on `3f394b2`, OVERALL PASS, 109 rows;
+> F11, F9, F21 and F20 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain;
+> 2026-11-03, unattended)*.
 
 ---
 
