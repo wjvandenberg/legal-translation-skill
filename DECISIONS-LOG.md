@@ -2481,4 +2481,6 @@ child runs; **(5)** `test_instruction_rules`'s calibration of `string_only_edit`
 than `origin/main`, every shipped script being edited here; **(6)** F35, step 3's row on the same passages, is left
 open and noted; **(7)** `05-apply.md`'s first rule, the twin of rule 6's paragraph and as false, is corrected
 with it, its two required sentences kept; **(8)** the review's finding of the same class at four more places —
-post_process's two runners and repack's two — is fixed here, both trees, rather than filed.
+post_process's two runners and repack's two — is fixed here, both trees, rather than filed; **(9)** with
+the five-hour usage limit at 87% against the 90% stop and only the filing left, the close waited for the limit to
+reset rather than run across it, a half-filed record being worse than a later one.

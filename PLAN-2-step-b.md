@@ -2482,6 +2482,11 @@ the edited script, and the full run once, before the push.
 > Ctrl+C reaches the parent too, which re-raises before any reading; every error-stream write is a script's last.
 > **Declared:** `verify_diligence` reads a crashed `quality_check` as a FAIL, the right verdict with the cause named
 > generically; a child ended from outside, with no crash report, still reads by its code. 1228 assertions, 12 mutants.
+> **BUILT AND MERGED, 2026-11-03, as #188:** `7e9fa69` the fix with the review's four, reviewed before its commit,
+> then the filing; VERIFY 32 of 32 and TEST 25 of 25 through the cycle gate, the VERIFY on its second run after the
+> first refused a leakage row expecting CLEAN over 12 standing hits, every one at `HEAD`; the one full run on
+> `7e9fa69`, OVERALL PASS, 109 rows; C29 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the
+> conductor chain; 2026-11-03, unattended)*.
 
 ---
 

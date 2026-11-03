@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187, its fixes 14.9.1–14.9.4 planned; next, 14.9.1 · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187, its fixes 14.9.1–14.9.5 planned; 14.9.1, C29, as #188, 2026-11-03; next, 14.9.2 · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,21 +578,21 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-02, 14.6 TO 14.8 MERGED (#184 TO #186), 14.9 MEASURED (#187); NEXT, 14.9.1 (C29)
+### HANDOFF — 2026-11-03, 14.9.1 MERGED (#188), C29 CLOSED; NEXT, 14.9.2, OPENED AS A NESTED SESSION
 
-**PURPOSE: MET** — *every wrong instruction left in the step documents has a measured state and a planned fix*: 16 of
-option 5's 17 rows OPEN, F6 closed, C29 reproduced in both trees; four fix sub-steps planned in section 3.14 of the
-build plan; `DECISIONS-LOG.md`, 2026-11-02 (3) to (6), owns the day's choices and Wouter's Norwegian ruling.
+**PURPOSE: MET** — *an operator on an ordinary Windows console is never told that a crash is a deliberate block*: all
+20 shipped scripts escape what the console cannot hold, and apply, post_process and repack call a crash a crash, both
+trees; `DECISIONS-LOG.md`, 2026-11-02 (8) and 2026-11-03 (1), owns Wouter's answers and the session's nine choices.
 
-**PRODUCED:** code — G3, G13, G4 and C10 closed, each with its own plan, red first, mutants, `/code-review` and one
-full run, OVERALL PASS; documents — 14.9's measurement and plan. 982 assertions, 43 properties.
+**PRODUCED:** code — the guard in 40 scripts, a crash read as one at five runners, SKILL.md rule 6 and `05-apply.md`
+corrected; red first, 12 mutants, `/code-review`, one full run, OVERALL PASS; 1228 assertions, 46 properties.
 
-**SINGLE NEXT ACTION: SUB-STEP 14.9.1**, C29 — a validator crashing on a cp1252 console, and apply calling the crash
-a block — its prompt `temp/s1102g_next_prompt.md`; it waits for Wouter's word, no session starting itself.
+**SINGLE NEXT ACTION: SUB-STEP 14.9.2**, skill Steps 1 and 11 — F11, F9, F21, F20 — its prompt
+`temp/s1103_next_prompt.md`, opened by this session as a nested session on Wouter's word; the chain runs on to step 15.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** two conditions guarding one control hide each other — a mutant caught it at
-14.8; a fixture lock can fail a TEST run transiently, so prove the agent log empty before blaming the agent; append
-`DECISIONS-LOG.md` on its last line.
+**WHAT A NEW SESSION WOULD GET WRONG:** a `python -c` printing register text on this console still crashes unless
+`PYTHONIOENCODING=utf-8` is set — only the shipped scripts escape; a rewording can drop a sentence
+`test_instruction_rules` requires; three shipped files carry 12 standing leakage hits, so compare against `HEAD`.
 
-**Open, none blocking:** C26 is Wouter's design choice; Step 8 and 8a disagree on numbering; the dangling-ending
-rule's case-blindness; apply's remnant warning; 14.5's and 14.4's items. **Context: 72% when written.**
+**Open, none blocking:** C26 is planned as 14.9.5; F35 left open; Step 8 and 8a disagree on numbering; the
+dangling-ending rule's case-blindness; apply's remnant warning; 14.5's and 14.4's items. **Context: 18% when written.**
