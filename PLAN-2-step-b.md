@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-02 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9, option 5's share: the 17 rows section 9.3 gives no step, each measured against both trees, and the fixes planned from that measurement as their own sub-steps; documents only, in the conductor's session *(Wouter, 2026-11-02: continue with 14.9)* · **so that every wrong instruction left in the step documents has a measured state and a planned fix** *(written immediately after the tag `rollback-2026-11-02f-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-03 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.1, C29, resumed where 2026-11-02 parked it: the corpus count, the mutants, VERIFY and TEST through the cycle gate, the review, the one full run and the merge, C29 closed; no questions to Wouter *(Wouter, 2026-11-03: continue with everything)* · **so that an operator on an ordinary Windows console is never told that a crash is a deliberate block** *(written immediately after the tag `rollback-2026-11-03-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -2408,6 +2408,85 @@ the edited script, and the full run once, before the push.
 > random line numbers in the lexicon files read at skill Step 3, the operator quotes them into a receipt, and skill
 > Step 5 refuses to start without a matching one — **planned as 14.9.5**, after 14.9.4; then the small loose ends and
 > the language widenings, `DECISIONS-LOG.md`, 2026-11-02 (7).
+> **14.9.1 — ITS OWN WRITTEN PLAN, 2026-11-02, before any edit, on `feature/step14-9-1-validator-console-crash`.**
+> C29, by 14.9's block above; **Wouter's four answers through the question tool, each the recommended option**
+> *(`DECISIONS-LOG.md`, 2026-11-02 (8))*. **Measured first, `main` at `95b865c`, both trees alike:** C29 reproduces —
+> `validate_segment_shapes.py --strict`, a child on a cp1252 console, on a regular "the" before an ins "Agreement
+> applies.", exits 1 on a `UnicodeEncodeError` mid-finding, and `_run_validator` raises `SKILL GATE FIRED` over it;
+> **and a worse half the row does not name:** under `block_codes={2}`, apply's two pre-apply checks, a crash exits 1
+> and reads as `WARN (exit 1). Continuing.` — a check that never finished, passed (`temp/s1102h_repro.py`). **By the
+> parser** (`temp/s1102h_census.py`): 0 of 20 shipped scripts set their output's error handler, either tree, so the
+> row's *"each already wraps `sys.stdout`"* is false; a `print()` literal cp1252 cannot encode sits in 5 —
+> `validate_translations`, `validate_segment_shapes`, `validate_reject_all`, `repack_docx`, `translate_numbering` —
+> and every script echoes document text, where a Polish or Japanese word crashes the rest: **the fix is the stream's,
+> never the literals'.** Python 3.14.10 prints `Traceback (most recent call last):` for a runtime crash but not for a
+> script too damaged to start — a syntax error prints a `File "…", line N` line and the error — forced colours wrap
+> that line in escape codes, and a clean exit prints neither; every error-stream write in the five validators is the
+> last thing before its exit.
+> **Changes,** both trees, no exit code and no gate's verdict moved: **(1) the guard, in all 20 scripts** *(Wouter)* —
+> the first statement of each `__main__` block sets `errors='backslashreplace'` on both output streams, the character
+> set untouched, so a character the console cannot hold prints as an escape and every byte that prints today prints
+> the same; never at import. **(2) The call site** *(Wouter: two layers)* — `_run_validator` passes its child
+> `PYTHONIOENCODING` set to apply's own output encoding with `backslashreplace`. **(3) A crash told from a gate**
+> *(Wouter: read the crash report)* — `_run_validator` keeps the child's error stream, writes it out unchanged when
+> the child ends, and a non-zero exit other than 3 whose stream carries either mark, colour codes stripped, raises
+> `VALIDATOR CRASHED — NOT A GATE`: a broken install or a bug, rule 6 governs, STOP and re-install. No word BLOCK in
+> it, so `05-apply.md`'s rule that a BLOCK banner is a gate comes true; tested after exit 3 and before `block_codes`,
+> so a crash stops apply under `{2}` as well. **(4) SKILL.md rule 6's second paragraph** *(Wouter)*, false since step 5
+> for exit 3: it names both install-side banners and keeps "read the lines above", no longer than it was. **F35,**
+> step 3's row on these passages, is noted and left open.
+> **The defect beside the false one,** asked of it: a real gate still reads as a block — the scanner's real finding
+> on a cp1252 console, exit 2 under `{2}` with its message, exit 1 under `{2}` still a WARN that continues, exit 0
+> passing, exit 3 still the install banner; a crash report on exit 0 passes; a gate's own message reaches the operator
+> once. **Controls,** `tests/test_check_scoping.py`, both trees, the old code read out of git at the pin: each of the
+> five validators a child on a cp1252 console on an invented finding — `validate_apply` and `validate_en_runs` through
+> echoed text alone — PROVED to crash before, now printing the whole finding and the exit a UTF-8 run gives; through
+> `_run_validator`, the old scanner's crash, a crash under `{2}`, a script cut mid-statement, a crash in forced
+> colours and an unguarded child printing an arrow, each PROVED misread before and now right; the clean exits above,
+> before and now alike; the guard first in all 40 `__main__` blocks, one text, each run in a child on a cp1252
+> console; and a property, generated strings through every guard, printing exactly their escaped form.
+> **Must not touch:** an exit code, a gate's verdict or message, a check's scope, the anti-drift safeguards,
+> `05-apply.md`, F35. **Corpus,** counts and hashes only (`temp/s1102h_corpus.py`): the five validators as apply runs
+> them over every frozen workdir, at `95b865c` and now — on UTF-8 every exit and output byte the same; on cp1252 the
+> crashes counted before, none after, each exit the UTF-8 one. **Then** the parity check, every changed file's
+> divergence re-recorded from the INDEX, `check_checkers.py` v22 adopted byte for byte, the three confidentiality
+> controls, VERIFY and TEST through `tools/cycle_evidence.py`, mutants, `/code-review` before the one full run. **No
+> render, declared:** nothing reaches a delivered document. **Done when:** C29 is CLOSED in the register on that
+> evidence.
+> **AMENDED IN THE BUILD, 2026-11-02 and 2026-11-03, before the full run** — parked overnight at Wouter's word and
+> resumed at it. **(1) `validate_en_runs` cannot crash on output,** measured: it writes every finding to the error
+> stream, which Python always escapes, so the plan's "PROVED to crash before" is false for it; its control asks "no
+> crash on cp1252 before either", its exit having moved since the pin for C13's tiling rule. **(2) The rewrite of rule
+> 6 had dropped a required sentence:** `tests/test_instruction_rules.py` asserts F35's "If the reported exit code is
+> **3**"; it is back, verbatim, the paragraph at 728 bytes of the 760 it replaced. **(3) A control passing for the
+> wrong reason, found writing the mutants:** a runtime crash's `Traceback` header is never coloured, so "a crash in
+> forced colours" read as a crash with the colour stripping gone; it is now a script too damaged to start, in forced
+> colours — no header, a coloured `File` line, measured. **(4) A calibration's premise broke, as its third arm was
+> built to say:** `test_instruction_rules` calibrated `string_only_edit` on `extract_paragraphs.py` against
+> `origin/main`, "a script the instrument branches do not edit", and this sub-step edits all twenty; its baseline is
+> now the index, which holds the unmutated target wherever a branch stages before it tests. **(5) Apply's header now
+> flushes** before the child runs, so "the lines above" are above in a captured log too — declared. **Corpus,**
+> `temp/s1102h_corpus.py` against `95b865c`, 130 runs, 13 workdirs × 2 trees × 5 validators: on UTF-8 130 of 130
+> byte-identical, exit and both streams; on cp1252 4 crashes before — `validate_reject_all` on two documents, both
+> trees, each an encoding error — 0 now, and every exit the UTF-8 one. **Red first,** `temp/s1103_red_first.py`: at
+> `2178cce` and at `95b865c` the scanner crashes in 2 of 2 trees and apply reads a crash as a crash in 0 of 2; now 0
+> and 2 of 2.
+> **(6) `05-apply.md`'s first rule made the same false claim** as rule 6's paragraph — that apply wraps any
+> non-zero exit in a gate banner — and is corrected the same way, both trees, its two required sentences
+> kept, 710 bytes to 703; the plan had put the file out of bounds, having checked its second rule and not its first.
+> **(7) `/code-review` at high, before the commit: six findings, four fixed, two needing no change.** Fixed — the
+> same class at four more places: `post_process`'s post-strip gate, which printed C29's very banner over a crash and
+> over exit 3, and its strip_noop runner; repack's pre-repack runner, and its delivered-document gate, whose refusal
+> read a crash as a fired gate too, measured. Each now tells a crash from a refusal, and post_process exit 3 as the
+> install, both trees; repack's delivered child writes the UTF-8 repack decodes; a test's magic offset. No change —
+> Ctrl+C reaches the parent too, which re-raises before any reading; every error-stream write is a script's last.
+> **Declared:** `verify_diligence` reads a crashed `quality_check` as a FAIL, the right verdict with the cause named
+> generically; a child ended from outside, with no crash report, still reads by its code. 1228 assertions, 12 mutants.
+> **BUILT AND MERGED, 2026-11-03, as #188:** `7e9fa69` the fix with the review's four, reviewed before its commit,
+> then the filing; VERIFY 32 of 32 and TEST 25 of 25 through the cycle gate, the VERIFY on its second run after the
+> first refused a leakage row expecting CLEAN over 12 standing hits, every one at `HEAD`; the one full run on
+> `7e9fa69`, OVERALL PASS, 109 rows; C29 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the
+> conductor chain; 2026-11-03, unattended)*.
 
 ---
 

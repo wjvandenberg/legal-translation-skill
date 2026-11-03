@@ -1561,6 +1561,295 @@ for tree in ("uk", "us"):
                f"(rc={r.returncode}) {line!r}")
 
 # =============================================================================
+print("\nC29 — a checker prints its finding on any console, and apply tells a crash from a gate")
+print("-" * 96)
+
+# A Windows console whose output is captured -- Claude Code's, any pipe -- writes cp1252, and Python raises on
+# a character cp1252 cannot hold: an arrow in a finding's own words, a Polish letter echoed from the document.
+# The checker died mid-message on exit 1, and apply called the crash a deliberate block -- or, under
+# block_codes={2}, a WARN, carrying on past a check that never finished. Register C29; 14.9.1 of
+# PLAN-2-step-b.md section 3.14. THE CONSOLE IS SET IN THE CHILD'S ENVIRONMENT: this interpreter's own stdout
+# is reconfigured above, and nothing done to it reaches a child. Each case runs in a workdir of its own and
+# names its files by RELATIVE path, so a UTF-8 run and a cp1252 run print the same words.
+import ast  # noqa: E402
+
+# --- 14.9.1 cases: begin
+C29_DOC = ('<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'
+           '<w:p><w:r><w:t>The room opens at nine.</w:t></w:r></w:p></w:body></w:document>')
+C29_FINDINGS = (
+    # (label, script, paragraphs, its flags as apply passes them, PROVED to crash on cp1252 before)
+    ("the scanner's finding, an arrow in its own words", "validate_segment_shapes.py",
+     [{"idx": 0, "text": "invented", "en": "theAgreement applies.", "en_segments": [
+         {"type": "regular", "en": "the"}, {"type": "ins", "en": "Agreement applies."}]}], ["--strict"], True),
+    ("reject-all's finding, an arrow in its own words", "validate_reject_all.py",
+     [{"idx": 0, "text": "x", "en_segments": [
+         {"type": "regular", "en": "The keys stay with the Buyer.The office opens at nine. "},
+         {"type": "ins", "en": "The tenant agrees."}]}], [], True),
+    ("the retention WARN, a sign in its own words", "validate_translations.py",
+     [{"idx": 0, "text": 'Il servizio "Pulizia Uffici Centro Nord Est" inizia ogni lunedi mattina alle nove.',
+       "en": "The cleaning service starts every Monday morning at nine."}], [], True),
+    ("a token finding, a Polish letter echoed from the declared English alone", "validate_apply.py",
+     [{"idx": 0, "text": "invented", "en": "The Wa" + chr(0x142) + "ek office opens at nine."}],
+     ["document.xml", "--strict"], True),
+    ("the en_runs block, on the error stream, which Python always escapes", "validate_en_runs.py",
+     [{"idx": 0, "text": "x", "en": "The office opens.", "en_runs": [{"start": 0, "end": 5, "bold": True}]}],
+     [], False),
+)
+C29_CRASH = "print('[probe] checking the batch'); raise ValueError('invented')"
+C29_ARROW = "print(chr(0x2192))"
+C29_GATE2 = "import sys; print('[probe] invented finding', file=sys.stderr); sys.exit(2)"
+C29_TB0 = ("import traceback" + chr(10) + "try:" + chr(10) + "    raise ValueError('invented')" + chr(10)
+           + "except ValueError:" + chr(10) + "    traceback.print_exc()")
+C29_COLOURS = {"PYTHON_COLORS": "1", "FORCE_COLOR": "1"}
+# --- 14.9.1 cases: end
+C29_GUARD = ast.parse("for _stream in (sys.stdout, sys.stderr):" + chr(10)
+                      + "    try:" + chr(10)
+                      + "        _stream.reconfigure(errors='backslashreplace')" + chr(10)
+                      + "    except (AttributeError, ValueError):" + chr(10)
+                      + "        pass" + chr(10)).body[0]
+C29_DRIVER = TMP / "c29_driver.py"
+# apply's own _run_validator, driven from a process whose OWN console writes cp1252, as apply's is under a
+# captured Windows console: it prints the banner's kind and nothing of the banner's text.
+C29_DRIVER.write_text(
+    "import importlib.util, json, os, sys" + chr(10)
+    + "path, codes, argv = sys.argv[1], json.loads(sys.argv[2]), json.loads(sys.argv[3])" + chr(10)
+    + "sys.path.insert(0, os.path.dirname(path))" + chr(10)
+    + "spec = importlib.util.spec_from_file_location('c29_apply', path)" + chr(10)
+    + "ap = importlib.util.module_from_spec(spec)" + chr(10)
+    + "spec.loader.exec_module(ap)" + chr(10)
+    + "try:" + chr(10)
+    + "    ap._run_validator('probe', argv, block_codes=None if codes is None else set(codes))" + chr(10)
+    + "    print('@@ continued', flush=True)" + chr(10)
+    + "except RuntimeError as e:" + chr(10)
+    + "    m = str(e)" + chr(10)
+    + "    print('@@ ' + ('crash' if 'VALIDATOR CRASHED' in m else 'install' if 'FILE INTEGRITY' in m" + chr(10)
+    + "                   else 'gate' if 'SKILL GATE FIRED' in m else 'other'), flush=True)" + chr(10)
+    + "    print('@@ banner-clean ' + str('BLOCK' not in m and 'GATE FIRED' not in m and 'rule 6' in m" + chr(10)
+    + "                                    and 're-install' in m), flush=True)" + chr(10),
+    encoding="utf-8")
+
+
+def c29_old_tree(tree):
+    """Every script of <tree>/scripts at the pin, side by side, so an old checker imports its own siblings."""
+    d = TMP / f"c29-old-{tree}"
+    d.mkdir()
+    names = subprocess.run(["git", "ls-tree", "--name-only", f"{REF}:{tree}/scripts/"], capture_output=True,
+                           text=True, cwd=ROOT, check=True).stdout.split()
+    for n in names:
+        if n.endswith(".py"):
+            (d / n).write_bytes(subprocess.run(["git", "show", f"{REF}:{tree}/scripts/{n}"], capture_output=True,
+                                               cwd=ROOT, check=True).stdout)
+    return d
+
+
+C29_BEFORE = "95b865c"   # the commit before 14.9.1: section (4)'s runners are measured against it
+_c29_trees = {}
+
+
+def c29_tree(tree, ref):
+    """Every script of <tree>/scripts at `ref`, built once."""
+    if (tree, ref) not in _c29_trees:
+        d = TMP / f"c29-at-{ref}-{tree}"
+        d.mkdir()
+        names = subprocess.run(["git", "ls-tree", "--name-only", f"{ref}:{tree}/scripts/"], capture_output=True,
+                               text=True, cwd=ROOT, check=True).stdout.split()
+        for n in names:
+            if n.endswith(".py"):
+                (d / n).write_bytes(subprocess.run(["git", "show", f"{ref}:{tree}/scripts/{n}"],
+                                                   capture_output=True, cwd=ROOT, check=True).stdout)
+        for n in ("post_process.py", "repack_docx.py"):
+            if (d / n).read_bytes() == (ROOT / tree / "scripts" / n).read_bytes():
+                print(f"VOID — {tree}/{n} at {ref} is the working tree's: section (4)'s 'before' would be the fix.")
+                sys.exit(1)
+        _c29_trees[(tree, ref)] = d
+    return _c29_trees[(tree, ref)]
+
+
+C29_DRIVER2 = TMP / "c29_driver2.py"
+# One function of a module, called from a process whose own console is cp1252; '@archive' is an in-memory
+# archive, '@dir' the module's folder. It prints the raised banner's kind and nothing of its text.
+C29_DRIVER2.write_text(
+    "import importlib.util, io, json, os, sys" + chr(10)
+    + "path, func, args = sys.argv[1], sys.argv[2], json.loads(sys.argv[3])" + chr(10)
+    + "d = os.path.dirname(path)" + chr(10)
+    + "sys.path.insert(0, d)" + chr(10)
+    + "args = [io.BytesIO(b'x') if a == '@archive' else d if a == '@dir' else a for a in args]" + chr(10)
+    + "spec = importlib.util.spec_from_file_location('c29_mod', path)" + chr(10)
+    + "m = importlib.util.module_from_spec(spec)" + chr(10)
+    + "spec.loader.exec_module(m)" + chr(10)
+    + "try:" + chr(10)
+    + "    getattr(m, func)(*args)" + chr(10)
+    + "    print('@@ continued', flush=True)" + chr(10)
+    + "except BaseException as e:" + chr(10)
+    + "    s = str(e)" + chr(10)
+    + "    print('@@ ' + ('crash' if 'VALIDATOR CRASHED' in s else 'install' if 'FILE INTEGRITY' in s" + chr(10)
+    + "                   else 'gate' if 'SKILL GATE FIRED' in s else 'other'), flush=True)" + chr(10),
+    encoding="utf-8")
+
+
+def c29_call(module_path, func, args, cwd):
+    r = subprocess.run([sys.executable, str(C29_DRIVER2), str(module_path), func, json.dumps(args)],
+                       capture_output=True, env=dict(os.environ, PYTHONIOENCODING="cp1252"), cwd=cwd)
+    marks = [ln[3:].strip() for ln in r.stdout.decode("cp1252", "replace").splitlines() if ln.startswith("@@ ")]
+    return marks[0] if marks else f"none, rc {r.returncode}"
+
+
+def c29_child(script_path, case, enc):
+    """rc, stdout bytes and stderr text of one checker run as apply runs it, on a console writing `enc`."""
+    wd = TMP / f"c29-{next(_G13_N)}"
+    wd.mkdir()
+    (wd / "paragraphs.json").write_text(json.dumps(case[2]), encoding="utf-8")
+    (wd / "document.xml").write_text(C29_DOC, encoding="utf-8")
+    r = subprocess.run([sys.executable, str(script_path), "paragraphs.json"] + case[3], capture_output=True,
+                       env=dict(os.environ, PYTHONIOENCODING=enc), cwd=wd)
+    return r.returncode, r.stdout, r.stderr.decode(enc, errors="replace")
+
+
+def c29_drive(apply_path, argv, codes, extra=None):
+    """The banner's kind apply raised, its banner-clean flag, and the driver's stdout and stderr as text."""
+    r = subprocess.run([sys.executable, str(C29_DRIVER), str(apply_path),
+                        json.dumps(None if codes is None else sorted(codes)), json.dumps(argv)],
+                       capture_output=True, env=dict(os.environ, PYTHONIOENCODING="cp1252", **(extra or {})),
+                       cwd=TMP)
+    out = r.stdout.decode("cp1252", errors="replace")
+    marks = [ln[3:].strip() for ln in out.splitlines() if ln.startswith("@@ ")]
+    return (marks[0] if marks else f"none, rc {r.returncode}"), marks[1:], out, r.stderr.decode("cp1252", "replace")
+
+
+C29_TB = "Traceback (most recent call last)"
+for tree in ("uk", "us"):
+    s_dir = ROOT / tree / "scripts"
+    old_dir = c29_old_tree(tree)
+    for _s in ("apply_translations_textmatch.py",) + tuple(c[1] for c in C29_FINDINGS):
+        assert_baseline_differs(_s, tree)
+    # (1) EACH CHECKER, A CHILD ON A cp1252 CONSOLE: the whole finding printed now, every byte a UTF-8 run gives save
+    # what cp1252 cannot hold, which arrives as an escape; and the same exit.
+    for case in C29_FINDINGS:
+        label, script, _d, _f, crashed_before = case
+        u_rc, u_out, u_err = c29_child(s_dir / script, case, "utf-8")
+        n_rc, n_out, n_err = c29_child(s_dir / script, case, "cp1252")
+        o_rc, _o_out, o_err = c29_child(old_dir / script, case, "cp1252")
+        ok(f"C29 {tree} {label}: no crash on cp1252 now, the exit a UTF-8 run gives",
+           C29_TB not in n_err and n_rc == u_rc, f"(rc {n_rc}, on UTF-8 {u_rc})")
+        ok(f"C29 {tree} {label}: every line printed on cp1252, what it cannot hold as an escape",
+           n_out == u_out.decode("utf-8").encode("cp1252", "backslashreplace") and n_err == u_err,
+           f"({len(n_out)} bytes, {len(u_out)} on UTF-8)")
+        if crashed_before:
+            ok(f"C29 {tree} {label}: PROVED it crashed on cp1252 before",
+               C29_TB in o_err and "UnicodeEncodeError" in o_err, f"(rc {o_rc})")
+        else:
+            # Its exit moved since the pin for a reason of its own -- the tiling rule, C13, came later.
+            ok(f"C29 {tree} {label}: no crash on cp1252 before either", C29_TB not in o_err, f"(rc {o_rc})")
+    # (2) APPLY'S _run_validator, DRIVEN FROM A cp1252 CONSOLE, the pinned apply beside today's.
+    pj = TMP / f"c29-scan-{tree}.json"
+    pj.write_text(json.dumps(C29_FINDINGS[0][2]), encoding="utf-8")
+    cut = TMP / f"c29-cut-{tree}.py"
+    vss = (s_dir / "validate_segment_shapes.py").read_text(encoding="utf-8")
+    cut_at = "ap.add_argument('paragraphs_json',"
+    cut.write_text(vss[:vss.index(cut_at) + len(cut_at)], encoding="utf-8")
+    py = sys.executable
+    new_ap, old_ap = s_dir / "apply_translations_textmatch.py", old_dir / "apply_translations_textmatch.py"
+    for label, argv, codes, extra, before, now in (
+            ("a crash", [py, "-c", C29_CRASH], None, None, "gate", "crash"),
+            ("a crash under block_codes={2}", [py, "-c", C29_CRASH], {2}, None, "continued", "crash"),
+            ("a script too damaged to start", [py, str(cut), str(pj)], None, None, "gate", "crash"),
+            ("a script too damaged to start, under block_codes={2}", [py, str(cut), str(pj)], {2}, None,
+             "continued", "crash"),
+            # NOT a runtime crash: its Traceback header is never coloured, so it would read as a crash with the
+            # colour stripping gone. A script that cannot start prints no header and only a coloured File line.
+            ("a script too damaged to start, in forced colours", [py, str(cut), str(pj)], None, C29_COLOURS, "gate",
+             "crash"),
+            ("a child with no guard printing an arrow", [py, "-c", C29_ARROW], None, None, "gate", "continued")):
+        n_kind, n_flags, _n_out, n_err = c29_drive(new_ap, argv, codes, extra)
+        o_kind, _o_flags, _o_out, o_err = c29_drive(old_ap, argv, codes, extra)
+        ok(f"C29 {tree} apply, {label}: reads as {now} now", n_kind == now, f"({n_kind})")
+        ok(f"C29 {tree} apply, {label}: PROVED it read as {before} before", o_kind == before, f"({o_kind})")
+        if now == "crash":
+            ok(f"C29 {tree} apply, {label}: the crash banner is no gate's, names rule 6 and the re-install",
+               n_flags == ["banner-clean True"], f"({n_flags})")
+            mark = "SyntaxError" if argv[1] == str(cut) else C29_TB
+            ok(f"C29 {tree} apply, {label}: the crash report reaches the operator once", n_err.count(mark) == 1,
+               f"({mark}: {n_err.count(mark)}x)")
+    # THE TRUE POSITIVES: a real gate still reads as a block, every clean exit as it did, before and now alike.
+    n_kind, _f, n_out, n_err = c29_drive(new_ap, [py, str(s_dir / "validate_segment_shapes.py"), str(pj), "--strict"],
+                                         None)
+    o_kind, _f, _o, o_err = c29_drive(old_ap, [py, str(old_dir / "validate_segment_shapes.py"), str(pj), "--strict"],
+                                      None)
+    ok(f"C29 {tree} apply, the scanner's real finding on cp1252: a gate now, its FIX line printed, no crash",
+       n_kind == "gate" and (chr(92) + "u2192 FIX:") in n_out and C29_TB not in n_err, f"({n_kind})")
+    ok(f"C29 {tree} apply, the scanner's real finding on cp1252: PROVED a crash read as a gate before",
+       o_kind == "gate" and C29_TB in o_err, f"({o_kind})")
+    for label, argv, codes, want in (
+            ("exit 0", [py, "-c", "import sys; sys.exit(0)"], None, "continued"),
+            ("exit 1", [py, "-c", "import sys; sys.exit(1)"], None, "gate"),
+            ("exit 2 with its message, under block_codes={2}", [py, "-c", C29_GATE2], {2}, "gate"),
+            ("exit 1 under block_codes={2}, a WARN", [py, "-c", "import sys; sys.exit(1)"], {2}, "continued"),
+            ("exit 3, a truncated install", [py, "-c", "import sys; sys.exit(3)"], {2}, "install"),
+            ("a crash report on exit 0", [py, "-c", C29_TB0], None, "continued")):
+        n_kind, _f, _n_out, n_err = c29_drive(new_ap, argv, codes)
+        o_kind, _f, _o_out, _o_err = c29_drive(old_ap, argv, codes)
+        ok(f"C29 {tree} apply, TRUE POSITIVE {label}: reads as {want} now and before", n_kind == o_kind == want,
+           f"(now {n_kind}, before {o_kind})")
+        if argv[-1] == C29_GATE2:
+            ok(f"C29 {tree} apply, {label}: the gate's own message reaches the operator once",
+               n_err.count("[probe] invented finding") == 1, f"({n_err.count('[probe] invented finding')}x)")
+    # (3) THE GUARD, BY SOURCE AND BY RUN: the first statement of every script's __main__ block, one text, and
+    # nowhere else; each file's own guard, run in a child on cp1252, printing what it cannot hold as an escape.
+    files = sorted(s_dir.glob("*.py"))
+    ok(f"C29 {tree}: all {len(files)} shipped scripts read, the census's population", len(files) == 20)
+    want = (chr(92) + "u2192" + chr(92) + "u0142" + os.linesep).encode("ascii")
+    for f in files:
+        src = f.read_text(encoding="utf-8")
+        mains = [s for s in ast.parse(src).body if isinstance(s, ast.If) and isinstance(s.test, ast.Compare)
+                 and getattr(s.test.left, "id", None) == "__name__"]
+        first = mains[0].body[0] if len(mains) == 1 else None
+        ok(f"C29 {tree} {f.name}: the guard is its __main__ block's first statement, and nowhere else",
+           first is not None and ast.dump(first) == ast.dump(C29_GUARD)
+           and src.count("reconfigure(errors='backslashreplace')") == 1, "")
+        old_src = (old_dir / f.name).read_text(encoding="utf-8") if (old_dir / f.name).exists() else ""
+        ok(f"C29 {tree} {f.name}: PROVED no guard before", "reconfigure(errors='backslashreplace')" not in old_src, "")
+        if first is not None:
+            r = subprocess.run([py, "-c", "import sys" + chr(10) + ast.unparse(first) + chr(10)
+                                + "print(chr(0x2192) + chr(0x142))"], capture_output=True,
+                               env=dict(os.environ, PYTHONIOENCODING="cp1252"))
+            ok(f"C29 {tree} {f.name}: its own guard, run on cp1252, prints the escapes", r.returncode == 0
+               and r.stdout == want, f"(rc {r.returncode}, {r.stdout[:20]!r})")
+    # (4) THE OTHER RUNNERS OF THE SAME SHAPE, found by the review: post_process's two and repack's two, each run
+    # from a cp1252 console on a copy of the tree whose child is replaced -- a crash, a clean refusal, exit 3. Their
+    # "before" is the commit before this sub-step: the pin predates the delivered-document gate.
+    for label, module, func, child, body, args, before, now in (
+            ("post_process's post-strip gate, its child crashing", "post_process.py",
+             "_run_validate_apply_post_strip", "validate_apply.py", C29_CRASH, ["doc.xml", "p.json"], "gate", "crash"),
+            ("post_process's post-strip gate, a truncated child (exit 3)", "post_process.py",
+             "_run_validate_apply_post_strip", "validate_apply.py", "import sys; sys.exit(3)", ["doc.xml", "p.json"],
+             "gate", "install"),
+            ("post_process's post-strip gate, TRUE POSITIVE a clean refusal (exit 1)", "post_process.py",
+             "_run_validate_apply_post_strip", "validate_apply.py", "import sys; sys.exit(1)", ["doc.xml", "p.json"],
+             "gate", "gate"),
+            ("post_process's strip_noop runner, its child crashing", "post_process.py",
+             "_run_strip_noop_subprocess", "strip_noop_tracked_changes.py", C29_CRASH, ["doc.xml"], "other", "crash"),
+            ("post_process's strip_noop runner, TRUE POSITIVE a clean failure (exit 2)", "post_process.py",
+             "_run_strip_noop_subprocess", "strip_noop_tracked_changes.py", "import sys; sys.exit(2)", ["doc.xml"],
+             "other", "other"),
+            ("repack's pre-repack runner, its child crashing", "repack_docx.py", "_run_pre_repack_validator",
+             None, None, ["probe", [py, "-c", C29_CRASH]], "other", "crash"),
+            ("repack's pre-repack runner, TRUE POSITIVE a clean refusal (exit 1)", "repack_docx.py",
+             "_run_pre_repack_validator", None, None, ["probe", [py, "-c", "import sys; sys.exit(1)"]], "other",
+             "other"),
+            ("repack's delivered-document gate, its child crashing", "repack_docx.py", "_delivered_gate",
+             # Measured: before, its refusal banner read the crash as a fired gate -- C29's own lie, a fourth time.
+             "validate_apply.py", C29_CRASH, ["o.docx", "@archive", "p.json", "@dir"], "gate", "crash")):
+        kinds = {}
+        for when, src in (("now", s_dir), ("before", c29_tree(tree, C29_BEFORE))):
+            d = TMP / f"c29-run-{next(_G13_N)}"
+            shutil.copytree(src, d)
+            if child:
+                (d / child).write_text(body, encoding="utf-8")
+            kinds[when] = c29_call(d / module, func, args, d)
+        ok(f"C29 {tree} {label}: reads as {now} now", kinds["now"] == now, f"({kinds['now']})")
+        ok(f"C29 {tree} {label}: read as {before} before", kinds["before"] == before, f"({kinds['before']})")
+
+# =============================================================================
 shutil.rmtree(TMP, ignore_errors=True)
 print()
 print("=" * 96)

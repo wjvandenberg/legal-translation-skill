@@ -346,11 +346,16 @@ check("the cross-tree prose check FAILS when one tree is edited alone", drifted 
 # instead of describing somebody's diff, and it does not go stale when a branch edits a
 # script. `with_mutation` restores the bytes in a `finally` and never touches git.
 STRING_ONLY_TARGET = "scripts/extract_paragraphs.py"
+# AND THE BASELINE IS THE INDEX, NOT origin/main, FOR THE SAME REASON ONE LEVEL UP: "a script the
+# instrument branches do not edit" stopped existing on 14.9.1 (C29), which gives all twenty a guard,
+# and the third arm below went red as it was built to. The index holds the unmutated target on every
+# branch that stages before it tests, as the house cycle does -- `git show :path`, an empty ref.
+STRING_ONLY_BASE = ""
 
 
 def _probe_string_only():
     rr = subprocess.run(
-        [sys.executable, str(ROOT / "tools" / "string_only_edit.py"), "origin/main",
+        [sys.executable, str(ROOT / "tools" / "string_only_edit.py"), STRING_ONLY_BASE,
          "uk/" + STRING_ONLY_TARGET],
         capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=ROOT)
     return rr.returncode
@@ -373,7 +378,7 @@ check("string_only_edit FAILS when control flow changes", flow_rc == 1, f"exit {
 # also be 0, which is what proves the two arms above differ because of the PLANT and not
 # because the file was already dirty. Without it, a target that some other branch had
 # edited would make the pass arm fail for a reason neither arm names.
-check("and the unmutated file is itself clean against origin/main",
+check("and the unmutated file is itself clean against the index",
       _probe_string_only() == 0, f"exit {_probe_string_only()}")
 
 # ---- STEP 4's negatives ------------------------------------------------------------

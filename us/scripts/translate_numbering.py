@@ -592,6 +592,12 @@ def translate_numbering(orig_docx, output_xml, language=None, custom_map=None,
     return False
 
 if __name__ == '__main__':
+    # C29: a character the console cannot show prints as an escape, never as a crash.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(errors='backslashreplace')
+        except (AttributeError, ValueError):
+            pass
     import argparse
     parser = argparse.ArgumentParser(description='Translate numbering format strings in word/numbering.xml')
     parser.add_argument('original', help='Original .docx file')

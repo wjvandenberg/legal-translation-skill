@@ -1013,6 +1013,80 @@ ok(f"C10 a part with no copy FAILS exactly when the generator wrote a visible te
 ok(f"C10 the old code FAILED on every one of the {n['visible'] + n['empty']}", not old13, f"{len(old13)} passed")
 ok("C10 the us tree identical to the uk tree on every part", not us13, f"{len(us13)} apart")
 
+# =============================================================================
+print("\nPROPERTY 14 — C29: every script prints anything on a cp1252 console; a crash is told by its own report")
+# The guard, read out of each script's __main__ block by the parser, run in a child whose console writes cp1252,
+# over generated strings from every range a document or a finding can hold -- the output exactly their escaped
+# form; and the same population, printed as the code at the pin printed it, with no guard, crashing. Then apply's
+# crash reader over generated error streams: a crash exactly where a crash mark was planted, coloured or not.
+import ast  # noqa: E402
+import json  # noqa: E402
+
+rng14 = random.Random(SEED + 14)
+RANGES14 = ((0x20, 0x7E), (0xA0, 0xFF), (0x100, 0x24F), (0x370, 0x3FF), (0x400, 0x4FF), (0x2000, 0x206F),
+            (0x2190, 0x22FF), (0x3000, 0x30FF), (0x4E00, 0x4FFF), (0xFF00, 0xFFEF), (0x1F300, 0x1F64F))
+strings14 = []
+for _ in range(300):
+    strings14.append("".join(chr(rng14.randint(*rng14.choice(RANGES14))) for _ in range(rng14.randint(1, 24))))
+SJ = TMP / "c29-strings.json"
+SJ.write_text(json.dumps(strings14), encoding="ascii")
+want14 = b"".join(s.encode("cp1252", "backslashreplace") + os.linesep.encode() for s in strings14)
+unencodable14 = sum(1 for s in strings14 if s.encode("cp1252", "backslashreplace") != s.encode("cp1252", "replace"))
+LOOP14 = chr(10) + "for s in json.load(open(sys.argv[1], encoding='ascii')):" + chr(10) + "    print(s)" + chr(10)
+CP14 = dict(os.environ, PYTHONIOENCODING="cp1252")
+n14, wrong14 = 0, []
+for tree in ("uk", "us"):
+    for f in sorted((ROOT / tree / "scripts").glob("*.py")):
+        mains = [s for s in ast.parse(f.read_text(encoding="utf-8")).body if isinstance(s, ast.If)
+                 and isinstance(s.test, ast.Compare) and getattr(s.test.left, "id", None) == "__name__"]
+        guard = ast.unparse(mains[0].body[0]) if len(mains) == 1 else "pass"
+        r = subprocess.run([sys.executable, "-c", "import json, sys" + chr(10) + guard + LOOP14, str(SJ)],
+                           capture_output=True, env=CP14)
+        n14 += 1
+        if r.returncode != 0 or r.stdout != want14:
+            wrong14.append(f"{tree}/{f.name}")
+r = subprocess.run([sys.executable, "-c", "import json, sys" + LOOP14, str(SJ)], capture_output=True, env=CP14)
+ok(f"C29 every script's own guard prints all {len(strings14)} generated strings as their escaped form on cp1252 "
+   f"({unencodable14} holding what cp1252 cannot)", n14 == 40 and not wrong14 and unencodable14 > 0,
+   f"{n14} scripts, wrong: {wrong14[:4]}")
+ok("C29 with no guard, as the code at the pin printed, the same population crashes on cp1252",
+   r.returncode != 0 and b"UnicodeEncodeError" in r.stderr, f"(rc {r.returncode})")
+
+AP14 = [load(ROOT / t / "scripts" / "apply_translations_textmatch.py", f"p_ap14_{t}") for t in ("uk", "us")]
+PLAIN14 = "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789 .,:;!?-_()[]{}=+*/<>'|#@$%&~"
+
+
+def line14():
+    return "".join(rng14.choice(PLAIN14) for _ in range(rng14.randint(0, 70)))
+
+
+def colour14(text):
+    return chr(27) + "[" + rng14.choice(("35", "1;35", "31", "0")) + "m" + text + chr(27) + "[0m"
+
+
+wrong14, kinds14 = [], Counter()
+for i in range(600):
+    lines = [line14() for _ in range(rng14.randint(0, 12))]
+    planted = i % 2 == 1
+    if planted:
+        if rng14.random() < 0.5:
+            mark = "Traceback (most recent call last):"
+            kinds14["header"] += 1
+        else:
+            path = '"' + "".join(rng14.choice(PLAIN14.replace("'", "")) for _ in range(rng14.randint(1, 40))) + '"'
+            num = str(rng14.randint(1, 99999))
+            coloured = rng14.random() < 0.5
+            mark = ("  File " + (colour14(path) if coloured else path) + ", line "
+                    + (colour14(num) if coloured else num) + rng14.choice(("", ", in <module>", ", in main")))
+            kinds14["file line, coloured" if coloured else "file line"] += 1
+        lines.insert(rng14.randint(0, len(lines)), mark)
+    err = rng14.choice((chr(10), chr(13) + chr(10))).join(lines)
+    got = [ap._died_on_traceback(err) for ap in AP14]
+    if got != [planted, planted]:
+        wrong14.append((planted, got, err[:60]))
+ok(f"C29 apply's crash reader finds a crash exactly where one was planted, both trees, 600 streams "
+   f"({dict(kinds14)})", not wrong14 and min(kinds14.values()) > 0 and len(kinds14) == 3, f"{wrong14[:2]}")
+
 shutil.rmtree(TMP, ignore_errors=True)
 print()
 print("=" * 96)

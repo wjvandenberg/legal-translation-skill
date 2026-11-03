@@ -1046,6 +1046,12 @@ def _summarise_aux_xml(raw_xml, kind, label):
     return {'label': label, 'kind': kind, 'substantive': substantive}
 
 if __name__ == '__main__':
+    # C29: a character the console cannot show prints as an escape, never as a crash.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(errors='backslashreplace')
+        except (AttributeError, ValueError):
+            pass
     _check_self_integrity()
     if len(sys.argv) != 3:
         print("Usage: extract_paragraphs.py <input.docx|document.xml> <output.json>")
