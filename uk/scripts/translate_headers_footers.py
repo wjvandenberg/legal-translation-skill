@@ -1295,6 +1295,12 @@ def translate_headers_footers_legacy(orig_docx, output_dir, language=None):
 # ──────────────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
+    # C29: a character the console cannot show prints as an escape, never as a crash.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(errors='backslashreplace')
+        except (AttributeError, ValueError):
+            pass
     parser = argparse.ArgumentParser(
         description=(
             'Translate word/headerN.xml and word/footerN.xml files. '

@@ -1659,15 +1659,40 @@ def _doc_has_tracked_changes(paragraphs_json_path):
 # another.
 _INTEGRITY_EXIT = 3
 
+# A CHILD THAT DIED ON A PYTHON ERROR, told by the crash report the interpreter itself
+# writes: a runtime traceback's header, or -- for a script too damaged to start, which
+# prints no header -- its `File "...", line N` line. Colour codes, which a forced-colour
+# terminal wraps that line in, are stripped first. Register C29.
+_CRASH_FILE_LINE = re.compile(r'[\s|]*File ".*", line \d+')
+_COLOUR_CODE = re.compile(chr(27) + r'\[[0-9;]*m')
+
+
+def _died_on_traceback(err):
+    for line in _COLOUR_CODE.sub('', err).splitlines():
+        if 'Traceback (most recent call last):' in line or _CRASH_FILE_LINE.match(line):
+            return True
+    return False
+
 
 def _run_validator(label, args, block_codes=None):
     """Invoke a validator subprocess; raise RuntimeError on block.
     block_codes={set} or None (any non-zero blocks).
-    Exit 3 — a truncated install — blocks unconditionally, whatever block_codes says."""
+    Exit 3 — a truncated install — blocks unconditionally, whatever block_codes says,
+    and so does a crash (C29)."""
     import subprocess
-    print(f"\n{'=' * 60}\n[apply] auto-running {label}\n{'=' * 60}")
-    result = subprocess.run(args, capture_output=False)
+    print(f"\n{'=' * 60}\n[apply] auto-running {label}\n{'=' * 60}", flush=True)
+    # C29: the child writes apply's own character set, escaping what that set cannot
+    # hold, so a finding prints on any console. Its error stream is kept, to tell a crash
+    # from a gate, and written out unchanged when it ends -- every validator writes it
+    # last, so the operator reads the same order.
+    enc = getattr(sys.stdout, 'encoding', None) or 'utf-8'
+    result = subprocess.run(args, stderr=subprocess.PIPE,
+                            env=dict(os.environ, PYTHONIOENCODING=f'{enc}:backslashreplace'))
     rc = result.returncode
+    err = result.stderr.decode(enc, errors='replace')
+    if err and sys.stderr is not None:
+        sys.stderr.write(err)
+        sys.stderr.flush()
 
     # EXIT 3 BLOCKS UNCONDITIONALLY, AND IS TESTED BEFORE ANYTHING ELSE.
     #
@@ -1695,6 +1720,21 @@ def _run_validator(label, args, block_codes=None):
             f"NOT edit paragraphs.json, do NOT pass an override flag, and do not "
             f"treat this as a gate to be satisfied — no change to the input can "
             f"repair a truncated script."
+        )
+
+    # A CRASH BLOCKS UNCONDITIONALLY TOO, AND IT IS NOT A GATE EITHER (C29). A validator
+    # that died on an unhandled error exits 1 -- the scanner's own block code, and a WARN
+    # under block_codes={2}, where apply carried on past a check that never finished. Its
+    # checks never ran, so no change to the input can satisfy it: rule 6's, never rule 5's.
+    if rc != 0 and _died_on_traceback(err):
+        raise RuntimeError(
+            f"VALIDATOR CRASHED — NOT A GATE. {label} died on a Python error "
+            f"(exit {rc}, its traceback above), so its checks never ran. A broken "
+            f"install or a bug in the skill, not an input problem. Apply aborted. "
+            f"SKILL.md rule 6 governs and rule 5 does not: STOP and re-install the "
+            f"skill from the .skill / .zip archive, then re-run apply; a crash that "
+            f"survives a re-install is a bug — report it with the traceback. Do NOT "
+            f"edit paragraphs.json and do NOT pass an override flag."
         )
 
     if block_codes is None:
@@ -2457,6 +2497,12 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
     return changes
 
 if __name__ == '__main__':
+    # C29: a character the console cannot show prints as an escape, never as a crash.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(errors='backslashreplace')
+        except (AttributeError, ValueError):
+            pass
     _check_self_integrity()
     import argparse
     parser = argparse.ArgumentParser(

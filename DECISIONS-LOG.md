@@ -2441,3 +2441,44 @@ unmeasured words sourced from published law). **C26, his choice of three:** *"A 
 read, a script names a few random line numbers in the lexicon files read, the operator quotes those lines into a
 receipt, and skill Step 5 refuses to start without a matching receipt; it proves the files were opened at those
 places, not that every line was read. Planned as 14.9.5, its own session, after 14.9.4.
+
+## 2026-11-02 (8) — Wouter's four answers for sub-step 14.9.1, C29; then no questions for an hour
+
+**WOUTER, THROUGH THE QUESTION TOOL, AT 14.9.1's OPENING, EACH THE RECOMMENDED OPTION:** **(1) how apply tells a
+crash from a gate** — *"Read the crash report"*: apply keeps a checker's error stream, shows it unchanged, and reads
+Python's own crash marks, over a new exit code (blind to a script too damaged to start) and a launcher (SKILL.md rule
+6 forbids running a script through a wrapper). **(2) how a script prints what the console cannot hold** — *"Escape it,
+two layers"*: a guard in each script, the character set untouched, and apply passing the same setting to its
+children, over a switch to UTF-8 and over apply alone. **(3) the reach** — *"All 20 shipped scripts"*, C29's own remedy
+saying "the shipped scripts", over the five apply runs with the rest filed. **(4) SKILL.md rule 6's second paragraph**
+— *"Amend it, both trees"*, F35 left open, over leaving it to 14.9.4.
+
+**AND THEN, IN HIS WORDS:** *"Don't ask me questions anymore for the next hour please."* So every later choice in this
+session is the session's own, recorded where it is taken for him to confirm or overturn at the close.
+
+## 2026-11-03 (1) — Wouter: 14.9.1 to be finished without questions, the chain carried on to step 15, the next sessions opened as nested sessions
+
+**WOUTER, IN HIS WORDS.** On 2026-11-02, after telling 14.9.1's session directly *"Stop now, it is enough for today.
+We'll continue tomorrow."*, through the conductor's session: *"Continue 14.9.1 as before - without any questions to
+me until you are completely done with 14. Start new nested sessions yourself."* The session held on the direct word
+until he said it himself, and the conductor agreed. On 2026-11-03, in 14.9.1's session: *"Continue. I won't be
+checking these sessions for another 7 hours so continue with everything like yesterday, even branch 15, as per your
+recommendations."*, then *"Open new sessions directly as nested sessions"*.
+
+**SO, UNTIL STEP 14 IS DONE:** nothing is put to him; wherever a session would ask, it takes its recommended option,
+says so in one line, and records it in `temp/s1102_questions_answered.md`, in this log and in its last message; each
+sub-step's session merges on green, writes the next prompt and opens the next sub-step itself, as a nested session;
+and the chain carries on past step 14 into step 15. A red that cannot be fixed, or usage above 90% on either limit,
+still stops it.
+
+**14.9.1's OWN CHOICES, for him to confirm or overturn:** **(1)** the controls live in the step's own suite,
+`tests/test_check_scoping.py`, the old code read out of git beside the new, over `tests/test_checks_can_fail.py`,
+which drives apply in the UK tree only; **(2)** apply on a cp1252 console is tested from a separate process whose own
+output is cp1252, as on a captured Windows console, because apply now hands its child its own encoding and an
+in-process test cannot reach that; **(3)** the crash banner reads `VALIDATOR CRASHED — NOT A GATE`, with no word BLOCK,
+so that `05-apply.md`'s rule that a BLOCK banner is a gate comes true; **(4)** apply's header line flushes before a
+child runs; **(5)** `test_instruction_rules`'s calibration of `string_only_edit` compares against the index rather
+than `origin/main`, every shipped script being edited here; **(6)** F35, step 3's row on the same passages, is left
+open and noted; **(7)** `05-apply.md`'s first rule, the twin of rule 6's paragraph and as false, is corrected
+with it, its two required sentences kept; **(8)** the review's finding of the same class at four more places —
+post_process's two runners and repack's two — is fixed here, both trees, rather than filed.

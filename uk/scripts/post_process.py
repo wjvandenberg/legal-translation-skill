@@ -2320,23 +2320,70 @@ def _xml_has_tracked_changes(xml_path):
             b'<w:del ' in content or b'<w:del>' in content or
             b'<w:delText' in content)
 
+# A CHILD THAT DIED ON A PYTHON ERROR, told by the crash report the interpreter itself
+# writes -- apply's _run_validator's test, copied because no script imports another's
+# helpers (decision 6b). Register C29.
+_CRASH_FILE_LINE = re.compile(r'[\s|]*File ".*", line \d+')
+_COLOUR_CODE = re.compile(chr(27) + r'\[[0-9;]*m')
+
+
+def _died_on_traceback(err):
+    for line in _COLOUR_CODE.sub('', err).splitlines():
+        if 'Traceback (most recent call last):' in line or _CRASH_FILE_LINE.match(line):
+            return True
+    return False
+
+
+def _run_child(args):
+    """Run a checker as apply's _run_validator does (C29): in this process's own character
+    set, escaping what it cannot hold, its error stream kept and written out unchanged when
+    it ends. Returns (exit code, error-stream text)."""
+    import subprocess
+    enc = getattr(sys.stdout, 'encoding', None) or 'utf-8'
+    result = subprocess.run(args, stderr=subprocess.PIPE,
+                            env=dict(os.environ, PYTHONIOENCODING=f'{enc}:backslashreplace'))
+    err = result.stderr.decode(enc, errors='replace')
+    if err and sys.stderr is not None:
+        sys.stderr.write(err)
+        sys.stderr.flush()
+    return result.returncode, err
+
+
+def _refuse_install_failure(label, rc, err):
+    """Both children here exit 3 only when truncated: that, and a crash, are rule 6's and
+    never a gate's -- raised before any other reading of the exit (C29)."""
+    if rc == 3:
+        raise RuntimeError(
+            f"FILE INTEGRITY — THE INSTALL IS TRUNCATED. This is NOT a gate. {label} "
+            f"exited 3. SKILL.md rule 6 governs: STOP and re-install the skill from the "
+            f".skill / .zip archive, then re-run this step. Do NOT edit paragraphs.json.")
+    if rc != 0 and _died_on_traceback(err):
+        raise RuntimeError(
+            f"VALIDATOR CRASHED — NOT A GATE. {label} died on a Python error "
+            f"(exit {rc}, its traceback above), so its checks never ran. A broken "
+            f"install or a bug in the skill, not an input problem. SKILL.md rule 6 "
+            f"governs and rule 5 does not: STOP and re-install the skill from the "
+            f".skill / .zip archive, then re-run this step; a crash that survives a "
+            f"re-install is a bug — report it with the traceback. Do NOT edit "
+            f"paragraphs.json and do NOT pass an override flag.")
+
+
 def _run_strip_noop_subprocess(xml_path):
     """Auto-invoke strip_noop_tracked_changes.py as a subprocess.
     Mandatory for TC documents — refuses to leave post_process if the
     strip step fails."""
-    import subprocess
     scripts_dir = os.path.dirname(os.path.abspath(__file__))
     print(f"\n{'=' * 60}\n[post_process] auto-running "
-          f"strip_noop_tracked_changes.py (TC document)\n{'=' * 60}")
-    result = subprocess.run(
+          f"strip_noop_tracked_changes.py (TC document)\n{'=' * 60}", flush=True)
+    rc, err = _run_child(
         [sys.executable,
          os.path.join(scripts_dir, 'strip_noop_tracked_changes.py'),
-         xml_path],
-        capture_output=False)
-    if result.returncode != 0:
+         xml_path])
+    _refuse_install_failure('strip_noop_tracked_changes.py', rc, err)
+    if rc != 0:
         raise RuntimeError(
             f"strip_noop_tracked_changes.py returned exit code "
-            f"{result.returncode}. post_process aborted; document may be "
+            f"{rc}. post_process aborted; document may be "
             f"in an inconsistent state."
         )
 
@@ -2383,12 +2430,11 @@ def _run_validate_apply_post_strip(xml_path, paragraphs_json_path):
     Same script, same flag, same exit semantics — ``_run_validator``-
     style block on exit code != 0.
     """
-    import subprocess
     scripts_dir = os.path.dirname(os.path.abspath(__file__))
     print(f"\n{'=' * 60}\n[post_process] auto-running "
           f"validate_apply.py --strict (post-strip drift gate)\n"
-          f"{'=' * 60}")
-    result = subprocess.run(
+          f"{'=' * 60}", flush=True)
+    rc, err = _run_child(
         [sys.executable,
          os.path.join(scripts_dir, 'validate_apply.py'),
          paragraphs_json_path,
@@ -2399,13 +2445,13 @@ def _run_validate_apply_post_strip(xml_path, paragraphs_json_path):
          # to simulate the same insertion on the declared side
          # so tokenisation is symmetric and the gate doesn't
          # false-fire on the post-mortem digit→upper class.
-         '--post-spacing-fix'],
-        capture_output=False)
-    if result.returncode != 0:
+         '--post-spacing-fix'])
+    _refuse_install_failure('validate_apply.py --strict (post-strip)', rc, err)
+    if rc != 0:
         raise RuntimeError(
             f"SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR. "
             f"validate_apply.py --strict returned exit code "
-            f"{result.returncode} after post_process / strip_noop. "
+            f"{rc} after post_process / strip_noop. "
             f"The document drifted from paragraphs.json during Step 6 "
             f"(typically: phantom segment glued to next regular by "
             f"period-lowercase, or symbol placeholder stripped as noise). "
@@ -2675,6 +2721,12 @@ def post_process(xml_path, fix=True, variant='uk', paragraphs_json=None):
     return results
 
 if __name__ == '__main__':
+    # C29: a character the console cannot show prints as an escape, never as a crash.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(errors='backslashreplace')
+        except (AttributeError, ValueError):
+            pass
     import argparse
     parser = argparse.ArgumentParser(description='Post-process translated legal document XML')
     parser.add_argument('xml_path', help='Path to document.xml')

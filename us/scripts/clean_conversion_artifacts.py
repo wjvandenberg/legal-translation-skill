@@ -156,6 +156,12 @@ def clean_docx(docx_path, accept=False):
     print(f"Cleaned: {docx_path}")
 
 if __name__ == '__main__':
+    # C29: a character the console cannot show prints as an escape, never as a crash.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(errors='backslashreplace')
+        except (AttributeError, ValueError):
+            pass
     args = [a for a in sys.argv[1:] if not a.startswith('-')]
     accept = '--accept-conversion-artifacts' in sys.argv[1:]
     if len(args) != 1:

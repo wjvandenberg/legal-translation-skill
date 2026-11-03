@@ -1322,6 +1322,12 @@ def check(xml_path, verbose=False, source_json=None, variant='us',
     return results
 
 if __name__ == '__main__':
+    # C29: a character the console cannot show prints as an escape, never as a crash.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(errors='backslashreplace')
+        except (AttributeError, ValueError):
+            pass
     import argparse
     ap = argparse.ArgumentParser(
         description='Quality check for a translated legal document.xml.',

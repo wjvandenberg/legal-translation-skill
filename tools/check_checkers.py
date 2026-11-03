@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """check_checkers.py - is this project's copy of each standard script current?
-CHECKER VERSION 21 (2026-10-22)
+CHECKER VERSION 22 (2026-11-02)
 
 Every project gets its OWN COPY of the standard scripts in its tools\\ folder. Copies drift:
 the shared one gets fixed and yours does not hear about it, or yours gets edited and the fix
@@ -141,6 +141,10 @@ when its blob is one the shared file has held, renames followed: then it is mere
 THE FIRST ADOPTION RUNS THE SHARED COPY. A project's own copy older than this version has no
 --adopt, so run the shared one from the project root - it finds its folder by walking up, as
 the drift check does: uv run python <the shared folder>/check_checkers.py --adopt
+
+KEPT WHOLE, REVIEWED 2026-11-01. --adopt is the one part that writes, and it reuses the
+report's own classification, so splitting it out would copy or import the classifier for no
+gain. Ask again at a second command that writes files, or at 1,300 live lines.
 """
 from __future__ import annotations
 

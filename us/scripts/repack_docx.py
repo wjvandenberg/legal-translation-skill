@@ -514,12 +514,47 @@ def _cross_check_language(declared, agreed):
               "could not rule: the two detectors do not agree on the original.")
 
 
+# A CHILD THAT DIED ON A PYTHON ERROR, told by the crash report the interpreter itself
+# writes -- apply's _run_validator's test, copied because no script imports another's
+# helpers (decision 6b). Register C29. Exit 3 is left to each check here: the delivered
+# check's 3 is VOID, not a truncated install.
+_CRASH_FILE_LINE = re.compile(r'[\s|]*File ".*", line \d+')
+_COLOUR_CODE = re.compile(chr(27) + r'\[[0-9;]*m')
+
+
+def _died_on_traceback(err):
+    for line in _COLOUR_CODE.sub('', err).splitlines():
+        if 'Traceback (most recent call last):' in line or _CRASH_FILE_LINE.match(line):
+            return True
+    return False
+
+
+def _refuse_crash(label, rc, err):
+    if rc != 0 and _died_on_traceback(err):
+        raise RuntimeError(
+            f"VALIDATOR CRASHED — NOT A GATE. {label} died on a Python error "
+            f"(exit {rc}, its traceback above), so its checks never ran. A broken "
+            f"install or a bug in the skill, not an input problem. Repack aborted; no "
+            f".docx written. SKILL.md rule 6 governs and rule 5 does not: STOP and "
+            f"re-install the skill from the .skill / .zip archive, then re-run repack; a "
+            f"crash that survives a re-install is a bug — report it with the traceback.")
+
+
 def _run_pre_repack_validator(label, args):
     """Auto-invoke a validator script as a subprocess before bundling.
-    Mandatory pre-repack gate — refuses to bundle on non-zero exit."""
+    Mandatory pre-repack gate — refuses to bundle on non-zero exit. The child writes
+    repack's own character set, escaping what it cannot hold, and its error stream is
+    kept, to tell a crash from a refusal, and written out unchanged when it ends (C29)."""
     import subprocess
-    print(f"\n{'=' * 60}\n[repack] auto-running {label}\n{'=' * 60}")
-    result = subprocess.run(args, capture_output=False)
+    print(f"\n{'=' * 60}\n[repack] auto-running {label}\n{'=' * 60}", flush=True)
+    enc = getattr(sys.stdout, 'encoding', None) or 'utf-8'
+    result = subprocess.run(args, stderr=subprocess.PIPE,
+                            env=dict(os.environ, PYTHONIOENCODING=f'{enc}:backslashreplace'))
+    err = result.stderr.decode(enc, errors='replace')
+    if err and sys.stderr is not None:
+        sys.stderr.write(err)
+        sys.stderr.flush()
+    _refuse_crash(label, result.returncode, err)
     if result.returncode != 0:
         raise RuntimeError(
             f"{label} returned exit code {result.returncode}. Repack "
@@ -672,8 +707,11 @@ def _delivered_gate(orig_docx, archive, paragraphs_json, scripts_dir):
         res = subprocess.run([sys.executable, os.path.join(scripts_dir, 'validate_apply.py'),
                               paragraphs_json, '--delivered', copy, '--original', orig_docx,
                               '--strict', '--report-json', report],
-                             capture_output=True, text=True, encoding='utf-8', errors='replace')
+                             capture_output=True, text=True, encoding='utf-8', errors='replace',
+                             # C29: the child writes the UTF-8 this decodes, whatever the console.
+                             env=dict(os.environ, PYTHONIOENCODING='utf-8:backslashreplace'))
         print((res.stdout or '') + (res.stderr or ''), end='')
+        _refuse_crash('validate_apply.py --delivered', res.returncode, res.stderr or '')
         rep, unreadable = None, False
         if os.path.isfile(report):
             # A REPORT WRITTEN BUT NOT READABLE IS NO REPORT -- this gate's own refusal below, never a
@@ -1297,6 +1335,12 @@ def repack(orig_docx, translated_doc_xml, output_docx,
     print(f"Repacked: {output_docx}")
 
 if __name__ == '__main__':
+    # C29: a character the console cannot show prints as an escape, never as a crash.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(errors='backslashreplace')
+        except (AttributeError, ValueError):
+            pass
     import argparse
     parser = argparse.ArgumentParser(
         description='Repack translated document.xml (and optional auxiliary XML parts) '

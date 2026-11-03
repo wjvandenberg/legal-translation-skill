@@ -1111,6 +1111,12 @@ def reorder(xml_path, output_path=None, dry_run=False, expected_defs=None):
     return True
 
 if __name__ == '__main__':
+    # C29: a character the console cannot show prints as an escape, never as a crash.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(errors='backslashreplace')
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(
         description=(
             "Reorder definitions alphabetically by the English defined term. "

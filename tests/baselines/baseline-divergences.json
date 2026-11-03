@@ -3,77 +3,77 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 60,
+ "count": 62,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/step13-4-variant-conversion",
-   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
-   "sha256_now": "f00e69f3a06621c6a50d8335266474ce53e77845e33684f2896d6538def39655"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "1fec4466661e362860a50de633959ac19fd3faeba2363a359279d6d5271b747e"
   },
   "uk/scripts/apply_translations_textmatch.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "9776378958cf5f92665ab60e64c4db1d7e35eea4970164114448f0caea811649"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "aa77c1b8171de863218ce7ea78da354c9a5a870d5ad70a6cb37e530c5b45acd6"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
-   "changed_by": "feature/signed-python-no-doc-moves",
-   "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
-   "sha256_now": "97a7fc549a8ad39a63c8c62adaf25e107352947dbc377d239a8b0ff1c9618fb6"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "c83cb1d04e5b6a3fd9952ee7331ad588f6f606b3478f719a4a3412ccd773ef3a"
   },
   "uk/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/step13-3-admission-envelope",
-   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
-   "sha256_now": "2ba725e153c5061dc82bb31203a819f5d57bba655b77a7e4a63751dca41e73d6"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "a1ea6d865f40d57228eaf873066385d00a5133c0b2f9cf59e51d530275bfd932"
   },
   "uk/scripts/post_process.py": {
-   "changed_by": "feature/branch10-slice4-page-break-detector",
-   "commit_subject": "Branch 10 slice 4 - the page-break pass inserts nothing, the principle every pass obeys, and the detections in the journal (B7)",
-   "sha256_now": "7a4064265a13db83d9bc9dd00319cc3df278ce5704f1ca52996d7fc1c9d6b8c1"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "479663ba97c1faa915c008d0b049cbdb4629c8be3b4a42ae458e909fe72dfb7d"
   },
   "uk/scripts/quality_check.py": {
-   "changed_by": "feature/step14-6-qc-and-or-kept-names",
-   "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
-   "sha256_now": "4c8f114186370d9aa6c6dc1a5b86434efa6a0c1fc5e37472adf3429fd9869e60"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "229f182933965da4d64dcd6cfb60c6bde64556d62cbbbfde8bce868a9290be2b"
   },
   "uk/scripts/repack_docx.py": {
-   "changed_by": "feature/step13-5-side-part-language",
-   "commit_subject": "Sub-step 13.5, R2: every part of the delivery says the variant's English, both trees, nothing else moved",
-   "sha256_now": "85ad27ca9c2b2695188dec8f2d5eeef8c7336c8d58c7119e5ccfcb7d5f3feda5"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "9d0cfa4a0d69ff5c24945de90052b2f8b42a9cb1d42d630da2f15793896b893d"
   },
   "uk/scripts/source_language_markers.py": {
-   "changed_by": "feature/step14-6-qc-and-or-kept-names",
-   "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
-   "sha256_now": "aa9d922ba28e98f7b2e632592f05d47444c939c2a60cea4f9be2ee601a4794c5"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "ec46fbc1312c741a2c704f48b55e0254815b311706fc35d121c66093bb33f574"
   },
   "uk/scripts/strip_noop_tracked_changes.py": {
-   "changed_by": "feature/branch11-slice4a",
-   "commit_subject": "Branch 11 slice 4a - strip_noop keeps a tracked-change wrapper whole while it holds anything besides runs, run properties and text (B10)",
-   "sha256_now": "0ce03126e0eec32a4acaa6bff7f77971c7871ce8de5ec921fa655faae01e235d"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "fc9574e357059462c6b8c6de50a7528dc95c5a5a1bebc92b8f09bfd39c494403"
   },
   "uk/scripts/translate_headers_footers.py": {
-   "changed_by": "fix/sibling-import-integrity",
-   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
-   "sha256_now": "b366072f07ae2eeca91db27d330cfc86350ff6c6a4d43f5afbac3048d4f6d5b8"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "7d3f6b0297040d88d066b5f4c042cf7806a1fa57f297b5b9967882d7d66b5427"
   },
   "uk/scripts/translate_numbering.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "dad3bc3b86656619f01449e43bfdfacd7e009be937297f6609f00bf4fbec7e0d"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "043bfc59f88175b316b112c8d62bde324b24d4d3b0824e4bd6a83df5186e75db"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "fix/sibling-import-integrity",
-   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
-   "sha256_now": "aa280a377a3434831934c38dc76a82baa5ad643c83da7452e948c4b6418fc03a"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "b3e232c66e4aaefc1285a9d52ecbc986e7bb74a0ae73444a43a7b730df10bb20"
   },
   "uk/scripts/validate_segment_shapes.py": {
-   "changed_by": "feature/step14-2-segment-shapes",
-   "commit_subject": "Step 14.2 - validate_segment_shapes stops reporting an alpha collision across a del/ins pair, which no reading can show and which Step 4 mandates (F10); 04-translate.md rule 14 says apply runs it --strict, so a finding stops apply (F5)",
-   "sha256_now": "eafb1eda65345c21ec741b86e2279e25d982f740863513220750fad6fdd9778b"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "8d86b419b857cf59d17cd6cf814df27435617020dfcb9f65a83b4bef00ffe12a"
   },
   "uk/scripts/verify_diligence.py": {
-   "changed_by": "feature/step14-8-diligence-empty-parts",
-   "commit_subject": "Step 14.8 - verify_diligence's skill Step 8 audit asks for a translated copy only of a part that carries text (C10)",
-   "sha256_now": "f4fced10af5c485eb1bd40bf1e1a82477f9addbbfe3eed90a9a014bb8084b3ea"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "b65f3f3791fe390c374378f0ac262b3c01229959a470a54a087e7764679c2ba7"
   },
   "uk/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/step13-4-variant-conversion",
@@ -86,9 +86,9 @@
    "sha256_now": "40971e01ee359200e65ad2927758bdbcd5d3556a85450de594bc8d038a6f478e"
   },
   "uk/skill-docs/05-apply.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "3a722f4f09f5520431a1b6c8604a435a80328394116fc8adae1ea2d523df160b"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "063c7ac035f11bb5c01d6034b7696b1bc4a3d9a1c97f8dbe7f8e89f25adfd1df"
   },
   "uk/skill-docs/06-postprocess-and-reorder.md": {
    "changed_by": "feature/branch10-slice4-page-break-detector",
@@ -106,74 +106,74 @@
    "sha256_now": "645a69597270b100319ee6f4d5e24f02850a34cb3c899c013b923a63ff8dd154"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/step13-4-variant-conversion",
-   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
-   "sha256_now": "2f19e93d28330348343f6e9ba09c5e686565b3df835d774376ce21bcb1d209dd"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "40cc86e951f8170378e8dd7f24d45af0a0810344b03bea40e8f087342ea71e47"
   },
   "us/scripts/apply_translations_textmatch.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "1e05e33381de92e458b9d240db7cafff77ad87139e24888ee3bece69c3680f50"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "ecd014e9a21aafc71911a5737c090e987ec825a139b0f4c61737cbb4c29dd90f"
   },
   "us/scripts/clean_conversion_artifacts.py": {
-   "changed_by": "feature/signed-python-no-doc-moves",
-   "commit_subject": "Signed Python and no document moves - repack and clean_conversion_artifacts build in memory and write once, and the project runs on the signed Python 3.14 (W5)",
-   "sha256_now": "97a7fc549a8ad39a63c8c62adaf25e107352947dbc377d239a8b0ff1c9618fb6"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "c83cb1d04e5b6a3fd9952ee7331ad588f6f606b3478f719a4a3412ccd773ef3a"
   },
   "us/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/step13-3-admission-envelope",
-   "commit_subject": "Sub-step 13.3, L5: the accepted input declared in skill Step 1b and refused at admission by extract_paragraphs.py, both trees",
-   "sha256_now": "f82dd1acc7d07607d0018f7c6a8f8053a142345b47e4edc875722f25b192225e"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "5bd94dd4927c30753afad5cb62b32b8eee0823b31c3c9db0ba021c2bc61d2b3e"
   },
   "us/scripts/post_process.py": {
-   "changed_by": "feature/branch10-slice4-page-break-detector",
-   "commit_subject": "Branch 10 slice 4 - the page-break pass inserts nothing, the principle every pass obeys, and the detections in the journal (B7)",
-   "sha256_now": "1211578c21f75a42ea81489889142b68d0932871202f4df6ab4f2f1040a011ba"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "b51e5e56fd19b04bef20d593d6f18c725cd5dad16cd936bc70dd4f93cb45eb77"
   },
   "us/scripts/quality_check.py": {
-   "changed_by": "feature/step14-6-qc-and-or-kept-names",
-   "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
-   "sha256_now": "b7b1fcc6303c2344fd30abd5f0c4542e3e0b0b7e42e82da6642e09a115d4f45f"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "a086e461c24af2024de4f30fd18c045b9e58c6cfdaa5a24c9d8122ce909a501d"
   },
   "us/scripts/repack_docx.py": {
-   "changed_by": "feature/step13-5-side-part-language",
-   "commit_subject": "Sub-step 13.5, R2: every part of the delivery says the variant's English, both trees, nothing else moved",
-   "sha256_now": "c02cc1d98213540989a607baf7375b4dab2cce42c580293513433613f7ec7bac"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "da787d51efa20bf2751ee8d290a7ff3d92c78565f31b825a9f2f38a500b9a8f4"
   },
   "us/scripts/source_language_markers.py": {
-   "changed_by": "feature/step14-6-qc-and-or-kept-names",
-   "commit_subject": "Step 14.6 - quality_check reads `; and/or` as a list connective (G3) and no name the lexicon keeps as a remnant (G13)",
-   "sha256_now": "803c37f1a2df1a7dd51917c39c762e0e02f1cc83a53b7f12ae126ba1cfa8a81d"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "ff9ba308d28dc73ae85e792ada762e12442e20691a26d1107915394fca327d2a"
   },
   "us/scripts/strip_noop_tracked_changes.py": {
-   "changed_by": "feature/branch11-slice4a",
-   "commit_subject": "Branch 11 slice 4a - strip_noop keeps a tracked-change wrapper whole while it holds anything besides runs, run properties and text (B10)",
-   "sha256_now": "5f18c14d5a8c1191efb310bdea9b933f425e4cbc2b5da5106917f9f2f9822ab3"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "58277b2f8aed45d49fc7466a38b4d9d3f9898e4751c3cc653883b146d1184072"
   },
   "us/scripts/translate_headers_footers.py": {
-   "changed_by": "fix/sibling-import-integrity",
-   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
-   "sha256_now": "606bdc21fc99ed36dbad21d08af7a4f7904bb004606c5cb25ea326824ba47163"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "47d0467426c5656b2d7157fd82fbbf3b0554415493d160114f3b7eb0801c3979"
   },
   "us/scripts/translate_numbering.py": {
-   "changed_by": "fix/language-module-integrity",
-   "commit_subject": "A missing or half-cut language module exits as FILE INTEGRITY",
-   "sha256_now": "dad3bc3b86656619f01449e43bfdfacd7e009be937297f6609f00bf4fbec7e0d"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "043bfc59f88175b316b112c8d62bde324b24d4d3b0824e4bd6a83df5186e75db"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "fix/sibling-import-integrity",
-   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
-   "sha256_now": "605254e29dc9277b262b407282e7f251e0c92b13722d86d22c25c12f1437376f"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "1624ce3e9e8d360b6a1f218d3a382498de8fe2f260bf8f5b563399105252b37f"
   },
   "us/scripts/validate_segment_shapes.py": {
-   "changed_by": "feature/step14-2-segment-shapes",
-   "commit_subject": "Step 14.2 - validate_segment_shapes stops reporting an alpha collision across a del/ins pair, which no reading can show and which Step 4 mandates (F10); 04-translate.md rule 14 says apply runs it --strict, so a finding stops apply (F5)",
-   "sha256_now": "4284ec0d3a251ececfc2d81a01512b2b1d4438b4070144c7a94bbecfe3ec1ebb"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "ad407326d25b15ca4d0c29fbc38ab373ee1c0250127450b51560f484729dac68"
   },
   "us/scripts/verify_diligence.py": {
-   "changed_by": "feature/step14-8-diligence-empty-parts",
-   "commit_subject": "Step 14.8 - verify_diligence's skill Step 8 audit asks for a translated copy only of a part that carries text (C10)",
-   "sha256_now": "e7d75ed6e073da90d0f582c5770864b4fac4956d02df27ea1952a433f76fc599"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "ca21036a388fce7874d935297aa1d01c24a780f83a22339846ed653d4b66cb6b"
   },
   "us/skill-docs/01-setup-and-extract.md": {
    "changed_by": "feature/step13-4-variant-conversion",
@@ -186,9 +186,9 @@
    "sha256_now": "e98e8b023d74ec63b88ed87434210451d66d39d6c5b1820bc0a057762a620226"
   },
   "us/skill-docs/05-apply.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "3a722f4f09f5520431a1b6c8604a435a80328394116fc8adae1ea2d523df160b"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "063c7ac035f11bb5c01d6034b7696b1bc4a3d9a1c97f8dbe7f8e89f25adfd1df"
   },
   "us/skill-docs/06-postprocess-and-reorder.md": {
    "changed_by": "feature/branch10-slice4-page-break-detector",
@@ -206,24 +206,24 @@
    "sha256_now": "7dbac7c8d878427f9e8aed5a0935eabe44652ad4e05b41a945e6b892d603d0e1"
   },
   "uk/scripts/validate_en_runs.py": {
-   "changed_by": "fix/sibling-import-integrity",
-   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
-   "sha256_now": "82306e41b551059e76d0bc7c0680c372c027673e81cd2c4526408704b0888996"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "187ecbb9892ccd78cf85309911d74d0697c40a234d4b9fbf934493a787ad36bd"
   },
   "us/scripts/validate_en_runs.py": {
-   "changed_by": "fix/sibling-import-integrity",
-   "commit_subject": "A cut-short sibling exits as FILE INTEGRITY; a missing one stays tolerated where designed",
-   "sha256_now": "82306e41b551059e76d0bc7c0680c372c027673e81cd2c4526408704b0888996"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "187ecbb9892ccd78cf85309911d74d0697c40a234d4b9fbf934493a787ad36bd"
   },
   "uk/scripts/coalesce_fragmented_tcs.py": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
-   "sha256_now": "a26044f1fbf2df0c89ab4af4af6c844c97fa2792b2ea130a62e42628704aac74"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "3309c0c0b76aa18d5ddf36445aff7cdd57e7265651e8ece89cc7304f41976617"
   },
   "uk/scripts/validate_translations.py": {
-   "changed_by": "feature/step14-5-g7-every-language",
-   "commit_subject": "Step 14.5 - validate_translations exempts a defined term in its marker and a title beside its title word in every supported language, and reads the low opening quote (G7)",
-   "sha256_now": "7301436e09551d63a8ef8b50a7a13460356786c45b2a5e3b14a771920e6e0db5"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "a71a8cdeb15d1860ed5e2b99af6894eeab9e663dc8c7624e9c9c8a8ff89ddeb4"
   },
   "uk/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/step13-4-variant-conversion",
@@ -236,14 +236,14 @@
    "sha256_now": "52dad1e3018025bcee4e0ccd4782204df49a99370b698b224c797cc63c7d0e85"
   },
   "us/scripts/coalesce_fragmented_tcs.py": {
-   "changed_by": "feature/branch11-slice4b",
-   "commit_subject": "Branch 11 slice 4b - C14 and C30: the scaffold counts a glued stem, CJK junctions excepted, and validate_translations refuses a leftover placeholder; the corpus acceptance and the record",
-   "sha256_now": "b1e10bf5b6cf4ebd990ada6df0cc082876be8af72df64221373de342a619ab94"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "36f9cef27d5f0af335fc1579845e6ff69e1a1ee17e28457483aa90b12fdd2ddd"
   },
   "us/scripts/validate_translations.py": {
-   "changed_by": "feature/step14-5-g7-every-language",
-   "commit_subject": "Step 14.5 - validate_translations exempts a defined term in its marker and a title beside its title word in every supported language, and reads the low opening quote (G7)",
-   "sha256_now": "7301436e09551d63a8ef8b50a7a13460356786c45b2a5e3b14a771920e6e0db5"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "a71a8cdeb15d1860ed5e2b99af6894eeab9e663dc8c7624e9c9c8a8ff89ddeb4"
   },
   "us/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/step13-4-variant-conversion",
@@ -256,14 +256,14 @@
    "sha256_now": "a4b9d39024a7941325d634a93bb3089eeaa4877b54805d651bf6a3a62967f283"
   },
   "uk/scripts/translate_comments.py": {
-   "changed_by": "feature/branch11-slice4c",
-   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
-   "sha256_now": "99522376e7f485158a6120d05306839aea261da4696bbcb259b503057e21a457"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "c575fffa63c18d547da616db19ac60b6156486c531ac08a82e5c930d0b58ee4f"
   },
   "us/scripts/translate_comments.py": {
-   "changed_by": "feature/branch11-slice4c",
-   "commit_subject": "Branch 11 slice 4c - a comment of several paragraphs is written one piece per text paragraph and a mismatch refused, --list and the reader show Word's text (A23, F47)",
-   "sha256_now": "e7097b54478ed167c87565d264d61f2e3148a605ec962ee6ddb0dd0a2defada9"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "e544a18fd6d3d50bb1b0ccacbb1c671da11220761fa77831faadaa48aae9f4f6"
   },
   "uk/sub-lexicons/italian-finance-banking.md": {
    "changed_by": "fix/lexicon-table-widths",
@@ -286,24 +286,34 @@
    "sha256_now": "e8dd91e2d4b4dd8dfd64efd26ae4b9aaebe365d191c92ac6dff7bf0eb525f344"
   },
   "uk/scripts/lexicon_compliance.py": {
-   "changed_by": "feature/step14-4-lexicon-article",
-   "commit_subject": "Step 14.4 - lexicon_compliance's Article N warning is quiet on a citation of legislation, a decree with no article before it (G2) and a paragraph or a list before the code (G8), and warns on an internal reference the bare of-the hid (G14)",
-   "sha256_now": "a62dc81ea14bce9180d9db72d03afae0bf3788733972396191cdf4dda665ff0e"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "8f89edb12c9d7c55923301d220c57755886d1adcf704a78b443768216e7a8dc7"
   },
   "us/scripts/lexicon_compliance.py": {
-   "changed_by": "feature/step14-4-lexicon-article",
-   "commit_subject": "Step 14.4 - lexicon_compliance's Article N warning is quiet on a citation of legislation, a decree with no article before it (G2) and a paragraph or a list before the code (G8), and warns on an internal reference the bare of-the hid (G14)",
-   "sha256_now": "27029ebf089b757e97120016801cb47efac80345a8b8078184c5ce14a118350c"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "d86f85704668be8491553433f8e73aaa50100ffedaffe53de708afed29b84d02"
   },
   "uk/scripts/validate_reject_all.py": {
-   "changed_by": "feature/step14-7-reject-all-dotted-forms",
-   "commit_subject": "Step 14.7 - validate_reject_all's missing-space rule skips a dot inside a dotted form such as B.V. or S.p.A. (G4)",
-   "sha256_now": "82b66b7d70e5f693cd6a689f8ab845cb5490f3d737e5c985944928ebcfd5211b"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "a4f89fd02359303772e7d5ad902e0c223c5ded0de5b029141139bc4335864d1c"
   },
   "us/scripts/validate_reject_all.py": {
-   "changed_by": "feature/step14-7-reject-all-dotted-forms",
-   "commit_subject": "Step 14.7 - validate_reject_all's missing-space rule skips a dot inside a dotted form such as B.V. or S.p.A. (G4)",
-   "sha256_now": "f7e62e13924f8ca9f232456d147a79e80238fae7f8463eb15af18d38afca8307"
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "698f6b47929884980ab5771605b90a1a1afefd8f7664888ca306fd7d3c3decc7"
+  },
+  "uk/scripts/reorder_definitions.py": {
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "9170b819d93dd6f176c97188b67a386700b2316401ba6937274d9f2c93a7d318"
+  },
+  "us/scripts/reorder_definitions.py": {
+   "changed_by": "feature/step14-9-1-validator-console-crash",
+   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
+   "sha256_now": "a8525d4fd7519c895c5a824fb55de659b3cc6c3425d603316c57af67180a483e"
   }
  }
 }
