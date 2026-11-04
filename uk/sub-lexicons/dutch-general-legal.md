@@ -247,4 +247,4 @@ Belgian Civil Code (Burgerlijk Wetboek / Code civil) and Gerechtelijk Wetboek.
 - **"voor zover vereist" / "voor zoveel nodig"**: Common Dutch boilerplate; translate as "to the extent necessary" or "to the extent required" — not "insofar as needed" (too literal).
 - **"zonder voorafgaande ingebrekestelling"**: "Without prior notice of default" — a specific legal concept, not generic notice. Preserve in translation; the ingebrekestelling requirement in Dutch law is often waived by contract and the clause should reflect that.
 - **Lower-case conventions**: Dutch drafting keeps most nouns lowercase (unlike German). Defined terms follow English convention (Capitalised) in Dutch-law English-language contracts.
-- **Dates**: Dutch format is DD-MM-YYYY or "15 april 2026". Convert to English convention (15 April 2026 or April 15, 2026) per project style.
+- **Dates**: Dutch format is DD-MM-YYYY or "15 april 2026". Render them by the date rule in `references/general-legal.md`.

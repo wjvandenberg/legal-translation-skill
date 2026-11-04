@@ -2512,3 +2512,65 @@ The old command, run as the skill gave it, without `--headless`, opened LibreOff
 about a minute each of the two times it ran; he asked about it and was told, and its run is now opt-in.
 `/code-review` at high found four, all fixed. The machine crashed during TEST at 11 of 25; nothing was left
 half-restored, and TEST ran whole again.
+
+## 2026-11-04 (1) — Wouter: the chain to run until step 14 is closed, without questions, the next sessions opened as nested sessions; the conductor's two readings
+
+**WOUTER, IN HIS WORDS.** On the evening of 2026-11-03, in 14.9.2's session, he stopped the chain: *"Stop, we'll do
+this tomorrow."* On 2026-11-04, in the same session: *"Why do you never give me the prompt to copy? It is
+frustrating."*, then *"With the same instruction: please continue until you reach planning of branch 15 and branch 14
+is closed. Without questions, until the end"* and *"(and open new nested sessions yourself)"*.
+
+**THE CONDUCTOR'S TWO READINGS — each the conductor's, not his ruling:** **(i) the chain STOPS when step 14 is
+closed.** A step's plan is agreed with Wouter, so no session in this chain plans or builds step 15: the session that
+closes step 14 writes as its next prompt the one for step 15's planning session, in STANDARD MODE, its questions to
+him at its opening, and the conductor opens nothing after it. This narrows 2026-11-03 (1), which carried the chain
+into step 15. **(ii) The 14.9.2 session is the conductor and opens each next session,** because the app refuses a
+start in a turn begun by another session's message or by a background notification, which is every turn a nested
+session has.
+
+**SO, UNTIL STEP 14 IS CLOSED:** as 2026-11-03 (1), nothing is put to him and each session's choices are recorded in
+`temp/s1102_questions_answered.md`, in this log and in its last message; and every closing message prints the next
+prompt in one fence, never a path alone.
+
+**AND AT ABOUT 12:40 THE SAME DAY, IN 14.9.3's SESSION, IN HIS WORDS:** *"Don't bother me for the next 2.5 hours.
+Following recommendations yourself. Start a new session after closing here directly as a nested session, and
+continue until 14:45h without me."* and *"No questions, nothing"*. So 14.9.3's session opens 14.9.4's itself, as a
+nested session, on his own word in it, and the chain runs without him until 14:45 that day.
+
+## 2026-11-04 (2) — sub-step 14.9.3, unattended: skill Step 4's rules, F2, F3, F14, F18, F32, F4 with F8; thirteen choices the session's own
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS IN 2026-11-04 (1)** — each choice below is THE SESSION'S, taken on its own
+recommendation and carried here for him to confirm or overturn; none is his ruling.
+
+**(1) THE ONE DATE RULE LIVES IN `references/general-legal.md`,** read in full at Step 3 in every mode, before any
+translating, and the file SKILL.md already says wins on English conventions; SKILL.md's bullet becomes a pointer and
+SKILL.md the shorter, over SKILL.md itself, already past the only observed install-truncation size, and over Step 4's
+rule 7a, read only after the Step 3 decision D04 got wrong. **(2) NO EXCEPTION FOR A DATE INSIDE A TRACKED CHANGE,**
+the row's proposed fix: the change's words are translated anyway, a source-ordered date inside English text is
+inconsistent, the skill cannot tell another party's change from any other, and the variant-conversion mode already
+converts date conventions; the rule says so in terms. **(3) A DATE IN FIGURES IS WRITTEN IN WORDS,** a numeric code
+in a registration number or a table cell kept, by rule 7a's "every date in the English output", its placeholder
+rule and the Dutch line, over SKILL.md's old "leave alone". **(4) F8 CLOSES WITH F4,** though section 9.3 defers it
+to the reconciliation: the same block, its defect gone with F4's rewrite, and a row left open over a fixed defect
+misdirects whoever reads it. **(5) THE CLASS IS FIXED, DECLARED:** Rule 2, contradicted by the same example as F3;
+the US Japanese sub-lexicon's day-first conversion examples and placeholder; the Dutch one's "per project style".
+**(6) TWO FINDINGS ARE RECORDED, NOT FIXED OR FILED:** the appendix's "a literal space alone is stripped" is stale
+on invented one-run segments, and a page break between two text runs of one paragraph is lost at apply; the first
+needs proof on the frozen corpus's multi-run segments and touches `.claude/rules/ooxml.md`, the second is code, so
+both go to the loose ends. **(7) F32 IS FIXED IN THE DOCUMENT ALONE:** measured, the validator already prints its
+own line for the mid-document case, so the row's "better" option, a code change, buys nothing. **(8) F18's SENTENCE
+STATES THE `\t` REMEDY,** the truth of what apply does with a tab, which is half of F31; F31 stays step 19's.
+**(9) THE APPENDIX IS RENAMED "Seams without whitespace":** its old title told a Latin operator to skip it, and no
+file cites it but the register, quoting it as evidence. **(10) THE SIZE IS ACCEPTED AFTER ONE TIGHTENING PASS:**
+what every document reads rose 1,949 bytes in `uk/` and 1,338 in `us/` with the review's fixes, each addition required by a row,
+SKILL.md 56 bytes smaller; older prose was not cut to pay for it, the nearest candidate being 14.9.4's to proofread. **(11) `/code-review` AT HIGH FOUND SEVEN; FIVE ARE FIXED:** a lone change before punctuation carries a ZWSP alone;
+the general rule every tracked-change operator reads now carries the lone change's space, so a Latin source that
+skips the appendix still meets it; the pointer and the box state one skip test; the appendix body and the gate's
+label in 04b and SKILL.md's table no longer scope the seam by script. The mid-paragraph page break is skipped, a
+code defect for the loose ends, and Rule 1's opening needs no change, its header naming the exception. **(12) AN INSTRUMENT IS FIXED IN THE SAME CHANGE:**
+`stepb_metacheck` found that `stepb_audit`'s cited-figure check passed its 694 -> 690 mutation, the plan now citing
+the commit `2fb6940`, which holds 694; a cited figure now counts only where no digit touches it, the audit's red rows
+identical before and after, the metacheck 15 of 15, over rewording the plan around the hash. **(13) THE CENSUS'S HOUSE-COPY LIST LOSES
+`auto_mode_headless.py` IN A SECOND COMMIT:** the house retired it mid-session, failing the first full run on
+`vocabulary_census --selftest` on `main` as here; the project's copy is kept until an opening adopts the retirement,
+and `auto_mode.py` and `auto_mode_guard.py` v5, released the same afternoon, are adopted there too.

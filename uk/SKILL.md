@@ -345,9 +345,8 @@ than interrupting the translation to ask.
 
 - **Spelling**: organise/organize, authorise/authorize, favour/favor, defence/defense,
   fulfil/fulfill, programme/program, judgement/judgment (UK legal), analyse/analyze.
-- **Date format**: "15 April 2026" (UK) vs "April 15, 2026" (US). Apply consistently in dates
-  introduced by the translation; leave original-language dates in source documents alone
-  beyond translating the month name.
+- **Date format**: each variant's order — the date rule in `references/general-legal.md`,
+  read in full at Step 3, is the only statement of it.
 - **Quotation conventions**: single quotes for primary quotations with double inside, commas
   and full stops outside the closing quote when not part of the quoted material (UK); double
   quotes with punctuation inside the closing quote (US). Note: legal drafting practice
@@ -389,7 +388,7 @@ as English rather than against the source language's dictionary.
 | `extract_paragraphs.py` | Extract paragraphs with formatting metadata to JSON (incl. TC deleted text) |
 | `coalesce_fragmented_tcs.py` | **MANDATORY if source has TCs** — Detect character-level TC fragments (e.g. Spanish "Duodécima" → "Decimotercera" edited letter by letter) and scaffold `en_segments` with placeholders on the first ins/del and empty strings on intermediate runs; leaves `tc_segments` untouched |
 | `validate_translations.py` | Check translation completeness (character ratios). **Per-batch invocation in Step 4 is manual; the final pre-apply pass auto-runs from inside `apply_translations_textmatch.py`.** |
-| `validate_segment_shapes.py` | **MANDATORY if source has TCs** — Pre-apply shape linter: scans `en_segments` pair-wise for XML-boundary risk shapes (article collision, alpha-collision across a boundary with no whitespace — non-Latin script gotcha, digit-at-TC-boundary, double space straddling a boundary, bare-article TC segment, internal camelCase collision). **Auto-runs from `apply_translations_textmatch.py` on TC documents.** |
+| `validate_segment_shapes.py` | **MANDATORY if source has TCs** — Pre-apply shape linter: scans `en_segments` pair-wise for XML-boundary risk shapes (article collision, alpha-collision across a boundary with no whitespace — a seam without whitespace, in any script, digit-at-TC-boundary, double space straddling a boundary, bare-article TC segment, internal camelCase collision). **Auto-runs from `apply_translations_textmatch.py` on TC documents.** |
 | `validate_reject_all.py` | **MANDATORY if source has TCs** — Reconstruct accept-all and reject-all views from `en_segments` and scan for readability defects (double article, repeated word, stranded preposition, run-together words, double space, empty brackets, forbidden collocations). **Auto-runs from `apply_translations_textmatch.py` on TC documents.** |
 | `lexicon_compliance.py` | **MANDATORY (pre-apply AND pre-repack)** — Scan JSON or document.xml for calques and hard-rule violations drawn from lexicon Avoid columns. Pre-apply run is manual (Step 4d); pre-repack run **auto-fires from inside `repack_docx.py`** before bundling. Reads the source language declared at Step 1c; a language the skill does not support runs every language's rules, none written for it, and says NOT SUPPORTED, never PASSED. |
 | `source_language_markers.py` | **MANDATORY at Step 1c** — `--declare <language> <workdir>` writes `source_language.json`, the one source language every language-dependent check reads; also holds the remnant marker lists and their verdict. |

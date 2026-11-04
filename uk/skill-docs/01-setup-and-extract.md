@@ -122,11 +122,16 @@ The extraction script MUST collect text from ALL `w:t` children of each run (not
 the first). Using `r.find('{W}t')` silently drops all text after the first `w:t` —
 a data-loss bug that can leave entire commercial clauses (payment milestones, finance
 party consent rights) invisible to the translator. The patched script iterates over
-all child elements of each `w:r`, collecting text from every `w:t` while skipping
-`w:tab` and `w:br` elements (which are preserved in the XML during the apply step).
-Do NOT insert tab or newline characters for `w:tab`/`w:br` in the extracted text —
-the apply script's `get_paragraph_text()` joins `w:t` texts without separators, so
-inserting separators would cause text-match failures.
+all child elements of each `w:r`, collecting text from every `w:t`.
+**A tab or a line break: what `text` shows, and what you write in `en`.** A plain
+line break (`<w:br/>`) shows in `text` as `\n`: write `\n` in `en` where the
+English line breaks; apply turns it back into a break, and without it the lines run
+together. A tab (`<w:tab/>`) shows as nothing, a clause number running into its
+first word (`11.3.1Il 10%…`): write `\t` in `en` where the tab stood; apply turns
+it back into a tab, and without it the tab is lost.
+A page break shows as nothing too: write nothing for it. The offsets in `runs` count
+`w:t` text alone, never a `\n`; your `en_runs` offsets count every character of
+`en`, `\n` and `\t` included.
 
 This creates a JSON array where each entry contains:
 - `idx` — paragraph index at time of extraction

@@ -193,12 +193,18 @@ When translating into English legal register from any source language, apply the
 - **Word order in enumerations**: Ensure natural English order ("all existing and future
   receivables", not "receivables existing and future").
 
-## Calendar Conventions — MANDATORY (all source languages)
+## Dates and Calendar Conventions — MANDATORY (all source languages)
 
-All dates in the English translation must be in full Gregorian (Western) form:
-`29 November 2017`, `1 April 2023`, `15 March 1989`. Many legal systems draft
-dates in non-Gregorian calendars; convert every such date to its Gregorian
-equivalent before it appears in the English output.
+**The date rule, stated here alone; SKILL.md points here.** Every date in the
+English takes the variant's order, however the source orders it, in a tracked
+change as anywhere else: `15 April 2026` (UK), `April 15, 2026` (US). A date the
+source writes in figures is written in words, a bracketed placeholder within its
+brackets (`[15.1.2021]` → `[15 January 2021]` / `[January 15, 2021]`); a numeric
+date code in a registration number or a numeric table cell stays as it stands.
+
+Every date must also be Gregorian (Western): many legal systems draft dates in
+non-Gregorian calendars; convert every such date to its Gregorian equivalent
+before it appears in the English output.
 
 Calendars commonly encountered in legal documents:
 

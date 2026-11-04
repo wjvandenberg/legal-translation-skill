@@ -446,7 +446,8 @@ RIGHT (adjusted)
 
 **General rule — articles, prepositions, and any word whose grammaticality
 depends on whether the neighbouring tracked-change is accepted or rejected
-must live INSIDE the del or ins, not in the regular span adjacent to it.**
+must live INSIDE the del or ins, not in the regular span adjacent to it — and
+so does the space a lone ins or del needs on one side.**
 The same rule applies to defined-term phrase boundaries: if two consecutive
 noun phrases come from different segments, at least one of them must carry
 its own leading article/comma/whitespace so that reinstating the deleted
@@ -467,15 +468,12 @@ and a list of forbidden collocations. Fix every hit by rewriting the
 offending segments so the article/preposition lives on the correct side of
 the TC boundary, then re-run. A clean run is required before apply.
 
-**Non-Latin script sources have additional segment-shape rules.** If the
-source language uses a non-Latin script — Chinese, Japanese, Korean, Thai,
-Lao, Khmer, Cyrillic (Russian, Bulgarian, Serbian, Ukrainian, etc.), Greek,
-Arabic, Hebrew, Devanagari, or any other — read the **Non-Latin script
-sources only** appendix at the end of Step 4 *before* writing `en_segments`.
-Latin-script sources (Italian, Dutch, Spanish, French, German, Polish,
-Hungarian, Finnish, Portuguese, Czech, Romanian, Vietnamese, Danish,
-Swedish, Norwegian, English, etc.) inherit inter-segment whitespace from
-the source and can skip that appendix entirely.
+**A seam without whitespace has additional segment-shape rules.** Read the
+**Seams without whitespace** appendix at the end of Step 4 *before* writing
+`en_segments` if any tracked-change seam in the source lacks whitespace, in
+any script, or the source is in a non-Latin script; its opening box says how
+to tell. A Latin-script source whose every seam has whitespace on one side can
+skip it.
 
 Run `validate_segment_shapes.py` on the filled `paragraphs.json` to
 mechanically catch segment-shape violations before
@@ -714,16 +712,18 @@ through, `validate_apply.py --report-clusters --apply-zwsp` re-injects
 ZWSPs into cluster-flagged en strings as a belt-and-suspenders
 fallback — rarely needed.
 
-#### Sub-appendix: Non-Latin script sources only — for TC docs with non-Latin source script
+#### Sub-appendix: Seams without whitespace — for TC docs, in any script
 
-> **SKIP if source is Latin-script** (Italian, Dutch, Spanish, French, German, Polish,
-> Hungarian, Finnish, Portuguese, Czech, Romanian, Vietnamese, Danish, Swedish,
-> Norwegian, English, etc.). Latin-script sources carry inter-word whitespace that
-> survives extract and apply, so segments separate cleanly without the rules below.
+> **READ if any tracked-change seam lacks whitespace in the source** — where a
+> regular segment meets an ins or del, neither side has a space at the join. Every
+> seam does in a source written without spaces between words (Chinese, Japanese,
+> Korean, Thai, Lao, Khmer); in ANY script a seam does
+> where a change begins or ends inside a word: an Italian amount spelled as one
+> word, a German compound, a Hungarian suffix. **READ too for a Cyrillic (Russian,
+> Bulgarian, Serbian, Ukrainian, etc.), Greek, Arabic, Hebrew or Devanagari source.**
 >
-> **READ if source is non-Latin script** — Chinese, Japanese, Korean, Thai, Lao, Khmer,
-> Cyrillic (Russian, Bulgarian, Serbian, Ukrainian, etc.), Greek, Arabic, Hebrew,
-> Devanagari, etc.
+> **SKIP only if the source is Latin-script and every seam has whitespace on one
+> side** — then write the English's spaces where the source has them.
 
 **TROUBLESHOOTING — read this first if `validate_segment_shapes.py` passes but
 apply produces glued text at TC seams.** This is the single most common failure
@@ -751,7 +751,8 @@ TC paragraph; do not iterate through whitespace candidates.** The path of
 trial-and-error costs ~6–8 tool calls per failure; reading Rule 1 once
 costs none.
 
-Non-Latin scripts either write without inter-word spaces at all (CJK, Thai, Lao, Khmer)
+A seam without whitespace gets none from the source, in any script; and
+non-Latin scripts either write without inter-word spaces at all (CJK, Thai, Lao, Khmer)
 or carry character classes that `fix_spacing` handles less reliably (Cyrillic, Greek,
 Arabic, Hebrew, Devanagari). Either way, the English translator must **manufacture**
 the whitespace English needs at segment boundaries. If `en_segments` are
@@ -761,7 +762,7 @@ collides two words.
 
 Four rules, applied to every `en_segments` array:
 
-1. **Bookend every regular↔ins/del seam with the visible-space + ZWSP hybrid (this is the default — read carefully, both failure modes below have been observed in production).** At the
+1. **Bookend every regular↔ins/del seam with the visible-space + ZWSP hybrid — a LONE ins or del on one side only, as below (this is the default — read carefully, both failure modes below have been observed in production).** At the
    *trailing* edge of a regular segment that abuts an ins/del, append `" ​"`
    (one literal space, then U+200B ZWSP). At the *leading* edge of a regular
    segment that follows an ins/del, prepend `"​ "` (ZWSP, then one literal
@@ -802,6 +803,14 @@ Four rules, applied to every `en_segments` array:
    revisions. The recipe in one line: **regular sides
    carry visible-space + ZWSP; ins↔ins or ins↔del seams carry ZWSP only.**
 
+   **A LONE ins or del — no deletion or insertion beside it — is the exception,
+   as in the second example below.** In the view that drops it the two bookends
+   would meet as a double space, unseen by `validate_reject_all.py` (a ZWSP is not
+   whitespace). So bookend only the regular segment BEFORE it, put the space after
+   it inside the change (`"Investment ​"`), and a ZWSP alone on the regular after
+   it (`"​Insurance"`): `the Investment Insurance` with it, `the Insurance` without.
+   Where the regular after it opens with punctuation, the change carries a ZWSP alone.
+
    Worked example (verified on a Japanese sponsor-guarantee MOU re-run,
    the case that produced "of500262.5MW on" before the hybrid was applied):
    ```json
@@ -811,11 +820,11 @@ Four rules, applied to every `en_segments` array:
    {"type": "regular", "en": "​ MW on the Commercial Operation Date"}
    ```
 
-   Worked example for alpha ins/del abutting alpha regular:
+   Worked example for a lone alpha ins between alpha regulars:
    ```json
    {"type": "regular", "en": "the ​"},
-   {"type": "ins",     "en": "​Investment​"},
-   {"type": "regular", "en": "​ Insurance"}
+   {"type": "ins",     "en": "Investment ​"},
+   {"type": "regular", "en": "​Insurance"}
    ```
 
    Pure ZWSP bookend (`"​"` only, no visible space) is acceptable
@@ -824,14 +833,17 @@ Four rules, applied to every `en_segments` array:
    text has a real visual separator from the punctuation itself. For
    alpha-alpha or alpha-digit boundaries (the common case in legal English
    prose), use the hybrid above.
-2. **Never end a segment with a digit.** A digit on a TC boundary plus an alpha on
-   the other side produces `"2025the"` / `"Clause5"`. Keep digits in the middle of
-   their segment.
+2. **A digit at a seam takes Rule 1's bookends like a letter.** Unseparated, a digit
+   and a letter across a seam read `"2025the"` / `"Clause5"`; Rule 1's first example
+   ends its ins and del on digits, and its bookends keep them apart.
 3. **Articles live inside the ins/del that contains the noun.** Same rule as the
    "Reject-all grammar" subsection earlier; bites harder here without a whitespace
    buffer.
-4. **Never end a regular segment with a preposition.** Stranded prepositions on
-   reject-all. Keep preposition + object in the same segment.
+4. **A preposition whose object is a lone ins or del goes inside it, with its
+   object.** Left at the end of the regular segment it strands in the view that
+   drops the change (`the provisions of apply`). Before a paired change, where
+   each view keeps an object, it may end the regular segment, as in Rule 1's first
+   example.
 
 `validate_segment_shapes.py` (universal, already runs on every TC document) catches
 violations mechanically. These rules are the prompt-side companion that keep the linter

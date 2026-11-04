@@ -153,16 +153,16 @@ output, not even parenthetically.**
 
 | Source | Output |
 |---|---|
-| `平成29年11月29日` | `29 November 2017` |
-| `令和5年4月1日` | `1 April 2023` |
-| `昭和64年1月7日` | `7 January 1989` (Showa 64 = Heisei 1 = 1989) |
+| `平成29年11月29日` | `November 29, 2017` |
+| `令和5年4月1日` | `April 1, 2023` |
+| `昭和64年1月7日` | `January 7, 1989` (Showa 64 = Heisei 1 = 1989) |
 | `平成元年` | `1989` (`元` = first year of era) |
 | `令和10年` | `2028` (Gregorian = first-year + (era year − 1)) |
 
 ### Placeholders (unfilled date cells)
 
 Drafts often contain blanks like `令和〇年〇月〇日` for a date to be filled
-in later. Render the whole span as `[__] [Month] 20__` or
+in later. Render the whole span as `[Month] [__], 20__` or
 `[date to be inserted]` — do NOT translate the era segment as `Reiwa` and
 do NOT apply the placeholder-zero rule to the year cell in
 isolation. The era + placeholder-digit combination is a single semantic
