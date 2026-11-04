@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-03 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.2, skill Steps 1 and 11, F11, F9, F21 and F20, both trees: the `.doc` conversion command proved on a synthetic `.doc`, the closing checklists made to ask only what is true at the step they close, and Step 11b's tracked-change line; measured before and after, then the cycle gate, the one full run and the merge; no questions to Wouter *(Wouter, 2026-11-03: continue with everything)* · **so that an operator who follows skill Steps 1 and 11 to the letter is never told to do the wrong thing** *(written immediately after the tag `rollback-2026-11-03b-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-04 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.3, skill Step 4's rules, F2, F3, F14, F18, F32 and F4, both trees: the tracked-change bookending rule told apart for an unpaired insertion or deletion, its appendix scoped by whether a seam lacks whitespace, Step 2's line-break sentence and Step 4b's WARN made to say what the scripts do, measured by running them on an invented document, and the date rule stated once; counted before and after, then the cycle gate, the one full run and the merge; no questions to Wouter *(Wouter, 2026-11-04: continue until step 14 is closed)* · **so that an operator who follows skill Step 4 to the letter is never told to do the wrong thing** *(written immediately after the tag `rollback-2026-11-04-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -2540,6 +2540,49 @@ the edited script, and the full run once, before the push.
 > machine crashed at 11 of 25, nothing left half-restored; the one full run on `3f394b2`, OVERALL PASS, 109 rows;
 > F11, F9, F21 and F20 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain;
 > 2026-11-03, unattended)*.
+> **14.9.3 — ITS OWN WRITTEN PLAN, 2026-11-04, before any edit, on `feature/step14-9-3-step-4-rules`.** F2, F3, F14,
+> F18, F32 and F4, by 14.9's block above; **no question put to Wouter, each choice the recommended option, recorded**
+> *(Wouter, 2026-11-04: continue until step 14 is closed; `DECISIONS-LOG.md`, 2026-11-04 (2))*. **Measured first, by
+> running the scripts on invented documents, `main` at `2fb6940`, both trees alike** (`temp/s1104_f2_probe.py`,
+> `temp/s1104_f18_probe.py`, `temp/s1104_f32_probe.py`: extract, apply with its gates, `fix_spacing` and repack's
+> U+200B scrub, each reading as delivered). **F2:** Rule 1's own second example, a lone insertion bookended on both
+> sides, delivers `the  Insurance` once the insertion is rejected, and a lone deletion so bookended a double space once
+> it is accepted; `validate_reject_all --strict` catches a plain double space and passes this one, the ZWSPs between
+> the two spaces not being whitespace; the far space put inside the lone change reads right both ways, every gate
+> passing. **F3:** a preposition before a lone deletion strands, unseen by the same scanner, and reads right inside it;
+> before a paired change, Rule 1's first example, it is right. **And a class the row undercounts:** Rule 2, "never end
+> a segment with a digit", is contradicted by the same example, whose insertion and deletion both end on one. **F14:**
+> a Latin seam without whitespace, a word split by a lone insertion, meets F2's double space as a CJK seam does; a
+> Latin seam with whitespace reads right with the English's spaces where the source has them. **F18:** `text` holds
+> `\n` at a plain line break and nothing at a tab or a page break, and the `runs` offsets never count the `\n`; apply
+> turns `\n` and `\t` back into a break and a tab, and without them both are lost, so the sentence is false three ways.
+> **F32:** after a batch with paragraphs still to translate the validator prints its own line, `N paragraphs without
+> translations`, exit 1, only when nothing else warned; its ratio is per paragraph, so the row's mechanism is stale and
+> its complaint is not. **F4:** five statements, not three, the class adding the US tree's Japanese sub-lexicon, whose
+> conversion examples are day-first, and the Dutch one's "per project style"; and **F8**, which section 9.3 defers to
+> the reconciliation, is the same block's day-first exemplars in the US file.
+> **Changes, both trees, documents only:** **(1) F2** — Rule 1's header and a paragraph after its one-line recipe name
+> the lone change, bookended before it with the hybrid, the space after it inside it, the regular after it a ZWSP
+> only; the second example becomes one. **(2) F3** — Rule 4: a preposition whose object is a lone change goes inside
+> it, and before a paired change may stay; Rule 2 likewise, a digit taking Rule 1's bookends. **(3) F14** — the
+> appendix becomes **Seams without whitespace**, read where a seam lacks whitespace in any script and for the non-Latin
+> scripts it named, skipped only by a Latin source whose every seam has it; the pointer before it says the same.
+> **(4) F18** — 01's sentence says what extract and apply do with a tab, a line break and a page break, and what the
+> offsets count. **(5) F32** — 04b's WARN names its three lines and when the third is expected. **(6) F4, with F8** —
+> `references/general-legal.md`, read in full at Step 3 in every mode, states the date rule once: each variant's order
+> for every date, inside a tracked change too, a date in figures in words, a bracketed placeholder in its brackets, a
+> numeric code as it stands; SKILL.md's bullet, US rule 7a and the Dutch line point at it, SKILL.md the shorter; the
+> US Japanese examples take US order. **Controls,** `tests/test_instruction_rules.py`: each corrected phrase REQUIRED,
+> each wrong one FORBIDDEN, a cross-tree span over each new block, red first against `2fb6940`; mutants in `us/`.
+> **Must not touch:** a script, an anti-drift sentence, an existing needle, a step number, the hybrid device itself.
+> **Size:** what the model reads, measured before and after, at its least. **Then** the parity check, every changed
+> file's divergence re-recorded from the INDEX, the three confidentiality controls, VERIFY and TEST through the cycle
+> gate, `/code-review`, the one full run. **No render, declared:** no script changes, so no delivered byte can move.
+> **Found, not this sub-step's, recorded for the loose ends:** the appendix's "a literal space alone is stripped" is
+> stale, apply placing segment text unstripped since the rev42 comment in its segment loop and a plain space surviving
+> on every arm, but a one-run fixture cannot retire the hybrid or its twin in `.claude/rules/ooxml.md`; and a page
+> break between two text runs of one paragraph is lost at apply, with or without a `\n`. **Done when:** F2, F3, F14,
+> F18, F32, F4 and F8 are CLOSED in the register on that evidence.
 
 ---
 

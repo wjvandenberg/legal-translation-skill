@@ -41,6 +41,8 @@ TREES = ("uk", "us")
 # --------------------------------------------------------------------------------------
 # The header of a list that closes TWO skill steps (F21), and when an item naming no step is confirmed.
 HEAD_TWO_STEP = "Confirm each item once the step it names has run, one naming no step at the first step's close:"
+# Two characters no needle may type: a zero-width space (U+200B) and a backslash. Built, never typed.
+ZW, BS = chr(0x200B), chr(92)
 REQUIRED = [
     # K1 + X3 — the scope rule. The cheapest fix in the project, and the one X3 says must
     # ADD a rule rather than soften one.
@@ -179,6 +181,89 @@ REQUIRED = [
     ("F20", "skill-docs/10-repack-and-validate.md", "the source's own revisions are all there"),
     # ...and a count lower than the source's is no loss when Step 3b merged a fragmented cluster.
     ("F20", "skill-docs/10-repack-and-validate.md", "(Step 3b may merge its fragments)"),
+
+    # ---- STEP 14.9.3 — skill Step 4's rules -------------------------------------------
+    # F2: Rule 1's bookends are right for a PAIRED change and deliver a double space around a
+    # LONE one, measured on invented documents through apply, fix_spacing and the U+200B scrub.
+    ("F2", "skill-docs/04-translate.md", "a LONE ins or del on one side only, as below"),
+    ("F2", "skill-docs/04-translate.md",
+     "**A LONE ins or del — no deletion or insertion beside it — is the exception,"),
+    ("F2", "skill-docs/04-translate.md",
+     "would meet as a double space, unseen by `validate_reject_all.py` (a ZWSP is not"),
+    ("F2", "skill-docs/04-translate.md",
+     "So bookend only the regular segment BEFORE it, put the space after"),
+    ("F2", "skill-docs/04-translate.md", "Worked example for a lone alpha ins between alpha regulars:"),
+    ("F2", "skill-docs/04-translate.md", '{"type": "ins",     "en": "Investment ' + ZW + '"},'),
+    ("F2", "skill-docs/04-translate.md", '{"type": "regular", "en": "' + ZW + 'Insurance"}'),
+    # /code-review: punctuation after a lone change needs no space; and the general rule every
+    # tracked-change operator reads, appendix or not, carries the lone change's space too.
+    ("F2", "skill-docs/04-translate.md",
+     "Where the regular after it opens with punctuation, the change carries a ZWSP alone."),
+    ("F2", "skill-docs/04-translate.md", "so does the space a lone ins or del needs on one side.**"),
+    # F3: a preposition strands only where its object is a LONE change; and Rule 2, the same class.
+    ("F3", "skill-docs/04-translate.md",
+     "**A preposition whose object is a lone ins or del goes inside it, with its"),
+    ("F3", "skill-docs/04-translate.md",
+     "drops the change (`the provisions of apply`). Before a paired change, where"),
+    ("F3", "skill-docs/04-translate.md", "**A digit at a seam takes Rule 1's bookends like a letter.**"),
+    # F14: the appendix is read where a seam lacks whitespace, in any script.
+    ("F14", "skill-docs/04-translate.md", "**A seam without whitespace has additional segment-shape rules.**"),
+    ("F14", "skill-docs/04-translate.md",
+     "#### Sub-appendix: Seams without whitespace — for TC docs, in any script"),
+    ("F14", "skill-docs/04-translate.md", "> **READ if any tracked-change seam lacks whitespace in the source**"),
+    ("F14", "skill-docs/04-translate.md",
+     "where a change begins or ends inside a word: an Italian amount spelled as one"),
+    ("F14", "skill-docs/04-translate.md",
+     "> **SKIP only if the source is Latin-script and every seam has whitespace on one"),
+    # /code-review: one skip test in pointer and box, the appendix body and the gate's label in any script.
+    ("F14", "skill-docs/04-translate.md",
+     "A Latin-script source whose every seam has whitespace on one side can"),
+    ("F14", "skill-docs/04-translate.md", "A seam without whitespace gets none from the source, in any script; and"),
+    ("F14", "skill-docs/04b-translate-gates.md",
+     "(a seam without whitespace, in any script), a double-space straddling"),
+    ("F14", "SKILL.md", "with no whitespace — a seam without whitespace, in any script"),
+    # F18: what extract writes at a tab, a line break and a page break, and what apply makes of `en`.
+    ("F18", "skill-docs/01-setup-and-extract.md",
+     "**A tab or a line break: what `text` shows, and what you write in `en`.**"),
+    ("F18", "skill-docs/01-setup-and-extract.md",
+     f"line break (`<w:br/>`) shows in `text` as `{BS}n`: write `{BS}n` in `en` where the"),
+    ("F18", "skill-docs/01-setup-and-extract.md",
+     f"first word (`11.3.1Il 10%…`): write `{BS}t` in `en` where the tab stood"),
+    ("F18", "skill-docs/01-setup-and-extract.md", "A page break shows as nothing too: write nothing for it."),
+    ("F18", "skill-docs/01-setup-and-extract.md",
+     f"`w:t` text alone, never a `{BS}n`; your `en_runs` offsets count every character of"),
+    # F32: the WARN a multi-batch document meets after every batch but the last, named.
+    ("F32", "skill-docs/04b-translate-gates.md",
+     "`N paragraphs without translations` (printed only when nothing else warned):"),
+    ("F32", "skill-docs/04b-translate-gates.md",
+     "expected after every batch but the last, N being the paragraphs later batches will"),
+    ("F32", "skill-docs/04b-translate-gates.md",
+     "translate; after the last batch, translate the missed paragraphs before Step 5."),
+    # F4 (and F8): the date rule stated once, where it is read in full at Step 3 in every mode.
+    ("F4", "references/general-legal.md",
+     "## Dates and Calendar Conventions — MANDATORY (all source languages)"),
+    ("F4", "references/general-legal.md", "**The date rule, stated here alone; SKILL.md points here.**"),
+    ("F4", "references/general-legal.md",
+     "change as anywhere else: `15 April 2026` (UK), `April 15, 2026` (US)."),
+    ("F4", "references/general-legal.md",
+     "source writes in figures is written in words, a bracketed placeholder within its"),
+    ("F4", "references/general-legal.md", "a numeric table cell stays as it stands."),
+    ("F4", "SKILL.md",
+     "- **Date format**: each variant's order — the date rule in `references/general-legal.md`,"),
+    ("F4", "sub-lexicons/dutch-general-legal.md",
+     "Render them by the date rule in `references/general-legal.md`."),
+]
+
+# One-tree rules: (row, tree, file, phrase, must be present). US rule 7a and the US Japanese examples,
+# and a control that the UK tree keeps its own order.
+TREE_RULES = [
+    ("F4", "us", "skill-docs/04-translate.md",
+     "7a. **Dates: the date rule in `references/general-legal.md`**, read in full at Step 3,", True),
+    ("F4", "us", "skill-docs/04-translate.md", "Date format — US default", False),
+    ("F4", "us", "sub-lexicons/japanese-general-legal.md", "| `平成29年11月29日` | `November 29, 2017` |", True),
+    ("F4", "us", "sub-lexicons/japanese-general-legal.md", "`29 November 2017`", False),
+    ("F4", "us", "sub-lexicons/japanese-general-legal.md", "Render the whole span as `[Month] [__], 20__`", True),
+    ("F4", "uk", "sub-lexicons/japanese-general-legal.md", "| `平成29年11月29日` | `29 November 2017` |", True),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -204,6 +289,28 @@ FORBIDDEN = [
     ("F21", "skill-docs/10-repack-and-validate.md", "Before moving to the next step, confirm:"),
     # F20: the sentence that, on a redline, meant stripping the revisions just translated.
     ("F20", "skill-docs/10-repack-and-validate.md", "No tracked changes visible"),
+    # Step 14.9.3. F2: the example that IS the defect, a lone insertion bookended on both sides.
+    ("F2", "skill-docs/04-translate.md", "Worked example for alpha ins/del abutting alpha regular"),
+    ("F2", "skill-docs/04-translate.md", '{"type": "ins",     "en": "' + ZW + "Investment" + ZW + '"}'),
+    ("F2", "skill-docs/04-translate.md", '{"type": "regular", "en": "' + ZW + ' Insurance"}'),
+    # F3, and Rule 2 of its class: both contradicted by Rule 1's own first example.
+    ("F3", "skill-docs/04-translate.md", "Never end a regular segment with a preposition"),
+    ("F3", "skill-docs/04-translate.md", "Never end a segment with a digit"),
+    # F14: the scope by script family, and the premise that failed for a Latin seam.
+    ("F14", "skill-docs/04-translate.md", "Non-Latin script sources only"),
+    ("F14", "skill-docs/04-translate.md", "can skip that appendix entirely"),
+    ("F14", "skill-docs/04-translate.md", "Latin-script sources carry inter-word whitespace that"),
+    ("F14", "skill-docs/04b-translate-gates.md", "(Non-Latin script gotcha)"),
+    ("F14", "SKILL.md", "non-Latin script gotcha"),
+    # F18: the sentence that, obeyed, loses every line break and tab.
+    ("F18", "skill-docs/01-setup-and-extract.md", "Do NOT insert tab or newline characters"),
+    ("F18", "skill-docs/01-setup-and-extract.md", "which are preserved in the XML during the apply step"),
+    # F32: WARN described only as a quality signal.
+    ("F32", "skill-docs/04b-translate-gates.md", "some paragraphs have low ratios"),
+    # F4 and F8: the misleading statements and the day-first exemplars.
+    ("F4", "SKILL.md", "leave original-language dates in source documents alone"),
+    ("F4", "references/general-legal.md", "`29 November 2017`, `1 April 2023`, `15 March 1989`"),
+    ("F4", "sub-lexicons/dutch-general-legal.md", "per project style"),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -279,6 +386,12 @@ for row, rel, phrase in FORBIDDEN:
     check(f"{row}  {rel}  “{phrase[:58]}…”", not present,
           f"still in {', '.join(present)}" if present else "")
 
+print("\n2b. THE ONE-TREE RULES — each in the tree it names, as it says")
+for row, tree, rel, phrase, want in TREE_RULES:
+    have = phrase in read(tree, rel)
+    check(f"{row}  {tree}/{rel}  {'has' if want else 'lacks'}  “{phrase[:50]}…”", have == want,
+          "" if have == want else ("absent" if want else "still present"))
+
 print("\n3. THE ANTI-DRIFT TEXT WAS ADDED TO, NOT SOFTENED  (X3)")
 for rel, phrase in PRESERVED:
     missing = [t for t in TREES if phrase not in read(t, rel)]
@@ -315,6 +428,25 @@ for label, rel, start, end in [
      "## Internal compliance check — 08", "**Next:**"),
     ("skill Step 11b and the Steps 10-11 closing list", "skill-docs/10-repack-and-validate.md",
      "#### Step 11b — Visual checks", "If any check is uncertain, STOP."),
+    # Step 14.9.3's prose. Rule 2 names Clause or Section by tree, so its span stops short of it.
+    ("the skill Step 4 seam pointer", "skill-docs/04-translate.md",
+     "**A seam without whitespace has additional segment-shape rules.**",
+     "Run `validate_segment_shapes.py` on the filled"),
+    ("the seams appendix's opening box", "skill-docs/04-translate.md",
+     "#### Sub-appendix: Seams without whitespace", "**TROUBLESHOOTING"),
+    ("Rule 1's lone change", "skill-docs/04-translate.md",
+     "   **A LONE ins or del", "   Worked example (verified on"),
+    ("Rule 1's second example", "skill-docs/04-translate.md",
+     "   Worked example for a lone alpha ins", "2. **A digit at a seam"),
+    ("Rules 3 and 4", "skill-docs/04-translate.md",
+     "3. **Articles live inside", "`validate_segment_shapes.py` (universal"),
+    ("the skill Step 2 tab and line-break sentence", "skill-docs/01-setup-and-extract.md",
+     "**A tab or a line break: what `text` shows", "This creates a JSON array"),
+    ("the skill Step 4b WARN", "skill-docs/04b-translate-gates.md",
+     "- **WARN** (exit 1)", "- **BLOCK** (exit 2)"),
+    ("the date rule", "references/general-legal.md",
+     "## Dates and Calendar Conventions", "Calendars commonly encountered"),
+    ("SKILL.md's date bullet", "SKILL.md", "- **Date format**:", "- **Quotation conventions**"),
 ]:
     blocks = {}
     for t in TREES:

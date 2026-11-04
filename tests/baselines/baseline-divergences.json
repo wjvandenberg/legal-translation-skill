@@ -3,12 +3,12 @@
  "_what": "Files that DELIBERATELY differ from the rev44 publication archives. Branch 0 committed both trees unmodified so that every later change would be readable against a provable original; this is the register of those changes.",
  "_why_a_list_and_not_a_switch": "Deleting the byte comparison once the trees legitimately changed would have thrown the guarantee away to avoid the paperwork. Naming each divergence keeps it: anything NOT in this list is still an unexplained change and still fails.",
  "_on_changed_by": "changed_by is the branch for a change not yet merged, and the squash-merge commit once it is. A branch author cannot know its own merge hash, and inventing one would be worse than naming the branch.",
- "count": 62,
+ "count": 67,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "1fec4466661e362860a50de633959ac19fd3faeba2363a359279d6d5271b747e"
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "40ec89e48a8ee9cbb6be64a03cff909c4d9d6e7dad42f726a8053ebe98d6ee65"
   },
   "uk/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -76,14 +76,14 @@
    "sha256_now": "b65f3f3791fe390c374378f0ac262b3c01229959a470a54a087e7764679c2ba7"
   },
   "uk/skill-docs/01-setup-and-extract.md": {
-   "changed_by": "feature/step14-9-2-steps-1-and-11",
-   "commit_subject": "Step 14.9.2 - skill Steps 1 and 11 say what is true: the .doc command, the closing lists, Step 11b (F11, F9, F21, F20)",
-   "sha256_now": "69af5f1797e6acbb07c5b199c2af48dbfadadb7d77b2b571e3cc4a482c91c208"
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "08451e6f7592874f72e60de08d78bbd5a6a8d1516f7d3a9522d5265d6c1556ab"
   },
   "uk/skill-docs/04b-translate-gates.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "40971e01ee359200e65ad2927758bdbcd5d3556a85450de594bc8d038a6f478e"
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "4f06688158410cc1f180a5d8e95567798b25fb71e756e5d8ab0e8cb54ec6872b"
   },
   "uk/skill-docs/05-apply.md": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -106,9 +106,9 @@
    "sha256_now": "92fa9fb0e409a33ea89e3ad074a93446d49c88f3200029d0213668a4a001a094"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "40cc86e951f8170378e8dd7f24d45af0a0810344b03bea40e8f087342ea71e47"
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "27f4cd37b373d8e6d80b51dc903b370de306df83c1db5834d0f69e15c143d2e7"
   },
   "us/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -176,14 +176,14 @@
    "sha256_now": "ca21036a388fce7874d935297aa1d01c24a780f83a22339846ed653d4b66cb6b"
   },
   "us/skill-docs/01-setup-and-extract.md": {
-   "changed_by": "feature/step14-9-2-steps-1-and-11",
-   "commit_subject": "Step 14.9.2 - skill Steps 1 and 11 say what is true: the .doc command, the closing lists, Step 11b (F11, F9, F21, F20)",
-   "sha256_now": "69af5f1797e6acbb07c5b199c2af48dbfadadb7d77b2b571e3cc4a482c91c208"
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "08451e6f7592874f72e60de08d78bbd5a6a8d1516f7d3a9522d5265d6c1556ab"
   },
   "us/skill-docs/04b-translate-gates.md": {
-   "changed_by": "feature/branch12-slice12a",
-   "commit_subject": "Branch 12 slice 12a - the declared source language: Step 1c declares it, every language-dependent check reads it, an unsupported or guessed one says NOT SUPPORTED, never CLEAN or PASSED",
-   "sha256_now": "e98e8b023d74ec63b88ed87434210451d66d39d6c5b1820bc0a057762a620226"
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "1690d03683a76c88515e503eb3385d4ce93f5cd4d2526a327c150b33408cd87f"
   },
   "us/skill-docs/05-apply.md": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -231,9 +231,9 @@
    "sha256_now": "02b8d5c3c4b430419a707d86e77d1734fa6a8e568a3ba0e70308cc0fbcdacbd3"
   },
   "uk/skill-docs/04-translate.md": {
-   "changed_by": "feature/step14-2-segment-shapes",
-   "commit_subject": "Step 14.2 - validate_segment_shapes stops reporting an alpha collision across a del/ins pair, which no reading can show and which Step 4 mandates (F10); 04-translate.md rule 14 says apply runs it --strict, so a finding stops apply (F5)",
-   "sha256_now": "52dad1e3018025bcee4e0ccd4782204df49a99370b698b224c797cc63c7d0e85"
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "cd1a8747a7b1cd120a99d46a1b1289daa7d2dd179cd62d2c0f87dc3f87d2a8a0"
   },
   "us/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -251,9 +251,9 @@
    "sha256_now": "c34927055febc10a448a93af3b5998252b29d466286ef07cf187eb4217ae6c5f"
   },
   "us/skill-docs/04-translate.md": {
-   "changed_by": "feature/step14-2-segment-shapes",
-   "commit_subject": "Step 14.2 - validate_segment_shapes stops reporting an alpha collision across a del/ins pair, which no reading can show and which Step 4 mandates (F10); 04-translate.md rule 14 says apply runs it --strict, so a finding stops apply (F5)",
-   "sha256_now": "a4b9d39024a7941325d634a93bb3089eeaa4877b54805d651bf6a3a62967f283"
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "992c825c0c7615f6a0ee001682c772e8adbd670290ab0c3d589b1725d8289c75"
   },
   "uk/scripts/translate_comments.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -314,6 +314,31 @@
    "changed_by": "feature/step14-9-1-validator-console-crash",
    "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
    "sha256_now": "a8525d4fd7519c895c5a824fb55de659b3cc6c3425d603316c57af67180a483e"
+  },
+  "uk/references/general-legal.md": {
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "160d23ee39902a1db11f3261bbf794efe55824d03519c85da7fa89b93e003f58"
+  },
+  "uk/sub-lexicons/dutch-general-legal.md": {
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "4dd503bd848e5e10669cc7a03a8c845425efd6a7e0a21d9b51b6fddc779a51f9"
+  },
+  "us/references/general-legal.md": {
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "59c5842e4da5675b48905398bfe2fba88a13a230c26b298444fa0b68f714d149"
+  },
+  "us/sub-lexicons/dutch-general-legal.md": {
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "08ad96b9f7a74bd097fde436cf160c9d46d4c89005cc847f752344d3100f80ec"
+  },
+  "us/sub-lexicons/japanese-general-legal.md": {
+   "changed_by": "feature/step14-9-3-step-4-rules",
+   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
+   "sha256_now": "93854fde213094e3e4d7ecfe65d76bdd0d12b5f26ba343e93e00e1860d8549ad"
   }
  }
 }

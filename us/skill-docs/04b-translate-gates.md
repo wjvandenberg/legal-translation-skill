@@ -15,8 +15,12 @@ python <skill-path>/scripts/validate_translations.py <workdir>/paragraphs.json
 
 The script reports:
 - **PASS**: ratios acceptable — continue.
-- **WARN** (exit 1): some paragraphs have low ratios — review and re-translate if genuinely
+- **WARN** (exit 1): its last line says which. `possibly incomplete translations` or
+  `quoted source phrases not found in en`: review them, re-translate any genuinely
   incomplete; continuing is allowed.
+  `N paragraphs without translations` (printed only when nothing else warned):
+  expected after every batch but the last, N being the paragraphs later batches will
+  translate; after the last batch, translate the missed paragraphs before Step 5.
 - **BLOCK** (exit 2): one or more paragraphs are critically short — re-translate before
   proceeding.
 
@@ -41,7 +45,7 @@ What each gate catches:
   per-segment for XML-boundary risk shapes — an article or preposition
   in the wrong segment, a digit sitting exactly on a TC boundary, two
   alpha characters colliding across a boundary with no whitespace
-  (Non-Latin script gotcha), a double-space straddling a boundary, an
+  (a seam without whitespace, in any script), a double-space straddling a boundary, an
   ins/del containing only a bare article, an internal camelCase
   collision. Each hit names the rule, points at the offending boundary,
   and suggests the rewrite.

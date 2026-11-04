@@ -713,7 +713,9 @@ MUST_CITE = ["694", "38", "91.8", "31.1", "28 → 14", "42", "8813", "32", "1,54
              "134", "180 of 184", "37", "60", "1,803", "178", "221", "8,028", "121", "16.8%",
              "25 minutes", "2.4", "6.4%", "35 minutes", "28 commands", "40%", "13", "80", "34"]
 for fig in MUST_CITE:
-    if fig not in LIVE:
+    # DIGIT-BOUNDED, 2026-11-04 (sub-step 14.9.3): a figure inside a longer number is no citation of it. The plan
+    # came to cite the commit 2fb6940, which holds 694, and the metacheck's 694 -> 690 mutation then passed here.
+    if not re.search("(?<![0-9])" + re.escape(fig) + "(?![0-9])", LIVE):
         fail("11c", f"the analysis no longer cites the measured figure {fig!r} — either it was "
                     f"altered or the claim it supports was removed")
 if not [f for f in FAIL if f.startswith("11c")]:
