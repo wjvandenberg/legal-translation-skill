@@ -2583,6 +2583,34 @@ the edited script, and the full run once, before the push.
 > on every arm, but a one-run fixture cannot retire the hybrid or its twin in `.claude/rules/ooxml.md`; and a page
 > break between two text runs of one paragraph is lost at apply, with or without a `\n`. **Done when:** F2, F3, F14,
 > F18, F32, F4 and F8 are CLOSED in the register on that evidence.
+> **AMENDED IN THE BUILD, 2026-11-04, before the full run.** **(1) A tightening pass after the first count:** what
+> every document reads had risen 2,113 bytes in `uk/` and 1,502 in `us/`; the thirteen files went back to the pin
+> through a script that first proved each held only the change set (`temp/s1104_restore.py`), the change set's texts
+> were shortened and re-applied, and every needle phrase was checked whole on one line. **(2) F14's skip box claims
+> no restoration:** at a Latin seam with whitespace an English written without its spaces is not restored by apply
+> but stopped by `validate_segment_shapes --strict`, so the box says to write the spaces where the source has them.
+> **(3) `validate_reject_all` runs inside apply without `--strict`,** printing and exiting 0, so the probe reads it
+> with `--strict`: it catches a plain double space and passes F2's, a ZWSP between the two spaces. **(4)
+> `/code-review` at high, before the commit: seven findings, five fixed** — a lone change before punctuation carries
+> a ZWSP alone; the general rule every tracked-change operator reads carries the lone change's space, so a Latin
+> source that skips the appendix meets it; the pointer and the box state one skip test; the appendix body and the
+> gate's label in 04b and SKILL.md's table no longer scope the seam by script; **one skipped,** the page break lost
+> mid-paragraph, code, for the loose ends; **one needing no change,** Rule 1's opening, its header naming the
+> exception. **(5) An instrument passing for the wrong reason, found by VERIFY:** `stepb_metacheck`'s falsified-figure
+> mutation passed `stepb_audit`, whose cited-figure check matched the figure inside the commit `2fb6940` this plan cites; a
+> cited figure now counts only where no digit touches it, the audit's red rows identical, the metacheck 15 of 15.
+> **(6) Three VERIFY runs failed and were run again whole:** a mutant expectation cut by the test's 58-character
+> print; a probe verdict reading the words "WARN below" as a warning; a test run killed from outside after 9 s, the
+> in-place guard putting its file back byte-exact. The house released `auto_mode.py` and `auto_mode_guard.py` v5 mid-session,
+> declared by content, to adopt at the next opening; and **(7) the first full run, on `eb821de`, failed one row,**
+> `vocabulary_census --selftest`: the house retired `auto_mode_headless.py` that day, so the census's house-copy list
+> no longer matched the shared folder, on `main` as here; `0ecc2ba` takes it off the list, the project's copy kept. **Size:** +1,949 and +1,338 bytes read for every document,
+> SKILL.md 56 smaller. **Red first,** the final instrument with the thirteen files at the pin: 140 of 203, its 63
+> failures every one a new entry; 36 of 36 mutants caught, each on exactly its rows, in `us/`.
+> **BUILT AND MERGED, 2026-11-04, as #190:** `eb821de` the fix with the review's five, reviewed before its commit,
+> then the filing; VERIFY 39 of 39 and TEST 28 of 28 through the cycle gate; `0ecc2ba` the census list, its own VERIFY
+> and TEST; the full run on `0ecc2ba`, OVERALL PASS, 109 rows; F2, F3, F4, F8, F14, F18 and F32 CLOSED in the register; squash-merged on green *(Wouter,
+> 2026-10-29, the conductor chain; 2026-11-04, unattended)*.
 
 ---
 
