@@ -831,7 +831,7 @@ def _run_is_text_bearing(r):
 
 def _norm_ortho_text(s):
     """Rev28: strip ZWSP + surrounding whitespace for ortho-pair compare.
-    Handles  hybrid bookends correctly"""
+    Handles the hybrid bookends correctly."""
     if not s:
         return ''
     return s.replace('​', '').strip()
@@ -1762,8 +1762,9 @@ def _run_validator(label, args, block_codes=None):
 
 def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                     allow_bold_loss=False):
-    """Apply translations using text matching. Auto-invokes mandatory
-    validators (segment_shapes, reject_all, validate_apply) the full gate sequence."""
+    """Apply translations using text matching. Auto-invokes the five
+    mandatory validators: en_runs and translations before applying, segment_shapes and
+    reject_all too on a tracked-change document, validate_apply after."""
     scripts_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Pre-apply: en_runs gate (extracted to validate_en_runs.py).

@@ -222,7 +222,7 @@ _TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9.\-]*[A-Za-z0-9]|[A-Za-z0-9]+")
 #
 # Implemented as a pre-tokenize normalization rather than a regex
 # change so that the abbreviation token shape (``S.p.A``, ``v.2.3``,
-# ``1234.50``) is preserved exactly as in . The substitution
+# ``1234.50``) is left exactly as it stands. The substitution
 # applies symmetrically to both declared and applied text, so domain
 # names (``github.com``) and version numbers (``v.2.3``) tokenize
 # consistently and produce no false negatives.
@@ -2599,7 +2599,7 @@ def main():
             args.paragraphs_json, args.document_xml,
             post_spacing_fix=args.post_spacing_fix)
     except Exception as exc:
-        # refactored to use a helper at byte-shifted position.
+        # Through _emit_error, defined near the top of the file, where a truncated install still has it.
         _emit_error(f'validate_apply: {exc}')
         return 2
 

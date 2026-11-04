@@ -252,6 +252,65 @@ REQUIRED = [
      "- **Date format**: each variant's order — the date rule in `references/general-legal.md`,"),
     ("F4", "sub-lexicons/dutch-general-legal.md",
      "Render them by the date rule in `references/general-legal.md`."),
+
+    # ---- STEP 14.9.4 — the claims about the skill ------------------------------------
+    # F23: apply runs five checks, measured at its call sites, two on tracked-change documents only;
+    # and the class at repack, which runs three where two lists named two.
+    ("F23", "SKILL.md", "which validators auto-invoke from `apply_translations_textmatch.py` (there are five)"),
+    ("F23", "SKILL.md", "`apply_translations_textmatch.py` (auto-invokes 5 validators)"),
+    ("F23", "SKILL.md", "`repack_docx.py` (auto-invokes lexicon_compliance, validate_apply --strict, then --delivered)"),
+    ("F23", "SKILL.md", "auto-runs five validators: `validate_en_runs` and `validate_translations` before applying,"),
+    ("F23", "SKILL.md",
+     "`validate_segment_shapes` and `validate_reject_all` too on a TC document, then `validate_apply --strict`"),
+    ("F23", "SKILL.md",
+     "`repack_docx.py` auto-runs `lexicon_compliance --stage pre-repack` and `validate_apply --strict` again"),
+    ("F23", "SKILL.md", "Auto-runs `validate_en_runs.py` and `validate_translations.py` (each BLOCK code 2 only)"),
+    ("F23", "skill-docs/04b-translate-gates.md",
+     "(definitions-section bold-italic gate) + the final `validate_translations.py` pass"),
+    ("F23", "skill-docs/04b-translate-gates.md",
+     "+ `validate_segment_shapes.py` + `validate_reject_all.py` (these two on TC docs only)"),
+    ("F23", "skill-docs/05-apply.md",
+     "(validate_en_runs, validate_translations, segment_shapes, reject_all, validate_apply)"),
+    ("F23", "skill-docs/10-repack-and-validate.md",
+     "`validate_en_runs.py` (pre-apply, BLOCK on missing or broken `en_runs`) and"),
+    ("F23", "scripts/apply_translations_textmatch.py",
+     "mandatory validators: en_runs and translations before applying, segment_shapes and"),
+    # F37: apply writes with ElementTree behind four guards, each run on an invented document; and
+    # translate_numbering, which the same list said used lxml, rewrites by regex.
+    ("F37", "SKILL.md", "problem although `apply_translations_textmatch.py` uses ElementTree too: it registers every"),
+    ("F37", "SKILL.md", "prefix the source's root declares, grafts the original root tag back, injects any missing"),
+    ("F37", "SKILL.md", "declaration, and stops rather than write a synthetic `nsN:` prefix."),
+    ("F37", "SKILL.md", "for the auxiliary files has none of these guards, which is where ElementTree sneaks in."),
+    ("F37", "SKILL.md", "correctly; the second rewrites its strings by regex."),
+    # F36: a gate in apply exits 1; argparse's mistyped command is the only exit 2.
+    ("F36", "skill-docs/05-apply.md",
+     "exits with code 1 on a `RuntimeError` mentioning `BLOCK`, or prints a banner"),
+    ("F36", "skill-docs/05-apply.md", "that is a gate firing intentionally; an exit 2 is a mistyped command."),
+    ("F36", "skill-docs/05-apply.md", "- [ ] No validator's exit code 2 was suppressed or worked around"),
+    # F38: each sentence an automated edit broke, made whole without its version token, one needle a site.
+    ("F38", "SKILL.md", "The script's own invariant check would"),
+    ("F38", "skill-docs/04-translate.md", "style provides bold.** The auto-detector inside"),
+    ("F38", "skill-docs/04-translate.md", "**Style-provided bold.** Definitions sections and clause/article"),
+    ("F38", "skill-docs/04-translate.md", "**Backstop: `fix_spacing` covers ins↔del seams.**"),
+    ("F38", "skill-docs/04-translate.md", "the hybrid is now the default in Rule 1 above (was a caveat).**"),
+    ("F38", "skill-docs/06-postprocess-and-reorder.md", "**Run a dry-run first** so you see what the script will do"),
+    ("F38", "skill-docs/06-postprocess-and-reorder.md", "**structurally**: a definitions section is"),
+    ("F38", "skill-docs/08-aux-and-quality.md",
+     "**`--aux-dir` is mandatory here, though the script runs without it.**"),
+    ("F38", "skill-docs/08-aux-and-quality.md", "source-language text in an auxiliary file?"),
+    ("F38", "scripts/apply_translations_textmatch.py", "Handles the hybrid bookends correctly."),
+    ("F38", "scripts/validate_apply.py", "``1234.50``) is left exactly as it stands. The substitution"),
+    ("F38", "scripts/validate_apply.py", "# Through _emit_error, defined near the top of the file, where a truncated"),
+    ("F38", "scripts/validate_en_runs.py", "paragraphs.json has any paragraph without `en_runs`."),
+    ("F38", "scripts/repack_docx.py", "repack now runs both, so the operator runs ONE command and"),
+    ("F38", "scripts/post_process.py", "# The earlier blanket replacement broke legitimate adjective use"),
+    ("F38", "scripts/post_process.py", "It now iterates ``<w:t>`` AND ``<w:delText>`` together in"),
+    ("F38", "scripts/post_process.py", "document order. The earlier version only walked ``<w:t>``"),
+    ("F38", "scripts/post_process.py", "preposition, not a label). The length cap doesn't"),
+    ("F38", "scripts/post_process.py", "# The skill replaced the LEGISLATION_KW hardcoded list"),
+    ("F38", "scripts/reorder_definitions.py", "paragraphs.json, OR a paragraph whose English text matches"),
+    ("F38", "scripts/reorder_definitions.py", "defined terms (Doc 1 post-mortem; cascade root cause)."),
+    ("F38", "scripts/source_language_markers.py", "references that once walked through every gate, because"),
 ]
 
 # One-tree rules: (row, tree, file, phrase, must be present). US rule 7a and the US Japanese examples,
@@ -311,6 +370,46 @@ FORBIDDEN = [
     ("F4", "SKILL.md", "leave original-language dates in source documents alone"),
     ("F4", "references/general-legal.md", "`29 November 2017`, `1 April 2023`, `15 March 1989`"),
     ("F4", "sub-lexicons/dutch-general-legal.md", "per project style"),
+    # Step 14.9.4. F23: every wrong count, and every list of apply's or repack's checks missing one.
+    ("F23", "SKILL.md", "(there are four)"),
+    ("F23", "SKILL.md", "(auto-invokes 4 validators)"),
+    ("F23", "SKILL.md", "(auto-invokes validate_apply --strict, then --delivered)"),
+    ("F23", "SKILL.md", "auto-runs four pre-apply validators"),
+    ("F23", "SKILL.md", "Auto-runs `validate_translations.py` (BLOCK code 2 only)"),
+    ("F23", "skill-docs/04b-translate-gates.md", "Pre-apply gates (TC documents)"),
+    ("F23", "skill-docs/05-apply.md", "(segment_shapes, reject_all, validate_en_runs, validate_apply)"),
+    ("F23", "scripts/apply_translations_textmatch.py",
+     "validators (segment_shapes, reject_all, validate_apply) the full gate sequence"),
+    # F37: the library apply does not use, and a second script said to use it.
+    ("F37", "SKILL.md", "uses lxml and grafts the original root"),
+    ("F37", "SKILL.md", "They use lxml, which preserves prefixes correctly."),
+    # F36: an exit code no gate in apply gives.
+    ("F36", "skill-docs/05-apply.md", "exits with code 2, raises `RuntimeError`"),
+    ("F36", "skill-docs/05-apply.md", "No gate exit code 2 was suppressed"),
+    # F38: each broken sentence, the one step 11's rewrite removed included, so none comes back.
+    ("F38", "SKILL.md", "The  invariant check"),
+    ("F38", "skill-docs/04-translate.md", "style provides bold .**"),
+    ("F38", "skill-docs/04-translate.md", "**Style-provided bold .**"),
+    ("F38", "skill-docs/04-translate.md", "**Backstop:  `fix_spacing`"),
+    ("F38", "skill-docs/04-translate.md", "(was  caveat)"),
+    ("F38", "skill-docs/06-postprocess-and-reorder.md", "**Run a dry-run first**  so"),
+    ("F38", "skill-docs/06-postprocess-and-reorder.md", "**structurally** : a definitions"),
+    ("F38", "skill-docs/08-aux-and-quality.md", "is and strongly recommended"),
+    ("F38", "skill-docs/08-aux-and-quality.md", "in auxiliary file ?"),
+    ("F38", "skill-docs/10-repack-and-validate.md", "added in  by covering"),
+    ("F38", "scripts/apply_translations_textmatch.py", "Handles  hybrid bookends"),
+    ("F38", "scripts/validate_apply.py", "preserved exactly as in . The substitution"),
+    ("F38", "scripts/validate_apply.py", "# refactored to use a helper at byte-shifted position."),
+    ("F38", "scripts/validate_en_runs.py", "(gate introduced) and  (extracted to standalone file)"),
+    ("F38", "scripts/repack_docx.py", "     folds them into repack"),
+    ("F38", "scripts/post_process.py", "# The  blanket replacement"),
+    ("F38", "scripts/post_process.py", "    now iterates ``<w:t>``"),
+    ("F38", "scripts/post_process.py", "The  version only walked"),
+    ("F38", "scripts/post_process.py", "The  length cap"),
+    ("F38", "scripts/post_process.py", "# replaced the LEGISLATION_KW"),
+    ("F38", "scripts/reorder_definitions.py", "paragraphs.json , OR"),
+    ("F38", "scripts/reorder_definitions.py", "(Doc 1  post-mortem"),
+    ("F38", "scripts/source_language_markers.py", "every gate in  because"),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -371,7 +470,7 @@ def read(tree, rel):
 
 
 print("=" * 96)
-print("INSTRUCTION-LAYER ACCEPTANCE — steps 3 and 4")
+print("INSTRUCTION-LAYER ACCEPTANCE — steps 3 and 4, and step 14's instruction fixes")
 print("=" * 96)
 
 print("\n1. EVERY REQUIRED RULE IS PRESENT, IN BOTH TREES")
@@ -447,6 +546,14 @@ for label, rel, start, end in [
     ("the date rule", "references/general-legal.md",
      "## Dates and Calendar Conventions", "Calendars commonly encountered"),
     ("SKILL.md's date bullet", "SKILL.md", "- **Date format**:", "- **Quotation conventions**"),
+    # Step 14.9.4's prose.
+    ("SKILL.md's anti-drift safeguard 3", "SKILL.md", "3. **Auto-invoked gates.**", "\n4. **Per-batch validation.**"),
+    ("SKILL.md's ElementTree passage", "SKILL.md", "**Where this bites**", "**Do not**: use `xml.etree"),
+    ("skill Step 4b's pointer to Step 5's gates", "skill-docs/04b-translate-gates.md",
+     "**Pre-apply gates and the post-apply", "For a manual pre-flight check before Step 5"),
+    ("skill Step 5's gate reading", "skill-docs/05-apply.md",
+     "**Distinguishing skill gates from script errors.**", "```bash"),
+    ("skill Step 9's --aux-dir", "skill-docs/08-aux-and-quality.md", "**`--aux-dir` is mandatory here", "**Variant flag"),
 ]:
     blocks = {}
     for t in TREES:

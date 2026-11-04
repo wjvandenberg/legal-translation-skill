@@ -378,7 +378,7 @@ python <skill-path>/scripts/quality_check.py <workdir>/final/word/document.xml \
   --aux-dir <workdir>/final
 ```
 
-**`--aux-dir` is and strongly recommended.** It points at the directory
+**`--aux-dir` is mandatory here, though the script runs without it.** It points at the directory
 containing translated `word/numbering.xml`, `word/headerN.xml`, `word/footerN.xml`,
 and `word/comments.xml` (typically `<workdir>/final`). With this flag, quality_check
 also scans every auxiliary file produced by Step 8 for source-language remnants. Without
@@ -393,7 +393,7 @@ variants between Step 6 and Step 9 produce false-positive "spelling violations".
 
 Review the output. Key checks:
 - `<source_language>_remnants` — source-language text in `document.xml`?
-- `aux_<filename>` — source-language text in auxiliary file ?
+- `aux_<filename>` — source-language text in an auxiliary file?
 - Both read the language declared at Step 1c, beside `--with-source`. **NOT SUPPORTED in
   place of CLEAN means the check could not rule** — a language the skill does not support,
   or nothing declared — and the closing line then says so instead of PASSED: read the

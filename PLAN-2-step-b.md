@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-04 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.3, skill Step 4's rules, F2, F3, F14, F18, F32 and F4, both trees: the tracked-change bookending rule told apart for an unpaired insertion or deletion, its appendix scoped by whether a seam lacks whitespace, Step 2's line-break sentence and Step 4b's WARN made to say what the scripts do, measured by running them on an invented document, and the date rule stated once; counted before and after, then the cycle gate, the one full run and the merge; no questions to Wouter *(Wouter, 2026-11-04: continue until step 14 is closed)* · **so that an operator who follows skill Step 4 to the letter is never told to do the wrong thing** *(written immediately after the tag `rollback-2026-11-04-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-04 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.4, the claims about the skill, F23, F37, F36's remaining parts and F38's fourteen sites, both trees: SKILL.md's count of the validators apply runs, its description of apply's XML library and guards, 05-apply.md's exit code, and fourteen sentences an automated edit broke, each made to say what the scripts do, measured at the call sites and imports and by running a script, proofread one by one; counted before and after, then the cycle gate, the one full run and the merge; no questions to Wouter *(Wouter, 2026-11-04: continue until step 14 is closed)* · **so that every claim the skill makes about its own scripts is true, and every sentence reads whole** *(written immediately after the tag `rollback-2026-11-04b-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -2611,6 +2611,52 @@ the edited script, and the full run once, before the push.
 > then the filing; VERIFY 39 of 39 and TEST 28 of 28 through the cycle gate; `0ecc2ba` the census list, its own VERIFY
 > and TEST; the full run on `0ecc2ba`, OVERALL PASS, 109 rows; F2, F3, F4, F8, F14, F18 and F32 CLOSED in the register; squash-merged on green *(Wouter,
 > 2026-10-29, the conductor chain; 2026-11-04, unattended)*.
+> **14.9.4 — ITS OWN WRITTEN PLAN, 2026-11-04, before any edit, on `feature/step14-9-4-claims-about-the-skill`.** F23,
+> F37, F36's remaining parts and F38, by 14.9's block above; **no question put to Wouter, each choice the recommended
+> option, recorded** *(Wouter, 2026-11-04: continue until step 14 is closed; `DECISIONS-LOG.md`, 2026-11-04 (3))*.
+> **Measured first, `main` at `a05de9d`, both trees alike** — at the call sites and imports, and by running the
+> scripts on invented documents (`temp/s1104b_f36_probe.py`, `temp/s1104b_f37_probe.py`,
+> `temp/s1104b_auxdir_probe.py`). **F23:** apply runs five checks — `validate_en_runs` and `validate_translations`
+> before applying, `validate_segment_shapes` and `validate_reject_all` too on a document with tracked changes,
+> `validate_apply --strict` after — and seven passages and the docstring say otherwise: `SKILL.md`'s checkpoint
+> "(there are four)", its step table's "4 validators", anti-drift safeguard 3's four "pre-apply" (one post-apply,
+> `validate_translations` missing) and its Scripts row (`validate_en_runs` missing); 04b's list under its right "five
+> gates" and 05's closing item (`validate_translations` missing); Step 10's list (`validate_en_runs` missing); apply's
+> docstring, three. **And the class at repack:** it runs three — `lexicon_compliance --stage pre-repack`,
+> `validate_apply --strict`, `validate_apply --delivered` — where the step table and safeguard 3 name two. **F37:**
+> apply imports `xml.etree.ElementTree` and no lxml, and each of its four guards acts as run: a prefix the source's
+> root declares is written back under its own name, the root tag grafted back byte for byte, a drawing prefix the
+> root lacks gets its declaration injected, and a prefix declared only in the body makes ElementTree fall back to
+> `ns0:` and apply stop, nothing written. **And the class:** `SKILL.md` says `translate_numbering.py` uses lxml; it
+> reads with ElementTree and rewrites the format strings by regex. **F36:** (i) apply exits 0 clean, 1 when a gate
+> fires (its banner and a `RuntimeError`), 3 on a truncated install, and 2 only on a mistyped command (argparse) — so
+> 05's "exits with code 2" names a code no gate gives, and the row's "unreachable" is itself inexact; (ii)
+> `verify_diligence` returns `2 if strict else 1` on a WARN since step 5 (`9b3dd75`, `tests/test_checks_can_fail.py`),
+> closed on that evidence; (iii) F5, closed at 14.2. **And the pass the row asks for:** every exit code `SKILL.md` and
+> the step documents state, 24 lines a tree, read against its script's exits — 05's code 2 the one false; 05's first
+> rule is F35's, left open. **F38:** the row lists fifteen locations under "fourteen"; at the pin fourteen are broken
+> in each tree, and 10's "added in  by covering" went with step 11's rewrite (`4d3d247`). **And the class:** a census
+> of double spaces and of a space before punctuation in shipped prose, comments and docstrings (68 and 69, the rest
+> column alignment), and of sentences opening on a lowercase verb, finds nine more lines in four scripts — apply's
+> "Handles  hybrid", `post_process`'s "The  blanket", "now iterates", "The  version", "The  length cap" and
+> "# replaced the LEGISLATION_KW", `reorder_definitions`'s "paragraphs.json , OR" and "Doc 1  post-mortem", and
+> `source_language_markers`'s "every gate in  because". **`--aux-dir`, F38's meaning-changing site:** without it
+> `quality_check` exits 0 and never reads a header still in Italian; with it, that header is an issue, exit 2.
+> **Changes, both trees, wording only — no code, no exit code, no gate:** **(1) F23** — each passage names the five,
+> the two tracked-change-only checks said so, and repack's two lists its three. **(2) F37** — `SKILL.md` names
+> ElementTree and the four guards, and says inline code for an auxiliary part has none of them; `translate_numbering`
+> rewrites its strings by regex. **(3) F36** — 05's gate is exit 1 with the banner, exit 2 a mistyped command. **(4)
+> F38** — each site read one by one and made whole WITHOUT its version token, as the tokens name revisions of a history
+> kept outside the repository, cannot be recovered without the private archives, and option 9's item 7 replaces the
+> tokens left with one version identifier; `--aux-dir` mandatory at skill Step 9, as Step 10's list and Step 11a's
+> re-run have it, the script running without it. **Controls,** `tests/test_instruction_rules.py`: each corrected
+> phrase REQUIRED, each wrong one FORBIDDEN, a cross-tree span over new prose, red first against `a05de9d`; the script
+> edits proved string-only by `tools/string_only_edit.py` against `a05de9d`; mutants in `us/`. **Must not touch:**
+> a script's code, an exit code, a gate, an anti-drift sentence, an existing needle, 05's first rule, a step number.
+> **Size:** what the model reads, 205,835 and 208,368 bytes over the seven documents, measured after, at its least.
+> **Then** the parity check, every changed file's divergence re-recorded from the INDEX, the three confidentiality
+> controls, VERIFY and TEST through the cycle gate, `/code-review`, the one full run. **No render, declared:** no code
+> moves, so no delivered byte can. **Done when:** F23, F37, F36 and F38 are CLOSED in the register on that evidence.
 
 ---
 

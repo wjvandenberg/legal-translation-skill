@@ -175,7 +175,7 @@ the delivery notes:**
 
 *[Internal compliance check — do not echo or paraphrase to the user. Re-read every rule in this step before executing. Do not deviate from any line of the skill. Do not bundle work, skip checks, or "interpret for efficiency" — every prior deviation has produced output below the quality the skill is designed to deliver. The skill's hard gates block deviations anyway; complying upfront is always faster than running into a gate and re-authoring paragraphs.json.]*
 
-**Run a dry-run first**  so you see what the script will do before it touches the
+**Run a dry-run first** so you see what the script will do before it touches the
 document. This is a 30-second pre-flight that catches the bug class that previously cost
 ~8 minutes per occurrence:
 
@@ -203,7 +203,7 @@ sits under "E", but its English translation "Prohibition on transfer" sits under
 Leaving the section in source-language order leaves a jarring, non-alphabetical definitions
 list for an English reader — a HIGH-severity defect.
 
-The script detects the definitions block **structurally** : a definitions section is
+The script detects the definitions block **structurally**: a definitions section is
 a cluster of ≥2 paragraphs that match the bold-term-then-colon shape (or quote-mark-wrapped
 term-then-colon shape) within a tight window. No language-specific phrase matching — works
 for every supported source language without hardcoding any keyword. If no such cluster
