@@ -93,6 +93,7 @@
       {"command": "uv run python tools/auto_mode_headless.py --dry-run"},
       {"command": "uv run python tools/install_hooks.py --check"},
       {"command": "uv run python tools/purpose_guard.py --probe"},
+      {"command": "uv run python tools/board_guard.py --probe"},
       {"command": "uv run python tools/vocabulary_census.py"}
     ],
     "entry_points_exempt": {

@@ -171,7 +171,9 @@ DATE = re.compile(r"20\d\d-\d\d-\d\d")
 HOUSE_COPIES = {"verify_md.py", "verify_charter.py", "verify_code.py", "verify_deliverable.py", "verify_expected.py",
                 "verify_confidential.py", "cycle_evidence.py", "check_checkers.py", "run_tests.py", "auto_mode.py",
                 "auto_mode_guard.py", "purpose_guard.py", "install_hooks.py",
-                "house_common.py", "trace_instructions.py"}
+                "house_common.py", "trace_instructions.py", "board_guard.py"}
+# board_guard.py JOINED THIS LIST 2026-11-05 (sub-step 14.9.5), adopted byte for byte at that opening: the house's
+# copy is the house's to word, so it is out of this census's scope like every other one here.
 # auto_mode_headless.py LEFT THIS LIST 2026-11-04 (sub-step 14.9.3): the house retired the headless loop that day and
 # removed it from the shared folder, so the selftest's equality failed on main as on the branch. The project's copy
 # stays until an opening adopts the retirement, and is counted meanwhile as project code.
