@@ -58,6 +58,7 @@ sys.path.insert(0, str(ROOT / "tests"))
 # same buffer means the first is collected and CLOSES it, so the script does its whole job and
 # then dies on its closing print. Two runs were lost to that on the previous sub-step.
 from make_fixtures import main as build_fixtures  # noqa: E402,F401
+from read_receipt import file_receipt  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
 from lxml import etree  # noqa: E402
 
 assert isinstance(sys.stdout, io.TextIOWrapper), "expected make_fixtures to wrap stdout"
@@ -109,6 +110,7 @@ def run_apply(src, notes, out, scripts=SCRIPTS):
     what reads as a read-only check, `git switch` then refusing, `git bisect` broken, and one
     `git add -A` from committing run state to a public repository.
     """
+    file_receipt(notes, scripts.parent)
     proc = subprocess.run(
         ["uv", "run", "--with", "lxml", "python",
          str(scripts / "apply_translations_textmatch.py"), str(src), str(notes), str(out)],

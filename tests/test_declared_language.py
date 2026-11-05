@@ -48,6 +48,7 @@ os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from make_fixtures import R, W, WP, docx, p, r  # noqa: E402
+from read_receipt import file_receipt  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
 
 ROOT = Path(__file__).resolve().parent.parent
 ap = argparse.ArgumentParser()
@@ -303,6 +304,7 @@ def apply_case(name, lang, en, declared):
     d, nj = workdir(name, lang, en, declared=declared)
     orig = d / "orig.docx"
     docx(orig, "".join(p(r(t)) for t in SRC[lang]))
+    file_receipt(nj, TREE)
     rc, out = run("apply_translations_textmatch.py", orig, nj, d / "out.xml")
     scan = [ln.strip() for ln in out.splitlines() if "Source-language scan" in ln or "remnant(s) detected" in ln]
     return rc, out, scan, (d / "out.xml").is_file()

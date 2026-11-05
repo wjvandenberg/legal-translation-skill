@@ -52,6 +52,7 @@ os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tests"))
 from docx_census import census, delta  # noqa: E402
+from read_receipt import file_receipt, lexicons_beside  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
 from lxml import etree  # noqa: E402
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -269,6 +270,7 @@ if SAME:
 TMP = Path(tempfile.mkdtemp(prefix="b6-corpus-"))
 OLDTREE = TMP / "old_scripts"
 shutil.copytree(ROOT / args.variant / "scripts", OLDTREE)
+lexicons_beside(OLDTREE, ROOT / args.variant)
 (OLDTREE / SCRIPT).write_bytes(blob.stdout)
 # The sentinel is a plain string at the file's end, not a hash, so a copied script still
 # passes its own integrity check. Prove it rather than assume it.
@@ -578,6 +580,7 @@ for wd in wds:
                  "headers_footers.json", "_boldmap.json"):
         if (wd / name).is_file():
             shutil.copyfile(wd / name, work / "in" / name)
+    file_receipt(work / "in" / "paragraphs.json", ROOT / args.variant)
     # One independent copy per arm, so neither arm's state file can reach the other.
     arms = {}
     for arm, scripts_dir in (("old", OLDTREE),

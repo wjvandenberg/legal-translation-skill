@@ -59,6 +59,8 @@
       {"name": "precommit_gate", "command": "uv run --with lxml python tests/test_precommit_gate.py", "count": "RESULT: [0-9]+ of ([0-9]+)"},
       {"name": "ratio_check", "command": "uv run --with lxml python tests/test_ratio_check.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "ratio_check [us]", "command": "uv run --with lxml python tests/test_ratio_check.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
+      {"name": "read_receipt", "command": "uv run --with lxml python tests/test_read_receipt.py", "count": "READ RECEIPT: ([0-9]+) check\\(s\\)"},
+      {"name": "read_receipt [us]", "command": "uv run --with lxml python tests/test_read_receipt.py --variant us", "count": "READ RECEIPT: ([0-9]+) check\\(s\\)"},
       {"name": "render_keep", "command": "uv run --with lxml python tests/test_render_keep.py", "count": "(?:PASS\\W+|of )([0-9]+) checks"},
       {"name": "repack_scrub_and_block", "command": "uv run --with lxml python tests/test_repack_scrub_and_block.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "repack_scrub_and_block [us]", "command": "uv run --with lxml python tests/test_repack_scrub_and_block.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
@@ -91,6 +93,7 @@
       {"command": "uv run python tools/auto_mode_headless.py --dry-run"},
       {"command": "uv run python tools/install_hooks.py --check"},
       {"command": "uv run python tools/purpose_guard.py --probe"},
+      {"command": "uv run python tools/board_guard.py --probe"},
       {"command": "uv run python tools/vocabulary_census.py"}
     ],
     "entry_points_exempt": {

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """check_checkers.py - is this project's copy of each standard script current?
-CHECKER VERSION 22 (2026-11-02)
+CHECKER VERSION 23 (2026-11-05)
 
 Every project gets its OWN COPY of the standard scripts in its tools\\ folder. Copies drift:
 the shared one gets fixed and yours does not hear about it, or yours gets edited and the fix
@@ -228,11 +228,16 @@ if hasattr(sys.stdout, "reconfigure"):
 # verify_charter.py JOINS 2026-10-12 (v19), and it needs no argument: it is verify_md.py's six
 # charter checks, split out, and verify_md.py v30 FAILS six rows without it. A project holding
 # v30 and not this file would be told so only by those FAILs - this list tells it first.
+# board_guard.py JOINS ON ITS FIRST DAY, 2026-11-05 (v23), and on purpose_guard's own sentence: as a
+# PreToolUse hook it REFUSES a call outright, exit 2, so it gates harder than any checker - and
+# install_hooks.py v12 installs it by default, so a project holding v12 and no copy of this file
+# would be told so only by an install that reports the guard ABSENT. Joining late cost the last
+# guard twelve days of a stale copy nothing reported; joining on day one costs nothing.
 TRACKED = ["house_common.py", "verify_md.py", "verify_charter.py", "verify_code.py",
            "verify_deliverable.py", "verify_crossdoc.py", "verify_refs.py",
            "verify_expected.py", "verify_confidential.py", "cycle_evidence.py",
            "check_checkers.py", "run_tests.py", "auto_mode.py", "auto_mode_guard.py",
-           "purpose_guard.py", "install_hooks.py"]
+           "purpose_guard.py", "install_hooks.py", "board_guard.py"]
 
 
 def default_shared() -> Path:

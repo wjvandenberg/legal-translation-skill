@@ -69,6 +69,8 @@ from lxml import etree
 from keep_declarations import write_keep_declarations
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "tests"))
+from read_receipt import file_receipt, lexicons_beside  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 from sibling_dirs import corpus_dirs, logs_dir  # noqa: E402  (register I-40)
 LOGS = logs_dir()
@@ -338,6 +340,7 @@ def ok(label, cond, detail=""):
 
 
 def run_apply(scripts_dir, src_docx, notes_json, out_xml):
+    file_receipt(notes_json, ROOT / args.variant)
     env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
                PYTHONDONTWRITEBYTECODE="1")
     p = subprocess.run(
@@ -612,6 +615,7 @@ if args.fixture:
     _fxtmp = Path(tempfile.mkdtemp(prefix="fx-oldtree-"))
     FX_OLDTREE = _fxtmp / "old_scripts"
     shutil.copytree(ROOT / args.variant / "scripts", FX_OLDTREE)
+    lexicons_beside(FX_OLDTREE, ROOT / args.variant)
     _any_diff = False
     _differ = []
     for _name in FX_SCRIPTS:
@@ -969,6 +973,7 @@ if args.doc:
     atexit.register(shutil.rmtree, TMP, ignore_errors=True)
     OLDTREE = TMP / "old_scripts"
     shutil.copytree(ROOT / args.variant / "scripts", OLDTREE)
+    lexicons_beside(OLDTREE, ROOT / args.variant)
     _differ = []
     for _n in subprocess.run(["git", "ls-tree", "--name-only", REF, f"{args.variant}/scripts/"],
                              capture_output=True, text=True, cwd=ROOT).stdout.split():

@@ -73,6 +73,7 @@ os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from make_fixtures import CONTAINER_SHAPES, CONTAINER_EN  # noqa: E402
+from read_receipt import file_receipt  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
 from lxml import etree  # noqa: E402
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -173,6 +174,7 @@ def run_apply(work, source_xml, notes, label, fixture=None, expect_block=False):
     shutil.copyfile(fixture or FIX, orig)
     pj = work / "paragraphs.json"
     pj.write_text(json.dumps(notes, ensure_ascii=False), encoding="utf-8")
+    file_receipt(pj, ROOT / args.variant)
     out = work / "out.xml"
     env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
                PYTHONDONTWRITEBYTECODE="1")

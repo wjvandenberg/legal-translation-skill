@@ -47,6 +47,18 @@ Rules for this step:
    inside Step 10 `repack_docx.py`) will block repack if any documented Avoid-column
    phrase survives to the output. It is cheap — run it early and often, not just
    at the end.
+7. **File the read receipt when the read is done — Step 5 will not start without one:**
+
+   ```bash
+   python <skill-path>/scripts/lexicon_compliance.py <workdir>/paragraphs.json --read-receipt references/general-legal.md <each other lexicon read>
+   ```
+
+   Name each lexicon by its path in the skill folder, `<language>-general-legal.md` too for a
+   supported language. It names two random lines in each, one per half, and writes
+   `lexicon_read_receipt.json` beside `paragraphs.json`: copy each line, exactly as it stands
+   in its file, into its `quote`. Read another lexicon or declare another language, and issue
+   it again for the whole set; never edit a named line. **It proves the files were opened at
+   those lines, not that every line was read.**
 
 **Always read the base English lexicon first, in full:**
 - `references/general-legal.md` — Universal English legal terms, structural conventions, grammar rules
@@ -224,6 +236,7 @@ Before moving to the next step, confirm:
 - [ ] You read all relevant English reference lexicons in full **in this document's session** (do not rely on lexicon reads from a previous document)
 - [ ] You read every applicable per-language sub-lexicon in full **in this document's session** (sub-lexicon Avoid-column entries that fit Document N-1 may not fit Document N — re-Read or you will drift)
 - [ ] In the variant-conversion mode (Step 1c) none applies: you read no sub-lexicon, and every English reference above in full
+- [ ] You filed the read receipt (rule 7) after the read, each named line copied from its file
 - [ ] For TC documents, you scaffolded `en_segments` (Step 3b) before translating
 - [ ] You did NOT skim the lexicons or summarize — you read them end-to-end
 

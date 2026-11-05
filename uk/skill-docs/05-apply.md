@@ -15,6 +15,8 @@ python <skill-path>/scripts/apply_translations_textmatch.py \
   <workdir>/final/word/document.xml
 ```
 
+**It refuses to start without skill Step 3's read receipt** (03's rule 7), its first check: a gate, exit 1, the lines above its banner naming each quote that does not match its line and each lexicon changed since issue. Copy the line exactly, or issue the receipt again, and re-run; no flag skips it.
+
 This is the single most important step. It does everything at once:
 
 1. Reads the original document.xml directly from the source .docx ZIP
@@ -56,7 +58,7 @@ Before moving to the next step, confirm:
 
 - [ ] You ran `apply_translations_textmatch.py` and let it auto-invoke ALL pre-apply gates
 - [ ] You did NOT pass `--allow-bold-loss` unless bold loss is genuinely acceptable
-- [ ] You read every gate output (validate_en_runs, validate_translations, segment_shapes, reject_all, validate_apply)
+- [ ] You read every gate output (the read receipt, validate_en_runs, validate_translations, segment_shapes, reject_all, validate_apply)
 - [ ] No validator's exit code 2 was suppressed or worked around
 
 If any check is uncertain, STOP. Re-read this file. Do not proceed.

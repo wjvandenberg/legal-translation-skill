@@ -69,6 +69,8 @@ from lxml import etree  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 from sibling_dirs import corpus_dirs, logs_dir  # noqa: E402  (register I-40)
+sys.path.insert(0, str(ROOT / "tests"))
+from read_receipt import file_receipt  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
 LOGS = logs_dir()
 
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. A before-and-after check in this
@@ -423,6 +425,7 @@ def rebuild_from_apply(ordinal, wd, corpus):
                  "headers_footers.json", "_boldmap.json"):
         if (wd / name).is_file():
             shutil.copyfile(wd / name, a / name)
+    file_receipt(a / "paragraphs.json", ROOT / args.variant)
     r = subprocess.run(["uv", "run", "--with", "lxml", "python", str(SCRIPTS / APPLY),
                         str(a / "src.docx"), str(a / "paragraphs.json"), str(a / "out.xml")],
                        capture_output=True, text=True, encoding="utf-8", errors="replace",

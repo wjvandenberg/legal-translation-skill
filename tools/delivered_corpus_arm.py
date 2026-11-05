@@ -153,6 +153,8 @@ from keep_declarations import write_keep_declarations  # noqa: E402  (review fin
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 from sibling_dirs import corpus_dirs, logs_dir  # noqa: E402  (register I-40)
+sys.path.insert(0, str(ROOT / "tests"))
+from read_receipt import file_receipt, lexicons_beside  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
 LOGS = logs_dir()
 DOC_ID = re.compile(r"\bD\d{2}B?\b")
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1", PYTHONDONTWRITEBYTECODE="1")
@@ -678,6 +680,7 @@ if args.ref and args.arm in ("b", "both"):
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(subprocess.run(["git", "show", f"{args.ref}:{name}"], capture_output=True,
                                         cwd=str(ROOT), check=True).stdout)
+    lexicons_beside(REFTREE, ROOT / args.variant)
     here = sorted(str(p.relative_to(SCRIPTS)).replace("\\", "/") for p in SCRIPTS.rglob("*.py"))
     same = [r for r in here if (REFTREE / r).is_file() and (REFTREE / r).read_bytes() == (SCRIPTS / r).read_bytes()]
     print(f"  --ref {args.ref}: {len(names)} file(s) at the ref · {len(here) - len(same)} of {len(here)} "
@@ -831,6 +834,7 @@ def chain(scripts_dir, d, src, wd, today=None, language=None):
                         "--stage", "pre-apply"])
         said["4d"] = (r4d.stdout or "") + (r4d.stderr or "")
         LANG_OUT[d.name] = said
+    file_receipt(d / "paragraphs.json", ROOT / args.variant)
     rap = run(py + [str(scripts_dir / "apply_translations_textmatch.py"), str(d / "src.docx"),
                     str(d / "paragraphs.json"), str(xml)])
     rcs = {"apply": rap.returncode}
