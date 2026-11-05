@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187, its fixes 14.9.1–14.9.5 planned; 14.9.1 as #188 and 14.9.2 as #189, 2026-11-03, 14.9.3 as #190, 2026-11-04; next, 14.9.4 · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187, its fixes 14.9.1–14.9.5 planned; 14.9.1 as #188 and 14.9.2 as #189, 2026-11-03, 14.9.3 as #190, 2026-11-04, 14.9.4 as #191, 2026-11-05; next, 14.9.5 · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,20 +578,20 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-04, 14.9.3 MERGED (#190), F2, F3, F14, F18, F32, F4 AND F8 CLOSED; NEXT, 14.9.4
+### HANDOFF — 2026-11-05, 14.9.4 MERGED (#191), F23, F37, F36 AND F38 CLOSED; NEXT, 14.9.5
 
-**PURPOSE: MET** — *an operator who follows skill Step 4 to the letter is never told to do the wrong thing*: a lone
-tracked change is bookended on one side, the seams appendix is read in any script, Steps 2 and 4b say what the
-scripts do, and the date rule is stated once; each claim proved by running the scripts. `DECISIONS-LOG.md`, 2026-11-04.
+**PURPOSE: MET** — *every claim the skill makes about its own scripts is true, and every sentence reads whole*:
+apply's five checks and repack's three named wherever listed, apply's XML library and guards and its exit codes, and
+the broken sentences made whole; each claim proved by running the scripts. `DECISIONS-LOG.md`, 2026-11-04 (3).
 
-**PRODUCED:** six files per tree and the US Japanese sub-lexicon, +1,949 and +1,338 bytes read, SKILL.md −56; 203
-checks in `tests/test_instruction_rules.py`, 36 mutants; `stepb_audit`'s figure check digit-bounded; one full run.
+**PRODUCED:** SKILL.md, six step documents and seven scripts' comments a tree, +571 bytes read, the script edits
+proved string-only; 285 checks in `tests/test_instruction_rules.py`, 44 mutants; the house's v5 pair; one full run.
 
-**SINGLE NEXT ACTION: SUB-STEP 14.9.4**, the claims about the skill — F23, F37, F36's rest, F38's fourteen sites —
-its prompt `temp/s1104_next_prompt.md`, started by this session at Wouter's word; the chain stops at step 14's close.
+**SINGLE NEXT ACTION: SUB-STEP 14.9.5**, C26's read receipt, inside an existing script — the tree has no file slot —
+its prompt `temp/s1104b_next_prompt.md`, started by this session at Wouter's word; the chain stops at step 14's close.
 
 **WHAT A NEW SESSION WOULD GET WRONG:** the charter sits AT its wrapped cap, so the 3.1 clause and this section pay
-in place; `validate_reject_all` is advisory inside apply; adopt the house's `auto_mode.py` v5 at the opening.
+in place; a heredoc eats a regex's backslashes; a test span's end marker is searched from the file's start.
 
-**Open, none blocking:** the stale strip claim and the lost mid-paragraph page break, for the loose ends; F30's
-detection half; F12; C26 as 14.9.5; F35; F31, step 19's; 14.5's, 14.4's items. **Context: 67%.**
+**Open, none blocking:** the stale strip claim, the lost mid-paragraph page break and apply writing with ElementTree,
+for the loose ends; F35; F30's detection half; F12; F31, step 19's; 14.5's, 14.4's items. **Context: 58%.**

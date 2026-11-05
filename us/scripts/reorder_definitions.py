@@ -13,7 +13,7 @@ Detection heuristics (tried in order):
 
 Section boundaries:
   - Start: paragraph flagged with role 'definitions_intro' in
-    paragraphs.json , OR a paragraph whose English text matches
+    paragraphs.json, OR a paragraph whose English text matches
     one of the case-insensitive intro triggers (legacy fallback).
   - End: next major heading (all-caps paragraph, or a paragraph whose
     style is Heading 1 / Heading 2).
@@ -425,7 +425,7 @@ def _find_definition_bounds_by_heading(all_p):
     None`` — typically because the operator did not supply ``en_runs``
     on the definition paragraphs and ``apply_translations_textmatch``'s
     default-off override stripped the style-provided bold from the
-    defined terms (Doc 1  post-mortem; cascade root cause).
+    defined terms (Doc 1 post-mortem; cascade root cause).
 
     Two anchors required (both, not either) to keep false-positive
     risk near zero:

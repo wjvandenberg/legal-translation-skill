@@ -818,7 +818,7 @@ def repack(orig_docx, translated_doc_xml, output_docx,
       — re-checks token presence in the post-modification document.xml.
 
     Both used to be separate operator-invoked steps (Step 8d, Step 8e);
-     folds them into repack so the operator runs ONE command and
+    repack now runs both, so the operator runs ONE command and
     cannot accidentally skip either gate.
     """
     scripts_dir = os.path.dirname(os.path.abspath(__file__))

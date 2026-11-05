@@ -43,7 +43,7 @@ Translate **every non-empty paragraph** by filling in the `"en"` field in the JS
 
 3. **Provide `en_runs` for any paragraph whose source `runs` array shows bold on text,
    AND for every paragraph in a definitions section or in a heading paragraph whose
-   style provides bold .** The auto-detector inside
+   style provides bold.** The auto-detector inside
    `apply_translations_textmatch.py` only handles the classic `"X" means …` definition
    shape with explicit quotes. It will MISS bold on defined-term parentheticals in
    recitals (`(the "Agreement")`, `(hereinafter the "Substation")`), party-block defined
@@ -52,7 +52,7 @@ Translate **every non-empty paragraph** by filling in the `"en"` field in the JS
    explicitly — locate each bold quoted phrase in your `en` string and emit
    `{"start": …, "end": …, "bold": true}` for it.
 
-   **Style-provided bold .** Definitions sections and clause/article headings
+   **Style-provided bold.** Definitions sections and clause/article headings
    often get their bold from the *paragraph style* (e.g. `FWBL1`, `ITScheduleL1`,
    bespoke template styles whose `<w:rPr>` in `styles.xml` carries `<w:b/>`), with
    the run-level `<w:rPr>` left empty. `extract_paragraphs.py` reads run-level
@@ -849,7 +849,7 @@ Four rules, applied to every `en_segments` array:
 violations mechanically. These rules are the prompt-side companion that keep the linter
 silent.
 
-**Backstop:  `fix_spacing` covers ins↔del seams.** `post_process.py`'s
+**Backstop: `fix_spacing` covers ins↔del seams.** `post_process.py`'s
 `fix_spacing` now iterates `<w:t>` and `<w:delText>` together in document order, so
 alpha+alpha collisions between an inserted run and an adjacent deletion's struck-
 through text get a space inserted automatically. Visible glue in the reject-all
@@ -858,7 +858,7 @@ view (`"theInvestment Insurance"` from a `del("Investment")` between
 intervention. ZWSP is still the recommended bookend for the validator-token view —
 the two layers are complementary, not redundant.
 
-**Rev20: the hybrid is now the default in Rule 1 above (was  caveat).**
+**Rev20: the hybrid is now the default in Rule 1 above (was a caveat).**
 The wording presented the visible-space + ZWSP hybrid as a "when
 readability matters" exception under a pure-ZWSP default, and operators
 reading top-down picked up pure ZWSP first. Pure ZWSP renders glued in

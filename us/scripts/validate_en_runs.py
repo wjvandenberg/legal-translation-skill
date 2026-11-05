@@ -1,5 +1,5 @@
 """Pre-apply gate: BLOCK if a detected definitions section in
-paragraphs.json has any paragraph without `en_runs`(gate introduced) and  (extracted to standalone file).
+paragraphs.json has any paragraph without `en_runs`.
 
 Auto-invoked by apply_translations_textmatch.py before the main
 translation step. Operators don't run this directly; the subprocess

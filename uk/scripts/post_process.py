@@ -717,7 +717,7 @@ TERM_REPLACEMENTS = [
     # --- Literal translation patterns ---
     ('by universal or singular title', 'whether by way of universal or individual succession', False),
     # 'stipulated' is calque ONLY in verb-of-contracting context.
-    # The  blanket replacement broke legitimate adjective use
+    # The earlier blanket replacement broke legitimate adjective use
     # ("in the proportions stipulated in the Memorandum" = "set out
     # in the Memorandum"). Narrow patterns capture only the calque
     # ("hereby stipulate", "to stipulate", "the parties stipulate")
@@ -837,7 +837,7 @@ UK_SPELLING = [
 ANNEX_EXCLUDE = ['Regulation', 'Directive', 'Law', 'Decree', 'Regolamento']
 
 # LEGISLATION KEYWORDS (paragraphs containing these keep "Article")
-# replaced the LEGISLATION_KW hardcoded list (which had to
+# The skill replaced the LEGISLATION_KW hardcoded list (which had to
 # enumerate "Civil Code", "Royal Decree", "T.U.B.", etc. and missed
 # "Code of Civil Procedure", "Resolution of the CICR", etc.) with a
 # language-agnostic structural detector. See _is_external_article_ref().
@@ -1190,8 +1190,8 @@ def fix_spacing(root):
     """Insert a missing space between adjacent text elements within a paragraph
     — but ONLY where nothing between them already supplies the separation.
 
-    now iterates ``<w:t>`` AND ``<w:delText>`` together in
-    document order. The  version only walked ``<w:t>``, so the
+    It now iterates ``<w:t>`` AND ``<w:delText>`` together in
+    document order. The earlier version only walked ``<w:t>``, so the
     seam between an inserted run and a struck-through deletion was
     never inspected — the reject-all view of paragraphs with
     del-then-regular structure showed cosmetic glue
@@ -2230,7 +2230,7 @@ def fix_schedule_page_breaks(root):
         # rendering happens to start with the word "Schedule" has a
         # lowercase preposition or proper noun there (e.g. "Schedule
         # for Performance of the Works" — "for" is a lowercase
-        # preposition, not a label). The  length cap doesn't
+        # preposition, not a label). The length cap doesn't
         # catch the short variant of this defect (the offending para
         # is 36 chars, well under 120). Strip trailing punctuation
         # from the label token before the lowercase check so dash- or

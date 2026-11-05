@@ -24,11 +24,11 @@ The script reports:
 - **BLOCK** (exit 2): one or more paragraphs are critically short — re-translate before
   proceeding.
 
-**Pre-apply gates (TC documents) and post-apply token check run automatically inside
+**Pre-apply gates and the post-apply token check run automatically inside
 Step 5.** `apply_translations_textmatch.py` auto-invokes `validate_en_runs.py`
-(definitions-section bold-italic gate) + `validate_segment_shapes.py`
-+ `validate_reject_all.py` (TC docs only) at the start, and `validate_apply.py
---strict` at the end. The operator runs ONE command (Step 5) and gets all five gates
+(definitions-section bold-italic gate) + the final `validate_translations.py` pass
++ `validate_segment_shapes.py` + `validate_reject_all.py` (these two on TC docs only)
+at the start, and `validate_apply.py --strict` at the end. The operator runs ONE command (Step 5) and gets all five gates
 for free — there is no separate command for them and no flag to skip them.
 
 For a manual pre-flight check before Step 5 (optional — the gates fire

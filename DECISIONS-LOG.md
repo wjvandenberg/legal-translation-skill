@@ -2574,3 +2574,43 @@ identical before and after, the metacheck 15 of 15, over rewording the plan arou
 `auto_mode_headless.py` IN A SECOND COMMIT:** the house retired it mid-session, failing the first full run on
 `vocabulary_census --selftest` on `main` as here; the project's copy is kept until an opening adopts the retirement,
 and `auto_mode.py` and `auto_mode_guard.py` v5, released the same afternoon, are adopted there too.
+
+## 2026-11-04 (3) — sub-step 14.9.4, unattended: the claims about the skill, F23, F37, F36, F38; eight choices the session's own
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS IN 2026-11-04 (1) AND HIS WORD TO 14.9.3'S SESSION AT ABOUT 12:40** —
+each choice below is THE SESSION'S, taken on its own recommendation and carried here for him to confirm or overturn;
+none is his ruling.
+
+**(1) THE BROKEN SENTENCES ARE MADE WHOLE WITHOUT THEIR VERSION TOKENS,** over the register's "restoring one version
+token per site": the tokens name revisions of a history kept outside the repository, so a public reader cannot use
+them; they could be recovered only by opening the private archived revisions; and option 9's item 7 already replaces
+the revision tokens left with one version identifier. **(2) THE CLASS IS FIXED, NOT ONLY THE ROWS' SITES:** nine more
+broken lines in four scripts' comments, repack's three checks where two lists named two, apply's five where three
+more lists missed one, and `translate_numbering.py` said to use lxml — each a wording fix, the house rule being to fix
+the class. **(3) `--aux-dir` IS MANDATORY AT SKILL STEP 9,** saying the script runs without it: measured, a run
+without it passes a header still in the source language; Step 10's list and Step 11a's re-run already have it so.
+**(4) F36's SECOND PART CLOSES ON THE CODE'S EVIDENCE,** fixed at step 5 and tested, not re-fixed. **(5) 05's FIRST
+RULE, which names two of apply's five checks for exit 3, IS LEFT WITH F35,** open and broader, as 14.9.1 left it.
+**(6) APPLY STILL WRITES OOXML WITH ElementTree, against `.claude/rules/ooxml.md`:** the claim is corrected and the
+code question recorded for the loose ends — a rewrite of the primary script is code no plan has approved, and the
+four guards are measured to hold. **(7) THE SIZE IS ACCEPTED AFTER ONE TIGHTENING PASS:** +571 bytes read in each
+tree, 0.24% of `SKILL.md` and the step documents, every byte a correction a finding requires.
+**(8) `/code-review` AT HIGH, BEFORE THE COMMIT: five findings, three fixed, two needing no change** — fixed:
+Step 10's list had given `validate_en_runs` `validate_translations`' "BLOCK on critical", now its own; 05's closing
+item now says a validator's exit code 2, beside the rule that apply's own exit 2 is a mistyped command; the test's
+banner. No change: safeguard 3's "cannot be skipped" beside `--allow-bold-loss`, the validator still running; and
+"every prefix" against a root past 8,000 bytes, which ends in the very stop the sentence names.
+
+## 2026-11-05 (1) — Wouter: 14.9.4's full run moved to today; 14.9.4's session conducts, past 15:30; another session's checks no reason to wait
+
+**WOUTER, IN 14.9.4'S SESSION:** on 2026-11-04 at about 17:00, *"I need to leave, can we pause here? Will restart in
+1 hour"* and *"I need to stop, sorry."* — the session parked, its mutant run stopped and the one mutated file put back
+byte-exact by the in-place guard; at his *"continue"* it resumed; at about 18:40, *"Stop, we'll do the run
+tomorrow"* — the full run stopped mid-way, nothing recorded. On 2026-11-05: *"continue please, also starting nested
+sessions. Continue at least until 15:30, without asking questions and continuing all the time. If there are other
+sessions doing checks in the meantime, just continue with the checks and ignore that."* **The session's three readings,
+each its own and not his ruling:** (i) 14.9.4's session conducts from here, starting 14.9.5 and each next sub-step's
+session from the prompt the one before writes; (ii) another session's checks running at the same time are no reason
+to wait, so the house's rule against two suites at once yields to his word for this chain, a clash reading as a run
+to repeat and never as a pass; (iii) the purpose line dated 2026-11-05 is written after the full run, which needs a
+clean tree, and not at the opening.

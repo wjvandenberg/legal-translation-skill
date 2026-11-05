@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""auto_mode_guard.py - refuse an unattended session's irreversible acts.  CHECKER VERSION 4 (2026-10-16)
+"""auto_mode_guard.py - refuse an unattended session's irreversible acts.  CHECKER VERSION 5 (2026-11-04)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -27,13 +27,17 @@ THE SCOPE, WRITTEN DOWN, BECAUSE A GATE THAT DOES NOT STATE ITS OWN BOUNDARY HAS
                    rebase, filter-repo, reflog expire) · reset --hard and clean · deleting
                    files or branches · gh repo create/edit/delete and release/gist publish
                    · npm publish · creating or changing a scheduled task, by shell command
-                   OR by tool name · the obvious MCP send/post tools.
+                   OR by tool name · an MCP tool whose own name carries the WORD send,
+                   post, reply or forward (v5; v4 caught only a name starting send_/post_).
   ALLOWED, NAMED   git commit, but ONLY on the branch AUTO-MODE-RUN.md names. A local
                    commit on a feature branch is reversible, and AUTO MODE's own rule is
                    one commit per step - forbidding it leaves a chain's work unversioned
-                   until a person returns.
+                   until a person returns. And (v5) a message to ANOTHER CLAUDE SESSION,
+                   by the app's tool's exact name: any session may message another.
   NOT CHECKED      a script that deletes, sends or spends without saying so in its command
-                   line · the Write and Edit tools overwriting a file · anything reached
+                   line · an MCP tool that sends under ANOTHER word - share, invite,
+                   upload, a calendar event's invitations · the Write and Edit tools
+                   overwriting a file · anything reached
                    through an interpreter. Those stay PROSE in AUTO-MODE-RUN.md, and that
                    file marks which rows are which.
   DATA, NOT CODE   the body of a heredoc or a PowerShell here-string is NOT judged as a
@@ -123,10 +127,36 @@ DENY_TOOLS: list[tuple[str, str, str]] = [
      "every hop is armed up front; a chain that can extend itself has no bound"),
     ("publish", r"Artifact",
      "an artifact is published to a URL, and a URL that has been served cannot be unserved"),
-    ("message", r"mcp__[\w-]+__(send|post)_\w+",
-     "a hop may not message anyone. This catches the obvious tools by name and nothing else "
-     "- a script that sends is NOT caught, which is why the rule also stands in prose"),
 ]
+
+#: v5 - EVERY SESSION MAY MESSAGE ANOTHER; NOTHING LEAVES THE MACHINE (Wouter, 2026-11-04: a
+#: session that changes a shared script tells the live ones). The desktop app's own tool for a
+#: message to another Claude session, allowed by its EXACT name - never by a pattern, which a
+#: connector naming a tool alike would satisfy. SendMessage, built in and not MCP, always passed.
+SESSION_MESSAGE_TOOL = "mcp__ccd_session_mgmt__send_message"
+
+#: v5 - a WORD in an MCP tool's own name that says the call carries something out. v4 matched
+#: only a name STARTING `send_` or `post_`, so a mail connector's `reply` and `forward` and a
+#: chat connector's `slack_send_message` all passed, measured. A WORD, not a fragment, so
+#: `get_sender`, `list_posts` and `sharepoint_search` - reads - still pass. The cost, accepted:
+#: a read named for a noun, `get_post`, is refused, since no word list tells a noun from a verb.
+#: NOT caught, declared: a word fused with no boundary (`sendmail`), or inflected (`posting`).
+OUTWARD_WORDS = frozenset({"send", "post", "reply", "forward"})
+
+
+def name_words(tool_name: str) -> list[str]:
+    """The words of an MCP tool's OWN name - the part after the last `__`, split at `_`, `-`
+    and a camelCase boundary, lower-cased. The server's part is not read: it names who, not what."""
+    own = (tool_name or "").rsplit("__", 1)[-1]
+    own = re.sub(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", "_", own)   # SMSSend: SMS_Send
+    return [w for w in re.split(r"[_\-\s]+", own.lower()) if w]
+
+
+def outward_message(tool_name: str) -> bool:
+    """True for an MCP tool whose own name carries an OUTWARD word, except the session message."""
+    if not (tool_name or "").startswith("mcp__") or tool_name == SESSION_MESSAGE_TOOL:
+        return False
+    return any(w in OUTWARD_WORDS for w in name_words(tool_name))
 
 #: git commit is the one conditional allowance, so it is matched separately and LAST.
 COMMIT = re.compile(r"\bgit\s+(?:-\S+\s+)*commit\b", re.I)
@@ -215,6 +245,12 @@ def decide(tool_name: str, tool_input: dict, branch: str, cfg: dict,
                                          for p in cfg.get("extra_deny_tools", [])]:
         if re.fullmatch(pat, tool_name or ""):
             return False, _refusal(label, tool_name, why)
+    if outward_message(tool_name):
+        return False, _refusal(
+            "message", tool_name,
+            "a message may go to another Claude session, never off this machine. This catches "
+            "an MCP tool by the words of its own name - send, post, reply, forward - and nothing "
+            "else: a script that sends is NOT caught, which is why the rule also stands in prose")
 
     command = ""
     for key in ("command", "script"):
@@ -424,6 +460,34 @@ def selftest() -> int:
              bad=tool("mcp__some-server__send_message"),
              good=tool("mcp__some-server__get_message"),
              want="REFUSE", good_want="ALLOW"),
+        # v5: EVERY SESSION MAY MESSAGE ANOTHER, AND NOTHING LEAVES THE MACHINE. The good arm of
+        # the first pair is the app's own session message, which v4 refused like an email.
+        Case("session message passes, mail send not", probe,
+             bad=tool("mcp__mail__send_message"),
+             good=tool(SESSION_MESSAGE_TOOL),
+             want="REFUSE", good_want="ALLOW"),
+        Case("the built-in SendMessage passes", probe,
+             bad=tool("mcp__mail__post_message"), good=tool("SendMessage"),
+             want="REFUSE", good_want="ALLOW"),
+        Case("an MCP reply is refused", probe,
+             bad=tool("mcp__mail__reply"), good=tool("mcp__mail__get_thread"),
+             want="REFUSE", good_want="ALLOW"),
+        Case("an MCP forward is refused", probe,
+             bad=tool("mcp__mail__forward"), good=tool("mcp__mail__list_drafts"),
+             want="REFUSE", good_want="ALLOW"),
+        Case("a send INSIDE the name is refused", probe,
+             bad=tool("mcp__chat__slack_send_message"),
+             good=tool("mcp__chat__slack_read_channel"),
+             want="REFUSE", good_want="ALLOW"),
+        Case("a post is refused, a list of posts not", probe,
+             bad=tool("mcp__forum__create_post"), good=tool("mcp__forum__list_posts"),
+             want="REFUSE", good_want="ALLOW"),
+        Case("camelCase word counts, a fragment not", probe,
+             bad=tool("mcp__mail__sendEmail"), good=tool("mcp__mail__get_sender"),
+             want="REFUSE", good_want="ALLOW"),
+        Case("an acronym before a word splits", probe,
+             bad=tool("mcp__sms__SMSSend"), good=tool("mcp__sms__SMSStatus"),
+             want="REFUSE", good_want="ALLOW"),
         Case("a commit on ANOTHER branch is refused", _commit_elsewhere,
              bad=lambda d: _repo(d, "some/other-branch"),
              good=lambda d: _repo(d, branch),
@@ -447,6 +511,14 @@ def selftest() -> int:
     ok &= good
     print(f"  {'OK  ' if good else 'MISS'} live only while STATUS is RUNNING     -> "
           f"COMPLETE: exit {inert} (allow), RUNNING: exit {live} (refuse)")
+    # v5: the same two messages through the REAL entry point while a run is live - the case
+    # table above asks decide() directly, and the hook is what a session actually meets.
+    said = _live_probe(tmp, "RUNNING", "", tool_name=SESSION_MESSAGE_TOOL)
+    out = _live_probe(tmp, "RUNNING", "", tool_name="mcp__mail__reply")
+    good = said == ALLOW and out == REFUSE
+    ok &= good
+    print(f"  {'OK  ' if good else 'MISS'} live: a session message, then a reply  -> "
+          f"session: exit {said} (allow), reply: exit {out} (refuse)")
 
     # ---- v3: THE PAYLOAD AS CLAUDE CODE SENDS IT - raw UTF-8, nothing escaped - through the
     #      REAL entry point, the child GIVEN the code page this machine reads a pipe in, cp1252,
@@ -522,15 +594,17 @@ def _commit_nowhere(d: Path) -> str:
     return "ALLOW" if allowed else "REFUSE"
 
 
-def _live_probe(tmp: Path, status: str, command: str) -> int:
-    """Run the REAL entry point end to end, against a state file in the given status."""
+def _live_probe(tmp: Path, status: str, command: str, tool_name: str = "Bash") -> int:
+    """Run the REAL entry point end to end, against a state file in the given status - a Bash
+    command, or (v5) any other tool by name, sent with no input."""
     d = tmp / f"live-{status}"
     d.mkdir(parents=True, exist_ok=True)
     (d / "AUTO-MODE-RUN.md").write_bytes(
         ("```auto-mode\nRUN_ID: r\nN: 1\nK: 0\nSTATUS: " + status +
          "\nBRANCH: session/the-run\nHOP_ACTIVE: no\nWOKE: -\n```\n").encode("utf-8"))
     env = dict(os.environ, AUTO_MODE_RUN_FILE=str(d / "AUTO-MODE-RUN.md"))
-    payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": command},
+    payload = json.dumps({"tool_name": tool_name,
+                          "tool_input": {"command": command} if command else {},
                           "cwd": str(d)})
     r = subprocess.run([sys.executable, str(Path(__file__).resolve())],
                        input=payload, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)

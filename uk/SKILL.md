@@ -26,7 +26,7 @@ all original .docx formatting (fonts, styles, headers, tables, numbering, etc.).
 
 This skill's discipline depends on you actually reading SKILL.md, not just having it loaded in context. Before performing any step (Step 1 through Step 11), post a single short confirmation line in chat: **"Understanding of skill discipline is confirmed, now initiating translation process."** (use this exact wording). Do NOT print the technical details (Hard Rules location, validator names, step files) — the user does not want a wall of internal-state text. The act of writing the confirmation line is what proves you are at the right place; keep it terse.
 
-If, while you are about to type the line, you realise you cannot from memory name (a) where the Hard Rules block lives, (b) which validators auto-invoke from `apply_translations_textmatch.py` (there are four), or (c) the file containing the step you are about to perform — **STOP**, `Read('SKILL.md')` again slowly, then post the one-line confirmation. Internal verification is required; user-facing display of that verification is not.
+If, while you are about to type the line, you realise you cannot from memory name (a) where the Hard Rules block lives, (b) which validators auto-invoke from `apply_translations_textmatch.py` (there are five), or (c) the file containing the step you are about to perform — **STOP**, `Read('SKILL.md')` again slowly, then post the one-line confirmation. Internal verification is required; user-facing display of that verification is not.
 
 ### Compaction-resume trigger — treat as session start
 
@@ -198,12 +198,12 @@ High-level summary of what each step does. Detail in the step files.
 | 4b | Per-batch validate | `validate_translations.py` after each batch | `skill-docs/04b-translate-gates.md` |
 | 4c | Cross-refs | Resolve broken cross-references in translated text | `skill-docs/04b-translate-gates.md` |
 | 4d | Lexicon compliance | `lexicon_compliance.py` pre-apply scan | `skill-docs/04b-translate-gates.md` |
-| 5 | Apply | `apply_translations_textmatch.py` (auto-invokes 4 validators) | `skill-docs/05-apply.md` |
+| 5 | Apply | `apply_translations_textmatch.py` (auto-invokes 5 validators) | `skill-docs/05-apply.md` |
 | 6 | Post-process | `post_process.py` (terminology, spacing, UK English, etc.) | `skill-docs/06-postprocess-and-reorder.md` |
 | 7 | Reorder | `reorder_definitions.py` for documents with definitions | `skill-docs/06-postprocess-and-reorder.md` |
 | 8 | Aux files | Translate headers/footers/comments/footnotes/endnotes | `skill-docs/08-aux-and-quality.md` |
 | 9 | Quality check | `quality_check.py` for source-language remnants, in the language declared at 1c | `skill-docs/08-aux-and-quality.md` |
-| 10 | Repack | `repack_docx.py` (auto-invokes validate_apply --strict, then --delivered) | `skill-docs/10-repack-and-validate.md` |
+| 10 | Repack | `repack_docx.py` (auto-invokes lexicon_compliance, validate_apply --strict, then --delivered) | `skill-docs/10-repack-and-validate.md` |
 | 11 | Validate | Final integrity check on the .docx | `skill-docs/10-repack-and-validate.md` |
 
 ## Anti-drift safeguards
@@ -216,7 +216,7 @@ The defences are layered and they are non-optional:
 
 2. **Hard Rules apply skill-wide.** The 5 Hard Rules above are not just for Step 4. Every step's compliance check asks you to re-confirm them.
 
-3. **Auto-invoked gates.** `apply_translations_textmatch.py` auto-runs four pre-apply validators (`validate_en_runs`, `validate_segment_shapes`, `validate_reject_all`, then `validate_apply --strict` after applying). `repack_docx.py` auto-runs `validate_apply --strict` again, and last `validate_apply --delivered` on a check copy of the finished archive. `post_process.py` auto-runs `strip_noop_tracked_changes.py`. None of these can be skipped from the CLI.
+3. **Auto-invoked gates.** `apply_translations_textmatch.py` auto-runs five validators: `validate_en_runs` and `validate_translations` before applying, `validate_segment_shapes` and `validate_reject_all` too on a TC document, then `validate_apply --strict` after applying. `repack_docx.py` auto-runs `lexicon_compliance --stage pre-repack` and `validate_apply --strict` again, and last `validate_apply --delivered` on a check copy of the finished archive. `post_process.py` auto-runs `strip_noop_tracked_changes.py`. None of these can be skipped from the CLI.
 
 4. **Per-batch validation.** `validate_translations.py` enforces a hard cap of 35 newly-translated paragraphs per invocation. The state file `.validate-state.json` makes batch coverage auditable.
 
@@ -392,7 +392,7 @@ as English rather than against the source language's dictionary.
 | `validate_reject_all.py` | **MANDATORY if source has TCs** — Reconstruct accept-all and reject-all views from `en_segments` and scan for readability defects (double article, repeated word, stranded preposition, run-together words, double space, empty brackets, forbidden collocations). **Auto-runs from `apply_translations_textmatch.py` on TC documents.** |
 | `lexicon_compliance.py` | **MANDATORY (pre-apply AND pre-repack)** — Scan JSON or document.xml for calques and hard-rule violations drawn from lexicon Avoid columns. Pre-apply run is manual (Step 4d); pre-repack run **auto-fires from inside `repack_docx.py`** before bundling. Reads the source language declared at Step 1c; a language the skill does not support runs every language's rules, none written for it, and says NOT SUPPORTED, never PASSED. |
 | `source_language_markers.py` | **MANDATORY at Step 1c** — `--declare <language> <workdir>` writes `source_language.json`, the one source language every language-dependent check reads; also holds the remnant marker lists and their verdict. |
-| `apply_translations_textmatch.py` | **PRIMARY** — Apply translations by text matching onto original. Auto-runs `validate_translations.py` (BLOCK code 2 only), plus `validate_segment_shapes.py` and `validate_reject_all.py` on TC docs, all pre-apply, plus `validate_apply.py --strict` post-apply. |
+| `apply_translations_textmatch.py` | **PRIMARY** — Apply translations by text matching onto original. Auto-runs `validate_en_runs.py` and `validate_translations.py` (each BLOCK code 2 only), plus `validate_segment_shapes.py` and `validate_reject_all.py` on TC docs, all pre-apply, plus `validate_apply.py --strict` post-apply. |
 | `repack_docx.py` | **MANDATORY** — Repack translated XML back into .docx (replaces shell zip). Auto-runs `lexicon_compliance.py --stage pre-repack` and (when `--paragraphs` supplied) `validate_apply.py --strict` before bundling. Scrubs every U+200B from every prose part, then reads the archive back BEFORE delivery and REFUSES if one survives or if a prose part carries a source-language remnant — in the language declared at Step 1c, cross-checked against the original, a mismatch warned — and the classes declared advisory in `source_language_markers.py` only warn. Last, still before the write, it runs `validate_apply.py --delivered` on a check copy of the finished archive against the notes and the original, and REFUSES on a blocking finding or a check that examined nothing. |
 | `translate_numbering.py` | Translate numbering format strings in word/numbering.xml, in the language declared at Step 1c. Lists every string it left NOT TRANSLATED; **exits 1** when the language was declared and is supported and a string the document uses is left (render it with `--custom`) |
 | `translate_headers_footers.py` | Translate text in word/headerN.xml and word/footerN.xml |
@@ -500,9 +500,10 @@ but uses `ns1:`, `ns2:`, etc. deep in the body — unbound prefixes that Word ca
 
 **Where this bites**: `word/comments.xml`, `word/footnotes.xml`, `word/endnotes.xml`,
 `word/headerN.xml`, `word/footerN.xml`. The main `document.xml` pipeline avoids this
-problem because `apply_translations_textmatch.py` uses lxml and grafts the original root
-tag back; but the auxiliary files are usually translated with ad-hoc inline Python, which
-is where ElementTree sneaks in.
+problem although `apply_translations_textmatch.py` uses ElementTree too: it registers every
+prefix the source's root declares, grafts the original root tag back, injects any missing
+declaration, and stops rather than write a synthetic `nsN:` prefix. Ad-hoc inline Python
+for the auxiliary files has none of these guards, which is where ElementTree sneaks in.
 
 **Why header-grafting alone is insufficient**: earlier versions of this skill recommended
 capturing the original `<w:comments ...>` opening tag and regex-substituting it back after
@@ -514,7 +515,8 @@ enforces prefix binding per element, so grafting the root is not enough.
 1. **(Preferred for comments)** Use the bundled `translate_comments.py` script. It replaces
    text purely via regex, without parsing the XML tree, so no prefix is ever renamed.
 2. **(Preferred for headers/footers/numbering)** Use the bundled `translate_headers_footers.py`
-   / `translate_numbering.py` scripts. They use lxml, which preserves prefixes correctly.
+   / `translate_numbering.py` scripts. The first uses lxml, which preserves prefixes
+   correctly; the second rewrites its strings by regex.
 3. **(For footnotes/endnotes or any other aux file)** Use pure-regex text substitution
    inside `<w:t>` / `<w:delText>` elements, keeping every other byte of the original XML
    verbatim. Example pattern is in Step 8d.
@@ -570,7 +572,7 @@ input hits a different OOXML quirk, the term-sanity guard still catches the symp
    will emit `definition_order` warnings; document them as known false positives in the
    delivery notes.
 
-**Do not** patch the script ad-hoc to "force" a sort. The  invariant check would
+**Do not** patch the script ad-hoc to "force" a sort. The script's own invariant check would
 abort anyway. If the reorder won't run cleanly, source-order delivery is the supported
 fallback.
 

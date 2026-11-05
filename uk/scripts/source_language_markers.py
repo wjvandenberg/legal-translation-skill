@@ -196,7 +196,7 @@ LANGUAGE_MARKERS = {
         '代表取締役', '取締役', '支配人',
         # romanised era names with a year digit. Catches the
         # "Reiwa 5" / "Heisei 29" / "Showa 64.1.7" defect class — era
-        # references that walked through every gate in  because
+        # references that once walked through every gate, because
         # the Japanese remnant list was CJK-only. Era + digit is
         # unambiguous: under the strict Gregorian-only rule
         # (references/general-legal.md and japanese-general-legal.md),

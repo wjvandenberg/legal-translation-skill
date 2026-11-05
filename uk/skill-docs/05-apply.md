@@ -6,7 +6,7 @@
 
 **Rule out a truncated install FIRST — one condition wears the costume of the other.** `apply_translations_textmatch.py` runs `validate_segment_shapes.py` and `validate_reject_all.py`, and **exit code 3 from either of those means the script is truncated, not that a gate fired** — apply names it, and a crash, in banners of their own. So before reading any banner as a gate: if the reported exit code is **3**, or a `FILE INTEGRITY CHECK FAILED — script truncated` banner appears above it, **STOP and re-install the skill** — SKILL.md's script-integrity rule governs and the paragraph below does not apply. Re-authoring `paragraphs.json` will not clear it, because the input is not the problem.
 
-**Distinguishing skill gates from script errors.** Once a truncated install is ruled out: if `apply_translations_textmatch.py` exits with code 2, raises `RuntimeError` mentioning `BLOCK`, or prints a banner reading `SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR`, that is a gate firing intentionally. The scripts are not crashing and not buggy. Read the BLOCK message printed immediately above the exit/raise — it tells you exactly which gate fired (en_runs missing on a definitions section, per-batch cap exceeded, validate_apply token mismatch, post-strip drift, etc.) and how to fix `paragraphs.json`. **Do NOT work around a gate by calling `textmatch_apply()` from a wrapper that bypasses the auto-invoked validators, by suppressing `--strict` flags, or by patching the script to return success.** The gates exist because every prior occasion the operator went around them shipped output below the quality the skill is designed to deliver. Fix the underlying issue and re-run apply; it is always faster than the workaround.
+**Distinguishing skill gates from script errors.** Once a truncated install is ruled out: if `apply_translations_textmatch.py` exits with code 1 on a `RuntimeError` mentioning `BLOCK`, or prints a banner reading `SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR`, that is a gate firing intentionally; an exit 2 is a mistyped command. The scripts are not crashing and not buggy. Read the BLOCK message printed immediately above the exit/raise — it tells you exactly which gate fired (en_runs missing on a definitions section, per-batch cap exceeded, validate_apply token mismatch, post-strip drift, etc.) and how to fix `paragraphs.json`. **Do NOT work around a gate by calling `textmatch_apply()` from a wrapper that bypasses the auto-invoked validators, by suppressing `--strict` flags, or by patching the script to return success.** The gates exist because every prior occasion the operator went around them shipped output below the quality the skill is designed to deliver. Fix the underlying issue and re-run apply; it is always faster than the workaround.
 
 ```bash
 python <skill-path>/scripts/apply_translations_textmatch.py \
@@ -56,8 +56,8 @@ Before moving to the next step, confirm:
 
 - [ ] You ran `apply_translations_textmatch.py` and let it auto-invoke ALL pre-apply gates
 - [ ] You did NOT pass `--allow-bold-loss` unless bold loss is genuinely acceptable
-- [ ] You read every gate output (segment_shapes, reject_all, validate_en_runs, validate_apply)
-- [ ] No gate exit code 2 was suppressed or worked around
+- [ ] You read every gate output (validate_en_runs, validate_translations, segment_shapes, reject_all, validate_apply)
+- [ ] No validator's exit code 2 was suppressed or worked around
 
 If any check is uncertain, STOP. Re-read this file. Do not proceed.
 

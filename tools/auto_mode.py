@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""auto_mode.py - the counter an unattended chain of sessions runs on.  CHECKER VERSION 4 (2026-11-03)
+"""auto_mode.py - the counter an unattended chain of sessions runs on.  CHECKER VERSION 5 (2026-11-04)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -54,6 +54,12 @@ back. It draws the hop's window from WOKE, so --claim now writes WOKE to the sec
 minute, compared as text with the cycle store's own times, every record of the day fell inside.
 And --hop names the hop the conductor started, since one that never claimed leaves the last
 hop's fields in place, and the check would otherwise pass them and restart it on every wake.
+
+THE ARM SPEAKS THE CONDUCTOR ROUTE (v5). The headless runner retired to archive/ on 2026-11-04,
+the conductor being the one mechanism for chained work, and --arm still told its reader to
+confirm the runner's flags line and that every hop must be scheduled - neither true of a run a
+conductor starts. It now names the conductor's next two acts, and the selftest refuses either
+retired instruction coming back.
 
 THE EFFORT A HOP RUNS AT (v3), AND WHY ARMING REFUSES WITHOUT IT. Measured 2026-09-30: a
 desktop session at `xhigh` armed a run, the runner was started from a plain terminal, and the
@@ -110,6 +116,8 @@ EFFORT_LEVELS = ("low", "medium", "high", "xhigh", "max")
 #: tracked list, so a project re-copying this counter is told nothing about the runner beside
 #: it - and a v5 runner ignores EFFORT, launching every hop at the CLI default. --arm is the
 #: one place that sees both files, so it refuses there. The fix for caller N+1, not a note.
+#: THE RUNNER RETIRED TO archive/ ON 2026-11-04 (v5) and this check is KEPT: a project still
+#: holding an older copy beside this counter is refused here until it adopts, as before.
 RUNNER_NAME = "auto_mode_headless.py"
 RUNNER_MIN_VERSION = 6
 
@@ -553,12 +561,12 @@ def act_arm(fields: dict, run_id: str, hops: int, branch: str, effort: str | Non
     fields.update({"RUN_ID": run_id, "N": str(hops), "K": "0", "STATUS": RUNNING,
                    "BRANCH": branch, "HOP_ACTIVE": "no", "WOKE": "-", "EFFORT": level})
     return RC_OK, [f"  ARMED: run {run_id}, {hops} hop(s), on branch {branch}.",
-                   f"  EFFORT: {level} (from {source}) - every hop is launched at it, and the "
-                   "runner reads back what each one ran at.",
-                   f"  BEFORE HANDING OVER THE LAUNCH COMMAND: confirm the runner's flags line "
-                   f"shows --effort {level}.",
+                   f"  EFFORT: {level} (from {source}) - a hop inherits the conductor's effort, "
+                   "so run at this one and start no hop lower.",
+                   "  NEXT, AS THE CONDUCTOR: the canary, then hop 1 on a person's own turn - "
+                   "AUTO-MODE.md, the conductor, steps 2 and 3.",
                    "  K = 0: no hop has run yet. The first to claim becomes hop 1.",
-                   "  Every hop must be scheduled ALREADY - a hop may not create a task."], True
+                   "  The conductor starts every hop - a hop never starts a session or creates a task."], True
 
 
 # -------------------------------------------------------------------------------- driver
@@ -774,6 +782,13 @@ def selftest() -> int:
              bad=lambda d: (_state(d), "xhigh", None, 5),
              good=lambda d: (_state(d), "xhigh", None, None),
              want="REFUSED", good_want="ARMED xhigh"),
+        # THE ARM'S OWN WORDS (v5): the headless runner retired, so an arm that still says
+        # "confirm the runner's flags line" or "every hop must be scheduled" misdirects the
+        # conductor who reads it - measured on the first conductor run, 2026-11-03.
+        Case("an arm speaks the conductor route, not the loop's", _probe_arm_words,
+             bad=lambda d: (_state(d), None, None, None),
+             good=lambda d: (_state(d), "xhigh", None, None),
+             want="REFUSED", good_want="CONDUCTOR"),
         # THE CONDUCTOR'S CHECK AFTER EVERY HOP (v4) - the gate the headless runner makes,
         # asked with one command. Each pair differs in ONE thing.
         Case("a hop that recorded no verify+test is refused", _probe_hop_check,
@@ -962,6 +977,19 @@ def _probe_arm(args) -> str:
     if rc == RC_REFUSED:
         return "REFUSED"
     return f"ARMED {read_state(f)[0].get('EFFORT')}"
+
+
+def _probe_arm_words(args) -> str:
+    """--arm's printed lines, judged: CONDUCTOR when they name the conductor and neither of the
+    retired loop's instructions, HEADLESS when either survives. A refused arm prints no route."""
+    f, effort, env, runner = args
+    fields, _raw, _term = read_state(f)
+    rc, lines, _dirty = act_arm(fields, "r-test", 2, "session/x", effort, env, runner)
+    if rc == RC_REFUSED:
+        return "REFUSED"
+    text = "\n".join(lines)
+    stale = "flags line" in text or "scheduled ALREADY" in text
+    return "HEADLESS" if stale or "conductor" not in text else "CONDUCTOR"
 
 
 def _probe_block(f: Path) -> str:

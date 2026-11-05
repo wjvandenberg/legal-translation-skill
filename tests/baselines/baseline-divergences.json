@@ -6,14 +6,14 @@
  "count": 67,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/step14-9-3-step-4-rules",
-   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
-   "sha256_now": "40ec89e48a8ee9cbb6be64a03cff909c4d9d6e7dad42f726a8053ebe98d6ee65"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "08801bd08fdd553dc0a904d2aca7adc008cfdc28ced162583e439459ef06f236"
   },
   "uk/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "aa77c1b8171de863218ce7ea78da354c9a5a870d5ad70a6cb37e530c5b45acd6"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "9d969215a99c4ee71694ca41f8245d0b999d0cf1e76b37e428be26274f285070"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -26,9 +26,9 @@
    "sha256_now": "a1ea6d865f40d57228eaf873066385d00a5133c0b2f9cf59e51d530275bfd932"
   },
   "uk/scripts/post_process.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "479663ba97c1faa915c008d0b049cbdb4629c8be3b4a42ae458e909fe72dfb7d"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "93a63296c2fa453cbcfc44384cc834e1bce4dbaed206d826a7240c8a01dbfa82"
   },
   "uk/scripts/quality_check.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -36,14 +36,14 @@
    "sha256_now": "229f182933965da4d64dcd6cfb60c6bde64556d62cbbbfde8bce868a9290be2b"
   },
   "uk/scripts/repack_docx.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "9d0cfa4a0d69ff5c24945de90052b2f8b42a9cb1d42d630da2f15793896b893d"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "4a153638d04fbb34c0c64139ac5593bb74be86597c205b03cb84126f86d81df8"
   },
   "uk/scripts/source_language_markers.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "ec46fbc1312c741a2c704f48b55e0254815b311706fc35d121c66093bb33f574"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "e76d7748b29633253215fdd98179b7962157fbb48ed063b829d392c3aeb3043f"
   },
   "uk/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -61,9 +61,9 @@
    "sha256_now": "043bfc59f88175b316b112c8d62bde324b24d4d3b0824e4bd6a83df5186e75db"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "b3e232c66e4aaefc1285a9d52ecbc986e7bb74a0ae73444a43a7b730df10bb20"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "4f4a969064f1bd1f09a500f16ebfcebeae78bb551280ecc8471d4ea7b0d82829"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -81,39 +81,39 @@
    "sha256_now": "08451e6f7592874f72e60de08d78bbd5a6a8d1516f7d3a9522d5265d6c1556ab"
   },
   "uk/skill-docs/04b-translate-gates.md": {
-   "changed_by": "feature/step14-9-3-step-4-rules",
-   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
-   "sha256_now": "4f06688158410cc1f180a5d8e95567798b25fb71e756e5d8ab0e8cb54ec6872b"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "67139cb6faaf5d994748de3da9268b560cde4e7b0c6f83925a46d0d7c22048a1"
   },
   "uk/skill-docs/05-apply.md": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "063c7ac035f11bb5c01d6034b7696b1bc4a3d9a1c97f8dbe7f8e89f25adfd1df"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "9f9a2b5eaea595d39665cb036f29263d36d137a31fb195118a2b3862fafe05fd"
   },
   "uk/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "feature/step14-9-2-steps-1-and-11",
-   "commit_subject": "Step 14.9.2 - skill Steps 1 and 11 say what is true: the .doc command, the closing lists, Step 11b (F11, F9, F21, F20)",
-   "sha256_now": "d66d1ba997c2b702541fbeec1915985fdee729a3e95a673821066cc064ef3924"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "d0b5470a5bfca04530d102f165e328da04a990c0acfdddc279233a7bc5ee72c8"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/step14-9-2-steps-1-and-11",
-   "commit_subject": "Step 14.9.2 - skill Steps 1 and 11 say what is true: the .doc command, the closing lists, Step 11b (F11, F9, F21, F20)",
-   "sha256_now": "e56af3b5dafcec9234c38369ce5b4b3e3f4421b32fabc0771d16b2bf67c51382"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "08355bdcfcf9daf125ac3a6b3ba99f35aa9bcb26af2ec6d79223eafca1e8de4c"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/step14-9-2-steps-1-and-11",
-   "commit_subject": "Step 14.9.2 - skill Steps 1 and 11 say what is true: the .doc command, the closing lists, Step 11b (F11, F9, F21, F20)",
-   "sha256_now": "92fa9fb0e409a33ea89e3ad074a93446d49c88f3200029d0213668a4a001a094"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "a44f612208742de992925e5910120c2d279212b544fcff925a1a2e6fe1bda8b9"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/step14-9-3-step-4-rules",
-   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
-   "sha256_now": "27f4cd37b373d8e6d80b51dc903b370de306df83c1db5834d0f69e15c143d2e7"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "bc716bfd977a896fdc7f8782996a1f6a7b98321e06f574c53c572dd9c528cd2c"
   },
   "us/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "ecd014e9a21aafc71911a5737c090e987ec825a139b0f4c61737cbb4c29dd90f"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "e8d153363521886ab18a62b58490cb10847e940ca2aeb7b076c333f28bedbf97"
   },
   "us/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -126,9 +126,9 @@
    "sha256_now": "5bd94dd4927c30753afad5cb62b32b8eee0823b31c3c9db0ba021c2bc61d2b3e"
   },
   "us/scripts/post_process.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "b51e5e56fd19b04bef20d593d6f18c725cd5dad16cd936bc70dd4f93cb45eb77"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "f1c78f52e146c1158d07dd77a448b6eb28976bdf29bbd3520801197c169557de"
   },
   "us/scripts/quality_check.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -136,14 +136,14 @@
    "sha256_now": "a086e461c24af2024de4f30fd18c045b9e58c6cfdaa5a24c9d8122ce909a501d"
   },
   "us/scripts/repack_docx.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "da787d51efa20bf2751ee8d290a7ff3d92c78565f31b825a9f2f38a500b9a8f4"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "a4a89edc23a757b2860aac547cb0fcfffe0b58cee2f33a4cf43a7ab907ae7117"
   },
   "us/scripts/source_language_markers.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "ff9ba308d28dc73ae85e792ada762e12442e20691a26d1107915394fca327d2a"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "19d78fe0500909481978522e850472b11ec97293e901d31a912e46b7294226d7"
   },
   "us/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -161,9 +161,9 @@
    "sha256_now": "043bfc59f88175b316b112c8d62bde324b24d4d3b0824e4bd6a83df5186e75db"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "1624ce3e9e8d360b6a1f218d3a382498de8fe2f260bf8f5b563399105252b37f"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "8d97848958881b712b5907e7f02b1165ceec9572550788381113cde39b664eec"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -181,39 +181,39 @@
    "sha256_now": "08451e6f7592874f72e60de08d78bbd5a6a8d1516f7d3a9522d5265d6c1556ab"
   },
   "us/skill-docs/04b-translate-gates.md": {
-   "changed_by": "feature/step14-9-3-step-4-rules",
-   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
-   "sha256_now": "1690d03683a76c88515e503eb3385d4ce93f5cd4d2526a327c150b33408cd87f"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "b4429488388e3b4693b1291ecb2d38e339f98a9dfdd2a02c4655d32b4411efb9"
   },
   "us/skill-docs/05-apply.md": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "063c7ac035f11bb5c01d6034b7696b1bc4a3d9a1c97f8dbe7f8e89f25adfd1df"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "9f9a2b5eaea595d39665cb036f29263d36d137a31fb195118a2b3862fafe05fd"
   },
   "us/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "feature/step14-9-2-steps-1-and-11",
-   "commit_subject": "Step 14.9.2 - skill Steps 1 and 11 say what is true: the .doc command, the closing lists, Step 11b (F11, F9, F21, F20)",
-   "sha256_now": "0cbe054678bc1cb1b3851cb187485d46f1c63e031338bfa1559516fbce92f9fd"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "24542f85b30be5f9e5ea1f52da008a9b32acce08d08d1249ec5e019c2c3e91e8"
   },
   "us/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/step14-9-2-steps-1-and-11",
-   "commit_subject": "Step 14.9.2 - skill Steps 1 and 11 say what is true: the .doc command, the closing lists, Step 11b (F11, F9, F21, F20)",
-   "sha256_now": "d3ccc6eb8b6eb6414ce8b81d12fa5cb73db3cbd28bf4453136f00140b2c0f992"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "8b2e37bc3312f6b53d3b7f3b4835ba6c56961104041ca35a9978ef1f317a01d0"
   },
   "us/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/step14-9-2-steps-1-and-11",
-   "commit_subject": "Step 14.9.2 - skill Steps 1 and 11 say what is true: the .doc command, the closing lists, Step 11b (F11, F9, F21, F20)",
-   "sha256_now": "f1acce8567c5a99de2a19f6ea4d7357d83a5c3151331b9eb22dd138a5a6b7ca6"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "9218649f430ac96bbeb87a6547242cb208509bbfcec24842f3abf2e805d069ef"
   },
   "uk/scripts/validate_en_runs.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "187ecbb9892ccd78cf85309911d74d0697c40a234d4b9fbf934493a787ad36bd"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "0d1cdd405547526cc265a01103d8658908f3d7bd694ca43fdbf88ab120ab0156"
   },
   "us/scripts/validate_en_runs.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "187ecbb9892ccd78cf85309911d74d0697c40a234d4b9fbf934493a787ad36bd"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "0d1cdd405547526cc265a01103d8658908f3d7bd694ca43fdbf88ab120ab0156"
   },
   "uk/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -231,9 +231,9 @@
    "sha256_now": "02b8d5c3c4b430419a707d86e77d1734fa6a8e568a3ba0e70308cc0fbcdacbd3"
   },
   "uk/skill-docs/04-translate.md": {
-   "changed_by": "feature/step14-9-3-step-4-rules",
-   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
-   "sha256_now": "cd1a8747a7b1cd120a99d46a1b1289daa7d2dd179cd62d2c0f87dc3f87d2a8a0"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "69aec0f92687902f7f92dfb01389fdd4b253830242ff3f56a19491575c65c7bb"
   },
   "us/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -251,9 +251,9 @@
    "sha256_now": "c34927055febc10a448a93af3b5998252b29d466286ef07cf187eb4217ae6c5f"
   },
   "us/skill-docs/04-translate.md": {
-   "changed_by": "feature/step14-9-3-step-4-rules",
-   "commit_subject": "Step 14.9.3 - skill Step 4's rules say what is true: a lone tracked change, seams without whitespace, tabs and breaks, the WARN, one date rule (F2, F3, F14, F18, F32, F4, F8)",
-   "sha256_now": "992c825c0c7615f6a0ee001682c772e8adbd670290ab0c3d589b1725d8289c75"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "704fbef0fb255507e68df56b3fb0e4543641d05532cd0258e422f58083cb9b2c"
   },
   "uk/scripts/translate_comments.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -306,14 +306,14 @@
    "sha256_now": "698f6b47929884980ab5771605b90a1a1afefd8f7664888ca306fd7d3c3decc7"
   },
   "uk/scripts/reorder_definitions.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "9170b819d93dd6f176c97188b67a386700b2316401ba6937274d9f2c93a7d318"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "8cdeb3a4a4a6f5da356c2d90ab4ab2b621232c0dfc1175ff598b7dc26629fd8f"
   },
   "us/scripts/reorder_definitions.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "a8525d4fd7519c895c5a824fb55de659b3cc6c3425d603316c57af67180a483e"
+   "changed_by": "feature/step14-9-4-claims-about-the-skill",
+   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
+   "sha256_now": "1d8653f67f5a9ebb30a81eb3e9ae7b26bcf7d0325b0098af1d5913ae60f1593d"
   },
   "uk/references/general-legal.md": {
    "changed_by": "feature/step14-9-3-step-4-rules",
