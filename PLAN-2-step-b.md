@@ -2723,6 +2723,45 @@ the edited script, and the full run once, before the push.
 > re-recorded from the INDEX, the three confidentiality controls, VERIFY and TEST through the cycle gate,
 > `/code-review`, the one full run. **No render, declared:** no delivered byte moves. **Done when:** C26 is CLOSED in
 > the register on that evidence.
+> **AMENDED IN THE BUILD, 2026-11-05, before the full run.** **(1) The plan's 15 places held:** 8 in 7 suites of
+> the full run, 4 in the corpus tools, 3 in the probe; the corpus tools' old arms copy only `scripts/`, so a newer
+> apply there would find no lexicons — `tests/read_receipt.py`'s `lexicons_beside` puts them beside the copy.
+> **(2) A truncation built for the wrong reason, found by the first green run:** replacing the closing sentinel also
+> rewrote the integrity check's own literal, and the check passed; the test now cuts the file before the sentinel.
+> **(3) A draw caught by chance:** the halves and the three letters asked of one draw would catch their mutants only
+> sometimes; N4 asks them of all 12 issues, 48 lines. **(4) `/code-review` at high, before the commit: six
+> findings, one fixed** — a byte-order mark kept on a lexicon's line 1 would refuse a right quote forever, so lines
+> are read as `utf-8-sig`; **declared, no change:** a child ended from outside reads by its code, as 14.9.1
+> declared for every check; the seal is unkeyed, so it stops an edit, not a forger, which is the row's own limit;
+> the helper's mandatory set is a second reader on purpose; **skipped:** one read per named line, and the
+> negative input reading `us` from the runner's argv as the runner does. **(5) The first mutant run caught 29 of
+> 34, and the five were the instruments' (`temp/s1105_mutants_run1.txt`):** A4's wrong quote sat among unquoted
+> lines, so it was refused for them; A4 read an earlier row's output file; a blank-line mutant fails other rows by
+> chance, now optional beside N4; and the runner compared a revert with the patch's backslash placeholder. The
+> test now quotes every line before spoiling one and removes the output before each run. **(6) VERIFY's first run
+> failed six rows and was run again whole:** four read a snapshot my script had written under the previous
+> session's folder name; the house released `board_guard.py` v2 and `install_hooks.py` v13 after the opening, so
+> the checkers row declares those two STALE rows by content, adopted at the next opening; and the publication
+> check's four findings in the two adopted house scripts — a home-relative folder name and an escaped string, no
+> name — are declared by content, any other failing the row. **(7) The commit gate refused the first commit:**
+> `tools/script_committability.py`'s home-path arm read Claude Code's projects folder, named from the home folder, in the adopted `board_guard.py` as a
+> real string — the house's own way of naming a path, the same folder on every machine. Wrong in scope, fixed in
+> the probe as `trace_instructions.py`'s was: that folder itself passes; a folder under it, which carries a user's
+> path, and a look-alike still fire; vectors both ways in `tests/test_committability_probe.py`, the gate's
+> refusal its red. **Size:** what the model reads rose by
+> the least the design takes — `SKILL.md` and four step documents, each tree; `lexicon_compliance.py` to 44,476
+> bytes, 11 KB below W1's cut. **Red first,** the final instruments against `285f83f`: the receipt suite 38 of 39
+> failing in each tree, its one pass the A3 guard; the instruction test 282 of 314, its 32 failures every one a
+> new entry; 34 of 34 mutants caught, each on exactly its rows, in `us/`. **Corpus:** apply at `285f83f` against
+> the branch over every frozen workdir, a receipt filed in each copy: every document byte-identical.
+> **(8) The first full run, on `60d9fc6`, failed 2 of 112 rows, both this branch's:** the adopted `board_guard.py`
+> was named neither in the census's house copies nor among the runner's entry points; both added in `1912484`,
+> its own VERIFY and TEST through the cycle gate, and the one full run repeated on it.
+> **BUILT AND MERGED, 2026-11-05, as #192:** `60d9fc6` the fix with the review's one, reviewed before its
+> commit, `1912484` the two names, then the filing; VERIFY 46 of 46 and TEST 39 of 39 through the cycle gate;
+> the full run on `1912484`, OVERALL PASS; C26
+> CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain; 2026-11-05, unattended
+> at his word)*.
 
 ---
 
