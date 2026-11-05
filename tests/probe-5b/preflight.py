@@ -20,6 +20,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from read_receipt import file_receipt  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
+
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -30,6 +33,8 @@ FINDINGS = []
 
 
 def run(script, *args, tree="uk"):
+    if script == "apply_translations_textmatch.py":
+        file_receipt(args[1], ROOT / tree)
     return subprocess.run(
         ["uv", "run", "--with", "lxml", "python",
          str(ROOT / tree / "scripts" / script), *[str(a) for a in args]],

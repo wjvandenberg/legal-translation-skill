@@ -85,6 +85,7 @@ sys.path.insert(0, str(ROOT / "tests"))
 # buffer -- so the script does its whole job and then dies on its closing print with
 # "I/O operation on closed file". Measured here, first run.
 from make_fixtures import docx, p, r  # noqa: E402
+from read_receipt import file_receipt  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
 from lxml import etree  # noqa: E402
 
 # AND NO WRAPPER OF OUR OWN, WHICH IS THE OTHER HALF OF THE SAME HAZARD. `make_fixtures` has
@@ -341,6 +342,7 @@ notes = [{"idx": i, "text": c[2], "en": c[3], "style": "Normal",
          for i, c in enumerate(CASES)]
 nj = TMP / "paragraphs.json"
 nj.write_bytes(json.dumps(notes, ensure_ascii=False, indent=2).encode("utf-8"))
+file_receipt(nj, ROOT / "uk")
 
 env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
            PYTHONDONTWRITEBYTECODE="1")
@@ -478,6 +480,7 @@ else:
     fx_src_copy, fx_notes_copy = FXTMP / FX.name, FXTMP / FXN.name
     shutil.copyfile(FX, fx_src_copy)
     shutil.copyfile(FXN, fx_notes_copy)
+    file_receipt(fx_notes_copy, ROOT / "uk")
     fxp = subprocess.run(
         ["uv", "run", "--with", "lxml", "python",
          str(ROOT / "uk" / "scripts" / "apply_translations_textmatch.py"),

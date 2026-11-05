@@ -56,6 +56,10 @@ MUST_FIRE = [
     ('a drive path after whitespace', r'    see E:\Invented\Folder\notes.md'),
     ('a home path', r'log lives at ~/invented/folder/trace.log'),
     ('a home path, backslash form', r'~\invented\folder\trace.log'),
+    # 2026-11-05: Claude Code's folder is let through only as ITSELF; one under it carries a user's path.
+    ('a project folder under ~/.claude/projects', 'see ~/.claude/projects/C--Users-someone-Desktop-x'),
+    ('the same, backslash form', r'~\.claude\projects\C--Users-someone'),
+    ('a look-alike of that folder', '~/.claude/projects-copy/invented/x'),
 ]
 
 # MUST STAY QUIET. Escape sequences inside ordinary Python string literals.
@@ -65,6 +69,10 @@ MUST_NOT_FIRE = [
     ('a tab escape after a word', '"columns:\\tone\\ttwo\\n"'),
     ('a plain sentence with a colon', 'The rule says: never bypass a gate.'),
     ('a relative path, which is not this probe\'s subject', 'tools/hooks/evidence_guard.py'),
+    # 2026-11-05: Claude Code's own folder, named the way the house names paths - the same on every machine.
+    ('Claude Code\'s projects folder ending a sentence', 'a transcript under ~/.claude/projects/. The first call'),
+    ('the same folder before an arrow', 'found under ~/.claude/projects -> REFUSE'),
+    ('the same folder alone', '~/.claude/projects'),
 ]
 
 
@@ -187,6 +195,16 @@ def main() -> int:
               f"({n} hit(s)) -- the file the false positive blocked")
     else:
         print("\n    VOID  tools/trace_instructions.py absent -- this arm proved nothing")
+        ok = False
+    # The same arm for the house hook the home-path arm blocked on 2026-11-05.
+    target = ROOT / "tools" / "board_guard.py"
+    if target.exists():
+        n = len(pat.findall(target.read_text(encoding="utf-8", errors="replace")))
+        ok &= (n == 0)
+        print(f"    {'OK  ' if n == 0 else 'MISS'} tools/board_guard.py is clean ({n} hit(s)) -- the house hook "
+              f"blocked for naming ~/.claude/projects")
+    else:
+        print("    VOID  tools/board_guard.py absent -- this arm proved nothing")
         ok = False
 
     # ---- the doubled-separator arm, its own probe ----

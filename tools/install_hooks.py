@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 11 (2026-10-22)
+"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 12 (2026-11-05)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -69,6 +69,12 @@ tag on a commit the remote already has was refused for want of a record, though 
 is the other direction, green both sides: a tag carrying a new commit is still checked. An arm may DECLARE A SKIP
 now, printed N/A with its reason. And interpreter_missing() joins checker_missing(): an install that would refuse
 every push for want of a Python says so at install time - case 15. RE-COPY hooks/pre-push WITH THIS FILE, as for v8.
+
+v12 (2026-11-05) - A FOURTH KIND, 'board': board_guard.py, which refuses a NESTED session's tools until it has printed
+its brief's status board. Wired on the AUTO MODE guard's matcher, so Read, Edit and Write stay the repair route, and
+proved by board_bites() - a briefed session that has not printed its board refused, one that has and one a person
+typed allowed. It is in the default set, so a bare run installs it too; case 16 proves --only board alone, red
+against v11, and case 11 now swaps the board guard's stdin read as well. Copy board_guard.py beside this file.
 
 WHERE THE SOURCES COME FROM. A directory named 'hooks' beside this file. In a project that
 is tools/hooks/; in the shared folder it is standard-scripts/hooks/. Discovered rather
@@ -150,6 +156,15 @@ GUARD_MATCHER = r"Bash|PowerShell|Artifact|Cron\w*|ScheduleWakeup|mcp__.*"
 #: because a hook proved only to refuse has not been shown to be anything but an outage.
 PURPOSE = HERE / "purpose_guard.py"
 PURPOSE_MATCHER = r"Write|Edit|NotebookEdit|MultiEdit"
+
+#: THE THIRD CLAUDE CODE HOOK, v12, 2026-11-05: board_guard.py, which refuses a NESTED session's
+#: tools until it has printed its brief's status board. ITS MATCHER IS THE AUTO MODE GUARD'S, and
+#: the reason is the one above, measured again: Read, Edit and Write stay unhooked, so a board guard
+#: that cannot start leaves the repair route open; and the sessions it governs made their first call
+#: with one of these tools 7 times of 7. A hook call costs about a second here, and matching hooks
+#: run side by side, so beside the AUTO MODE guard it adds no wait.
+BOARD = HERE / "board_guard.py"
+BOARD_MATCHER = GUARD_MATCHER
 
 #: v7: A NAME NO CODE-PAGE READ SURVIVES - cp1252 mangles the 'é', and cannot decode the second
 #: byte of the 'Ł' at all. Every bite's folder or command carries it.
@@ -282,6 +297,40 @@ def purpose_bites(root: Path) -> tuple[bool, str]:
                            f"recorded (exit {r2.returncode}). That is an outage, not a guard")
     except (OSError, subprocess.SubprocessError) as e:
         return False, f"{PURPOSE.name}: could not be run at all - {e}"
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return True, ""
+
+
+def board_bites(root: Path) -> tuple[bool, str]:
+    """v12: FIRE THREE REAL CALLS AT THE BOARD GUARD - a session briefed with a board that has not
+    printed it must be REFUSED; one that printed it first, and one a person typed, ALLOWED. Three
+    transcripts are planted in a temp directory named with NON_ASCII, so the arm also proves the
+    transcript's path arrives intact; nothing about the real project is read or written."""
+    if not BOARD.exists():
+        return False, f"{BOARD.name}: the settings entry names it and it is not there"
+    tmp = Path(tempfile.mkdtemp(prefix=f"board_bite_{NON_ASCII}_"))
+    board = "| # | phase | state |\n|---|---|---|\n| **1** | **BITE** | open |"
+    brief = {"type": "user", "message": {"role": "user", "content": f"Print this first:\n\n{board}\n"}}
+    tool = {"type": "assistant", "message": {"content": [{"type": "tool_use", "name": "Bash", "input": {}}]}}
+    said = {"type": "assistant", "message": {"content": [{"type": "text", "text": board}]}}
+    person = {"type": "user", "message": {"role": "user", "content": "please carry on"}}
+    try:
+        env = dict(os.environ, CLAUDE_PROJECT_DIR=str(tmp))
+        verdicts = {}
+        for name, rows, want in (("unprinted", [brief, tool], 2), ("printed", [brief, said, tool], 0),
+                                 ("a person's", [person, tool], 0)):
+            t = tmp / f"{name[:4]}.jsonl"
+            t.write_bytes(("\n".join(json.dumps(r) for r in rows) + "\n").encode("utf-8"))
+            r = fire(BOARD, {"tool_name": "Bash", "session_id": f"bite-{name[:4]}-0000",
+                             "transcript_path": str(t)}, env)
+            verdicts[name] = r.returncode
+            if r.returncode != want:
+                return False, (f"{BOARD.name}: the {name} session got exit {r.returncode}, expected {want}"
+                               + (" - a guard refusing a session that did print its board is an outage"
+                                  if want == 0 else " - the entry is configured and the guard does not bite"))
+    except (OSError, subprocess.SubprocessError) as e:
+        return False, f"{BOARD.name}: could not be run at all - {e}"
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     return True, ""
@@ -553,8 +602,8 @@ def push_arms(hook: Path, work: Path, checker_dir: Path = HERE, only=None) -> di
     return arms
 
 
-#: THE THREE KINDS --only can select, in the order they are reported. v4, 2026-09-24.
-KINDS = ("git", "auto", "purpose")
+#: THE KINDS --only can select, in the order they are reported. v4, 2026-09-24; 'board' joined in v12.
+KINDS = ("git", "auto", "purpose", "board")
 
 
 def parse_selection(argv) -> tuple:
@@ -598,7 +647,7 @@ def parse_selection(argv) -> tuple:
 
 
 def main(argv) -> int:
-    global GUARD, PURPOSE
+    global GUARD, PURPOSE, BOARD
     if "--selftest" in argv:
         return selftest()
 
@@ -609,6 +658,7 @@ def main(argv) -> int:
     if guard_dir is not None:
         GUARD = guard_dir / GUARD.name
         PURPOSE = guard_dir / PURPOSE.name
+        BOARD = guard_dir / BOARD.name
 
     check_only = "--check" in argv
     if "git" in only and not SRC.is_dir():
@@ -732,6 +782,41 @@ def main(argv) -> int:
             print("  IF IT EVER LOCKS YOU OUT: it matches only the four EDITING tools, so Bash,")
             print("  PowerShell and Read stay open - delete its entry from settings.local.json")
             print("  through one of those. That escape route is the reason for the narrow matcher.")
+        print()
+
+    if "board" in only:
+        print("=" * 92)
+        print("CLAUDE CODE HOOK - a nested session must print its brief's status board")
+        print("=" * 92)
+        if not BOARD.exists():
+            print(f"  {BOARD.name:<22} ABSENT - the board rule stays prose, enforced by the")
+            print(f"  {'':<22} very thing it binds")
+            problems.append(f"{BOARD.name}: not present in {BOARD.parent}")
+        else:
+            if not check_only:
+                install_settings_hook(root, BOARD, BOARD_MATCHER)
+            sf = settings_path(root)
+            settings = {}
+            if sf.exists():
+                try:
+                    settings = json.loads(sf.read_text(encoding="utf-8-sig"))
+                except ValueError:
+                    settings = {}
+            wired = settings_has_guard(settings, root, BOARD)
+            print(f"  entry in {sf.name:<22} {'present' if wired else 'MISSING'}"
+                  f"   (matcher: {BOARD_MATCHER})")
+            if not wired:
+                problems.append(f"board_guard: no PreToolUse entry in {sf.name}")
+            bites, why = board_bites(root)
+            print(f"  it actually refuses    {'yes' if bites else 'NO'}"
+                  f"   (a briefed session that has not printed its board; NOT one that has)")
+            if not bites:
+                problems.append(why)
+            print()
+            print("  IT IS LIVE ONLY IN A SESSION WHOSE FIRST MESSAGE CARRIES A BOARD TABLE - a session")
+            print("  another session started. A session a person typed is never checked.")
+            print("  IF IT EVER LOCKS YOU OUT: Read, Edit and Write are never matched - delete its")
+            print("  entry from settings.local.json with Edit. A CHANGED HOOK IS READ AT SESSION START.")
     print("=" * 92)
     if problems:
         for p in problems:
@@ -851,8 +936,9 @@ def selftest() -> int:
     #    no --only, overwrites the pre-push and wires both guards.
     import contextlib
     import io
-    global GUARD, PURPOSE
+    global GUARD, PURPOSE, BOARD
     saved_guard, saved_purpose, saved_cwd = GUARD, PURPOSE, Path.cwd()
+    saved_board = BOARD
 
     def _repo(name):
         repo = tmp / name
@@ -918,12 +1004,12 @@ def selftest() -> int:
         repo2 = _repo("guard-dir")
         code2, cfg2 = _run(repo2, ["--only", "purpose", "--guard-dir", str(gd)])
         named = settings_has_guard(cfg2, repo2, (gd / saved_purpose.name).resolve())
-        GUARD, PURPOSE = saved_guard, saved_purpose
+        GUARD, PURPOSE, BOARD = saved_guard, saved_purpose, saved_board
         empty = tmp / "no-guard-here"
         empty.mkdir()
         repo3 = _repo("guard-dir-empty")
         code3, cfg3 = _run(repo3, ["--only", "purpose", "--guard-dir", str(empty)])
-        GUARD, PURPOSE = saved_guard, saved_purpose
+        GUARD, PURPOSE, BOARD = saved_guard, saved_purpose, saved_board
         unwired = not cfg3.get("hooks")
         good = code2 == 0 and named and code3 == 1 and unwired
         ok &= good
@@ -940,7 +1026,7 @@ def selftest() -> int:
     #     wrongly - the shape only an arm judging a PATH can catch.
     text_modes = {"strict": b"sys.stdin.read()",
                   "replaced": b'(sys.stdin.reconfigure(errors="replace") or sys.stdin.read())'}
-    for real, bite in ((saved_purpose, purpose_bites), (saved_guard, guard_bites)):
+    for real, bite in ((saved_purpose, purpose_bites), (saved_guard, guard_bites), (saved_board, board_bites)):
         if not real.exists():
             print(f"    N/A  the {real.stem} bite fails a text-mode reader -> DECLARED SKIP:"
                   f" {real.name} is not beside this copy")
@@ -961,10 +1047,12 @@ def selftest() -> int:
             (d / real.name).write_bytes(body)
             if real == saved_purpose:
                 PURPOSE = d / real.name
+            elif real == saved_board:
+                BOARD = d / real.name
             else:
                 GUARD = d / real.name
             verdicts[kind] = bite(tmp)[0]
-            GUARD, PURPOSE = saved_guard, saved_purpose
+            GUARD, PURPOSE, BOARD = saved_guard, saved_purpose, saved_board
         good = verdicts["as-is"] and not any(verdicts[k] for k in text_modes)
         ok &= good
         print(f"    {'OK  ' if good else 'MISS'} the {real.stem} bite fails a text-mode reader"
@@ -1086,6 +1174,27 @@ def selftest() -> int:
                     os.environ.pop(k, None)
                 else:
                     os.environ[k] = v
+
+    # 16. v12: --only board WIRES THE BOARD GUARD AND NOTHING ELSE, on the AUTO MODE guard's matcher -
+    #     so Read, Edit and Write are never matched and a board guard that cannot start can always be
+    #     removed through them - and the wired guard bites both ways. RED against v11, which refuses
+    #     'board' as an unknown kind. Declared skip where board_guard.py is not beside this copy.
+    if not saved_board.exists():
+        print(f"    N/A  --only board wires the board guard alone -> DECLARED SKIP: {saved_board.name} is not"
+              f" beside this copy (a project that declared it absent); the shared copy runs this case")
+    else:
+        repo16 = _repo("board-only")
+        code16, cfg16 = _run(repo16, ["--only", "board"])
+        groups = cfg16.get("hooks", {}).get("PreToolUse", []) or []
+        matchers = [g.get("matcher") for g in groups]
+        open_route = all(re.fullmatch(m or "", t) is None for m in matchers for t in ("Read", "Edit", "Write"))
+        good = (code16 == 0 and settings_has_guard(cfg16, repo16, saved_board)
+                and not settings_has_guard(cfg16, repo16, saved_guard)
+                and not settings_has_guard(cfg16, repo16, saved_purpose)
+                and matchers == [GUARD_MATCHER] and open_route)
+        ok &= good
+        print(f"    {'OK  ' if good else 'MISS'} --only board wires the board guard alone, Read/Edit/Write"
+              f" unhooked -> exit {code16}, matchers {matchers}")
 
     shutil.rmtree(tmp, ignore_errors=True)
     print("\nSELFTEST: " + ("PASS" if ok else "FAIL"))

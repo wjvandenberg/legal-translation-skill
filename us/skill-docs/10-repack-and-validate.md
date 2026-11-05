@@ -63,7 +63,7 @@ checked.
 **Unconditional — run on every document:**
 
 1. `apply_translations_textmatch.py` — translations applied to document.xml. **Auto-runs
-   `validate_en_runs.py` (pre-apply, BLOCK on missing or broken `en_runs`) and
+   skill Step 3's read-receipt check first, then `validate_en_runs.py` (pre-apply, BLOCK on missing or broken `en_runs`) and
    `validate_translations.py` (pre-apply, BLOCK on critical), plus
    `validate_segment_shapes.py` and `validate_reject_all.py` (pre-apply, TC docs only),
    plus `validate_apply.py --strict` (post-apply).** No separate invocation required.

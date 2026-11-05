@@ -48,6 +48,7 @@ os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tests"))
 from make_fixtures import docx, p, r  # noqa: E402
+from read_receipt import file_receipt  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--variant", default="uk", choices=("uk", "us"))
@@ -170,6 +171,7 @@ for n in notes:
 (w / "paragraphs.json").write_text(json.dumps(notes, ensure_ascii=False, indent=1), encoding="utf-8")
 (w / "final" / "word").mkdir(parents=True)
 xml = w / "final" / "word" / "document.xml"
+file_receipt(w / "paragraphs.json", ROOT / args.variant)
 rc, out = run("apply_translations_textmatch.py", src, w / "paragraphs.json", xml)
 ok("S3: apply exits 0", rc == 0 and xml.is_file(), out[-300:])
 rc, out = run("post_process.py", xml, "--fix", "--variant", args.variant)

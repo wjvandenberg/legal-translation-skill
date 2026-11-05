@@ -2614,3 +2614,25 @@ session from the prompt the one before writes; (ii) another session's checks run
 to wait, so the house's rule against two suites at once yields to his word for this chain, a clash reading as a run
 to repeat and never as a pass; (iii) the purpose line dated 2026-11-05 is written after the full run, which needs a
 clean tree, and not at the opening.
+
+## 2026-11-05 (2) — sub-step 14.9.5, unattended: C26's read receipt; ten choices the session's own
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS IN 2026-11-05 (1)** — each choice below is THE SESSION'S, taken on its own
+recommendation and carried here for him to confirm or overturn; none is his ruling. His design is 2026-11-02 (7).
+
+**(1) THE RECEIPT LIVES IN `lexicon_compliance.py`,** over `validate_translations.py` and apply itself: the tree has
+no file slot; it is the lexicon script and already reads Step 1c's declaration; and it is 33,469 bytes where apply,
+130,515, is already past the 55,466 at which an install was once cut (register W1). **(2) TWO LINES IN EACH FILE, ONE
+IN EACH HALF,** over one a file or five in all: 03 itself names skimming the first half as the failure. **(3) THE
+RECEIPT MUST COVER `references/general-legal.md` AND, FOR A DECLARED SUPPORTED LANGUAGE, ITS
+`<language>-general-legal.md`,** besides every file the operator names: the two the skill makes mandatory for every
+document; a receipt over one small file would prove nothing about the read. **(4) A QUOTE MATCHES THE WHOLE LINE,
+runs of whitespace collapsed and the ends trimmed,** over a fragment or a byte match. **(5) APPLY RUNS IT FIRST:**
+"Step 5 refuses to start without a matching receipt". **(6) THE SEED IS A FUNCTION ARGUMENT A TEST PASSES,** never a
+flag or an environment variable an operator could set to predict the lines. **(7) A REFUSAL NAMES THE FILE AND LINE,
+NEVER THE LINE'S TEXT,** which would hand over the answer. **(8) EXIT CODES 1 AND 2 BLOCK, THROUGH APPLY'S RUNNER,**
+so its banner reads "fix the underlying issue", not the any-code banner's "fix paragraphs.json or run with the
+gate's documented override flag", which this gate has neither of. **(9) ONE SHARED TEST HELPER FILES A RECEIPT
+THROUGH THE REAL COMMAND AND QUOTES THE LINES,** over a pre-made fixture or code in each suite; **(10) THE OLD
+PROBE'S THREE PLACES GET IT TOO,** though no runner runs them, the house rule being to fix the class. `README.md`
+is unchanged, declared: its "Quality gates at every stage" already covers a new gate, and no feature claim moves.

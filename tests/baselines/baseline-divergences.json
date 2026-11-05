@@ -6,14 +6,14 @@
  "count": 67,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "08801bd08fdd553dc0a904d2aca7adc008cfdc28ced162583e439459ef06f236"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "5b85404ec1883d6aa1a2932e2d76e4dd3581757f8702aec22f1eb8b1d198b68e"
   },
   "uk/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "9d969215a99c4ee71694ca41f8245d0b999d0cf1e76b37e428be26274f285070"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "5676a2fbe7f81da381198029ba9bb9a4761faa5c015bd5e5dec80723a79ce375"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -81,14 +81,14 @@
    "sha256_now": "08451e6f7592874f72e60de08d78bbd5a6a8d1516f7d3a9522d5265d6c1556ab"
   },
   "uk/skill-docs/04b-translate-gates.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "67139cb6faaf5d994748de3da9268b560cde4e7b0c6f83925a46d0d7c22048a1"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "8620163a53e40b72e68b0da018f5e036a7e96a8c3670824a5b72e0aba9418a9d"
   },
   "uk/skill-docs/05-apply.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "9f9a2b5eaea595d39665cb036f29263d36d137a31fb195118a2b3862fafe05fd"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "c0a962b50d78f00a0e99180d181ce6dbd09569dd27a77ccf7e489cd829dbda21"
   },
   "uk/skill-docs/06-postprocess-and-reorder.md": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -101,19 +101,19 @@
    "sha256_now": "08355bdcfcf9daf125ac3a6b3ba99f35aa9bcb26af2ec6d79223eafca1e8de4c"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "a44f612208742de992925e5910120c2d279212b544fcff925a1a2e6fe1bda8b9"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "25bd1a3fbed4f6750293301a921b955b2f3522e64901eff636ae90773131f06f"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "bc716bfd977a896fdc7f8782996a1f6a7b98321e06f574c53c572dd9c528cd2c"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "7943280287e4707fd9a357fced5106e4c9462248df16f358f95b5b5e13a6dfa4"
   },
   "us/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "e8d153363521886ab18a62b58490cb10847e940ca2aeb7b076c333f28bedbf97"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "1db3019cfef3d930a21c14c5e3869f955fe1b7944a2e423d1f60b65cfa6e6c3e"
   },
   "us/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -181,14 +181,14 @@
    "sha256_now": "08451e6f7592874f72e60de08d78bbd5a6a8d1516f7d3a9522d5265d6c1556ab"
   },
   "us/skill-docs/04b-translate-gates.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "b4429488388e3b4693b1291ecb2d38e339f98a9dfdd2a02c4655d32b4411efb9"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "f7fea286fb8576083bad583b8c7d9d5e417f06d00d5874db5d502465dee3b171"
   },
   "us/skill-docs/05-apply.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "9f9a2b5eaea595d39665cb036f29263d36d137a31fb195118a2b3862fafe05fd"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "c0a962b50d78f00a0e99180d181ce6dbd09569dd27a77ccf7e489cd829dbda21"
   },
   "us/skill-docs/06-postprocess-and-reorder.md": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -201,9 +201,9 @@
    "sha256_now": "8b2e37bc3312f6b53d3b7f3b4835ba6c56961104041ca35a9978ef1f317a01d0"
   },
   "us/skill-docs/10-repack-and-validate.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "9218649f430ac96bbeb87a6547242cb208509bbfcec24842f3abf2e805d069ef"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "f3a9193ddc47a48c637e6c3ec40c16beea2fecbf0ca7ac7adbce9080268ce43e"
   },
   "uk/scripts/validate_en_runs.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -226,9 +226,9 @@
    "sha256_now": "a71a8cdeb15d1860ed5e2b99af6894eeab9e663dc8c7624e9c9c8a8ff89ddeb4"
   },
   "uk/skill-docs/03-lexicons-and-segments.md": {
-   "changed_by": "feature/step13-4-variant-conversion",
-   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
-   "sha256_now": "02b8d5c3c4b430419a707d86e77d1734fa6a8e568a3ba0e70308cc0fbcdacbd3"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "ba28811b417fda2bc84a40f9de46b47605b99da05c12399852b5f19bad532851"
   },
   "uk/skill-docs/04-translate.md": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -246,9 +246,9 @@
    "sha256_now": "a71a8cdeb15d1860ed5e2b99af6894eeab9e663dc8c7624e9c9c8a8ff89ddeb4"
   },
   "us/skill-docs/03-lexicons-and-segments.md": {
-   "changed_by": "feature/step13-4-variant-conversion",
-   "commit_subject": "Sub-step 13.4, H1 and H3: a source already in English opens a declared variant-conversion mode at skill Step 1c, both trees",
-   "sha256_now": "c34927055febc10a448a93af3b5998252b29d466286ef07cf187eb4217ae6c5f"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "d9be5b530d53d59604f8f590f648486cb7bdc33a94f2e1795841bb83404a45d0"
   },
   "us/skill-docs/04-translate.md": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -286,14 +286,14 @@
    "sha256_now": "e8dd91e2d4b4dd8dfd64efd26ae4b9aaebe365d191c92ac6dff7bf0eb525f344"
   },
   "uk/scripts/lexicon_compliance.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "8f89edb12c9d7c55923301d220c57755886d1adcf704a78b443768216e7a8dc7"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "bb22c4ba0155114449e9e3087a3fc0a1d11b20d93bdd9be3579d0c813092cabf"
   },
   "us/scripts/lexicon_compliance.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "d86f85704668be8491553433f8e73aaa50100ffedaffe53de708afed29b84d02"
+   "changed_by": "feature/step14-9-5-read-receipt",
+   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
+   "sha256_now": "dd3226c8b198cffceae407bb3efe3262015157719ec220a786ecdb426cdc1854"
   },
   "uk/scripts/validate_reject_all.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",

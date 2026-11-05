@@ -19,6 +19,7 @@ A case declares:
 """
 import json
 import shutil
+import sys
 import zipfile
 from pathlib import Path
 
@@ -336,3 +337,25 @@ def _thf(tmp):
     good = Path(tmp) / "thf_good.docx"
     shutil.copyfile(FIXTURES / "headers-footers.docx", good)
     return bad, good
+
+
+# ---------------------------------------------------------------------------
+# lexicon_compliance.py --check-read-receipt — skill Step 3's read receipt (register C26),
+# apply's first check. Both receipts issued through the real command, every line quoted
+# from its file as an operator would; the bad one then quotes another line's words.
+# ---------------------------------------------------------------------------
+@case("lexicon_compliance.py", "a read receipt whose quote is not its line",
+      args="{in} --check-read-receipt")
+def _lrr(tmp):
+    from read_receipt import RECEIPT, file_receipt
+    tree = ROOT / ("us" if "us" in sys.argv else "uk")  # the runner's own reading of --variant
+    pair = []
+    for name in ("lrr_bad", "lrr_good"):
+        nj = _write(tmp, f"{name}/paragraphs.json", [_para(0, "Le parti convengono.", "The parties agree.")])
+        file_receipt(nj, tree)
+        pair.append(nj)
+    rp = pair[0].parent / RECEIPT
+    data = json.loads(rp.read_bytes().decode("utf-8"))
+    data["lines"][0]["quote"] = "The parties agree."
+    rp.write_bytes(json.dumps(data, ensure_ascii=False, indent=1).encode("utf-8"))
+    return pair[0], pair[1]

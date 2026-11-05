@@ -25,10 +25,10 @@ The script reports:
   proceeding.
 
 **Pre-apply gates and the post-apply token check run automatically inside
-Step 5.** `apply_translations_textmatch.py` auto-invokes `validate_en_runs.py`
+Step 5.** `apply_translations_textmatch.py` auto-invokes skill Step 3's read-receipt check, then `validate_en_runs.py`
 (definitions-section bold-italic gate) + the final `validate_translations.py` pass
 + `validate_segment_shapes.py` + `validate_reject_all.py` (these two on TC docs only)
-at the start, and `validate_apply.py --strict` at the end. The operator runs ONE command (Step 5) and gets all five gates
+at the start, and `validate_apply.py --strict` at the end. The operator runs ONE command (Step 5) and gets all six gates
 for free — there is no separate command for them and no flag to skip them.
 
 For a manual pre-flight check before Step 5 (optional — the gates fire

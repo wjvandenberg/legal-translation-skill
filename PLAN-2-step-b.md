@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-05 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.4, begun 2026-11-04, the claims about the skill, F23, F37, F36's remaining parts and F38's fourteen sites, both trees: SKILL.md's count of the validators apply runs, its description of apply's XML library and guards, 05-apply.md's exit code, and fourteen sentences an automated edit broke, each made to say what the scripts do, measured at the call sites and imports and by running a script, proofread one by one; counted before and after, then the cycle gate, the one full run and the merge; no questions to Wouter *(Wouter, 2026-11-04: continue until step 14 is closed; 2026-11-05: continue, starting nested sessions)* · **so that every claim the skill makes about its own scripts is true, and every sentence reads whole** *(written immediately after the tag `rollback-2026-11-04b-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-05 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.5, C26's read receipt, both trees, by Wouter's design of 2026-11-02: after skill Step 3's read a script names a few random lines in the lexicon files read, the operator quotes them into a receipt, and skill Step 5's apply refuses to start without a matching one, inside an existing script because the tree has no file slot; planned in 3.14 first, red first, then the code, the cycle gate, the one full run and the merge; no questions to Wouter *(Wouter, 2026-11-05: continue, starting nested sessions, without questions)* · **so that the mandatory lexicon read leaves a trace the operator cannot fake without opening the files, and the skill says exactly what that proves and no more** *(written immediately after the tag `rollback-2026-11-05-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -2683,6 +2683,46 @@ the edited script, and the full run once, before the push.
 > then the filing; VERIFY 42 of 42 and TEST 29 of 29 through the cycle gate; the full run on `8c1b0d7`, OVERALL
 > PASS, 109 rows; F23, F36, F37 and F38 CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the
 > conductor chain; 2026-11-05, unattended at his word)*.
+> **14.9.5 — ITS OWN WRITTEN PLAN, 2026-11-05, before any edit, on `feature/step14-9-5-read-receipt`.** C26, by
+> Wouter's design *(`DECISIONS-LOG.md`, 2026-11-02 (7))*; **no question put to Wouter, each choice the recommended
+> option, recorded** *(Wouter, 2026-11-05: continue without questions; `DECISIONS-LOG.md`, 2026-11-05 (2))*.
+> **Measured first, `main` at `285f83f`, both trees alike:** skill Step 3's read leaves no artefact but 03's
+> checklist, and 03 still calls partial reading "the single most common failure mode"; apply runs five checks, each a
+> child through `_run_validator`; apply is executed at 12 places — 8 in 7 suites of the full run, 4 in the corpus
+> tools run by hand — and 3 in the old probe, each on a working folder of its own; the tree holds 198 of its 199
+> files, the last spoken for (charter 6.3); apply is 130,515 bytes, past the 55,466 at which an install was once cut
+> (register W1), `lexicon_compliance.py` 33,469; every supported language has a `<language>-general-legal.md`.
+> **Changes, both trees, one patch:** **(1) The receipt, in `lexicon_compliance.py`** — the lexicon script, which
+> already reads Step 1c's declaration, and far below W1's cut where apply is past it; no new file. `--read-receipt
+> <file>…`, run at the end of skill Step 3, takes each lexicon read by its path in the skill folder; refuses a file
+> outside `references/` and `sub-lexicons/`, and a set without `references/general-legal.md` or, for a declared
+> supported language, its `<language>-general-legal.md`; names two lines in each file, one in each half of its lines
+> holding three letters or more, drawn from the system's random source — a seed only a test passes, to the function,
+> never a flag; and writes `lexicon_read_receipt.json` beside paragraphs.json: each file's hash, the named lines with
+> an empty quote each, and a seal over both. Issuing again replaces it. **(2) The check**, `--check-read-receipt`,
+> exits 1 and says how to fix on: no receipt; one unreadable; a seal no longer matching, lines or files edited; a file
+> missing or changed since issue; a mandatory file not covered, as when Step 1c now declares another language; a quote
+> not matching its line, whitespace runs collapsed — naming the file and line, never the line's text. **(3) Apply runs
+> it FIRST,** through `_run_validator`, block codes 1 and 2, the gate's banner and exit 1; exit 3 the install and a
+> crash as before; no flag skips it, `--allow-bold-loss` included. **(4) The skill says so,** both trees: 03 a rule 7
+> and a checklist item — the command, each line copied exactly, the receipt issued again for the whole set when the
+> set changes, the named lines never edited, and **that it proves the files were opened at those lines, not that every
+> line was read**; 05 the refusal and its fix; six checks in every list of apply's five — `SKILL.md`'s checkpoint, step
+> table, safeguard 3 and Scripts rows, 04b, 05's item, 10's list, apply's docstring — each list changed with its
+> needle. **(5) The callers:** `tests/read_receipt.py` files a receipt through the real command and quotes each named
+> line from its file, as an operator would; each of the 15 places calls it before apply.
+> **Controls, red first against `285f83f`:** `tests/test_read_receipt.py`, both trees, a new suite of the full run —
+> no receipt refused; a wrong quote refused, its line's text not printed; right quotes accepted, apply writing its
+> output; a changed lexicon refused, in a copy of the tree; another declared language refused; an edited line number
+> refused; issuing refused without `general-legal.md` and for a file outside the lexicons; the halves, the three
+> letters, a fixed seed reproducing and the system source varying; a truncated `lexicon_compliance` read as the
+> install; no flag in apply's help that skips it; one negative input, a wrong quote beside a right one; the
+> instruction needles; mutants. **Must not touch:** an anti-drift sentence, another gate's verdict or exit code, a
+> step number, 05's first rule (F35's), a lexicon. **Corpus:** `tools/apply_corpus_diff.py --ref 285f83f`, a receipt
+> filed in each copied workdir — no delivered byte moves. **Then** the parity check, every changed file's divergence
+> re-recorded from the INDEX, the three confidentiality controls, VERIFY and TEST through the cycle gate,
+> `/code-review`, the one full run. **No render, declared:** no delivered byte moves. **Done when:** C26 is CLOSED in
+> the register on that evidence.
 
 ---
 

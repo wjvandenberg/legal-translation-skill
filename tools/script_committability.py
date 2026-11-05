@@ -86,8 +86,15 @@ PROBES = [
     # WHY IT WAS FIXED RATHER THAN WORKED AROUND: section 5.7 -- a gate can be wrong in SCOPE,
     # and the remedy is to fix the gate, never to bypass it and never to contort the input.
     # It blocked a commit of the house trace_instructions.py, whose fixture strings are correct.
+    # AND CLAUDE CODE'S OWN FOLDER, NAMED AS THE HOUSE NAMES PATHS, IS NOT A REAL STRING (2026-11-05, sub-step
+    # 14.9.5). The house rule is to name a path from the home folder, and Claude Code's projects folder named so is the same on every
+    # machine, so the adopted house hook board_guard.py, which says where it reads a transcript, was blocked for
+    # writing a path the sanctioned way. Only that folder ITSELF is let through - followed by nothing, a space or
+    # punctuation; a folder under it is named after the project's path and so after the user, and still fires, as
+    # does a look-alike. Vectors both ways in tests/test_committability_probe.py.
     ("absolute or home path",
-     r"(?<!\w)[A-Za-z]:\\[\w\-.]+(?:\\[\w\-. ]+)+|~[\\/][\w\-.]+(?:[\\/][\w\-. ]+)+"),
+     r"(?<!\w)[A-Za-z]:\\[\w\-.]+(?:\\[\w\-. ]+)+"
+     r"|~[\\/](?!\.claude[\\/]projects(?![\w\-]|[\\/][\w\-]))[\w\-.]+(?:[\\/][\w\-. ]+)+"),
     # THE DOUBLED-SEPARATOR FORM, ADDED 2026-09-09, AND IT IS A NOTE RATHER THAN A BLOCKER.
     # The arm above requires ONE backslash, so a path inside a NON-RAW Python literal -- where
     # every separator is doubled -- was invisible to it. That is a real hole and its failure

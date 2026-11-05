@@ -20,6 +20,13 @@ Usage:
     # PASSED; a declared language the skill does not support runs every language's rules,
     # as an unknown language always has, and says NOT SUPPORTED too.
 
+    # Skill Step 3, after the read: name each lexicon read; it names the lines to quote into
+    # lexicon_read_receipt.json, beside paragraphs.json
+    python scripts/lexicon_compliance.py paragraphs.json --read-receipt references/general-legal.md sub-lexicons/italian-general-legal.md
+
+    # Skill Step 5: apply runs this FIRST, and does not start unless the receipt matches
+    python scripts/lexicon_compliance.py paragraphs.json --check-read-receipt
+
     # Disable source-language hints (use only the language-agnostic ruleset)
     python scripts/lexicon_compliance.py paragraphs.json --language none
 
@@ -35,17 +42,21 @@ context checks.
 
 Exit codes:
     0 — clean
-    1 — violations found (script prints each, then exits 1)
+    1 — violations found (script prints each, then exits 1); a read receipt
+        not issued, or not matching
     2 — I/O error or bad invocation
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
+import secrets
 import sys
+import unicodedata
 from pathlib import Path
 from typing import Iterable, List, Optional, Tuple
 
@@ -103,6 +114,7 @@ try:
     from source_language_markers import (  # noqa: E402
         LANGUAGE_MARKERS,
         not_supported,
+        read_declared_language,
         resolve_source_language,
     )
 except (ImportError, SyntaxError) as _exc:  # deleted, or cut short: a broken install, SKILL.md rule 6
@@ -447,6 +459,192 @@ def _ctx(text: str, a: int, b: int, radius: int = 40) -> str:
     return chunk
 
 # --------------------------------------------------------------------------
+# The read receipt — skill Step 3, checked first at skill Step 5 (register C26)
+# --------------------------------------------------------------------------
+#
+# Skill Step 3's end-to-end read of the lexicons left no trace, and no mechanism can prove a
+# file was read rather than skimmed. So this asks for something the operator cannot predict
+# (Wouter's design, 2026-11-02): after the read, --read-receipt names two random lines in each
+# lexicon read, one in each half; the operator copies each into the receipt; and apply's first
+# check, --check-read-receipt, refuses to start without a match. It proves the files were
+# opened at those lines, not that every line was read, and says so - never more.
+
+RECEIPT_FILE = 'lexicon_read_receipt.json'
+_SKILL_DIR = os.path.dirname(_SCRIPTS_DIR)
+_LEXICON_DIRS = ('references', 'sub-lexicons')
+_GENERAL = 'references/general-legal.md'
+_PROVES = 'It proves the files were opened at those lines, not that every line was read.'
+_ISSUE = 'lexicon_compliance.py <workdir>/paragraphs.json --read-receipt <each lexicon read>'
+
+
+def _receipt_path(notes: str) -> str:
+    return os.path.join(os.path.dirname(os.path.abspath(notes)), RECEIPT_FILE)
+
+
+def _lexicon(name: str) -> Optional[str]:
+    """A lexicon's path in the skill folder - 'references/x.md' or 'sub-lexicons/x.md' - or
+    None for anything else: a script, a folder, a path leaving the skill."""
+    full = os.path.normpath(name if os.path.isabs(name) else os.path.join(_SKILL_DIR, name))
+    try:
+        rel = os.path.relpath(full, _SKILL_DIR).replace(os.sep, '/')
+    except ValueError:  # another drive
+        return None
+    parts = rel.split('/')
+    if len(parts) != 2 or parts[0] not in _LEXICON_DIRS or not parts[1].endswith('.md'):
+        return None
+    return rel
+
+
+def _read_lines(rel: str) -> Tuple[bytes, List[str]]:
+    """A lexicon's bytes, and its lines as an editor numbers them: split on LF, from 1."""
+    with open(os.path.join(_SKILL_DIR, rel), 'rb') as fh:
+        data = fh.read()
+    return data, data.decode('utf-8-sig').replace('\r\n', '\n').split('\n')
+
+
+def _same(quote: str, line: str) -> bool:
+    """Equal once both are NFC, their runs of whitespace collapsed and their ends trimmed."""
+    def norm(s):
+        return ' '.join(unicodedata.normalize('NFC', s).split())
+    return norm(quote) == norm(line)
+
+
+def _required(notes: str) -> List[str]:
+    """What every receipt covers: the general reference and, for a declared language the skill
+    supports, that language's general sub-lexicon - the two skill Step 3 makes mandatory."""
+    language, state, _why = read_declared_language(notes)
+    return [_GENERAL] + ([f'sub-lexicons/{language}-general-legal.md'] if state == 'supported' else [])
+
+
+def _seal(files: dict, lines: list) -> str:
+    blob = json.dumps([sorted(files.items()), [[e['file'], e['line']] for e in lines]])
+    return hashlib.sha256(blob.encode('utf-8')).hexdigest()
+
+
+def issue_read_receipt(notes: str, names: List[str], rng=None) -> Tuple[int, List[str]]:
+    """Skill Step 3, after the read: name two random lines in each lexicon read, one in each half
+    of its lines holding three letters or more, and write the receipt beside paragraphs.json.
+    (exit code, what to print). `rng` is a test's draw; in use it is the system's random
+    source, and nothing the operator passes can set it. Issuing again replaces the receipt."""
+    rng = rng or secrets.SystemRandom()
+    files, problems = [], []
+    for name in names:
+        rel = _lexicon(name)
+        if rel is None:
+            problems.append(f'{name}: not a lexicon — name a file in references/ or sub-lexicons/ '
+                            'by its path in the skill folder')
+        elif not os.path.isfile(os.path.join(_SKILL_DIR, rel)):
+            problems.append(f'{rel}: no such lexicon in this skill')
+        elif rel not in files:
+            files.append(rel)
+    for rel in _required(notes):
+        if rel not in files:
+            problems.append(f'{rel}: skill Step 3 makes it mandatory for this document — read it '
+                            'in full and name it too')
+    if problems:
+        return 1, problems
+    hashes, lines = {}, []
+    for rel in files:
+        data, text = _read_lines(rel)
+        hashes[rel] = hashlib.sha256(data).hexdigest()
+        cands = [i + 1 for i, s in enumerate(text) if sum(c.isalpha() for c in s) >= 3]
+        if not cands:
+            return 1, [f'{rel}: holds no line to quote']
+        half = len(cands) // 2
+        for part in ((cands[:half], cands[half:]) if half else (cands,)):
+            lines.append({'file': rel, 'line': rng.choice(part), 'quote': ''})
+    receipt = {'what': 'skill Step 3 read receipt: copy each named line, exactly as it stands in '
+                       'its file, into its quote',
+               'files': hashes, 'lines': lines, 'seal': _seal(hashes, lines)}
+    with open(_receipt_path(notes), 'w', encoding='utf-8', newline='\n') as fh:
+        json.dump(receipt, fh, ensure_ascii=False, indent=1)
+        fh.write('\n')
+    return 0, [f'{e["file"]}  line {e["line"]}' for e in lines]
+
+
+def check_read_receipt(notes: str) -> Tuple[int, List[str]]:
+    """Apply's first check: (0, [the verdict]) when the receipt beside paragraphs.json matches,
+    else (1, [each reason, with its fix]). A refusal names a file and a line, never the line's
+    text, which would hand over the answer."""
+    path = _receipt_path(notes)
+    again = f'issue it again with `{_ISSUE}`'
+    if not os.path.isfile(path):
+        return 1, [f'no {RECEIPT_FILE} beside paragraphs.json. Skill Step 3 ends with it: read the '
+                   f'lexicons in full, run `{_ISSUE}`, and copy each line it names into its quote '
+                   '(skill-docs/03-lexicons-and-segments.md, rule 7).']
+    try:
+        with open(path, 'r', encoding='utf-8-sig') as fh:
+            data = json.load(fh)
+        files, lines, seal = data['files'], data['lines'], data['seal']
+        well_formed = (isinstance(files, dict) and isinstance(lines, list) and bool(lines)
+                       and all(isinstance(k, str) and isinstance(v, str) for k, v in files.items())
+                       and all(isinstance(e, dict) and e.get('file') in files
+                               and type(e.get('line')) is int and isinstance(e.get('quote'), str)
+                               for e in lines))
+    except (OSError, ValueError, KeyError, TypeError):
+        well_formed = False
+    if not well_formed:
+        return 1, [f'{RECEIPT_FILE} cannot be read as a receipt — {again}.']
+    if _seal(files, lines) != seal:
+        return 1, [f'its named lines or files were edited after it was issued — {again}, and '
+                   'never edit a line number or the file list.']
+    problems = []
+    for rel, digest in files.items():
+        if _lexicon(rel) != rel or not os.path.isfile(os.path.join(_SKILL_DIR, rel)):
+            problems.append(f'{rel}: no longer in this skill — {again} for the lexicons you read.')
+        elif hashlib.sha256(_read_lines(rel)[0]).hexdigest() != digest:
+            problems.append(f'{rel}: changed since the receipt was issued — read it again in '
+                            f'full, then {again}.')
+    for rel in _required(notes):
+        if rel not in files:
+            problems.append(f'{rel}: mandatory for this document and not covered, as when Step 1c '
+                            f'declares another language — read it in full, then {again}, naming '
+                            'every lexicon you read.')
+    if problems:
+        return 1, problems
+    for e in lines:
+        text = _read_lines(e['file'])[1]
+        where = f'{e["file"]} line {e["line"]}'
+        if not e['quote'].strip():
+            problems.append(f'{where}: not quoted — open the file at that line and copy it into '
+                            'its quote.')
+        elif not 1 <= e['line'] <= len(text) or not _same(e['quote'], text[e['line'] - 1]):
+            problems.append(f'{where}: the quote does not match that line — open the file at '
+                            'that line and copy the line exactly as it stands.')
+    if problems:
+        return 1, problems
+    return 0, [f'{len(lines)} line(s) in {len(files)} file(s) match. {_PROVES}']
+
+
+def _receipt_main(args) -> int:
+    """The two receipt modes. PATH is the paragraphs.json the receipt sits beside."""
+    if not args.path.lower().endswith('.json'):
+        print('lexicon_compliance: the read receipt sits beside paragraphs.json — name that as '
+              f'PATH, not {args.path}', file=sys.stderr)
+        return 2
+    if args.check_read_receipt:
+        code, said = check_read_receipt(args.path)
+        if not code:
+            print(f'Lexicon read receipt: {said[0]}')
+            return 0
+        print('Lexicon read receipt — REFUSED: skill Step 5 does not start without one that matches.')
+    else:
+        code, said = issue_read_receipt(args.path, args.read_receipt)
+        if not code:
+            print(f'Lexicon read receipt — skill Step 3: {len(said)} line(s), written to '
+                  f'{_receipt_path(args.path)}.')
+            print('  Open each file at each line below and copy that line, exactly as it stands, '
+                  'into its "quote":')
+            for s in said:
+                print(f'    {s}')
+            print(f'  {_PROVES}')
+            return 0
+        print('Lexicon read receipt — NOT ISSUED:')
+    for s in said:
+        print(f'  - {s}')
+    return code
+
+# --------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------
 
@@ -470,12 +668,23 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="Advisory label printed in output; does not change rule selection.")
     ap.add_argument("--warnings-are-errors", action="store_true",
                     help="Treat WARN severity as BLOCK and fail on them too.")
+    receipt = ap.add_mutually_exclusive_group()
+    receipt.add_argument("--read-receipt", nargs="+", metavar="LEXICON", default=None,
+                         help="Skill Step 3, after the read: each lexicon read, by its path in "
+                              "the skill folder. Names two random lines in each and writes "
+                              "lexicon_read_receipt.json beside PATH, the paragraphs.json, "
+                              "for the operator to quote.")
+    receipt.add_argument("--check-read-receipt", action="store_true",
+                         help="Skill Step 5, apply's first check: exits 1 unless the receipt "
+                              "beside PATH matches the lexicons, every quote its line.")
     args = ap.parse_args(argv)
 
     path = args.path
     if not os.path.exists(path):
         print(f"lexicon_compliance: file not found: {path}", file=sys.stderr)
         return 2
+    if args.read_receipt is not None or args.check_read_receipt:
+        return _receipt_main(args)
 
     try:
         entries = _extract(path)

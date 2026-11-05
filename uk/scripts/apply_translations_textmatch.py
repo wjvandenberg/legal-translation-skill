@@ -1762,10 +1762,24 @@ def _run_validator(label, args, block_codes=None):
 
 def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                     allow_bold_loss=False):
-    """Apply translations using text matching. Auto-invokes the five
-    mandatory validators: en_runs and translations before applying, segment_shapes and
-    reject_all too on a tracked-change document, validate_apply after."""
+    """Apply translations using text matching. Auto-invokes the six
+    mandatory validators: the Step 3 read receipt first, en_runs and translations before
+    applying, segment_shapes and reject_all too on a tracked-change document, validate_apply
+    after."""
     scripts_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Pre-apply, FIRST: skill Step 3's read receipt (register C26) - Step 5 does not start
+    # without one that matches. Codes 1 and 2 block, so the banner says to fix the underlying
+    # issue: this gate has no override flag, and its input is the receipt, not
+    # paragraphs.json. Exit 3 and a crash read as the install, as for every check here.
+    _run_validator(
+        'lexicon_compliance.py --check-read-receipt (pre-apply read receipt)',
+        [sys.executable,
+         os.path.join(scripts_dir, 'lexicon_compliance.py'),
+         paragraphs_json_path,
+         '--check-read-receipt'],
+        block_codes={1, 2},
+    )
 
     # Pre-apply: en_runs gate (extracted to validate_en_runs.py).
     en_runs_args = [sys.executable,

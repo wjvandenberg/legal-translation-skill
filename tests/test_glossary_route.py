@@ -62,6 +62,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from make_fixtures import (                                          # noqa: E402
     GLOSSARY_CT, GLOSSARY_DATE_PART, GLOSSARY_PARTY_PART, GLOSSARY_PROMPTS,
     GLOSSARY_RELS, GLOSSARY_SHAPES, _glossary_part, docx)
+from read_receipt import file_receipt  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
 
 ROOT = Path(__file__).resolve().parent.parent
 FIX = ROOT / "tests" / "fixtures" / "glossary.docx"
@@ -126,6 +127,7 @@ def stage(name, docx_path, notes_path=None):
 def apply_and_get_xml(name, src, notes):
     """Run the real apply; return the translated document.xml path, or None."""
     out = TMP / name / "final" / "word" / "document.xml"
+    file_receipt(notes, SCRIPTS.parent)
     r = run([SCRIPTS / "apply_translations_textmatch.py", src, notes, out])
     if not out.exists():
         tail = (r.stderr or r.stdout or "").strip().splitlines()

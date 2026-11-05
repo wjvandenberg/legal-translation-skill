@@ -256,25 +256,28 @@ REQUIRED = [
     # ---- STEP 14.9.4 — the claims about the skill ------------------------------------
     # F23: apply runs five checks, measured at its call sites, two on tracked-change documents only;
     # and the class at repack, which runs three where two lists named two.
-    ("F23", "SKILL.md", "which validators auto-invoke from `apply_translations_textmatch.py` (there are five)"),
-    ("F23", "SKILL.md", "`apply_translations_textmatch.py` (auto-invokes 5 validators)"),
+    # Step 14.9.5 made them six, the read receipt first (C26): each list changed with its needle.
+    ("F23", "SKILL.md", "which validators auto-invoke from `apply_translations_textmatch.py` (there are six)"),
+    ("F23", "SKILL.md", "`apply_translations_textmatch.py` (auto-invokes 6 validators, the read receipt first)"),
     ("F23", "SKILL.md", "`repack_docx.py` (auto-invokes lexicon_compliance, validate_apply --strict, then --delivered)"),
-    ("F23", "SKILL.md", "auto-runs five validators: `validate_en_runs` and `validate_translations` before applying,"),
+    ("F23", "SKILL.md", "auto-runs six validators: first `lexicon_compliance --check-read-receipt`, skill Step 3's"),
+    ("F23", "SKILL.md", "every line was read — then `validate_en_runs` and `validate_translations` before applying,"),
     ("F23", "SKILL.md",
      "`validate_segment_shapes` and `validate_reject_all` too on a TC document, then `validate_apply --strict`"),
     ("F23", "SKILL.md",
      "`repack_docx.py` auto-runs `lexicon_compliance --stage pre-repack` and `validate_apply --strict` again"),
-    ("F23", "SKILL.md", "Auto-runs `validate_en_runs.py` and `validate_translations.py` (each BLOCK code 2 only)"),
+    ("F23", "SKILL.md", "Auto-runs `lexicon_compliance.py --check-read-receipt` first, then `validate_en_runs.py` and"),
+    ("F23", "SKILL.md", "`validate_en_runs.py` and `validate_translations.py` (each BLOCK code 2 only)"),
     ("F23", "skill-docs/04b-translate-gates.md",
      "(definitions-section bold-italic gate) + the final `validate_translations.py` pass"),
     ("F23", "skill-docs/04b-translate-gates.md",
      "+ `validate_segment_shapes.py` + `validate_reject_all.py` (these two on TC docs only)"),
     ("F23", "skill-docs/05-apply.md",
-     "(validate_en_runs, validate_translations, segment_shapes, reject_all, validate_apply)"),
+     "(the read receipt, validate_en_runs, validate_translations, segment_shapes, reject_all, validate_apply)"),
     ("F23", "skill-docs/10-repack-and-validate.md",
      "`validate_en_runs.py` (pre-apply, BLOCK on missing or broken `en_runs`) and"),
     ("F23", "scripts/apply_translations_textmatch.py",
-     "mandatory validators: en_runs and translations before applying, segment_shapes and"),
+     "mandatory validators: the Step 3 read receipt first, en_runs and translations before"),
     # F37: apply writes with ElementTree behind four guards, each run on an invented document; and
     # translate_numbering, which the same list said used lxml, rewrites by regex.
     ("F37", "SKILL.md", "problem although `apply_translations_textmatch.py` uses ElementTree too: it registers every"),
@@ -311,6 +314,31 @@ REQUIRED = [
     ("F38", "scripts/reorder_definitions.py", "paragraphs.json, OR a paragraph whose English text matches"),
     ("F38", "scripts/reorder_definitions.py", "defined terms (Doc 1 post-mortem; cascade root cause)."),
     ("F38", "scripts/source_language_markers.py", "references that once walked through every gate, because"),
+
+    # ---- STEP 14.9.5 — C26, the read receipt ------------------------------------------
+    # Skill Step 3 files it, skill Step 5 refuses without it, and the skill says what it proves and no more.
+    ("C26", "skill-docs/03-lexicons-and-segments.md",
+     "7. **File the read receipt when the read is done — Step 5 will not start without one:**"),
+    ("C26", "skill-docs/03-lexicons-and-segments.md",
+     "paragraphs.json --read-receipt references/general-legal.md <each other lexicon read>"),
+    ("C26", "skill-docs/03-lexicons-and-segments.md", "copy each line, exactly as it stands"),
+    ("C26", "skill-docs/03-lexicons-and-segments.md", "it again for the whole set; never edit a named line."),
+    ("C26", "skill-docs/03-lexicons-and-segments.md", "those lines, not that every line was read.**"),
+    ("C26", "skill-docs/03-lexicons-and-segments.md",
+     "- [ ] You filed the read receipt (rule 7) after the read, each named line copied from its file"),
+    ("C26", "skill-docs/05-apply.md",
+     "**It refuses to start without skill Step 3's read receipt** (03's rule 7), its first check: a gate,"),
+    ("C26", "skill-docs/05-apply.md", "or issue the receipt again, and re-run; no flag skips it."),
+    ("C26", "SKILL.md", "proof the lexicons were opened at the lines it names, not that every line was read"),
+    ("C26", "SKILL.md", "(none in the variant-conversion mode), then file the read receipt |"),
+    ("C26", "SKILL.md", "At Step 3, `--read-receipt` names the lines the operator quotes into"),
+    ("C26", "skill-docs/04b-translate-gates.md", "auto-invokes skill Step 3's read-receipt check, then"),
+    ("C26", "skill-docs/04b-translate-gates.md", "and gets all six gates"),
+    ("C26", "skill-docs/10-repack-and-validate.md", "skill Step 3's read-receipt check first, then `validate_en_runs.py`"),
+    ("C26", "scripts/lexicon_compliance.py",
+     "_PROVES = 'It proves the files were opened at those lines, not that every line was read.'"),
+    ("C26", "scripts/apply_translations_textmatch.py",
+     "'lexicon_compliance.py --check-read-receipt (pre-apply read receipt)',"),
 ]
 
 # One-tree rules: (row, tree, file, phrase, must be present). US rule 7a and the US Japanese examples,
@@ -410,6 +438,18 @@ FORBIDDEN = [
     ("F38", "scripts/reorder_definitions.py", "paragraphs.json , OR"),
     ("F38", "scripts/reorder_definitions.py", "(Doc 1  post-mortem"),
     ("F38", "scripts/source_language_markers.py", "every gate in  because"),
+    # Step 14.9.5. C26: every list of apply's checks that still counts five or misses the receipt, and a claim
+    # that the receipt proves the read itself.
+    ("C26", "SKILL.md", "(there are five)"),
+    ("C26", "SKILL.md", "(auto-invokes 5 validators)"),
+    ("C26", "SKILL.md", "auto-runs five validators"),
+    ("C26", "SKILL.md", "Auto-runs `validate_en_runs.py` and `validate_translations.py`"),
+    ("C26", "skill-docs/04b-translate-gates.md", "all five gates"),
+    ("C26", "skill-docs/05-apply.md",
+     "(validate_en_runs, validate_translations, segment_shapes, reject_all, validate_apply)"),
+    ("C26", "scripts/apply_translations_textmatch.py", "Auto-invokes the five"),
+    ("C26", "SKILL.md", "proves the lexicons were read"),
+    ("C26", "skill-docs/03-lexicons-and-segments.md", "proves the lexicons were read"),
 ]
 
 # --------------------------------------------------------------------------------------
@@ -554,6 +594,11 @@ for label, rel, start, end in [
     ("skill Step 5's gate reading", "skill-docs/05-apply.md",
      "**Distinguishing skill gates from script errors.**", "```bash"),
     ("skill Step 9's --aux-dir", "skill-docs/08-aux-and-quality.md", "**`--aux-dir` is mandatory here", "**Variant flag"),
+    # Step 14.9.5's prose.
+    ("skill Step 3's read receipt, rule 7", "skill-docs/03-lexicons-and-segments.md",
+     "7. **File the read receipt", "**Always read the base English lexicon first"),
+    ("skill Step 5's refusal without a receipt", "skill-docs/05-apply.md",
+     "**It refuses to start without skill Step 3's read receipt**", "This is the single most important step."),
 ]:
     blocks = {}
     for t in TREES:
