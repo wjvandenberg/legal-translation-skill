@@ -11,9 +11,9 @@
    "sha256_now": "5b85404ec1883d6aa1a2932e2d76e4dd3581757f8702aec22f1eb8b1d198b68e"
   },
   "uk/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step14-9-5-read-receipt",
-   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
-   "sha256_now": "5676a2fbe7f81da381198029ba9bb9a4761faa5c015bd5e5dec80723a79ce375"
+   "changed_by": "feature/step14-9-6-small-loose-ends",
+   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
+   "sha256_now": "2825006b2ca814202bd4fb0dd29bfa8c09152ef2baa5532212bfd3fee39d3048"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -31,9 +31,9 @@
    "sha256_now": "93a63296c2fa453cbcfc44384cc834e1bce4dbaed206d826a7240c8a01dbfa82"
   },
   "uk/scripts/quality_check.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "229f182933965da4d64dcd6cfb60c6bde64556d62cbbbfde8bce868a9290be2b"
+   "changed_by": "feature/step14-9-6-small-loose-ends",
+   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
+   "sha256_now": "1f99305ea2820cdb437212db11040ab7062b37973816c584a87ffa6e86232047"
   },
   "uk/scripts/repack_docx.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -86,9 +86,9 @@
    "sha256_now": "8620163a53e40b72e68b0da018f5e036a7e96a8c3670824a5b72e0aba9418a9d"
   },
   "uk/skill-docs/05-apply.md": {
-   "changed_by": "feature/step14-9-5-read-receipt",
-   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
-   "sha256_now": "c0a962b50d78f00a0e99180d181ce6dbd09569dd27a77ccf7e489cd829dbda21"
+   "changed_by": "feature/step14-9-6-small-loose-ends",
+   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
+   "sha256_now": "c0f23d6887670e80f20c900cf20e5e916e14604235a2885ab811b29e606e491f"
   },
   "uk/skill-docs/06-postprocess-and-reorder.md": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -96,9 +96,9 @@
    "sha256_now": "d0b5470a5bfca04530d102f165e328da04a990c0acfdddc279233a7bc5ee72c8"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "08355bdcfcf9daf125ac3a6b3ba99f35aa9bcb26af2ec6d79223eafca1e8de4c"
+   "changed_by": "feature/step14-9-6-small-loose-ends",
+   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
+   "sha256_now": "efc154f82997152e93edd20c6d77200837c0f421a2ddce3f5fe638dbe7356798"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/step14-9-5-read-receipt",
@@ -111,9 +111,9 @@
    "sha256_now": "7943280287e4707fd9a357fced5106e4c9462248df16f358f95b5b5e13a6dfa4"
   },
   "us/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step14-9-5-read-receipt",
-   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
-   "sha256_now": "1db3019cfef3d930a21c14c5e3869f955fe1b7944a2e423d1f60b65cfa6e6c3e"
+   "changed_by": "feature/step14-9-6-small-loose-ends",
+   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
+   "sha256_now": "ab2c4c351434d1bdec6ad2eb18e11038063de2f5b9c36ffc52451a1b7eb7809b"
   },
   "us/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -131,9 +131,9 @@
    "sha256_now": "f1c78f52e146c1158d07dd77a448b6eb28976bdf29bbd3520801197c169557de"
   },
   "us/scripts/quality_check.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "a086e461c24af2024de4f30fd18c045b9e58c6cfdaa5a24c9d8122ce909a501d"
+   "changed_by": "feature/step14-9-6-small-loose-ends",
+   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
+   "sha256_now": "dbac5255b5302c1276beab67ea990cb76ceb519dff579e82463932c872e76993"
   },
   "us/scripts/repack_docx.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -186,9 +186,9 @@
    "sha256_now": "f7fea286fb8576083bad583b8c7d9d5e417f06d00d5874db5d502465dee3b171"
   },
   "us/skill-docs/05-apply.md": {
-   "changed_by": "feature/step14-9-5-read-receipt",
-   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
-   "sha256_now": "c0a962b50d78f00a0e99180d181ce6dbd09569dd27a77ccf7e489cd829dbda21"
+   "changed_by": "feature/step14-9-6-small-loose-ends",
+   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
+   "sha256_now": "c0f23d6887670e80f20c900cf20e5e916e14604235a2885ab811b29e606e491f"
   },
   "us/skill-docs/06-postprocess-and-reorder.md": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -196,9 +196,9 @@
    "sha256_now": "24542f85b30be5f9e5ea1f52da008a9b32acce08d08d1249ec5e019c2c3e91e8"
   },
   "us/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "8b2e37bc3312f6b53d3b7f3b4835ba6c56961104041ca35a9978ef1f317a01d0"
+   "changed_by": "feature/step14-9-6-small-loose-ends",
+   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
+   "sha256_now": "7292c1139603916ddbe8be0a9eafbe0ddf882891ce9634750838925ea336fe34"
   },
   "us/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/step14-9-5-read-receipt",
@@ -231,9 +231,9 @@
    "sha256_now": "ba28811b417fda2bc84a40f9de46b47605b99da05c12399852b5f19bad532851"
   },
   "uk/skill-docs/04-translate.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "69aec0f92687902f7f92dfb01389fdd4b253830242ff3f56a19491575c65c7bb"
+   "changed_by": "feature/step14-9-6-small-loose-ends",
+   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
+   "sha256_now": "a64800b642af26783502a1e8e483cfd12e40a80c2ef358f80d5c2c3ed3accd62"
   },
   "us/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -251,9 +251,9 @@
    "sha256_now": "d9be5b530d53d59604f8f590f648486cb7bdc33a94f2e1795841bb83404a45d0"
   },
   "us/skill-docs/04-translate.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "704fbef0fb255507e68df56b3fb0e4543641d05532cd0258e422f58083cb9b2c"
+   "changed_by": "feature/step14-9-6-small-loose-ends",
+   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
+   "sha256_now": "8ccc47c33c8140f334254899155b44189403a2087624836299b02812b7081df1"
   },
   "uk/scripts/translate_comments.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",

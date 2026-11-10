@@ -55,8 +55,9 @@ re-tested. If you need these twice in one session, re-open this file deliberatel
   application.**
 
 - **Non-Latin tracked changes need the visible-space plus ZWSP hybrid.** Source text in CJK carries no
-  inter-word whitespace, so `.strip()` in apply eats the operator's authored boundary space. A zero-width
-  space (U+200B) is Unicode category `Cf`, so `str.isspace()` is False and it survives `.strip()`. **Do not**
+  inter-word whitespace, so until rev42 `.strip()` in apply ate the operator's authored boundary space, and a
+  zero-width space (U+200B), Unicode category `Cf`, survived it. Apply now keeps the authored space, but the
+  hybrid is the device proved through the whole pipeline, so it stays (sub-step 14.9.6). **Do not**
   iterate through NBSP, ideographic space or thin/en/em spaces — that path is documented and dead. **And a
   ZWSP in the deliverable is always a defect:** the fix is a pre-repack scrub, not a prohibition on the
   device.

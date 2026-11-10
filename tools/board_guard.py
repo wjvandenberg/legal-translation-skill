@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """board_guard.py - refuse a nested session's tools until it has printed its brief's status board.
 
-CHECKER VERSION 1 (2026-11-05)
+CHECKER VERSION 2 (2026-11-05)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
+
+v2 (2026-11-05, the same day) - THE TRANSCRIPT LAGS THE SCREEN. v1's first live run refused a session that had
+printed its board FIRST: the board's row was stamped 1.3 s before the call and was not yet on disk when the hook
+read it, though it was 2 s later. A MISSING board is now re-read for up to GRACE_SECONDS before a refusal, and
+FIRST is judged by the file's own order - the board's text ahead of every tool call - never by "never refused",
+which logged that session LATE. A refusal now costs up to three seconds; an allow costs nothing more.
 
 WHAT THIS IS. A Claude Code PreToolUse hook. It reads one tool call on stdin and either says
 nothing (exit 0, the call proceeds) or REFUSES it (exit 2, and the reason goes to the model on
@@ -77,10 +83,15 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 ALLOW, REFUSE = 0, 2
 MAX_REFUSALS = 2
+#: v2: how long a MISSING board is re-read before a refusal, and how often. Measured on v1's first live run: a
+#: board row stamped 1.3 s before the call was not yet on disk when the hook read, and was 2 s later.
+GRACE_SECONDS = 3.0
+POLL_SECONDS = 0.25
 HEADER_CELLS = ("#", "phase")
 STATE_REL = ("temp", "board_guard_state.json")
 LOG_REL = ("temp", "board_guard.log")
@@ -265,6 +276,12 @@ def decide(payload: dict, root: Path, home: Path | None = None) -> tuple[int, st
         return ALLOW, ""
     try:
         kind, first = judge(read_rows(path))
+        # v2: THE FILE LAGS THE SCREEN - re-read for a short window before refusing, never after allowing.
+        waited, grace = 0.0, float(globals().get("GRACE_SECONDS", 0.0))
+        while kind == "MISSING" and waited < grace:
+            time.sleep(POLL_SECONDS)
+            waited += POLL_SECONDS
+            kind, first = judge(read_rows(path))
     except OSError as e:
         log(root, key, "FAIL-OPEN", f"transcript unreadable: {type(e).__name__}")
         return ALLOW, ""
@@ -272,8 +289,9 @@ def decide(payload: dict, root: Path, home: Path | None = None) -> tuple[int, st
         log(root, key, "FAIL-OPEN", "no user text in the transcript yet")
         return ALLOW, ""
     if kind in ("NONE", "PRINTED"):
-        entry["verdict"] = "NONE" if kind == "NONE" else (
-            "FIRST" if first and not entry["refusals"] else "LATE")
+        # v2: FIRST BY THE FILE'S OWN ORDER - the board's text ahead of every tool call - whatever was refused
+        # while the file lagged. v1 read "never refused" instead, and so logged LATE for a board printed first.
+        entry["verdict"] = "NONE" if kind == "NONE" else ("FIRST" if first else "LATE")
     elif entry["refusals"] >= MAX_REFUSALS:
         entry["verdict"] = "ESCAPED"
     if entry.get("verdict"):
@@ -373,6 +391,8 @@ def selftest() -> int:
     """EVERY REFUSAL PROVED BOTH WAYS: a guard proved only to refuse has not been shown to stay
     quiet, and one proved only to stay quiet has not been shown to bite."""
     cases = []
+    saved_grace = globals().get("GRACE_SECONDS")
+    globals()["GRACE_SECONDS"] = 0.0      # in-process cases judge at once; the lag case sets its own window
     td = Path(tempfile.mkdtemp(prefix="board_guard_selftest_"))
     try:
         root, home = td / "project", td / "home"
@@ -432,6 +452,35 @@ def selftest() -> int:
                       got == [REFUSE] * MAX_REFUSALS + [ALLOW]))
         cases.append(("...logged ESCAPED", verdict("session-thinking") == "ESCAPED"))
 
+        # v2: THE TRANSCRIPT LAGS THE SCREEN. Measured live on v1's first real run: the board printed first, its
+        # row stamped 1.3 s before the call, and still not on disk when the hook read - so v1 refused, and then
+        # logged LATE, because it took "first" from "never refused" rather than from the file's own order.
+        # Both cases below are RED against v1.
+        import threading
+        late = td / "t" / "session-lagging.jsonl"
+        _write(late, [_u(BRIEF_PLAIN)])
+        writer = threading.Timer(0.6, lambda: _write(late, [_u(BRIEF_PLAIN), _text(BOARD), _tool()]))
+        writer.start()
+        globals()["GRACE_SECONDS"] = 3.0
+        try:
+            c = decide({"tool_name": "Bash", "session_id": "session-lagging",
+                        "transcript_path": str(late)}, root, home)[0]
+        finally:
+            writer.join()
+            globals()["GRACE_SECONDS"] = 0.0
+        cases.append(("the board written to disk 0.6 s late, inside the grace window -> ALLOW, never refused",
+                      c == ALLOW))
+        cases.append(("...logged FIRST", verdict("session-lagging") == "FIRST"))
+        lag2 = td / "t" / "session-refused-first.jsonl"
+        _write(lag2, [_u(BRIEF_PLAIN)])
+        c1 = decide({"tool_name": "Bash", "session_id": "session-refused-first",
+                     "transcript_path": str(lag2)}, root, home)[0]
+        _write(lag2, [_u(BRIEF_PLAIN), _text(BOARD), _tool(), _tool()])
+        c2 = decide({"tool_name": "Bash", "session_id": "session-refused-first",
+                     "transcript_path": str(lag2)}, root, home)[0]
+        cases.append(("refused while the file lagged, the board then found BEFORE the first tool call -> FIRST",
+                      (c1, c2) == (REFUSE, ALLOW) and verdict("session-refused-first") == "FIRST"))
+
         # A DECIDED SESSION NEVER RE-READS ITS TRANSCRIPT.
         (c, _), sid = ask([_u(BRIEF_PLAIN), _text(BOARD), _tool()], sid="session-cached")
         (td / "t" / "session-cached.jsonl").unlink()
@@ -480,6 +529,10 @@ def selftest() -> int:
         cases.append(("piped: an empty payload -> exit 0", r.returncode == ALLOW))
     finally:
         shutil.rmtree(td, ignore_errors=True)
+        if saved_grace is None:
+            globals().pop("GRACE_SECONDS", None)
+        else:
+            globals()["GRACE_SECONDS"] = saved_grace
 
     print("board_guard selftest")
     ok = True

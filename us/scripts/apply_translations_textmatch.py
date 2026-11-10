@@ -14,6 +14,7 @@ import io
 import json
 import zipfile
 import copy
+from collections import Counter
 import xml.etree.ElementTree as ET
 
 # Import the shared per-language marker module. It lives in the same scripts/
@@ -54,6 +55,8 @@ def _sibling_integrity_exit(name, exc):
 try:
     from source_language_markers import (  # noqa: E402
         scan_remnants,
+        remnant_verdict,
+        KEPT_NAME_WHY,
         detect_language,
         SUPPORTED_LANGUAGES,
         not_supported,
@@ -2434,8 +2437,28 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
     # source-language strike-through that a reviewer with "Show Markup" on
     # still sees. Reporting the two views separately tells the translator
     # exactly which view to inspect.
+    #
+    # A NAME THE LEXICON KEEPS IN THE SOURCE LANGUAGE IS NO REMNANT (register G13, sub-step 14.9.6).
+    # The lexicons tell the operator to write a few names untranslated, each holding a marker word, and
+    # this scan listed them beside "fix manually if genuine" - an invitation to alter a faithful
+    # rendering. quality_check drops the class the same way since 14.6: only a hit whose own span lies
+    # inside such a name, told by remnant_verdict's KEPT_NAME_WHY, out of scan_remnants' own hits in
+    # their own order; every other class, bare months included, is reported exactly as before.
+    def _remnant_hits(text, lang):
+        kept = Counter((marker, context) for marker, context, why in remnant_verdict(text, lang)[1]
+                       if why.startswith(KEPT_NAME_WHY + ' '))
+        hits, dropped = [], 0
+        for hit in scan_remnants(text, lang):
+            if kept[hit]:
+                kept[hit] -= 1
+                dropped += 1
+            else:
+                hits.append(hit)
+        return hits, dropped
+
     remnants_accept = []
     remnants_reject = []
+    kept_name_hits = 0
     if source_lang:
         accept_text = ' '.join(
             m.group(1) for m in re.finditer(r'<w:t[^>]*>([^<]+)</w:t>', rebuilt_xml)
@@ -2443,14 +2466,14 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
         del_text = ' '.join(
             m.group(1) for m in re.finditer(r'<w:delText[^>]*>([^<]+)</w:delText>', rebuilt_xml)
         )
-        remnants_accept = scan_remnants(accept_text, source_lang)
+        remnants_accept, kept_accept = _remnant_hits(accept_text, source_lang)
         # Reject-all view is the union of w:t outside w:ins and w:delText
-        # content. Rather than re-walk the XML we approximate by scanning the
-        # union of accept_text + del_text — any source-language hit in either
-        # bucket is a real remnant. This over-reports slightly for an ins
-        # whose source was already translated, but in practice the translator
-        # will have filled that in so both views are clean.
-        remnants_reject = scan_remnants(del_text, source_lang)
+        # content. Rather than re-walk the XML, only the w:delText content is
+        # scanned here: a hit in the ordinary w:t text is already reported
+        # under the accept-all view above, so it is reported once, there, and
+        # this view adds only what a reviewer sees in the struck-through text.
+        remnants_reject, kept_reject = _remnant_hits(del_text, source_lang)
+        kept_name_hits = kept_accept + kept_reject
 
     if source_lang:
         label = source_lang.capitalize()
@@ -2480,6 +2503,9 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
         if remnants_reject:
             _print_hits('reject-all / markup view', remnants_reject)
             any_hit = True
+        if kept_name_hits:
+            print(f"  Kept names: {kept_name_hits} hit(s) inside a name the lexicon keeps in the source "
+                  f"language - not remnants, and skill Step 9 does not count them either.")
         if cannot_rule:
             # Said whether or not it found anything: warnings that rest on a guess say so too.
             print("  Source-language scan: " + not_supported("the source-language scan", cannot_rule)

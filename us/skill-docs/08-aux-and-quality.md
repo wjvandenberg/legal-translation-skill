@@ -10,8 +10,9 @@ translation pipeline (Steps 2-7) only touches `document.xml` — every auxiliary
 translated separately in this step. Run all applicable sub-steps before Step 9 (quality
 check) so the QC pass scans the auxiliary files too.
 
-**A sub-step is MANDATORY whenever its part carries text** — not only when you judge that
-text to be in the source language. Step 11a's diligence audit checks every such part, and
+**A sub-step is MANDATORY whenever its part carries text, and Step 8a whenever `numbering.xml`
+exists** — a level's words sit in its format strings, which the text test does not read — and
+not only when you judge that text to be in the source language. Step 11a's diligence audit checks every such part, and
 Step 10's delivered-document check reports any side-part text shipped in the source's words
 that no declaration keeps. Text you keep on purpose — already English, a name, a code — is
 **declared**, never silently left: `en == text` or `null` in 8b's scaffold, the English
@@ -230,7 +231,7 @@ dictionaries. Prefer the scaffold round-trip. It guesses no language, prints NOT
 SUPPORTED for one it has no dictionary for, and counts the text runs it left as they
 were: read each, and use the round-trip for any still in the source language.
 
-#### Step 8c: Translate comments — MANDATORY (if word/comments.xml exists)
+#### Step 8c: Translate comments — MANDATORY (whenever the part carries text)
 
 ```bash
 # 1. List source comments so you can draft translations
@@ -309,7 +310,7 @@ with open(f'<workdir>/final/word/{PART}.xml', 'w', encoding='utf-8') as f:
 Replaces text content only; every namespace declaration, prefix, rsid, and paragraph
 ID passes through byte-for-byte.
 
-#### Step 8e: Translate glossary building blocks — MANDATORY (if word/glossary/document.xml exists)
+#### Step 8e: Translate glossary building blocks — MANDATORY (whenever the part carries text)
 
 **This is the one auxiliary flag the repack REFUSES to bundle without.** Every other
 `--flag` is optional in CLI terms; this one is not, and the reason is what the part does.

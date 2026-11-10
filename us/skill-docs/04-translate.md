@@ -763,20 +763,21 @@ space at boundaries, leading-only ASCII space, NBSP (U+00A0) at boundaries,
 NBSP at every leading edge, ideographic space (U+3000), thin space (U+2009),
 en-space (U+2002), em-space (U+2003). They all return `True` from
 `str.isspace()`, so `validate_segment_shapes.py` accepts them at line 224
-(the `_rule_alpha_collision_no_space` whitespace-present check); they all
-get removed by `apply_translations_textmatch.py`'s `.strip()` call inside
-the `en_segments` distribution path (Python's `str.strip()` removes every
-character whose `.isspace()` returns `True`). For European-source paragraphs
-this never surfaces because `distribute_text_across_elements` restores
-boundary whitespace from the source `<w:t>` element, and source elements in
-European languages naturally have spaces. Non-Latin source elements have no
-inter-character whitespace, so nothing is restored — the rendered output
-reads `"theInvestment"`, `"of500MW"`, `"Section3Insurance"`. The documented
-fix is the visible-space + ZWSP hybrid in Rule 1: `" ​"` after a
+(the `_rule_alpha_collision_no_space` whitespace-present check); until
+rev42 apply's `.strip()` removed every one of them at the seam (Python's
+`str.strip()` removes every character whose `.isspace()` returns `True`).
+For European-source paragraphs that never surfaced, because
+`distribute_text_across_elements` restores boundary whitespace from the
+source `<w:t>` element, and source elements in European languages naturally
+have spaces. Non-Latin source elements have no inter-character whitespace,
+so nothing was restored — the rendered output read `"theInvestment"`, `"of500MW"`, `"Section3Insurance"`. Apply now
+places a segment's text as written, so a space you write survives apply,
+but the fix is still the one device proved through the whole pipeline, the
+visible-space + ZWSP hybrid in Rule 1: `" ​"` after a
 regular segment, `"​ "` before a regular segment that follows an
 ins/del. The ZWSP (U+200B) is Unicode category `Cf` (Format), NOT whitespace
-per `.isspace()`, so `.strip()` stops at the ZWSP and the adjacent literal
-space survives. **Read Rule 1 in full before authoring the first non-Latin
+per `.isspace()`, so the old `.strip()` stopped at the ZWSP and the
+adjacent literal space survived. **Read Rule 1 in full before authoring the first non-Latin
 TC paragraph; do not iterate through whitespace candidates.** The path of
 trial-and-error costs ~6–8 tool calls per failure; reading Rule 1 once
 costs none.
@@ -797,17 +798,17 @@ Four rules, applied to every `en_segments` array:
    (one literal space, then U+200B ZWSP). At the *leading* edge of a regular
    segment that follows an ins/del, prepend `"​ "` (ZWSP, then one literal
    space). The visible space gives the reader a real separator in the rendered
-   docx; the ZWSP anchors the space through `apply_translations_textmatch.py`'s
-   `.strip()` (which strips trailing/leading whitespace per `str.isspace()` but
-   stops at the ZWSP since ZWSP is Unicode category `Cf`, not whitespace), and
+   docx; the ZWSP anchored the space through apply's `.strip()` until rev42
+   removed that call (ZWSP is Unicode category `Cf`, not whitespace), and
    the ZWSP is also treated as a token boundary by `validate_apply` and
    filtered out by `strip_noop_tracked_changes`. There are exactly two failure
    modes that the hybrid avoids:
 
-   - **Literal space alone** — apply `.strip()`s the trailing/leading
-     whitespace and the seam ends up glued in BOTH the rendered view and
+   - **Literal space alone** — before rev42 apply `.strip()`ped it, and the
+     seam ended up glued in BOTH the rendered view and
      the validator-token view (`"theInvestment"`, `"of500262.5MW on"`).
-   - **Pure ZWSP alone** — survives `.strip()` (validator-token view is
+     Apply now keeps it, but a plain space is not proved through the rest of the pipeline.
+   - **Pure ZWSP alone** — survives apply (validator-token view is
      fine because the tokenizer splits on ZWSP), but ZWSP is zero-width,
      so the *rendered* docx still reads `"theInvestment"` / `"of500MW"`.
      Markdown / `pandoc` previews look correct because they collapse

@@ -333,6 +333,45 @@ ok("A6b: and the warnings say they rest on a guess — NOT SUPPORTED is said whe
 ok("A7: apply no longer tells the operator to pass a flag it does not have",
    "pass --source-language" not in (SCRIPTS / "apply_translations_textmatch.py").read_text(encoding="utf-8"))
 
+# A NAME THE LEXICON KEEPS IN THE SOURCE LANGUAGE IS NO REMNANT IN APPLY'S SCAN EITHER (register G13, sub-step
+# 14.9.6). quality_check has dropped that class since 14.6; apply listed it as a "possible remnant" beside "fix
+# manually if genuine". Red at 01bb48d: A8 and A10 a hit, A9 two.
+KEPT = CLEAN[:2] + ["The parties shall file the annual return with the Agenzia delle Entrate on time."]
+KEPT_BESIDE = CLEAN[:2] + ["The parties shall file the return della with the Agenzia delle Entrate on time."]
+rc, out, scan, wrote = apply_case("a-kept-name", "italian", KEPT, "italian")
+ok("A8: a kept name alone — CLEAN, and the scan says one hit sat inside a kept name",
+   wrote and any("CLEAN" in s for s in scan) and not any("remnant(s) detected" in s for s in scan)
+   and "1 hit(s) inside a name the lexicon keeps" in out, scan)
+rc, out, scan, wrote = apply_case("a-kept-beside", "italian", KEPT_BESIDE, "italian")
+ok("A9: a kept name beside a real marker — the marker is still one remnant, the name is not",
+   wrote and any("1 possible Italian remnant(s)" in s for s in scan) and "'della'" in out.replace("\\b", ""),
+   scan)
+
+
+def apply_tc_case(name, en_deleted):
+    """A tracked deletion filled from `en_deleted` by apply's legacy mode: the reject-all view's text."""
+    d, nj = workdir(name, "italian", CLEAN, declared="italian")
+    notes = json.loads(nj.read_bytes().decode("utf-8"))
+    notes[2]["en_deleted"] = en_deleted
+    nj.write_bytes(json.dumps(notes, ensure_ascii=False, indent=1).encode("utf-8"))
+    orig = d / "orig.docx"
+    dele = ('<w:del w:id="9" w:author="a" w:date="2026-01-01T00:00:00Z"><w:r>'
+            '<w:delText xml:space="preserve"> vecchio testo</w:delText></w:r></w:del>')
+    body = "".join(p(r(t)) for t in SRC["italian"][:2])
+    body += p(r(SRC["italian"][2])).replace("</w:p>", dele + "</w:p>")
+    docx(orig, body)
+    file_receipt(nj, TREE)
+    rc, out = run("apply_translations_textmatch.py", orig, nj, d / "out.xml")
+    xml = (d / "out.xml").read_text(encoding="utf-8") if (d / "out.xml").is_file() else ""
+    return rc, out, xml
+
+
+rc, out, xml = apply_tc_case("a-kept-del", " the old return to the Agenzia delle Entrate")
+ok("A10: a kept name in the deletion view — CLEAN there too, counted, the deletion written in English",
+   "Agenzia delle Entrate</w:delText>" in xml and "remnant(s) detected" not in out and "CLEAN" in out
+   and "1 hit(s) inside a name the lexicon keeps" in out,
+   [ln.strip() for ln in out.splitlines() if "remnant" in ln or "scan" in ln][:6])
+
 # =============================================================================================
 # ARM Q — quality_check
 # =============================================================================================

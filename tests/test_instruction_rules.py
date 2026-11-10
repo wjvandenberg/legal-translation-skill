@@ -60,7 +60,9 @@ REQUIRED = [
     ("F35", "SKILL.md", "If the reported exit code is **3**"),
     ("F35", "skill-docs/05-apply.md", "Rule out a truncated install FIRST"),
     ("F35", "skill-docs/05-apply.md",
-     "exit code 3 from either of those means the script is truncated"),
+     "exit code 3 from any of them means that script is truncated"),
+    # Step 14.9.6: the rule names apply's one runner and all six checks, not two of them.
+    ("F35", "skill-docs/05-apply.md", "runs six checks through one runner"),
 
     # K3 — what delivery notes must contain, and the completion invariant.
     ("K3", "SKILL.md", "## What the delivery notes must contain"),
@@ -339,6 +341,22 @@ REQUIRED = [
      "_PROVES = 'It proves the files were opened at those lines, not that every line was read.'"),
     ("C26", "scripts/apply_translations_textmatch.py",
      "'lexicon_compliance.py --check-read-receipt (pre-apply read receipt)',"),
+    # Step 14.9.6. C10: skill Step 8's opening names 8a's exception and its reason; 8c and 8e take its words.
+    ("C10", "skill-docs/08-aux-and-quality.md", "and Step 8a whenever `numbering.xml`"),
+    ("C10", "skill-docs/08-aux-and-quality.md",
+     "a level's words sit in its format strings, which the text test does not read"),
+    ("C10", "skill-docs/08-aux-and-quality.md",
+     "#### Step 8c: Translate comments — MANDATORY (whenever the part carries text)"),
+    ("C10", "skill-docs/08-aux-and-quality.md",
+     "#### Step 8e: Translate glossary building blocks — MANDATORY (whenever the part carries text)"),
+    # F2: the appendix gives apply's old `.strip()` as history, never as a live reason; the hybrid stays.
+    ("F2", "skill-docs/04-translate.md", "rev42 apply's `.strip()` removed every one of them at the seam"),
+    ("F2", "skill-docs/04-translate.md", "places a segment's text as written, so a space you write survives apply,"),
+    ("F2", "skill-docs/04-translate.md", "docx; the ZWSP anchored the space through apply's `.strip()` until rev42"),
+    ("F2", "skill-docs/04-translate.md", "plain space is not proved through the rest of the pipeline."),
+    # G13: apply's scan drops a name the lexicon keeps, as skill Step 9 does, and says so.
+    ("G13", "scripts/apply_translations_textmatch.py",
+     'print(f"  Kept names: {kept_name_hits} hit(s) inside a name the lexicon keeps in the source "'),
 ]
 
 # One-tree rules: (row, tree, file, phrase, must be present). US rule 7a and the US Japanese examples,
@@ -361,6 +379,15 @@ FORBIDDEN = [
     # truncated" on the one condition where they may be exactly that.
     ("F35", "skill-docs/05-apply.md",
      "The scripts are not crashing, not truncated, and not buggy"),
+    # Step 14.9.6. F35: two checks named where apply runs six through one runner.
+    ("F35", "skill-docs/05-apply.md", "exit code 3 from either of those"),
+    # C10: 8c's and 8e's headings asked for a part's existence where the opening and the code ask for text.
+    ("C10", "skill-docs/08-aux-and-quality.md", "MANDATORY (if word/comments.xml exists)"),
+    ("C10", "skill-docs/08-aux-and-quality.md", "MANDATORY (if word/glossary/document.xml exists)"),
+    # F2: apply's `.strip()` stated as live, which rev42 removed from the segment path.
+    ("F2", "skill-docs/04-translate.md", "apply `.strip()`s the trailing/leading"),
+    ("F2", "skill-docs/04-translate.md", "the ZWSP anchors the space through"),
+    ("F2", "skill-docs/04-translate.md", "so `.strip()` stops at the ZWSP"),
     # K2: the remedy that told the operator to edit one side without asking which was wrong.
     ("K2", "scripts/post_process.py", "Fix paragraphs.json and re-run from Step 5"),
     # Step 14.9.2. F11: a flag LibreOffice does not have, which printed its usage and converted nothing.

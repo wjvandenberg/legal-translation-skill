@@ -221,6 +221,14 @@ TRUNCATION_ENDINGS = [
     r'\bshall\s*$', r'\bwill\s*$', r'\bmay\s*$',
     r'\ba\s*$', r'\ban\s*$',
 ]
+# A PARAGRAPH WRITTEN IN CAPITALS IS CUT OFF IN CAPITALS (sub-step 14.9.6). The endings above are
+# matched in lower case, so "... SHALL NOT BE LIABLE FOR" was never flagged. Folding case for every
+# paragraph would flag "Schedule A", "Part A" and "the Will"; so the endings are read in capitals only
+# where every cased letter of the paragraph is a capital, and never the lone article, which in
+# capitals reads as a label ("SCHEDULE A"), nor "may" and "will", which in capitals are as often the
+# month and the noun ("... DAY OF MAY", "... MY LAST WILL"): mixed case tells those apart by the
+# capital letter, and capitals cannot.
+CAPS_SKIP_ENDINGS = (r'\ba\s*$', r'\bmay\s*$', r'\bwill\s*$')
 
 # List-connective whitelist: "; and", ", and", "; or", ", or" and "; and/or" are
 # legal-English list connectives, NOT truncation. Short-circuits the truncation flag
@@ -782,8 +790,10 @@ def check_truncation(root, verbose, source_data=None):
         if LIST_CONNECTOR_RE.search(full):
             continue
         # Check if paragraph ends with a dangling preposition/article/auxiliary
+        caps = full.isupper()
         for pat in TRUNCATION_ENDINGS:
-            if re.search(pat, full):
+            if re.search(pat, full) or (caps and pat not in CAPS_SKIP_ENDINGS
+                                        and re.search(pat, full, re.IGNORECASE)):
                 # Don't flag if it's clearly a heading or short label
                 if len(full.split()) < 5:
                     continue

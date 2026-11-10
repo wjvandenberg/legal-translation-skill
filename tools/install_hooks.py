@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 12 (2026-11-05)
+"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 13 (2026-11-05)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -75,6 +75,11 @@ its brief's status board. Wired on the AUTO MODE guard's matcher, so Read, Edit 
 proved by board_bites() - a briefed session that has not printed its board refused, one that has and one a person
 typed allowed. It is in the default set, so a bare run installs it too; case 16 proves --only board alone, red
 against v11, and case 11 now swaps the board guard's stdin read as well. Copy board_guard.py beside this file.
+
+v13 (2026-11-05, the same day) - TWO PRINTED SENTENCES CORRECTED, nothing else. Both said a changed hook is read only
+at session start. Measured the day v12 was installed: the board guard's new entry reached a desktop session that was
+already running, 13 s after the settings file was written. A message telling the reader a restart keeps a hook out
+is the dangerous direction, so both now say a new hook can reach a running session.
 
 WHERE THE SOURCES COME FROM. A directory named 'hooks' beside this file. In a project that
 is tools/hooks/; in the shared folder it is standard-scripts/hooks/. Discovered rather
@@ -744,7 +749,8 @@ def main(argv) -> int:
             print("  IT IS LIVE ONLY WHILE AUTO-MODE-RUN.md READS 'STATUS: RUNNING', in any")
             print("  session. With no run armed it is inert and silent. To work by hand during a")
             print("  run, stop the run - that is the same one-word off switch, not a second one.")
-            print("  A CHANGED HOOK IS READ AT SESSION START: install it, then restart Claude.")
+            print("  A NEW HOOK CAN REACH A SESSION ALREADY RUNNING - measured once, 13 s after it was")
+            print("  written - so never count on a restart to keep one out; restart anyway to be sure it is in.")
         print()
 
     if "purpose" in only:
@@ -816,7 +822,7 @@ def main(argv) -> int:
             print("  IT IS LIVE ONLY IN A SESSION WHOSE FIRST MESSAGE CARRIES A BOARD TABLE - a session")
             print("  another session started. A session a person typed is never checked.")
             print("  IF IT EVER LOCKS YOU OUT: Read, Edit and Write are never matched - delete its")
-            print("  entry from settings.local.json with Edit. A CHANGED HOOK IS READ AT SESSION START.")
+            print("  entry from settings.local.json with Edit. IT CAN REACH A SESSION ALREADY RUNNING.")
     print("=" * 92)
     if problems:
         for p in problems:

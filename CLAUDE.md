@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187, its fixes 14.9.1–14.9.5 planned; 14.9.1 as #188 and 14.9.2 as #189, 2026-11-03, 14.9.3 as #190, 2026-11-04, 14.9.4 as #191 and 14.9.5, C26's read receipt, as #192, 2026-11-05; next, the small loose ends · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187, its fixes 14.9.1–14.9.5 planned; 14.9.1 to 14.9.5 as #188 to #192, 2026-11-03 to 2026-11-05, and 14.9.6, the small loose ends, as #193, 2026-11-10; next, 14.9.7, the language widenings · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,20 +578,20 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-05, 14.9.5 MERGED (#192), C26 CLOSED; NEXT, THE SMALL LOOSE ENDS
+### HANDOFF — 2026-11-10, 14.9.6 MERGED (#193), F35 CLOSED; NEXT, 14.9.7, THE LANGUAGE WIDENINGS
 
-**PURPOSE: MET** — *the mandatory lexicon read leaves a trace the operator cannot fake without opening the
-files, and the skill says what it proves and no more*: skill Step 3 files a read receipt, and apply refuses to
-start without one that matches. `DECISIONS-LOG.md`, 2026-11-05 (2).
+**PURPOSE: MET** — *every loose end step 14 left open is fixed on evidence or closed with its reason written
+down*: five fixed and three recorded, in the register's F35, G13, G3, F2, C10, F18, F37 and G14.
 
-**PRODUCED:** `lexicon_compliance.py --read-receipt` and `--check-read-receipt`, apply's first of six checks,
-both trees; 03's rule 7, 05's refusal, every list saying six; `tests/test_read_receipt.py`, 39 a tree, and the
-helper the 15 places that run apply now call; 34 mutants; the house's three new scripts adopted; one full run.
+**PRODUCED:** apply's scan drops a name the lexicon keeps and counts it; `quality_check`'s dangling-ending rule
+reads a paragraph in capitals, never the lone A, MAY or WILL there; skill Steps 4, 5 and 8 and the OOXML rules
+say what is true. Built 2026-11-05, resumed 2026-11-10; a second `/code-review` found MAY and WILL, fixed red
+first. `DECISIONS-LOG.md`, 2026-11-05 (3).
 
-**SINGLE NEXT ACTION: THE SMALL LOOSE ENDS** — apply's remnant warning, the Article reader, the dangling-ending
-rule, Step 8 against 8a, and the chain's four carried items; its prompt `temp/s1105_next_prompt.md`.
+**SINGLE NEXT ACTION: 14.9.7, THE LANGUAGE WIDENINGS** — Finnish quotes, a Japanese and Chinese word count, the
+unmeasured words from published law, apply's kept-name helper moved; prompt `temp/s1110_next_prompt.md`.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** apply needs a receipt — `tests/read_receipt.py`; the charter is AT its cap.
+**WHAT A NEW SESSION WOULD GET WRONG:** a mutant's search text must occur once; the charter is AT its cap.
 
-**Open, none blocking:** the stale strip claim, the lost mid-paragraph page break, apply writing with
-ElementTree, 05's first rule (F35); F30's detection half; F12; F31, step 19's. **Context: 66%.**
+**Open, none blocking:** the page break lost mid-paragraph (F18, the formatting steps'); F30's detection half;
+F12; F31, step 19's. **Context: 34%.**

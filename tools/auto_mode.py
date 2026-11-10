@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""auto_mode.py - the counter an unattended chain of sessions runs on.  CHECKER VERSION 5 (2026-11-04)
+"""auto_mode.py - the counter an unattended chain of sessions runs on.  CHECKER VERSION 7 (2026-11-05)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -35,6 +35,10 @@ hop halts on arrival and says so instead of racing.
     uv run python tools/auto_mode.py --claim      # THE HOP'S FIRST ACT: take the next number
     uv run python tools/auto_mode.py --release    # the hop's last act: let the next one in
     uv run python tools/auto_mode.py --arm --run-id X --hops 4 --branch session/y --effort xhigh
+    uv run python tools/auto_mode.py --arm ... --until 15:30   # or --for 7: when the run
+                                                 # ends, held as one UNTIL (v6) - never both
+    uv run python tools/auto_mode.py --arm ... --questions answer   # or save, the default:
+                                                 # what a hop does with a question (v7)
     uv run python tools/auto_mode.py --stop       # the off switch, same as editing the file
     uv run python tools/auto_mode.py --blocked    # THE HOP'S own halt: a question it may
                                                  # not answer alone. STOPPED is a person
@@ -61,6 +65,31 @@ confirm the runner's flags line and that every hop must be scheduled - neither t
 conductor starts. It now names the conductor's next two acts, and the selftest refuses either
 retired instruction coming back.
 
+THE BOUND (v6). A run ends at the time the person arming it names - "hop mode for the next 7
+hours" - as a clock time, --until HH:MM, or as hours, --for 7, never both. Either becomes ONE
+clock time at the moment of arming, written as UNTIL in WOKE's own shape, so the block holds one
+deadline whichever form was typed. A clock time already past today can only mean tomorrow -
+02:00 named at 22:00 is past midnight - so it is read as tomorrow, never refused, and the arm
+prints the date and the hours it comes to, for the person still there to see a slip. --for
+takes more than 0 and at most 24 hours, the most a clock time can name, so both forms bound the
+same range and a mistyped 730 for 7:30 is refused. Past UNTIL the conductor starts no hop -
+--hop-check says so, and why - a claim refuses, and the claim or release that finds the time up
+closes the run as COMPLETE: left RUNNING, the guard would go on refusing in every session in the
+folder after the run had ended. A hop already working when the time passes finishes; nothing is
+interrupted, as --stop interrupts nothing. A block without UNTIL behaves exactly as before.
+
+THE QUESTIONS LINE (v7). What a hop does with a question is the person's word, given at arming:
+--questions save, the default when nothing is said, keeps a question for the hand-back while the
+work goes on around it, and only a question nothing can proceed without halts the run through
+--blocked; --questions answer has the hop take the recommended option and log each choice, with
+its reason, in DECISIONS-LOG.md. It is held as an OPTIONAL QUESTIONS field, as EFFORT and UNTIL
+are, and a block without it reads as save - every run before v7 behaved so. --arm always writes
+it, so a re-arm never inherits the last run's answer, and --status and --claim name it, the claim
+being the hop's first read. UNDER answer --blocked STAYS, for a check that fails and cannot be
+fixed - a question is never its reason there, and its words ask for the check, not a question.
+A value that is neither is VOID: the hop cannot know which rule binds it. The guard's refusals
+are the same in both modes - an answered question never reaches an irreversible act.
+
 THE EFFORT A HOP RUNS AT (v3), AND WHY ARMING REFUSES WITHOUT IT. Measured 2026-09-30: a
 desktop session at `xhigh` armed a run, the runner was started from a plain terminal, and the
 hop's own log recorded `medium` - the CLI's default - on every message. Nothing reported it;
@@ -81,10 +110,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -105,7 +135,32 @@ FIELDS = ("RUN_ID", "N", "K", "STATUS", "BRANCH", "HOP_ACTIVE", "WOKE")
 #: for the reason BLOCKED is a status value: read_state refuses a block missing any REQUIRED
 #: field, so a new required one would make every state file armed before v3 VOID. It is
 #: required where it matters instead - the runner refuses to START a run that names none.
-OPTIONAL_FIELDS = ("EFFORT",)
+#: UNTIL JOINED IT IN v6 for the same reason: a bound is optional, and a block without one reads
+#: and runs exactly as before. AND A FIELD NOT LISTED HERE IS DROPPED BY THE FIRST WRITE - v5,
+#: handed a block carrying UNTIL, lost it on the first claim, measured in the v6 selftest.
+#: QUESTIONS JOINED IN v7, and v6 dropped it on the first claim the same way, measured red.
+OPTIONAL_FIELDS = ("EFFORT", "UNTIL", "QUESTIONS")
+
+#: WHAT A HOP DOES WITH A QUESTION (v7) - the module docstring says why. `save` is the default,
+#: a block naming none reading as it (Wouter, answer 56: the prompt silent, questions saved).
+QUESTIONS_MODES = ("save", "answer")
+DEFAULT_QUESTIONS = "save"
+
+#: EACH MODE IN THE WORDS --arm, --status AND --claim PRINT - one place, so the three cannot
+#: come to disagree. Rule 6 of AUTO-MODE-RUN.md is the hop's full text.
+QUESTIONS_SAY = {
+    "save": "a question is kept for the hand-back and the work goes on around it; only one "
+            "nothing can proceed without halts the run, through --blocked",
+    "answer": "the hop takes the recommended option and logs each choice, with its reason, in "
+              "DECISIONS-LOG.md; a question never halts the run",
+}
+
+#: UNTIL AND WOKE ARE WRITTEN IN ONE SHAPE, local time to the second, so one reader parses both.
+STAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+#: THE LONGEST BOUND --for TAKES, IN HOURS: a day, the most a clock time can name - so the two
+#: forms bound the same range, and a mistyped 730 for 7:30 is refused while a person is there.
+MAX_BOUND_HOURS = 24
 
 #: WHAT `claude --effort` ACCEPTS, copied off CLI 2.1.283's own help rather than typed from
 #: memory: "(low, medium, high, xhigh, max)". A level outside it is refused at --arm, where a
@@ -225,9 +280,96 @@ def as_int(fields: dict, key: str) -> int:
         raise Void(f"{key} is {fields.get(key)!r}, which is not a whole number") from e
 
 
+def stamp(t: datetime) -> str:
+    """A time as the block carries it: 2026-11-05 15:30:00 local."""
+    return t.strftime(STAMP_FORMAT) + " local"
+
+
 def now() -> str:
     # TO THE SECOND SINCE v4: --hop-check draws a hop's window from it (hop_window_start).
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S local")
+    return stamp(datetime.now())
+
+
+def parse_stamp(value: str, name: str) -> datetime:
+    """A field stamp() wrote, read back - VOID when it is not one, never a guess."""
+    m = re.fullmatch(r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) local", value.strip())
+    try:
+        if not m:
+            raise ValueError
+        return datetime.strptime(m.group(1), STAMP_FORMAT)
+    except ValueError:
+        raise Void(f"{name} is {value!r}, not a time to the second as --arm writes it "
+                   f"(YYYY-MM-DD HH:MM:SS local)") from None
+
+
+def say_time(t: datetime) -> str:
+    """A deadline in the words a person reads: 15:30 on 2026-11-05."""
+    return f"{t:%H:%M} on {t:%Y-%m-%d}"
+
+
+def hours_until(end: datetime, clock: datetime | None = None) -> float:
+    """REAL hours from the clock to `end`, by timestamp - a wall-clock difference is an hour
+    out on the night the clocks change."""
+    return (end.timestamp() - (clock or datetime.now()).timestamp()) / 3600
+
+
+def resolve_until(until: str | None, for_hours: str | None,
+                  clock: datetime | None = None) -> tuple[str | None, str]:
+    """(UNTIL to write, how it was reached) - '' when no bound was given - or (None, why the
+    arm is refused). ONE CLOCK TIME EITHER WAY (Wouter, answer 55): --until HH:MM or --for
+    hours, turned into one time here, at arming, so nothing later has to know which was typed.
+    The module docstring says why a time already past means tomorrow and why --for stops at 24.
+    """
+    t = clock or datetime.now()
+    if until is not None and for_hours is not None:
+        return None, ("--until and --for both given. Say ONE: a clock time, --until 15:30, or a "
+                      "number of hours, --for 7 - a run has one end, not two.")
+    if until is not None:
+        m = re.fullmatch(r"([01]?\d|2[0-3]):([0-5]\d)", until.strip())
+        if not m:
+            return None, (f"--until {until!r} is not a clock time. Give it as HH:MM, 00:00 to "
+                          f"23:59 - or a number of hours with --for.")
+        end = t.replace(hour=int(m.group(1)), minute=int(m.group(2)), second=0, microsecond=0)
+        if end <= t:
+            end += timedelta(days=1)            # already past today: past midnight, tomorrow
+        return stamp(end), f"--until {until.strip()}"
+    if for_hours is not None:
+        try:
+            hours = float(for_hours)
+        except ValueError:
+            hours = math.nan
+        if not (math.isfinite(hours) and 0 < hours <= MAX_BOUND_HOURS):
+            return None, (f"--for {for_hours!r} is not a number of hours above 0 and at most "
+                          f"{MAX_BOUND_HOURS}, such as 7 or 2.5. For a clock time use --until.")
+        # BY TIMESTAMP, NOT BY ADDING TO THE WALL CLOCK: on the night the clocks change, 7 hours
+        # added to the wall clock is 6 or 8 real ones.
+        end = datetime.fromtimestamp(t.timestamp() + hours * 3600).replace(microsecond=0)
+        return stamp(end), f"--for {for_hours.strip()}"
+    return "", "no bound"
+
+
+def time_up(fields: dict, clock: datetime | None = None) -> datetime | None:
+    """The run's UNTIL once the clock has reached it; None before it, or when the run names
+    none. AN UNTIL THAT WILL NOT PARSE IS VOID: a bound that cannot be read is not one that
+    holds, and skipping it would run on past the time a person named."""
+    raw = fields.get("UNTIL")
+    if not raw:
+        return None
+    end = parse_stamp(raw, "UNTIL")
+    return end if (clock or datetime.now()) >= end else None
+
+
+def questions_mode(fields: dict) -> str:
+    """The run's QUESTIONS - `save` when the block names none, as no block before v7 does. ONE
+    THAT IS NEITHER IS VOID: a hop cannot know which rule binds it, and reading it as either is
+    the guess the field exists to remove."""
+    raw = (fields.get("QUESTIONS") or "").strip().lower()
+    if not raw:
+        return DEFAULT_QUESTIONS
+    if raw not in QUESTIONS_MODES:
+        raise Void(f"QUESTIONS is {fields['QUESTIONS']!r}, not one of "
+                   f"{' / '.join(QUESTIONS_MODES)} as --arm writes it")
+    return raw
 
 
 # --------------------------------------------------------------------------- the actions
@@ -241,12 +383,26 @@ def act_status(fields: dict) -> tuple[int, list[str]]:
            f"  HOP_ACTIVE {fields['HOP_ACTIVE']}   (woke: {fields['WOKE']})",
            f"  BRANCH     {fields['BRANCH']}",
            f"  EFFORT     {fields.get('EFFORT') or 'NOT RECORDED - armed before v3, so the runner will refuse it'}"]
+    if fields.get("UNTIL"):
+        left = hours_until(parse_stamp(fields["UNTIL"], "UNTIL"))
+        out.append(f"  UNTIL      {fields['UNTIL']}   ("
+                   + (f"{left:.1f} hours from now)" if left > 0 else f"passed {-left:.1f} hours ago)"))
+    else:
+        out.append("  UNTIL      none - the run is bounded by its hop count alone")
+    mode = questions_mode(fields)
+    out.append(f"  QUESTIONS  {mode}   ("
+               + ("" if fields.get("QUESTIONS") else "the default, the block naming none - ")
+               + f"{QUESTIONS_SAY[mode]})")
+    up = time_up(fields)
     if fields["STATUS"] != RUNNING:
         out.append(f"  -> the run is {fields['STATUS']}. A hop waking now must halt.")
     elif fields["HOP_ACTIVE"].lower() == "yes":
         out.append(f"  -> hop {k} is ALREADY ACTIVE. A hop waking now must halt.")
     elif k >= n:
         out.append("  -> every hop has run. A hop waking now must halt.")
+    elif up:
+        out.append(f"  -> the run's time is up - it was to end at {say_time(up)}. A hop waking "
+                   "now must halt.")
     else:
         out.append(f"  -> the next hop to claim will be hop {k + 1} of {n}.")
     return RC_OK, out
@@ -288,6 +444,15 @@ def act_claim(fields: dict) -> tuple[int, list[str], bool]:
         fields["STATUS"] = COMPLETE
         return RC_REFUSED, [f"REFUSED: K = {k} and N = {n} - every hop in this run has run.",
                             "         STATUS set to COMPLETE. Halt and hand back."], True
+    up = time_up(fields)
+    if up:
+        # THE TIME IS UP (v6), and closed in the same breath for the same reason as above.
+        fields["STATUS"] = COMPLETE
+        return RC_REFUSED, [f"REFUSED: the run's time is up - it was to end at {say_time(up)}, "
+                            f"and it is now {datetime.now():%H:%M}.",
+                            f"         {k} of {n} hops ran. STATUS set to COMPLETE. Halt and "
+                            "hand back. Do no work."], True
+    mode = questions_mode(fields)                   # VOID before the claim, never after it
 
     fields["K"] = str(k + 1)
     fields["HOP_ACTIVE"] = "yes"
@@ -295,6 +460,9 @@ def act_claim(fields: dict) -> tuple[int, list[str], bool]:
     return RC_OK, [f"  CLAIMED: you are hop {k + 1} of {n} in run {fields['RUN_ID']}.",
                    f"  BRANCH:  {fields['BRANCH']} - one branch for the whole run.",
                    f"  WOKE:    {fields['WOKE']}",
+                   *([f"  UNTIL:   {fields['UNTIL']} - no hop starts after it; finish the work "
+                      "you were given."] if fields.get("UNTIL") else []),
+                   f"  QUESTIONS: {mode} - {QUESTIONS_SAY[mode]}.",
                    "",
                    "  Read the rest of " + STATE_NAME + " before doing anything else: the",
                    "  bounded-authority list there says what you may never do, and the",
@@ -311,9 +479,16 @@ def act_release(fields: dict) -> tuple[int, list[str], bool]:
                             "         Both mean the counter no longer describes reality."], False
     fields["HOP_ACTIVE"] = "no"
     lines = [f"  RELEASED: hop {k} of {n} is finished."]
+    # ONLY A LIVE RUN IS CLOSED BY ITS TIME: a STOPPED or BLOCKED one keeps the word that says
+    # why it ended, which is the record a person reads afterwards.
+    up = time_up(fields) if fields["STATUS"].upper() == RUNNING and k < n else None
     if k >= n:
         fields["STATUS"] = COMPLETE
         lines.append("  STATUS set to COMPLETE - that was the last hop of the run.")
+    elif up:
+        fields["STATUS"] = COMPLETE
+        lines.append(f"  STATUS set to COMPLETE - the run's time is up: it was to end at "
+                     f"{say_time(up)}, so no hop {k + 1} starts. {k} of {n} hops ran.")
     else:
         lines.append(f"  The next hop to fire will claim hop {k + 1}.")
     return RC_OK, lines, True
@@ -338,12 +513,22 @@ def act_blocked(fields: dict) -> tuple[int, list[str], bool]:
     IT RELEASES THE LOCK IN THE SAME BREATH, deliberately. A hop that blocks and leaves
     HOP_ACTIVE at 'yes' looks identical to a hop that died mid-flight, and the next reader
     cannot tell a deliberate halt from a crash.
+
+    AND UNDER QUESTIONS: answer (v7) IT STAYS, for a check that fails and cannot be fixed - a
+    question is never its reason there, so its words ask for the check and its output.
     """
     if fields["STATUS"].upper() != RUNNING:
         return RC_REFUSED, [f"REFUSED: STATUS is {fields['STATUS']!r}, not {RUNNING} - there "
                             f"is no live run to block."], False
+    mode = questions_mode(fields)
     fields["STATUS"] = BLOCKED
     fields["HOP_ACTIVE"] = "no"
+    if mode == "answer":
+        return RC_OK, ["  STATUS set to BLOCKED. The chain ends here and hands back.",
+                       "  QUESTIONS is answer, so a question is never the reason for a block -",
+                       "  it is for a check that fails and cannot be fixed. WRITE THE CHECK AND",
+                       "  ITS OUTPUT into the decision record before you exit. Any hop waking",
+                       "  after this is refused."], True
     return RC_OK, ["  STATUS set to BLOCKED. The chain ends here and hands back.",
                    "  WRITE THE QUESTION DOWN before you exit - the decision record is the",
                    "  only place it survives, and this field carries the fact, not the",
@@ -482,8 +667,17 @@ def act_hop_check(fields: dict, root: Path, started: int) -> tuple[int, list[str
         return RC_REFUSED, [f"REFUSED: hop {k} cycle evidence MISSING - {why}.",
                             "         A hop that did not verify and test is not a hop whose",
                             "         work can be built on. Halt and hand back."]
-    nxt = (f"  -> start hop {k + 1} of {n}." if fields["STATUS"].upper() == RUNNING and k < n
-           else f"  -> the run is {fields['STATUS']}: hand back, starting nothing.")
+    # PAST UNTIL (v6) NO NEXT HOP IS NAMED, AND THE LINE SAYS WHY - whether the release that
+    # found the time up has already closed the run as COMPLETE, or the clock passed it since.
+    up = time_up(fields)
+    status = fields["STATUS"].upper()
+    if status == RUNNING and k < n and not up:
+        nxt = f"  -> start hop {k + 1} of {n}."
+    elif up and k < n and status in (RUNNING, COMPLETE):
+        nxt = (f"  -> the run's time is up: it was to end at {say_time(up)}, and it is now "
+               f"{datetime.now():%H:%M} - so no hop {k + 1}. Hand back, starting nothing.")
+    else:
+        nxt = f"  -> the run is {fields['STATUS']}: hand back, starting nothing."
     return RC_OK, [f"  hop {k} of {n} released, and {why}.", nxt]
 
 
@@ -537,8 +731,9 @@ def runner_version(folder: Path = HERE) -> int | None:
 
 
 def act_arm(fields: dict, run_id: str, hops: int, branch: str, effort: str | None = None,
-            env_effort: str | None = None,
-            runner: int | None = None) -> tuple[int, list[str], bool]:
+            env_effort: str | None = None, runner: int | None = None,
+            until: str | None = None, for_hours: str | None = None,
+            questions: str | None = None) -> tuple[int, list[str], bool]:
     """Set the run up. THE ATTENDED SESSION'S LAST ACT, and the order matters.
 
     Commit first, create the scheduled tasks second, arm third. The guard that refuses an
@@ -547,6 +742,13 @@ def act_arm(fields: dict, run_id: str, hops: int, branch: str, effort: str | Non
 
     AND IT RECORDS THE EFFORT (v3), refusing to arm without one - see resolve_effort. `runner`
     is the version of the runner beside this file (runner_version), None when there is none.
+
+    AND THE BOUND (v6): `until` (HH:MM) or `for_hours`, one UNTIL - see resolve_until. AN ARM
+    WITH NEITHER CLEARS THE LAST RUN'S, since an old UNTIL left in place would end the new run
+    the moment it began.
+
+    AND THE QUESTIONS LINE (v7): `questions`, answer or save, `save` when none is given - and
+    ALWAYS WRITTEN, so a re-arm never inherits the last run's `answer`.
     """
     if hops < 1:
         return RC_REFUSED, [f"REFUSED: --hops is {hops}. A run with no hops is not a run."], False
@@ -558,11 +760,31 @@ def act_arm(fields: dict, run_id: str, hops: int, branch: str, effort: str | Non
                             f"only v{RUNNER_MIN_VERSION}+ passes the effort to its hops - a",
                             "         stale one would launch every hop at the CLI default. "
                             "Re-copy it from the shared folder."], False
+    bound, how = resolve_until(until, for_hours)
+    if bound is None:
+        return RC_REFUSED, [f"REFUSED: {how}"], False
+    if bound:
+        end = parse_stamp(bound, "UNTIL")
+        late = ", past midnight" if end.date() > datetime.now().date() else ""
+        until_line = (f"  UNTIL: {say_time(end)} (from {how}{late}; {hours_until(end):.1f} hours "
+                      "from now) - the conductor starts no hop after it; a hop still working "
+                      "finishes.")
+    else:
+        until_line = "  UNTIL: none - the run is bounded by its hop count alone."
+    mode = (questions or "").strip().lower() or DEFAULT_QUESTIONS
+    if mode not in QUESTIONS_MODES:
+        return RC_REFUSED, [f"REFUSED: --questions {questions!r} is neither answer nor save. Say "
+                            "answer only on the person's word - save is the default."], False
     fields.update({"RUN_ID": run_id, "N": str(hops), "K": "0", "STATUS": RUNNING,
-                   "BRANCH": branch, "HOP_ACTIVE": "no", "WOKE": "-", "EFFORT": level})
+                   "BRANCH": branch, "HOP_ACTIVE": "no", "WOKE": "-", "EFFORT": level,
+                   "UNTIL": bound, "QUESTIONS": mode})
     return RC_OK, [f"  ARMED: run {run_id}, {hops} hop(s), on branch {branch}.",
                    f"  EFFORT: {level} (from {source}) - a hop inherits the conductor's effort, "
                    "so run at this one and start no hop lower.",
+                   until_line,
+                   f"  QUESTIONS: {mode} ("
+                   + ("from --questions" if (questions or "").strip() else "the default, none given")
+                   + f") - {QUESTIONS_SAY[mode]}.",
                    "  NEXT, AS THE CONDUCTOR: the canary, then hop 1 on a person's own turn - "
                    "AUTO-MODE.md, the conductor, steps 2 and 3.",
                    "  K = 0: no hop has run yet. The first to claim becomes hop 1.",
@@ -591,6 +813,16 @@ def main(argv) -> int:
     ap.add_argument("--branch")
     ap.add_argument("--effort", help="--arm: the effort THIS session runs at; else "
                                      "CLAUDE_EFFORT; refused when neither")
+    ap.add_argument("--until", metavar="HH:MM",
+                    help="--arm: the clock time the run ends - the next time the clock reads "
+                         "it, so one already past today is tomorrow. Not with --for")
+    ap.add_argument("--for", dest="for_hours", metavar="HOURS",
+                    help=f"--arm: how many hours the run lasts, above 0 and at most "
+                         f"{MAX_BOUND_HOURS}, made one clock time at arming. Not with --until")
+    ap.add_argument("--questions", metavar="answer|save",
+                    help="--arm: what a hop does with a question - save it for the hand-back, "
+                         "the default, or answer it with the recommended option, each choice "
+                         "logged in DECISIONS-LOG.md")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args(argv)
 
@@ -625,7 +857,8 @@ def main(argv) -> int:
                 print("  --arm needs --run-id, --hops and --branch")
                 return RC_COULD_NOT_RUN
             rc, lines, dirty = act_arm(fields, a.run_id, a.hops, a.branch, a.effort,
-                                       os.environ.get("CLAUDE_EFFORT"), runner_version())
+                                       os.environ.get("CLAUDE_EFFORT"), runner_version(),
+                                       a.until, a.for_hours, a.questions)
         elif a.claim:
             rc, lines, dirty = act_claim(fields)
         elif a.release:
@@ -711,6 +944,12 @@ def selftest() -> int:
         if dirty:
             write_state(f, fields, raw, term)
         return "REFUSED" if rc == RC_REFUSED else "RELEASED"
+
+    # THE BOUND'S CLOCK, READ ONCE: a clock time typed into an arm and the stamp it must land
+    # on are drawn from the SAME moment, or a case run across a minute's turn compares 14:59
+    # with 15:00 and reports a defect that is the suite's own.
+    t0 = datetime.now()
+    ahead, behind = t0 + timedelta(hours=1), t0 - timedelta(hours=1)
 
     cases = [
         Case("a stopped run refuses a hop", claim,
@@ -834,6 +1073,125 @@ def selftest() -> int:
              bad=lambda d: _hop_state(d, recorded=None),
              good=lambda d: _hop_state(d, recorded=(_AFTER, 0, False)),
              want="REFUSED", good_want="OK"),
+        # THE BOUND (v6): a run ends at the time Wouter names - a clock time or a number of
+        # hours, held as ONE UNTIL. The arm is driven through main(), as a conductor types it,
+        # and every time sits an hour either side of the real clock, read ONCE above, so each
+        # pair reads the same at any hour of the day, midnight included.
+        Case("--until arms the clock time named", _probe_arm_until,
+             bad=lambda d: (_state(d), ["--until", "7.5"]),
+             good=lambda d: (_state(d), ["--until", f"{ahead:%H:%M}"]),
+             want="REFUSED", good_want=f"UNTIL {_minute_stamp(ahead)}"),
+        # A CLOCK TIME ALREADY PAST CAN ONLY MEAN TOMORROW - 02:00 named at 22:00, past midnight.
+        Case("--until already past means tomorrow", _probe_arm_until,
+             bad=lambda d: (_state(d), ["--until", f"{behind:%H:%M}"]),
+             good=lambda d: (_state(d), ["--until", f"{ahead:%H:%M}"]),
+             want=f"UNTIL {_minute_stamp(behind + timedelta(days=1))}",
+             good_want=f"UNTIL {_minute_stamp(ahead)}"),
+        Case("--for hours become one clock time", _probe_arm_for,
+             bad=lambda d: (_state(d), ["--for", "0"]),
+             good=lambda d: (_state(d), ["--for", "2.5"]),
+             want="REFUSED", good_want="UNTIL +2.5h"),
+        Case("--for beyond a day is refused", _probe_arm_for,
+             bad=lambda d: (_state(d), ["--for", "24.5"]),
+             good=lambda d: (_state(d), ["--for", "24"]),
+             want="REFUSED", good_want="UNTIL +24.0h"),
+        Case("--until and --for together refused", _probe_arm_for,
+             bad=lambda d: (_state(d), ["--until", f"{ahead:%H:%M}", "--for", "2"]),
+             good=lambda d: (_state(d), ["--for", "2"]),
+             want="REFUSED", good_want="UNTIL +2.0h"),
+        # A RE-ARM REPLACES THE BOUND: an old UNTIL left behind would end the new run at once.
+        Case("a re-arm with no bound clears UNTIL", _probe_arm_until,
+             bad=lambda d: (_until_state(d, _at(-1)), []),
+             good=lambda d: (_until_state(d, _at(-1)), ["--until", f"{ahead:%H:%M}"]),
+             want="NO UNTIL", good_want=f"UNTIL {_minute_stamp(ahead)}"),
+        Case("--claim past UNTIL is refused", _probe_claim_until,
+             bad=lambda d: _until_state(d, _at(-1)),
+             good=lambda d: _until_state(d, _at(1)),
+             want="REFUSED", good_want="CLAIMED"),
+        Case("...and a block with NO UNTIL claims", _probe_claim_until,
+             bad=lambda d: _until_state(d, _at(-1)),
+             good=lambda d: _until_state(d, None),
+             want="REFUSED", good_want="CLAIMED"),
+        # AND IT CLOSES THE RUN IN THE SAME BREATH, as K = N does: a file still reading RUNNING
+        # keeps the guard refusing in every session in the folder after the run has ended.
+        Case("a claim past UNTIL closes the run", _probe_claim_status,
+             bad=lambda d: _until_state(d, _at(-1)),
+             good=lambda d: _until_state(d, _at(1)),
+             want=COMPLETE, good_want=RUNNING),
+        Case("a release past UNTIL closes the run", _probe_release_status,
+             bad=lambda d: _until_state(d, _at(-1), k=1, active="yes"),
+             good=lambda d: _until_state(d, _at(1), k=1, active="yes"),
+             want=COMPLETE, good_want=RUNNING),
+        Case("--hop-check past UNTIL starts nothing", _probe_hop_next,
+             bad=lambda d: _hop_state(d, recorded=(_AFTER, 0, False), until=_at(-1)),
+             good=lambda d: _hop_state(d, recorded=(_AFTER, 0, False), until=_at(1)),
+             want="TIME UP", good_want="START 2"),
+        Case("...and with NO UNTIL starts the next", _probe_hop_next,
+             bad=lambda d: _hop_state(d, recorded=(_AFTER, 0, False), until=_at(-1)),
+             good=lambda d: _hop_state(d, recorded=(_AFTER, 0, False)),
+             want="TIME UP", good_want="START 2"),
+        Case("--status shows UNTIL, or that none", _probe_status_until,
+             bad=lambda d: _until_state(d, _at(1)),
+             good=lambda d: _until_state(d, None),
+             want="SHOWN", good_want="NONE SHOWN"),
+        Case("--status past UNTIL says halt", _probe_status_next,
+             bad=lambda d: _until_state(d, _at(-1)),
+             good=lambda d: _until_state(d, _at(1)),
+             want="HALT", good_want="NEXT"),
+        # A BOUND THAT CANNOT BE READ IS NOT A BOUND THAT HOLDS: refused, never skipped.
+        Case("an UNTIL that will not parse is VOID", _probe_claim_until,
+             bad=lambda d: _until_state(d, "15:30"),
+             good=lambda d: _until_state(d, _at(1)),
+             want="VOID", good_want="CLAIMED"),
+        # UNTIL IS AN OPTIONAL FIELD, as EFFORT is: a writer that knows only the required ones
+        # drops it on the first claim, and the run loses its bound in silence.
+        Case("a claim keeps UNTIL", _probe_claim_keeps,
+             bad=lambda d: _until_state(d, _at(1)),
+             good=lambda d: _until_state(d, None),
+             want="KEPT", good_want="NONE"),
+        # THE QUESTIONS LINE (v7): a run's questions saved for the end or answered with the
+        # recommended option, on Wouter's prompt's word - SAVED when it says nothing (answer 56).
+        # The arm is driven through main(), as a conductor types it.
+        Case("--questions answer is written", _probe_arm_questions,
+             bad=lambda d: (_state(d), ["--questions", "answer"]),
+             good=lambda d: (_state(d), []),
+             want="QUESTIONS answer", good_want="QUESTIONS save"),
+        Case("--questions takes answer or save only", _probe_arm_questions,
+             bad=lambda d: (_state(d), ["--questions", "yes"]),
+             good=lambda d: (_state(d), ["--questions", "Save"]),
+             want="REFUSED", good_want="QUESTIONS save"),
+        # A RE-ARM REPLACES IT, as it replaces UNTIL: an old `answer` left behind would answer the
+        # questions of a run whose prompt said nothing about them.
+        Case("a re-arm with none writes save", _probe_arm_questions,
+             bad=lambda d: (_q_state(d, "answer"), []),
+             good=lambda d: (_q_state(d, "answer"), ["--questions", "answer"]),
+             want="QUESTIONS save", good_want="QUESTIONS answer"),
+        # AN OPTIONAL FIELD, as UNTIL is: a writer that knows only the others drops it on the
+        # first claim, and the run's hops go back to saving what he said to answer.
+        Case("a claim keeps QUESTIONS", _probe_claim_keeps_questions,
+             bad=lambda d: _q_state(d, "answer"),
+             good=lambda d: _q_state(d, None),
+             want="KEPT", good_want="NONE"),
+        Case("--status shows QUESTIONS, or save", _probe_status_questions,
+             bad=lambda d: _q_state(d, "answer"),
+             good=lambda d: _q_state(d, None),
+             want="SHOWN answer", good_want="DEFAULT save"),
+        # THE CLAIM IS THE HOP'S FIRST READ, so it names the rule that binds this run.
+        Case("a claim tells the hop which", _probe_claim_words,
+             bad=lambda d: _q_state(d, "answer"),
+             good=lambda d: _q_state(d, None),
+             want="ANSWER", good_want="SAVE"),
+        # --blocked STAYS under `answer`, for a check that fails and cannot be fixed - but a
+        # question is never its reason there, so its words must not ask for one.
+        Case("--blocked under answer is for a check", _probe_blocked_words,
+             bad=lambda d: _q_state(d, "answer", k=1),
+             good=lambda d: _q_state(d, "save", k=1),
+             want="CHECK", good_want="QUESTION"),
+        # A MODE THAT IS NEITHER IS VOID: the hop cannot know which rule binds it.
+        Case("a QUESTIONS that is neither is VOID", _probe_claim_until,
+             bad=lambda d: _q_state(d, "anwser"),
+             good=lambda d: _q_state(d, "answer"),
+             want="VOID", good_want="CLAIMED"),
     ]
     ok_cases, paired, unpaired = run_cases(cases, tmp)
     ok &= ok_cases
@@ -932,13 +1290,15 @@ def selftest() -> int:
 
     # 5. ...AND AN OLD FILE STAYS OLD. A claim on a state file armed before v3 changes the
     #    fields a claim changes and adds nothing, so its diff is exactly what v2's was.
+    #    AND SINCE v6 NO UNTIL EITHER: a block armed without a bound is claimed exactly as before.
     (tmp / "oldfile").mkdir(exist_ok=True)
     f5 = _state(tmp / "oldfile")
     claim(f5)
-    good = b"EFFORT" not in f5.read_bytes() and read_state(f5)[0]["K"] == "1"
+    added = [k for k in ("EFFORT", "UNTIL", "QUESTIONS") if k.encode() in f5.read_bytes()]
+    good = not added and read_state(f5)[0]["K"] == "1"
     ok &= good
     print(f"  {'OK  ' if good else 'MISS'} a pre-v3 file is claimed and gains no field"
-          f" -> {'no EFFORT line' if b'EFFORT' not in f5.read_bytes() else 'EFFORT ADDED'}")
+          f" -> {'no EFFORT, UNTIL or QUESTIONS line' if not added else ', '.join(added) + ' ADDED'}")
 
     print()
     report_pairing(paired, unpaired)
@@ -1019,12 +1379,13 @@ _WOKE = "2026-11-03 10:37:05 local"
 _BEFORE, _AFTER = "2026-11-03T10:32:28", "2026-11-03T10:41:10"
 
 
-def _hop_state(d: Path, woke=_WOKE, active="no", recorded=None) -> Path:
+def _hop_state(d: Path, woke=_WOKE, active="no", recorded=None, until=None) -> Path:
     """Hop 1 of 2, claimed at `woke`, and a cycle store holding verify and test recorded at
     `recorded` = (when, exit, declared_na) - or no store at all. Written the way
-    cycle_evidence writes it, keyed by branch."""
+    cycle_evidence writes it, keyed by branch. `until`, when given, is the run's UNTIL line."""
     f = _bad_block(d, f"RUN_ID: r\nN: 2\nK: 1\nSTATUS: {RUNNING}\nBRANCH: session/x\n"
-                      f"HOP_ACTIVE: {active}\nWOKE: {woke}\n")
+                      f"HOP_ACTIVE: {active}\nWOKE: {woke}\n"
+                      + (f"UNTIL: {until}\n" if until else ""))
     if recorded is not None:
         when, rc, na = recorded
         store = d / "temp" / ".cycle-evidence.json"
@@ -1066,6 +1427,239 @@ def _probe_window(woke: str) -> str:
     except Void:
         return "VOID"
     return "DRAWN"
+
+
+# ---- THE BOUND's fixtures and probes (v6). The times are written HERE, not with the script's
+#      own formatter, so a wrong format in the script is a MISS rather than a shared mistake.
+
+_STAMP = "%Y-%m-%d %H:%M:%S local"
+
+
+def _at(hours: float) -> str:
+    """An UNTIL `hours` from the real clock, negative for one already past."""
+    return (datetime.now() + timedelta(hours=hours)).strftime(_STAMP)
+
+
+def _minute_stamp(t: datetime) -> str:
+    """The UNTIL a clock time HH:MM names: that minute, to the second, its seconds zero."""
+    return t.replace(second=0, microsecond=0).strftime(_STAMP)
+
+
+def _until_state(d: Path, until=None, k=0, active="no") -> Path:
+    """Hop k of 2 on a live run, its UNTIL line `until` - or none, as every block before v6."""
+    return _bad_block(d, f"RUN_ID: r\nN: 2\nK: {k}\nSTATUS: {RUNNING}\nBRANCH: session/x\n"
+                         f"HOP_ACTIVE: {active}\nWOKE: -\n"
+                         + (f"UNTIL: {until}\n" if until else ""))
+
+
+def _arm_through_main(f: Path, extra: list) -> tuple[str, str]:
+    """--arm through main() itself, as a conductor types it, the bound's arguments in `extra`.
+    Returns (ARMED, the UNTIL the FILE now carries or '') - or (REFUSED / rc N, ''). An
+    argument the command line does not know is its own refusal, rc 2, never a crash.
+    CLAUDE_EFFORT is cleared for the call: the desktop app sets it, and one disagreeing with
+    --effort would refuse the arm for a reason no case here is about."""
+    import contextlib                                               # noqa: PLC0415
+    import io                                                       # noqa: PLC0415
+
+    from house_common import isolated_env                           # noqa: PLC0415
+    with isolated_env("CLAUDE_EFFORT"), contextlib.redirect_stdout(io.StringIO()), \
+            contextlib.redirect_stderr(io.StringIO()):
+        try:
+            rc = main(["--file", str(f), "--arm", "--run-id", "r-bound", "--hops", "2",
+                       "--branch", "session/x", "--effort", "xhigh", *extra])
+        except SystemExit as e:
+            rc = e.code
+    if rc == RC_REFUSED:
+        return "REFUSED", ""
+    if rc != RC_OK:
+        return f"rc {rc}", ""
+    return "ARMED", read_state(f)[0].get("UNTIL") or ""
+
+
+def _probe_arm_until(args) -> str:
+    """(state file, arguments): the UNTIL an arm wrote, exactly, or how it was refused."""
+    verdict, until = _arm_through_main(*args)
+    if verdict != "ARMED":
+        return verdict
+    return f"UNTIL {until}" if until else "NO UNTIL"
+
+
+def _probe_arm_for(args) -> str:
+    """(state file, arguments): the UNTIL an arm wrote, as REAL hours from the moment of
+    arming - by timestamp, so a day the clocks change still reads its true length."""
+    t0 = datetime.now()
+    verdict, until = _arm_through_main(*args)
+    if verdict != "ARMED":
+        return verdict
+    if not until:
+        return "NO UNTIL"
+    try:
+        end = datetime.strptime(until, _STAMP)
+    except ValueError:
+        return f"UNTIL {until!r} UNREADABLE"
+    return f"UNTIL +{(end.timestamp() - t0.timestamp()) / 3600:.1f}h"
+
+
+def _claim_through(f: Path) -> tuple[str, dict]:
+    """--claim through the real action: (CLAIMED / REFUSED / VOID, the block read back after)."""
+    try:
+        fields, raw, term = read_state(f)
+        rc, _lines, dirty = act_claim(fields)
+    except Void:
+        return "VOID", {}
+    if dirty:
+        write_state(f, fields, raw, term)
+    return ("CLAIMED" if rc == RC_OK else "REFUSED"), read_state(f)[0]
+
+
+def _probe_claim_until(f: Path) -> str:
+    return _claim_through(f)[0]
+
+
+def _probe_claim_status(f: Path) -> str:
+    """The run's STATUS after a claim, refused or not."""
+    verdict, after = _claim_through(f)
+    return after.get("STATUS", verdict)
+
+
+def _probe_claim_keeps(f: Path) -> str:
+    """KEPT when a claim leaves the UNTIL it found exactly as it was, NONE when there was none."""
+    before = read_state(f)[0].get("UNTIL")
+    verdict, after = _claim_through(f)
+    if verdict != "CLAIMED":
+        return verdict
+    if not after.get("UNTIL"):
+        return "NONE"
+    return "KEPT" if after["UNTIL"] == before else f"CHANGED to {after['UNTIL']!r}"
+
+
+def _probe_release_status(f: Path) -> str:
+    """The run's STATUS after a release through the real action."""
+    try:
+        fields, raw, term = read_state(f)
+        rc, _lines, dirty = act_release(fields)
+    except Void:
+        return "VOID"
+    if dirty:
+        write_state(f, fields, raw, term)
+    return read_state(f)[0]["STATUS"] if rc == RC_OK else "REFUSED"
+
+
+def _probe_hop_next(f: Path) -> str:
+    """--hop-check's word on the NEXT hop, by a conductor that started hop 1: START 2 when it
+    names hop 2; TIME UP when it names none AND says why - the deadline's clock time and the
+    word 'time' in the line a person reads, not a bare refusal."""
+    try:
+        fields = read_state(f)[0]
+        rc, lines = act_hop_check(fields, f.parent, 1)
+    except Void:
+        return "VOID"
+    if rc != RC_OK:
+        return "REFUSED"
+    text = "\n".join(lines)
+    if "start hop 2" in text:
+        return "START 2"
+    hhmm = fields.get("UNTIL", "")[11:16]
+    return "TIME UP" if hhmm and hhmm in text and "time" in text.lower() else "NO REASON GIVEN"
+
+
+def _probe_status_until(f: Path) -> str:
+    """--status's UNTIL row: SHOWN with the block's own value, NONE SHOWN when it has none."""
+    fields = read_state(f)[0]
+    _rc, lines = act_status(fields)
+    row = next((ln for ln in lines if ln.strip().startswith("UNTIL")), None)
+    if row is None:
+        return "ABSENT"
+    if not fields.get("UNTIL"):
+        return "NONE SHOWN"
+    return "SHOWN" if fields["UNTIL"] in row else "WRONG VALUE"
+
+
+def _probe_status_next(f: Path) -> str:
+    """--status's last line: HALT when it tells a waking hop to stop, NEXT when it names one."""
+    try:
+        _rc, lines = act_status(read_state(f)[0])
+    except Void:
+        return "VOID"
+    arrow = lines[-1]
+    return "HALT" if "must halt" in arrow else "NEXT" if "next hop" in arrow else arrow.strip()
+
+
+# ---- THE QUESTIONS LINE's fixtures and probes (v7). Each reads the FILE or the printed words,
+#      never the fields the action handed back, so a field written and not kept is a MISS.
+
+def _q_state(d: Path, questions=None, k=0, active="no") -> Path:
+    """Hop k of 2 on a live run, its QUESTIONS line `questions` - or none, as every block
+    before v7."""
+    return _bad_block(d, f"RUN_ID: r\nN: 2\nK: {k}\nSTATUS: {RUNNING}\nBRANCH: session/x\n"
+                         f"HOP_ACTIVE: {active}\nWOKE: -\n"
+                         + (f"QUESTIONS: {questions}\n" if questions else ""))
+
+
+def _probe_arm_questions(args) -> str:
+    """(state file, arguments): the QUESTIONS an arm wrote into the file, or how it was refused."""
+    f, extra = args
+    verdict, _until = _arm_through_main(f, extra)
+    if verdict != "ARMED":
+        return verdict
+    q = read_state(f)[0].get("QUESTIONS")
+    return f"QUESTIONS {q}" if q else "NO QUESTIONS"
+
+
+def _probe_claim_keeps_questions(f: Path) -> str:
+    """KEPT when a claim leaves the QUESTIONS it found as it was, NONE when there was none."""
+    before = read_state(f)[0].get("QUESTIONS")
+    verdict, after = _claim_through(f)
+    if verdict != "CLAIMED":
+        return verdict
+    if not after.get("QUESTIONS"):
+        return "NONE"
+    return "KEPT" if after["QUESTIONS"] == before else f"CHANGED to {after['QUESTIONS']!r}"
+
+
+def _probe_status_questions(f: Path) -> str:
+    """--status's QUESTIONS row: SHOWN with the block's own value; DEFAULT save when the block
+    names none AND the row says it is the default - a bare 'save' would hide that none was set."""
+    fields = read_state(f)[0]
+    _rc, lines = act_status(fields)
+    row = next((ln for ln in lines if ln.strip().startswith("QUESTIONS")), None)
+    if row is None:
+        return "ABSENT"
+    if not fields.get("QUESTIONS"):
+        return "DEFAULT save" if "save" in row and "default" in row.lower() else row.strip()
+    return f"SHOWN {fields['QUESTIONS']}" if fields["QUESTIONS"] in row else "WRONG VALUE"
+
+
+def _probe_claim_words(f: Path) -> str:
+    """What the claim tells the hop about its questions: ANSWER when it says to take the
+    recommended option and log it in DECISIONS-LOG.md, SAVE when it says to keep them for the
+    hand-back, SILENT when it says neither."""
+    try:
+        rc, lines, _dirty = act_claim(read_state(f)[0])
+    except Void:
+        return "VOID"
+    if rc != RC_OK:
+        return "REFUSED"
+    text = "\n".join(lines)
+    if "recommended option" in text and "DECISIONS-LOG.md" in text:
+        return "ANSWER"
+    return "SAVE" if "hand-back" in text else "SILENT"
+
+
+def _probe_blocked_words(f: Path) -> str:
+    """--blocked through the real action: CHECK when it still blocks and its words say a block
+    is for a check that fails, QUESTION when they tell the hop to write its question down."""
+    fields = read_state(f)[0]
+    try:
+        rc, lines, _dirty = act_blocked(fields)
+    except Void:
+        return "VOID"
+    if rc != RC_OK or fields["STATUS"] != BLOCKED:
+        return "REFUSED"
+    text = "\n".join(lines).lower()
+    if "write the question down" in text:
+        return "QUESTION"
+    return "CHECK" if "a check that fails" in text else "NEITHER"
 
 
 if __name__ == "__main__":
