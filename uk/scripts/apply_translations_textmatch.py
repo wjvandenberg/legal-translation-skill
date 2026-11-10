@@ -14,7 +14,6 @@ import io
 import json
 import zipfile
 import copy
-from collections import Counter
 import xml.etree.ElementTree as ET
 
 # Import the shared per-language marker module. It lives in the same scripts/
@@ -54,9 +53,7 @@ def _sibling_integrity_exit(name, exc):
 
 try:
     from source_language_markers import (  # noqa: E402
-        scan_remnants,
-        remnant_verdict,
-        KEPT_NAME_WHY,
+        remnant_hits,
         detect_language,
         SUPPORTED_LANGUAGES,
         not_supported,
@@ -2441,21 +2438,9 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
     # A NAME THE LEXICON KEEPS IN THE SOURCE LANGUAGE IS NO REMNANT (register G13, sub-step 14.9.6).
     # The lexicons tell the operator to write a few names untranslated, each holding a marker word, and
     # this scan listed them beside "fix manually if genuine" - an invitation to alter a faithful
-    # rendering. quality_check drops the class the same way since 14.6: only a hit whose own span lies
-    # inside such a name, told by remnant_verdict's KEPT_NAME_WHY, out of scan_remnants' own hits in
-    # their own order; every other class, bare months included, is reported exactly as before.
-    def _remnant_hits(text, lang):
-        kept = Counter((marker, context) for marker, context, why in remnant_verdict(text, lang)[1]
-                       if why.startswith(KEPT_NAME_WHY + ' '))
-        hits, dropped = [], 0
-        for hit in scan_remnants(text, lang):
-            if kept[hit]:
-                kept[hit] -= 1
-                dropped += 1
-            else:
-                hits.append(hit)
-        return hits, dropped
-
+    # rendering. source_language_markers.remnant_hits drops the class, the one helper quality_check
+    # shares since 14.9.7: only a hit whose own span lies inside such a name, out of scan_remnants' own
+    # hits in their own order; every other class, bare months included, is reported exactly as before.
     remnants_accept = []
     remnants_reject = []
     kept_name_hits = 0
@@ -2466,13 +2451,13 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
         del_text = ' '.join(
             m.group(1) for m in re.finditer(r'<w:delText[^>]*>([^<]+)</w:delText>', rebuilt_xml)
         )
-        remnants_accept, kept_accept = _remnant_hits(accept_text, source_lang)
+        remnants_accept, kept_accept = remnant_hits(accept_text, source_lang)
         # Reject-all view is the union of w:t outside w:ins and w:delText
         # content. Rather than re-walk the XML, only the w:delText content is
         # scanned here: a hit in the ordinary w:t text is already reported
         # under the accept-all view above, so it is reported once, there, and
         # this view adds only what a reviewer sees in the struck-through text.
-        remnants_reject, kept_reject = _remnant_hits(del_text, source_lang)
+        remnants_reject, kept_reject = remnant_hits(del_text, source_lang)
         kept_name_hits = kept_accept + kept_reject
 
     if source_lang:

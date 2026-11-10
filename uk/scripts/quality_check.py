@@ -68,9 +68,7 @@ def _sibling_integrity_exit(name, exc):
 
 try:
     from source_language_markers import (  # noqa: E402
-        scan_remnants,
-        remnant_verdict,
-        KEPT_NAME_WHY,
+        remnant_hits,
         bare_month_hits,
         detect_language,
         SUPPORTED_LANGUAGES,
@@ -428,22 +426,14 @@ def _note_bare_months(text, lang, where, sink):
 # statute by its date -- and each holds a marker word, so this check failed skill Step 9 on a
 # translation that followed the lexicon. repack's block already reads those names from
 # source_language_markers.LEXICON_KEPT_NAMES through remnant_verdict; this check reads them through
-# the same call, so the names live in one list. Only a hit whose own span lies inside such a name is
+# the same module, so the names live in one list. Only a hit whose own span lies inside such a name is
 # dropped: the same marker word beside it still counts, and the CJK and company-form classes,
 # advisory in repack, stay issues here. The hits keep scan_remnants' order, so the display cap shows
-# the findings it showed before. The class is told by KEPT_NAME_WHY, the module's own opening of
-# that reason, so the wording lives in one place.
+# the findings it showed before. The helper is the module's remnant_hits, shared with apply since
+# sub-step 14.9.7, so the class is dropped in one place; a bare month is this check's own warning.
 def _remnant_hits(text, lang):
     """scan_remnants(text, lang, bare_months=False)'s hits, less those inside a kept name."""
-    kept = Counter((marker, context) for marker, context, why in remnant_verdict(text, lang)[1]
-                   if why.startswith(KEPT_NAME_WHY + ' '))
-    hits = []
-    for hit in scan_remnants(text, lang, bare_months=False):
-        if kept[hit]:
-            kept[hit] -= 1
-        else:
-            hits.append(hit)
-    return hits
+    return remnant_hits(text, lang, bare_months=False)[0]
 
 
 def check_source_remnants(root, verbose, source_language=None, bare_months=None):

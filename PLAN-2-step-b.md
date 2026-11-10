@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-10 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.6, the small loose ends, finished: built and verified on 2026-11-05 and stopped in TEST, it is resumed to review the change again, fix the review's one false alarm red first (a paragraph in capitals ending on the month MAY or the noun WILL read as cut off), then VERIFY and TEST through the cycle gate, the one full run, the PR, the filing and the merge; no questions to Wouter *(Wouter, 2026-11-05: continue, starting nested sessions, without questions)* · **so that every loose end step 14 left open is either fixed on evidence or closed with its reason written down, and nothing is carried past step 14 unrecorded** *(written immediately after the tag `rollback-2026-11-05b-start`, on resuming)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-10 (2) — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.7, the language widenings: G7's retention check reads Finnish's own quotation mark when Finnish is declared, counts a Japanese or Chinese quoted span in words so that a CJK name dropped from the English is seen, and its unmeasured drafting words are sourced from published law; and apply's kept-name helper moves into `source_language_markers.py`, read in one pass, its behaviour unchanged byte for byte · measured first on the frozen corpus and on published law fetched to disk, red first, both trees by one patch, controls and mutants, the census old against new, VERIFY and TEST through the cycle gate, `/code-review`, the one full run, one PR merged on green; no questions to Wouter *(Wouter, 2026-11-05 and 2026-11-10: continue without questions, starting nested sessions)* · **so that the retention check guards every supported language as it guards Italian and English, its words resting on evidence rather than recollection, and a shared capability lives in one place** *(written immediately after the tag `rollback-2026-11-10-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -2830,6 +2830,65 @@ the edited script, and the full run once, before the push.
 > on `cebfaf6`, OVERALL PASS; F35 CLOSED, G13's apply half, the capitals beside G3, the strip claim beside F2 and
 > C10's agreement fixed, F18, F37 and G14 recorded, in the register; squash-merged on green *(Wouter,
 > 2026-10-29, the conductor chain; 2026-11-05 and 2026-11-10, unattended at his word)*.
+> **14.9.7 — ITS OWN WRITTEN PLAN, 2026-11-10, before any edit, on `feature/step14-9-7-language-widenings`.** The
+> language widenings, by Wouter's order *(`DECISIONS-LOG.md`, 2026-11-02 (7))* — G7's three items 14.5 declared and
+> did not build — and the helper 14.9.6's review carried here *(2026-11-05 (3), its (10) and (11))*; **no question put
+> to Wouter, each choice the recommended option, recorded**. **Measured first, `main` at `b39f438`:** the corpus by
+> `temp/s1110b_probe.py` and `temp/s1110b_apposition.py`, counts only; and **published law** — three EU acts, the 2021
+> standard contractual clauses (`32021D0914`), the renewable energy directive (`32018L2001`) and the public
+> procurement directive (`32014L0024`), each in ten languages, fetched to disk from the Publications Office's Cellar
+> repository with every file's SHA-256 recorded, read by `temp/s1110b_law_probe.py` and, through the module's own
+> exemption, `temp/s1110b_law_cover.py`. Each item triaged by the plan template's table:
+> **(1) Finnish's quotation marks — MEDIUM, FIXED HERE.** Finnish law writes `”…”` (114 spans) and `’…’` (145) and no
+> other style; the check reads neither, so a Finnish name dropped in either is unseen. Both are read when Finnish is
+> declared at skill Step 1c — `”…”` as a double quote, `’…’` as a single — each opening only where no letter precedes
+> it and closing only where none follows, as 14.3's apostrophe; a `”…”` span never holds `“` or `„`, so `“A” … “B”`
+> pairs no phantom (14.5 measured 24). Corpus: D08 holds one `”…”` span, short, so no finding can move.
+> **(2) The comma-set marker — MEDIUM, FIXED HERE, every language.** Finnish law sets all 26 of its defined-term
+> markers off by commas and none in a bracket — `X, jäljempänä ’Y’,` — and six other languages' versions do so 1 to
+> 3 times each; the corpus holds 3, all in D02. Reading (1) without it would warn on every long Finnish term. A span
+> straight after a comma and a marker FORMULA — a lead-in that is not one of the adverbs, with its optional following
+> words and article — and closed by punctuation or the paragraph's end, a German or Dutch participle allowed before
+> it as in a bracket (Dutch law: `, hierna de „X” genoemd,`), is translated by design, under the quote-count
+> condition every exemption keeps.
+> **(3) Published law's lead-ins the lists lack — LIGHT, FIXED HERE.** Italian `(in prosieguo «X»)` (3); and a second
+> lead-in after the first, Spanish `(cada una denominada en lo sucesivo «X»)` (2) — `cada una` a lead-in, and every
+> formula allowed among the following words, so Italian `(congiuntamente, di seguito, le «Parti»)` reads as its
+> reverse order already does.
+> **(4) The Japanese and Chinese word count — MEDIUM, FIXED HERE.** `「…」` and `『…』` are not read, and a span with
+> no space counts one word, so a CJK name dropped is unseen — a control pins it. `「…」` is read as a double quote
+> (`『…』`, a work's title in a contract, is not, as the review found), and a span counts its words without a CJK
+> letter plus 0.6 a CJK letter: on D11 one Japanese letter yields 0.614 English
+> words at the median and 0.580 at the lower quartile, over 18 paragraphs; Chinese, absent from the corpus, takes the
+> Japanese figure, declared, as `EXPECTED_RATIO` does. **And a span holding a CJK letter is never expected verbatim in
+> the English** — it is translated or romanised by design — **so it is checked by the quote-count condition alone**:
+> quiet while the English keeps at least as many quoted spans as the source, warning when the name goes with its
+> quotes. Corpus: D11's nine spans all sit in a `（以下「X」という。）` marker and the English keeps its quotes, so none
+> is added. **Not read, declared:** Chinese `《…》`, a title mark, its content translated by design.
+> **(5) The unmeasured words, sourced — LIGHT, RECORDED.** Each of 14.5's words read in its own language's three acts,
+> in the marker or title shape and anywhere, the table in `evidence/EVIDENCE-measurement.md`. **Every word stays:** an
+> exemption hides no loss while the quote-count condition holds, and three acts cannot prove a word unused; the
+> code's "unmeasured" sentence says where each word comes from.
+> **(6) Apply's kept-name helper — MEDIUM, MOVED HERE, NO BEHAVIOUR MOVED.** `remnant_hits(text, lang,
+> bare_months=True)` in both trees' `source_language_markers.py`, returning the hits and the count dropped, the text
+> read once; apply and `quality_check` import it and lose their copies; `remnant_verdict`'s comment that apply does
+> not call it, corrected.
+> **Must not touch:** the threshold of any span holding no CJK letter, the definition-body skip, the article rule, the
+> bare-bracket rule, the ratio, the batch cap, any exit code, any other remnant rule, the anti-drift safeguards.
+> **Tests, red first against `b39f438`,** `tests/test_check_scoping.py`, both trees: a Finnish marker in each mark, in
+> a bracket and set by commas, silent now and PROVED to fire before (its typographic twin where the old code read
+> none); a Finnish name dropped in each mark firing now and PROVED unread before; the phantom `“A” … “B”` quiet with
+> Finnish declared; the marks unread when it is not; the comma form in Italian and Dutch and the two lead-ins, silent
+> now and PROVED to fire; an adverb after a comma, and a span with words after it, still checked; the Japanese name
+> dropped, DECLARED BLIND until now, firing and PROVED silent before; the CJK markers and a CJK name kept with its
+> quotes, quiet; by property, a span with no CJK letter counted exactly as before. The helper's callers' suites
+> unchanged. Mutants on every changed line. **Corpus:** the retention check old against new over the 13 frozen
+> workdirs, both trees, counts only, every removal attributed to G7 by the census's own reading and every addition to
+> the widening; the helper old against new over every corpus text in every supported language, both settings,
+> compared whole — expected identical. **Then** the parity check, every changed file's divergence re-recorded from
+> the INDEX, the three confidentiality controls, VERIFY and TEST through the cycle gate, `/code-review`, the one full
+> run. **No render, declared:** a WARN decides nothing apply writes, and the helper prints what it printed. **Done
+> when:** G7's three declared items built and its row amended, the sourcing recorded, the helper in one place.
 
 ---
 

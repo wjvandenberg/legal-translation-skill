@@ -72,6 +72,7 @@ import re
 import os
 import sys
 from collections import namedtuple
+from collections import Counter
 
 def _check_self_integrity():
     """Detect install-time truncation. Whole-file scan tolerates null-padding."""
@@ -421,8 +422,8 @@ def bare_month_hits(text, source_language):
 # ──────────────────────────────────────────────────────────────────────
 # THE REMNANT VERDICT — which of scan_remnants' hits STOP a delivery and which
 # only warn. repack_docx.py refuses on a BLOCKING hit (register C22, branch 11
-# slice 2b, Wouter 2026-09-25); quality_check reads the kept-name class alone,
-# and drops those hits (register G13, step 14.6); apply does not call this.
+# slice 2b, Wouter 2026-09-25); remnant_hits, below, drops the kept-name class
+# for quality_check (register G13, step 14.6) and apply (sub-step 14.9.6).
 # A hit is ADVISORY only for a class the scan cannot rule on:
 #   * a CJK character marker — a kept name may stand in its own script;
 #   * a marker in REMNANT_ADVISORY, each with its reason;
@@ -476,7 +477,7 @@ def _kept_name_re(name):
 
 
 _KEPT_NAME_RES = [(n, _kept_name_re(n)) for n in LEXICON_KEPT_NAMES]
-# How remnant_verdict's reason for a kept name begins. quality_check drops that class by it
+# How remnant_verdict's reason for a kept name begins. remnant_hits drops that class by it
 # (register G13), so the wording lives here once.
 KEPT_NAME_WHY = 'inside the kept name'
 
@@ -487,13 +488,46 @@ def remnant_verdict(text, source_language):
     hold exactly scan_remnants' hits between them: the same patterns, flags,
     order and WHITESPACE_OK_CONTEXTS suppression, re-read here with their spans
     so a kept name covers its OWN span and never a word beside it."""
+    hits = _verdict_in_order(text, source_language)
+    return ([(pat, context) for pat, context, why, _bare in hits if not why],
+            [(pat, context, why) for pat, context, why, _bare in hits if why])
+
+
+def remnant_hits(text, source_language, bare_months=True):
+    """(hits, dropped) — scan_remnants(text, source_language, bare_months)'s hits
+    less those inside a name the lexicon keeps in the source language, in their
+    own order, and how many were dropped (register G13). The lexicons tell the
+    operator to write those names untranslated, so a hit inside one is no
+    remnant; every other class, bare months included, stays as scan_remnants
+    reports it. Shared by quality_check (since step 14.6) and apply (since
+    sub-step 14.9.6), whose own copies it replaced at 14.9.7: it reads the text
+    once, and drops by (marker, context) exactly as those copies did."""
+    hits = _verdict_in_order(text, source_language)
+    kept = Counter((pat, context) for pat, context, why, _bare in hits
+                   if why and why.startswith(KEPT_NAME_WHY + ' '))
+    out, dropped = [], 0
+    for pat, context, _why, bare in hits:
+        if bare and not bare_months:
+            continue
+        if kept[(pat, context)]:
+            kept[(pat, context)] -= 1
+            dropped += 1
+        else:
+            out.append((pat, context))
+    return out, dropped
+
+
+def _verdict_in_order(text, source_language):
+    """scan_remnants' hits in its own order, each (marker, context, why, bare):
+    `why` None for a blocking hit, else remnant_verdict's advisory reason;
+    `bare` where scan_remnants(bare_months=False) leaves the hit out."""
     if not source_language:
-        return [], []
+        return []
     patterns = LANGUAGE_MARKERS.get(source_language.lower())
     if not patterns:
-        return [], []
+        return []
     kept = [(m.span(), n) for n, rx in _KEPT_NAME_RES for m in rx.finditer(text)]
-    blocking, advisory = [], []
+    hits = []
     for pat in patterns:
         cjk = isinstance(pat, str) and not pat.startswith(r'\b')
         found = (re.finditer(re.escape(pat), text) if cjk
@@ -503,20 +537,19 @@ def remnant_verdict(text, source_language):
             context = text[max(0, start - 30): end + 30]
             if any(ok in context for ok in WHITESPACE_OK_CONTEXTS):
                 continue
+            bare = (not cjk and pat in _MONTH_PATTERNS
+                    and not month_is_dated(text, start, end))
             if cjk:
                 why = 'CJK characters: a kept name may stand in its own script'
             elif pat in REMNANT_ADVISORY:
                 why = REMNANT_ADVISORY[pat]
-            elif pat in _MONTH_PATTERNS and not month_is_dated(text, start, end):
+            elif bare:
                 why = BARE_MONTH_WHY
             else:
                 why = next((f'{KEPT_NAME_WHY} "{n}" — {LEXICON_KEPT_NAMES[n]}'
                             for (s, e), n in kept if s <= start and end <= e), None)
-            if why:
-                advisory.append((pat, context, why))
-            else:
-                blocking.append((pat, context))
-    return blocking, advisory
+            hits.append((pat, context, why, bare))
+    return hits
 
 SUPPORTED_LANGUAGES = sorted(LANGUAGE_MARKERS.keys())
 

@@ -1,8 +1,9 @@
 # EVIDENCE-measurement.md — the corpus, and what measurement and verification cost to get right
 
-**This document owns three things and no rules:** the **eleven-document test corpus as a listing** *(from
+**This document owns four things and no rules:** the **eleven-document test corpus as a listing** *(from
 section 5.5 of `CLAUDE.md`)*, the **dated cost stories behind the measurement rules** *(from section 5.5)*,
-and the **dated instances behind the verification-hygiene rules** *(from section 5.3, added 2026-08-25)*.
+the **dated instances behind the verification-hygiene rules** *(from section 5.3, added 2026-08-25)*, and
+**the published law read for the retention check's drafting words** *(section 5, added 2026-11-10)*.
 Every rule stayed in the charter or is carried by the auto-loaded house file. **Where this document and the
 charter appear to disagree, THE CHARTER WINS.**
 
@@ -213,3 +214,77 @@ this is the document that describes real client documents.
 script · table count · bold-run count · paragraph count · batch position · tracked-change load ·
 highlight count. **None of it says what any instrument is about**, which is the whole test section 5.6 of
 `CLAUDE.md` sets.
+
+## 5 — Published law, read for the retention check's drafting words — sub-step 14.9.7, 2026-11-10
+
+**Why.** Sub-step 14.5 took register G7's marker and title exemptions in `validate_translations.py` to every
+language with words that were, beyond those the corpus and the lexicons hold, *"its language's usual drafting
+formula, unmeasured"*; Wouter ordered them sourced from published law *(`DECISIONS-LOG.md`, 2026-11-02 (7))*.
+**Public law only: no client document was read for this section**, so nothing in it falls under section 5.6
+of `CLAUDE.md`.
+
+**What was read.** Three EU acts in ten languages, fetched on 2026-11-10 from the Publications Office's
+Cellar repository by content negotiation on `http://publications.europa.eu/resource/celex/<CELEX>`: the
+public procurement directive `32014L0024`, the renewable energy directive `32018L2001`, and the 2021
+standard contractual clauses `32021D0914`, the one written as a contract. Thirty files, each proved to be in
+its language by the act's own word for the Commission and to differ from every other; the first twelve hex
+digits of each file's SHA-256:
+
+| language | `32014L0024` | `32018L2001` | `32021D0914` |
+|---|---|---|---|
+| deu | `c97a294508f1` | `6accafee97ec` | `af4655e47ce5` |
+| eng | `f1bda7780252` | `397c92486129` | `85d76f03ea30` |
+| fin | `7eee92bf1bb4` | `b8a6142eab0f` | `c04c4f8149a2` |
+| fra | `b9067d2131d7` | `bebb50724767` | `1ad6d1926afb` |
+| hun | `6029e1a4b75a` | `d4664d99c55d` | `e2958087f67e` |
+| ita | `96ecf2bc3c9c` | `4d8868c48072` | `c1f5e6b3c2bf` |
+| nld | `43455f0d585c` | `cc5d0b008405` | `f20ecb6e1469` |
+| pol | `a7c9a29f94a3` | `31a49fd92887` | `c572d6d6b614` |
+| por | `803cc7b00d59` | `0b33624d5819` | `ecb3631f20db` |
+| spa | `976fdab432c5` | `4e7ac2b41362` | `58f77d46815f` |
+
+**How.** `temp/s1110b_law_probe.py` read each word of the module's lists in its own language's three acts,
+counting it in the **marker shape** — in a bracket before a quotation that closes inside it, or set off by a
+comma with a quotation in the 40 characters after — in the **title shape**, the 40 characters before an
+opening quotation (after a closing one for a Hungarian title word), and **anywhere**, a planted control
+first. `temp/s1110b_law_cover.py` then asked the module's own exemption about every bracketed or comma-set
+quotation in the same text, before and after the sub-step.
+
+**The quotation marks, in spans per language:** English `‘…’` 258; Italian, French, Spanish and Portuguese
+`«…»` 290, 269, 280 and 271; German `„…“` 287; Dutch `„…”` 252 and `“…”` 18; Polish `„…”` 284; Hungarian
+`„…”` 250; **Finnish `”…”` 114 and `’…’` 145**, each opening only where no letter precedes it and closing only
+where none follows, and no other style. *(A count of `»…«` between two guillemet quotations is the gap from
+one to the next, not a style, and is left out.)*
+
+**The words 14.5 added**, every word but Italian's and English's, which 14.3 measured on the corpus: of 86,
+seven were measured on the corpus or the lexicons (Dutch `hierna`, `hierna te noemen` and `hieronder`, Polish
+`zwana dalej`, French `ci-après` and `ci-dessous`, German `nachstehend`). **Of the other 79: 26 stand in
+published law in their shape, 38 stand there but not in it, and 15 were not found in the three acts.**
+
+| language | in the shape | in the law, not in the shape | not found |
+|---|---|---|---|
+| French | ensemble, chacun(e), dénommé, appelé, par, intitulé | conjointement, collectivement, individuellement, désigné | — |
+| Spanish | en lo sucesivo, denominado, titulado | conjuntamente, colectivamente, individualmente, designado, como | en adelante, llamado |
+| Portuguese | a seguir, designado, por, intitulado | adiante, conjuntamente, coletivamente, individualmente | doravante, denominado, simplesmente, abreviadamente |
+| German | im Folgenden, jeweils, als, mit dem Titel | nachfolgend, im Weiteren, gemeinsam, zusammen, einzeln, genannt, bezeichnet, kurz, auch | betitelt, unter dem Titel |
+| Dutch | getiteld | gezamenlijk, afzonderlijk, ieder, elk, genoemd, ook | tezamen, met de titel, onder de titel |
+| Polish | dalej, zwany, także, również, zatytułowany | łącznie, odpowiednio, każdy | pod tytułem |
+| Hungarian | a továbbiakban, című | együttesen, külön-külön, egyenként | címmel |
+| Finnish | jäljempänä | yhdessä, erikseen, kumpikin, myös | otsikolla, otsikoltaan |
+
+**Norwegian is not EU law:** `heretter` was measured on the corpus; `samlet`, `kalt` and `benevnt` are not
+sourced. **Two lead-ins the law writes were MISSING from the lists and were added:** Italian
+`(in prosieguo «X»)`, 3 times, and Spanish `(cada una denominada en lo sucesivo «X»)`, twice, a second
+formula after the first. **And every Finnish marker in the three acts — 26 of 26 — is set off by commas, none
+in a bracket,** as are 1 to 3 in each of six other languages, Dutch with its participle after the term
+(`, hierna de „X” genoemd,`): that is the comma-set marker the sub-step built.
+
+**Through the module, `b39f438` against the sub-step:** bracketed quotations recognised as markers 129 to 145
+of 281, those not read at all 6 to 0; comma-set markers recognised 0 to 39 of 41, the two left being Polish
+`zwanej także`, "also called" — a naming phrase, not a formula, and under the word threshold besides. The
+136 bracketed quotations still not recognised are, by their first words, mostly ordinary bracketed text, and
+otherwise a bare `("X")`, which 14.5 keeps checked on purpose.
+
+**Decided, not by Wouter but by the sub-step, recorded:** **every word stays** — an exemption hides no loss
+while the English keeps at least as many quoted spans as the source, and three acts cannot prove a word
+unused; a word not found here is a drafting formula the law did not need, not one a contract never uses.

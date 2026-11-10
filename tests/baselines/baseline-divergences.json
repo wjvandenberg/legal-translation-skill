@@ -11,9 +11,9 @@
    "sha256_now": "5b85404ec1883d6aa1a2932e2d76e4dd3581757f8702aec22f1eb8b1d198b68e"
   },
   "uk/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step14-9-6-small-loose-ends",
-   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
-   "sha256_now": "2825006b2ca814202bd4fb0dd29bfa8c09152ef2baa5532212bfd3fee39d3048"
+   "changed_by": "feature/step14-9-7-language-widenings",
+   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
+   "sha256_now": "abf99c2f06cd0927e8f3a45295216ac0d4c4a30f9ee6ff4221df970aed45002c"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -31,9 +31,9 @@
    "sha256_now": "93a63296c2fa453cbcfc44384cc834e1bce4dbaed206d826a7240c8a01dbfa82"
   },
   "uk/scripts/quality_check.py": {
-   "changed_by": "feature/step14-9-6-small-loose-ends",
-   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
-   "sha256_now": "1f99305ea2820cdb437212db11040ab7062b37973816c584a87ffa6e86232047"
+   "changed_by": "feature/step14-9-7-language-widenings",
+   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
+   "sha256_now": "8d36c8cf26cb2f94bb727a9ce743d3ec150d4a71c45a746c6047a63c17cfcc28"
   },
   "uk/scripts/repack_docx.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -41,9 +41,9 @@
    "sha256_now": "4a153638d04fbb34c0c64139ac5593bb74be86597c205b03cb84126f86d81df8"
   },
   "uk/scripts/source_language_markers.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "e76d7748b29633253215fdd98179b7962157fbb48ed063b829d392c3aeb3043f"
+   "changed_by": "feature/step14-9-7-language-widenings",
+   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
+   "sha256_now": "bed3e150701aac72df0523dea8c3f09169e9c1c845b5464d33d2c834abf48a61"
   },
   "uk/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -111,9 +111,9 @@
    "sha256_now": "7943280287e4707fd9a357fced5106e4c9462248df16f358f95b5b5e13a6dfa4"
   },
   "us/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step14-9-6-small-loose-ends",
-   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
-   "sha256_now": "ab2c4c351434d1bdec6ad2eb18e11038063de2f5b9c36ffc52451a1b7eb7809b"
+   "changed_by": "feature/step14-9-7-language-widenings",
+   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
+   "sha256_now": "cdf26eae08964f9c4dd5a96a3da44450d5989008fce5e579bee1d4d82708b2a4"
   },
   "us/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -131,9 +131,9 @@
    "sha256_now": "f1c78f52e146c1158d07dd77a448b6eb28976bdf29bbd3520801197c169557de"
   },
   "us/scripts/quality_check.py": {
-   "changed_by": "feature/step14-9-6-small-loose-ends",
-   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
-   "sha256_now": "dbac5255b5302c1276beab67ea990cb76ceb519dff579e82463932c872e76993"
+   "changed_by": "feature/step14-9-7-language-widenings",
+   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
+   "sha256_now": "efef571243166c2fa0cdfc15585ef26450813d332ce0d560c865aed476255090"
   },
   "us/scripts/repack_docx.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -141,9 +141,9 @@
    "sha256_now": "a4a89edc23a757b2860aac547cb0fcfffe0b58cee2f33a4cf43a7ab907ae7117"
   },
   "us/scripts/source_language_markers.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "19d78fe0500909481978522e850472b11ec97293e901d31a912e46b7294226d7"
+   "changed_by": "feature/step14-9-7-language-widenings",
+   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
+   "sha256_now": "99154aea094ab8e6219107726761dba81aea692d19213d4648298c69edc098b1"
   },
   "us/scripts/strip_noop_tracked_changes.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -221,9 +221,9 @@
    "sha256_now": "3309c0c0b76aa18d5ddf36445aff7cdd57e7265651e8ece89cc7304f41976617"
   },
   "uk/scripts/validate_translations.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "a71a8cdeb15d1860ed5e2b99af6894eeab9e663dc8c7624e9c9c8a8ff89ddeb4"
+   "changed_by": "feature/step14-9-7-language-widenings",
+   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
+   "sha256_now": "49106cb031e2fa32b76cc5d80e63064e6a106be43a2273ddb2e19a1d8d36fc32"
   },
   "uk/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/step14-9-5-read-receipt",
@@ -241,9 +241,9 @@
    "sha256_now": "36f9cef27d5f0af335fc1579845e6ff69e1a1ee17e28457483aa90b12fdd2ddd"
   },
   "us/scripts/validate_translations.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "a71a8cdeb15d1860ed5e2b99af6894eeab9e663dc8c7624e9c9c8a8ff89ddeb4"
+   "changed_by": "feature/step14-9-7-language-widenings",
+   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
+   "sha256_now": "49106cb031e2fa32b76cc5d80e63064e6a106be43a2273ddb2e19a1d8d36fc32"
   },
   "us/skill-docs/03-lexicons-and-segments.md": {
    "changed_by": "feature/step14-9-5-read-receipt",
