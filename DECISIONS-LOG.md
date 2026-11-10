@@ -2661,3 +2661,49 @@ VERIFY repeated whole for one red row; recommended to him as a step for phase 9,
 the next prompt asks for one pass per check. **At his word** (*"can you please message house tooling project to
 make sure that this will be fixed?"*) **the session messaged the house tooling's conductor, `house tooling -
 Phase 8, Step 6`, his words quoted,** asking it to record the step in phase 9's plan and tell him where.
+
+## 2026-11-05 (3) — sub-step 14.9.6, unattended: the small loose ends; built 2026-11-05, finished 2026-11-10; the choices the session's own
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS IN 2026-11-05 (1)** and, typed by him into 14.9.6's first session,
+*"CONTINUE WITH THE NEXT SESSION AUTOMATICALLY IN A NEW NESTED SESSION, AFTER CLOSE. MAKE SURE TO SHOW STATUS
+BOARD AT BEGINNING OF END OF THIS AND ANY NEWLY OPENED NESTED SESSIONS."*, and on resuming, *"Continue, it does
+not matter we hit 90%"*, and during the work on 2026-11-10, *"Please do not ask me questions for the next hour
+please - just continue, also open new sessionse tc"* — each choice below is THE SESSION'S, taken on its own recommendation and carried here for
+him to confirm or overturn; none is his ruling. His order for the loose ends is 2026-11-02 (7).
+
+**AT THE FIRST OPENING, 2026-11-05, NOTHING BUILT. (1) NUMBERED 14.9.6,** the next in the run that gave C26 14.9.5,
+over 14.10, so no forward citation moves and the language widenings become 14.9.7. **(2) PARKED AT ONCE** when
+weekly usage read 89% and then 90%, over carrying on to the line mid-change: a half-applied change is worse than
+none. **(3) NO NEXT SESSION STARTED THEN,** the usage stop binding a new session too. **(4) THE OPENING'S OWN
+CHANGES UNDONE,** `main` left exactly as found, over committing a one-minute adoption on a branch.
+
+**THE BUILD, 2026-11-05: (5) THE EIGHT ITEMS' TRIAGE AND WHAT EACH GOT ARE `PLAN-2-step-b.md` SECTION 3.14's
+14.9.6 BLOCK,** each the session's: five fixed — apply's kept names, the dangling-ending rule in capitals, Step 8
+against 8a, the stale strip claim with the device kept, 05's first rule — and three recorded with their reasons,
+the page break lost mid-paragraph, apply's ElementTree writer and `post_process.py`'s Article reader.
+
+**ON RESUMING, 2026-11-10. (6) TODAY'S PURPOSE LINE WRITTEN BEFORE THE FIX,** not at the opening: the evidence
+tool fingerprints every difference from the last commit, so writing it first would have cost a whole VERIFY; the
+review then changed code, and the line went into the same re-run. **(7) `/code-review` RUN AGAIN, AT HIGH,** over
+recording the first review from one line: its five findings were written down nowhere and the build session's
+transcript is not on disk, and a record written from a summary is the précis the house rules forbid. **(8) ITS
+FIRST FINDING FIXED, RED FIRST:** in a paragraph all in capitals the month `MAY` and the noun `WILL` at the end read
+as a sentence cut off — measured, both fired, while `day of May` and `my last Will` did not; like the lone `A`, they
+are never an ending in capitals, a capitals paragraph cut off on `SHALL`, `FOR` or `THE` still caught. A new false
+alarm of the kind step 14 removes would push an operator to alter a faithful translation (charter 2.4 item 5).
+**(9) ITS FOURTH FIXED:** a comment in apply said the reject-all view scans ordinary and deleted text together; the
+code scans the deleted text only, and the comment now says so. **(10) ITS SECOND CARRIED, NOT FIXED:** apply's new
+kept-name helper repeats `quality_check`'s line for line in both trees, where the skill-authoring convention keeps
+a shared capability in one place — moving it to `source_language_markers.py` touches a third shipped pair, so it
+goes to 14.9.7, the language widenings, which work in that module, and its prompt carries it. **(11) ITS THIRD,
+NO CHANGE:** the helper scans the text twice, a fraction of a second once a run, gone with (10)'s move. **(12) ITS
+FIFTH, NO CHANGE:** skill Step 5's rule names six checks of which two run only on a tracked-change document; the
+rule's point, that exit 3 from any check that runs means a truncated script, holds either way, and a banner prints
+only on a failure. **(13) ONLY THE CAPITALS RULE'S MUTANTS RE-RUN,** five and two new, over all twenty-one: no other
+target moved; its first re-run's two VOID mutants and one narrowed control were the instrument's, corrected and run
+again. **(14) THE REGISTER'S ROWS AND THE BUILD RECORD DATED 2026-11-10,** the day the fix reaches `main`; this
+entry keeps the number its prompt gave it. **(15) THE COMMIT GATE REFUSED THE FIRST COMMIT, AND WAS OBEYED:**
+skill Step 4's re-wrapped "literal space alone" bullet had moved an old example, a glued word holding a power
+figure, onto a new line, read as an added capacity figure; the bullet is re-wrapped so that line is exactly as on
+`main`, its meaning unchanged, over overriding the gate or inventing a new example in this change; the gate is a
+VERIFY row now. Whether the old example should become an invented one is left open, not decided here.

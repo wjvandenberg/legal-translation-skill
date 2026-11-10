@@ -2817,6 +2817,19 @@ the edited script, and the full run once, before the push.
 > what it reports. **Done when:** F35 CLOSED; G13's apply half, the case-blindness (beside G3) and the strip claim
 > (beside F2) fixed in the register; C10 says 08 agrees; items (6) to (8) recorded with their reasons in F18, F37 and
 > G14.
+> **BUILT AND MERGED, 2026-11-10, as #193** *(built 2026-11-05, TEST stopped when Wouter had to leave,
+> resumed 2026-11-10)*: `cebfaf6` the fix, then the filing. **A second `/code-review` at high, the first's five
+> findings having been written down nowhere — five:** a paragraph in capitals ending on the month `MAY` or the
+> noun `WILL` read as cut off, **FIXED red first** (4 of 1,292 at the code as built), both skipped in capitals as
+> the lone `A` is, seven mutants caught; a comment in apply on the reject-all view, corrected; apply's helper
+> repeating `quality_check`'s, **carried to 14.9.7**; the double scan and the six-check count, no change
+> *(`DECISIONS-LOG.md`, 2026-11-05 (3))*. **The commit gate then refused the first commit:** the re-wrapped
+> "literal space alone" bullet had moved an old example holding a power figure onto a new line; it is re-wrapped
+> so that line is as on `main`, and the gate is a VERIFY row now. VERIFY 56 of 56 and TEST 31 of 31 through the
+> cycle gate; the full run
+> on `cebfaf6`, OVERALL PASS; F35 CLOSED, G13's apply half, the capitals beside G3, the strip claim beside F2 and
+> C10's agreement fixed, F18, F37 and G14 recorded, in the register; squash-merged on green *(Wouter,
+> 2026-10-29, the conductor chain; 2026-11-05 and 2026-11-10, unattended at his word)*.
 
 ---
 
