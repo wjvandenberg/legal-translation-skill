@@ -332,6 +332,41 @@ else:
 print()
 print("=" * 100)
 shutil.rmtree(TMP, ignore_errors=True)
+# =============================================================================================
+# 14.9.6 — THE PIECES JOIN TO THE AUTHORED TEXT, OVER ANY NUMBER OF RUNS, BOTH TREES. Skill Step 4's
+# appendix said apply's `.strip()` removes a space written at a tracked-change seam; since rev42 the
+# segment path distributes the text as written and its pieces partition it. One to four runs whose
+# source text holds no whitespace to restore, as at a non-Latin seam; a space, an NBSP and the
+# visible-space + ZWSP hybrid at either edge.
+# =============================================================================================
+print()
+print("14.9.6 — apply's distribution keeps the authored text whole, both trees")
+import importlib.util as _ilu  # noqa: E402
+import xml.etree.ElementTree as _ET  # noqa: E402
+sys.dont_write_bytecode = True
+_ZW, _NB = chr(0x200B), chr(0xA0)
+for _tree in ("uk", "us"):
+    _dir = ROOT / _tree / "scripts"
+    sys.modules.pop("source_language_markers", None)
+    sys.path.insert(0, str(_dir))
+    _spec = _ilu.spec_from_file_location(f"apply_1496_{_tree}", _dir / "apply_translations_textmatch.py")
+    _ap = _ilu.module_from_spec(_spec)
+    _spec.loader.exec_module(_ap)
+    sys.path.pop(0)
+    for _lead, _trail in ((" ", " "), (_NB, _NB), (_ZW + " ", " " + _ZW)):
+        for _text in (_lead + "provisions apply to", "the contract" + _trail, _lead + "the contract" + _trail):
+            for _n in (1, 2, 3, 4):
+                _els = []
+                for _k in range(_n):
+                    _e = _ET.Element(f"{{{W}}}t")
+                    _e.text = "xyz"[: 1 + _k % 3]
+                    _els.append(_e)
+                _ap.distribute_text_across_elements(_els, _text)
+                _got = "".join(_e.text or "" for _e in _els)
+                ok(f"14.9.6 {_tree} {_n} run(s), {_text!r}: the pieces join to the authored text",
+                   _got == _text, repr(_got))
+sys.modules.pop("source_language_markers", None)
+
 if FAIL:
     print(f"  FAIL — {len(FAIL)} expectation(s) missed:")
     for f in FAIL:

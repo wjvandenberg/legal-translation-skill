@@ -1850,6 +1850,48 @@ for tree in ("uk", "us"):
         ok(f"C29 {tree} {label}: read as {before} before", kinds["before"] == before, f"({kinds['before']})")
 
 # =============================================================================
+# THE DANGLING-ENDING RULE READ CAPITALS AS NOTHING (sub-step 14.9.6, found at 14.6 beside G3). Its endings
+# were matched in lower case only, so a paragraph written in capitals and cut off mid-sentence was never
+# flagged. An ending in capitals now counts where every cased letter of the paragraph is a capital, never the
+# lone `A`, which in capitals reads as a label. Invented sentences.
+# =============================================================================
+print("\n14.9.6 — the dangling-ending rule reads a paragraph written in capitals")
+print("-" * 96)
+CAPS_TP = (("cut off on FOR", "THE SUPPLIER SHALL NOT BE LIABLE TO THE PURCHASER FOR"),
+           ("cut off on THE", "NOTHING IN THIS AGREEMENT SHALL LIMIT OR EXCLUDE THE"),
+           ("cut off on AND", "EACH PARTY SHALL BEAR ITS OWN COSTS AND EXPENSES AND"),
+           ("cut off on SHALL, digits beside it", "THE 2026 PRICE OF 500 UNITS PAYABLE BY THE BUYER SHALL"))
+CAPS_QUIET = (("a label in capitals, SCHEDULE A", "THE SERVICES ARE DESCRIBED IN FULL IN SCHEDULE A"),
+              ("a label in capitals, PART A", "THE PRICE IS PAYABLE IN THE MANNER SET OUT IN PART A"),
+              ("mixed case, a capitalised Will", "The executor shall act strictly in accordance with the Will"),
+              ("mixed case, Schedule A", "The services are described in full in Schedule A"),
+              ("capitals, a list connective ; AND/OR", "THE SUPPLIER SHALL MAINTAIN INSURANCE COVER; AND/OR"),
+              ("capitals, a list connective ; AND", "THE SUPPLIER SHALL MAINTAIN INSURANCE COVER; AND"),
+              ("capitals, a signing lead-in", "SIGNED AS A DEED FOR AND ON BEHALF OF"),
+              ("capitals, a heading under five words", "PAYMENT SUBJECT TO THE"),
+              ("capitals, a full stop", "THE SUPPLIER SHALL NOT BE LIABLE FOR ANY INDIRECT LOSS."),
+              # At review, 2026-11-10: in capitals the month MAY and the noun WILL lose the capital letter that
+              # tells them from the auxiliary in mixed case, so like the lone A they are never an ending there.
+              ("capitals, the month MAY", "THIS DEED IS MADE ON THE FIRST DAY OF MAY"),
+              ("capitals, the noun WILL", "THIS CODICIL IS SUPPLEMENTAL TO MY LAST WILL"),
+              ("one lower-case letter", "THE SUPPLIER SHALL NOT BE LIABLE TO THE PURCHASEr FOR"))
+for tree in ("uk", "us"):
+    old_qc = OLD_QC if tree == "uk" else load_old("quality_check.py", "us")
+    new_qc = NEW_QC if tree == "uk" else load_new("quality_check.py", "us")
+
+    def trunc(mod, text):
+        return [i for i in mod.check_truncation(doc(para(text)), False, None) if i.startswith("Dangling ending")]
+
+    for label, text in CAPS_TP:
+        n, o = trunc(new_qc, text), trunc(old_qc, text)
+        ok(f"CAPS {tree} TRUE POSITIVE {label}: fires now", bool(n), f"({n})")
+        ok(f"CAPS {tree} TRUE POSITIVE {label}: PROVED silent before", not o, f"({o})")
+    for label, text in CAPS_QUIET:
+        n, o = trunc(new_qc, text), trunc(old_qc, text)
+        ok(f"CAPS {tree} {label}: quiet now", not n, f"({n})")
+        ok(f"CAPS {tree} {label}: quiet before", not o, f"({o})")
+
+# =============================================================================
 shutil.rmtree(TMP, ignore_errors=True)
 print()
 print("=" * 96)

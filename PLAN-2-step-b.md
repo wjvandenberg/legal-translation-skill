@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-05 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.5, C26's read receipt, both trees, by Wouter's design of 2026-11-02: after skill Step 3's read a script names a few random lines in the lexicon files read, the operator quotes them into a receipt, and skill Step 5's apply refuses to start without a matching one, inside an existing script because the tree has no file slot; planned in 3.14 first, red first, then the code, the cycle gate, the one full run and the merge; no questions to Wouter *(Wouter, 2026-11-05: continue, starting nested sessions, without questions)* · **so that the mandatory lexicon read leaves a trace the operator cannot fake without opening the files, and the skill says exactly what that proves and no more** *(written immediately after the tag `rollback-2026-11-05-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-10 — SESSION PURPOSE — what · how · purpose:** sub-step 14.9.6, the small loose ends, finished: built and verified on 2026-11-05 and stopped in TEST, it is resumed to review the change again, fix the review's one false alarm red first (a paragraph in capitals ending on the month MAY or the noun WILL read as cut off), then VERIFY and TEST through the cycle gate, the one full run, the PR, the filing and the merge; no questions to Wouter *(Wouter, 2026-11-05: continue, starting nested sessions, without questions)* · **so that every loose end step 14 left open is either fixed on evidence or closed with its reason written down, and nothing is carried past step 14 unrecorded** *(written immediately after the tag `rollback-2026-11-05b-start`, on resuming)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -2762,6 +2762,61 @@ the edited script, and the full run once, before the push.
 > the full run on `1912484`, OVERALL PASS; C26
 > CLOSED in the register; squash-merged on green *(Wouter, 2026-10-29, the conductor chain; 2026-11-05, unattended
 > at his word)*.
+> **14.9.6 — ITS OWN WRITTEN PLAN, 2026-11-05, before any edit, on `feature/step14-9-6-small-loose-ends`.** The small
+> loose ends, by Wouter's order *(`DECISIONS-LOG.md`, 2026-11-02 (7))*, and the four this chain carried; **numbered
+> 14.9.6**, the next in the run that gave C26 14.9.5, so 14.10 keeps its number and the language widenings become
+> 14.9.7; **no question put to Wouter, each choice the recommended option, recorded** *(Wouter, 2026-11-05: continue
+> without questions; and, at the usage line, "it does not matter we hit 90%")*. **Measured first, `main` at
+> `01bb48d`, both trees alike, each item triaged by the plan template's table:**
+> **(1) Apply's remnant warning — MEDIUM, FIXED HERE.** Apply's source-language scan is the last caller of
+> `scan_remnants` that lists a name the lexicon keeps in the source language as a "possible remnant", beside "fix
+> manually if genuine" — an invitation to alter a faithful rendering; `quality_check` drops that class since 14.6, and
+> repack reads it as advisory. The scan drops it the same way — through `remnant_verdict`'s kept-name class alone, in
+> `scan_remnants`' own order — and says how many it dropped; every other class, bare months included, unchanged.
+> **(2) The dangling-ending rule's case-blindness — MEDIUM, FIXED HERE.** `TRUNCATION_ENDINGS` is matched in lower
+> case only, so a paragraph written in capitals and cut off mid-sentence is never flagged. Folding case for every
+> paragraph would flag `Schedule A`, `Part A` and `the Will`; so an ending in capitals counts only in a paragraph whose
+> cased letters are all capitals, and never the lone `A`, which in capitals reads as a label.
+> **(3) Step 8 against 8a — LIGHT, FIXED HERE.** 08's opening makes a sub-step mandatory whenever its part carries
+> text; 8a's heading, and `verify_diligence`, whenever `numbering.xml` exists — rightly, a level's words sitting in its
+> format strings, which the text test does not read; and 8c's and 8e's headings say "if the part exists" where the
+> code and the opening say "carries text". The opening names the numbering exception and its reason; 8c and 8e take
+> the opening's words.
+> **(4) The stale strip claim — LIGHT, THE CLAIM FIXED HERE, THE DEVICE KEPT.** Since rev42 apply distributes a
+> segment's text as written: its pieces join to exactly the authored string over any number of runs, so no space the
+> operator writes is lost at apply. Step 4's troubleshooting paragraph and Rule 1 still give apply's `.strip()` as the
+> reason, as does `.claude/rules/ooxml.md`; each says what happened before rev42 and what is true now. The hybrid and
+> the do-not-iterate list stay: the hybrid is the device proved through the whole pipeline and a plain space is not,
+> so retiring either is phase 3's, on the Cowork test.
+> **(5) 05's first rule — LIGHT, FIXED HERE; F35 CLOSES.** Apply runs six checks, every one through `_run_validator`,
+> which blocks an exit 3 whatever the check (C29, 14.9.1); the rule names two of them. It names the runner and all six.
+> **(6) The page break lost mid-paragraph — HEAVY, RECORDED, NOT FIXED HERE.** Not an accident: Clause 2's limit drops
+> a run holding only a page break that sits between text-bearing runs, because the English arrives as one string and
+> no position inside it is knowable, and a `\n` recreates a line break, never a page break. Moving it to the
+> paragraph's end, or a new authored device, changes where apply puts layout in every document — option 11's lever, a
+> delivered-byte change needing a render of both documents. Counted over the corpus here; carried to the formatting
+> steps.
+> **(7) Apply writes with ElementTree — LIGHT, RECORDED, NO CHANGE.** Behind the four guards 14.9.4 measured and
+> SKILL.md now describes; replacing the writer would rewrite apply with no defect behind it.
+> **(8) `post_process.py`'s Article reader — LIGHT, RECORDED, NO CHANGE.** It reads `of the Agreement` as outside law
+> and keeps "Article"; but since 14.4 `lexicon_compliance` warns on that shape before apply, so the error left is the
+> safe one; telling `the Agreement` from `the Treaty` would copy 14.4's legislation-noun list into a second script; and
+> 14.4's census found no such reference in the corpus (0 added).
+> **Must not touch:** an anti-drift sentence, the hybrid, the do-not-iterate list, any other remnant class, any other
+> `quality_check` rule, an exit code, a step number. **Tests, red first against `01bb48d`:** apply's scan in
+> `tests/test_declared_language.py` — a kept name alone CLEAN (red: a hit), a kept name beside a real marker still a
+> hit, the deletion view alike; the dangling rule in `tests/test_check_scoping.py` — a cut-off paragraph in capitals
+> flags (red: silent), while `SCHEDULE A`, `the Will`, a capital `; AND/OR` and a short heading stay quiet;
+> distribution in `tests/test_whitespace_and_offsets.py` — the pieces join to the authored text over one to four runs,
+> with a space, an NBSP and the hybrid at either edge; the wording in `tests/test_instruction_rules.py` — each new
+> sentence required and each stale one forbidden, both trees. Mutants on every changed line. **Corpus:**
+> `quality_check` and apply's scan, old against new over the 13 frozen workdirs, both trees, counts only; the
+> page-break shape counted in the sources. **Then** the parity check, every changed file's divergence re-recorded from
+> the INDEX, the three confidentiality controls, VERIFY and TEST through the cycle gate, `/code-review`, the one full
+> run. **No render, declared:** no delivered byte moves — apply's change is to what it prints, `quality_check`'s to
+> what it reports. **Done when:** F35 CLOSED; G13's apply half, the case-blindness (beside G3) and the strip claim
+> (beside F2) fixed in the register; C10 says 08 agrees; items (6) to (8) recorded with their reasons in F18, F37 and
+> G14.
 
 ---
 
