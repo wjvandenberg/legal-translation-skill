@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """board_guard.py - refuse a nested session's tools until it has printed its brief's status board.
 
-CHECKER VERSION 2 (2026-11-05)
+CHECKER VERSION 3 (2026-11-10)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
+
+v3 (2026-11-10) - A HEADER THAT NAMES THE PHASE COLUMN IN MORE THAN ONE WORD WAS NO BOARD. The scope below says a
+header that NAMES "#" and "phase"; v2 asked for a cell that WAS "phase", so two real briefs headed
+"phase · step · sub-step" were logged NONE and never checked - silently, NONE being also what a person's own
+session reads. "phase" is now a whole word in any header cell ("phases" is not); "#" is still a whole cell.
 
 v2 (2026-11-05, the same day) - THE TRANSCRIPT LAGS THE SCREEN. v1's first live run refused a session that had
 printed its board FIRST: the board's row was stamped 1.3 s before the call and was not yet on disk when the hook
@@ -24,7 +29,7 @@ between, 0 of 3). The brief supplies the board; this hook makes dropping it impo
 silently.
 
 ITS SCOPE, DECIDED BY ITSELF. Only a session whose FIRST user message carries a board TABLE - a
-markdown table whose header row names "#" and "phase". A session a person typed carries none, so
+markdown table whose header row names "#" and "phase" (v3: the word, in any cell). A session a person typed carries none, so
 it is never checked. Measured before building: 2 of 7 briefs carried the board with no dash
 lines around it, so the TABLE is the key, not the dashes - a dash-keyed hook would have left
 those sessions unchecked and said nothing.
@@ -93,6 +98,8 @@ MAX_REFUSALS = 2
 GRACE_SECONDS = 3.0
 POLL_SECONDS = 0.25
 HEADER_CELLS = ("#", "phase")
+#: v3: "#" is a whole cell; "phase" a whole WORD in a cell, so "phase · step · sub-step" names it and "phases" does not.
+HEADER_WORD = {"#": re.compile(r"^#$"), "phase": re.compile(r"\bphase\b")}
 STATE_REL = ("temp", "board_guard_state.json")
 LOG_REL = ("temp", "board_guard.log")
 DECIDED = {"NONE", "FIRST", "LATE", "ESCAPED"}
@@ -122,7 +129,8 @@ def board_rows(text: str) -> list[str]:
     lines = text.splitlines()
     for i, line in enumerate(lines):
         s = line.strip()
-        if s.startswith("|") and all(h in _cells(s) for h in HEADER_CELLS):
+        cells = _cells(s) if s.startswith("|") else []
+        if cells and all(any(HEADER_WORD[h].search(c) for c in cells) for h in HEADER_CELLS):
             rows = []
             for row in lines[i:]:
                 r = row.strip()
@@ -360,6 +368,10 @@ BOARD = ("| # | phase | state |\n|---|---|---|\n| ~~1~~ | ~~THE FIRST~~ | closed
 BRIEF_DASHES = f"The task.\n\n-----\n{BOARD}\n\n**Purpose:** x. **Next step:** y.\n-----\n\nDo it."
 BRIEF_PLAIN = f"Print this board as your FIRST text:\n\n{BOARD}\n\n**Purpose:** x. **Next step:** y."
 ATTENDED = "Please continue with step 5, sub-step 3."
+#: v3: a board whose phase column names MORE than the word - the header two real briefs carried, 2026-11-10.
+WIDE = BOARD.replace("| # | phase | state |", "| # | phase · step · sub-step | where it stands |")
+BRIEF_WIDE = f"Print this board as your FIRST text:\n\n{WIDE}\n\n**Purpose:** x. **Next step:** y."
+NOT_A_BOARD = "Read this:\n\n| # | phases | x |\n|---|---|---|\n| 1 | a | b |"
 
 
 def _u(text):
@@ -436,6 +448,17 @@ def selftest() -> int:
         sid_late = f"session-{n[0]:04d}"
         cases.append(("printed after an earlier tool call -> ALLOW", c == ALLOW))
         cases.append(("...logged LATE, not FIRST", verdict(sid_late) == "LATE"))
+
+        # v3: THE HEADER NAMES THE PHASE COLUMN, IT NEED NOT BE ONLY THAT WORD. Measured 2026-11-10: two briefs
+        # headed "| # | phase · step · sub-step | where it stands |" were logged NONE and never checked, while the
+        # docstring scoped the hook to a header that NAMES "#" and "phase". Both cases below are RED against v2.
+        (c, _), _ = ask([_u(BRIEF_WIDE), _tool()])
+        cases.append(("a board whose phase column names more than 'phase', tool first -> REFUSE", c == REFUSE))
+        (c, _), sid = ask([_u(BRIEF_WIDE), _text(WIDE), _tool()])
+        cases.append(("...printed as the first text -> ALLOW, logged FIRST", c == ALLOW and verdict(sid) == "FIRST"))
+        (c, _), sid = ask([_u(NOT_A_BOARD), _tool()])
+        cases.append(("a header naming 'phases', not the word 'phase', is no board -> ALLOW, NONE (the control)",
+                      c == ALLOW and verdict(sid) == "NONE"))
 
         # A REFUSAL, THEN THE BOARD: the same session goes on, LATE.
         rows = [_u(BRIEF_PLAIN), _tool()]
