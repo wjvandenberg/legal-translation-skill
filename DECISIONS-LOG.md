@@ -2742,3 +2742,34 @@ over recording a composed result. **(15) NOT THE SESSION'S BUT WOUTER'S: THE SEC
 his word of 2026-11-10, *"Stop, give preference to house tooling, I want to fix that first."*, and taken a third
 time on the same commit at his word of 2026-11-11, *"Yes, restart it"*, beside the house tooling's own suite: it
 passed, 97 of 97.
+
+## 2026-11-11 — sub-step 14.10, unattended: G12 classified by shape; a 14.11 added; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-11, QUOTED WHOLE,** typed into 14.9.7's session, which then conducted: *"Start this
+and all other new sessions after it as nested sessions automatically. Do all checks and test runs etc only once per
+session, at the end. Assume all recommended answers going forward. Continue like this until 15:20h without any
+further input from me or otherwise. Merge at the end of each step (e.g. step 14) without asking my approval at that
+time - I give it to you now already. Other parts we'll merge at 15:20h"*. **No question was asked; each choice
+below is THE SESSION'S, its recommended answer, for him to confirm or overturn — none is his ruling.**
+
+**THE MEASUREMENT** *(the register's G12 row owns it)*: all 16 classified by `tools/g12_shapes.py`, never read —
+15 citations of legislation or a regulator, named in the same sentence, that `post_process` keeps as external and
+`quality_check`'s 20-entry keyword list misses; 1 italic the notes declare, flagged by the word count B1 removed
+from `post_process`. All false positives; each blocks skill Step 9. The row's paragraph-scope hypothesis refuted.
+
+**(1) THE FIX GOES TO A NEW HEAVY SUB-STEP, 14.11,** over phase 3's repairs or this session: it is step 14's own
+class, check scoping; it blocks skill Step 9 on two corpus documents now, so phase 3 would meet it at once; and
+14.10 was approved as touching no shipped file. **(2) THE ITALIC GOES WITH IT,** over steps 15 to 17: the same
+script and the same shape of fix — ask what `post_process` already decides. **(3) G12 AMENDED AND KEPT OPEN,** over
+two new rows: its subject is exactly these 16, and a new id moves typed counts in four files. **(4) THE ARTICLE FIX
+READS `lexicon_compliance`'s LEGISLATION TAIL,** never `post_process`'s classifier, which reads `of the Agreement`
+as external — measured on a synthetic input — so deferring to it would silence a true positive. **(5) THE
+INSTRUMENT IS COMMITTED** in `tools/` with its suite in the runner list, over `temp/`: it holds no real string, its
+suite is the confidentiality proof, and it is re-run when 14.11 lands. **(6) THE PULL REQUEST STAYS OPEN,** over
+merging on green: 14.10 no longer ends step 14, and his words merge only a step's end before 15:20; 14.11 continues
+on the same branch and pull request. **(7) STEP 14 STAYS OPEN, SO THE NEXT PROMPT IS 14.11's,** over step 15's.
+**(8) A HOUSE SESSION'S QUIET WINDOW HONOURED** — its timing asked for one; every suite here held from 12:22 to
+13:00. **(9) `board_guard.py` v3 ADOPTED AT THE OPENING,** byte for byte, as the brief said. **(10) ONE
+PUBLICATION FINDING DECLARED BY CONTENT,** over editing the house's file or the control: v3's test string `text:`
+plus a newline escape reads as a drive letter to `publication_check` — no path; changing a confidentiality control
+unattended is Wouter's to decide, so the pattern's false positive is carried as a follow-up.

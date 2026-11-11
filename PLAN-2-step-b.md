@@ -1930,6 +1930,8 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 | G4 | `validate_reject_all.py`: the missing-space rule on a dotted corporate form | **CLOSED 2026-11-02**, both trees, #185 — inside the form whatever followed it, as this row said | 14.7 |
 | C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | **CLOSED 2026-11-02**, both trees, #186 — an empty part needs no copy; one that carries text, however little, still does | 14.8 |
 | G7 | the three items 14.5 declared and did not build: Finnish's own quotes, a Japanese and Chinese word count, the unmeasured words | **CLOSED 2026-11-11**, both trees, #194 — every word sourced from published law and kept; `『…』` and `《…》` declared, not read | 14.9.7 |
+| G12 | `quality_check`'s 16 unaccounted findings, by the shape of their citation and never their text | **CLASSIFIED 2026-11-11**, #195 — 15 citations of legislation its keyword list misses, `post_process` keeping all 15; 1 italic the notes declare; all false positives, the fix 14.11's | 14.10 |
+| G12 | `quality_check.py`: the article rule reads a legislation tail, the spurious-italic rule asks the notes | **NOT BUILT** — HEAVY, both trees; added by 14.10's classification | 14.11 |
 
 **The sub-steps.** 14.2 to 14.8 each edit one script — and 14.2 one step document as well — **in both trees,
 so each is HEAVY.** Each makes its fix as a PATTERN change, the rule still running. Each adds its controls to
@@ -1985,6 +1987,17 @@ with negative tests of its own, touching no shipped file.
   shape and never reads them. MEDIUM, touching no shipped file; its own negative tests first — a planted shape it
   must report, a planted string it must never print — and its design is its own explore-and-plan at the
   sub-step's start. *Done when:* each of the 16 is classified by shape, and each class closed, filed or routed.
+- **14.11 — `quality_check.py`: G12's two classes, closed by asking what the skill already decides** *(added
+  2026-11-11 by 14.10's classification, the session's recommended answer under Wouter's go of that day)*. HEAVY,
+  both trees, the rule still running and its exit unchanged. (1) The article rule stays quiet on a reference
+  followed in its sentence by a legislation tail — `lexicon_compliance`'s of 14.4, one matcher and not a third
+  list, and never `post_process`'s `_classify_article_ref`, which reads `of the Agreement` as external. (2) The
+  spurious-italic rule flags a long italic run only where the notes, read through `post_process`'s
+  `_declared_italic` as B1's fix reads them, do not declare it. *TP:* `Article 7 above`, `Article 7 of the
+  Agreement`, an undeclared long italic run still flag. *FP:* the 16's shapes, planted synthetically from
+  `tools/g12_shapes.py`'s report — `of the <Name> Decree`, `of the Italian Code of Civil Procedure`, `of the
+  <acronym> Resolution`, a declared italic — quiet now and PROVED to have fired at the pin. *Corpus:* `qc_census`
+  16 to 0, none added; `g12_shapes` 0 of 0. *Done when:* G12 CLOSED, and with it step 14.
 
 **What every sub-step must NOT touch:** no gate weakened — a rule stays a rule, a WARN stays a WARN, a block
 stays a block, and no exit code moves; no true positive silenced; no other script; the anti-drift safeguards;
@@ -2912,6 +2925,29 @@ the edited script, and the full run once, before the push.
 > the house tooling's own suite, at his word. G7's three declared items built in the register, the sourcing in
 > `EVIDENCE-measurement.md` section 5; squash-merged on green *(Wouter, 2026-10-29, the conductor chain;
 > 2026-11-05 and 2026-11-10, unattended at his word)*.
+> **14.10 — ITS OWN WRITTEN PLAN, 2026-11-11, on `feature/step14-10-g12-text-free-route` — WRITTEN AFTER THE
+> FIRST BUILD, declared:** the instrument's design was iterated on synthetic documents before any corpus run, and
+> its plan is recorded here, not before the first edit. **Measured first, counts only** (`tools/qc_census.py`, 13
+> workdirs): `internal_article_refs` 15 (D05 2, D06 13) and `formatting` 1 (D03) — G12's figure of 2026-08-21
+> unchanged; `numbering`'s 11 are M1's, inherited. **Builds:** `tools/g12_shapes.py`, reading each workdir's
+> delivered body, notes and source containers and printing per finding only labels, counts and words of its own
+> lists; `tests/test_g12_shapes.py`, synthetic documents only, in the runner list. **Must not:** touch a shipped
+> file, print a word of a finding, weaken a gate. **MEDIUM**, one instrument and its suite. **Done when:** each of
+> the 16 classified by shape, each class closed, filed or routed.
+> **BUILT 2026-11-11, as #195 — LEFT OPEN, NOT MERGED:** `c66330d` the instrument; its suite red first in a
+> worktree at `c33f001`, the tool absent, then green; 15 mutants, each caught; `/code-review` at high, eight
+> findings, six fixed — an exception's message printed past the guard, the italic verdict asked of runs the rule
+> exempts, a test matching labels by prefix, an unreadable container read as none, a hyphenated decider, a
+> three-digit article number — and two recorded: the sentence end copied from `post_process`, a text box turning
+> a run VOID. VERIFY 40 of 40 and TEST 13 of 13 through the cycle gate; the full run on `c66330d`, OVERALL PASS, 98 suites and 15 entry points.
+> **One publication finding DECLARED BY CONTENT:** the house's `board_guard.py` v3 holds a test string ending
+> `text:` and a newline escape, which `publication_check`'s Windows-path pattern reads as a drive letter — no
+> path, and the file is the house's byte for byte; the pattern's false positive is a follow-up, a control not
+> changed unattended.
+> **The classes are G12's register row's:** 15 citations of legislation `post_process` keeps, 1 italic the notes
+> declare — all false positives, the fix routed to 14.11, which this sub-step adds. **Not merged, because 14.10 no
+> longer ends step 14:** Wouter's *"Other parts we'll merge at 15:20h"* (2026-11-11); 14.11 continues on this
+> branch and pull request and merges it when it closes the step.
 
 ---
 
