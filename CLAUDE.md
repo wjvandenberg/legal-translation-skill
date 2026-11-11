@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187, its fixes 14.9.1–14.9.5 planned; 14.9.1 to 14.9.5 as #188 to #192, 2026-11-03 to 2026-11-05, and 14.9.6, the small loose ends, as #193, 2026-11-10; next, 14.9.7, the language widenings · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.9.6 as #188 to #193, 2026-11-03 to 2026-11-10, and 14.9.7, the language widenings, as #194, 2026-11-11; next, 14.10, G12's text-free tool · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,20 +578,20 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-10, 14.9.6 MERGED (#193), F35 CLOSED; NEXT, 14.9.7, THE LANGUAGE WIDENINGS
+### HANDOFF — 2026-11-11, 14.9.7 MERGED (#194), G7's DECLARED ITEMS BUILT; NEXT, 14.10, G12's TEXT-FREE TOOL
 
-**PURPOSE: MET** — *every loose end step 14 left open is fixed on evidence or closed with its reason written
-down*: five fixed and three recorded, in the register's F35, G13, G3, F2, C10, F18, F37 and G14.
+**PURPOSE: MET** — *the retention check guards every supported language as it guards Italian and English, its
+words resting on evidence, and a shared capability lives in one place*: all three of G7's declared items built.
 
-**PRODUCED:** apply's scan drops a name the lexicon keeps and counts it; `quality_check`'s dangling-ending rule
-reads a paragraph in capitals, never the lone A, MAY or WILL there; skill Steps 4, 5 and 8 and the OOXML rules
-say what is true. Built 2026-11-05, resumed 2026-11-10; a second `/code-review` found MAY and WILL, fixed red
-first. `DECISIONS-LOG.md`, 2026-11-05 (3).
+**PRODUCED:** Finnish's two marks read where Finnish is declared; a marker set off by a comma, in every language;
+Japanese and Chinese `「…」` read at 0.6 words a letter, a CJK name dropped with its quotes now warning; every word
+read in three EU acts in ten languages, `EVIDENCE-measurement.md` section 5; apply's kept-name helper moved into the
+markers module, proved identical. Built 2026-11-10, merged 2026-11-11. `DECISIONS-LOG.md`, 2026-11-10.
 
-**SINGLE NEXT ACTION: 14.9.7, THE LANGUAGE WIDENINGS** — Finnish quotes, a Japanese and Chinese word count, the
-unmeasured words from published law, apply's kept-name helper moved; prompt `temp/s1110_next_prompt.md`.
+**SINGLE NEXT ACTION: 14.10, G12's TEXT-FREE TOOL** — section 3.14 of the build plan; prompt
+`temp/s1110b_next_prompt.md`.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** a mutant's search text must occur once; the charter is AT its cap.
+**WHAT A NEW SESSION WOULD GET WRONG:** `board_guard.py` v3 is STALE here, released mid-session — adopt it at the
+opening with its four edits. The charter is AT its cap.
 
-**Open, none blocking:** the page break lost mid-paragraph (F18, the formatting steps'); F30's detection half;
-F12; F31, step 19's. **Context: 34%.**
+**Open, none blocking:** a third CJK-letter test (the review's); F18; F30's detection half; F12; F31. **Context: 19%.**

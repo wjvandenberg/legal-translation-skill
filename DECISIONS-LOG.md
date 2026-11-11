@@ -2707,3 +2707,38 @@ skill Step 4's re-wrapped "literal space alone" bullet had moved an old example,
 figure, onto a new line, read as an added capacity figure; the bullet is re-wrapped so that line is exactly as on
 `main`, its meaning unchanged, over overriding the gate or inventing a new example in this change; the gate is a
 VERIFY row now. Whether the old example should become an invented one is left open, not decided here.
+
+## 2026-11-10 — sub-step 14.9.7, unattended: the language widenings; the choices the session's own
+
+**NO QUESTION WAS ASKED, BY WOUTER'S WORDS** of 2026-11-05 and, during 14.9.6's resumed session, *"Please do not
+ask me questions for the next hour please - just continue, also open new sessionse tc"* — each choice below is THE
+SESSION'S, taken on its own recommendation and carried here for him to confirm or overturn; none is his ruling. His
+order is 2026-11-02 (7); the helper is 2026-11-05 (3), its (10) and (11).
+
+**(1) FINNISH'S QUOTES ARE BOTH ITS MARKS,** `”…”` and `’…’`, over the double mark alone: Finnish published law
+writes both and no other, 114 and 145 spans in three EU acts; read only where Finnish is declared, with the
+apostrophe's letter rule. **(2) THE COMMA-SET MARKER IN EVERY LANGUAGE,** over Finnish alone: all 26 of Finnish
+law's markers and 1 to 3 in each of six other languages' are set off by commas, and 14.5 keeps one list for every
+language; a formula opens it, never an adverb. **(3) TWO LEAD-INS ADDED FROM THE LAW,** Italian `in prosieguo` and
+Spanish `cada una`, a formula allowed after the first, over recording them only. **(4) 0.6 WORDS A CJK LETTER,**
+D11's measured median, over one word a character; Chinese takes the Japanese figure, as the ratio check does.
+**(5) A CJK SPAN IS CHECKED BY THE QUOTE COUNT ALONE,** over the verbatim test, which would warn on every faithfully
+translated CJK name; held, at review, to the source's spans that reach their threshold. **(6) THE LAW READ FROM THE
+PUBLICATIONS OFFICE'S CELLAR REPOSITORY,** EUR-Lex refusing a script: three EU acts in ten languages, each file's
+fingerprint recorded. **(7) EVERY WORD STAYS,** 15 of 79 not found in the three acts, over removing them: an
+exemption hides no loss while the quote count holds, and three acts cannot prove a contract never uses a word.
+**(8) THE WORD TABLE IS `EVIDENCE-measurement.md` SECTION 5,** its header updated to own it, over a new document,
+which would need Wouter's leave. **(9) THE HELPER DROPS BY (MARKER, CONTEXT) EXACTLY AS BOTH COPIES DID,** over by
+position, sharing `remnant_verdict`'s own loop so the text is read once; proved identical over 32,444 calls in each
+tree. **(10) THE NEW TESTS' "BEFORE" IS `b39f438`,** the one red run pointed at `95b865c`, whose retention
+behaviour is the same, the suite refusing to compare the code with itself. **(11) THE REVIEW'S SIX:** four fixed,
+two recorded — `PLAN-2-step-b.md` section 3.14's 14.9.7 block. **(12) `board_guard.py` v3, RELEASED BY THE HOUSE
+MID-SESSION,** declared by content in VERIFY and left for the next opening, over adopting it mid-change. **(13) ONE
+MUTANT'S REQUIRED LIST CORRECTED AND IT ALONE RE-RUN,** over the whole batch: the miss was the list's, the suite
+having gone red on the row that carries the change. **(14) THE FIRST FULL RUN READ AS VOID, NOT RED, AND RAN
+AGAIN:** 96 of 97 suites passed and the commit gate's row timed out at 900 s, examining nothing, while the machine
+paused as Wouter closed it; run alone the gate passed in 10 s, so the whole run was taken again on the same commit,
+over recording a composed result. **(15) NOT THE SESSION'S BUT WOUTER'S: THE SECOND FULL RUN STOPPED PART-WAY** on
+his word of 2026-11-10, *"Stop, give preference to house tooling, I want to fix that first."*, and taken a third
+time on the same commit at his word of 2026-11-11, *"Yes, restart it"*, beside the house tooling's own suite: it
+passed, 97 of 97.
