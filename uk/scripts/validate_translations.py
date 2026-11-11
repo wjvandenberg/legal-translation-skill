@@ -39,6 +39,7 @@ import re
 import sys
 import json
 import datetime
+import unicodedata
 
 def _check_self_integrity():
     """Rev27: detect install-time truncation"""
@@ -119,6 +120,13 @@ PLACEHOLDER = "<<TRANSLATE:"   # Step 3b's scaffold marker; never allowed to rea
 # substitutions out of the warning stream.
 QUOTE_SINGLE_MIN_WORDS = 2
 QUOTE_DOUBLE_MIN_WORDS = 5
+# Step 14.9.7: Japanese and Chinese put no space between words, so a span of
+# theirs counted one word under every threshold. Each CJK letter counts this
+# many words: over the recorded Japanese run's paragraphs of 10+ letters, one
+# letter yields 0.614 English words at the median, 0.580 at the lower quartile.
+# Chinese, absent from the recorded runs, takes the same figure, as in
+# EXPECTED_RATIO. So 9 letters reach the double threshold, 4 the single.
+CJK_WORDS_PER_LETTER = 0.6
 
 # Quote-pair definitions used by the retention check. Each entry is
 # (opener, closer). For ASCII single/double quotes opener == closer; the
@@ -134,11 +142,29 @@ _QUOTE_PAIRS_DOUBLE = [
     ('«', '»'),      # « » guillemets
     # Step 14.5: the low opening quote, closed by ” (Polish, Hungarian, Dutch)
     # or by “ (German) — the two closers in one string; see _quoted_spans.
-    # Not read: Finnish ”…”, one mark on both sides, which would pair across
-    # “A” … “B”; and Japanese or Chinese 「…」, where a span with no space is
-    # one word, under every threshold.
     ('„', '”“'),
+    # Step 14.9.7: the Japanese and Chinese corner bracket, counted in words by
+    # _span_words. Finnish's own marks are read only where Finnish is declared:
+    # see _quote_pairs. Not read: the white corner bracket 『…』 and the Chinese
+    # title mark 《…》, each a work's title in a contract — translated by design.
+    ('「', '」'),
 ]
+# Step 14.9.7: Finnish writes ”…” and ’…’, one mark on both sides — the only
+# two styles in Finnish published law (114 and 145 spans in three EU acts). A
+# mark opens only where no letter precedes it and closes only where none
+# follows, as the ASCII apostrophe (G1), so the apostrophe inside vaa’an never
+# pairs; and a ”…” span never holds “ or „, so “A” … “B” reads no span from
+# A's closer to B's. Read only where Finnish is declared.
+_FINNISH_PAIRS_SINGLE = [('’', '’')]
+_FINNISH_PAIRS_DOUBLE = [('”', '”')]
+
+
+def _quote_pairs(language=None):
+    """(single, double) — the quote pairs read for a paragraph in `language`."""
+    if language == 'finnish':
+        return (_QUOTE_PAIRS_SINGLE + _FINNISH_PAIRS_SINGLE,
+                _QUOTE_PAIRS_DOUBLE + _FINNISH_PAIRS_DOUBLE)
+    return _QUOTE_PAIRS_SINGLE, _QUOTE_PAIRS_DOUBLE
 
 # Step 14.3, register G1: a straight apostrophe AFTER a letter never opens a
 # quotation, and one BEFORE a letter never closes one. So an elision or a
@@ -171,8 +197,15 @@ _APOSTROPHE_INNER = r"(?:[^']|'(?=" + _LETTER + r'))'
 # every language; an article alone follows the declared language, see
 # _ARTICLES. Measured on the recorded runs: the Italian and English
 # shapes, Dutch hierna, Polish zwana dalej, Norwegian heretter; from the
-# lexicons: ci-après, ci-dessous, nachstehend, hieronder; every other word is
-# its language's usual drafting formula, unmeasured, its controls synthetic.
+# lexicons: ci-après, ci-dessous, nachstehend, hieronder. Step 14.9.7 read
+# every word in its own language's text of three EU acts (register G7 says
+# which were found there, and in what shape) and added the two lead-ins those
+# acts write that these lists lacked: in prosieguo, and cada una.
+# Step 14.9.7: a formula may also follow the first lead-in — Spanish (cada una
+# denominada en lo sucesivo «X») — and a marker may stand outside a bracket,
+# set off by a comma, as every Finnish marker in those acts does: X, jäljempänä
+# ’Y’, — a formula, never an adverb, opening it, and the span closing it before
+# punctuation or the paragraph's end. See _MARKER_COMMA.
 _MARKER_ADVERBS = (
     'congiuntamente', 'collettivamente', 'singolarmente', 'rispettivamente',
     'ciascuna', 'ciascuno', 'entrambe', 'entrambi', 'insieme', 'together',
@@ -185,8 +218,10 @@ _MARKER_ADVERBS = (
     'gezamenlijk', 'tezamen', 'afzonderlijk', 'ieder', 'elk', 'łącznie',
     'odpowiednio', 'każd[aey]', 'együttesen', 'külön-külön', 'egyenként',
     'yhdessä', 'erikseen', 'kumpikin', 'samlet',
+    # 14.9.7: Spanish published law.
+    r'cada\s+un[oa]',
 )
-_MARKER_LEADIN_START = (
+_MARKER_FORMULAS = (
     r'di\s+seguito', r'in\s+seguito', r'nel\s+seguito',
     r"d['’]ora\s+in\s+(?:avanti|poi|innanzi)", 'hereinafter', 'hereafter',
     'breviter',
@@ -196,7 +231,10 @@ _MARKER_LEADIN_START = (
     r'im\s+Folgenden', r'im\s+Weiteren', 'hierna', 'hieronder',
     r'zwan\w*\s+dalej', 'dalej', r'(?:a\s+)?továbbiakban',
     'jäljempänä', 'heretter',
-) + _MARKER_ADVERBS
+    # 14.9.7: Italian published law.
+    r'in\s+prosieguo',
+)
+_MARKER_LEADIN_START = _MARKER_FORMULAS + _MARKER_ADVERBS
 _MARKER_LEADIN_MORE = (
     'anche', 'denominato', 'denominata', 'denominati', 'denominate', 'definito',
     'definita', 'definiti', 'definite', 'indicato', 'indicata', 'indicati',
@@ -208,7 +246,7 @@ _MARKER_LEADIN_MORE = (
     'auch', 'als', r'te\s+noemen', 'genoemd', 'ook',
     r'zwan\w*', 'dalej', 'także', 'również', 'myös', 'kalt',
     'benevnt',
-) + _MARKER_ADVERBS
+) + _MARKER_ADVERBS + _MARKER_FORMULAS
 # The definite and indefinite articles of each language that has them. After a
 # lead-in any of them may stand, the lead-in having marked the term. Alone in
 # the bracket, only the DECLARED language's count, with English `the`: one
@@ -250,6 +288,14 @@ _ARTICLE_ONLY[None] = _article_only(_UNDECLARED_ARTICLES)
 _THE_ONLY = _article_only(('the',))   # a declared language with no article
 _MARKER_AFTER = re.compile(r'\s*(?:(?:genannt|bezeichnet|genoemd)\s*)?\)',
                            re.IGNORECASE)
+# Step 14.9.7: the comma-set marker, searched in the text just before the span.
+_MARKER_COMMA = re.compile(
+    r',\s*(?:' + '|'.join(_MARKER_FORMULAS) + r')\b(?:[\s,:]+(?:'
+    + '|'.join(_MARKER_LEADIN_MORE) + r')\b)*[\s,:]*' + _MARKER_ARTICLE + r'?\Z',
+    re.IGNORECASE)
+# As in a bracket, a German or Dutch participle may close it: , hierna „X” genoemd,
+_COMMA_AFTER = re.compile(r'\s*(?:(?:genannt|bezeichnet|genoemd)\s*)?(?:[,;.:)]|\Z)',
+                          re.IGNORECASE)
 _TITLE_BEFORE = re.compile(
     r'\b(?:recante|recanti|intitolat[oaie]|entitled|titled'
     # 14.5: French, Spanish, Portuguese, German, Dutch, Polish and Finnish.
@@ -271,6 +317,13 @@ def _quoted_spans(text, opener, closer):
     if opener == closer == "'":
         pat = (_APOSTROPHE_OPEN + '(' + _APOSTROPHE_INNER + '+)'
                + _APOSTROPHE_CLOSE)
+    elif (opener, closer) in _FINNISH_PAIRS_SINGLE + _FINNISH_PAIRS_DOUBLE:
+        # Step 14.9.7: Finnish's own marks, the ASCII apostrophe's rule; an
+        # apostrophe inside a word may sit inside ’…’, and ”…” holds no “ or „.
+        inner = ("(?:[^’]|’(?=" + _LETTER + "))" if opener == '’'
+                 else '[^' + re.escape('”“„') + ']')
+        pat = ('(?<!' + _LETTER + ')' + re.escape(opener) + '(' + inner + '+)'
+               + re.escape(closer) + '(?!' + _LETTER + ')')
     elif len(closer) > 1:
         # Step 14.5: an opener closed by any one of several marks — „ by ” or
         # by “ — none of them, nor the opener, inside the span.
@@ -288,22 +341,52 @@ def _quoted_spans(text, opener, closer):
     return re.finditer(pat, text)
 
 
-def _quoted_span_count(s):
-    """How many quoted spans of any style and length s holds."""
-    return sum(1 for o, c in _QUOTE_PAIRS_SINGLE + _QUOTE_PAIRS_DOUBLE
-               for _ in _quoted_spans(s, o, c))
+def _quoted_span_count(s, language=None):
+    """How many quoted spans of any style and length s holds, reading the
+    quote pairs read for `language`."""
+    single, double = _quote_pairs(language)
+    return sum(1 for o, c in single + double for _ in _quoted_spans(s, o, c))
+
+
+def _cjk_letters(s):
+    """How many of s's letters are Chinese or Japanese — han, hiragana or
+    katakana (Korean is not a supported language)."""
+    return sum(1 for ch in s if ch.isalpha() and any(
+        k in unicodedata.name(ch, '') for k in ('CJK', 'HIRAGANA', 'KATAKANA')))
+
+
+def _span_words(s):
+    """The words a quoted span counts against the thresholds: its words holding
+    no CJK letter, plus CJK_WORDS_PER_LETTER for each CJK letter (14.9.7). A
+    span holding no CJK letter counts exactly its words, as before."""
+    words = cjk = 0
+    for w in s.split():
+        n = _cjk_letters(w)
+        cjk += n
+        words += not n
+    return words + CJK_WORDS_PER_LETTER * cjk if cjk else words
+
+
+def _long_span_count(s, language=None):
+    """How many of s's quoted spans reach their style's threshold (14.9.7)."""
+    single, double = _quote_pairs(language)
+    return sum(1 for pairs, least in ((single, QUOTE_SINGLE_MIN_WORDS), (double, QUOTE_DOUBLE_MIN_WORDS))
+               for o, c in pairs for m in _quoted_spans(s, o, c) if _span_words(m.group(1).strip()) >= least)
 
 
 def _translated_by_design(text, m, language=None):
     """True where span m sits in a defined-term marker or beside a title word
-    (G7) — see _MARKER_BEFORE, _ARTICLE_ONLY, _TITLE_BEFORE and _TITLE_AFTER.
-    A marker opens at the last parenthesis before the span, so the search
-    starts there; a marker of an article alone reads the declared language's."""
+    (G7) — see _MARKER_BEFORE, _ARTICLE_ONLY, _MARKER_COMMA, _TITLE_BEFORE and
+    _TITLE_AFTER. A marker opens at the last parenthesis before the span, so the
+    search starts there; a marker of an article alone reads the declared
+    language's; a comma-set marker is searched in the 160 characters before."""
     k = text.rfind('(', 0, m.start())
     alone = _ARTICLE_ONLY.get(language, _THE_ONLY)
     return bool((k >= 0 and (_MARKER_BEFORE.match(text, k, m.start())
                              or alone.match(text, k, m.start()))
                  and _MARKER_AFTER.match(text, m.end()))
+                or (_MARKER_COMMA.search(text, max(0, m.start() - 160), m.start())
+                    and _COMMA_AFTER.match(text, m.end()))
                 or _TITLE_BEFORE.search(text, 0, m.start())
                 or _TITLE_AFTER.match(text, m.end()))
 
@@ -337,11 +420,19 @@ def _check_quoted_phrase_retention(p, language=None):
     exactly as before. Step 14.5: every supported language's markers and title
     words, and the low opening quote read; `language`, the one declared at
     Step 1c, decides which articles may make a marker on their own.
+
+    Step 14.9.7: where Finnish is declared its own marks are read; a marker may
+    be set off by a comma; Japanese and Chinese corner brackets are read, and a
+    span counted in words by _span_words. A span holding a CJK letter is never
+    verbatim in English — it is translated or romanised by design — so, like a
+    marker, it is checked by the quote count alone, against the source's spans
+    that reach their threshold: a CJK name dropped together with its quotes warns.
     """
     text = (p.get('text') or '').strip()
     en = (p.get('en') or '').strip()
     if not text or not en:
         return []
+    single, double = _quote_pairs(language)
 
     # Skip: paragraph is a textbook definition body. Heuristic — text
     # begins with a quoted term (any style) immediately followed by a
@@ -363,7 +454,7 @@ def _check_quoted_phrase_retention(p, language=None):
         # it from the candidate set.
         # (`text` is stripped, so a leading span starts at 0.)
         leading_quoted = None
-        for opener, closer in _QUOTE_PAIRS_SINGLE + _QUOTE_PAIRS_DOUBLE:
+        for opener, closer in single + double:
             m = next(_quoted_spans(text, opener, closer), None)
             if m is not None and m.start() == 0:
                 leading_quoted = m.group(1)
@@ -372,24 +463,31 @@ def _check_quoted_phrase_retention(p, language=None):
         leading_quoted = None
 
     findings = []
-    keeps_quotes = None   # G7's condition, counted once and only if needed
+    # G7's condition, counted once and only if needed. The English is counted
+    # with the base pairs: Finnish's marks are the source's, and two typographic
+    # apostrophes in English prose would read as a span (14.9.7). A CJK span is
+    # held to the source's spans that reach their threshold, so a short term
+    # rendered unquoted beside it does not count against a name kept in quotes.
+    keeps_quotes = keeps_long = None
     for style, pairs, min_words in (
-            ('single', _QUOTE_PAIRS_SINGLE, QUOTE_SINGLE_MIN_WORDS),
-            ('double', _QUOTE_PAIRS_DOUBLE, QUOTE_DOUBLE_MIN_WORDS)):
+            ('single', single, QUOTE_SINGLE_MIN_WORDS),
+            ('double', double, QUOTE_DOUBLE_MIN_WORDS)):
         for opener, closer in pairs:
             for m in _quoted_spans(text, opener, closer):
                 phrase_stripped = m.group(1).strip()
                 if leading_quoted is not None and phrase_stripped == leading_quoted:
                     continue
-                if len(phrase_stripped.split()) < min_words:
+                if _span_words(phrase_stripped) < min_words:
                     continue
                 if phrase_stripped in en:
                     continue
-                if _translated_by_design(text, m, language):
+                cjk = _cjk_letters(phrase_stripped)
+                if cjk or _translated_by_design(text, m, language):
                     if keeps_quotes is None:
-                        keeps_quotes = (_quoted_span_count(en)
-                                        >= _quoted_span_count(text))
-                    if keeps_quotes:
+                        en_spans = _quoted_span_count(en)
+                        keeps_quotes = en_spans >= _quoted_span_count(text, language)
+                        keeps_long = en_spans >= _long_span_count(text, language)
+                    if keeps_long if cjk else keeps_quotes:
                         continue
                 findings.append((style, phrase_stripped))
     return findings
@@ -641,6 +739,10 @@ def validate(json_path, accept_large_batch=False):
         print(f"  quoted multi-word phrase is a known missing-content")
         print(f"  defect class. (single-quote threshold ≥{QUOTE_SINGLE_MIN_WORDS} words; "
               f"double-quote threshold ≥{QUOTE_DOUBLE_MIN_WORDS} words.)\n")
+        if any(_cjk_letters(phrase) for w in quoted_phrase_warnings for _s, phrase in w['phrases']):
+            print("  A Japanese or Chinese phrase is never verbatim in English: it is listed")
+            print("  because the English holds fewer quoted phrases than the source. Check that")
+            print("  each name or term was translated, not dropped.\n")
         for w in quoted_phrase_warnings:
             print(f"    idx {w['idx']}:")
             for style, phrase in w['phrases']:

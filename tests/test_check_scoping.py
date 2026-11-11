@@ -937,9 +937,9 @@ print("-" * 96)
 # dropped with its quotes, a naming verb and a cross-reference still fire, now and before. The
 # low opening quote (Polish, Hungarian, Dutch; German) was never read, so a marker in it is proved
 # through its typographic twin, and a name dropped in it fires now and was PROVED silent before.
-# Japanese and Chinese spans hold no space, so are one word under every threshold: their marker is
-# moot, and a name dropped in them is not seen -- a declared blind spot, pinned here so that
-# reading it one day turns this red on purpose. Every exemption still holds only while the
+# Japanese and Chinese spans held no space, so were one word under every threshold: their marker was
+# moot, and a name dropped in them was not seen -- a blind spot 14.9.7 read, its own section below
+# proving the name dropped now fires; the markers stay silent here. Every exemption still holds only while the
 # English keeps as many quoted spans as the source. 14.5 of PLAN-2-step-b.md section 3.14; every
 # string INVENTED, on office services.
 # --- 14.5 cases: begin
@@ -1149,13 +1149,11 @@ G7L_WIDE = (
     ("German", "Die Parteien verwirklichen das Projekt „Bürozentrum am Alten Markt Nummer Eins“ fristgerecht.",
      "The parties carry out the project on time.", "Bürozentrum am Alten Markt Nummer Eins"),
 )
-# Moot: a span with no space is one word. The marker is silent then and now -- and so, DECLARED BLIND,
-# is a name dropped in it.
+# Moot at 14.5: a span with no space was one word. The marker is silent then and now; the name dropped
+# in it, DECLARED BLIND here until 14.9.7, fires now -- that section's W97_TP.
 G7L_MOOT = (
     ("Japanese marker", "当事者は本契約（以下「事務所清掃業務委託契約」という。）を締結する。", KEEP),
     ("Chinese marker", "双方签订本合同（以下简称“办公室清洁服务合同”）。", KEEP),
-    ("Japanese name dropped, DECLARED BLIND", "当事者は「事務所清掃センター北棟」の業務を実施する。",
-     "The parties carry out the services."),
 )
 # --- 14.5 cases: end
 
@@ -1890,6 +1888,205 @@ for tree in ("uk", "us"):
         n, o = trunc(new_qc, text), trunc(old_qc, text)
         ok(f"CAPS {tree} {label}: quiet now", not n, f"({n})")
         ok(f"CAPS {tree} {label}: quiet before", not o, f"({o})")
+
+# =============================================================================
+# THE LANGUAGE WIDENINGS (sub-step 14.9.7): G7's three items 14.5 declared and did not build. Finnish's own
+# marks, ”…” and ’…’, read when Finnish is declared, each opening only where no letter precedes it and
+# closing only where none follows; the comma-set marker, Finnish law's only form, in every language; two
+# lead-ins published law writes; and a Japanese or Chinese span counted in words, 0.6 a CJK letter, and
+# checked by the quote-count condition alone, being never verbatim in English. "Before" is W97_BEFORE, the
+# code before this sub-step; a Finnish marker the old code exempted in its typographic twin is proved at the
+# suite's pinned baseline instead. Every string INVENTED, on office services.
+# =============================================================================
+print("\n14.9.7 — the language widenings: Finnish's marks, the comma-set marker, two lead-ins, the CJK word count")
+print("-" * 96)
+W97_BEFORE = os.environ.get("LT_W97_BEFORE", "b39f438")   # main before 14.9.7
+FI = "finnish"
+NO_SPAN = "The parties carry out the project on time."
+_w97 = {}
+
+
+def w97_old(tree):
+    """<tree>'s validate_translations at W97_BEFORE -- VOID if that is the working tree's."""
+    if tree not in _w97:
+        d = TMP / f"w97-at-{W97_BEFORE}-{tree}"
+        d.mkdir()
+        for n in ("validate_translations.py", "source_language_markers.py"):
+            (d / n).write_bytes(subprocess.run(["git", "show", f"{W97_BEFORE}:{tree}/scripts/{n}"],
+                                               capture_output=True, cwd=ROOT, check=True).stdout)
+        if (d / "validate_translations.py").read_bytes() == \
+                (ROOT / tree / "scripts" / "validate_translations.py").read_bytes():
+            print(f"VOID — {tree}/validate_translations.py at {W97_BEFORE} is the working tree's: "
+                  f"every 'before' below would be the fix itself.")
+            sys.exit(1)
+        name = f"w97old_{tree}_validate_translations"
+        spec = importlib.util.spec_from_file_location(name, d / "validate_translations.py")
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[name] = mod
+        sys.path.insert(0, str(d))
+        try:
+            spec.loader.exec_module(mod)
+        finally:
+            sys.path.remove(str(d))
+        _w97[tree] = mod
+    return _w97[tree]
+
+
+def w97_twin(s):
+    """The paragraph with its first Finnish opening mark typographic, as the old code read it."""
+    i = min((k for k in (s.find("”"), s.find("’")) if k >= 0), default=-1)
+    return s if i < 0 else s[:i] + ("“" if s[i] == "”" else "‘") + s[i + 1:]
+
+
+# Finnish declared: (label, source, the span) -- silent with KEEP, firing with DROP, PROVED unread before
+W97_FI_MARKS = (
+    ("a bracket marker in ”…”",
+     "Osapuolet tekevät sopimuksen (jäljempänä ”Toimistojen siivouspalvelujen puitesopimus vuosille 2026–2030”).",
+     "Toimistojen siivouspalvelujen puitesopimus vuosille 2026–2030"),
+    ("a bracket marker in ’…’", "Osapuolet tekevät sopimuksen (jäljempänä ’Siivouspalvelujen Puitesopimus’).",
+     "Siivouspalvelujen Puitesopimus"),
+)
+# The comma-set marker: (label, language, source, the span) -- silent with KEEP and firing with DROP now,
+# PROVED to fire before with KEEP (a Finnish mark through its typographic twin)
+W97_COMMA = (
+    ("Finnish, ’…’", FI, "Palveluntarjoaja, jäljempänä ’Siivouspalvelujen Toimittaja’, sitoutuu sopimukseen.",
+     "Siivouspalvelujen Toimittaja"),
+    ("Finnish, ”…”", FI, "Palveluntarjoaja, jäljempänä ”Toimistojen siivouspalvelujen pääasiallinen toimittaja "
+                         "Helsingissä”, sitoutuu sopimukseen.",
+     "Toimistojen siivouspalvelujen pääasiallinen toimittaja Helsingissä"),
+    ("Italian", "italian", 'Il Cliente affida i servizi alla Società, di seguito "Fornitore dei Servizi di Pulizia '
+                           'degli Uffici", che accetta.', "Fornitore dei Servizi di Pulizia degli Uffici"),
+    ("Italian, closing the paragraph", "italian", 'Il Cliente affida i servizi alla Società, di seguito "Fornitore '
+                                                  'dei Servizi di Pulizia degli Uffici".',
+     "Fornitore dei Servizi di Pulizia degli Uffici"),
+    ("Dutch", "dutch", 'De opdrachtgever sluit een overeenkomst met de leverancier, hierna "Leverancier van '
+                       'Schoonmaakdiensten voor Kantoren", die aanvaardt.',
+     "Leverancier van Schoonmaakdiensten voor Kantoren"),
+    ("Dutch, a participle closing it", "dutch", 'De opdrachtgever sluit een overeenkomst met de leverancier, hierna '
+                                                'de "Leverancier van Schoonmaakdiensten voor Kantoren" genoemd, die '
+                                                'aanvaardt.', "Leverancier van Schoonmaakdiensten voor Kantoren"),
+)
+# Lead-ins published law writes: (label, language, source, the span) -- as W97_COMMA
+W97_LEADS = (
+    ("Italian `in prosieguo`", "italian",
+     'Le parti stipulano il contratto (in prosieguo "Contratto Quadro per i Servizi di Pulizia").',
+     "Contratto Quadro per i Servizi di Pulizia"),
+    ("Spanish `cada una`, then a second lead-in", "spanish",
+     'Las partes firman el contrato (cada una denominada en lo sucesivo "Parte del Contrato de Servicios de '
+     'Limpieza").', "Parte del Contrato de Servicios de Limpieza"),
+    ("Italian, an adverb before the lead-in", "italian",
+     'Le parti (congiuntamente, di seguito, le "Parti del Contratto di Servizi di Pulizia") firmano.',
+     "Parti del Contratto di Servizi di Pulizia"),
+)
+# (label, language, source, English, the span, before) -- fires now; before: "fired" or "silent"
+W97_TP = (
+    ("an adverb after a comma is no formula", "italian",
+     'Le parti, insieme "Gruppo dei Servizi di Pulizia degli Uffici", firmano.', KEEP,
+     "Gruppo dei Servizi di Pulizia degli Uffici", "fired"),
+    ("a comma-set span with words after it", "italian",
+     'Il Cliente affida i servizi alla Società, di seguito "Fornitore dei Servizi di Pulizia degli Uffici" e alla '
+     'sua controllata.', KEEP, "Fornitore dei Servizi di Pulizia degli Uffici", "fired"),
+    ("a Finnish name dropped in ”…”", FI,
+     "Osapuolet toteuttavat hankkeen ”Toimistokeskus Pohjoinen Yksi Kaksi Kolme” määräajassa.", NO_SPAN,
+     "Toimistokeskus Pohjoinen Yksi Kaksi Kolme", "silent"),
+    ("a Finnish name dropped in ’…’", FI, "Osapuolet toteuttavat hankkeen ’Toimistokeskus Pohjoinen’ määräajassa.",
+     NO_SPAN, "Toimistokeskus Pohjoinen", "silent"),
+    ("a Finnish name holding an apostrophe", FI, "Osapuolet toteuttavat hankkeen ’Vaa’an Toimistokeskus’ määräajassa.",
+     NO_SPAN, "Vaa’an Toimistokeskus", "silent"),
+    ("a Finnish name after an inch mark", FI,
+     "Näytön koko on 24” ja hanke on ”Toimistokeskus Pohjoinen Yksi Kaksi Kolme”.", NO_SPAN,
+     "Toimistokeskus Pohjoinen Yksi Kaksi Kolme", "silent"),
+    ("a Japanese name dropped, DECLARED BLIND until now", "japanese",
+     "当事者は「事務所清掃センター北棟」の業務を実施する。", "The parties carry out the services.",
+     "事務所清掃センター北棟", "silent"),
+    ("a Japanese marker dropped with its quotes", "japanese",
+     "当事者は本契約（以下「事務所清掃業務委託契約」という。）を締結する。", DROP, "事務所清掃業務委託契約", "silent"),
+    ("a Japanese name dropped beside a short term rendered unquoted", "japanese",
+     "当事者は「本契約」に基づき「北区事務所清掃サービス契約」を履行する。",
+     "Under this Agreement the parties perform the contract.", "北区事務所清掃サービス契約", "silent"),
+    ("a Finnish marker dropped, two apostrophes in the English", FI,
+     "Osapuolet tekevät sopimuksen (jäljempänä ”Toimistojen siivouspalvelujen puitesopimus vuosille 2026–2030”).",
+     "The parties renew the ’90 contract for 2026 and 2030’ s terms.",
+     "Toimistojen siivouspalvelujen puitesopimus vuosille 2026–2030", "silent"),
+    ("a Chinese name dropped in “…”", "chinese", "双方共同实施“北区办公楼清洁服务中心项目”。",
+     "The parties jointly carry out the project.", "北区办公楼清洁服务中心项目", "silent"),
+    ("a Latin name in 「…」 dropped", "japanese", "当事者は「North Office Cleaning Services Centre」の業務を実施する。",
+     "The parties carry out the services.", "North Office Cleaning Services Centre", "silent"),
+)
+# (label, language, source, English) -- silent now
+W97_QUIET = (
+    ("Finnish apostrophes inside words never pair", FI,
+     "Sopimus koskee vaa’an ja raa’an mittalaitteiden kalibrointia.", "The contract covers calibration."),
+    ("a Finnish apostrophe inside a word opens no span before a ’…’ name", FI,
+     "Sopimus koskee vaa’an ja ’Toimistokeskus Pohjoinen’ kalibrointia.",
+     "The contract covers the scales of Toimistokeskus Pohjoinen."),
+    ("Finnish ”…” never runs across “…”", FI,
+     "Sopimus koskee “Toimisto Pohjoinen 1” sekä Helsingin keskustassa sijaitsevaa uutta “Toimisto Etelä 2” "
+     "rakennusta.", "The contract covers the two office buildings."),
+    ("Finnish marks unread when Finnish is not declared", None,
+     "Osapuolet toteuttavat hankkeen ”Toimistokeskus Pohjoinen Yksi Kaksi Kolme” määräajassa.", NO_SPAN),
+    ("a Japanese marker, the English keeping its quotes", "japanese",
+     "当事者は本契約（以下「事務所清掃業務委託契約」という。）を締結する。", KEEP),
+    ("a Chinese name kept with its quotes", "chinese", "双方共同实施“北区办公楼清洁服务中心项目”。",
+     'The parties jointly carry out the "North District Office Cleaning Service Centre Project".'),
+    ("a short Japanese term, under the threshold", "japanese", "当事者は「清掃契約書」に署名する。",
+     "The parties sign the contract."),
+    ("a Japanese name kept with its quotes beside a short term rendered unquoted", "japanese",
+     "当事者は「本契約」に基づき「北区事務所清掃サービス契約」を履行する。",
+     'Under this Agreement the parties perform the "North District Office Cleaning Services Contract".'),
+    ("a Japanese title in 『…』 is not read", "japanese", "当事者は『事務所清掃業務標準手順書第二版』に従う。",
+     "The parties follow the Standard Office Cleaning Procedures Manual, Second Edition."),
+    ("a Japanese name kept in its own script", "japanese", "当事者は「事務所清掃センター北棟」の業務を実施する。",
+     "The parties carry out the services of 事務所清掃センター北棟."),
+)
+for tree in ("uk", "us"):
+    new_vt, old_vt, b_vt = load_new("validate_translations.py", tree), load_old("validate_translations.py", tree), \
+        w97_old(tree)
+
+    def spans(mod, src, en, lang):
+        return [p for _s, p in mod._check_quoted_phrase_retention({"text": src, "en": en}, lang)]
+
+    for label, src, span in W97_FI_MARKS:
+        ok(f"W97 {tree} Finnish {label}: silent now", not spans(new_vt, src, KEEP, FI))
+        ok(f"W97 {tree} Finnish {label} dropped with its quotes: fires now", span in spans(new_vt, src, DROP, FI))
+        ok(f"W97 {tree} Finnish {label} dropped with its quotes: PROVED unread before",
+           not spans(b_vt, src, DROP, FI))
+        tw = w97_twin(src)
+        ok(f"W97 {tree} Finnish {label}: its twin PROVED to fire at {REF}",
+           span in [p for _s, p in old_vt._check_quoted_phrase_retention({"text": tw, "en": KEEP})])
+    for group, rows in (("comma-set", W97_COMMA), ("lead-in", W97_LEADS)):
+        for label, lang, src, span in rows:
+            ok(f"W97 {tree} {group} {label}: silent now", not spans(new_vt, src, KEEP, lang),
+               f"({spans(new_vt, src, KEEP, lang)})")
+            ok(f"W97 {tree} {group} {label} dropped with its quotes: fires now", span in spans(new_vt, src, DROP, lang))
+            ok(f"W97 {tree} {group} {label}: PROVED to fire before" + (" (its twin)" if lang == FI else ""),
+               span in spans(b_vt, w97_twin(src) if lang == FI else src, KEEP, lang))
+    for label, lang, src, en, span, before in W97_TP:
+        n, b = spans(new_vt, src, en, lang), spans(b_vt, src, en, lang)
+        ok(f"W97 {tree} TRUE POSITIVE {label}: fires now, on that span", span in n, f"({n})")
+        ok(f"W97 {tree} TRUE POSITIVE {label}: {'fired' if before == 'fired' else 'PROVED silent'} before",
+           (span in b) if before == "fired" else not b, f"({b})")
+    for label, lang, src, en in W97_QUIET:
+        n = spans(new_vt, src, en, lang)
+        ok(f"W97 {tree} {label}: silent now", not n, f"({n})")
+    # THE COUNT ITSELF: a span holding no CJK letter counts exactly its words, as before; CJK at 0.6 a letter.
+    sw = getattr(new_vt, "_span_words", None)
+    latin = [s for row in G7L + W97_COMMA + W97_LEADS for s in row if isinstance(s, str)] + \
+            [s for row in G7L_TP for s in row[2:4]]
+    ok(f"W97 {tree} a span with no CJK letter counts its words exactly as before ({len(latin)} strings)",
+       sw is not None and all(sw(s) == len(s.split()) for s in latin))
+    ok(f"W97 {tree} nine CJK letters reach the double threshold and eight do not",
+       sw is not None and sw("一" * 9) >= new_vt.QUOTE_DOUBLE_MIN_WORDS > sw("一" * 8))
+    ok(f"W97 {tree} four CJK letters reach the single threshold and three do not",
+       sw is not None and sw("一" * 4) >= new_vt.QUOTE_SINGLE_MIN_WORDS > sw("一" * 3))
+    # THE WHOLE SCRIPT, as skill Step 4 runs it: a CJK finding carries its note, a Latin one does not.
+    jp = next(r for r in W97_TP if r[0].startswith("a Japanese name dropped, DECLARED"))
+    for row, case, note in (("CJK", (None, jp[2], jp[3]), True),
+                            ("Latin", (None, G7L_WIDE[0][1], G7L_WIDE[0][2]), False)):
+        rc, out = vt_run(ROOT / tree / "scripts", f"w97-{row}-{tree}", case)
+        ok(f"W97 {tree} the whole script, a {row} finding: warns {'with' if note else 'without'} the CJK note",
+           rc == 1 and "Quoted source phrases NOT found" in out and ("never verbatim in English" in out) == note,
+           f"(rc={rc})")
 
 # =============================================================================
 shutil.rmtree(TMP, ignore_errors=True)
