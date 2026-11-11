@@ -2773,3 +2773,30 @@ on the same branch and pull request. **(7) STEP 14 STAYS OPEN, SO THE NEXT PROMP
 PUBLICATION FINDING DECLARED BY CONTENT,** over editing the house's file or the control: v3's test string `text:`
 plus a newline escape reads as a drive letter to `publication_check` — no path; changing a confidentiality control
 unattended is Wouter's to decide, so the pattern's false positive is carried as a follow-up.
+
+## 2026-11-11 — sub-step 14.11, unattended: parked at the plan; the choices the session's own
+
+**Wouter's words of 2026-11-11 are quoted whole in the entry above.** No question was asked; **each choice below
+is THE SESSION'S, its recommended answer, for him to confirm or overturn — none is his ruling.**
+
+**THE MEASUREMENT** *(section 3.14 of the build plan owns it, in 14.11's plan)*: 14.4's legislation tail is quiet
+on 12 of G12's 15 article findings where `quality_check`'s match ends, and on 15 of 15 from the whole number — the
+three misses a three-digit number the rule's pattern cuts short; the italic declared, 1 of 1; and 11 references
+the keyword exemption silences that the tail calls internal.
+
+**(1) PARKED AT THE PLAN,** over building: started at 14:00, HEAVY, the full run alone 35 to 60 minutes, so its
+checks could not honestly finish by 15:20 — the brief's own rule. **(2) THE NUMBER TAKEN WHOLE,** over widening
+the tail: the tail matches all 15 once asked from the right place, and widening it would be the blind widening
+the brief forbids. **(3) ONE MATCHER, LIFTED INTO A NAMED CONSTANT** in `lexicon_compliance`, over importing
+its two private pieces: the rule's inline extras are part of its decision, so importing `_ART_GAP` and
+`_ART_TAIL` alone would leave two matchers that can disagree; the lift is proved non-behavioural byte for byte.
+**(4) THE KEYWORD EXEMPTION KEPT,** over replacing it with the tail now: that would add up to 11 findings,
+unclassified, against the brief's *none added*. **(5) THE 11 CARRIED IN G12's CLOSING TEXT,** over a new id now:
+a new id moves typed counts in four files, and their class is not yet known. **(6) THE ITALIC QUIET ONLY ON
+TRUE** — False, the notes covering the run and calling it plain, and None, nothing covering it, still flag:
+B1's pass changes nothing on None, so the italic it leaves is still unexplained. **(7) THREE HOUSE CHECKERS
+DIVERGED MID-SESSION** — `verify_confidential.py`, `cycle_evidence.py` and `install_hooks.py`, the shared
+copies rewritten at 13:53 by the house's running session at unchanged versions — declared, never adopted
+mid-change; the next opening adopts them. **(8) THE PULL REQUEST's TITLE LEFT** for the build, which lands the
+fix it names. **(9) NOTHING STARTED, AND THE NEXT PROMPT IS 14.11's BUILD,** over step 15's: step 14 is not
+closed. Keep-awake was refused by the app's own check; the session carried on without it.
