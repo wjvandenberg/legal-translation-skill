@@ -2823,3 +2823,25 @@ run, its WARN contract's - so each verdict stays its own and never a missing fil
 lift's byte proof is pinned to `c33f001`, on main, never to a branch commit a squash-merge leaves unreachable.
 **(7)** G6 closed with the step, as section 3.14 disposes of it. **(8)** Three house checkers declared by
 content, the house releasing them mid-session at unchanged versions; the next opening adopts them.
+
+## 2026-11-12 (2) — step 15 planned, unattended, in the conducting session; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-12, QUOTED WHOLE,** typed into the session that now conducts: *"Continue and don't bother me until close of step 15, merge everything at the end automatically, and start new sessions yourself as nested sessions automatically, without my input."* **No question
+was asked; each choice below is THE SESSION'S, its recommended answer, for him to confirm or overturn.**
+
+**WHERE IT RAN:** the conductor tried to start step 15's planning as a nested session and the app refused — it
+starts one only on a turn Wouter typed, and this turn was woken by a background watch on #195. So the plan was
+written here; recorded so the next conductor starts its sessions ON his turn, each finished one waking it.
+
+**THE MEASUREMENT** *(section 3.15 owns the table)*: 132 of 3,996 corpus runs bold or italic by the style
+cascade while extraction emits them plain, in 4 of 10 documents; 0 the other way; the toggle readings never
+disagree. And G9's first half rests on a premise that does not hold: the source segments are in the notes,
+`tc_segments`, aligned with `en_segments` on 81 of 81 tracked-change paragraphs.
+
+**(1) 15.1 EMITS ONE SPARSE KEY, `resolved`,** only on a run whose cascade differs from what is emitted today, over
+a full object on every run or a side file: section 3.9 says the step adds fields to the notes; existing keys stay
+untouched; the operator's reading cost follows the 132 runs; 6 of 10 documents' notes stay byte-identical.
+**(2) ECMA-376's TOGGLE RULE,** over last-wins: the corpus never tells them apart, so the specification decides, a
+synthetic fixture proving it. **(3) G9's FIRST HALF CLOSES AT 15.3 BY READING `tc_segments`,** over the schema
+change its row assumed: the datum is already there, and the frozen intermediates then stand. **(4) THE ORDER 15.1,
+15.2, 15.3,** 15.2 the rebuild probe, put to Wouter at step 15's close and never a silent step into step 16.

@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-12, 14.11 RESUMED — SESSION PURPOSE — what · how · purpose:** sub-step 14.11 finished: its build, staged on 2026-11-11, committed, its full run, its filing, and #195 squash-merged, closing step 14 · VERIFY and TEST retaken on the final diff through the cycle gate; the one full run on the exact commit; the records spliced byte for byte; no questions to Wouter *(Wouter, 2026-11-12)* · **so that G12 closes with no true positive silenced, step 14 closes, and step 15 branches from main** *(written immediately after the tag `rollback-2026-11-12-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-12 (2), STEP 15's PLAN — SESSION PURPOSE — what · how · purpose:** step 15, formatting part 1, planned as section 3.15 - its sub-steps, each with its controls, triaged HEAVY, MEDIUM or LIGHT - committed and pushed on `feature/step15-formatting-part-1` · the code and its readers measured first, counts only; every question taking the recommended answer, unattended at Wouter's word of 2026-11-12; the documents spliced byte for byte and checked by D and DT through the cycle gate · **so that formatting part 1 is built against a plan written against the code, not a guess** *(written immediately after the tag `rollback-2026-11-12b-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -3010,6 +3010,65 @@ the edited script, and the full run once, before the push.
 > its own controls against the code before it; the corpus gaining no finding but 14.4's missed alarm, filed as G14.
 
 ---
+
+### 3.15 Formatting, part 1 — step 15 · *option 3, its first part* · **PLANNED 2026-11-12, unattended — the session's answers, Wouter's to overturn**
+
+> **FOR THE BUILD — THE PLAN, 2026-11-12.** Section 3.9 owns WHAT step 15 is — extraction EMITS the formatting in
+> force on each run, nothing consumes it, every output byte-identical, and the rebuild probe answered. This owns
+> HOW and the order. **Needs first:** nothing — step 14 closed with #195. **Unblocks:** step 16, with step 11's
+> delivered-document check, which exists. **Done when:** 15.1 to 15.3 each meet their own *Done when* below.
+> *(Written in the conducting session, not a nested one: the app starts a nested session only on a turn Wouter
+> typed — `DECISIONS-LOG.md`, 2026-11-12 (2).)*
+
+**Measured 2026-11-12, counts only** — `temp/s1112k_style_probe.py` over the pristine corpus, its positive
+control planted and firing; the segment count over the 13 recorded workdirs:
+
+| what | measured |
+|---|---|
+| text runs in the corpus's Word documents | 3,996, in 10 of 10 `.docx`; the 1 legacy `.doc` not read |
+| runs the style cascade makes bold or italic while extraction emits them plain | **132** — 130 bold, 2 italic, in 4 of 10 documents |
+| runs extraction emits bold or italic that the cascade makes plain | 0 |
+| runs carrying a character style | 9 |
+| runs where the two toggle readings, last-wins and ECMA-376's, disagree | 0 — reachable only by a synthetic fixture |
+| shipped scripts naming `paragraphs.json`, of 20 | 17; reading a run's `bold` or `italic`, 2 — apply and `post_process` — and the operator, by `04-translate.md` |
+| tracked-change paragraphs, 13 recorded workdirs | 81, 412 segments; `tc_segments`, the SOURCE segments extraction writes, beside `en_segments` on 81 of 81, same length and type order on 81 of 81; 167 source segments with whitespace at an edge |
+
+**The sub-steps,** in this order:
+
+- **15.1 — `extract_paragraphs.py`: the resolver, emitted sparsely.** HEAVY, both trees. One function resolves a
+  run's bold and italic through the cascade — document defaults, the paragraph style's `basedOn` chain (the
+  default paragraph style where none is set), the character style's chain, then the run's own `rPr` — with
+  ECMA-376's toggle rule (a toggle set true in the style hierarchy flips the inherited value; direct formatting
+  is absolute). **A run whose resolved value differs from what extraction emits today gains ONE key, `resolved`,
+  holding only the differing properties; every existing key untouched, and no key where nothing differs** — so
+  6 of 10 corpus documents' notes are byte-identical. *TP:* synthetic — document defaults, a `basedOn` chain, the
+  default paragraph style, a character-style chain, the toggle pair, italic: each reported. *FP:* a direct
+  `w:b w:val="0"` defeating a style, a run already bold, the paragraph mark's own `rPr`: none reported.
+  **Acceptance, the byte comparison, proved able to fail by a planted change:** (i) the new notes with `resolved`
+  removed are byte-identical to today's, all 10 corpus documents and every synthetic fixture; (ii) the mechanical
+  half over the 13 frozen workdirs, their notes given the key, delivers byte-identical documents — every reader
+  ignores it. The notes' size measured before and after (what the operator reads). *Done when:* both hold.
+- **15.2 — the rebuild probe, answered.** LIGHT, documents; it may ride with 15.1's session. From 15.1's output and
+  apply's code: can step 16 layer per-span consumption onto apply's present `en_runs` path, or must extraction and
+  apply be replaced wholesale? Answered in section 3.9's record and the decisions log, with its counts, and put to
+  Wouter at step 15's close — never a silent step into step 16. *Done when:* the answer is written, either way.
+- **15.3 — `validate_segment_shapes.py`: G9's first half, by reading `tc_segments`.** HEAVY, both trees. G9's row
+  took the source text to be absent from the notes, having measured `en_segments` alone; it is beside them, in
+  `tc_segments`, aligned on 81 of 81 — **so no schema change, and the frozen intermediates stand.** The
+  alpha-collision rule asks, of the paired source segment, whether apply's boundary-whitespace restoration will
+  supply the space — apply's own restoration, imported where it can be, never a second statement of it; where the
+  two lists do not align the rule runs as today. *TP:* a collision the restoration does not cure still fires. *FP:*
+  G9's D08 shape, invented — a deletion declared without the space its source segment ends on — quiet now and
+  proved to have fired at the pin. *Corpus:* 0 before and after (the recorded notes are post-compliance, so the
+  synthetic is the proof). *Done when:* G9 CLOSED, both halves, and with it step 15.
+
+**What every sub-step must NOT touch:** an existing key of the notes; apply's behaviour (step 16's); the operator's
+instructions (step 17's); a gate's strength or an exit code; the anti-drift safeguards; the frozen intermediates,
+never regenerated — step 15 moves no behaviour. **Size:** two HEAVY sub-steps and one LIGHT — two or three
+sessions, one branch, `feature/step15-formatting-part-1`, one pull request, opened by 15.1 and squash-merged by
+the session that closes 15.3. **VERIFY:** each sub-step's controls red at the pinned old code first, the byte
+comparison, the parity check, the three confidentiality controls. **TEST:** the suites that drive extraction or
+the segment check, both trees; the smoke suite; the full run once, before the push.
 
 ## 4. How each step is tested — THE METHOD
 
