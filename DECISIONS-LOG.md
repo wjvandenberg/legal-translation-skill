@@ -2742,3 +2742,84 @@ over recording a composed result. **(15) NOT THE SESSION'S BUT WOUTER'S: THE SEC
 his word of 2026-11-10, *"Stop, give preference to house tooling, I want to fix that first."*, and taken a third
 time on the same commit at his word of 2026-11-11, *"Yes, restart it"*, beside the house tooling's own suite: it
 passed, 97 of 97.
+
+## 2026-11-11 — sub-step 14.10, unattended: G12 classified by shape; a 14.11 added; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-11, QUOTED WHOLE,** typed into 14.9.7's session, which then conducted: *"Start this
+and all other new sessions after it as nested sessions automatically. Do all checks and test runs etc only once per
+session, at the end. Assume all recommended answers going forward. Continue like this until 15:20h without any
+further input from me or otherwise. Merge at the end of each step (e.g. step 14) without asking my approval at that
+time - I give it to you now already. Other parts we'll merge at 15:20h"*. **No question was asked; each choice
+below is THE SESSION'S, its recommended answer, for him to confirm or overturn — none is his ruling.**
+
+**THE MEASUREMENT** *(the register's G12 row owns it)*: all 16 classified by `tools/g12_shapes.py`, never read —
+15 citations of legislation or a regulator, named in the same sentence, that `post_process` keeps as external and
+`quality_check`'s 20-entry keyword list misses; 1 italic the notes declare, flagged by the word count B1 removed
+from `post_process`. All false positives; each blocks skill Step 9. The row's paragraph-scope hypothesis refuted.
+
+**(1) THE FIX GOES TO A NEW HEAVY SUB-STEP, 14.11,** over phase 3's repairs or this session: it is step 14's own
+class, check scoping; it blocks skill Step 9 on two corpus documents now, so phase 3 would meet it at once; and
+14.10 was approved as touching no shipped file. **(2) THE ITALIC GOES WITH IT,** over steps 15 to 17: the same
+script and the same shape of fix — ask what `post_process` already decides. **(3) G12 AMENDED AND KEPT OPEN,** over
+two new rows: its subject is exactly these 16, and a new id moves typed counts in four files. **(4) THE ARTICLE FIX
+READS `lexicon_compliance`'s LEGISLATION TAIL,** never `post_process`'s classifier, which reads `of the Agreement`
+as external — measured on a synthetic input — so deferring to it would silence a true positive. **(5) THE
+INSTRUMENT IS COMMITTED** in `tools/` with its suite in the runner list, over `temp/`: it holds no real string, its
+suite is the confidentiality proof, and it is re-run when 14.11 lands. **(6) THE PULL REQUEST STAYS OPEN,** over
+merging on green: 14.10 no longer ends step 14, and his words merge only a step's end before 15:20; 14.11 continues
+on the same branch and pull request. **(7) STEP 14 STAYS OPEN, SO THE NEXT PROMPT IS 14.11's,** over step 15's.
+**(8) A HOUSE SESSION'S QUIET WINDOW HONOURED** — its timing asked for one; every suite here held from 12:22 to
+13:00. **(9) `board_guard.py` v3 ADOPTED AT THE OPENING,** byte for byte, as the brief said. **(10) ONE
+PUBLICATION FINDING DECLARED BY CONTENT,** over editing the house's file or the control: v3's test string `text:`
+plus a newline escape reads as a drive letter to `publication_check` — no path; changing a confidentiality control
+unattended is Wouter's to decide, so the pattern's false positive is carried as a follow-up.
+
+## 2026-11-11 — sub-step 14.11, unattended: parked at the plan; the choices the session's own
+
+**Wouter's words of 2026-11-11 are quoted whole in the entry above.** No question was asked; **each choice below
+is THE SESSION'S, its recommended answer, for him to confirm or overturn — none is his ruling.**
+
+**THE MEASUREMENT** *(section 3.14 of the build plan owns it, in 14.11's plan)*: 14.4's legislation tail is quiet
+on 12 of G12's 15 article findings where `quality_check`'s match ends, and on 15 of 15 from the whole number — the
+three misses a three-digit number the rule's pattern cuts short; the italic declared, 1 of 1; and 11 references
+the keyword exemption silences that the tail calls internal.
+
+**(1) PARKED AT THE PLAN,** over building: started at 14:00, HEAVY, the full run alone 35 to 60 minutes, so its
+checks could not honestly finish by 15:20 — the brief's own rule. **(2) THE NUMBER TAKEN WHOLE,** over widening
+the tail: the tail matches all 15 once asked from the right place, and widening it would be the blind widening
+the brief forbids. **(3) ONE MATCHER, LIFTED INTO A NAMED CONSTANT** in `lexicon_compliance`, over importing
+its two private pieces: the rule's inline extras are part of its decision, so importing `_ART_GAP` and
+`_ART_TAIL` alone would leave two matchers that can disagree; the lift is proved non-behavioural byte for byte.
+**(4) THE KEYWORD EXEMPTION KEPT,** over replacing it with the tail now: that would add up to 11 findings,
+unclassified, against the brief's *none added*. **(5) THE 11 CARRIED IN G12's CLOSING TEXT,** over a new id now:
+a new id moves typed counts in four files, and their class is not yet known. **(6) THE ITALIC QUIET ONLY ON
+TRUE** — False, the notes covering the run and calling it plain, and None, nothing covering it, still flag:
+B1's pass changes nothing on None, so the italic it leaves is still unexplained. **(7) THREE HOUSE CHECKERS
+DIVERGED MID-SESSION** — `verify_confidential.py`, `cycle_evidence.py` and `install_hooks.py`, the shared
+copies rewritten at 13:53 by the house's running session at unchanged versions — declared, never adopted
+mid-change; the next opening adopts them. **(8) THE PULL REQUEST's TITLE LEFT** for the build, which lands the
+fix it names. **(9) NOTHING STARTED, AND THE NEXT PROMPT IS 14.11's BUILD,** over step 15's: step 14 is not
+closed. Keep-awake was refused by the app's own check; the session carried on without it.
+
+## 2026-11-12 — sub-step 14.11 built and step 14 closed: Wouter's three answers, and the build's own choices
+
+**WOUTER'S WORDS OF 2026-11-12, about 09:25,** typed into the 14.10 session, which conducts, relayed here and
+quoted whole: *"Continue and don't bother me until close of step 15, merge everything at the end
+automatically, and start new sessions yourself as nested sessions automatically, without my input."* So 14.11
+resumed from where it parked at his request the evening before, no question put to him; #195's merge rests on
+his answer (1) below and on these words.
+
+**WOUTER'S ANSWERS OF 2026-11-11, about 15:55, through the question tool — HIS RULINGS,** the override of the
+morning having lapsed at 15:20: **(1)** *"Build, merge on green"* — 14.11 built in both trees, every check once at
+the end with the one full run, #195 squash-merged on green; **(2)** *"One named piece in lexicon_compliance"* — the
+legislation test lifted into one constant both scripts use, the warning built from it proved byte for byte; **(3)**
+*"Follow-up for phase 3"* — the keyword exemption untouched, the 11 masked references noted in G12's closing text
+and routed to phase 3's repairs, classified by shape there. **The session's own choices, for him to confirm or
+overturn — none is his ruling:** **(4)** `tools/g12_shapes.py` asks the rule as skill Step 9 runs it — the whole
+number, the shared tail, the notes — over keeping a copy that would read VOID; its suite re-plants two citations
+so every shape field keeps a positive control. **(5)** `tests/test_checks_can_fail.py` copies the two new
+siblings wherever it copies `quality_check` alone - its truncation guard's case and, caught by TEST's first
+run, its WARN contract's - so each verdict stays its own and never a missing file's. **(6)** The
+lift's byte proof is pinned to `c33f001`, on main, never to a branch commit a squash-merge leaves unreachable.
+**(7)** G6 closed with the step, as section 3.14 disposes of it. **(8)** Three house checkers declared by
+content, the house releasing them mid-session at unchanged versions; the next opening adopts them.

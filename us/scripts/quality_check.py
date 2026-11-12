@@ -23,7 +23,9 @@ Usage:
     python quality_check.py <document.xml> [--verbose] [--with-source <paragraphs.json>]
 
 The --with-source flag enables truncation detection by comparing English length
-against the Italian source stored in paragraphs.json.
+against the Italian source stored in paragraphs.json. It also lets the spurious-italic
+rule (15) read which runs the notes DECLARE italic, as post_process's pass reads them:
+a declared run is no finding.
 """
 import sys
 import os
@@ -77,6 +79,19 @@ try:
     )
 except (ImportError, SyntaxError) as _exc:  # deleted, or cut short: a broken install, SKILL.md rule 6
     _sibling_integrity_exit('source_language_markers.py', _exc)
+
+# TWO SIBLINGS ASKED, NEVER COPIED (register G12; sub-step 14.11). The internal-reference rule asks
+# lexicon_compliance's own legislation look-ahead - one test, so the two scripts cannot disagree on what cites
+# legislation - and the spurious-italic rule asks post_process's own reader of the operator's notes, the question
+# register B1's fix put to them. Neither has a fallback: a missing or cut-short sibling is a broken install.
+try:
+    from lexicon_compliance import ART_LEGISLATION_FOLLOWS  # noqa: E402
+except (ImportError, SyntaxError) as _exc:  # deleted, or cut short: a broken install, SKILL.md rule 6
+    _sibling_integrity_exit('lexicon_compliance.py', _exc)
+try:
+    from post_process import load_declared_notes, _notes_norm, _declared_italic  # noqa: E402
+except (ImportError, SyntaxError) as _exc:  # deleted, or cut short: a broken install, SKILL.md rule 6
+    _sibling_integrity_exit('post_process.py', _exc)
 
 
 def _check_self_integrity():
@@ -621,13 +636,22 @@ def check_uk_spelling(root, verbose):
     return issues
 
 def check_article_refs(root, verbose):
-    """Check 12: Article for internal cross-refs (should be Clause)."""
+    """Check 12: Article for internal cross-refs (should be Clause).
+
+    A reference followed in its sentence by a legislation tail - `of the Sample Act`, `, paragraph 2, of
+    the Sample Decree` - cites legislation and is no finding: the tail is lexicon_compliance's own
+    look-ahead, asked where the WHOLE number ends (register G12; sub-step 14.11). The number is read whole
+    because the pattern once took one or two digits with nothing after them, so a three-digit article was
+    cut inside its number and the tail was asked from its last digit. The keyword exemption is unchanged:
+    it silences a whole paragraph, internal references included, which G12 records as a follow-up."""
     issues = []
     for p in root.iter(f'{{{W}}}p'):
         full = ''.join(t.text or '' for t in p.iter(f'{{{W}}}t'))
         is_leg = any(kw in full for kw in LEGISLATION_KW)
         if not is_leg:
-            for m in re.finditer(r'\bArticles?\s+\d{1,2}(?:\.\d+)*', full):
+            for m in re.finditer(r'\bArticles?\s+\d+(?:\.\d+)*', full):
+                if ART_LEGISLATION_FOLLOWS.match(full, m.end()):
+                    continue
                 issues.append(f"'{m.group()}' in '{full[:70]}'")
     return issues
 
@@ -857,8 +881,12 @@ def check_truncation(root, verbose, source_data=None):
 
     return issues
 
-def check_formatting(root, verbose):
-    """Check 15: Formatting issues (bold on definitions, spurious italic)."""
+def check_formatting(root, verbose, notes=None):
+    """Check 15: Formatting issues (bold on definitions, spurious italic).
+
+    `notes` is post_process's `load_declared_notes` mapping, or None: with it, a long italic run the
+    operator's notes DECLARE italic, or carry from an italic source run, is no finding - B1's question,
+    asked as post_process's italic pass asks it (register G12; sub-step 14.11). Without notes, as before."""
     issues = []
 
     for p in root.iter(f'{{{W}}}p'):
@@ -933,6 +961,12 @@ def check_formatting(root, verbose):
                 if len(text) <= 5 and re.match(r'^[\d\.\(\)a-z]+$', text):
                     continue
                 if len(text.split()) > 2:
+                    # Only a True answer silences it: a run the notes call plain, a run they do not
+                    # cover and a paragraph they do not reach are flagged exactly as before.
+                    if notes is not None:
+                        entry = notes.get(_notes_norm(full))
+                        if entry is not None and _declared_italic(entry, t.text) is True:
+                            continue
                     issues.append(f"Spurious italic run: '{text[:50]}' in para: '{full[:50]}'")
 
     return issues
@@ -1193,6 +1227,9 @@ def check(xml_path, verbose=False, source_json=None, variant='us',
     if source_json:
         with open(source_json, 'r', encoding='utf-8') as f:
             source_data = json.load(f)
+    # The operator's notes as post_process's italic pass reads them: None without --with-source or when
+    # they cannot be read, and then the spurious-italic rule behaves exactly as before.
+    declared_notes = load_declared_notes(source_json) if source_json else None
 
     # The UNTRANSLATED body, for the checks that must not report an anomaly the
     # document arrived with. Optional: without it those checks behave exactly as
@@ -1232,7 +1269,7 @@ def check(xml_path, verbose=False, source_json=None, variant='us',
         ('word_order', check_word_order),
         ('internal_article_refs', check_article_refs),
         ('that_precedes_follows', check_that_precedes),
-        ('formatting', check_formatting),
+        ('formatting', lambda r, v: check_formatting(r, v, declared_notes)),
         ('numbering', lambda r, v: check_numbering(r, v, source_root)),
         ('definition_order', check_definition_order),
     ]

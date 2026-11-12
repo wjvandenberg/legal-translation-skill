@@ -32,6 +32,7 @@
       {"name": "evidence_guard", "command": "uv run --with lxml python tests/test_evidence_guard.py", "count": "RESULT: [0-9]+ of ([0-9]+)"},
       {"name": "extraction_completeness", "command": "uv run --with lxml python tests/test_extraction_completeness.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "extraction_completeness [us]", "command": "uv run --with lxml python tests/test_extraction_completeness.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
+      {"name": "g12_shapes", "command": "uv run --with lxml python tests/test_g12_shapes.py", "count": "RESULT: [0-9]+ of ([0-9]+)"},
       {"name": "gate_tree_scan", "command": "uv run --with lxml python tests/test_gate_tree_scan.py", "count": "RESULT: [0-9]+ of ([0-9]+)"},
       {"name": "glossary_route", "command": "uv run --with lxml python tests/test_glossary_route.py", "count": "CHECKED:? +([0-9]+)"},
       {"name": "glossary_route [us]", "command": "uv run --with lxml python tests/test_glossary_route.py --variant us", "count": "CHECKED:? +([0-9]+)"},

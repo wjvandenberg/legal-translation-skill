@@ -203,7 +203,10 @@ for t in TREES:
 # it? 08-aux-and-quality.md says to run `--help` to see whether the guard fires. From below
 # __main__ that could never work, because argparse handles --help and exits first.
 gtmp = Path(tempfile.mkdtemp())
-shutil.copy(ROOT / "uk" / "scripts" / "source_language_markers.py", gtmp)
+# Every sibling quality_check imports above its guard, so the exit 3 below is the TRUNCATION's and never a
+# missing sibling's (sub-step 14.11 added lexicon_compliance and post_process).
+for _sib in ("source_language_markers.py", "lexicon_compliance.py", "post_process.py"):
+    shutil.copy(ROOT / "uk" / "scripts" / _sib, gtmp)
 full = (ROOT / "uk" / "scripts" / "quality_check.py").read_text(encoding="utf-8")
 # Cut at a top-level boundary AFTER the guard so the file still COMPILES. Where truncation
 # leaves invalid syntax Python raises SyntaxError before executing a line and no placement
@@ -411,7 +414,10 @@ for t in TREES:
     wtmp = Path(tempfile.mkdtemp())
     sdir = wtmp / "scripts"
     sdir.mkdir()
-    for f in ("verify_diligence.py", "quality_check.py", "source_language_markers.py"):
+    # quality_check's siblings too (sub-step 14.11): without them skill Step 9 exits 3 as a broken install, and the
+    # verdict is a FAIL this section did not induce
+    for f in ("verify_diligence.py", "quality_check.py", "source_language_markers.py", "lexicon_compliance.py",
+              "post_process.py"):
         shutil.copy(ROOT / t / "scripts" / f, sdir)
     wd = wtmp / "wd"
     (wd / "final" / "word").mkdir(parents=True)
