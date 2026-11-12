@@ -292,7 +292,12 @@ own = [x for x in own if x[0] not in DESCRIBES_NOT_MEMBER]
 # declaration is absent -- an exclusion that stops being true un-excludes itself instead of
 # quietly holding the number down. That is the difference between this and narrowing the
 # pattern, which the note above rules out.
-CLOSED_DEADLOCK = {"C17"}
+#
+# G9 LEFT ON 2026-11-12, AT SUB-STEP 15.3, the same way. Its row is the set's clearest instance — the segment check
+# called a deletion declared without its source's space a collision that apply's own restoration would have filled,
+# and declaring the space could deliver two. The check now asks apply's restoration, read from `tc_segments`, so a
+# compliant input exists again; the row declares both halves CLOSED, and the same policing holds it to that.
+CLOSED_DEADLOCK = {"C17", "G9"}
 for _f in sorted(CLOSED_DEADLOCK):
     if _f not in rows:
         fail("3c", f"{_f} is declared a closed deadlock but is not a register row")
@@ -314,13 +319,14 @@ print(f"  occurrences of 'fourteen' tied to this count in the document: {claims1
 # RE-DERIVED 2026-10-08, Wouter's: 18 -> 20. A24 and A25 joined on Step 10's wiring (#126) -- each now refused
 # at Step 10 with rule 5b the only exit -- so the pattern counts them, and the plan states TWENTY beside the
 # eighteen it was written on, which stays as dated history. The figure moves with a measurement, never to
-# make a count come out.
-EXPECT = 20
-claimed = "twenty" in doc.lower() and "twenty findings state" in doc.lower()
+# make a count come out. RE-DERIVED 2026-11-12, 20 -> 19: G9 closed at sub-step 15.3 (CLOSED_DEADLOCK above),
+# and the plan states NINETEEN beside the twenty, which stays as dated history too.
+EXPECT = 19
+claimed = "nineteen" in doc.lower() and "nineteen findings state" in doc.lower()
 if true_total != EXPECT:
     fail("3a", f"the wide pattern now gives {true_total}; the document is written against {EXPECT}")
 elif not claimed:
-    fail("3b", "the document does not state the twenty-row figure")
+    fail("3b", "the document does not state the nineteen-row figure")
 else:
     ok(f"the deadlock set is {true_total} rows and the document says so, with the set enumerated")
 

@@ -351,6 +351,41 @@ def distribute_text_across_elements(elements, text, preserve_source_boundary_whi
         if slice_text and (slice_text[0] == ' ' or slice_text[-1] == ' '):
             elem.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
 
+def effective_segment_texts(en_segments, source_texts):
+    """What each tracked-change segment will CARRY once apply has run, one entry per segment.
+
+    `en` missing or None -> the source stays, so the source text is what the segment beside it sees;
+    `''`                 -> the segment is cleared and counts as NO segment at all, which is why
+                            nearest_supplies_ws skips over empties rather than stopping at them;
+    else                 -> the authored English, INCLUDING a whitespace-only one, which after
+                            C17 is content rather than a clear-request.
+
+    Lifted unchanged out of apply_trackchanges_inplace (step 15.3), so that
+    validate_segment_shapes.py asks apply's own question of the notes rather than a copy of it.
+    """
+    effective = []
+    for _es, _src in zip(en_segments, source_texts):
+        _v = _es.get('en') if 'en' in _es else None
+        if _v is None:
+            effective.append(_src)
+        else:
+            effective.append(_v if isinstance(_v, str) else str(_v))
+    return effective
+
+def nearest_supplies_ws(effective, i, back):
+    """Does the nearest non-empty segment beside segment `i` already supply whitespace here?
+
+    `back` looks left, at the end of the segment before; otherwise right, at the start of the
+    segment after. It is the flag distribute_text_across_elements takes as `prev_boundary_has_ws`
+    / `next_boundary_has_ws` (C16). Lifted unchanged out of apply_trackchanges_inplace (step 15.3).
+    """
+    rng = range(i - 1, -1, -1) if back else range(i + 1, len(effective))
+    for j in rng:
+        if effective[j]:
+            return effective[j].endswith((' ', '\t')) if back \
+                else effective[j].startswith((' ', '\t'))
+    return False
+
 def apply_trackchanges_inplace(orig_p, en_text, it_text,
                                en_deleted=None, it_deleted=None,
                                en_segments=None,
@@ -499,28 +534,13 @@ def apply_trackchanges_inplace(orig_p, en_text, it_text,
             # of them is written. It has to be computed up front: once the loop starts
             # overwriting `.text`, the source text of a later segment is gone and the
             # authored text of an earlier one has replaced it, so neither can be consulted.
-            #
-            # `None` -> the source stays, so the source text is what the neighbor will see;
-            # `''`   -> the segment is cleared and is NOT a neighbor at all, which is why
-            #           the searches below skip over empties rather than stopping at them;
-            # else   -> the authored English, INCLUDING a whitespace-only one, which after
-            #           C17 is content rather than a clear-request.
-            effective = []
-            for _es, _xs in zip(en_segments, merged_xml):
-                _v = _es.get('en') if 'en' in _es else None
-                if _v is None:
-                    effective.append(''.join(e.text or '' for e in _xs['elements']))
-                else:
-                    effective.append(_v if isinstance(_v, str) else str(_v))
+            # The two functions it calls are module-level so the segment-shape check can
+            # ask the same question of the notes (register G9, step 15.3).
+            effective = effective_segment_texts(
+                en_segments, [''.join(e.text or '' for e in _xs['elements']) for _xs in merged_xml])
 
             def _boundary_ws(i, back):
-                """Does the nearest non-empty neighbor already supply whitespace here?"""
-                rng = range(i - 1, -1, -1) if back else range(i + 1, len(effective))
-                for j in rng:
-                    if effective[j]:
-                        return effective[j].endswith((' ', '\t')) if back \
-                            else effective[j].startswith((' ', '\t'))
-                return False
+                return nearest_supplies_ws(effective, i, back)
 
             for seg_i, (en_seg, xml_seg) in enumerate(zip(en_segments, merged_xml)):
                 # 'en' missing/None: leave source text. '': clear run (the

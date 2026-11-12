@@ -2869,3 +2869,29 @@ close, and step 16 does not start on it before)*: apply already writes per span,
 absolute; the 3 places reading a source run's formatting can read `resolved`, and the 2 writers of the
 off-flags can write one only where the styles disagree — which needs what the styles give WITHOUT the run's own
 formatting, not in the notes: step 16's first design choice.
+
+## 2026-11-12 (4) — sub-step 15.3 built and step 15 closed, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-12, QUOTED WHOLE,** typed into the session that conducts this chain: *"Continue and don't bother me until close of step 15, merge everything at the end automatically, and start new sessions yourself as nested sessions automatically, without my input."* **No
+question was asked; each choice below is THE SESSION'S, its recommended answer, for him to confirm or overturn.**
+
+**(1) APPLY'S TEST LIFTED, NOT RESTATED:** what each segment will carry and whether the nearest non-empty
+segment beside it supplies the space sat inside `apply_trackchanges_inplace`; both are now module-level, moved
+unchanged, and the check imports them with `distribute_text_across_elements` — over a second statement of them in
+the check, or a run of apply's whole paragraph, whose post-passes reshape the segments. Apply's code changed;
+its deliveries did not, 13 of 13 workdirs per tree. **(2) ONE STAND-IN PER SEGMENT,** holding the joined source
+text: faithful on 379 of 379 corpus segments, 70 of 70 paragraphs aligned; the two shapes where it can part, an
+empty edge element and segments the two scripts count differently, declared. **(3) ONLY THE ALPHA-COLLISION
+RULE ASKS:** the digit rule and a view's double space share the blind spot and are left open, a gate moving no
+further than G9's own false positive. **(4) G9 LEAVES THE NO-COMPLIANT-REPAIR SET,** twenty to nineteen,
+policed beside C17 — over a closed row kept in a count of deadlocks an operator can still walk into.
+**(5) A NEW SUITE PINNED AT `8961ec1`,** main's last commit before step 15, over the branch's own commits,
+which a squash-merge leaves unreachable. **(6) THE NEW IMPORT DECLARED** in the sibling-import suite, with no
+fallback: a missing apply is a broken install for the check. **(7) THE REVIEW'S SEVEN:** the audit's figure
+filed; two limits declared; the two sibling rules left open; the shared module name across trees in one
+process, the import's start-up cost and a loop's special case not changed. **(8) AT THE OPENING:** the house's
+`install_hooks.py` v15 adopted byte for byte; its `auto_mode.py` v8, not yet committed there, declared by content.
+
+**15.2, PUT TO WOUTER AT STEP 15's CLOSE, AS PLANNED:** LAYERED, NOT REBUILT — section 3.9's record. Step 16
+starts on his word; its first design choice is where what the styles give WITHOUT a run's own formatting comes
+from.

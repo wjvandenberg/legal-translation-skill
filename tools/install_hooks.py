@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 14 (2026-11-12)
+"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 15 (2026-11-12)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -85,6 +85,15 @@ v14 (2026-11-12) - THE SELFTEST'S SCRATCH REPOSITORIES ON FEWER GIT CALLS, nothi
 writes its scratch repository's settings - housekeeping off, the identity, house.python - into that repository's own
 config file in one plain write, _scratch_config(), and housekeeping off into the bare scratch remote's, whose receiving
 side ran it after every push it accepted: 275 git processes to 254, every case and every push unchanged.
+
+v15 (2026-11-12, the same day) - THE SCRATCH REMOTE IS READ BY --git-dir, AND A READ THAT FAILS IS NAMED. push_arms()
+asked its bare scratch remote what it held by running git INSIDE it. Under safe.bareRepository=explicit - git's
+hardening against a planted bare repository, which a terminal can set for every git it starts - git refuses that, and
+on_remote() took the refusal for "the branch is not there": in such a terminal five arms MISSed while every push had
+landed, and the arms asserting "not on the remote" PASSED FOR THE WRONG REASON. Measured: one tree's full run red in a
+terminal setting it and green in a shell that did not, and the selftest red here with only that setting added. Now the
+remote is named with --git-dir and read under the strict setting in every environment, so code that reads a bare
+repository by standing in it fails everywhere; a read neither found nor absent raises. The defect is older than v14.
 
 WHERE THE SOURCES COME FROM. A directory named 'hooks' beside this file. In a project that
 is tools/hooks/; in the shared folder it is standard-scripts/hooks/. Discovered rather
@@ -400,6 +409,10 @@ def guard_bites(root: Path) -> tuple[bool, str]:
 MAIN_OVERRIDE = "HOUSE_ALLOW_MAIN_PUSH"
 FULL_RUN_OVERRIDE = "HOUSE_PUSH_WITHOUT_FULL_RUN"
 
+#: v15: git's hardening against a planted bare repository, which push_arms() reads its scratch remote under in every
+#: environment, so code that reads a bare repository by standing in it fails here and not only where a shell sets it.
+STRICT_BARE = "'safe.bareRepository=explicit'"
+
 #: v8: what push_arms() proves, one line per arm, in the order it runs them.
 PUSH_ARMS = {
     "a": "a push no full run vouches for is refused",
@@ -535,8 +548,16 @@ def push_arms(hook: Path, work: Path, checker_dir: Path = HERE, only=None) -> di
         return r.returncode, r.stdout + r.stderr
 
     def on_remote(branch, kind="heads"):
-        r = _git(remote, "rev-parse", "--verify", "--quiet", f"refs/{kind}/{branch}")
-        return r.stdout.strip() if r.returncode == 0 else None
+        # v15: THE BARE REMOTE NAMED BY --git-dir, NEVER READ BY STANDING IN IT, and under the strict setting in every
+        # environment - the docstring's v15 note says why. A read that is neither found (0) nor absent (1, silent)
+        # raises, so a refusal can never pass for "not on the remote" again.
+        r = _git(work, "--git-dir", str(remote), "rev-parse", "--verify", "--quiet", f"refs/{kind}/{branch}",
+                 env=dict(os.environ, GIT_CONFIG_PARAMETERS=STRICT_BARE))
+        if r.returncode == 0:
+            return r.stdout.strip()
+        if r.returncode == 1 and not r.stderr.strip():
+            return None
+        raise subprocess.CalledProcessError(r.returncode, r.args, r.stdout, r.stderr)
 
     def commit(name, body):
         (repo / name).write_bytes(body)

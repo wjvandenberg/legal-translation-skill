@@ -7,7 +7,9 @@ translate_headers_footers (the side-part arm's reader, lazily), translate_header
 (graphic metadata), repack_docx -> lexicon_compliance (a best-effort language agreement). The fifth,
 validate_en_runs -> reorder_definitions, has no fallback at all; nor, since sub-step 14.11, have the sixth and
 seventh, quality_check -> lexicon_compliance (its legislation tail) and quality_check -> post_process (its reader of
-the operator's declared italic). None of them could tell a sibling that is
+the operator's declared italic); nor, since sub-step 15.3, has the eighth, validate_segment_shapes ->
+apply_translations_textmatch (the boundary-whitespace restoration it asks, register G9). None of them could tell a
+sibling that is
 ABSENT from one that is PRESENT BUT CUT SHORT, which is the broken install SKILL.md rule 6 answers by
 re-installing: a cut mid-statement gave a raw traceback, or - where the handler was broad - a control that
 silently went dark; a clean cut before the sibling's own check left its names missing, and the fallback ran as
@@ -62,13 +64,17 @@ ROUTES = [
     # neither has a fallback, so a DELETED sibling is a broken install there too
     ("quality_check.py", "lexicon_compliance.py", "load", False),
     ("quality_check.py", "post_process.py", "load", False),
+    # sub-step 15.3: the segment check asks apply's own boundary-whitespace restoration (register G9); no fallback
+    ("validate_segment_shapes.py", "apply_translations_textmatch.py", "load", False),
 ]
 # the names each importer asks of its sibling: a clean cut before the sibling's own check must remove every one
 NAMES = {"post_process.py": ["will_fix_spacing_fire", "load_declared_notes", "_notes_norm", "_declared_italic"],
          "translate_headers_footers.py": ["_field_aware_text_and_fields", "_para_text"],
          "extract_paragraphs.py": ["_GRAPHIC_ATTR_SURFACES", "graphic_metadata_surfaces"],
          "lexicon_compliance.py": ["_guess_language", "ART_LEGISLATION_FOLLOWS"],
-         "reorder_definitions.py": ["find_definitions_section_in_texts"]}
+         "reorder_definitions.py": ["find_definitions_section_in_texts"],
+         "apply_translations_textmatch.py": ["distribute_text_across_elements", "effective_segment_texts",
+                                             "nearest_supplies_ws"]}
 FROM_RE = re.compile(r"^[ \t]*from[ \t]+([A-Za-z_]\w*)[ \t]+import[ \t(]", re.M)
 # `import a, b as c` names every module in the list, not only the first
 IMPORT_RE = re.compile(r"^[ \t]*import[ \t]+([A-Za-z_][\w.]*(?:[ \t]+as[ \t]+\w+)?(?:[ \t]*,[ \t]*[A-Za-z_][\w.]*"
