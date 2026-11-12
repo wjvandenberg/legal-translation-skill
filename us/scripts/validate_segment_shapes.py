@@ -21,7 +21,8 @@ the segment-boundary level, and warns about the shapes of splits that
     an ins/del that starts with a noun — double-article / stranded
     preposition risk;
   * a segment ending with an alpha character abutting the next segment
-    starting with an alpha character, with no intervening whitespace —
+    starting with an alpha character, with no intervening whitespace and
+    none that apply will restore from the source segments in `tc_segments` —
     the gotcha for non-Latin script sources (Chinese, Japanese, Korean,
     Thai, Lao, Khmer, Cyrillic, Greek, Arabic, Hebrew, Devanagari, etc.),
     which either carry no inter-segment whitespace at all or whose
@@ -68,6 +69,7 @@ import json
 import os
 import re
 import sys
+import xml.etree.ElementTree as ET
 
 def _check_self_integrity():
     """Detect install-time truncation. Whole-file scan tolerates null-padding."""
@@ -91,6 +93,41 @@ def _check_self_integrity():
 
 _check_self_integrity()
 
+# G9's FIRST HALF (step 15.3): the alpha-collision rule asks APPLY'S OWN boundary-whitespace
+# restoration whether it will supply the space, so apply is imported, never restated. No .pyc
+# beside it in a shipped tree: the guard precedes the import (register I-18).
+sys.dont_write_bytecode = True
+_SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+if _SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPTS_DIR)
+
+
+def _sibling_integrity_exit(name, exc):
+    """A sibling module this script imports is missing or cut short: a broken install, which SKILL.md rule 6
+    answers by re-installing. So the banner and the exit 3 this script prints for its OWN truncation - never a
+    raw traceback and exit 1, and never a gate's costume. Only ImportError (deleted, or cut before the names it
+    is asked for) and SyntaxError (cut mid-statement) arrive here: a broader class would dress a real defect as
+    a broken install - and an ImportError about some OTHER module, raised inside the sibling, is that sibling's
+    defect, so it is raised as it is."""
+    if isinstance(exc, ImportError) and exc.name not in (None, os.path.splitext(name)[0]):
+        raise exc
+    bar = "=" * 60
+    for line in ("", bar, "[skill] FILE INTEGRITY CHECK FAILED — script truncated.",
+                 f"  File: {os.path.join(os.path.dirname(os.path.abspath(__file__)), name)}",
+                 f"  Needed by: {os.path.basename(__file__)} ({type(exc).__name__}: {exc})",
+                 "  Re-install the skill from the .skill / .zip archive.", bar, ""):
+        print(line, file=sys.stderr)
+    sys.exit(3)
+
+
+try:
+    from apply_translations_textmatch import (  # noqa: E402
+        distribute_text_across_elements,
+        effective_segment_texts,
+        nearest_supplies_ws,
+    )
+except (ImportError, SyntaxError) as _exc:  # deleted, or cut short: a broken install, SKILL.md rule 6
+    _sibling_integrity_exit('apply_translations_textmatch.py', _exc)
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -159,6 +196,51 @@ def _is_tc(seg):
 def _is_regular(seg):
     return _seg_type(seg) == 'regular'
 
+def _restoration(segs, tc_segs):
+    """Per segment, whether the text APPLY writes (starts, ends) with a space or tab.
+
+    Register G9, first half. apply restores ONE character of the source's boundary whitespace
+    onto a segment whose English dropped it, unless the nearest non-empty segment beside it
+    already supplies one (C16). The source is in the notes beside the English — `tc_segments`, written
+    by extraction, one entry per `en_segments` entry — so each segment is put through apply's
+    own `distribute_text_across_elements`, on a stand-in element holding its source text, with
+    apply's own test of the segments beside it. One stand-in per segment is apply's merged run of elements with
+    its inner boundaries dropped; the restoration reads only the outer two edges, and those
+    agreed with the joined source text on 379 of 379 corpus segments (an EMPTY edge element is
+    the one shape where they part — declared, PLAN-2-step-b.md section 3.15).
+
+    Returns None — and the rule then runs exactly as before — where the two lists do not pair
+    one for one: no `tc_segments`, or a different type sequence (and so a different length).
+    """
+    if not (isinstance(tc_segs, list)
+            and all(isinstance(s, dict) for s in segs)
+            and all(isinstance(t, dict) for t in tc_segs)
+            and [_seg_type(s) for s in segs] == [t.get('type') for t in tc_segs]):
+        return None
+    sources = [t.get('text') if isinstance(t.get('text'), str) else '' for t in tc_segs]
+    effective = effective_segment_texts(segs, sources)
+    edges = []
+    for i, seg in enumerate(segs):
+        en = seg.get('en')
+        if not isinstance(en, str) or not en:
+            edges.append((False, False))    # never one side of a join the rule reads
+            continue
+        stand_in = ET.Element('t')
+        stand_in.text = sources[i]
+        distribute_text_across_elements(
+            [stand_in], en,
+            prev_boundary_has_ws=nearest_supplies_ws(effective, i, True),
+            next_boundary_has_ws=nearest_supplies_ws(effective, i, False))
+        out = stand_in.text or ''
+        edges.append((out.startswith((' ', '\t')), out.endswith((' ', '\t'))))
+    return edges
+
+def _restored_between(edges, a, b):
+    """Does apply's text put a space or tab between segment a's end and segment b's start?
+
+    Asked only where the English has none there, so a True is apply's restoration."""
+    return edges is not None and (edges[a][1] or edges[b][0])
+
 # ──────────────────────────────────────────────────────────────────────
 # Rules — one function per rule, each yields (name, message, hint).
 # ──────────────────────────────────────────────────────────────────────
@@ -208,7 +290,7 @@ def _rule_binding_word_before_tc(left, right):
     # so leave this to validate_reject_all.py and do not emit here.
     return None
 
-def _rule_alpha_collision_no_space(left, right):
+def _rule_alpha_collision_no_space(left, right, restored=False):
     """left ends with alpha, right starts with alpha, no whitespace.
 
     Classic non-Latin-script-source defect: the source had no inter-segment
@@ -224,6 +306,13 @@ def _rule_alpha_collision_no_space(left, right):
     a letter and the ins starts with one — and apply runs this script
     --strict, so a translation obeying that rule was a hard block. The same
     scoping as the double-space rule below (register G9, second half).
+
+    AND NOT WHERE APPLY ITSELF WILL SUPPLY THE SPACE — register G9, first half.
+    `restored` is _restored_between's answer: apply puts the source's boundary
+    space back onto a segment whose English dropped it, so a deletion declared
+    without the space its source ends on delivers one space — and declaring the
+    space to quiet this rule could then deliver two. The rule used to fire there,
+    exit 1 under --strict, and leave the operator no compliant input.
     """
     lt = _seg_text(left)
     rt = _seg_text(right)
@@ -239,6 +328,8 @@ def _rule_alpha_collision_no_space(left, right):
     # A hyphen-word break is fine ("Anti-" + "trust" is unusual but the
     # translator likely knew what they were doing). Skip hyphen endings.
     if lt.endswith('-'):
+        return None
+    if restored:
         return None
     snippet = (lt[-20:] + '⟂' + rt[:20]).replace('\n', ' ')
     return (
@@ -461,7 +552,9 @@ def _rule_internal_digit_then_lower_run(seg):
         'abbreviations (5km, 10kg, 500ml) are not flagged.',
     )
 
-def _scan_pair(left, right):
+def _scan_pair(left, right, restored=False):
+    """The pair rules over two segments adjacent in the list. Only the alpha-collision rule is told
+    whether apply restores a space between them (register G9, first half)."""
     hits = []
     for rule in (
         _rule_binding_word_before_tc,
@@ -469,7 +562,10 @@ def _scan_pair(left, right):
         _rule_digit_at_tc_boundary,
         _rule_double_space_across_boundary,
     ):
-        r = rule(left, right)
+        if rule is _rule_alpha_collision_no_space:
+            r = rule(left, right, restored)
+        else:
+            r = rule(left, right)
         if r:
             hits.append(r)
     return hits
@@ -483,7 +579,7 @@ def _view_indices(segs, kept):
     """Indices of the segments a view renders, in order — non-empty text only."""
     return [i for i, s in enumerate(segs) if _seg_type(s) in kept and _seg_text(s)]
 
-def _scan_rendered_junctions(segs):
+def _scan_rendered_junctions(segs, edges=None):
     """The alpha-collision rule over the joins only a rendered view creates.
 
     Register F10's other half. The pair scan reads LIST neighbours, but a
@@ -493,9 +589,13 @@ def _scan_rendered_junctions(segs):
     fired on the del's last letter. Scanning each view's own joins sees it on
     purpose. List neighbours are skipped: _scan_pair has read them already.
 
+    `edges` is _restoration's answer, or None. Apply's test of adjacent segments reads LIST
+    order, not the view, so a segment the view drops can still decide whether
+    a space is restored at this join — which is why the question goes to apply.
+
     The double-space rule is deliberately not run here: whether a view's join
-    shows two spaces depends on apply's boundary-whitespace restoration, which
-    these notes do not carry (register G9).
+    shows two spaces depends on that same restoration, and only the
+    alpha-collision rule consults it (register G9, first half; step 15.3).
     """
     hits = []
     for view, kept in _VIEWS:
@@ -504,7 +604,7 @@ def _scan_rendered_junctions(segs):
             if b == a + 1:
                 continue
             left, right = segs[a], segs[b]
-            r = _rule_alpha_collision_no_space(left, right)
+            r = _rule_alpha_collision_no_space(left, right, _restored_between(edges, a, b))
             if r:
                 hits.append((f'{_seg_type(left)}→{_seg_type(right)} '
                              f'across a tracked change ({view})', r))
@@ -543,6 +643,9 @@ def validate(paragraphs_json_path):
             continue
         total_with_tc += 1
         total_scanned += 1
+        # What apply's boundary-whitespace restoration adds, where the source
+        # segments pair with the English ones; None runs every rule as before.
+        edges = _restoration(segs, entry.get('tc_segments'))
 
         para_hits = []
         # Scan per-segment rules.
@@ -552,10 +655,10 @@ def validate(paragraphs_json_path):
         # Scan pair-wise rules.
         for i in range(len(segs) - 1):
             left, right = segs[i], segs[i + 1]
-            for h in _scan_pair(left, right):
+            for h in _scan_pair(left, right, _restored_between(edges, i, i + 1)):
                 para_hits.append(('pair', f'{_seg_type(left)}→{_seg_type(right)}', h))
         # Scan the joins only a rendered view creates (register F10).
-        for where, h in _scan_rendered_junctions(segs):
+        for where, h in _scan_rendered_junctions(segs, edges):
             para_hits.append(('pair', where, h))
 
         if para_hits:

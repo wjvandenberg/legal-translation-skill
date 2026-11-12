@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """verify_confidential.py - is a forbidden phrase in this project's FILES, or in its HISTORY?
-CHECKER VERSION 4 (2026-09-08)
+CHECKER VERSION 5 (2026-11-12)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -776,13 +776,62 @@ def main(argv=None) -> int:
 
 # -------------------------------------------------------------------------- selftest
 
+def _fixture_config(git_dir: Path, settings: dict) -> None:
+    """Write ONE FIXTURE repository's settings into its own config FILE, without a git process.
+
+    Each `git config` call is a process of its own - measured, two per fixture, 98 in this
+    selftest - and after every commit git starts `git maintenance run --auto`, which in a
+    throwaway repository of a few objects finds nothing to do - 62. So both go into the config
+    file init made, and the repository ends as the calls left it, which is all a scan reads.
+    NOT BY ENVIRONMENT: the git helper is shared with the scans under test, whose own git calls
+    must not change, and a case commits again later, so the identity has to live in the
+    repository. Every value is quoted, so a space, `#` or `;` in it stays part of it. Raises if
+    init made no config, so a fixture that did not set up is named rather than every case after
+    it failing for a reason nobody gave."""
+    cfg = git_dir / "config"
+    if not cfg.is_file():
+        raise FileNotFoundError(f"no git config at {cfg} - the fixture's init did not make one")
+    sections: dict = {}
+    for key, value in settings.items():
+        section, name = key.split(".")
+        quoted = value.replace("\\", "\\\\").replace('"', '\\"')
+        sections.setdefault(section, []).append(f'\t{name} = "{quoted}"\n')
+    block = "".join(f"[{s}]\n" + "".join(lines) for s, lines in sections.items())
+    body = cfg.read_bytes()
+    cfg.write_bytes(body + (b"" if body.endswith(b"\n") else b"\n") + block.encode("utf-8"))
+
+
+_BASE: list = []          # the base repository's .git, once _base_git() has built it
+
+
+def _base_git() -> Path:
+    """THE ONE `git init` A SELFTEST RUN MAKES: a base repository, initialised and configured
+    once, whose `.git` every fixture copies. Measured, each of 49 fixtures here started its own
+    `init` for an empty repository that is the same every time. Built on first use in a folder
+    of its own, OUTSIDE the selftest's - _repo names a fixture by counting what its folder
+    holds, so a base beside the fixtures would renumber them - and removed at exit. A copy is
+    what `init` gave - the same files, config and branch, made on the same filesystem - and
+    each fixture still runs its own `add` and `commit`, so every commit is made as before."""
+    import atexit
+    import shutil
+    if not _BASE:
+        home = Path(tempfile.mkdtemp(prefix="verify_conf_base_"))
+        atexit.register(shutil.rmtree, home, True)
+        git(home, "init", "-q")
+        _fixture_config(home / ".git", {"maintenance.auto": "false", "user.email": "t@example.invalid",
+                                        "user.name": "t"})
+        _BASE.append(home / ".git")
+    return _BASE[0]
+
+
 def _repo(t: Path, files: dict, *, commit=True) -> Path:
-    """A real git repository, because both arms read git rather than the filesystem."""
+    """A real git repository, because both arms read git rather than the filesystem.
+    Automatic housekeeping is off, and the identity goes in by file - _fixture_config says why.
+    The empty repository is a copy of one built once - _base_git says why."""
+    import shutil
     d = t / f"proj{len(list(t.iterdir()))}"
     d.mkdir(parents=True)
-    git(d, "init", "-q")
-    git(d, "config", "user.email", "t@example.invalid")
-    git(d, "config", "user.name", "t")
+    shutil.copytree(_base_git(), d / ".git")
     for rel, body in files.items():
         f = d / rel
         f.parent.mkdir(parents=True, exist_ok=True)

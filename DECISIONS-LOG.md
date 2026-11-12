@@ -2823,3 +2823,75 @@ run, its WARN contract's - so each verdict stays its own and never a missing fil
 lift's byte proof is pinned to `c33f001`, on main, never to a branch commit a squash-merge leaves unreachable.
 **(7)** G6 closed with the step, as section 3.14 disposes of it. **(8)** Three house checkers declared by
 content, the house releasing them mid-session at unchanged versions; the next opening adopts them.
+
+## 2026-11-12 (2) — step 15 planned, unattended, in the conducting session; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-12, QUOTED WHOLE,** typed into the session that now conducts: *"Continue and don't bother me until close of step 15, merge everything at the end automatically, and start new sessions yourself as nested sessions automatically, without my input."* **No question
+was asked; each choice below is THE SESSION'S, its recommended answer, for him to confirm or overturn.**
+
+**WHERE IT RAN:** the conductor tried to start step 15's planning as a nested session and the app refused — it
+starts one only on a turn Wouter typed, and this turn was woken by a background watch on #195. So the plan was
+written here; recorded so the next conductor starts its sessions ON his turn, each finished one waking it.
+
+**THE MEASUREMENT** *(section 3.15 owns the table)*: 132 of 3,996 corpus runs bold or italic by the style
+cascade while extraction emits them plain, in 4 of 10 documents; 0 the other way; the toggle readings never
+disagree. And G9's first half rests on a premise that does not hold: the source segments are in the notes,
+`tc_segments`, aligned with `en_segments` on 81 of 81 tracked-change paragraphs.
+
+**(1) 15.1 EMITS ONE SPARSE KEY, `resolved`,** only on a run whose cascade differs from what is emitted today, over
+a full object on every run or a side file: section 3.9 says the step adds fields to the notes; existing keys stay
+untouched; the operator's reading cost follows the 132 runs; 6 of 10 documents' notes stay byte-identical.
+**(2) ECMA-376's TOGGLE RULE,** over last-wins: the corpus never tells them apart, so the specification decides, a
+synthetic fixture proving it. **(3) G9's FIRST HALF CLOSES AT 15.3 BY READING `tc_segments`,** over the schema
+change its row assumed: the datum is already there, and the frozen intermediates then stand. **(4) THE ORDER 15.1,
+15.2, 15.3,** 15.2 the rebuild probe, put to Wouter at step 15's close and never a silent step into step 16.
+
+## 2026-11-12 (3) — sub-step 15.1 built and 15.2 answered, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-12, QUOTED WHOLE,** typed into the session that conducts this chain: *"Continue and don't bother me until close of step 15, merge everything at the end automatically, and start new sessions yourself as nested sessions automatically, without my input."* **No
+question was asked; each choice below is THE SESSION'S, its recommended answer, for him to confirm or overturn.**
+
+**(1) THE TOGGLE RULE AS WORD APPLIES IT, refining (2) of 2026-11-12 (2):** Microsoft's notes on where Word
+departs from the standard, fetched and fingerprinted, say Word repeats unchanged values down a style chain
+(MS-OI29500 2.1.228) and that a paragraph style SETS a toggle rather than flipping it (2.1.258). So each chain
+is rolled up, the nearest level winning; the paragraph style sets; the character style's true flips — over the
+bare standard's flip at every level, or last-wins. The corpus never tells the three apart; invented documents
+pin each. **(2) THE PARAGRAPH MARK IS NO LEVEL:** a run with no properties of its own in a bold-mark paragraph
+is written bold today and resolves plain, as Word shows it; 0 corpus runs. **(3) NO KEY WHERE THE CASCADE
+CANNOT BE KNOWN** — a raw `.xml` input, a styles part that does not parse or that the relationships place
+elsewhere — over a guess. **(4) DECLARED, NOT BUILT:** table styles, and document defaults overriding the
+toggles, 0 corpus runs each, for step 16. **(5) ACCEPTANCE (ii) BY A WRAPPER IN `temp/`** that patches the
+delivered arm in memory, over a new option in a committed tool. **A CORRECTION:** the plan's "132 runs" is 132
+properties on 130 runs, two runs both bold and italic — corrected in section 3.15's table.
+
+**15.2, THE REBUILD PROBE — LAYERED, NOT REBUILT** *(section 3.9 owns the record; put to Wouter at step 15's
+close, and step 16 does not start on it before)*: apply already writes per span, each span's bold and italic
+absolute; the 3 places reading a source run's formatting can read `resolved`, and the 2 writers of the
+off-flags can write one only where the styles disagree — which needs what the styles give WITHOUT the run's own
+formatting, not in the notes: step 16's first design choice.
+
+## 2026-11-12 (4) — sub-step 15.3 built and step 15 closed, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-12, QUOTED WHOLE,** typed into the session that conducts this chain: *"Continue and don't bother me until close of step 15, merge everything at the end automatically, and start new sessions yourself as nested sessions automatically, without my input."* **No
+question was asked; each choice below is THE SESSION'S, its recommended answer, for him to confirm or overturn.**
+
+**(1) APPLY'S TEST LIFTED, NOT RESTATED:** what each segment will carry and whether the nearest non-empty
+segment beside it supplies the space sat inside `apply_trackchanges_inplace`; both are now module-level, moved
+unchanged, and the check imports them with `distribute_text_across_elements` — over a second statement of them in
+the check, or a run of apply's whole paragraph, whose post-passes reshape the segments. Apply's code changed;
+its deliveries did not, 13 of 13 workdirs per tree. **(2) ONE STAND-IN PER SEGMENT,** holding the joined source
+text: faithful on 379 of 379 corpus segments, 70 of 70 paragraphs aligned; the two shapes where it can part, an
+empty edge element and segments the two scripts count differently, declared. **(3) ONLY THE ALPHA-COLLISION
+RULE ASKS:** the digit rule and a view's double space share the blind spot and are left open, a gate moving no
+further than G9's own false positive. **(4) G9 LEAVES THE NO-COMPLIANT-REPAIR SET,** twenty to nineteen,
+policed beside C17 — over a closed row kept in a count of deadlocks an operator can still walk into.
+**(5) A NEW SUITE PINNED AT `8961ec1`,** main's last commit before step 15, over the branch's own commits,
+which a squash-merge leaves unreachable. **(6) THE NEW IMPORT DECLARED** in the sibling-import suite, with no
+fallback: a missing apply is a broken install for the check. **(7) THE REVIEW'S SEVEN:** the audit's figure
+filed; two limits declared; the two sibling rules left open; the shared module name across trees in one
+process, the import's start-up cost and a loop's special case not changed. **(8) AT THE OPENING:** the house's
+`install_hooks.py` v15 adopted byte for byte; its `auto_mode.py` v8, not yet committed there, declared by content.
+
+**15.2, PUT TO WOUTER AT STEP 15's CLOSE, AS PLANNED:** LAYERED, NOT REBUILT — section 3.9's record. Step 16
+starts on his word; its first design choice is where what the styles give WITHOUT a run's own formatting comes
+from.

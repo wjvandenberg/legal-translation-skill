@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """cycle_evidence.py - did VERIFY and TEST actually run, against the content being committed?
-CHECKER VERSION 2 (2026-10-21)
+CHECKER VERSION 3 (2026-11-12)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -91,6 +91,7 @@ command may have passed - the tree was not clean before, or the run changed it.
 """
 from __future__ import annotations
 
+import atexit
 import hashlib
 import json
 import os
@@ -610,15 +611,60 @@ def main(argv):
 
 # ------------------------------------------------------------------------------ selftest
 
+def _fixture_config(git_dir: Path, settings: dict) -> None:
+    """Write ONE FIXTURE repository's settings into its own config FILE, without a git process.
+
+    Each `git config` call is a process of its own - measured, three per fixture, 123 in this
+    selftest - and after every commit git starts `git maintenance run --auto`, which in a
+    throwaway repository of a few objects finds nothing to do - 48. So both go into the config
+    file init made, and the repository ends as the calls left it, which is all a check reads.
+    NOT BY ENVIRONMENT: git_bytes is shared with the checks under test, whose own git calls must
+    not change, and a case commits again later, so the identity has to live in the repository.
+    Every value is quoted, so a space, `#` or `;` in it stays part of it. Raises if init made no
+    config, so a fixture that did not set up is named rather than every case after it failing
+    for a reason nobody gave."""
+    cfg = git_dir / "config"
+    if not cfg.is_file():
+        raise FileNotFoundError(f"no git config at {cfg} - the fixture's init did not make one")
+    sections: dict = {}
+    for key, value in settings.items():
+        section, name = key.split(".")
+        quoted = value.replace("\\", "\\\\").replace('"', '\\"')
+        sections.setdefault(section, []).append(f'\t{name} = "{quoted}"\n')
+    block = "".join(f"[{s}]\n" + "".join(lines) for s, lines in sections.items())
+    body = cfg.read_bytes()
+    cfg.write_bytes(body + (b"" if body.endswith(b"\n") else b"\n") + block.encode("utf-8"))
+
+
+_BASE: list = []          # the base repository's .git, once _base_git() has built it
+
+
+def _base_git() -> Path:
+    """THE ONE `git init` A SELFTEST RUN MAKES: a base repository, initialised and configured
+    once, whose `.git` every fixture copies. Measured, each of 41 fixtures here started its own
+    `init` for an empty repository that is the same every time. Built on first use in a folder
+    of its own, OUTSIDE the selftest's, so no case sees it, and removed at exit. A copy is what
+    `init` gave - the same files, config and branch, made on the same filesystem - and each
+    fixture still runs its own `add` and `commit`, so every commit is made as before."""
+    if not _BASE:
+        home = Path(tempfile.mkdtemp(prefix="cycle_evidence_base_"))
+        atexit.register(shutil.rmtree, home, True)
+        git_bytes(home, "init", "-q")
+        _fixture_config(home / ".git", {"maintenance.auto": "false", "user.email": "noreply@example.invalid",
+                                        "user.name": "selftest", "commit.gpgsign": "false"})
+        _BASE.append(home / ".git")
+    return _BASE[0]
+
+
 def _repo(tmp: Path, name: str, ignore: str = "temp/\n") -> Path:
     """A real, tiny git repository. REAL because every claim here is about git's answers -
     a stub would test the stub. Identity is set locally so a machine with no global config
-    can still commit, and it is a noreply address for the reason this house always gives."""
+    can still commit, and it is a noreply address for the reason this house always gives.
+    Automatic housekeeping is off, and both go in by file - _fixture_config says why. The
+    empty repository is a copy of one built once - _base_git says why."""
     d = tmp / name
     d.mkdir(parents=True, exist_ok=True)
-    for args in (("init", "-q"), ("config", "user.email", "noreply@example.invalid"),
-                 ("config", "user.name", "selftest"), ("config", "commit.gpgsign", "false")):
-        git_bytes(d, *args)
+    shutil.copytree(_base_git(), d / ".git")
     (d / ".gitignore").write_bytes(ignore.encode("utf-8"))
     (d / "tracked.txt").write_bytes(b"content A\n")
     git_bytes(d, "add", "-A")

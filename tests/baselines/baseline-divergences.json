@@ -11,9 +11,9 @@
    "sha256_now": "5b85404ec1883d6aa1a2932e2d76e4dd3581757f8702aec22f1eb8b1d198b68e"
   },
   "uk/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step14-9-7-language-widenings",
-   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
-   "sha256_now": "abf99c2f06cd0927e8f3a45295216ac0d4c4a30f9ee6ff4221df970aed45002c"
+   "changed_by": "feature/step15-formatting-part-1",
+   "commit_subject": "Step 15.3 - G9's first half: the segment check asks apply's own boundary-whitespace restoration through tc_segments; step 15 closed",
+   "sha256_now": "5e58647e085ff3d3b7168d331528526c31ef49e0643549a5edf4f3717da1a7fa"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -21,9 +21,9 @@
    "sha256_now": "c83cb1d04e5b6a3fd9952ee7331ad588f6f606b3478f719a4a3412ccd773ef3a"
   },
   "uk/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "a1ea6d865f40d57228eaf873066385d00a5133c0b2f9cf59e51d530275bfd932"
+   "changed_by": "feature/step15-formatting-part-1",
+   "commit_subject": "Step 15.1 - extraction resolves each run's bold and italic through the style cascade, and writes one sparse key where they differ (option 3)",
+   "sha256_now": "c261ffb97a1af759577d195e9e3210526df3ad7f41aa1de49968ecf7906e2799"
   },
   "uk/scripts/post_process.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -66,9 +66,9 @@
    "sha256_now": "4f4a969064f1bd1f09a500f16ebfcebeae78bb551280ecc8471d4ea7b0d82829"
   },
   "uk/scripts/validate_segment_shapes.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "8d86b419b857cf59d17cd6cf814df27435617020dfcb9f65a83b4bef00ffe12a"
+   "changed_by": "feature/step15-formatting-part-1",
+   "commit_subject": "Step 15.3 - G9's first half: the segment check asks apply's own boundary-whitespace restoration through tc_segments; step 15 closed",
+   "sha256_now": "24c72b2eff248fe9cc197a72bb6b2bfe51b4bfb4891e797600e387d852d387a2"
   },
   "uk/scripts/verify_diligence.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -111,9 +111,9 @@
    "sha256_now": "7943280287e4707fd9a357fced5106e4c9462248df16f358f95b5b5e13a6dfa4"
   },
   "us/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step14-9-7-language-widenings",
-   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
-   "sha256_now": "cdf26eae08964f9c4dd5a96a3da44450d5989008fce5e579bee1d4d82708b2a4"
+   "changed_by": "feature/step15-formatting-part-1",
+   "commit_subject": "Step 15.3 - G9's first half: the segment check asks apply's own boundary-whitespace restoration through tc_segments; step 15 closed",
+   "sha256_now": "8bc371d94f612c02b0e8e108097c0bb2c6e8b758602d7fa6a35d6cff8e353a3a"
   },
   "us/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -121,9 +121,9 @@
    "sha256_now": "c83cb1d04e5b6a3fd9952ee7331ad588f6f606b3478f719a4a3412ccd773ef3a"
   },
   "us/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "5bd94dd4927c30753afad5cb62b32b8eee0823b31c3c9db0ba021c2bc61d2b3e"
+   "changed_by": "feature/step15-formatting-part-1",
+   "commit_subject": "Step 15.1 - extraction resolves each run's bold and italic through the style cascade, and writes one sparse key where they differ (option 3)",
+   "sha256_now": "f526ddd4b4f32d4ab94897dbe49563324212b57082fa0be8c64da90daff7bde6"
   },
   "us/scripts/post_process.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -166,9 +166,9 @@
    "sha256_now": "8d97848958881b712b5907e7f02b1165ceec9572550788381113cde39b664eec"
   },
   "us/scripts/validate_segment_shapes.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "ad407326d25b15ca4d0c29fbc38ab373ee1c0250127450b51560f484729dac68"
+   "changed_by": "feature/step15-formatting-part-1",
+   "commit_subject": "Step 15.3 - G9's first half: the segment check asks apply's own boundary-whitespace restoration through tc_segments; step 15 closed",
+   "sha256_now": "9667c1d2b66079e759aea620e274690e2426e82f89d401212cbd4ce6ce761a5d"
   },
   "us/scripts/verify_diligence.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",

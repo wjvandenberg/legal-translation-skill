@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 13 (2026-11-05)
+"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 15 (2026-11-12)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -80,6 +80,20 @@ v13 (2026-11-05, the same day) - TWO PRINTED SENTENCES CORRECTED, nothing else. 
 at session start. Measured the day v12 was installed: the board guard's new entry reached a desktop session that was
 already running, 13 s after the settings file was written. A message telling the reader a restart keeps a hook out
 is the dangerous direction, so both now say a new hook can reach a running session.
+
+v14 (2026-11-12) - THE SELFTEST'S SCRATCH REPOSITORIES ON FEWER GIT CALLS, nothing installed differently. push_arms()
+writes its scratch repository's settings - housekeeping off, the identity, house.python - into that repository's own
+config file in one plain write, _scratch_config(), and housekeeping off into the bare scratch remote's, whose receiving
+side ran it after every push it accepted: 275 git processes to 254, every case and every push unchanged.
+
+v15 (2026-11-12, the same day) - THE SCRATCH REMOTE IS READ BY --git-dir, AND A READ THAT FAILS IS NAMED. push_arms()
+asked its bare scratch remote what it held by running git INSIDE it. Under safe.bareRepository=explicit - git's
+hardening against a planted bare repository, which a terminal can set for every git it starts - git refuses that, and
+on_remote() took the refusal for "the branch is not there": in such a terminal five arms MISSed while every push had
+landed, and the arms asserting "not on the remote" PASSED FOR THE WRONG REASON. Measured: one tree's full run red in a
+terminal setting it and green in a shell that did not, and the selftest red here with only that setting added. Now the
+remote is named with --git-dir and read under the strict setting in every environment, so code that reads a bare
+repository by standing in it fails everywhere; a read neither found nor absent raises. The defect is older than v14.
 
 WHERE THE SOURCES COME FROM. A directory named 'hooks' beside this file. In a project that
 is tools/hooks/; in the shared folder it is standard-scripts/hooks/. Discovered rather
@@ -395,6 +409,10 @@ def guard_bites(root: Path) -> tuple[bool, str]:
 MAIN_OVERRIDE = "HOUSE_ALLOW_MAIN_PUSH"
 FULL_RUN_OVERRIDE = "HOUSE_PUSH_WITHOUT_FULL_RUN"
 
+#: v15: git's hardening against a planted bare repository, which push_arms() reads its scratch remote under in every
+#: environment, so code that reads a bare repository by standing in it fails here and not only where a shell sets it.
+STRICT_BARE = "'safe.bareRepository=explicit'"
+
 #: v8: what push_arms() proves, one line per arm, in the order it runs them.
 PUSH_ARMS = {
     "a": "a push no full run vouches for is refused",
@@ -431,6 +449,31 @@ def _setup(cwd: Path, *args) -> None:
     r = _git(cwd, *args)
     if r.returncode != 0:
         raise subprocess.CalledProcessError(r.returncode, ["git", *args], r.stdout, r.stderr)
+
+
+def _scratch_config(git_dir: Path, settings: dict) -> None:
+    """Write ONE SCRATCH repository's settings into its own config FILE, without a git process.
+
+    Each `git config` call is a process of its own - measured, four per push_arms() scratch repository, 8 in
+    this selftest - and git starts `git maintenance run --auto` after every commit, and the receiving side one
+    after every push it accepts, a process that in a scratch repository of a few objects finds nothing to do;
+    measured, 13, 6 after commits and 7 after pushes. So the settings go into each scratch repository's config
+    file, the bare remote's included, and the repository ends as the calls left it - which is all the hook and
+    the checker it runs read. The pushes themselves - their command, environment and what the remote holds
+    after - are what the arms test, and are not changed. Every value is quoted, so a space, `#` or `;` in it -
+    an interpreter's path in house.python - stays part of it. Raises if init made no config, so a setup that
+    did not happen is named, as _setup names one."""
+    cfg = git_dir / "config"
+    if not cfg.is_file():
+        raise FileNotFoundError(f"no git config at {cfg} - the scratch repository's init did not make one")
+    sections: dict = {}
+    for key, value in settings.items():
+        section, name = key.split(".")
+        quoted = value.replace("\\", "\\\\").replace('"', '\\"')
+        sections.setdefault(section, []).append(f'\t{name} = "{quoted}"\n')
+    block = "".join(f"[{s}]\n" + "".join(lines) for s, lines in sections.items())
+    body = cfg.read_bytes()
+    cfg.write_bytes(body + (b"" if body.endswith(b"\n") else b"\n") + block.encode("utf-8"))
 
 
 def checker_missing(root: Path, src: Path) -> str | None:
@@ -483,9 +526,10 @@ def push_arms(hook: Path, work: Path, checker_dir: Path = HERE, only=None) -> di
     remote, repo = work / "remote.git", work / "repo"
     _setup(work, "init", "-q", "--bare", str(remote))
     _setup(work, "init", "-q", "-b", "work", str(repo))
-    for k, v in (("user.email", "noreply@example.invalid"), ("user.name", "selftest"),
-                 ("commit.gpgsign", "false"), ("house.python", Path(sys.executable).as_posix())):
-        _setup(repo, "config", k, v)
+    _scratch_config(remote, {"maintenance.auto": "false"})      # housekeeping off on both sides, every
+    _scratch_config(repo / ".git", {"maintenance.auto": "false",  # setting by file - its docstring says why
+                                    "user.email": "noreply@example.invalid", "user.name": "selftest",
+                                    "commit.gpgsign": "false", "house.python": Path(sys.executable).as_posix()})
     _setup(repo, "remote", "add", "origin", str(remote))
     (repo / "tools").mkdir()
     for name in ("cycle_evidence.py", "house_common.py"):
@@ -504,8 +548,16 @@ def push_arms(hook: Path, work: Path, checker_dir: Path = HERE, only=None) -> di
         return r.returncode, r.stdout + r.stderr
 
     def on_remote(branch, kind="heads"):
-        r = _git(remote, "rev-parse", "--verify", "--quiet", f"refs/{kind}/{branch}")
-        return r.stdout.strip() if r.returncode == 0 else None
+        # v15: THE BARE REMOTE NAMED BY --git-dir, NEVER READ BY STANDING IN IT, and under the strict setting in every
+        # environment - the docstring's v15 note says why. A read that is neither found (0) nor absent (1, silent)
+        # raises, so a refusal can never pass for "not on the remote" again.
+        r = _git(work, "--git-dir", str(remote), "rev-parse", "--verify", "--quiet", f"refs/{kind}/{branch}",
+                 env=dict(os.environ, GIT_CONFIG_PARAMETERS=STRICT_BARE))
+        if r.returncode == 0:
+            return r.stdout.strip()
+        if r.returncode == 1 and not r.stderr.strip():
+            return None
+        raise subprocess.CalledProcessError(r.returncode, r.args, r.stdout, r.stderr)
 
     def commit(name, body):
         (repo / name).write_bytes(body)

@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.9.7 as #188 to #194, 2026-11-03 to 2026-11-11; 14.10 and 14.11 closed G12 as #195: STEP 14 CLOSED, 2026-11-12 · 15–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.11 as #188 to #195, 2026-11-03 to 2026-11-12, G12 closed: STEP 14 CLOSED · STEP 15 CLOSED #196 · 16–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,18 +578,18 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-12, 14.11 BUILT AND MERGED (#195) — G12 CLOSED, STEP 14 CLOSED; NEXT, STEP 15
+### HANDOFF — 2026-11-12 (4), STEP 15 CLOSED; NEXT, WOUTER ON 15.2, THEN STEP 16
 
-**PURPOSE: MET** — *G12 closed with no true positive silenced, step 14 closed, #195 merged on green*: 16 to 0 on
-the corpus, none added; every control red at the old code first; Done-when checked, 35 of 35 rows.
+**PURPOSE: MET** — *G9 closed, both halves, and with it step 15*: the check asks apply's own restoration
+where `tc_segments` pairs, 81 of 81; every delivery identical; #196 squash-merged on its green full run.
 
-**PRODUCED:** `quality_check` reads the whole article number and asks `lexicon_compliance`'s legislation tail,
-one named constant; given the notes, it spares an italic they declare. Both trees, by Wouter's three answers.
+**PRODUCED:** both trees' check, and apply's two functions lifted out unchanged; the suite
+`tests/test_segment_restoration.py`; G9 out of the no-compliant-repair set, nineteen now.
 
-**SINGLE NEXT ACTION: STEP 15, formatting part 1** — plan it first, section 3 of the build plan; prompt
-`temp/s1111c_next_prompt.md`.
+**SINGLE NEXT ACTION: Wouter rules on 15.2, LAYERED, NOT REBUILT** — section 3.9; step 16 starts on his
+word, its first design choice there. The unattended chain of 2026-11-12 ended at step 15's close.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** the keyword list still masks 11 references — phase 3's, not a bug to fix
-now. Three house checkers were mid-release at 14.11: adopt at the opening. The charter is AT its cap.
+**WHAT A NEW SESSION WOULD GET WRONG:** the segment check now imports apply; a cut-short apply exits 3 there. AT cap.
 
-**Open, none blocking:** a third CJK-letter test; F18; F30's detection half; F12; F31. **Context: 59%.**
+**Open, none blocking:** the digit rule and a view's double space share G9's blind spot; a third CJK-letter
+test; F18; F30's detection half; F12; F31. **Context: 42%.**

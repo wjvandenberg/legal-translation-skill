@@ -27,6 +27,10 @@ Output JSON format:
   ...
 ]
 
+A run whose formatting IN FORCE - its styles resolved - differs from its "bold" or "italic"
+also carries "resolved", holding only the differing properties, e.g. {"bold": true}; see THE
+STYLE CASCADE below. Nothing reads it yet.
+
 The "en" field should be filled with the full translated paragraph text.
 The "en_runs" field should be filled with formatting instructions for the English text:
 [
@@ -121,6 +125,127 @@ def get_color(rpr):
         return None
     c = rpr.find(f'{{{W}}}color')
     return c.get(f'{{{W}}}val') if c is not None else None
+
+# =========================================================================================
+# THE STYLE CASCADE - STEP 15, sub-step 15.1 (option 3's first part; PLAN-2-step-b.md 3.9, 3.15).
+#
+# `bold` and `italic` below read a run's OWN rPr, falling back to the paragraph mark's, and
+# never the styles part - so a run made bold by its paragraph style or its character style is
+# written plain. This resolves what is IN FORCE and writes it where it differs from what is
+# written today, as ONE sparse key, `resolved`, holding only the differing properties: every
+# existing key, printed line and exit code unchanged, and nothing reads the key yet (step 16
+# will). The rule, as Word applies it:
+#   1. the document defaults (docDefaults/rPrDefault) are the start;
+#   2. a style's basedOn chain is rolled up first - the nearest level naming a property wins.
+#      Word repeats unchanged values down a chain (MS-OI29500 2.1.228), so a flip per level
+#      would flip them wrongly;
+#   3. the paragraph style SETS the value - Word's stated departure from the standard's flip
+#      (MS-OI29500 2.1.258) - the default paragraph style where the paragraph names none;
+#   4. the character style's true FLIPS it and its false leaves it (ECMA-376 17.7.3, the
+#      toggle rule) - the default character style where the run names none;
+#   5. the run's own rPr is absolute; the paragraph mark's rPr is no level at all, as it
+#      formats the mark alone (ECMA-376 17.3.1.29).
+# A run takes its NEAREST paragraph's style. An unknown id, or one of the wrong type, falls to
+# its type's default; a basedOn naming another type is ignored; a cycle is cut. NOT resolved,
+# and declared: table styles, and document defaults overriding the toggles - 0 corpus runs
+# each when this was written. Where the cascade cannot be known - a raw .xml input, a styles
+# part that does not parse - NO key is written, never a guess; a package with no styles part
+# at all resolves on its runs' own properties.
+# =========================================================================================
+_CASCADE = (('b', 'bold'), ('i', 'italic'))
+
+
+def read_style_cascade(zf):
+    """The styles part of an open .docx, read once per document - or None where it cannot be
+    read, and then no run gets a `resolved` key."""
+    cascade = {'styles': {}, 'default': {}, 'doc': {tag: False for tag, _name in _CASCADE}, 'memo': {}}
+    try:
+        raw = zf.read('word/styles.xml')
+    except KeyError:
+        # No styles part where Word writes it. If the document's relationships still name one,
+        # it lives elsewhere and is unknown here, so nothing is resolved; only a package that
+        # names none resolves on its runs' own properties.
+        try:
+            rels = zf.read('word/_rels/document.xml.rels')
+        except KeyError:
+            return cascade
+        except (zipfile.BadZipFile, OSError, RuntimeError, NotImplementedError, EOFError):
+            return None
+        named = b'relationships/styles"' in rels or b"relationships/styles'" in rels  # never stylesWithEffects
+        return None if named else cascade
+    except (zipfile.BadZipFile, OSError, RuntimeError, NotImplementedError, EOFError):
+        return None
+    try:
+        sroot = etree.fromstring(raw, etree.XMLParser(resolve_entities=False, no_network=True))
+    except etree.XMLSyntaxError:
+        return None
+    for s in sroot.iter(f'{{{W}}}style'):
+        sid = s.get(f'{{{W}}}styleId')
+        if sid is None:
+            continue
+        stype = s.get(f'{{{W}}}type') or 'paragraph'     # ST_StyleType's default
+        based = s.find(f'{{{W}}}basedOn')
+        cascade['styles'][(stype, sid)] = (based.get(f'{{{W}}}val') if based is not None else None,
+                                           s.find(f'{{{W}}}rPr'))
+        flag = s.get(f'{{{W}}}default')
+        if flag is not None and flag.strip().lower() not in _ST_ONOFF_FALSE:
+            cascade['default'][stype] = sid               # where several claim it, the last wins
+    dd = sroot.find(f'{{{W}}}docDefaults/{{{W}}}rPrDefault/{{{W}}}rPr')
+    for tag, _name in _CASCADE:
+        cascade['doc'][tag] = get_prop_tristate(dd, tag) == 'true'
+    return cascade
+
+
+def _chain_value(cascade, stype, sid, tag):
+    """A property's rolled-up value in a style and its basedOn chain - the nearest level that
+    names it - as True, False, or None where no level does (rule 2)."""
+    styles = cascade['styles']
+    if sid is None or (stype, sid) not in styles:
+        sid = cascade['default'].get(stype)
+    seen = set()
+    while sid is not None and (stype, sid) in styles and sid not in seen:
+        seen.add(sid)
+        based, rpr = styles[(stype, sid)]
+        value = get_prop_tristate(rpr, tag)
+        if value is not None:
+            return value == 'true'
+        sid = based
+    return None
+
+
+def resolve_run(cascade, p_style, r_style, rpr):
+    """{'bold': ..., 'italic': ...} in force on a run, by rules 1 to 5 above."""
+    key = (p_style, r_style)
+    if key not in cascade['memo']:
+        styled = {}
+        for tag, name in _CASCADE:
+            state = cascade['doc'][tag]                               # 1
+            set_by_paragraph = _chain_value(cascade, 'paragraph', p_style, tag)
+            if set_by_paragraph is not None:
+                state = set_by_paragraph                              # 3
+            if _chain_value(cascade, 'character', r_style, tag):
+                state = not state                                     # 4
+            styled[name] = state
+        cascade['memo'][key] = styled
+    in_force = dict(cascade['memo'][key])
+    for tag, name in _CASCADE:
+        direct = get_prop_tristate(rpr, tag)
+        if direct is not None:
+            in_force[name] = direct == 'true'                         # 5
+    return in_force
+
+
+def resolved_differences(cascade, run_el, rpr, written):
+    """The properties whose value in force differs from what `written` (the run's entry) says,
+    as {'bold': ...} and/or {'italic': ...}; None where none differs."""
+    near = next(run_el.iterancestors(f'{{{W}}}p'))
+    ppr = near.find(f'{{{W}}}pPr')
+    ps = ppr.find(f'{{{W}}}pStyle') if ppr is not None else None
+    rs = rpr.find(f'{{{W}}}rStyle') if rpr is not None else None
+    in_force = resolve_run(cascade, ps.get(f'{{{W}}}val') if ps is not None else None,
+                           rs.get(f'{{{W}}}val') if rs is not None else None, rpr)
+    differs = {name: in_force[name] for _tag, name in _CASCADE if in_force[name] != written[name]}
+    return differs or None
 
 # =========================================================================================
 # THE CONTAINER INVENTORY — BRANCH 7's READING HALF.
@@ -293,9 +418,11 @@ def extract_paragraphs(input_path, output_json):
     # THE ENVELOPE FIRST (register L5): the container before it is opened, the body before a
     # paragraph is read. Either raises AdmissionRefused, and nothing below runs on a refused input.
     route = check_container(input_path)
+    cascade = None                          # a raw .xml input has no styles part to read
     if route == 'docx':
         with zipfile.ZipFile(input_path) as zf:
             xml_bytes = zf.read('word/document.xml')
+            cascade = read_style_cascade(zf)
         root = etree.fromstring(xml_bytes)
     else:
         tree = etree.parse(input_path)
@@ -407,6 +534,12 @@ def extract_paragraphs(input_path, output_json):
                     run_info["sz"] = p_sz
                 if color:
                     run_info["color"] = color
+                # STEP 15: the LAST key, and only where the cascade says otherwise - so a reader
+                # that drops it reads exactly the notes written before it existed.
+                if cascade is not None:
+                    differs = resolved_differences(cascade, r, rpr, run_info)
+                    if differs:
+                        run_info["resolved"] = differs
 
                 runs.append(run_info)
                 char_offset += len(text)
