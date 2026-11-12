@@ -2895,3 +2895,12 @@ process, the import's start-up cost and a loop's special case not changed. **(8)
 **15.2, PUT TO WOUTER AT STEP 15's CLOSE, AS PLANNED:** LAYERED, NOT REBUILT — section 3.9's record. Step 16
 starts on his word; its first design choice is where what the styles give WITHOUT a run's own formatting comes
 from.
+
+## 2026-11-12 (5) — Wouter: 15.2's answer accepted, layered, not rebuilt; step 16 may start
+
+**WOUTER'S WORDS, 2026-11-12, QUOTED WHOLE:** *"Yes, layered"* — his answer, by the next-step box's button, to
+the session's question *"Do you accept 15.2's answer, layered not rebuilt, so step 16 can start?"* So step 16
+extends extraction and apply at the places section 3.9 of the build plan names, and replaces neither. Its first
+design choice — where what the styles give WITHOUT a run's own formatting comes from — is still open, for step
+16's plan. The unattended chain of 2026-11-12 ended at step 15's close, as he set it; how step 16 runs is not
+decided.

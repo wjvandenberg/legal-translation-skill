@@ -578,7 +578,7 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-12 (4), STEP 15 CLOSED; NEXT, WOUTER ON 15.2, THEN STEP 16
+### HANDOFF — 2026-11-12 (5), STEP 15 CLOSED, 15.2 ACCEPTED; NEXT, STEP 16's PLAN
 
 **PURPOSE: MET** — *G9 closed, both halves, and with it step 15*: the check asks apply's own restoration
 where `tc_segments` pairs, 81 of 81; every delivery identical; #196 squash-merged on its green full run.
@@ -586,8 +586,8 @@ where `tc_segments` pairs, 81 of 81; every delivery identical; #196 squash-merge
 **PRODUCED:** both trees' check, and apply's two functions lifted out unchanged; the suite
 `tests/test_segment_restoration.py`; G9 out of the no-compliant-repair set, nineteen now.
 
-**SINGLE NEXT ACTION: Wouter rules on 15.2, LAYERED, NOT REBUILT** — section 3.9; step 16 starts on his
-word, its first design choice there. The unattended chain of 2026-11-12 ended at step 15's close.
+**SINGLE NEXT ACTION: step 16's plan, written with Wouter before any code** — 15.2's answer ACCEPTED
+(Wouter, 2026-11-12 (5)); its first design choice is in section 3.9. The unattended chain has ended.
 
 **WHAT A NEW SESSION WOULD GET WRONG:** the segment check now imports apply; a cut-short apply exits 3 there. AT cap.
 

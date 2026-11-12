@@ -1696,7 +1696,7 @@ decomposition renegotiated.** Slice A is where that becomes knowable, at no risk
 its output yet. **Whoever runs slice A must report that question explicitly on completing it, not silently
 proceed to slice B.**
 
-**THE PROBE ANSWERED, 2026-11-12 (3) — sub-step 15.2: LAYERED, NOT REBUILT** *(unattended; put to Wouter at
+**THE PROBE ANSWERED, 2026-11-12 (3) — sub-step 15.2: LAYERED, NOT REBUILT; ACCEPTED BY WOUTER, 2026-11-12 (5)** *(unattended; put to Wouter at
 step 15's close, and step 16 does not start on it before)*. Apply already writes per span: the operator's
 `en_runs`, or its own guess, are spans over the English, each built by `make_run_et` with an ABSOLUTE bold and
 italic. What it lacked was the source's formatting in force, which 15.1 now writes as `resolved`, on 130 of
@@ -3095,7 +3095,7 @@ control planted and firing; the segment count over the 13 recorded workdirs:
 - **15.2 — the rebuild probe, answered.** LIGHT, documents; it may ride with 15.1's session. From 15.1's output and
   apply's code: can step 16 layer per-span consumption onto apply's present `en_runs` path, or must extraction and
   apply be replaced wholesale? Answered in section 3.9's record and the decisions log, with its counts, and put to
-  Wouter at step 15's close — never a silent step into step 16. *Done when:* the answer is written, either way. **ANSWERED 2026-11-12 (3), with 15.1: LAYERED, NOT REBUILT** — section 3.9's record.
+  Wouter at step 15's close — never a silent step into step 16. *Done when:* the answer is written, either way. **ANSWERED 2026-11-12 (3), with 15.1: LAYERED, NOT REBUILT** — section 3.9's record. **ACCEPTED by Wouter, 2026-11-12 (5): step 16 may start.**
 - **15.3 — `validate_segment_shapes.py`: G9's first half, by reading `tc_segments`.** HEAVY, both trees. G9's row
   took the source text to be absent from the notes, having measured `en_segments` alone; it is beside them, in
   `tc_segments`, aligned on 81 of 81 — **so no schema change, and the frozen intermediates stand.** The
