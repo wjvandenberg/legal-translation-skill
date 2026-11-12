@@ -2800,3 +2800,26 @@ copies rewritten at 13:53 by the house's running session at unchanged versions �
 mid-change; the next opening adopts them. **(8) THE PULL REQUEST's TITLE LEFT** for the build, which lands the
 fix it names. **(9) NOTHING STARTED, AND THE NEXT PROMPT IS 14.11's BUILD,** over step 15's: step 14 is not
 closed. Keep-awake was refused by the app's own check; the session carried on without it.
+
+## 2026-11-12 — sub-step 14.11 built and step 14 closed: Wouter's three answers, and the build's own choices
+
+**WOUTER'S WORDS OF 2026-11-12, about 09:25,** typed into the 14.10 session, which conducts, relayed here and
+quoted whole: *"Continue and don't bother me until close of step 15, merge everything at the end
+automatically, and start new sessions yourself as nested sessions automatically, without my input."* So 14.11
+resumed from where it parked at his request the evening before, no question put to him; #195's merge rests on
+his answer (1) below and on these words.
+
+**WOUTER'S ANSWERS OF 2026-11-11, about 15:55, through the question tool — HIS RULINGS,** the override of the
+morning having lapsed at 15:20: **(1)** *"Build, merge on green"* — 14.11 built in both trees, every check once at
+the end with the one full run, #195 squash-merged on green; **(2)** *"One named piece in lexicon_compliance"* — the
+legislation test lifted into one constant both scripts use, the warning built from it proved byte for byte; **(3)**
+*"Follow-up for phase 3"* — the keyword exemption untouched, the 11 masked references noted in G12's closing text
+and routed to phase 3's repairs, classified by shape there. **The session's own choices, for him to confirm or
+overturn — none is his ruling:** **(4)** `tools/g12_shapes.py` asks the rule as skill Step 9 runs it — the whole
+number, the shared tail, the notes — over keeping a copy that would read VOID; its suite re-plants two citations
+so every shape field keeps a positive control. **(5)** `tests/test_checks_can_fail.py` copies the two new
+siblings wherever it copies `quality_check` alone - its truncation guard's case and, caught by TEST's first
+run, its WARN contract's - so each verdict stays its own and never a missing file's. **(6)** The
+lift's byte proof is pinned to `c33f001`, on main, never to a branch commit a squash-merge leaves unreachable.
+**(7)** G6 closed with the step, as section 3.14 disposes of it. **(8)** Three house checkers declared by
+content, the house releasing them mid-session at unchanged versions; the next opening adopts them.

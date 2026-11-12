@@ -1931,7 +1931,7 @@ arms OPEN, the 6 inputs that must stay quiet staying quiet, every true-positive 
 | C10 | `verify_diligence.py`: the skill Step 8 presence check on an EMPTY part | **CLOSED 2026-11-02**, both trees, #186 — an empty part needs no copy; one that carries text, however little, still does | 14.8 |
 | G7 | the three items 14.5 declared and did not build: Finnish's own quotes, a Japanese and Chinese word count, the unmeasured words | **CLOSED 2026-11-11**, both trees, #194 — every word sourced from published law and kept; `『…』` and `《…》` declared, not read | 14.9.7 |
 | G12 | `quality_check`'s 16 unaccounted findings, by the shape of their citation and never their text | **CLASSIFIED 2026-11-11**, #195 — 15 citations of legislation its keyword list misses, `post_process` keeping all 15; 1 italic the notes declare; all false positives, the fix 14.11's | 14.10 |
-| G12 | `quality_check.py`: the article rule reads a legislation tail, the spurious-italic rule asks the notes | **PLANNED 2026-11-11, NOT BUILT** — HEAVY, both trees; added by 14.10's classification | 14.11 |
+| G12 | `quality_check.py`: the article rule reads a legislation tail, the spurious-italic rule asks the notes | **CLOSED 2026-11-12**, both trees, #195 — 16 to 0 on the corpus, none added; 11 masked references a follow-up for phase 3 | 14.11 |
 
 **The sub-steps.** 14.2 to 14.8 each edit one script — and 14.2 one step document as well — **in both trees,
 so each is HEAVY.** Each makes its fix as a PATTERN change, the rule still running. Each adds its controls to
@@ -2983,6 +2983,31 @@ the edited script, and the full run once, before the push.
 > confidentiality controls; VERIFY and TEST through the cycle gate; `/code-review`; the one full run. **Done
 > when:** G12 FIXED AT 14.11 and CLOSED, and with it step 14. **The 11:** classified by shape on `g12_shapes`'
 > route before the exemption may change — carried in G12's closing text, not a new id, and routed to phase 3.
+> **AMENDED AT THE BUILD, 2026-11-11, before any code — Wouter's three answers** *(the decisions log, 2026-11-11,
+> 14.11's build)*: build and merge on green; the shared constant in `lexicon_compliance`; the 11 a follow-up for
+> phase 3. **And three finds of the build's own explore:** `tools/g12_shapes.py` keeps its own copy of the rule,
+> which would read VOID after the change, so it asks the shared tail and hands the rule the notes as skill Step 9
+> does, and its suite re-plants the two citations the new rule rightly stops flagging, so every shape field keeps a
+> positive control; `tests/test_sibling_import_integrity.py` declares every sibling import, so the two new ones
+> are routes there, neither tolerated if missing; and `tests/test_checks_can_fail.py` would have passed for the
+> wrong reason — a missing sibling standing in for the truncation it tests — so it copies them. **TEST's first
+> run found the same trap twice:** that file's WARN section copied `quality_check` alone too, so Step 9 exited 3
+> and its WARN read FAIL — fixed the same way, every other caller read and found to run a whole tree.
+> **BUILT 2026-11-11, MERGED 2026-11-12 as #195:** `e58af9f` the fix; red first in a worktree at `e666780`,
+> 28 failing lines, all G12's, the instrument's suite and the sibling-import suite red likewise; then green.
+> **13 mutants**,
+> 12 caught by the first batch: the miss, the instrument's own copy of the rule left unasked, showed its suite
+> held no paragraph with a flagged and a spared reference together; one planted, the re-run caught it;
+> `/code-review` at high: seven findings, none changed - two limits recorded in G12, five of cost or hygiene;
+> VERIFY 45 of 45 and TEST 24 of 24 through the cycle gate;
+> the full run on `e58af9f`, OVERALL PASS, 98 suites and 15 entry points.
+> **The corpus:** `qc_census` 16 to 0 in the two classes, none added, `numbering`'s 11 M1's; `g12_shapes` 0 of
+> 0, both trees. G12 FIXED AT 14.11. **Three house checkers declared by content in VERIFY**, rewritten
+> mid-release by the house's own session at unchanged versions, left for the next opening.
+> **STEP 14 CLOSED, 2026-11-12 — its Done-when checked row by row against the register, by listing: 35 of 35**
+> — the table's 12 each CLOSED or FIXED; the 6 disposed of above, G5, G10 and G11 fixed at 14.1, G9's first half
+> step 15's, G6 closed with the step, C7 closed at step 11; option 5's 17 each FIXED or CLOSED. Each fix proved by
+> its own controls against the code before it; the corpus gaining no finding but 14.4's missed alarm, filed as G14.
 
 ---
 
