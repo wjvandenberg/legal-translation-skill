@@ -74,8 +74,10 @@ from sibling_dirs import logs_dir  # noqa: E402
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 DOC_ID = re.compile(r"\b(D0[1-9]|D1[01])(B?)\b")
 # quality_check's own pattern, inline in `check_article_refs` and so copied here; the per-paragraph
-# count below is checked against the rule's, so a drift between the two is a VOID, never silent.
-QC_ARTICLE_RE = re.compile(r"\bArticles?\s+\d{1,2}(?:\.\d+)*")
+# count below is checked against the rule's, so a drift between the two is a VOID, never silent. Since
+# 14.11 the number is whole and the rule skips a reference its legislation tail follows - that tail is
+# ASKED of quality_check's own import, `qc.ART_LEGISLATION_FOLLOWS`, never copied.
+QC_ARTICLE_RE = re.compile(r"\bArticles?\s+\d+(?:\.\d+)*")
 # post_process's own pattern, inline in `fix_article_to_clause`, copied for the same reason.
 PP_ARTICLE_RE = re.compile(r"\bArticles?\s+\d[\d.:]*(?:-[A-Za-z]{1,15})*")
 HEADING_RE = re.compile(r"^\s*(Article|Clause)s?\s+(\d{1,3})\b")
@@ -262,7 +264,8 @@ def article_shapes(qc, pp, paras, texts, legal, headings, ctx):
         if not found:
             continue
         full = texts[i]
-        matches = list(QC_ARTICLE_RE.finditer(full)) if not legal[i] else []
+        matches = [m for m in QC_ARTICLE_RE.finditer(full)
+                   if not qc.ART_LEGISLATION_FOLLOWS.match(full, m.end())] if not legal[i] else []
         if len(matches) != found:
             mismatch += 1
             continue
@@ -299,7 +302,7 @@ def article_shapes(qc, pp, paras, texts, legal, headings, ctx):
             ahead = next((k for k in range(1, 10) if i + k < len(paras) and legal[i + k]), None)
             shape["leg_before"] = _bucket(back) if back else "none"
             shape["leg_after"] = _bucket(ahead) if ahead else "none"
-            # The whole number, read from the text: the rule's own match stops at two digits.
+            # The whole number, read from the text (the rule's own match stopped at two digits until 14.11).
             number = re.compile(r"\d+").match(full, m.start() + re.match(r"Articles?\s+", m.group()).end()).group()
             shape["own_heading"] = "yes" if number in headings["Article"] else "no"
             shape["at_start"] = "yes" if not full[:m.start()].strip() else "no"
@@ -420,7 +423,7 @@ def flagged_italic_runs(runs):
 def formatting_shapes(qc, paras, texts, entries=(), bodies=(), pp=None, notes=None):
     rows, mismatch = [], 0
     for i, p in enumerate(paras):
-        issues = qc.check_formatting(p, False)
+        issues = qc.check_formatting(p, False, notes)
         for issue in issues:
             rule = next((lab for pre, lab in FORMATTING_RULES if issue.startswith(pre)), None)
             if rule is None:
@@ -488,8 +491,10 @@ def main(argv=None):
         m = DOC_ID.search(str(dx))
         doc = (m.group(1) + m.group(2)) if m else "unattributed"
         root = etree.parse(str(dx)).getroot()
+        # the notes as skill Step 9 hands them to the rule, through --with-source (sub-step 14.11)
+        notes_by_en = pp.load_declared_notes(str(dx.parents[2] / "paragraphs.json"))
         whole_art = len(qc.check_article_refs(root, False))
-        whole_fmt = len(qc.check_formatting(root, False))
+        whole_fmt = len(qc.check_formatting(root, False, notes_by_en))
         totals["article"] += whole_art
         totals["formatting"] += whole_fmt
         if not (whole_art or whole_fmt):
@@ -516,7 +521,6 @@ def main(argv=None):
         if unread:
             out.append(f"  {doc}  containers that could not be read: {_bucket(unread)} - "
                        "source_italic below is measured without them")
-        notes_by_en = pp.load_declared_notes(str(dx.parents[2] / "paragraphs.json")) if whole_fmt else None
         fmts, miss_f = formatting_shapes(qc, paras, texts, entries, bodies, pp, notes_by_en)
         mismatches += miss_a + miss_f
         if len(arts) != whole_art or len(fmts) != whole_fmt:

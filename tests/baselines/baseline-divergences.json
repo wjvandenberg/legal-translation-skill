@@ -31,9 +31,9 @@
    "sha256_now": "93a63296c2fa453cbcfc44384cc834e1bce4dbaed206d826a7240c8a01dbfa82"
   },
   "uk/scripts/quality_check.py": {
-   "changed_by": "feature/step14-9-7-language-widenings",
-   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
-   "sha256_now": "8d36c8cf26cb2f94bb727a9ce743d3ec150d4a71c45a746c6047a63c17cfcc28"
+   "changed_by": "feature/step14-10-g12-text-free-route",
+   "commit_subject": "Step 14.11 - quality_check asks what the skill decides: an article read whole against 14.4's legislation tail, and the italic the notes declare (G12)",
+   "sha256_now": "692a4fc6698e1478cbe2c04325a96cf8cfbccb3a57e23a4b222eefe194a2e7d8"
   },
   "uk/scripts/repack_docx.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -131,9 +131,9 @@
    "sha256_now": "f1c78f52e146c1158d07dd77a448b6eb28976bdf29bbd3520801197c169557de"
   },
   "us/scripts/quality_check.py": {
-   "changed_by": "feature/step14-9-7-language-widenings",
-   "commit_subject": "Step 14.9.7 - the language widenings: Finnish quotes, the comma-set marker, a Japanese and Chinese word count, the words sourced from published law, and one kept-name helper (G7)",
-   "sha256_now": "efef571243166c2fa0cdfc15585ef26450813d332ce0d560c865aed476255090"
+   "changed_by": "feature/step14-10-g12-text-free-route",
+   "commit_subject": "Step 14.11 - quality_check asks what the skill decides: an article read whole against 14.4's legislation tail, and the italic the notes declare (G12)",
+   "sha256_now": "69c3a94f3d5a16f57a7732a465782d1e06f18216f635482f7a19c3dde9ec9697"
   },
   "us/scripts/repack_docx.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -286,14 +286,14 @@
    "sha256_now": "e8dd91e2d4b4dd8dfd64efd26ae4b9aaebe365d191c92ac6dff7bf0eb525f344"
   },
   "uk/scripts/lexicon_compliance.py": {
-   "changed_by": "feature/step14-9-5-read-receipt",
-   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
-   "sha256_now": "bb22c4ba0155114449e9e3087a3fc0a1d11b20d93bdd9be3579d0c813092cabf"
+   "changed_by": "feature/step14-10-g12-text-free-route",
+   "commit_subject": "Step 14.11 - quality_check asks what the skill decides: an article read whole against 14.4's legislation tail, and the italic the notes declare (G12)",
+   "sha256_now": "c509a31d68b8ae13fdfb11165c4243455363e7371d5fb8a7fd5a7949c6f64c99"
   },
   "us/scripts/lexicon_compliance.py": {
-   "changed_by": "feature/step14-9-5-read-receipt",
-   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
-   "sha256_now": "dd3226c8b198cffceae407bb3efe3262015157719ec220a786ecdb426cdc1854"
+   "changed_by": "feature/step14-10-g12-text-free-route",
+   "commit_subject": "Step 14.11 - quality_check asks what the skill decides: an article read whole against 14.4's legislation tail, and the italic the notes declare (G12)",
+   "sha256_now": "978b86ef2f23746f02a5182e4ff5320b992f402efebc8fa9f780f92865b42b32"
   },
   "uk/scripts/validate_reject_all.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",

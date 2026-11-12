@@ -29,6 +29,7 @@ comparison that established nothing has not passed.
 All test content is INVENTED. No client text, no corpus material -- CLAUDE.md 5.6.
 """
 import importlib.util
+import inspect
 import json
 import os
 import re
@@ -1386,6 +1387,186 @@ for tree in ("uk", "us"):
     for row, text, lang in (("G3", G3_FP[0][1], "italian"), ("G13", G13_SENT.format(G13_KEPT[0][0]), "italian")):
         new_rc, new_out = qc_run(ROOT / tree / "scripts" / "quality_check.py", text, lang)
         old_rc, old_out = qc_run(OLD_DIR / (tag(tree) + "quality_check.py"), text, lang)
+        ok(f"{row} {tree}, the whole script: exits 0 and PASSED now",
+           new_rc == 0 and "*** PASSED" in new_out and "*** FAILED" not in new_out, f"(rc={new_rc})")
+        ok(f"{row} {tree}, the whole script: PROVED it exited 2 and FAILED before",
+           old_rc == 2 and "*** FAILED" in old_out, f"(rc={old_rc})")
+
+# =============================================================================
+print()
+print("G12 — quality_check: a citation of legislation is no internal reference; a declared italic is no finding")
+print("-" * 96)
+
+# G12: the internal-reference rule flagged `Article N` wherever its paragraph held none of a 20-entry keyword
+# list, so a citation naming its instrument in the same sentence - `of the <Name> Decree`, a code of procedure, a
+# regulator's resolution - read as a cross-reference to rewrite as `Clause N`, and a three-digit article was cut
+# inside its number. Now the number is read whole and lexicon_compliance's own legislation tail is asked where it
+# ends - ONE test, lifted into a named constant there, proved unchanged byte for byte. The spurious-italic rule
+# flagged a long italic run the operator's notes DECLARE, which post_process's pass keeps (register B1); given the
+# notes, it now asks them the same question. Each false positive silent now and PROVED to have fired at the pinned
+# baseline; each true positive beside it firing now and before. 14.11 of PLAN-2-step-b.md section 3.14; every
+# string INVENTED, on office services.
+# --- 14.11 cases: begin
+G12_FP = (
+    ("a decree named after `of the`", "The cleaning fee is set out in Article 7 of the Sample Decree."),
+    ("a paragraph between the number and the decree",
+     "The cleaning fee is provided for by Article 7, paragraph 2, of the Sample Decree."),
+    ("a three-digit article of a code of procedure",
+     "The unpaid cleaning invoice is enforced under Article 321 of the Sample Code of Civil Procedure."),
+    ("two three-digit articles, each with a paragraph, before the decree",
+     "The cleaning fee is set out in Article 123, paragraph 2, and Article 124, paragraph 1, of the Sample Decree."),
+    ("a regulator's resolution and its date",
+     "The cleaning tariff follows Article 5 of the XYZ Resolution of 1 March 2020."),
+    ("two articles in the plural, before the decree",
+     "The cleaning fee is set out in Articles 3 and 4 of the Sample Decree."),
+)
+G12_TP = (
+    ("`Article 7 above`", "The cleaner shall comply with Article 7 above."),
+    ("`Article 7 of the Agreement`", "The tenant may end the cleaning contract under Article 7 of the Agreement."),
+    ("a three-digit internal reference", "The cleaner shall comply with Article 120 above."),
+    ("the tail may not bridge from the Agreement to a decree",
+     "The tenant may end the cleaning contract under Article 7 of the Agreement and the Sample Decree."),
+    ("the tail may not cross into the next sentence",
+     "The cleaner shall comply with Article 7. The Sample Decree sets the fee."),
+)
+G12_KEYWORD = "The cleaner shall comply with Article 7 above and with the Civil Code."
+G12_WHOLE = "The cleaner shall comply with Article 2024 above."
+G12_ITALIC = "Office Cleaning Services Agreement"
+G12_LEAD, G12_END = "The parties sign the ", " today."
+G12_FULL = G12_LEAD + G12_ITALIC + G12_END
+G12_SPAN = {"start": len(G12_LEAD), "end": len(G12_LEAD + G12_ITALIC)}
+# (label, the notes) - None is no notes at all
+G12_ITALIC_FP = (
+    ("a run the note DECLARES italic", [{"idx": 0, "text": "x", "en": G12_FULL,
+                                         "en_runs": [dict(G12_SPAN, italic=True)]}]),
+    ("a run carried unchanged from an italic source run", [{"idx": 0, "text": "x", "en": G12_FULL,
+                                                            "runs": [{"text": G12_ITALIC, "italic": True}]}]),
+)
+G12_ITALIC_TP = (
+    ("a run the note calls plain", [{"idx": 0, "text": "x", "en": G12_FULL,
+                                     "en_runs": [dict(G12_SPAN, italic=False)]}]),
+    ("a run its note does not cover", [{"idx": 0, "text": "x", "en": G12_FULL}]),
+    ("a paragraph its notes do not reach", [{"idx": 0, "text": "x", "en": "The tenant pays the cleaner."}]),
+    ("no notes at all", None),
+)
+G12_LIFT_REF = "c33f001"     # main, #194: lexicon_compliance as 14.4 left it, before the lift
+# --- 14.11 cases: end
+
+
+def g12_italic_para():
+    return (f'<w:p><w:r><w:t xml:space="preserve">{G12_LEAD}</w:t></w:r>'
+            f'<w:r><w:rPr><w:i/></w:rPr><w:t xml:space="preserve">{G12_ITALIC}</w:t></w:r>'
+            f'<w:r><w:t xml:space="preserve">{G12_END}</w:t></w:r></w:p>')
+
+
+def g12_notes(pp, entries):
+    """The notes as post_process's own loader reads them - the reader the rule is handed at skill Step 9."""
+    if entries is None:
+        return None
+    path = TMP / f"g12-notes-{next(_G13_N)}.json"
+    path.write_text(json.dumps(entries), encoding="utf-8")
+    return pp.load_declared_notes(str(path))
+
+
+def g12_fmt(mod, notes):
+    """The rule's italic findings, handed the notes where it takes them. Asked of the code BEFORE the change it
+    cannot take them - so every control here still runs, and a false positive reads as a finding, not a crash."""
+    if "notes" in inspect.signature(mod.check_formatting).parameters:
+        return g12_italics(mod.check_formatting(doc(g12_italic_para()), False, notes))
+    return g12_italics(mod.check_formatting(doc(g12_italic_para()), False))
+
+
+def g12_italics(issues):
+    return [i for i in issues if i.startswith("Spurious italic")]
+
+
+def g12_run(script, body, entries):
+    wd = TMP / f"g12-run-{next(_G13_N)}"
+    wd.mkdir()
+    (wd / "document.xml").write_text(f'<w:document xmlns:w="{W}"><w:body>{body}</w:body></w:document>',
+                                     encoding="utf-8")
+    (wd / "paragraphs.json").write_text(json.dumps(entries), encoding="utf-8")
+    r = subprocess.run([sys.executable, str(script), str(wd / "document.xml"), "--with-source",
+                        str(wd / "paragraphs.json"), "--language", "italian"], capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", env=F10_ENV, cwd=wd)
+    return r.returncode, r.stdout + r.stderr
+
+
+def g12_article_rule(mod):
+    return next(r[1] for r in mod.RULES if r[2].startswith("'Article N'"))
+
+
+for tree in ("uk", "us"):
+    # the us script must ask the us tree's siblings, not the uk copies an earlier load left cached
+    for _m in ("lexicon_compliance", "post_process"):
+        sys.modules.pop(_m, None)
+    old_qc = OLD_QC if tree == "uk" else load_old("quality_check.py", "us")
+    new_qc = load_new("quality_check.py", tree)
+    ok(f"G12 {tree} the rule asks its OWN tree's legislation tail and notes reader",
+       all(getattr(sys.modules.get(m), "__file__", None)
+           and Path(sys.modules[m].__file__).parent.parent.name == tree for m in ("lexicon_compliance", "post_process")))
+    ok(f"G12 {tree} the italic rule takes the notes",
+       "notes" in inspect.signature(new_qc.check_formatting).parameters)
+    g12_pp = sys.modules.get("post_process") or load_new("post_process.py", tree)
+
+    # THE LIFT: lexicon_compliance's own warning pattern unchanged, byte for byte, against main before it
+    blob = subprocess.run(["git", "show", f"{G12_LIFT_REF}:{tree}/scripts/lexicon_compliance.py"],
+                          capture_output=True, cwd=ROOT)
+    lift = OLD_DIR / f"lift_{tree}_lexicon_compliance.py"
+    lift.write_bytes(blob.stdout)
+    spec = importlib.util.spec_from_file_location(f"lift_{tree}_lexicon_compliance", lift)
+    lift_lc = importlib.util.module_from_spec(spec)
+    sys.path.insert(0, str(OLD_DIR))
+    try:
+        spec.loader.exec_module(lift_lc)
+    finally:
+        sys.path.remove(str(OLD_DIR))
+    new_lc = sys.modules.get("lexicon_compliance") or load_new("lexicon_compliance.py", tree)
+    before, after = g12_article_rule(lift_lc), g12_article_rule(new_lc)
+    ok(f"G12 {tree} lexicon_compliance's 'Article N' warning: the same pattern and flags as at {G12_LIFT_REF}",
+       blob.returncode == 0 and before.pattern == after.pattern and before.flags == after.flags)
+    ahead = getattr(new_lc, "ART_LEGISLATION_AHEAD", "")
+    follows = getattr(new_qc, "ART_LEGISLATION_FOLLOWS", None)
+    ok(f"G12 {tree} and the shared constant is exactly the look-ahead inside it, the one the rule asks",
+       bool(ahead) and "(?!" + ahead + ")" in after.pattern and follows is not None and follows.pattern == ahead)
+
+    def arts(mod, text):
+        return mod.check_article_refs(doc(para(text)), False)
+
+    for label, text in G12_FP:
+        n, o = arts(new_qc, text), arts(old_qc, text)
+        ok(f"G12 {tree} {label}: silent now", not n, f"({n})")
+        ok(f"G12 {tree} {label}: PROVED it fired before", bool(o), f"({o})")
+    for label, text in G12_TP:
+        n, o = arts(new_qc, text), arts(old_qc, text)
+        ok(f"G12 {tree} TRUE POSITIVE {label}: still fires", bool(n), f"({n})")
+        ok(f"G12 {tree} TRUE POSITIVE {label}: fired before too", bool(o), f"({o})")
+    n, o = arts(new_qc, G12_KEYWORD), arts(old_qc, G12_KEYWORD)
+    ok(f"G12 {tree} the keyword exemption is untouched: silent then and now (the 11 are a follow-up)",
+       not n and not o, f"({n}, {o})")
+    n, o = arts(new_qc, G12_WHOLE), arts(old_qc, G12_WHOLE)
+    ok(f"G12 {tree} the number is read whole: one finding then and now, naming all four digits now",
+       len(n) == 1 == len(o) and "'Article 2024'" in n[0] and "'Article 20'" in o[0], f"({n}, {o})")
+
+    for label, entries in G12_ITALIC_FP:
+        n, o = g12_fmt(new_qc, g12_notes(g12_pp, entries)), g12_fmt(old_qc, None)
+        ok(f"G12 {tree} {label}: silent now", not n, f"({n})")
+        ok(f"G12 {tree} {label}: PROVED it fired before", bool(o), f"({o})")
+    for label, entries in G12_ITALIC_TP:
+        n, o = g12_fmt(new_qc, g12_notes(g12_pp, entries)), g12_fmt(old_qc, None)
+        ok(f"G12 {tree} TRUE POSITIVE {label}: still fires", bool(n), f"({n})")
+        ok(f"G12 {tree} TRUE POSITIVE {label}: fired before too", bool(o), f"({o})")
+    n = g12_italics(new_qc.check_formatting(doc(g12_italic_para()), False))
+    ok(f"G12 {tree} TRUE POSITIVE the rule called with no notes argument: still fires", bool(n), f"({n})")
+
+    # THE EXIT skill Step 9 reads, run as Step 9 runs it, with --with-source: rc 0 and PASSED now, rc 2 and
+    # FAILED before - each tree's script as a process of its own, so its own siblings are the ones asked.
+    for row, body, entries in (
+            ("G12 article", para(G12_FP[0][1]), [{"idx": 0, "text": G12_FP[0][1], "en": G12_FP[0][1]}]),
+            ("G12 italic", g12_italic_para(), [{"idx": 0, "text": G12_FULL, "en": G12_FULL,
+                                                "en_runs": [dict(G12_SPAN, italic=True)]}])):
+        new_rc, new_out = g12_run(ROOT / tree / "scripts" / "quality_check.py", body, entries)
+        old_rc, old_out = g12_run(OLD_DIR / (tag(tree) + "quality_check.py"), body, entries)
         ok(f"{row} {tree}, the whole script: exits 0 and PASSED now",
            new_rc == 0 and "*** PASSED" in new_out and "*** FAILED" not in new_out, f"(rc={new_rc})")
         ok(f"{row} {tree}, the whole script: PROVED it exited 2 and FAILED before",

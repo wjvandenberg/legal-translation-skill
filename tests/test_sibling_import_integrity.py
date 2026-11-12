@@ -5,7 +5,9 @@ Five shipped scripts import a sibling script and, by design, carry on without it
 install: validate_apply -> post_process (an inlined copy of the spacing rule), validate_apply ->
 translate_headers_footers (the side-part arm's reader, lazily), translate_headers_footers -> extract_paragraphs
 (graphic metadata), repack_docx -> lexicon_compliance (a best-effort language agreement). The fifth,
-validate_en_runs -> reorder_definitions, has no fallback at all. None of them could tell a sibling that is
+validate_en_runs -> reorder_definitions, has no fallback at all; nor, since sub-step 14.11, have the sixth and
+seventh, quality_check -> lexicon_compliance (its legislation tail) and quality_check -> post_process (its reader of
+the operator's declared italic). None of them could tell a sibling that is
 ABSENT from one that is PRESENT BUT CUT SHORT, which is the broken install SKILL.md rule 6 answers by
 re-installing: a cut mid-statement gave a raw traceback, or - where the handler was broad - a control that
 silently went dark; a clean cut before the sibling's own check left its names missing, and the fallback ran as
@@ -56,12 +58,16 @@ ROUTES = [
     ("translate_headers_footers.py", "extract_paragraphs.py", "load", True),
     ("repack_docx.py", "lexicon_compliance.py", "load", True),
     ("validate_en_runs.py", "reorder_definitions.py", "en_runs", False),
+    # sub-step 14.11: quality_check asks lexicon_compliance's legislation tail and post_process's notes reader;
+    # neither has a fallback, so a DELETED sibling is a broken install there too
+    ("quality_check.py", "lexicon_compliance.py", "load", False),
+    ("quality_check.py", "post_process.py", "load", False),
 ]
 # the names each importer asks of its sibling: a clean cut before the sibling's own check must remove every one
-NAMES = {"post_process.py": ["will_fix_spacing_fire"],
+NAMES = {"post_process.py": ["will_fix_spacing_fire", "load_declared_notes", "_notes_norm", "_declared_italic"],
          "translate_headers_footers.py": ["_field_aware_text_and_fields", "_para_text"],
          "extract_paragraphs.py": ["_GRAPHIC_ATTR_SURFACES", "graphic_metadata_surfaces"],
-         "lexicon_compliance.py": ["_guess_language"],
+         "lexicon_compliance.py": ["_guess_language", "ART_LEGISLATION_FOLLOWS"],
          "reorder_definitions.py": ["find_definitions_section_in_texts"]}
 FROM_RE = re.compile(r"^[ \t]*from[ \t]+([A-Za-z_]\w*)[ \t]+import[ \t(]", re.M)
 # `import a, b as c` names every module in the list, not only the first
@@ -191,7 +197,7 @@ others = sorted(p for p in found if p[1] != LANGUAGE_MODULE + ".py")
 declared = sorted((i, s) for i, s, _r, _t in ROUTES)
 print(f"  sibling imports discovered: {len(found)} - {len(found) - len(others)} of the language module "
       f"(the other suite's), {len(others)} others")
-ok("the other sibling imports are exactly the five routes here", others == declared,
+ok("the other sibling imports are exactly the routes declared here", others == declared,
    f"undeclared {sorted(set(others) - set(declared))}, declared but absent {sorted(set(declared) - set(others))}")
 dyn = dynamic_imports(scripts_dir)
 ok("no shipped script loads a module by name at run time (importlib.import_module, __import__)", not dyn,

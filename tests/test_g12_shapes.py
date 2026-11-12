@@ -9,9 +9,10 @@ temporary folder, and three things are asserted:
      statute by an instrument word, an undecided `thereof` with a statute a paragraph earlier, a
      defined term after a comma, an internal locator, a document's own heading, a source acronym the
      translation kept, G14's `of the Agreement`, the formatting rule's missing bold, and three spurious
-     italics (declared and paired with an italic source; with no note; called plain by its note) - is
-     planted once and its shape line asserted label by label; a paragraph that carries a legislation
-     keyword is planted beside them and must NOT be reported.
+     italics (paired with an italic source though its note calls it plain; with no note; called plain by
+     its note) - is planted once and its shape line asserted label by label; a paragraph that carries a
+     legislation keyword is planted beside them and must NOT be reported, and since 14.11 neither may a
+     citation the rule reads by its legislation tail, nor an italic run its note declares.
   2  A PLANTED STRING IT MUST NEVER PRINT. Every invented name in those paragraphs - two Latin and one
      non-Latin - is searched for in everything the tool printed. And the guard is made to fire for real:
      the tool is run in-process with one invented name ADDED to its instrument list, so it tries to print
@@ -85,30 +86,42 @@ ARTICLE_DOC = [
     para('In this deed (the "Quillfeather") the parties agree as follows.'),
     para("The Legislative Decree applies to the transfer."),                    # a keyword: not a finding
     para("The Quillfeather relies on Article 5 thereof."),                      # indeterminate, statute 1 back
-    para("Payment is made pursuant to Article 7 of the Civil Procedure Rules."),  # external, instrument
+    para("Payment is made pursuant to Article 7, as the Civil Procedure Rules require."),  # external, instrument
     para("Under Article 3, the Quillfeather shall pay the Łódźquill fee."),  # defined term
     para("As provided in Article 2 above, the term is fixed."),                 # internal, locator
-    para("Fees are fixed under Article 6 of the ZQXT Rules."),                  # a kept source acronym
+    para("Fees are fixed under Article 6, as the ZQXT Rules set them."),        # a kept source acronym
     para("The fee is due under Article 8 of the Agreement."),                   # G14's shape: a document word
     para("Article 9 of the Civil Code governs the Zanzibarcode."),              # keyword in paragraph: quiet
-]
+    para("Payment is made pursuant to Article 4 of the Civil Procedure Rules."),  # a legislation tail: quiet
+    para("As provided in Article 2 above and in Article 4 of the Civil Procedure Rules, the fee is fixed."),
+]                                                    # both in one paragraph: only the first is a finding
+# Since 14.11 the rule asks lexicon_compliance's legislation tail, so a citation written `of the <Name> Rules`
+# is no finding; the two shapes above that once were (an instrument word, a kept acronym) are written with no
+# `of` - `, as the ... Rules` - so the rule still flags them and the tool still has their shapes to report.
 ARTICLE_NOTES = [{"idx": 0, "text": "Le tariffe ZQXT del Vermiglione sono fisse.", "en": "unused"}]
 ITALIC_PAIRED = "Quillfeather shall remain wholly bound"
 ITALIC_PLAIN = "Quillfeather terms stay plain here"
 EXEMPT_A, EXEMPT_B = "Zanzibarcode sits wholly apart now", "(Quillfeather Exempt Title Here)"
+ITALIC_DECLARED = "Quillfeather terms stay italic here"
 FORMAT_DOC = [para('"Zanzibarcode" means the Quillfeather plan of the parties.'),  # no bold on the term
               para(ITALIC_PAIRED, italic=True),                                # italic, the source's too
               para("Zanzibarcode remains wholly unpaired here", italic=True),    # italic, no note at all
               para(ITALIC_PLAIN, italic=True),                                 # italic the note calls plain
               '<w:p><w:r><w:rPr><w:i/></w:rPr><w:t>' + EXEMPT_A + '</w:t></w:r>'  # one flagged run, plain by
-              '<w:r><w:rPr><w:i/></w:rPr><w:t>' + EXEMPT_B + '</w:t></w:r></w:p>']  # note; one exempt, declared
+              '<w:r><w:rPr><w:i/></w:rPr><w:t>' + EXEMPT_B + '</w:t></w:r></w:p>',  # note; one exempt, declared
+              para(ITALIC_DECLARED, italic=True)]                              # italic the note DECLARES
+# Since 14.11 the rule asks the notes, as skill Step 9 runs it with --with-source: a run they declare italic is
+# no finding. So the paired run's note calls it plain - its source still italic - and stays a finding, while the
+# last paragraph, declared, must not be reported at all.
 FORMAT_NOTES = [{"idx": 1, "text": "Vermiglione resta del tutto vincolato", "en": ITALIC_PAIRED,
-                 "en_runs": [{"start": 0, "end": len(ITALIC_PAIRED), "italic": True}]},
+                 "en_runs": [{"start": 0, "end": len(ITALIC_PAIRED), "italic": False}]},
                 {"idx": 3, "text": "Vermiglione senza corsivo", "en": ITALIC_PLAIN,
                  "en_runs": [{"start": 0, "end": len(ITALIC_PLAIN), "italic": False}]},
                 {"idx": 4, "text": "Vermiglione a parte", "en": EXEMPT_A + EXEMPT_B,
                  "en_runs": [{"start": 0, "end": len(EXEMPT_A), "italic": False},
-                             {"start": len(EXEMPT_A), "end": len(EXEMPT_A + EXEMPT_B), "italic": True}]}]
+                             {"start": len(EXEMPT_A), "end": len(EXEMPT_A + EXEMPT_B), "italic": True}]},
+                {"idx": 5, "text": "Vermiglione in corsivo", "en": ITALIC_DECLARED,
+                 "en_runs": [{"start": 0, "end": len(ITALIC_DECLARED), "italic": True}]}]
 FORMAT_SOURCE = [para("Vermiglione resta del tutto vincolato", italic=True)]
 
 
@@ -146,10 +159,10 @@ with tempfile.TemporaryDirectory() as tmp:
     ok("`thereof`: undecided, its tail read, the statute one paragraph back",
        has_all(line_for(out, "D05", "article", 2), "post_process=indeterminate", "tail=thereof",
                "leg_before=1", "own_heading=no"))
-    ok("an instrument word after `of the`: external, decided by the listed word, connector of,the",
+    ok("an instrument word after `, as the`: external, decided by the listed word, connector comma,as,the",
        has_all(line_for(out, "D05", "article", 3), "post_process=external", "decider=instrument:Civil",
-               "connector=of,the", "before=word,pursuant,to", "decider_group=2", "keyword_token=yes",
-               "with_keyword=yes", "in_source=no", "after=Procedure,Rules"))
+               "connector=comma,as,the", "before=word,pursuant,to", "decider_group=2", "keyword_token=yes",
+               "with_keyword=yes", "in_source=no", "after=Procedure,Rules,word"))
     ok("a defined term after a comma: external by post_process, decided by the document's own term",
        has_all(line_for(out, "D05", "article", 4), "post_process=external", "decider=defined:term",
                "connector=comma,the", "before=Cap"))
@@ -159,18 +172,22 @@ with tempfile.TemporaryDirectory() as tmp:
     ok("a kept source acronym: its form, a fourth distinct decider, a word of the source, Cap after",
        has_all(line_for(out, "D05", "article", 6), "post_process=external", "decider=capital:other",
                "decider_form=acronym", "decider_group=4", "in_source=yes", "with_keyword=no",
-               "keyword_token=no", "after=Rules"))
+               "keyword_token=no", "after=Rules,set,word"))
     ok("`of the Agreement`: external by post_process, and the document word shown as itself",
        has_all(line_for(out, "D05", "article", 7), "post_process=external", "decider=document:Agreement",
                "connector=of,the", "decider_group=5", "after=none"))
-    ok("a paragraph carrying a legislation keyword is not reported - seven findings, not eight",
-       not line_for(out, "D05", "article", 8))
+    ok("an internal reference beside a citation of legislation in one paragraph: only the first reported - the "
+       "instrument's copy of the rule asks the same tail (14.11), or the two disagree",
+       has_all(line_for(out, "D05", "article", 8), "post_process=internal", "decider=locator", "connector=none",
+               "own_heading=yes"))
+    ok("a paragraph carrying a legislation keyword, and a citation the rule reads by its legislation tail "
+       "(14.11), are not reported - eight findings, not ten", not line_for(out, "D05", "article", 9))
     ok("the formatting finding: the missing bold, its trigger, a straight quote at the start",
        has_all(line_for(out, "D03", "formatting", 1), "rule=no_bold_definition", "trigger=means",
                "quote=straight", "quote_at=start", "bold_runs=0", "by_means_of=no"))
-    ok("a spurious italic whose source paragraph, paired by text, is italic too",
+    ok("a spurious italic whose source paragraph, paired by text, is italic too, though its note calls it plain",
        has_all(line_for(out, "D03", "formatting", 2), "rule=spurious_italic", "italic_runs=1",
-               "bold_italic_runs=0", "source_italic=yes:exact", "declared=declared"))
+               "bold_italic_runs=0", "source_italic=yes:exact", "declared=undeclared"))
     ok("a spurious italic with no note to pair it: unpaired, and why, never guessed",
        has_all(line_for(out, "D03", "formatting", 3), "rule=spurious_italic", "source_italic=unpaired:notes0",
                "declared=no_note"))
@@ -180,8 +197,10 @@ with tempfile.TemporaryDirectory() as tmp:
     ok("an exempt parenthesised run beside a flagged one: only the flagged run's verdict, as the rule reads",
        has_all(line_for(out, "D03", "formatting", 5), "rule=spurious_italic", "italic_runs=2",
                "flagged_runs=1", "declared=undeclared"))
-    ok("the denominator: 12 of the 12 the two rules make, over 2 workdirs",
-       "findings reported by shape: 12 of 12 the two rules make over 2 workdir(s)" in out)
+    ok("a long italic run its note DECLARES is no finding (14.11) - five, not six",
+       not line_for(out, "D03", "formatting", 6))
+    ok("the denominator: 13 of the 13 the two rules make, over 2 workdirs",
+       "findings reported by shape: 13 of 13 the two rules make over 2 workdir(s)" in out)
     ok("the tally names each class", "    1  article  external  instrument:Civil" in out
        and "    1  formatting  no_bold_definition  none" in out
        and "    4  formatting  spurious_italic  none" in out)

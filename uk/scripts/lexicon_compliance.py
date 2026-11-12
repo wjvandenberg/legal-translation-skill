@@ -175,6 +175,13 @@ _ART_STOP = (r"(?:and|or|nor|but|to|of|in|on|at|by|for|with|from|under|between|a
              r"|the|its|their|his|her|our|present|hereof|herein|hereto|hereunder|thereof|above|below)\b")
 _ART_TAIL = (r"of\s+(?:(?:the|that|those)\s+)?(?:(?!" + _ART_STOP + r")[^\W_][\w'’-]*(?:(?:\.[\w'’-]+)+\.?)?\s+)"
              r"{0,3}" + _ART_HEAD)
+# THE WHOLE LOOK-AHEAD the 'Article N' warning below reads after the number, in ONE named piece, because
+# quality_check's internal-reference rule asks the same question (register G12; sub-step 14.11): one test, never
+# a second copy that could drift from this one. The warning's own pattern is built from it unchanged, byte for
+# byte. Matched where an 'Article N' reference ends, ART_LEGISLATION_FOLLOWS says that reference cites legislation.
+ART_LEGISLATION_AHEAD = (_ART_GAP + r"(?:" + _ART_TAIL
+                         + r"|of Book|BW|of Directive|of Regulation|of the EU|of the European|of Law)")
+ART_LEGISLATION_FOLLOWS = _c(ART_LEGISLATION_AHEAD)
 
 RULES: List[Rule] = [
     # ------ Language-agnostic (from references/general-legal.md) ------
@@ -229,8 +236,7 @@ RULES: List[Rule] = [
     # or are followed by a legislation tail (_ART_TAIL above), 'of Book', 'BW', etc.
     ("WARN", _c(r"\bArticle\s+\d+(?:\.\d+)*\b"
                 r"(?![\:\.]\d)"
-                r"(?!" + _ART_GAP + r"(?:" + _ART_TAIL
-                + r"|of Book|BW|of Directive|of Regulation|of the EU|of the European|of Law))"),
+                r"(?!" + ART_LEGISLATION_AHEAD + r")"),
      "'Article N' for an internal reference is non-standard in UK legal drafting — prefer 'Clause N' unless this is a reference to legislation (general-legal.md).",
      ["*"]),
 
