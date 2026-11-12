@@ -21,9 +21,9 @@
    "sha256_now": "c83cb1d04e5b6a3fd9952ee7331ad588f6f606b3478f719a4a3412ccd773ef3a"
   },
   "uk/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "a1ea6d865f40d57228eaf873066385d00a5133c0b2f9cf59e51d530275bfd932"
+   "changed_by": "feature/step15-formatting-part-1",
+   "commit_subject": "Step 15.1 - extraction resolves each run's bold and italic through the style cascade, and writes one sparse key where they differ (option 3)",
+   "sha256_now": "c261ffb97a1af759577d195e9e3210526df3ad7f41aa1de49968ecf7906e2799"
   },
   "uk/scripts/post_process.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -121,9 +121,9 @@
    "sha256_now": "c83cb1d04e5b6a3fd9952ee7331ad588f6f606b3478f719a4a3412ccd773ef3a"
   },
   "us/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/step14-9-1-validator-console-crash",
-   "commit_subject": "Step 14.9.1 - every shipped script prints on any console, and apply tells a crash from a gate (C29)",
-   "sha256_now": "5bd94dd4927c30753afad5cb62b32b8eee0823b31c3c9db0ba021c2bc61d2b3e"
+   "changed_by": "feature/step15-formatting-part-1",
+   "commit_subject": "Step 15.1 - extraction resolves each run's bold and italic through the style cascade, and writes one sparse key where they differ (option 3)",
+   "sha256_now": "f526ddd4b4f32d4ab94897dbe49563324212b57082fa0be8c64da90daff7bde6"
   },
   "us/scripts/post_process.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",

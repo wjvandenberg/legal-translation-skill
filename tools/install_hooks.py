@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 13 (2026-11-05)
+"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 14 (2026-11-12)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -80,6 +80,11 @@ v13 (2026-11-05, the same day) - TWO PRINTED SENTENCES CORRECTED, nothing else. 
 at session start. Measured the day v12 was installed: the board guard's new entry reached a desktop session that was
 already running, 13 s after the settings file was written. A message telling the reader a restart keeps a hook out
 is the dangerous direction, so both now say a new hook can reach a running session.
+
+v14 (2026-11-12) - THE SELFTEST'S SCRATCH REPOSITORIES ON FEWER GIT CALLS, nothing installed differently. push_arms()
+writes its scratch repository's settings - housekeeping off, the identity, house.python - into that repository's own
+config file in one plain write, _scratch_config(), and housekeeping off into the bare scratch remote's, whose receiving
+side ran it after every push it accepted: 275 git processes to 254, every case and every push unchanged.
 
 WHERE THE SOURCES COME FROM. A directory named 'hooks' beside this file. In a project that
 is tools/hooks/; in the shared folder it is standard-scripts/hooks/. Discovered rather
@@ -433,6 +438,31 @@ def _setup(cwd: Path, *args) -> None:
         raise subprocess.CalledProcessError(r.returncode, ["git", *args], r.stdout, r.stderr)
 
 
+def _scratch_config(git_dir: Path, settings: dict) -> None:
+    """Write ONE SCRATCH repository's settings into its own config FILE, without a git process.
+
+    Each `git config` call is a process of its own - measured, four per push_arms() scratch repository, 8 in
+    this selftest - and git starts `git maintenance run --auto` after every commit, and the receiving side one
+    after every push it accepts, a process that in a scratch repository of a few objects finds nothing to do;
+    measured, 13, 6 after commits and 7 after pushes. So the settings go into each scratch repository's config
+    file, the bare remote's included, and the repository ends as the calls left it - which is all the hook and
+    the checker it runs read. The pushes themselves - their command, environment and what the remote holds
+    after - are what the arms test, and are not changed. Every value is quoted, so a space, `#` or `;` in it -
+    an interpreter's path in house.python - stays part of it. Raises if init made no config, so a setup that
+    did not happen is named, as _setup names one."""
+    cfg = git_dir / "config"
+    if not cfg.is_file():
+        raise FileNotFoundError(f"no git config at {cfg} - the scratch repository's init did not make one")
+    sections: dict = {}
+    for key, value in settings.items():
+        section, name = key.split(".")
+        quoted = value.replace("\\", "\\\\").replace('"', '\\"')
+        sections.setdefault(section, []).append(f'\t{name} = "{quoted}"\n')
+    block = "".join(f"[{s}]\n" + "".join(lines) for s, lines in sections.items())
+    body = cfg.read_bytes()
+    cfg.write_bytes(body + (b"" if body.endswith(b"\n") else b"\n") + block.encode("utf-8"))
+
+
 def checker_missing(root: Path, src: Path) -> str | None:
     """v8: why an installed pre-push would refuse EVERY push, or None. A pre-push that calls
     `check-push` with no cycle_evidence.py in tools/ or standard-scripts/ refuses each push for want
@@ -483,9 +513,10 @@ def push_arms(hook: Path, work: Path, checker_dir: Path = HERE, only=None) -> di
     remote, repo = work / "remote.git", work / "repo"
     _setup(work, "init", "-q", "--bare", str(remote))
     _setup(work, "init", "-q", "-b", "work", str(repo))
-    for k, v in (("user.email", "noreply@example.invalid"), ("user.name", "selftest"),
-                 ("commit.gpgsign", "false"), ("house.python", Path(sys.executable).as_posix())):
-        _setup(repo, "config", k, v)
+    _scratch_config(remote, {"maintenance.auto": "false"})      # housekeeping off on both sides, every
+    _scratch_config(repo / ".git", {"maintenance.auto": "false",  # setting by file - its docstring says why
+                                    "user.email": "noreply@example.invalid", "user.name": "selftest",
+                                    "commit.gpgsign": "false", "house.python": Path(sys.executable).as_posix()})
     _setup(repo, "remote", "add", "origin", str(remote))
     (repo / "tools").mkdir()
     for name in ("cycle_evidence.py", "house_common.py"):

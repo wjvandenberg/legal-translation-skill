@@ -2845,3 +2845,27 @@ untouched; the operator's reading cost follows the 132 runs; 6 of 10 documents' 
 synthetic fixture proving it. **(3) G9's FIRST HALF CLOSES AT 15.3 BY READING `tc_segments`,** over the schema
 change its row assumed: the datum is already there, and the frozen intermediates then stand. **(4) THE ORDER 15.1,
 15.2, 15.3,** 15.2 the rebuild probe, put to Wouter at step 15's close and never a silent step into step 16.
+
+## 2026-11-12 (3) — sub-step 15.1 built and 15.2 answered, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-12, QUOTED WHOLE,** typed into the session that conducts this chain: *"Continue and don't bother me until close of step 15, merge everything at the end automatically, and start new sessions yourself as nested sessions automatically, without my input."* **No
+question was asked; each choice below is THE SESSION'S, its recommended answer, for him to confirm or overturn.**
+
+**(1) THE TOGGLE RULE AS WORD APPLIES IT, refining (2) of 2026-11-12 (2):** Microsoft's notes on where Word
+departs from the standard, fetched and fingerprinted, say Word repeats unchanged values down a style chain
+(MS-OI29500 2.1.228) and that a paragraph style SETS a toggle rather than flipping it (2.1.258). So each chain
+is rolled up, the nearest level winning; the paragraph style sets; the character style's true flips — over the
+bare standard's flip at every level, or last-wins. The corpus never tells the three apart; invented documents
+pin each. **(2) THE PARAGRAPH MARK IS NO LEVEL:** a run with no properties of its own in a bold-mark paragraph
+is written bold today and resolves plain, as Word shows it; 0 corpus runs. **(3) NO KEY WHERE THE CASCADE
+CANNOT BE KNOWN** — a raw `.xml` input, a styles part that does not parse or that the relationships place
+elsewhere — over a guess. **(4) DECLARED, NOT BUILT:** table styles, and document defaults overriding the
+toggles, 0 corpus runs each, for step 16. **(5) ACCEPTANCE (ii) BY A WRAPPER IN `temp/`** that patches the
+delivered arm in memory, over a new option in a committed tool. **A CORRECTION:** the plan's "132 runs" is 132
+properties on 130 runs, two runs both bold and italic — corrected in section 3.15's table.
+
+**15.2, THE REBUILD PROBE — LAYERED, NOT REBUILT** *(section 3.9 owns the record; put to Wouter at step 15's
+close, and step 16 does not start on it before)*: apply already writes per span, each span's bold and italic
+absolute; the 3 places reading a source run's formatting can read `resolved`, and the 2 writers of the
+off-flags can write one only where the styles disagree — which needs what the styles give WITHOUT the run's own
+formatting, not in the notes: step 16's first design choice.

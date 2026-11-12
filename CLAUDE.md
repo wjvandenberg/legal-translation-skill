@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.11 as #188 to #195, 2026-11-03 to 2026-11-12, G12 closed: STEP 14 CLOSED · 15 planned, 15.1 next · 16–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.11 as #188 to #195, 2026-11-03 to 2026-11-12, G12 closed: STEP 14 CLOSED · 15.1 and 15.2 done · 16–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,18 +578,18 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-12 (2), STEP 15 PLANNED, NOTHING BUILT; NEXT, 15.1, THE RESOLVER
+### HANDOFF — 2026-11-12 (3), 15.1 BUILT, 15.2 ANSWERED; NEXT, 15.3, G9's FIRST HALF
 
-**PURPOSE: MET** — *step 15 built against a plan written against the code*: section 3.15 of the build plan, three
-sub-steps, measured first; documents only, on `feature/step15-formatting-part-1`, no pull request yet.
+**PURPOSE: MET** — *extraction writes the formatting in force, every existing output byte-identical*: `resolved`
+on 130 corpus runs; notes and the 13 deliveries identical once it is removed; the step's PR OPEN until 15.3.
 
-**PRODUCED:** the plan, measured first: 132 of 3,996 corpus runs bold or italic by the style cascade, emitted
-plain; G9's first half needs no schema change — `tc_segments` align with `en_segments` on 81 of 81.
+**PRODUCED:** the resolver, both trees, as Word applies the cascade; `tests/test_style_cascade.py`; 15.2's
+answer, LAYERED, NOT REBUILT — section 3.9 of the build plan, put to Wouter at step 15's close.
 
-**SINGLE NEXT ACTION: 15.1, the resolver** — section 3.15; prompt `temp/s1112k_next_prompt.md`. Unattended at
-Wouter's word of 2026-11-12; the pull request merges when step 15 closes.
+**SINGLE NEXT ACTION: 15.3, G9's first half by reading `tc_segments`** — section 3.15; prompt
+`temp/s1112p_next_prompt.md`. Unattended at Wouter's word of 2026-11-12; the PR merges when 15.3 closes.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** the app starts a nested session only on Wouter's own turn, so this plan
-was written in the conductor; a session started on his turn wakes its starter when done. AT its cap.
+**WHAT A NEW SESSION WOULD GET WRONG:** `resolved` is the value IN FORCE, not what the styles alone give;
+step 16's off-flags need the second, and 15.2 names the choice. AT its cap.
 
-**Open, none blocking:** a third CJK-letter test; F18; F30's detection half; F12; F31. **Context: 58%.**
+**Open, none blocking:** a third CJK-letter test; F18; F30's detection half; F12; F31. **Context: 42%.**

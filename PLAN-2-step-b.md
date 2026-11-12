@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-12 (2), STEP 15's PLAN — SESSION PURPOSE — what · how · purpose:** step 15, formatting part 1, planned as section 3.15 - its sub-steps, each with its controls, triaged HEAVY, MEDIUM or LIGHT - committed and pushed on `feature/step15-formatting-part-1` · the code and its readers measured first, counts only; every question taking the recommended answer, unattended at Wouter's word of 2026-11-12; the documents spliced byte for byte and checked by D and DT through the cycle gate · **so that formatting part 1 is built against a plan written against the code, not a guess** *(written immediately after the tag `rollback-2026-11-12b-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-12 (3), 15.1 THE RESOLVER — SESSION PURPOSE — what · how · purpose:** both trees' `extract_paragraphs.py` resolve each run's bold and italic through the style cascade and add one sparse key, `resolved`, only where it differs from what is emitted today · controls red first on invented documents, then the code; every existing output byte-identical over the corpus, the fixtures and the 13 frozen workdirs, by a comparison proved able to fail; unattended at Wouter's word of 2026-11-12 · **so that step 16 has the formatting in force to put back, and nothing that reads the notes today moves** *(written immediately after the tag `rollback-2026-11-12c-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -1696,6 +1696,18 @@ decomposition renegotiated.** Slice A is where that becomes knowable, at no risk
 its output yet. **Whoever runs slice A must report that question explicitly on completing it, not silently
 proceed to slice B.**
 
+**THE PROBE ANSWERED, 2026-11-12 (3) — sub-step 15.2: LAYERED, NOT REBUILT** *(unattended; put to Wouter at
+step 15's close, and step 16 does not start on it before)*. Apply already writes per span: the operator's
+`en_runs`, or its own guess, are spans over the English, each built by `make_run_et` with an ABSOLUTE bold and
+italic. What it lacked was the source's formatting in force, which 15.1 now writes as `resolved`, on 130 of
+3,996 corpus runs. So step 16 extends, at named places: the 3 that read a source run's formatting — apply's
+sub-heading test and its tracked-change bold-off bypass, and `post_process`'s italic reading — read `resolved`
+where it is present; and the 2 writers of the off-flags — `make_run_et` and the tracked-change bold-leak fix —
+write a flag only where the wanted value differs from what the styles give. **Step 16's first design choice:**
+what the styles give WITHOUT the run's own formatting is not in the notes, `resolved` holding the value in force;
+extraction can write it per paragraph, or apply can resolve it from the styles part with a twin of the resolver
+held identical by a test, the container inventory's precedent. Either extends; neither replaces extraction or apply.
+
 **One operational cost, recorded because it is easy to get wrong and expensive if it is.** Slice B invalidates
 the frozen real-document intermediates, which are the high-fidelity half of the test plan. **They must be
 regenerated FROM THE ARCHIVED JULY RUNS, never by re-translating** — re-translating moves the never-regress
@@ -3026,7 +3038,7 @@ control planted and firing; the segment count over the 13 recorded workdirs:
 | what | measured |
 |---|---|
 | text runs in the corpus's Word documents | 3,996, in 10 of 10 `.docx`; the 1 legacy `.doc` not read |
-| runs the style cascade makes bold or italic while extraction emits them plain | **132** — 130 bold, 2 italic, in 4 of 10 documents |
+| runs the style cascade makes bold or italic while extraction emits them plain | **130 runs, 132 properties** — 130 bold, 2 italic, 2 runs both, in 4 of 10 documents *(corrected at 15.1: the probe counted properties)* |
 | runs extraction emits bold or italic that the cascade makes plain | 0 |
 | runs carrying a character style | 9 |
 | runs where the two toggle readings, last-wins and ECMA-376's, disagree | 0 — reachable only by a synthetic fixture |
@@ -3048,10 +3060,42 @@ control planted and firing; the segment count over the 13 recorded workdirs:
   removed are byte-identical to today's, all 10 corpus documents and every synthetic fixture; (ii) the mechanical
   half over the 13 frozen workdirs, their notes given the key, delivers byte-identical documents — every reader
   ignores it. The notes' size measured before and after (what the operator reads). *Done when:* both hold.
+  **15.1's own plan, written 2026-11-12 (3) before any edit** *(unattended; the session's answers are
+  `DECISIONS-LOG.md`, 2026-11-12 (3))*. **CHANGES:** both trees' `extract_paragraphs.py` — the styles part read
+  once per document, one resolver, one key — and a new suite, `tests/test_style_cascade.py`, its row in
+  `verify.config.json` and the divergence baseline; no shipped file is added, the tree stays at 198. **THE RULE,
+  checked against Microsoft's notes on where Word departs from the standard** *(fetched 2026-11-12, fingerprinted,
+  in `temp/`)*: document defaults first; each style's `basedOn` chain rolled up, the nearest level naming a
+  property winning — Word repeats unchanged values down a chain (MS-OI29500 2.1.228), so a flip per level would
+  flip them wrongly; the paragraph style SETS the value, Word's stated departure from the standard's flip
+  (2.1.258); the character style's true flips it and its false leaves it, the standard's toggle rule; the run's
+  own `rPr` absolute; the paragraph mark's `rPr` no level at all. A run takes its nearest paragraph's style; an
+  unknown or wrong-type id falls to its type's default; a `basedOn` cycle is cut. **DECLARED, NOT RESOLVED, 0
+  corpus runs each** *(`temp/s1112p_edge_probe.py`)*: table styles, and document defaults overriding the toggles.
+  **Where the cascade cannot be known** — an `.xml` input, an unreadable styles part — **no key is written,
+  never a guess**; a document with no styles part resolves on its runs' own properties. **MUST NOT:** move an
+  existing key, a printed line or an exit code; touch apply, the operator's instructions or a gate. **CHECKED
+  AGAINST:** (i) at the NOTES — a round trip of today's notes first, which must reproduce them, then the new
+  notes with `resolved` removed and every printed line, both trees, over the 10 corpus documents and every
+  `.docx` in `tests/fixtures/`, the planted change `bold` taking the resolved value, which must differ; (ii) at
+  the DELIVERY — `tools/delivered_corpus_arm.py`'s arm (b) against `7c18f67`, every run of every workdir's
+  notes given a `resolved` contradicting its `bold` and `italic`, driven by a wrapper in `temp/` that edits no
+  committed tool, the planted change `bold` itself flipped, which must move bytes; and the readers by census —
+  no shipped script iterates a run's keys. *TP and FP red against `7c18f67`'s code first.*
+  **BUILT 2026-11-12 (3), the step's pull request opened and left open until 15.3:** 130 of 3,996 corpus runs
+  carry `resolved` (130 bold, 2 italic, every value `true`) in 4 of 10 documents, the other 6 byte-identical;
+  the corpus's notes 972,097 → 978,121 bytes, +0.62%, what the operator reads — an addition, at its least.
+  (i) 34 of 34 inputs identical, both trees, the planted change caught on 5 per tree; (ii) 13 of 13 workdirs
+  per tree, every output, exit code and finding identical with every run — 5,999 per tree — given a `resolved`
+  contradicting it, the planted change moving all 5 workdirs of its batch. `tests/test_style_cascade.py` 91 of
+  91 both trees, red at `7c18f67` on 16 — the 15 TP and the control; 17 of 17 mutants caught; the census: 2
+  shipped scripts read a run's entry, both by named key. The script is now 61,761 bytes, past 55,466 — section
+  3.2's choice (4): the manifest, not a size, is the control. `/code-review`: a styles part the relationships
+  place elsewhere is now unknown, not absent; table styles and the document-default override stay declared.
 - **15.2 — the rebuild probe, answered.** LIGHT, documents; it may ride with 15.1's session. From 15.1's output and
   apply's code: can step 16 layer per-span consumption onto apply's present `en_runs` path, or must extraction and
   apply be replaced wholesale? Answered in section 3.9's record and the decisions log, with its counts, and put to
-  Wouter at step 15's close — never a silent step into step 16. *Done when:* the answer is written, either way.
+  Wouter at step 15's close — never a silent step into step 16. *Done when:* the answer is written, either way. **ANSWERED 2026-11-12 (3), with 15.1: LAYERED, NOT REBUILT** — section 3.9's record.
 - **15.3 — `validate_segment_shapes.py`: G9's first half, by reading `tc_segments`.** HEAVY, both trees. G9's row
   took the source text to be absent from the notes, having measured `en_segments` alone; it is beside them, in
   `tc_segments`, aligned on 81 of 81 — **so no schema change, and the frozen intermediates stand.** The
