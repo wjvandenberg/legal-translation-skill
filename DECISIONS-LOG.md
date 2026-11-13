@@ -2904,3 +2904,35 @@ extends extraction and apply at the places section 3.9 of the build plan names, 
 design choice — where what the styles give WITHOUT a run's own formatting comes from — is still open, for step
 16's plan. The unattended chain of 2026-11-12 ended at step 15's close, as he set it; how step 16 runs is not
 decided.
+
+## 2026-11-12 (6) — Wouter: step 16 planned at one input point; his seven answers
+
+**WOUTER'S ANSWERS, 2026-11-12, QUOTED AS GIVEN** — each the option he chose in the question dialog, after the
+session had measured the corpus *(section 3.16 of the build plan owns the counts and the plan built on them)*:
+
+**(1) "Import extraction's (Recommended)"** — to *where apply gets what the styles alone give a run*: apply imports
+the resolver step 15 built in `extract_paragraphs.py`, over a copy inside apply or a new key in the notes; the
+notes, and what the operator reads, unchanged. **(2) "The source as shown (Recommended)"** — to *what apply writes
+where nothing is declared*: the source paragraph's formatting in force wherever its text runs agree, today's rule
+where they do not; a declared span stays absolute. **(3) "Honour declarations (Recommended)"** — to *the
+sub-heading test that discards the operator's `en_runs`*: declared formatting always wins, the test running only
+where nothing is declared. **(4) "Build it first (Recommended)"** — to *how step 16 catches a formatting error,
+step 11's check comparing text only*: a formatting comparison in the delivered check, report-only, as 16.1, and
+section 3.9's claim corrected.
+
+**(5) "Other properties (Recommended), The definitions range, Tab positions per run"** — to *which of option 3's
+further rows step 16 also builds*: all three. The session recommended the first alone; the other two widen the step
+to L2 and L3, and to A3's remainder, A6 and A21 — 16.6 and 16.7, each to be measured first. **(6) "Graft at load
+time (Recommended)"** — to *how the frozen notes gain `resolved`*: in memory, at every corpus run, from today's
+extraction of the matched source, nothing written into the archive. **(7) "Unattended, stop at contract
+(Recommended)"** — to *how step 16 is built*: 16.1 to 16.4 unattended, then a hand-back before 16.5 changes what
+the notes contain; 16.5 to 16.7 each planned with him first.
+
+**ONE READING THE SESSION TOOK, HIS TO OVERTURN:** answer (7) read as two pull requests — the first squash-merged at
+the hand-back, the second opened by 16.5. **AT THE OPENING:** the house's `auto_mode.py` v8, committed there since
+15.3, adopted byte for byte; its `cycle_evidence.py` v4, staged and not committed there, declared by content —
+and the house committed it with `check_checkers.py` v24 during this session, both declared by content, for the
+next opening. **THE AUDIT GATE'S CORRECTION, BEFORE THE COMMIT:** question (3)'s figures — 142 firings, 7
+declarations differing, 5 in italic and 2 in bold — were counted over the notes; where apply reaches the test
+they are 122, 4, 3 and 1, D09's three matching register A11's three cells. The answer does not turn on them;
+section 3.16 carries the corrected figures.
