@@ -2904,3 +2904,70 @@ extends extraction and apply at the places section 3.9 of the build plan names, 
 design choice — where what the styles give WITHOUT a run's own formatting comes from — is still open, for step
 16's plan. The unattended chain of 2026-11-12 ended at step 15's close, as he set it; how step 16 runs is not
 decided.
+
+## 2026-11-12 (6) — Wouter: step 16 planned at one input point; his seven answers
+
+**WOUTER'S ANSWERS, 2026-11-12, QUOTED AS GIVEN** — each the option he chose in the question dialog, after the
+session had measured the corpus *(section 3.16 of the build plan owns the counts and the plan built on them)*:
+
+**(1) "Import extraction's (Recommended)"** — to *where apply gets what the styles alone give a run*: apply imports
+the resolver step 15 built in `extract_paragraphs.py`, over a copy inside apply or a new key in the notes; the
+notes, and what the operator reads, unchanged. **(2) "The source as shown (Recommended)"** — to *what apply writes
+where nothing is declared*: the source paragraph's formatting in force wherever its text runs agree, today's rule
+where they do not; a declared span stays absolute. **(3) "Honour declarations (Recommended)"** — to *the
+sub-heading test that discards the operator's `en_runs`*: declared formatting always wins, the test running only
+where nothing is declared. **(4) "Build it first (Recommended)"** — to *how step 16 catches a formatting error,
+step 11's check comparing text only*: a formatting comparison in the delivered check, report-only, as 16.1, and
+section 3.9's claim corrected.
+
+**(5) "Other properties (Recommended), The definitions range, Tab positions per run"** — to *which of option 3's
+further rows step 16 also builds*: all three. The session recommended the first alone; the other two widen the step
+to L2 and L3, and to A3's remainder, A6 and A21 — 16.6 and 16.7, each to be measured first. **(6) "Graft at load
+time (Recommended)"** — to *how the frozen notes gain `resolved`*: in memory, at every corpus run, from today's
+extraction of the matched source, nothing written into the archive. **(7) "Unattended, stop at contract
+(Recommended)"** — to *how step 16 is built*: 16.1 to 16.4 unattended, then a hand-back before 16.5 changes what
+the notes contain; 16.5 to 16.7 each planned with him first.
+
+**ONE READING THE SESSION TOOK, HIS TO OVERTURN:** answer (7) read as two pull requests — the first squash-merged at
+the hand-back, the second opened by 16.5. **AT THE OPENING:** the house's `auto_mode.py` v8, committed there since
+15.3, adopted byte for byte; its `cycle_evidence.py` v4, staged and not committed there, declared by content —
+and the house committed it with `check_checkers.py` v24 during this session, both declared by content, for the
+next opening. **THE AUDIT GATE'S CORRECTION, BEFORE THE COMMIT:** question (3)'s figures — 142 firings, 7
+declarations differing, 5 in italic and 2 in bold — were counted over the notes; where apply reaches the test
+they are 122, 4, 3 and 1, D09's three matching register A11's three cells. The answer does not turn on them;
+section 3.16 carries the corrected figures.
+
+## 2026-11-13 — sub-step 16.1 built, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-13, QUOTED WHOLE,** typed into the session that conducts step 16: *"go - and continue opening new sessions etc yourself and following your own recommendations for the next 5.5 hours, I will not look at this and will just trust you. Also, do max one check / test etc per session, at the end, rather than doing all the tests all the time for each commit etc."* **No
+question was asked; each choice below is THE SESSION'S, its recommended answer, for him to confirm or overturn.**
+
+**(1) KEPT APART BY CONSTRUCTION:** the formatting arm's findings go to their own report key, `formatting`, and
+their own printed block, never into `findings` — over a non-blocking class inside it — so every existing finding,
+the blocking and counted totals, repack's delivered gate and every exit code stay as they were without a ruling
+having to be read; a defect inside the arm is said, NOT RUN with its exception's type, never raised. **(2) THE
+RESOLVER IMPORTED WHEN THE ARM RUNS,** as the side arm imports its reader: missing, the arm says NOT RUN and names
+`extract_paragraphs.py`; cut short, exit 3 under SKILL.md rule 6 — a ninth route in the sibling-import suite.
+**(3) AMBIGUOUS, NEVER GUESSED:** where one text names several paragraphs on either side formatted differently, the
+pair is counted and not judged — 15 of 1,469 paired on arm (b) — over the bracket arm's first-occurrence rule,
+which a formatting comparison cannot borrow. **(4) EACH SIDE ITS OWN STYLES:** a `.docx` delivery resolved over
+its own styles part, an `.xml` one over the original's, said; the findings identical either way, the two trees
+stopping different documents at repack. **(5) A PATH ON EVERY FINDING** — rebuilt, tc, same-text — so the plan's
+rebuilt counts compare like for like. **(6) THE PINS IN THE CORPUS ARM:** `tools/delivered_corpus_arm.py` prints
+the arm on both arms and pins thirteen counts on arm (b), the prompt's eight instances with A17's bold beside its
+character style and A12's two underlines on D09, and A17's two sets of paragraphs being one. **(7) THE MUTANTS
+ON uk ONLY:** the arm's block is byte-identical in the two trees, which the port's own proof and the suite's case
+12 assert. **(8) THE REGISTER NOT TOUCHED:** 16.1 is an instrument; each row closes at the sub-step that repairs
+it. **(9) AT THE OPENING:** the house's `cycle_evidence.py` v4 and `check_checkers.py` v24 adopted byte for byte,
+each fingerprint its committed blob's. **(10) THE REVIEW'S THREE, DECLARED, NOT CHANGED:** a text box's
+tracked change labels its outer paragraph tc, and a whitespace-only difference labels one same-text — a path
+label each, never a class or a count; and the original's archive is opened twice.
+
+**MEASURED, BOTH TREES IDENTICAL:** `temp/s1113_derive.py`, positional on apply's raw output before the arm
+existed, and the arm on arm (b), by text on the delivery, agree on 104 of 104 findings — 100 rebuilt, 4 in
+tracked changes — over 1,453 of 1,469 paired paragraphs compared; arm (a), the July deliveries, 147.
+
+**(11) THE FULL RUN'S ONE RED, REPAIRED HERE:** `tests/test_cycle_gate.py` asserted that a failing command
+leaves no store file — v3's behaviour; v4's pass ledger counts every run, a red one too, so the case now asserts
+no phase RECORD, the thing `check` accepts. VERIFY re-run for that delta alone, the first VERIFY's 46 of 46
+standing for the rest, its code hashes stamped and unchanged; the full run then once more, on the exact tree.

@@ -26,6 +26,8 @@
       {"name": "declared_language [us]", "command": "uv run --with lxml python tests/test_declared_language.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "delivered_check", "command": "uv run --with lxml python tests/test_delivered_check.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "delivered_check [us]", "command": "uv run --with lxml python tests/test_delivered_check.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
+      {"name": "delivered_formatting", "command": "uv run --with lxml python tests/test_delivered_formatting.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
+      {"name": "delivered_formatting [us]", "command": "uv run --with lxml python tests/test_delivered_formatting.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "delivered_sides", "command": "uv run --with lxml python tests/test_delivered_sides.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "delivered_sides [us]", "command": "uv run --with lxml python tests/test_delivered_sides.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "document_language", "command": "uv run --with lxml python tests/test_document_language.py", "count": "([0-9]+) assertions"},
