@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-12 (6), STEP 16's PLAN — SESSION PURPOSE — what · how · purpose:** step 16's written plan as section 3.16, its sub-steps each with its controls, VERIFY, TEST and triage · the code read in both trees, counts measured over the corpus with a planted control, every decision put to Wouter at one input point, no code · **so that the largest change in the build plan is made against a plan written against the code, not a guess** *(written immediately after the tag `rollback-2026-11-12f-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-13, SUB-STEP 16.1 — SESSION PURPOSE — what · how · purpose:** a formatting arm in the delivered-document check, report-only, both trees · measured first, its own plan written into 16.1's entry, built, every check once at the end · **so that every later sub-step of step 16 is judged by an instrument that can see bold, italic and the properties en_runs cannot express** *(written immediately after the tag `rollback-2026-11-13-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -1689,7 +1689,7 @@ ahead of the conditional rewrite at branch 10, so that dependency resolves early
    the character-exact comparison is the only instrument that would catch it.**
    **CORRECTED 2026-11-12 (6), BY MEASUREMENT:** that comparison is of text — `validate_apply.py` names bold or
    italic 0 times — so it could not catch a wrong cascade, and nothing else did; 16.1 builds one that can, first
-   *(section 3.16)*.
+   *(section 3.16)* — **built 2026-11-13, report only: the delivered check's formatting arm.**
 
 **SLICE A IS THE REBUILD PROBE, and it is a decision point rather than a formality.** The fork was closed at
 §3.1 on the argument that the leap is available without a rebuild — with one escape clause: if a per-span
@@ -3203,6 +3203,33 @@ the off-flag totals identical on 44 of 44 rows:
   pin. **MUST NOT:** block, or move an exit code. **Section 3.9's claim, corrected when this plan was filed, is
   then made good:** an instrument that sees formatting exists. *Done when:* each named instance found, each FP
   quiet.
+  **16.1's OWN PLAN — 2026-11-13, written before any code** *(unattended; the session's choices are
+  `DECISIONS-LOG.md` 2026-11-13's, Wouter's to overturn)*. **Changes:** `validate_apply.py`, both trees — one arm
+  called by the delivered check once the text arm has paired, only with `--original`: its own printed block and
+  its own report key, `formatting`, beside `findings` and never in it, so every finding, the blocking and counted
+  totals and every exit code stay as they are by construction, and a defect inside the arm is said, never raised;
+  extraction's `read_style_cascade` and `resolve_run` imported when the arm runs, as the side arm imports its
+  reader — a missing sibling NOT RUN and named, a cut-short one exit 3 under SKILL.md rule 6 — the route declared
+  in `tests/test_sibling_import_integrity.py`; a new suite, `tests/test_delivered_formatting.py`, invented
+  documents only; `tools/delivered_corpus_arm.py` printing the arm per document on both arms, pinning (b)'s.
+  **Pairing — the text arm's, never a second:** an entry's delivered partner as `paired` holds it, its source
+  paragraph as the bracket arm finds it, by extraction's text; where one text names several paragraphs on either
+  side and their formatting differs, the pair is AMBIGUOUS — counted, never judged. **Compared:** the text runs
+  each paragraph OWNS (nearest `w:p`, non-blank `w:t`, so the accept reading); bold and italic in force over each
+  side's own styles part — an `.xml` delivery has none, so the original's, said; the eleven other properties by
+  their direct value, as the probes read them, said. A finding carries its path — rebuilt, tc, or same text — so
+  the derivation's rebuilt counts are compared like for like. **Must not:** a finding, a total, an exit code or a
+  delivered byte moved; a property value, a style id or a word of text printed. **Derived first:**
+  `temp/s1113_derive.py`, positional on apply's raw output, both trees, before the arm ran. **Checked against:**
+  the register rows' instances by document; ST_OnOff's tri-state and the toggle rule as 15.1 resolves them; the
+  journal's nearest-paragraph ownership; the pin's report and exit codes, workdir by workdir.
+  **BUILT 2026-11-13, unattended** *(`DECISIONS-LOG.md` 2026-11-13)*: **every named instance found on arm (b),
+  both trees, at the counts `temp/s1113_derive.py` derived first** — A12 D06 2 and its D09 underlines 2, A11 D09
+  3, A13 D04 7, A14 D10 1, A7 and A18 D02 1 each, A18 D06's small capitals 2, A17 D03 and D03B 2 each, its
+  character style and its bold on the same paragraphs, A4 D11 2. Arm (b) and the derivation agree on 104 of 104
+  findings, 100 rebuilt and 4 in tracked changes, over 1,453 of 1,469 paired paragraphs compared, 15 ambiguous;
+  arm (a), the July deliveries, 147. Each FP quiet on invented documents; every check run identical to the pin's
+  outside the arm's block; every delivery and exit code unchanged against the pin.
 - **16.2 — the frozen notes regenerated at load time.** MEDIUM, `tools/` only *(Wouter's answer: graft at load
   time)*. One committed helper grafts today's extraction's `resolved` into a frozen workdir's notes IN MEMORY, from
   the matched source, run by run, and refuses — VOID, never a pass — wherever an entry's idx, text or runs differ;

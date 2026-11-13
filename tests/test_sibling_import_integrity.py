@@ -4,7 +4,8 @@
 Five shipped scripts import a sibling script and, by design, carry on without it when it is MISSING - a partial
 install: validate_apply -> post_process (an inlined copy of the spacing rule), validate_apply ->
 translate_headers_footers (the side-part arm's reader, lazily), translate_headers_footers -> extract_paragraphs
-(graphic metadata), repack_docx -> lexicon_compliance (a best-effort language agreement). The fifth,
+(graphic metadata), repack_docx -> lexicon_compliance (a best-effort language agreement) - and since sub-step 16.1
+validate_apply -> extract_paragraphs (the formatting arm's style resolver, lazily, the arm said NOT RUN). The fifth,
 validate_en_runs -> reorder_definitions, has no fallback at all; nor, since sub-step 14.11, have the sixth and
 seventh, quality_check -> lexicon_compliance (its legislation tail) and quality_check -> post_process (its reader of
 the operator's declared italic); nor, since sub-step 15.3, has the eighth, validate_segment_shapes ->
@@ -57,6 +58,9 @@ LANGUAGE_MODULE = "source_language_markers"     # tests/test_language_module_int
 ROUTES = [
     ("validate_apply.py", "post_process.py", "load", True),
     ("validate_apply.py", "translate_headers_footers.py", "sides", True),
+    # sub-step 16.1: the delivered check's formatting arm asks extraction's style resolver, only with an original;
+    # report only, so a MISSING resolver leaves the arm NOT RUN and named, and the check's verdict as it was
+    ("validate_apply.py", "extract_paragraphs.py", "format", True),
     ("translate_headers_footers.py", "extract_paragraphs.py", "load", True),
     ("repack_docx.py", "lexicon_compliance.py", "load", True),
     ("validate_en_runs.py", "reorder_definitions.py", "en_runs", False),
@@ -70,7 +74,8 @@ ROUTES = [
 # the names each importer asks of its sibling: a clean cut before the sibling's own check must remove every one
 NAMES = {"post_process.py": ["will_fix_spacing_fire", "load_declared_notes", "_notes_norm", "_declared_italic"],
          "translate_headers_footers.py": ["_field_aware_text_and_fields", "_para_text"],
-         "extract_paragraphs.py": ["_GRAPHIC_ATTR_SURFACES", "graphic_metadata_surfaces"],
+         "extract_paragraphs.py": ["_GRAPHIC_ATTR_SURFACES", "graphic_metadata_surfaces", "read_style_cascade",
+                                   "resolve_run", "get_prop_tristate"],
          "lexicon_compliance.py": ["_guess_language", "ART_LEGISLATION_FOLLOWS"],
          "reorder_definitions.py": ["find_definitions_section_in_texts"],
          "apply_translations_textmatch.py": ["distribute_text_across_elements", "effective_segment_texts",
@@ -136,13 +141,13 @@ def helper_copies(scripts, name):
 
 def argv_for(reach, work):
     """How each importer reaches its import. The three at load import before they read an argument; the side-part
-    arm imports its reader only inside the delivered check against an original; validate_en_runs imports inside
-    main, after its one argument is parsed."""
+    arm imports its reader, and the formatting arm its resolver, only inside the delivered check against an
+    original; validate_en_runs imports inside main, after its one argument is parsed."""
     if reach == "load":
         return []
     paragraphs = work / "paragraphs.json"
     paragraphs.write_bytes(b"[]")
-    if reach == "sides":
+    if reach in ("sides", "format"):
         return [str(paragraphs), "--delivered", str(FIXTURE), "--original", str(FIXTURE)]
     if reach == "en_runs":
         return [str(paragraphs)]

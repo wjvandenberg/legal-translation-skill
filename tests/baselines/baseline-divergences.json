@@ -61,9 +61,9 @@
    "sha256_now": "043bfc59f88175b316b112c8d62bde324b24d4d3b0824e4bd6a83df5186e75db"
   },
   "uk/scripts/validate_apply.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "4f4a969064f1bd1f09a500f16ebfcebeae78bb551280ecc8471d4ea7b0d82829"
+   "changed_by": "feature/step16-formatting-part-2",
+   "commit_subject": "Step 16.1 - the formatting comparison, report only: the delivered check sees bold, italic and eleven run properties, and finds every named register instance on the corpus",
+   "sha256_now": "4d1b0ab8e238ee34125854089e6cfd54fe33dd00cfac616c403cb84fc1c30c07"
   },
   "uk/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/step15-formatting-part-1",
@@ -161,9 +161,9 @@
    "sha256_now": "043bfc59f88175b316b112c8d62bde324b24d4d3b0824e4bd6a83df5186e75db"
   },
   "us/scripts/validate_apply.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "8d97848958881b712b5907e7f02b1165ceec9572550788381113cde39b664eec"
+   "changed_by": "feature/step16-formatting-part-2",
+   "commit_subject": "Step 16.1 - the formatting comparison, report only: the delivered check sees bold, italic and eleven run properties, and finds every named register instance on the corpus",
+   "sha256_now": "98bd8be26294e7aed2f232ddfde87c52ee3ddfddb53c8e08854e629eff79c4b2"
   },
   "us/scripts/validate_segment_shapes.py": {
    "changed_by": "feature/step15-formatting-part-1",

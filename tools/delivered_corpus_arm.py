@@ -113,6 +113,12 @@ members MUST move -- by their language values and nothing else -- exactly where 
 not the variant's, and every value in every delivered language part must read the variant's; a pin carrying 13.5
 moves nothing there; and against a pin that predates it, a run where no side part's language moved FAILS.
 
+STEP 16, SUB-STEP 16.1 (2026-11-13) READS THE CHECK'S NEW FORMATTING ARM, which is report only and kept out of the
+findings every assertion above reads: both arms print it per document - paired, compared, ambiguous, the styles part
+read, and its findings by property, class and path - and arm (b) pins the register's instances at the counts
+temp/s1113_derive.py derived first, positional on apply's raw output (FMT_PINS), with the arm said to have run on
+every rebuilt workdir. Arm (a), the July deliveries, is measured and reported, never pinned.
+
 WHAT IT NEVER PRINTS: a filename, a path below the logs root, or any document text. Doc-ids,
 paragraph indices, classes and lengths only (CLAUDE.md 5.6). Nothing is written into the logs
 folder: every input is copied into a temporary directory first.
@@ -334,6 +340,46 @@ NAMED_2A = [
     ("brackets", ALL_DOCS, "23 other differences from the source, a count only",
      lambda R: (sum(brk(rep, "other") for rep, _ in R.values()) == 23, f"{per_doc(R, lambda r: brk(r, 'other'))}")),
 ]
+
+
+# SUB-STEP 16.1 (2026-11-13), STATED BEFORE MEASURING: validate_apply's FORMATTING ARM, report only, must find on
+# arm (b) the register's instances at the counts temp/s1113_derive.py derived first and independently -- positional
+# pairing on apply's RAW output, where the arm pairs by text on the DELIVERY -- both trees identical: per document,
+# (row, property, class) -> findings on the REBUILT path, the probes' population. D03's and D03B's two party-block
+# paragraphs are one set read twice (A17): the character style lost and the bold with it, so the two sets of idx
+# must be the same. Arm (a), the July deliveries, is measured and reported, never pinned.
+FMT_PINS = [("A12", "D06", "bold", "uniform-lost", 2), ("A11", "D09", "italic", "uniform-lost", 3),
+            ("A13", "D04", "u", "mixed-lost", 7), ("A14", "D10", "highlight", "mixed-lost", 1),
+            ("A7", "D02", "highlight", "mixed-lost", 1), ("A18", "D02", "highlight", "mixed-spread", 1),
+            ("A18", "D06", "smallCaps", "mixed-spread", 2), ("A17", "D03", "rStyle", "mixed-lost", 2),
+            ("A17", "D03B", "rStyle", "mixed-lost", 2), ("A17", "D03", "bold", "mixed-spans", 2),
+            ("A17", "D03B", "bold", "mixed-spans", 2), ("A4", "D11", "shd", "mixed-lost", 2),
+            ("A12", "D09", "u", "mixed-lost", 2)]
+
+
+def fmt_found(rep, prop, cls, path="rebuilt"):
+    return sorted(f["idx"] for f in (rep.get("formatting") or {}).get("findings") or []
+                  if f["property"] == prop and f["class"] == cls and f["path"] == path)
+
+
+def fmt_lines(key, rep):
+    """Sub-step 16.1's arm for one report: its summary and findings by property, class and path -- counts and
+    indices only, as the check prints them."""
+    fm = rep.get("formatting")
+    if not fm:
+        return [f"  {key:6} formatting: n/a — a report written before sub-step 16.1"]
+    if not fm.get("ran"):
+        return [f"  {key:6} formatting: NOT RUN — {fm.get('why')}"]
+    out = [f"  {key:6} formatting: paired {fm['paired']} compared {fm['compared']} source-not-found "
+           f"{fm['source_not_found']} ambiguous {fm['ambiguous']} no-text-run {fm['no_text_run']} · styles: "
+           f"{fm['styles']} · findings by path {fm['findings_by_path'] or 'none'}"]
+    groups = defaultdict(list)
+    for f in fm.get("findings") or []:
+        groups[(f["property"], f["class"], f["path"])].append(f["idx"])
+    for (prop, cls, path), idx in sorted(groups.items()):
+        out.append(f"        {prop:<10} {cls:<15} {path:<9} {len(idx):3d} at idx {sorted(idx)[:16]}"
+                   + (f" ... +{len(idx) - 16}" if len(idx) > 16 else ""))
+    return out
 
 
 _TEXTS = {}
@@ -1896,6 +1942,11 @@ if args.arm in ("a", "both"):
         if passed:
             print(f"        {detail}")
     print(f"\n  examined {len(reports_a)} of {len(workdirs)} workdirs")
+    print("\n  SUB-STEP 16.1 — THE FORMATTING ARM ON THE JULY DELIVERIES, measured and reported, never pinned "
+          "(document.xml deliveries, so read with the original's styles):")
+    for key, (rep, _rc) in reports_a.items():
+        for line in fmt_lines(key, rep):
+            print(line)
 
 if args.arm in ("b", "both"):
     print("\nARM (b) — THE SAME 13 REBUILT THROUGH TODAY'S PIPELINE: IT MUST NOT CRY WOLF")
@@ -1986,6 +2037,29 @@ if args.arm in ("b", "both"):
             ok(f"{key}: comment anchors delivered equal the original's, "
                + " ".join(f"{k} {v}" for k, v in want.items()),
                all(got.get(k) == (v, v) for k, v in want.items()), f"original/delivered {got}")
+    # SUB-STEP 16.1: the formatting arm ran on every rebuilt workdir, and found the register's instances at the
+    # derivation's counts -- see FMT_PINS. A document outside this run is said, never passed.
+    print("\n  SUB-STEP 16.1 — THE FORMATTING ARM, REPORT ONLY, ON TODAY'S BUILD:")
+    for key, (rep, _rc) in reports_b.items():
+        for line in fmt_lines(key, rep):
+            print(line)
+        ok(f"{key}: the formatting arm ran", bool((rep.get("formatting") or {}).get("ran")),
+           f"{(rep.get('formatting') or {}).get('why', 'no formatting key - the check predates 16.1')}")
+    for row, d, prop, cls, n in FMT_PINS:
+        keys = [k for k in reports_b if did_of(k) == d]
+        if not keys:
+            print(f"  --   {row} on {d}: not in this run — NOT ASSERTED")
+            continue
+        for key in keys:
+            got = fmt_found(reports_b[key][0], prop, cls)
+            ok(f"{key}: {row} — {prop} {cls}, rebuilt, at the derived count {n}", len(got) == n,
+               f"found {len(got)} at idx {got}")
+    for d in ("D03", "D03B"):
+        for key in [k for k in reports_b if did_of(k) == d]:
+            rep = reports_b[key][0]
+            ok(f"{key}: A17 — the paragraphs that lost the character style are the ones that lost bold spans",
+               fmt_found(rep, "rStyle", "mixed-lost") == fmt_found(rep, "bold", "mixed-spans"),
+               f"rStyle {fmt_found(rep, 'rStyle', 'mixed-lost')}, bold {fmt_found(rep, 'bold', 'mixed-spans')}")
     if REFTREE is not None:
         print(f"\n  SUB-STEPS 2b AND 4a — BYTES MOVE BY U+200B REMOVAL WHERE THE PIN PREDATES 2b's SCRUB AND ITS "
               f"DELIVERY CARRIED ONE, AND BY A WRAPPER THE GUARD KEPT WHERE THE PIN PREDATES 4a's GUARD; "

@@ -2936,3 +2936,38 @@ next opening. **THE AUDIT GATE'S CORRECTION, BEFORE THE COMMIT:** question (3)'s
 declarations differing, 5 in italic and 2 in bold — were counted over the notes; where apply reaches the test
 they are 122, 4, 3 and 1, D09's three matching register A11's three cells. The answer does not turn on them;
 section 3.16 carries the corrected figures.
+
+## 2026-11-13 — sub-step 16.1 built, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-13, QUOTED WHOLE,** typed into the session that conducts step 16: *"go - and continue opening new sessions etc yourself and following your own recommendations for the next 5.5 hours, I will not look at this and will just trust you. Also, do max one check / test etc per session, at the end, rather than doing all the tests all the time for each commit etc."* **No
+question was asked; each choice below is THE SESSION'S, its recommended answer, for him to confirm or overturn.**
+
+**(1) KEPT APART BY CONSTRUCTION:** the formatting arm's findings go to their own report key, `formatting`, and
+their own printed block, never into `findings` — over a non-blocking class inside it — so every existing finding,
+the blocking and counted totals, repack's delivered gate and every exit code stay as they were without a ruling
+having to be read; a defect inside the arm is said, NOT RUN with its exception's type, never raised. **(2) THE
+RESOLVER IMPORTED WHEN THE ARM RUNS,** as the side arm imports its reader: missing, the arm says NOT RUN and names
+`extract_paragraphs.py`; cut short, exit 3 under SKILL.md rule 6 — a ninth route in the sibling-import suite.
+**(3) AMBIGUOUS, NEVER GUESSED:** where one text names several paragraphs on either side formatted differently, the
+pair is counted and not judged — 15 of 1,469 paired on arm (b) — over the bracket arm's first-occurrence rule,
+which a formatting comparison cannot borrow. **(4) EACH SIDE ITS OWN STYLES:** a `.docx` delivery resolved over
+its own styles part, an `.xml` one over the original's, said; the findings identical either way, the two trees
+stopping different documents at repack. **(5) A PATH ON EVERY FINDING** — rebuilt, tc, same-text — so the plan's
+rebuilt counts compare like for like. **(6) THE PINS IN THE CORPUS ARM:** `tools/delivered_corpus_arm.py` prints
+the arm on both arms and pins thirteen counts on arm (b), the prompt's eight instances with A17's bold beside its
+character style and A12's two underlines on D09, and A17's two sets of paragraphs being one. **(7) THE MUTANTS
+ON uk ONLY:** the arm's block is byte-identical in the two trees, which the port's own proof and the suite's case
+12 assert. **(8) THE REGISTER NOT TOUCHED:** 16.1 is an instrument; each row closes at the sub-step that repairs
+it. **(9) AT THE OPENING:** the house's `cycle_evidence.py` v4 and `check_checkers.py` v24 adopted byte for byte,
+each fingerprint its committed blob's. **(10) THE REVIEW'S THREE, DECLARED, NOT CHANGED:** a text box's
+tracked change labels its outer paragraph tc, and a whitespace-only difference labels one same-text — a path
+label each, never a class or a count; and the original's archive is opened twice.
+
+**MEASURED, BOTH TREES IDENTICAL:** `temp/s1113_derive.py`, positional on apply's raw output before the arm
+existed, and the arm on arm (b), by text on the delivery, agree on 104 of 104 findings — 100 rebuilt, 4 in
+tracked changes — over 1,453 of 1,469 paired paragraphs compared; arm (a), the July deliveries, 147.
+
+**(11) THE FULL RUN'S ONE RED, REPAIRED HERE:** `tests/test_cycle_gate.py` asserted that a failing command
+leaves no store file — v3's behaviour; v4's pass ledger counts every run, a red one too, so the case now asserts
+no phase RECORD, the thing `check` accepts. VERIFY re-run for that delta alone, the first VERIFY's 46 of 46
+standing for the rest, its code hashes stamped and unchanged; the full run then once more, on the exact tree.
