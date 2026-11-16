@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""auto_mode.py - the counter an unattended chain of sessions runs on.  CHECKER VERSION 7 (2026-11-05)
+"""auto_mode.py - the counter an unattended chain of sessions runs on.  CHECKER VERSION 8 (2026-11-12)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -34,6 +34,8 @@ hop halts on arrival and says so instead of racing.
     uv run python tools/auto_mode.py --status     # what a hop needs to know, read-only
     uv run python tools/auto_mode.py --claim      # THE HOP'S FIRST ACT: take the next number
     uv run python tools/auto_mode.py --release    # the hop's last act: let the next one in
+    uv run python tools/auto_mode.py --release --done   # ...or, the run's work all finished,
+                                                 # close the run COMPLETE before its bound (v8)
     uv run python tools/auto_mode.py --arm --run-id X --hops 4 --branch session/y --effort xhigh
     uv run python tools/auto_mode.py --arm ... --until 15:30   # or --for 7: when the run
                                                  # ends, held as one UNTIL (v6) - never both
@@ -89,6 +91,18 @@ being the hop's first read. UNDER answer --blocked STAYS, for a check that fails
 fixed - a question is never its reason there, and its words ask for the check, not a question.
 A value that is neither is VOID: the hop cannot know which rule binds it. The guard's refusals
 are the same in both modes - an answered question never reaches an irreversible act.
+
+THE FINISHED RUN (v8). Before v8 a run reached COMPLETE only by its last hop's release or by its
+time running out, so a run whose work ended before its hop bound could be closed only by --stop -
+STOPPED, the word for a person pulling the switch, on a run nobody had stopped. That became
+routine once a hop takes work until 75% context rather than one step: a run armed for three hops
+often finishes in one. --release --done is the hop declaring every item of the run's work row
+finished, as its last act: it releases the lock and sets COMPLETE in one write, and --hop-check
+then says the work is finished and names no next hop. It is refused, as a bare --release is,
+without a claim, and refused on a run that is not RUNNING - a STOPPED or BLOCKED run keeps the
+word that says why it ended - before the lock is touched, so the hop can still release plainly.
+--done with anything but --release is refused rather than ignored. A block needs no new field:
+COMPLETE before the bound with the time not up has --done as its one writer.
 
 THE EFFORT A HOP RUNS AT (v3), AND WHY ARMING REFUSES WITHOUT IT. Measured 2026-09-30: a
 desktop session at `xhigh` armed a run, the runner was started from a plain terminal, and the
@@ -470,19 +484,33 @@ def act_claim(fields: dict) -> tuple[int, list[str], bool]:
                    "  Run --release as your LAST act."], True
 
 
-def act_release(fields: dict) -> tuple[int, list[str], bool]:
-    """The hop's last act. Also closes the run when the last hop finishes."""
+def act_release(fields: dict, done: bool = False) -> tuple[int, list[str], bool]:
+    """The hop's last act. Also closes the run when the last hop finishes - or, with `done`
+    (v8), when the hop declares every item of the run's work row finished before its hop bound.
+    """
     k, n = as_int(fields, "K"), as_int(fields, "N")
     if fields["HOP_ACTIVE"].lower() != "yes":
         return RC_REFUSED, ["REFUSED: nothing to release - HOP_ACTIVE is already 'no'.",
                             "         Either --claim never ran, or this is a second release.",
                             "         Both mean the counter no longer describes reality."], False
+    # --done CLOSES ONLY A LIVE RUN, for the reason the time does below: a STOPPED or BLOCKED run
+    # keeps the word that says why it ended. Refused BEFORE the lock is touched, so the hop
+    # still holds its claim and can release without --done.
+    if done and fields["STATUS"].upper() != RUNNING:
+        return RC_REFUSED, [f"REFUSED: --done on a run whose STATUS is {fields['STATUS']!r}, not "
+                            f"{RUNNING} - a run that",
+                            "         has already ended keeps the word that says why. Release "
+                            "without --done."], False
     fields["HOP_ACTIVE"] = "no"
     lines = [f"  RELEASED: hop {k} of {n} is finished."]
     # ONLY A LIVE RUN IS CLOSED BY ITS TIME: a STOPPED or BLOCKED one keeps the word that says
     # why it ended, which is the record a person reads afterwards.
     up = time_up(fields) if fields["STATUS"].upper() == RUNNING and k < n else None
-    if k >= n:
+    if done:
+        fields["STATUS"] = COMPLETE
+        lines.append(f"  STATUS set to COMPLETE - the hop declared the run's work finished: {k} of "
+                     f"{n} hops ran" + (f", and no hop {k + 1} starts." if k < n else "."))
+    elif k >= n:
         fields["STATUS"] = COMPLETE
         lines.append("  STATUS set to COMPLETE - that was the last hop of the run.")
     elif up:
@@ -676,6 +704,11 @@ def act_hop_check(fields: dict, root: Path, started: int) -> tuple[int, list[str
     elif up and k < n and status in (RUNNING, COMPLETE):
         nxt = (f"  -> the run's time is up: it was to end at {say_time(up)}, and it is now "
                f"{datetime.now():%H:%M} - so no hop {k + 1}. Hand back, starting nothing.")
+    elif status == COMPLETE and k < n:
+        # COMPLETE BEFORE THE HOP BOUND, WITH THE TIME NOT UP, HAS ONE WRITER: --release --done
+        # (v8) - so the line says the work is finished, not merely that the run ended.
+        nxt = (f"  -> the run is COMPLETE - hop {k} declared its work finished, {k} of {n} hops "
+               "ran: hand back, starting nothing.")
     else:
         nxt = f"  -> the run is {fields['STATUS']}: hand back, starting nothing."
     return RC_OK, [f"  hop {k} of {n} released, and {why}.", nxt]
@@ -799,6 +832,9 @@ def main(argv) -> int:
     ap.add_argument("--status", action="store_true")
     ap.add_argument("--claim", action="store_true")
     ap.add_argument("--release", action="store_true")
+    ap.add_argument("--done", action="store_true",
+                    help="--release only: the hop declares every item of the run's work row "
+                         "finished, so the run closes COMPLETE before its hop bound (v8)")
     ap.add_argument("--stop", action="store_true")
     ap.add_argument("--blocked", action="store_true",
                     help="THE HOP'S OWN halt: a question it may not answer alone")
@@ -835,6 +871,12 @@ def main(argv) -> int:
         print("  say exactly one of --status --claim --release --stop --blocked --arm "
               "--hop-check")
         return RC_COULD_NOT_RUN
+    if a.done and not a.release:
+        # REFUSED, NOT IGNORED: a --done riding on another action would leave the hop believing
+        # it had declared the work finished.
+        print("  --done goes with --release only - the hop's last act, declaring the run's work "
+              "finished")
+        return RC_COULD_NOT_RUN
 
     f = find_state_file(a.file)
     if f is None:
@@ -862,7 +904,7 @@ def main(argv) -> int:
         elif a.claim:
             rc, lines, dirty = act_claim(fields)
         elif a.release:
-            rc, lines, dirty = act_release(fields)
+            rc, lines, dirty = act_release(fields, a.done)
         elif a.stop:
             rc, lines, dirty = act_stop(fields)
         elif a.blocked:
@@ -1192,6 +1234,35 @@ def selftest() -> int:
              bad=lambda d: _q_state(d, "anwser"),
              good=lambda d: _q_state(d, "answer"),
              want="VOID", good_want="CLAIMED"),
+        # THE FINISHED RUN (v8): a hop that finishes the run's work before its hop bound closes it
+        # COMPLETE. Before v8 only the last hop's release or the time could, so a run done early
+        # could only be STOPPED - a person's word. Driven through main(), as a hop types it.
+        Case("--release --done closes the run", _probe_release_cli,
+             bad=lambda d: (_state(d, k=1, active="yes"), ["--release", "--done"]),
+             good=lambda d: (_state(d, k=1, active="yes"), ["--release"]),
+             want=COMPLETE, good_want=RUNNING),
+        Case("--done without a claim is refused", _probe_release_cli,
+             bad=lambda d: (_state(d, k=1, active="no"), ["--release", "--done"]),
+             good=lambda d: (_state(d, k=1, active="yes"), ["--release", "--done"]),
+             want="REFUSED", good_want=COMPLETE),
+        # ...AND ONLY ON A LIVE RUN: a STOPPED or BLOCKED one keeps the word that says why it ended.
+        Case("--done on a run not RUNNING is refused", _probe_release_cli,
+             bad=lambda d: (_state(d, k=1, active="yes", status=STOPPED), ["--release", "--done"]),
+             good=lambda d: (_state(d, k=1, active="yes"), ["--release", "--done"]),
+             want="REFUSED", good_want=COMPLETE),
+        # A --done riding on another action would be ignored in silence - a stop that the hop
+        # believed declared the work finished.
+        Case("--done goes with --release only", _probe_release_cli,
+             bad=lambda d: (_state(d, k=1, active="no"), ["--stop", "--done"]),
+             good=lambda d: (_state(d, k=1, active="yes"), ["--release", "--done"]),
+             want=f"rc {RC_COULD_NOT_RUN}", good_want=COMPLETE),
+        # THE CONDUCTOR'S WORD AFTER IT: the run complete, and why - never "start hop 2".
+        Case("--hop-check after --done starts nothing", _probe_hop_after_release,
+             bad=lambda d: (_hop_state(d, active="yes", recorded=(_AFTER, 0, False)),
+                            ["--release", "--done"]),
+             good=lambda d: (_hop_state(d, active="yes", recorded=(_AFTER, 0, False)),
+                             ["--release"]),
+             want="WORK DONE", good_want="START 2"),
     ]
     ok_cases, paired, unpaired = run_cases(cases, tmp)
     ok &= ok_cases
@@ -1660,6 +1731,50 @@ def _probe_blocked_words(f: Path) -> str:
     if "write the question down" in text:
         return "QUESTION"
     return "CHECK" if "a check that fails" in text else "NEITHER"
+
+
+# ---- THE FINISHED RUN's probes (v8). Through main(), so the flag itself is under test, and read
+#      back off the FILE, so a field set and not written is a MISS.
+
+def _probe_release_cli(args) -> str:
+    """(state file, arguments) through main(): the STATUS the file carries after, with the lock
+    released - or REFUSED, or rc N for a command line refused outright (an unknown flag included,
+    which is how v7 answers --done), or the lock left held."""
+    import contextlib                                               # noqa: PLC0415
+    import io                                                       # noqa: PLC0415
+    f, extra = args
+    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+        try:
+            rc = main(["--file", str(f), *extra])
+        except SystemExit as e:
+            rc = e.code
+    if rc == RC_REFUSED:
+        return "REFUSED"
+    if rc != RC_OK:
+        return f"rc {rc}"
+    after = read_state(f)[0]
+    return after["STATUS"] if after["HOP_ACTIVE"] == "no" else f"lock left {after['HOP_ACTIVE']!r}"
+
+
+def _probe_hop_after_release(args) -> str:
+    """(hop state, release arguments): the release through main(), then --hop-check by a
+    conductor that started hop 1 - START 2 when it names hop 2, WORK DONE when it names none AND
+    says the work was finished, so a bare 'hand back' would not pass."""
+    f, extra = args
+    released = _probe_release_cli((f, extra))
+    if released not in (RUNNING, COMPLETE):
+        return released
+    try:
+        rc, lines = act_hop_check(read_state(f)[0], f.parent, 1)
+    except Void:
+        return "VOID"
+    if rc != RC_OK:
+        return "REFUSED"
+    text = "\n".join(lines)
+    if "start hop 2" in text:
+        return "START 2"
+    return ("WORK DONE" if "finished" in text and "starting nothing" in text
+            else "NO REASON GIVEN")
 
 
 if __name__ == "__main__":

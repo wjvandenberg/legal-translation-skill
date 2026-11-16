@@ -113,6 +113,28 @@ members MUST move -- by their language values and nothing else -- exactly where 
 not the variant's, and every value in every delivered language part must read the variant's; a pin carrying 13.5
 moves nothing there; and against a pin that predates it, a run where no side part's language moved FAILS.
 
+STEP 16, SUB-STEP 16.1 (2026-11-13) READS THE CHECK'S NEW FORMATTING ARM, which is report only and kept out of the
+findings every assertion above reads: both arms print it per document - paired, compared, ambiguous, the styles part
+read, and its findings by property, class and path - and arm (b) pins the register's instances at the counts
+temp/s1113_derive.py derived first, positional on apply's raw output (FMT_PINS), with the arm said to have run on
+every rebuilt workdir. Arm (a), the July deliveries, is measured and reported, never pinned.
+
+STEP 16, SUB-STEP 16.3 (2026-11-16) CHANGES WHAT --ref ASSERTS AGAINST A PIN THAT PREDATES IT, as sub-step 2b did:
+apply now writes bold and italic only where the styles do not already give them, so the three XML members may move
+by their b, bCs, i and iCs flags alone - every paragraph's text and runs the same once those are set aside - and
+every text run's bold and italic IN FORCE, read by today's extraction over the source's styles, the same but in the
+paragraphs derived first (MOVE_16_3: D06's two headings, a bold gain, in every member the chain wrote). And
+post_process's journal, which counts every element before and after each pass, may move by those counts alone - each
+pass changing as many elements on both sides, ours fewer throughout by exactly what the final document lost (measured
+first, temp/s1116a_journal_probe.py: nothing else in it moved). A pin that carries 16.3 moves neither. A12 on D06 is
+pinned at 0 from 16.3 on.
+
+STEP 16, SUB-STEP 16.4 (2026-11-16) WIDENS THAT SENSE AGAINST A PIN THAT PREDATES IT: a declared span is absolute, so
+where the pin's sub-heading test replaced a declaration with one bold upright span, ours writes the declared runs - a
+paragraph may be SPLIT, accepted where it is the same once adjacent runs of equal properties are joined, its bold and
+italic in force compared character by character (MOVE_16_4: D09's three cells, an italic gain). A11 on D09 is pinned
+at 0 from 16.4 on. A pin that carries 16.4 moves no flag and splits no run.
+
 WHAT IT NEVER PRINTS: a filename, a path below the logs root, or any document text. Doc-ids,
 paragraph indices, classes and lengths only (CLAUDE.md 5.6). Nothing is written into the logs
 folder: every input is copied into a temporary directory first.
@@ -128,8 +150,10 @@ folder: every input is copied into a temporary directory first.
         --declare-language                                                                  # sub-step 12.1
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref c4639fa --declare-glossary-kept   # 13.2
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref 8ad07c3 --declare-glossary-kept   # 13.5
+    uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref c9b7d90 --graft ours              # 16.2
 """
 import argparse
+import copy
 import io
 import json
 import os
@@ -149,6 +173,7 @@ os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 from lxml import etree  # noqa: E402
 
 from keep_declarations import write_keep_declarations  # noqa: E402  (review finding 6: the one keep builder)
+from graft_resolved import GraftVoid, carried, describe, graft_notes_bytes  # noqa: E402  (sub-step 16.2)
 
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -183,9 +208,16 @@ ap.add_argument("--declare-language", action="store_true",
                      "variant-conversion mode), run skill Step 4d and skill Step 9 as well, and read what every "
                      "language-dependent check says from its own lines. With --ref the pin's build is read the same "
                      "way and must FAIL the acceptance it predates -- the acceptance's own red")
+ap.add_argument("--graft", nargs="?", const="both", choices=("both", "ours"), default=None,
+                help="SUB-STEP 16.2, arm (b): give each workdir's frozen notes today's extraction's `resolved`, in "
+                     "memory, through tools/graft_resolved.py, before the chain reads them -- VOID for that workdir "
+                     "wherever the notes and today's extraction disagree. Under --ref both builds get the same "
+                     "grafted bytes; `--graft ours` leaves the pin's build July's own notes (15.1's acceptance (ii))")
 args = ap.parse_args()
 if args.declare_language and args.sides:
     ap.error("--declare-language reads the body arm's chain; it is not wired into --sides.")
+if args.graft and (args.sides or args.arm == "a"):
+    ap.error("--graft gives apply the notes it reads; it drives arm (b) only and is not wired into arm (a) or --sides.")
 if args.skip_step8 and args.declare_glossary_kept:
     # I-36: skipping skill Step 8 is declaring nothing, so a flag that writes a declaration contradicts the scenario.
     ap.error("--skip-step8 simulates an operator who declares nothing; --declare-glossary-kept writes a "
@@ -334,6 +366,48 @@ NAMED_2A = [
     ("brackets", ALL_DOCS, "23 other differences from the source, a count only",
      lambda R: (sum(brk(rep, "other") for rep, _ in R.values()) == 23, f"{per_doc(R, lambda r: brk(r, 'other'))}")),
 ]
+
+
+# SUB-STEP 16.1 (2026-11-13), STATED BEFORE MEASURING: validate_apply's FORMATTING ARM, report only, must find on
+# arm (b) the register's instances at the counts temp/s1113_derive.py derived first and independently -- positional
+# pairing on apply's RAW output, where the arm pairs by text on the DELIVERY -- both trees identical: per document,
+# (row, property, class) -> findings on the REBUILT path, the probes' population. D03's and D03B's two party-block
+# paragraphs are one set read twice (A17): the character style lost and the bold with it, so the two sets of idx
+# must be the same. Arm (a), the July deliveries, is measured and reported, never pinned.
+# SUB-STEP 16.3 moved A12's D06 headings from 2 to 0: apply now writes the bold their style gives. SUB-STEP 16.4 moved
+# A11's D09 cells from 3 to 0: a declared span is absolute, so the sub-heading test no longer discards their italic.
+FMT_PINS = [("A12", "D06", "bold", "uniform-lost", 0), ("A11", "D09", "italic", "uniform-lost", 0),
+            ("A13", "D04", "u", "mixed-lost", 7), ("A14", "D10", "highlight", "mixed-lost", 1),
+            ("A7", "D02", "highlight", "mixed-lost", 1), ("A18", "D02", "highlight", "mixed-spread", 1),
+            ("A18", "D06", "smallCaps", "mixed-spread", 2), ("A17", "D03", "rStyle", "mixed-lost", 2),
+            ("A17", "D03B", "rStyle", "mixed-lost", 2), ("A17", "D03", "bold", "mixed-spans", 2),
+            ("A17", "D03B", "bold", "mixed-spans", 2), ("A4", "D11", "shd", "mixed-lost", 2),
+            ("A12", "D09", "u", "mixed-lost", 2)]
+
+
+def fmt_found(rep, prop, cls, path="rebuilt"):
+    return sorted(f["idx"] for f in (rep.get("formatting") or {}).get("findings") or []
+                  if f["property"] == prop and f["class"] == cls and f["path"] == path)
+
+
+def fmt_lines(key, rep):
+    """Sub-step 16.1's arm for one report: its summary and findings by property, class and path -- counts and
+    indices only, as the check prints them."""
+    fm = rep.get("formatting")
+    if not fm:
+        return [f"  {key:6} formatting: n/a — a report written before sub-step 16.1"]
+    if not fm.get("ran"):
+        return [f"  {key:6} formatting: NOT RUN — {fm.get('why')}"]
+    out = [f"  {key:6} formatting: paired {fm['paired']} compared {fm['compared']} source-not-found "
+           f"{fm['source_not_found']} ambiguous {fm['ambiguous']} no-text-run {fm['no_text_run']} · styles: "
+           f"{fm['styles']} · findings by path {fm['findings_by_path'] or 'none'}"]
+    groups = defaultdict(list)
+    for f in fm.get("findings") or []:
+        groups[(f["property"], f["class"], f["path"])].append(f["idx"])
+    for (prop, cls, path), idx in sorted(groups.items()):
+        out.append(f"        {prop:<10} {cls:<15} {path:<9} {len(idx):3d} at idx {sorted(idx)[:16]}"
+                   + (f" ... +{len(idx) - 16}" if len(idx) > 16 else ""))
+    return out
 
 
 _TEXTS = {}
@@ -541,6 +615,23 @@ LANG_VAL = re.compile(rb"(\sw:val=)([\"'])([^\"']*)\2")
 # comparison must not inherit the thing it compares (.claude/rules/verification.md rule 3).
 LANG_PART_RE = re.compile(r"^docx:word/(?:(glossary)/)?(?:(?:header|footer)\d*|(styles|settings|stylesWithEffects|"
                           r"numbering|footnotes|endnotes|comments|document))\.xml$")
+# STEP 16, SUB-STEP 16.3 (2026-11-16): apply writes a run's bold and italic only where its styles do not already give
+# them. A pin that predates it - its extraction has no `styles_give` - wrote an explicit flag on every run it rebuilt,
+# so under --ref the three XML members MAY move, by FLAGS_16_3 alone: every paragraph's text and runs the same, and
+# every text run's bold and italic IN FORCE - today's extraction's resolver over the source's styles - the same,
+# except exactly where temp/s1116h1_163_derive.py derived first, on both trees: D06's two headings, a bold gain
+# (register A12). Settled by the pin's own extraction: 16.3 has no commit to ask ancestry of until it lands.
+MARK_16_3 = b"def styles_give("
+FLAGS_16_3 = ("b", "bCs", "i", "iCs")
+MOVE_16_3 = {"D06": {("bold", "gain"): 2}}
+# STEP 16, SUB-STEP 16.4 (2026-11-16): a declared span is absolute and the sub-heading test reads the source in force. A
+# pin that predates it - its apply has no `run_in_force` - replaced a declaration with one bold upright span wherever
+# the test fired, so under --ref a paragraph may also be SPLIT into the runs its declaration names: the same text and
+# the same paragraph once the flags are set aside and adjacent runs of equal properties joined, its bold and italic in
+# force compared character by character. In force only where temp/s1116b_164_derive.py derived first, both trees:
+# D09's three cells, an italic gain (register A11).
+MARK_16_4 = b"def run_in_force("
+MOVE_16_4 = {"D09": {("italic", "gain"): 3}}
 
 
 def lang_part(k):
@@ -657,6 +748,141 @@ def restored(new_b, ref_b):
         return j == len(bc)
 
     return count[0] if align(new_root, ref_root) and count[0] else None
+def _unflagged(par):
+    """A copy of a paragraph with every run's FLAGS_16_3 removed, and a run's rPr left empty by that removed too."""
+    par = copy.deepcopy(par)
+    for rpr in list(par.iter(q("rPr"))):
+        parent = rpr.getparent()
+        if parent is None or parent.tag != q("r"):
+            continue
+        for child in list(rpr):
+            if child.tag in {q(f) for f in FLAGS_16_3}:
+                rpr.remove(child)
+        if not len(rpr) and not rpr.attrib:
+            parent.remove(rpr)
+    return etree.tostring(par)
+
+
+def _joined(par):
+    """SUB-STEP 16.4: `_unflagged`'s paragraph with adjacent plain text runs - run properties and one w:t - of equal
+    properties joined, and w:t's xml:space set aside, so a run split by a declaration alone compares equal."""
+    par = etree.fromstring(_unflagged(par))
+    space = "{http://www.w3.org/XML/1998/namespace}space"
+    for t in par.iter(q("t")):
+        t.attrib.pop(space, None)
+
+    def plain(el):
+        kids = [k for k in el if k.tag != q("rPr")]
+        return el.tag == q("r") and len(kids) == 1 and kids[0].tag == q("t")
+
+    def props(el):
+        rpr = el.find(q("rPr"))
+        return etree.tostring(rpr) if rpr is not None else b""
+
+    for parent in list(par.iter()):
+        kids, i = list(parent), 0
+        while i < len(kids) - 1:
+            a, b = kids[i], kids[i + 1]
+            if plain(a) and plain(b) and props(a) == props(b):
+                ta, tb = a.find(q("t")), b.find(q("t"))
+                ta.text = (ta.text or "") + (tb.text or "")
+                parent.remove(b)
+                kids.pop(i + 1)
+            else:
+                i += 1
+    return etree.tostring(par)
+
+
+def flags_moved(new_b, ref_b, cascade, resolver, splits=False):
+    """SUB-STEP 16.3's sense, for one XML member: None unless ours is the pin's with FLAGS_16_3 alone moved - the
+    same paragraphs, each with the same text and runs once those flags are set aside; else a Counter of
+    (property, gain|loss) -> paragraphs whose bold or italic IN FORCE moved, and -> runs under ("runs", ...).
+    `splits` (sub-step 16.4's sense, only against a pin that predates it): a paragraph whose runs differ is accepted
+    where it is the same once adjacent runs of equal properties are joined (`_joined`), counted under ("runs",
+    "split"), and its bold and italic in force compared character by character, blank characters set aside."""
+    try:
+        nr, rr = etree.fromstring(new_b), etree.fromstring(ref_b)
+    except etree.XMLSyntaxError:
+        return None
+    nps, rps = list(nr.iter(q("p"))), list(rr.iter(q("p")))
+    if len(nps) != len(rps) or cascade is None:
+        return None
+    moved = Counter()
+
+    def style(el, tag):
+        found = el.find(q(tag)) if el is not None else None
+        return found.get(q("val")) if found is not None else None
+
+    def in_force(run):
+        near = next(run.iterancestors(q("p")))
+        rpr = run.find(q("rPr"))
+        return resolver(cascade, style(near.find(q("pPr")), "pStyle"), style(rpr, "rStyle"), rpr)
+
+    for a, b in zip(nps, rps):
+        if etree.tostring(a) == etree.tostring(b):
+            continue
+        if _unflagged(a) != _unflagged(b):
+            if not splits or _joined(a) != _joined(b):
+                return None
+            moved[("runs", "split")] += 1
+            ca = [(ch, in_force(x)) for x in a.iter(q("r")) if x.find(q("t")) is not None
+                  for ch in "".join(t.text or "" for t in x.findall(q("t")))]
+            cb = [(ch, in_force(y)) for y in b.iter(q("r")) if y.find(q("t")) is not None
+                  for ch in "".join(t.text or "" for t in y.findall(q("t")))]
+            if [c for c, _f in ca] != [c for c, _f in cb]:
+                return None
+            ways = set()
+            for (ch, fx), (_c, fy) in zip(ca, cb):
+                for name in ("bold", "italic"):
+                    if ch.strip() and fx[name] != fy[name]:
+                        ways.add((name, "gain" if fx[name] else "loss"))
+            for way in ways:
+                moved[way] += 1
+            continue
+        ra = [x for x in a.iter(q("r")) if any((t.text or "").strip() for t in x.findall(q("t")))]
+        rb = [x for x in b.iter(q("r")) if any((t.text or "").strip() for t in x.findall(q("t")))]
+        ways = set()
+        for x, y in zip(ra, rb):
+            fx, fy = in_force(x), in_force(y)
+            for name in ("bold", "italic"):
+                if fx[name] != fy[name]:
+                    way = (name, "gain" if fx[name] else "loss")
+                    ways.add(way)
+                    moved[("runs",) + way] += 1
+        for way in ways:
+            moved[way] += 1
+    return moved
+
+
+def journal_counts_only(new_b, ref_b, offset):
+    """SUB-STEP 16.3's sense for post_process's journal: True when ours is the pin's with nothing moved but the
+    element counts each pass records (`elements_before`, `elements_after`), every pass changing the same number of
+    elements on both sides, and ours `offset` fewer throughout - the elements the flags were. Measured first
+    (temp/s1116a_journal_probe.py, uk, 13 of 13): those two keys and nothing else moved. Reads no value but counts."""
+    try:
+        a, b = json.loads(new_b.decode("utf-8")), json.loads(ref_b.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return False
+    gaps = set()
+
+    def same(x, y):
+        if isinstance(x, dict) and isinstance(y, dict):
+            if set(x) != set(y):
+                return False
+            if {"elements_before", "elements_after"} <= set(x):
+                eb, ea, rb, ra = x["elements_before"], x["elements_after"], y["elements_before"], y["elements_after"]
+                if not all(isinstance(v, int) for v in (eb, ea, rb, ra)) or ea - eb != ra - rb:
+                    return False
+                gaps.add(rb - eb)
+                return all(same(x[k], y[k]) for k in x if k not in ("elements_before", "elements_after"))
+            return all(same(x[k], y[k]) for k in x)
+        if isinstance(x, list) and isinstance(y, list):
+            return len(x) == len(y) and all(same(p, q_) for p, q_ in zip(x, y))
+        return x == y
+
+    return same(a, b) and gaps == {offset}
+
+
 ZW = "​".encode("utf-8")
 ZREF = re.compile(rb"&#(?:0*8203|[xX]0*200[bB]);")
 
@@ -746,6 +972,18 @@ if REFTREE is not None:
         print(f"  --ref {args.ref}: {'predates' if PRE_13_5 else 'carries'} 13.5's side-part language "
               f"(by ancestry against {START_13_5} and by its own repack, agreeing)")
 PRE_LANG = {"13.2": PRE_13_2, "13.5": PRE_13_5}
+# SUB-STEP 16.3's SENSE OF --ref: does the pin's extraction expose what the styles give a run?
+PRE_16_3 = None
+if REFTREE is not None:
+    pin_xp = REFTREE / "extract_paragraphs.py"
+    PRE_16_3 = pin_xp.is_file() and MARK_16_3 not in pin_xp.read_bytes()
+    print(f"  --ref {args.ref}: {'predates' if PRE_16_3 else 'carries'} 16.3's minimal flags (by its own extraction)")
+# SUB-STEP 16.4's SENSE OF --ref: does the pin's apply read a source run in force?
+PRE_16_4 = None
+if REFTREE is not None:
+    pin_ap = REFTREE / "apply_translations_textmatch.py"
+    PRE_16_4 = pin_ap.is_file() and MARK_16_4 not in pin_ap.read_bytes()
+    print(f"  --ref {args.ref}: {'predates' if PRE_16_4 else 'carries'} 16.4's declarations-win (by its own apply)")
 OURS_WIRED = GATE_WIRING in (SCRIPTS / "repack_docx.py").read_bytes()
 GLOSSARY_DECLARED, WIRED_REFUSED = {}, set()
 
@@ -803,13 +1041,14 @@ def gives_original_glossary(d):
                 and z.read("word/glossary/document.xml") == gl.read_bytes())
 
 
-def chain(scripts_dir, d, src, wd, today=None, language=None):
+def chain(scripts_dir, d, src, wd, today=None, language=None, notes=None):
     """apply -> post_process -> reorder -> repack in d, inputs copied from wd. Keeps a copy of the
     reordered XML (the check's input, as in sub-step 11.1) before repack runs. Returns (rcs, pp).
     `today` is side_parts' (--sides only). `language` (--declare-language, sub-step 12.1) is written beside the
     notes as skill Step 1c writes it, and skill Step 4d and skill Step 9 run too; their output and apply's and repack's are kept
     in LANG_OUT, in memory only, for the language readings -- never printed, since they can quote the text.
-    Neither step writes anything, so the outputs compared under --ref are the same set as without it."""
+    Neither step writes anything, so the outputs compared under --ref are the same set as without it.
+    `notes` (--graft, sub-step 16.2): the grafted notes' bytes, written over the copy in d - never into wd."""
     (d / "final" / "word").mkdir(parents=True, exist_ok=True)
     shutil.copyfile(src, d / "src.docx")
     # I-36: an operator who skips skill Step 8 declares nothing, and since the wiring REPACK reads the declarations beside
@@ -818,6 +1057,8 @@ def chain(scripts_dir, d, src, wd, today=None, language=None):
     for name in INPUTS:
         if name not in undeclared and (wd / name).is_file():
             shutil.copyfile(wd / name, d / name)
+    if notes is not None:
+        (d / "paragraphs.json").write_bytes(notes)
     xml, py = d / "final" / "word" / "document.xml", ["uv", "run", "--with", "lxml", "python"]
     said = {}
     if language is not None:
@@ -841,6 +1082,9 @@ def chain(scripts_dir, d, src, wd, today=None, language=None):
     said["5"] = (rap.stdout or "") + (rap.stderr or "")
     if not xml.is_file():
         return rcs, None
+    # sub-step 16.3: apply's own output, kept beside the outputs and never compared as one - what post_process's journal
+    # counts from; its later run merging moves the document's element count outside the journal's passes
+    shutil.copyfile(xml, d / "applied.xml")
     pp = run(py + [str(scripts_dir / "post_process.py"), str(xml), "--fix", "--variant", args.variant], timeout=900)
     rcs["post_process"] = pp.returncode
     rcs["reorder"] = run(py + [str(scripts_dir / "reorder_definitions.py"), "--doc", str(xml)], timeout=900).returncode
@@ -1780,7 +2024,13 @@ def acceptance(did, rd):
     return out
 
 
-reports_a, reports_b, LANG_KEY = {}, {}, {}
+reports_a, reports_b, LANG_KEY, GRAFTS, GRAFT_READ = {}, {}, {}, {}, {}
+# sub-step 16.3: per workdir, member -> moved in force; extraction's module, once; the workdirs that moved; the XML
+# members each chain wrote
+FMOVED, XPM, FMOVED_KEYS, XML_WRITTEN, JMOVED = {}, {}, [], {}, {}
+if args.graft:
+    print(f"  --graft {args.graft}: arm (b)'s notes given today's extraction's `resolved` in memory (sub-step 16.2)"
+          + ("; the pin's build gets July's own notes" if args.graft == "ours" and args.ref else ""))
 for n, wd in enumerate(workdirs, 1):
     ids = DOC_ID.findall(str(wd.relative_to(LOGS)))
     did = ids[-1] if ids else f"D??{n}"
@@ -1817,15 +2067,29 @@ for n, wd in enumerate(workdirs, 1):
         declared = TRUE_LANGUAGE.get(did) if args.declare_language else None
         if args.declare_language and declared is None:
             void(f"(b) {key} language", "no true language is recorded for this doc-id")
+        grafted = None
+        if args.graft:
+            # SUB-STEP 16.2: the notes apply reads, given today's `resolved` -- or this workdir is VOID, never run
+            # on the ungrafted notes, which would answer a different question under the same label.
+            try:
+                grafted, GRAFTS[key] = graft_notes_bytes(wd / "paragraphs.json", src, SCRIPTS)
+            except GraftVoid as exc:
+                void(f"(b) {key} graft", str(exc))
+                continue
         LANG_KEY[key] = (b.name, f"r{n:02d}" if REFTREE is not None else None, did)
-        rcs, pp = chain(SCRIPTS, b, src, wd, language=declared)
+        rcs, pp = chain(SCRIPTS, b, src, wd, language=declared, notes=grafted)
+        if args.graft:
+            GRAFT_READ[key] = {"ours": carried(b / "paragraphs.json")}
         if pp is None:
             void(f"(b) {key}", f"apply produced no output (rc={rcs['apply']})")
             continue
         gate = pp.returncode != 0 and "SKILL GATE FIRED" in (pp.stdout or "") + (pp.stderr or "")
         if REFTREE is not None:
             rb = TMP / f"r{n:02d}"
-            rrcs, _ = chain(REFTREE, rb, src, wd, language=declared)
+            rrcs, _ = chain(REFTREE, rb, src, wd, language=declared,
+                            notes=grafted if args.graft == "both" else None)
+            if args.graft:
+                GRAFT_READ[key]["pin"] = carried(rb / "paragraphs.json")
             dn, dr = outputs(b), outputs(rb)
             same_rc = rrcs == rcs
             # SUB-STEP 2: a pin without the delivered gate delivers what ours refuses. Then, and only then,
@@ -1839,6 +2103,34 @@ for n, wd in enumerate(workdirs, 1):
                 dr = {k: v for k, v in dr.items() if not k.startswith("docx")}
             BYTES[key] = (same_rc, compare(dn, dr), len(dn), rcs, rrcs)
             BYTES_LANG[key] = {k for k in dn if lang_part(k)}
+            # SUB-STEP 16.3: an XML member that moved by its bold and italic flags alone is taken out of "other" and
+            # kept with what moved IN FORCE, for the assertions below - whatever the pin, so a pin that carries 16.3
+            # and still moves flags is caught there rather than here.
+            other = BYTES[key][1][3]
+            XML_WRITTEN[key] = {k for k in XML_MEMBERS if dn.get(k) is not None}
+            jk, ak = "post_process_journal.json", "applied.xml"
+            if any(k in XML_MEMBERS or k == jk for k in other):
+                if XPM.get("mod") is None:
+                    XPM["mod"] = script_module("extract_paragraphs")
+                with zipfile.ZipFile(src) as zsrc:
+                    cascade = XPM["mod"].read_style_cascade(zsrc)    # this workdir's source, read afresh
+                for k in [k for k in other if k in XML_MEMBERS and dn.get(k) is not None and dr.get(k) is not None]:
+                    fm = flags_moved(dn[k], dr[k], cascade, XPM["mod"].resolve_run, splits=bool(PRE_16_4))
+                    if fm is not None:
+                        other.remove(k)
+                        FMOVED.setdefault(key, {})[k] = fm
+                # ...and the journal, which counts every element of apply's output before and after each pass: moved
+                # by those counts alone, by exactly the elements apply's output lost - measured on the copy chain()
+                # keeps, since post_process merges runs after its passes and moves the final count outside them
+                if (jk in other and dn.get(jk) is not None and dr.get(jk) is not None
+                        and (b / ak).is_file() and (rb / ak).is_file()):
+                    na, ra = (b / ak).read_bytes(), (rb / ak).read_bytes()
+                    if flags_moved(na, ra, cascade, XPM["mod"].resolve_run, splits=bool(PRE_16_4)) is not None:
+                        offset = (sum(1 for _ in etree.fromstring(ra).iter())
+                                  - sum(1 for _ in etree.fromstring(na).iter()))
+                        if journal_counts_only(dn[jk], dr[jk], offset):
+                            other.remove(jk)
+                            JMOVED[key] = offset
             # SUB-STEP 4a: the SAME check, today's, reads the pin's build too, so what a change to the
             # pipeline does to the findings is measured, never inferred from the bytes.
             rtarget = rb / "delivered.docx" if (rb / "delivered.docx").is_file() else rb / "checked.xml"
@@ -1896,6 +2188,11 @@ if args.arm in ("a", "both"):
         if passed:
             print(f"        {detail}")
     print(f"\n  examined {len(reports_a)} of {len(workdirs)} workdirs")
+    print("\n  SUB-STEP 16.1 — THE FORMATTING ARM ON THE JULY DELIVERIES, measured and reported, never pinned "
+          "(document.xml deliveries, so read with the original's styles):")
+    for key, (rep, _rc) in reports_a.items():
+        for line in fmt_lines(key, rep):
+            print(line)
 
 if args.arm in ("b", "both"):
     print("\nARM (b) — THE SAME 13 REBUILT THROUGH TODAY'S PIPELINE: IT MUST NOT CRY WOLF")
@@ -1986,6 +2283,29 @@ if args.arm in ("b", "both"):
             ok(f"{key}: comment anchors delivered equal the original's, "
                + " ".join(f"{k} {v}" for k, v in want.items()),
                all(got.get(k) == (v, v) for k, v in want.items()), f"original/delivered {got}")
+    # SUB-STEP 16.1: the formatting arm ran on every rebuilt workdir, and found the register's instances at the
+    # derivation's counts -- see FMT_PINS. A document outside this run is said, never passed.
+    print("\n  SUB-STEP 16.1 — THE FORMATTING ARM, REPORT ONLY, ON TODAY'S BUILD:")
+    for key, (rep, _rc) in reports_b.items():
+        for line in fmt_lines(key, rep):
+            print(line)
+        ok(f"{key}: the formatting arm ran", bool((rep.get("formatting") or {}).get("ran")),
+           f"{(rep.get('formatting') or {}).get('why', 'no formatting key - the check predates 16.1')}")
+    for row, d, prop, cls, n in FMT_PINS:
+        keys = [k for k in reports_b if did_of(k) == d]
+        if not keys:
+            print(f"  --   {row} on {d}: not in this run — NOT ASSERTED")
+            continue
+        for key in keys:
+            got = fmt_found(reports_b[key][0], prop, cls)
+            ok(f"{key}: {row} — {prop} {cls}, rebuilt, at the derived count {n}", len(got) == n,
+               f"found {len(got)} at idx {got}")
+    for d in ("D03", "D03B"):
+        for key in [k for k in reports_b if did_of(k) == d]:
+            rep = reports_b[key][0]
+            ok(f"{key}: A17 — the paragraphs that lost the character style are the ones that lost bold spans",
+               fmt_found(rep, "rStyle", "mixed-lost") == fmt_found(rep, "bold", "mixed-spans"),
+               f"rStyle {fmt_found(rep, 'rStyle', 'mixed-lost')}, bold {fmt_found(rep, 'bold', 'mixed-spans')}")
     if REFTREE is not None:
         print(f"\n  SUB-STEPS 2b AND 4a — BYTES MOVE BY U+200B REMOVAL WHERE THE PIN PREDATES 2b's SCRUB AND ITS "
               f"DELIVERY CARRIED ONE, AND BY A WRAPPER THE GUARD KEPT WHERE THE PIN PREDATES 4a's GUARD; "
@@ -1996,8 +2316,35 @@ if args.arm in ("b", "both"):
         for key, (same_rc, (moved, removed, wmoved, other, carried, lmoved, lcarried, lstill), nparts, rcs,
                   rrcs) in BYTES.items():
             ok(f"{key}: every exit code equal {rcs}", same_rc, f"now {rcs}, at the ref {rrcs}")
-            ok(f"{key}: of {nparts} output(s), nothing moved but U+200B removals, wrappers the guard kept and "
-               f"13.2's and 13.5's language values", not other, f"other movement in {other}")
+            ok(f"{key}: of {nparts} output(s), nothing moved but U+200B removals, wrappers the guard kept, "
+               f"13.2's and 13.5's language values and 16.3's bold and italic flags, with the journal's element "
+               f"counts", not other,
+               f"other movement in {other}")
+            # SUB-STEP 16.3: against a pin that predates it, every XML member that moved by its flags moved NOTHING in
+            # force but the derived paragraphs, the same in each member; against a pin that carries it, no flag moved
+            fm = FMOVED.get(key, {})
+            if PRE_16_3 or PRE_16_4:
+                # SUB-STEP 16.4: against a pin that predates it, its derived paragraphs too, and its run splits
+                want = Counter(MOVE_16_3.get(did_of(key), {})) if PRE_16_3 else Counter()
+                if PRE_16_4:
+                    want.update(MOVE_16_4.get(did_of(key), {}))
+                for k, got in sorted(fm.items()):
+                    paras = Counter({w: n for w, n in got.items() if w[0] != "runs"})
+                    runs = {w[1:]: n for w, n in got.items() if w[0] == "runs"}
+                    ok(f"{key}: {k} moved by bold and italic flags alone"
+                       + (" and the runs a declaration splits" if PRE_16_4 else "")
+                       + f", and in force exactly the derived paragraphs ({dict(want) or 'none'})", paras == want,
+                       f"in force {dict(paras)}, runs {runs}")
+                if fm:
+                    FMOVED_KEYS.append(key)
+                if key in JMOVED:
+                    print(f"        post_process's journal moved by its element counts alone, ours "
+                          f"{abs(JMOVED[key])} {'fewer' if JMOVED[key] >= 0 else 'more'} throughout — the flags"
+                          + (" and the runs a declaration splits" if PRE_16_4 else ""))
+            else:
+                ok(f"{key}: no bold or italic flag moved — the pin carries 16.3's and 16.4's",
+                   not fm and key not in JMOVED,
+                   f"moved in {sorted(fm)}" + (", and the journal's counts" if key in JMOVED else ""))
             # SUB-STEPS 13.2 AND 13.5, each on its own parts: the language values move IFF the pin predates that
             # sub-step AND delivered a value not the variant's
             tag = LANG_TAG[args.variant].decode()
@@ -2037,6 +2384,29 @@ if args.arm in ("b", "both"):
                    f"({carried or 'none'}; {len(moved)} member(s), {removed} U+200B removed"
                    + (f": {' '.join(moved)}" if moved else "") + ")", bool(moved) == bool(carried))
             moved_by_doc[did_of(key)] += bool(moved)
+        # SUB-STEP 16.3's PREMISE: against a pin that predates it the flags MUST have moved somewhere, and every derived
+        # paragraph in this run must have moved in force - else the assertions above were answered over nothing.
+        if PRE_16_3:
+            print(f"  16.3 — bold and italic flags moved on {len(FMOVED_KEYS)} of {len(BYTES)} compared workdir(s) "
+                  f"({args.variant}; the pin predates it)")
+            ok("16.3: the flags moved on at least one workdir — the pin predates it", bool(FMOVED_KEYS))
+            for key in BYTES:
+                if MOVE_16_3.get(did_of(key)):
+                    ok(f"{key}: 16.3's derived paragraphs moved in force in every XML member the chain wrote "
+                       f"({len(XML_WRITTEN.get(key, ()))})", bool(XML_WRITTEN.get(key))
+                       and set(FMOVED.get(key, {})) == XML_WRITTEN[key], f"moved in {sorted(FMOVED.get(key, {}))}")
+        # SUB-STEP 16.4's PREMISE, the same way: its derived paragraphs moved in force in every member the chain wrote
+        if PRE_16_4:
+            print(f"  16.4 — a declaration's runs or flags moved on {len(FMOVED_KEYS)} of {len(BYTES)} compared "
+                  f"workdir(s) ({args.variant}; the pin predates it)")
+            named16 = [key for key in BYTES if MOVE_16_4.get(did_of(key))]
+            ok("16.4: a workdir its derivation named was compared — the pin predates it, so its sense was exercised",
+               bool(named16), f"none of {sorted(MOVE_16_4)} in this run")
+            for key in BYTES:
+                if MOVE_16_4.get(did_of(key)):
+                    ok(f"{key}: 16.4's derived paragraphs moved in force in every XML member the chain wrote "
+                       f"({len(XML_WRITTEN.get(key, ()))})", bool(XML_WRITTEN.get(key))
+                       and set(FMOVED.get(key, {})) == XML_WRITTEN[key], f"moved in {sorted(FMOVED.get(key, {}))}")
         # EACH SUB-STEP'S PREMISE, asserted rather than assumed: against a pin that predates it the language MUST have
         # moved somewhere, or the IFF above was answered over nothing (every document stopped, or no delivery read).
         delivered = [k for k, parts in BYTES_LANG.items() if parts]
@@ -2132,6 +2502,23 @@ if args.declare_language and args.arm in ("b", "both"):
     print(f"  read {sum(1 for b, _r, _d in LANG_KEY.values() if b in LANG_OUT)} of {len(LANG_KEY)} rebuilt "
           f"workdirs' language readings")
 
+if args.graft:
+    # SUB-STEP 16.2: what the graft gave each workdir, counts only, and the totals a reader compares with the
+    # derivation (1,891 entries and 186 runs per tree over the 13, measured 2026-11-16).
+    print(f"\n  SUB-STEP 16.2 — THE GRAFT ({args.graft}), per workdir:")
+    for key, gs in GRAFTS.items():
+        print(f"  {key:6} {describe(gs)}")
+        # THE READ-BACK: the notes each build's chain actually read, counted after it ran. Today's apply ignores the
+        # key, so the delivered bytes could never show a graft computed and not handed over; this can.
+        rd, carry = GRAFT_READ.get(key, {}), gs["grafted"] + gs["already"]
+        ok(f"{key} graft: the notes our build read carry the key on {carry} run(s)", rd.get("ours") == carry,
+           f"read back {rd.get('ours')}")
+        if "pin" in rd:
+            want = carry if args.graft == "both" else gs["already"]
+            ok(f"{key} graft: the notes the pin's build read carry it on {want} ({args.graft})", rd["pin"] == want,
+               f"read back {rd['pin']}")
+    t = {k: sum(gs[k] for gs in GRAFTS.values()) for k in ("entries", "aligned", "runs", "grafted", "already")}
+    print(f"  GRAFT TOTAL: {len(GRAFTS)} workdir(s) · {describe(t)}")
 shutil.rmtree(TMP, ignore_errors=True)
 print("\n" + "=" * 96)
 print(f"  {CHECKED} check(s), {len(FAIL)} failure(s), {len(VOIDED)} void")

@@ -66,7 +66,12 @@ with guard.protecting(STORE):
     rc, out = run("verify", "--", sys.executable, "-c", "import sys; sys.exit(1)")
     case("a command that exits non-zero is NOT recorded",
          (rc, "NOT recorded" in out), (1, True))
-    case("...and leaves no evidence behind", STORE.exists(), False)
+    # v4 (adopted 2026-11-13, sub-step 16.1): the house's PASS LEDGER now counts every run, a red one too, so the
+    # store EXISTS after a failing command - what must not exist is a phase RECORD, the thing `check` accepts.
+    stored = json.loads(STORE.read_text(encoding="utf-8")) if STORE.exists() else {}
+    case("...and leaves no evidence behind - no phase record; v4's pass ledger only counts the run",
+         any(isinstance(v, dict) and any(p in v for p in ("verify", "test"))
+             for k, v in stored.items() if not k.startswith("passes:")), False)
 
     rc, out = run("na", "verify", "short")
     case("a declared N/A with no real reason is REFUSED", rc, 1)

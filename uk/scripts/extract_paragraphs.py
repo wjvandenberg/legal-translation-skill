@@ -29,7 +29,8 @@ Output JSON format:
 
 A run whose formatting IN FORCE - its styles resolved - differs from its "bold" or "italic"
 also carries "resolved", holding only the differing properties, e.g. {"bold": true}; see THE
-STYLE CASCADE below. Nothing reads it yet.
+STYLE CASCADE below. Apply reads it where an entry declares no "en_runs" (step 16, sub-step
+16.3).
 
 The "en" field should be filled with the full translated paragraph text.
 The "en_runs" field should be filled with formatting instructions for the English text:
@@ -133,8 +134,9 @@ def get_color(rpr):
 # never the styles part - so a run made bold by its paragraph style or its character style is
 # written plain. This resolves what is IN FORCE and writes it where it differs from what is
 # written today, as ONE sparse key, `resolved`, holding only the differing properties: every
-# existing key, printed line and exit code unchanged, and nothing reads the key yet (step 16
-# will). The rule, as Word applies it:
+# existing key, printed line and exit code unchanged. Since sub-step 16.3 apply reads the key,
+# and imports `read_style_cascade` and `styles_give` below to write a run's bold and italic only
+# where the styles do not already give them. The rule, as Word applies it:
 #   1. the document defaults (docDefaults/rPrDefault) are the start;
 #   2. a style's basedOn chain is rolled up first - the nearest level naming a property wins.
 #      Word repeats unchanged values down a chain (MS-OI29500 2.1.228), so a flip per level
@@ -235,6 +237,12 @@ def resolve_run(cascade, p_style, r_style, rpr):
     return in_force
 
 
+def styles_give(cascade, p_style, r_style):
+    """{'bold': ..., 'italic': ...} the STYLES alone give a run - rules 1 to 4, no direct formatting.
+    Apply's writers ask it (sub-step 16.3): a flag is written only where the wanted value differs."""
+    return resolve_run(cascade, p_style, r_style, None)
+
+
 def resolved_differences(cascade, run_el, rpr, written):
     """The properties whose value in force differs from what `written` (the run's entry) says,
     as {'bold': ...} and/or {'italic': ...}; None where none differs."""
@@ -255,8 +263,9 @@ def resolved_differences(cascade, run_el, rpr, written):
 # tuples are BYTE-FOR-BYTE the ones in apply_translations_textmatch.py, and
 # tests/test_container_inventory.py asserts the two copies are identical -- so a widening on
 # one side that is forgotten on the other fails a check instead of shipping. They are stated
-# twice rather than imported because the 2026-08-05 decision rules out a shared library
-# between the scripts, and a skill must run in whatever sandbox its host gives it.
+# twice, and checked, rather than imported. The 2026-08-05 decision rules out a shared LIBRARY
+# between the scripts - a module that exists only to be imported - and not one script importing
+# another's function: apply imports this script's style cascade (sub-step 16.3).
 #
 # THE READING HALF WAS NEVER THE BROKEN ONE, AND THE INVENTORY IS HERE ANYWAY. `p.iter(w:r)`
 # below is fully recursive, so extraction has always descended into every container and

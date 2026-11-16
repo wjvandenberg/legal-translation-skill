@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-12 (4), 15.3 G9's FIRST HALF — SESSION PURPOSE — what · how · purpose:** both trees' `validate_segment_shapes.py` read `tc_segments`, so the alpha-collision rule asks whether apply's own boundary-whitespace restoration supplies the space · apply's neighbour test lifted out of its closure so it is imported, never restated; controls red first at the pin on invented paragraphs; apply's deliveries byte-identical over the 13 frozen workdirs; unattended at Wouter's word of 2026-11-12 · **so that G9 closes, both halves, and with it step 15, its one pull request squash-merged** *(written immediately after the tag `rollback-2026-11-12d-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-16, WORKER 2 OF THE CHAIN OF 2026-11-16 — SESSION PURPOSE — what · how · purpose:** sub-step 16.4, the hand-back, then 16.5 to 16.7 and step 17 in order as the clock and the context allow · 16.4 to its plan in section 3.16: the sub-heading test only where nothing is declared, reading in force; the tracked-change bypass and post_process's untranslated-term italic reading `resolved`; the two downstream readers of a run's own bold measured first; its controls red on 16.3's commit first; each later sub-step its own plan in its entry first, each choice on the recommended option and recorded · **so that a declared span is absolute and every reader sees the formatting in force, nothing else moving** *(written immediately after the tag `rollback-2026-11-16b-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -336,7 +336,7 @@ live.
 | **13** | declared modes | 5 | Variant-conversion, authored-not-extracted, and the short-document gear — **declared by the operator, never inferred**. **Requires no decision** — the evidence names two of the three modes and the runtime measurement gives the third *(corrected 2026-08-05: this cell said "Requires decision 4", which is the layout decision and has nothing to do with modes)* | **yes** |
 | **14** | check scoping | 2 | The false-positive fixes. Each is a pattern change; each needs a test that proves it still catches the true positive | **yes** |
 | **15** | formatting, part 1 | 3 | The reading-apart step **emits** effective computed formatting per run, resolving the style chain and character styles. Nothing consumes it yet. **Definition of done (agreed 2026-08-05): output must byte-compare IDENTICAL** — it adds fields and changes nothing, so movement means something is wrong before we have started. **And it is the rebuild probe, a decision point rather than a formality** | **no** — additive |
-| **16** | formatting, part 2 | 3 | The writing-back step consumes it per span; the explicit off-flags are removed **in the same step**, because separating them renders a document entirely bold. **Definition of done (agreed 2026-08-05): does not begin until step 11's delivered-document check exists** — a wrong cascade is the one failure that would make the skill quietly worse, and that check is the only instrument that would catch it. **Regenerate the frozen intermediates FROM THE ARCHIVED RUNS, not by re-translating** | **yes** — the largest single change in the plan |
+| **16** | formatting, part 2 | 3 | The writing-back step consumes it per span; the explicit off-flags are removed **in the same step**, because separating them renders a document entirely bold. **Definition of done (agreed 2026-08-05): does not begin until step 11's delivered-document check exists** — a wrong cascade is the one failure that would make the skill quietly worse, and that check is the only instrument that would catch it *(corrected 2026-11-12 (6): it reads text only, so 16.1 builds the formatting comparison first — section 3.16)*. **Regenerate the frozen intermediates FROM THE ARCHIVED RUNS, not by re-translating** | **yes** — the largest single change in the plan |
 | **17** | formatting, part 3 | 3 | The longest rule in the skill collapses; the four instructions that existed only because the formatting was unknowable are deleted rather than reworded | **doc only** |
 | **18** | layout (**option 11**) | 11 | Flag any layout device whose **rendered** position changes between source and target — tab-positioned blocks, empty-paragraph page breaks, width-bearing padding, justified segments ending in a manual break — and route it through step 4's channel. **Plus the tab-authoring rule, which the register twice says belongs in this step and not elsewhere**, and the specific justified-short-tail check, which needs no render. **Decision 4 ANSWERED 2026-08-05: build 11a only.** And 11a must **CLASSIFY** each flagged instance — fixable by real tab stops / fixable by a real page break / neither — because that classification is what makes the later 11b decision arithmetic instead of judgement | **yes** — a new check |
 | **19** | furniture and prohibition | 4 | The furniture convention statements with both decided renderings; promote or reconcile the 221-entry script phrase map; and the prohibition decision. **Requires decision 1** | **yes** — content |
@@ -1657,7 +1657,7 @@ ahead of the conditional rewrite at branch 10, so that dependency resolves early
 > **FOR THE BUILD. Steps 15, 16, 17, in that order and not otherwise.**
 > **Needs first:** **step 16 does not begin until step 11's delivered-document check exists.** A wrong
 > cascade computation is the one failure in this plan that would make the skill *quietly worse*, and that
-> check is the only instrument that would catch it.
+> check is the only instrument that would catch it. *(Not so — corrected 2026-11-12 (6), section 3.16.)*
 > **Done when:** **step 15's output byte-compares IDENTICAL** — it adds fields and changes nothing, so any
 > movement means something is wrong before the work has properly started. Step 16 carries the off-flag
 > removal **in the same step**, because separating them renders a document entirely bold.
@@ -1687,6 +1687,9 @@ ahead of the conditional rewrite at branch 10, so that dependency resolves early
    in the sequence, so the order already holds and this condition confirms it rather than changing it. **A
    wrong cascade computation is the one failure in this plan that would make the skill *quietly worse*, and
    the character-exact comparison is the only instrument that would catch it.**
+   **CORRECTED 2026-11-12 (6), BY MEASUREMENT:** that comparison is of text — `validate_apply.py` names bold or
+   italic 0 times — so it could not catch a wrong cascade, and nothing else did; 16.1 builds one that can, first
+   *(section 3.16)* — **built 2026-11-13, report only: the delivered check's formatting arm.**
 
 **SLICE A IS THE REBUILD PROBE, and it is a decision point rather than a formality.** The fork was closed at
 §3.1 on the argument that the leap is available without a rebuild — with one escape clause: if a per-span
@@ -3151,6 +3154,274 @@ sessions, one branch, `feature/step15-formatting-part-1`, one pull request, open
 the session that closes 15.3. **VERIFY:** each sub-step's controls red at the pinned old code first, the byte
 comparison, the parity check, the three confidentiality controls. **TEST:** the suites that drive extraction or
 the segment check, both trees; the smoke suite; the full run once, before the push.
+
+### 3.16 Formatting, part 2 — step 16 · *option 3, its second part* · **PLANNED 2026-11-12 (6) with Wouter, at one input point**
+
+> **FOR THE BUILD — THE PLAN, 2026-11-12 (6).** Section 3.9 owns WHAT step 16 is — apply consumes the formatting
+> in force per span, the explicit off-flags go in the same step, and the frozen intermediates are regenerated from
+> the archived runs, never re-translated. This owns HOW and the order. **Needs first:** step 15, closed with #196,
+> and 15.2's answer, layered, accepted with #197. **Unblocks:** step 17, whose rewrite of the operator's
+> instructions then runs once, over a finished apply. **Done when:** 16.1 to 16.7 each meet their own *Done when*
+> below. **Wouter's seven answers are `DECISIONS-LOG.md`, 2026-11-12 (6)** — his scope answer widens the step past
+> section 3.9's bold and italic, to the rows sub-steps 16.5 to 16.7 name.
+
+**Measured 2026-11-12 (6), counts only** — `temp/s1112r_offflag_probe.py` and `temp/s1112r_scope_probe.py` over
+the 13 frozen workdirs, today's apply over each matched source, each probe's planted control firing; both trees,
+the off-flag totals identical on 44 of 44 rows:
+
+| what | measured |
+|---|---|
+| text runs apply writes into the 1,214 paragraphs it rebuilds | 1,883, of which 1,471 carry an explicit bold-off |
+| ... of those bold-offs, redundant: the styles already give off | **1,418**; italic-offs 1,626 of 1,648 |
+| bold-offs that strip bold the source shows | **2 paragraphs**, D06's two clause headings (register A12) — of D06's 688 rebuilt bold-offs, the other 686 are redundant |
+| off-flags doing work: the style gives on, the source shows off | 47 bold and 22 italic runs rebuilt, 27 bold in tracked changes — D02, D03, D03B: drop every flag and they turn bold or italic |
+| tracked-change paragraphs apply writes | 76, 777 text runs; 536 bold-offs redundant |
+| the sub-heading test | where apply reaches it, fires on 122 entries and discards the operator's `en_runs` on all 122; they differed on 4 — 3 in italic, D09's three cells (A11), 1 in bold (D06); counted over the notes, 142 today and 237 reading the formatting in force |
+| entries the source shows uniformly bold while extraction emits not-bold | 97 — 95 with `en_runs`, 2 of whose spans declare false, and 2 with none, D06's headings |
+| properties `en_runs` cannot express, in rebuilt paragraphs | lost or spread across a mixed paragraph: underline 11, highlight 3, colour 4, size 4, small capitals 2, shading 2, character style 4; a character style every source run shared dropped on 33; 8 doc-ids, each register instance found again by document and shape — A4 A7 A12 A13 A14 A17 A18, its paragraphs 16.1's to confirm |
+| step 11's delivered-document check | compares text only — bold or italic named 0 times in `validate_apply.py`; no tool or test compares delivered formatting with the source |
+| the frozen notes against today's extraction | 1,891 of 1,891 entries, the same text and runs at every idx; 186 runs would gain `resolved`; the July files 13 of 13 on their catalogue |
+| what the operator reads about it | rule 3 of skill Step 4's `04-translate.md`, lines 44–164, 8,075 bytes, and 1,210 on the tracked-change bypass, all describing the off-flags; `resolved` named nowhere — step 17's to rewrite |
+
+**The sub-steps,** in this order — 16.1 to 16.4 unattended, then a hand-back *(Wouter's run-mode answer)*; 16.5 to
+16.7 each with its own plan agreed with him first, because each changes what the notes contain. **THE PIN IS
+`c9b7d90`**, main before step 16, which a squash-merge keeps reachable:
+
+- **16.1 — the formatting comparison, built first.** HEAVY, both trees *(Wouter's answer: build it first)*.
+  `validate_apply.py --delivered --original` gains a formatting arm, report-only and never blocking, in the existing
+  script — no shipped file added: per paragraph, the source's bold and italic IN FORCE, through extraction's resolver
+  imported, against the delivered paragraph's — a uniform source paragraph compared exactly, a mixed one by its
+  count of spans, C20's method at delivery — and the direct value of every property `en_runs` cannot express:
+  uniform kept, or mixed lost or spread, the classifier `temp/s1112r_scope_probe.py` measured with. **It must find
+  what is known, derived first and independently:** on arm (b) of `tools/delivered_corpus_arm.py`, both trees,
+  D06's two headings (A12), D09's cells (A11), D04's seven underlines (A13), D10's highlight (A14), D02's lost and
+  spread highlight (A7, A18), D06's spread small capitals (A18), D03's and D03B's character-style terms (A17) and
+  D11's shading (A4), at the counts above, which its own first measurement re-derives; arm (a), the July
+  deliveries, measured and reported. *TP:* those, and an invented document for each kind. *FP:* a paragraph bold by
+  its style delivered with no flag; a source switching a style's bold off, delivered with the flag; a uniform
+  paragraph kept — each quiet. *Byte identity:* every delivery, exit code and existing finding unchanged against the
+  pin. **MUST NOT:** block, or move an exit code. **Section 3.9's claim, corrected when this plan was filed, is
+  then made good:** an instrument that sees formatting exists. *Done when:* each named instance found, each FP
+  quiet.
+  **16.1's OWN PLAN — 2026-11-13, written before any code** *(unattended; the session's choices are
+  `DECISIONS-LOG.md` 2026-11-13's, Wouter's to overturn)*. **Changes:** `validate_apply.py`, both trees — one arm
+  called by the delivered check once the text arm has paired, only with `--original`: its own printed block and
+  its own report key, `formatting`, beside `findings` and never in it, so every finding, the blocking and counted
+  totals and every exit code stay as they are by construction, and a defect inside the arm is said, never raised;
+  extraction's `read_style_cascade` and `resolve_run` imported when the arm runs, as the side arm imports its
+  reader — a missing sibling NOT RUN and named, a cut-short one exit 3 under SKILL.md rule 6 — the route declared
+  in `tests/test_sibling_import_integrity.py`; a new suite, `tests/test_delivered_formatting.py`, invented
+  documents only; `tools/delivered_corpus_arm.py` printing the arm per document on both arms, pinning (b)'s.
+  **Pairing — the text arm's, never a second:** an entry's delivered partner as `paired` holds it, its source
+  paragraph as the bracket arm finds it, by extraction's text; where one text names several paragraphs on either
+  side and their formatting differs, the pair is AMBIGUOUS — counted, never judged. **Compared:** the text runs
+  each paragraph OWNS (nearest `w:p`, non-blank `w:t`, so the accept reading); bold and italic in force over each
+  side's own styles part — an `.xml` delivery has none, so the original's, said; the eleven other properties by
+  their direct value, as the probes read them, said. A finding carries its path — rebuilt, tc, or same text — so
+  the derivation's rebuilt counts are compared like for like. **Must not:** a finding, a total, an exit code or a
+  delivered byte moved; a property value, a style id or a word of text printed. **Derived first:**
+  `temp/s1113_derive.py`, positional on apply's raw output, both trees, before the arm ran. **Checked against:**
+  the register rows' instances by document; ST_OnOff's tri-state and the toggle rule as 15.1 resolves them; the
+  journal's nearest-paragraph ownership; the pin's report and exit codes, workdir by workdir.
+  **BUILT 2026-11-13, unattended** *(`DECISIONS-LOG.md` 2026-11-13)*: **every named instance found on arm (b),
+  both trees, at the counts `temp/s1113_derive.py` derived first** — A12 D06 2 and its D09 underlines 2, A11 D09
+  3, A13 D04 7, A14 D10 1, A7 and A18 D02 1 each, A18 D06's small capitals 2, A17 D03 and D03B 2 each, its
+  character style and its bold on the same paragraphs, A4 D11 2. Arm (b) and the derivation agree on 104 of 104
+  findings, 100 rebuilt and 4 in tracked changes, over 1,453 of 1,469 paired paragraphs compared, 15 ambiguous;
+  arm (a), the July deliveries, 147. Each FP quiet on invented documents; every check run identical to the pin's
+  outside the arm's block; every delivery and exit code unchanged against the pin.
+- **16.2 — the frozen notes regenerated at load time.** MEDIUM, `tools/` only *(Wouter's answer: graft at load
+  time)*. One committed helper grafts today's extraction's `resolved` into a frozen workdir's notes IN MEMORY, from
+  the matched source, run by run, and refuses — VOID, never a pass — wherever an entry's idx, text or runs differ;
+  the corpus arms that drive apply or `post_process` gain it as an option. *TP:* 1,891 of 1,891 entries aligned,
+  186 runs grafted, per tree. *FP:* a planted misalignment, one run's text changed — VOID. *Byte identity:* the graft
+  on, every delivery identical to the pin's, 13 of 13 workdirs per tree — 15.1's acceptance (ii), made permanent.
+  **MUST NOT:** write into the logs folder; the July files stay 13 of 13 on their catalogue, the never-regress
+  baseline. *Done when:* all three hold.
+  **16.2's OWN PLAN — 2026-11-16, written before any code** *(hop 1 of the unattended run s16-hops-1116; its
+  choices are `DECISIONS-LOG.md` 2026-11-16's, Wouter's to overturn)*. **Changes:** a new helper,
+  `tools/graft_resolved.py` — today's tree's `extract_paragraphs.py` run over the matched source into a system temp
+  folder it removes, compared with the frozen notes, `resolved` copied run by run into a COPY; where nothing is
+  grafted the notes' own bytes come back unchanged, else in extraction's own format; and a `--graft` option on the
+  three corpus arms that drive apply or `post_process`: `delivered_corpus_arm.py`'s arm (b), both builds under
+  `--ref` given the same grafted bytes, or with `--graft ours` the pin's build July's own — 15.1's acceptance (ii)
+  in its own sense; `apply_corpus_diff.py`, both arms; `postprocess_corpus_arm.py`, both arms' staged notes and the
+  `--from-apply` rebuild, the source matched for every workdir. A new suite, `tests/test_graft_resolved.py`,
+  invented documents only, both trees, its rows in `verify.config.json` and the runner. **Aligned means:** the same
+  idx on both sides, each once; the same `text` at each; the same runs, each the WHOLE run entry with `resolved`
+  set aside — measured first, 1,891 of 1,891 entries and 5,999 of 5,999 runs equal that way, both trees, so the
+  strictest reading costs nothing; a frozen run already carrying `resolved` must carry today's. Anything else is
+  VOID, its reason in idx and key names only; the arm voids that workdir and exits non-zero, never running it
+  ungrafted. **Must not:** write into the logs folder; print a word of text, a style id or a value; move a
+  delivered byte, an exit code or a finding. **Derived first:** `temp/s1116h1_measure.py`, its own enumeration and
+  match, 186 runs gaining the key per tree. **Checked against:** that measurement, per workdir;
+  `tools/freeze_intermediates.py`, report only, 13 of 13 on the catalogue after every run; arm (b) against the pin
+  with `--graft ours`, 13 of 13 per tree, and 16.1's formatting pins unmoved.
+  **BUILT 2026-11-16, unattended** *(`DECISIONS-LOG.md` 2026-11-16 (1))*: **1,891 of 1,891 entries aligned, 5,999
+  runs, 186 given `resolved`, per tree**, on all three arms; `delivered_corpus_arm.py --arm b --ref c9b7d90 --graft
+  ours`, both trees: every delivery and exit code unchanged against the pin, 16.1's formatting pins held, each
+  read-back right; the planted misalignment on the corpus VOID, its reason in idx and key names only. Beyond the
+  plan, a READ-BACK in each arm — the notes each build read, counted after it ran — since no delivered byte can
+  show a graft never handed over: six wiring mutants each caught by it. `tests/test_graft_resolved.py` 33 of 33,
+  both trees; 17 of 17 helper mutants killed. Found, not caused: all 13 July `.validate-state.json` files off the
+  catalogue since 2026-09-02, every `paragraphs.json` on it — left, recorded, checked by content.
+  **16.3's OWN PLAN — 2026-11-16, written before any code** *(hop 1 of the unattended run s16-hops-1116; its
+  choices are `DECISIONS-LOG.md` 2026-11-16's, Wouter's to overturn)*. **Changes, both trees:**
+  `extract_paragraphs.py` gains `styles_give` — what the styles alone give a run, `resolve_run` with no direct
+  formatting, its output byte-identical, `tests/test_style_cascade.py`'s round trip proving it — and the inventory
+  comment's reason corrected: decision 6 forbids a shared library, not one script importing another.
+  `apply_translations_textmatch.py` reads the source's styles once, importing `read_style_cascade` and
+  `styles_give` when it runs: a MISSING sibling, today's explicit flags, said in one line; a cut-short one, exit 3
+  under SKILL.md rule 6 — the ninth route in `tests/test_sibling_import_integrity.py`. `make_run_et` takes what the
+  styles give the NEW run — the paragraph's style, the template run's character style — drops the template's
+  direct `b`, `bCs`, `i` and `iCs`, and writes a pair only where the wanted value differs, `bCs` with `b` and `iCs`
+  with `i` as today; with no styles known, today's explicit flags, byte for byte. The tracked-change bold-leak fix
+  the same for bold alone, as it was: `w:b w:val="0"` only where the run's styles give bold, a direct bold dropped
+  elsewhere. **The wanted value where nothing is declared:** per property, the entry's text runs in force — each
+  run's `resolved` over its `bold` and `italic`, so the graft is what the corpus measures with — all agreeing, that
+  value on every span; otherwise today's segments; a declared span absolute; the sub-heading test where it fires,
+  untouched (16.4's). A new suite, `tests/test_minimal_flags.py`, invented documents, both trees; a synthetic
+  fixture rendered both ways by `tools/render_diff.py`, which gains `--graft` for the corpus's page comparison,
+  mechanical and never looked at. The corpus arm's pin for A12 on D06 moves from 2 to 0. **Must not:** the
+  sub-heading test or the readers; another property; italic in the tracked-change path; an exit code or a gate;
+  extraction's output. **Derived first:** `temp/s1116h1_163_derive.py`, positional on today's apply output, the
+  notes grafted — the rebuilt, undeclared paragraphs whose source runs agree on a value today's output does not
+  give every run, per document and property — **run 2026-11-16, both trees identical, its control firing: 2
+  paragraphs, both D06's, A12's two headings, a bold gain on 2 runs; of 580 undeclared, 578 already agree in bold
+  and 579 in italic, 1 mixed.** So nothing else may move in force. **Checked against:** that list, paragraph by
+  paragraph: arm (b)
+  against the pin, `--graft`, every run whose bytes moved compared IN FORCE by the resolver over both deliveries —
+  unchanged, or in a derived paragraph, 0 unexplained; the off-flag probe's counts of 2026-11-12 for the flags
+  removed; the bold-document control, the runs whose flag does work, kept.
+  **BUILT 2026-11-16, unattended** *(`DECISIONS-LOG.md` 2026-11-16 (2))*: **arm (b) against the pin, the graft
+  on, both trees identical: 1,259 paragraphs and 2,343 runs moved in bytes, each by its flags alone and the same in
+  force by the resolver over both deliveries, but D06's two derived headings, a bold gain on 2 runs; 0
+  unexplained**, every exit code equal, 13 of 13 per tree. `delivered_corpus_arm.py --ref` gains 16.3's sense, as
+  it gained sub-step 2b's: the three XML members by their flags alone and in force but MOVE_16_3, and
+  post_process's journal by its element counts alone, tied to apply's own output since post_process merges runs
+  after its passes; 214 and 202 checks green, A12 on D06 pinned at 0. `quality_check`'s rows, total and exit code
+  unmoved, 13 of 13 per tree. `tests/test_minimal_flags.py` 23 of 23, both trees, red at the pin; 24 of 24 mutants
+  killed; the sibling suite's ninth route; a new fixture, `style-bold.docx`, whose own notes equal today's
+  extraction's run for run. Beyond the plan: run properties left empty are not written. **NOT DONE, DECLARED:**
+  the rendered diff. LibreOffice is no longer on this machine and Word's automation hung on a hidden dialog, so
+  `render_diff.py --fixture style-bold`, the `--graft` the plan gives it and the corpus page comparison wait for it.
+  **Found, for 16.4:** two readers of a run's own `w:b` downstream of apply, `quality_check`'s check 15 and
+  `reorder_definitions`' term detector, cannot see bold a style gives, which 16.3 no longer writes as a flag;
+  neither moved on any corpus document.
+  **16.4's OWN PLAN — 2026-11-16, written before any code** *(worker 1 of the chain of 2026-11-16, at its safe cut
+  after 16.3; its choices `DECISIONS-LOG.md` 2026-11-16 (2)'s, Wouter's to overturn)*. **Changes, both trees:**
+  `apply_translations_textmatch.py`: the sub-heading test runs only where an entry declares no `en_runs`, its call
+  in the declared branch removed, so a declared span is absolute there too; where it runs it reads each source run
+  in force, `resolved` over `bold`; the tracked-change bypass's "every source run bold" reads the same.
+  `post_process.py`: `_declared_italic`'s untranslated-term arm reads a source run's italic in force, `resolved`
+  over `italic`. **The two readers 16.3's review found** — `quality_check`'s check 15 and `reorder_definitions`'
+  `get_bold_term`, each reading a run's own `w:b`, blind to bold a style gives, which 16.3 no longer writes as a
+  flag — are 16.4's first measurement: whether each can reach the styles part of what it reads; where it can, it
+  reads bold in force through extraction's resolver, as apply does; where it cannot, it is left and the gap
+  declared. *TP:* D09's three cells keep their declared italic (A11 0 on arm (b)); D06's one entry its declared
+  bold pattern; invented: a span declared false over a short paragraph its runs show bold, a short undeclared
+  heading bold by its style alone, a tracked-change paragraph bold by its style throughout. *FP:* the rebuilt
+  entries where the test fires and the declaration agrees, unchanged; an undeclared short paragraph bold in force,
+  still bold. **Derived first,** positional on 16.3's output, the graft on: the declared entries where the
+  sub-heading test fires and the declaration disagrees (4 when measured 2026-11-12 (6): D09's three italic, D06's
+  one bold), and any undeclared short paragraph whose test answer moves when read in force. **Checked against:**
+  that list, run by run, through `delivered_corpus_arm.py --ref` with 16.3's commit as the pin, a 16.4 sense added
+  as 16.3's was; `quality_check` on both builds. **MUST NOT:** the writers, settled at 16.3. **Then the
+  hand-back:** PR #198 squash-merged on its green full run; Wouter's words of 2026-11-16 are the go for 16.5, its
+  own plan written into its entry first, on a new branch from main.
+  **BUILT 2026-11-16, unattended** *(`DECISIONS-LOG.md` 2026-11-16 (3))*: **the first measurement — neither
+  reader can reach a styles part.** The skill hands `quality_check` and `reorder_definitions` only
+  `final/word/document.xml`, and 0 of 13 frozen workdirs hold a styles part beside it (`temp/s1116b_reach.py`,
+  its control firing), so both are left and the gap declared: reaching one needs a new argument in the
+  operator's instructions, step 17's. Found beside it, not fixed: check 15 counts a run carrying
+  `<w:b w:val="0"/>` as bold. **Apply:** a declared span is absolute; the sub-heading test runs only where
+  nothing is declared, reading each source run in force through a new `run_in_force`, and where it fires the
+  source's italic in force wins as it does everywhere else (the worker's choice, 0 corpus paragraphs either
+  way); the tracked-change bypass reads the same; `post_process`'s untranslated-term arm reads a run's italic
+  in force. **Derived first,** `temp/s1116b_164_derive.py`, both trees identical, its control firing: D09's
+  three cells, an italic gain — of 123 declared entries where the test fires, 3 disagree on visible text; 0
+  undeclared or tracked-change paragraphs move; 0 source runs whose italic verdict can move. **On the corpus,
+  against 16.3's commit, the graft on, both trees identical:** at apply 4 paragraphs moved in bytes — D09's
+  three, named, and one D06 entry split by its own declaration, nothing in force — 0 unexplained, every exit
+  code equal; arm (b) 184 and 172 checks green, A11 on D09 pinned at 0, register A11 CLOSED;
+  `quality_check` unmoved, 13 of 13 per tree. A new suite, `tests/test_declarations_win.py`, 18 of 18 both trees,
+  red 11 of 18 at the pin on its true-positive arms alone; 6 of 6 mutants killed;
+  16.3's suite's arms 5b and 7 brought to 16.4's rule.
+  **NOT DONE, DECLARED:** the rendered diff — LibreOffice is still not installed.
+- **16.3 — bold and italic written only where needed, the off-flags removed in the same sub-step.** HEAVY, both
+  trees — the core of section 3.9's step 16, and the one sub-step never to be split, since removing the flags
+  without the computation renders a document bold. Apply imports extraction's resolver *(Wouter's answer)*, through
+  a function extraction exposes for what the styles give a run WITHOUT its own formatting — extraction's output
+  byte-identical, 15.1's round trip proving it; and extraction's comment that sibling scripts restate rather than
+  import is corrected — decision 6 forbids a shared library, not an import. The two writers, `make_run_et` and the
+  tracked-change bold-leak fix, drop a run's direct bold and italic and write one only where the wanted value
+  differs from what the styles give. **Where nothing is declared, the wanted value is the source paragraph's
+  formatting in force wherever its text runs agree, today's rule where they do not** *(Wouter's answer)*; a declared
+  span is absolute, so D06's two spans declaring false stay false. *TP:* D06's two headings bold; invented — a
+  heading bold by its style, undeclared; a character-style bold term declared bold, A17's shape. *FP, the
+  bold-document control:* the 96 runs whose flag does work, as the source shows them, both trees; invented — a bold
+  body style switched off run by run. *Corpus:* arm (b) against the pin, the graft on — bytes move, and every moved
+  run is a removed redundant flag, its formatting in force identical before and after by the resolver over both
+  deliveries, or in a named paragraph; 0 unexplained; 16.1's arm reports A12 0 on arm (b). **THE RENDERED DIFF**
+  *(charter 2.4 item 4):* invented documents rendered both ways, page by page, for Claude's eyes; on the corpus a
+  mechanical page comparison naming the pages that moved, for Wouter's own page-by-page look, never Claude's
+  *(charter 5.6)*. **MUST NOT:** the sub-heading test or the readers (16.4's); another property (16.5's).
+  *Done when:* the named paragraphs move and nothing else moves in force.
+- **16.4 — the readers: declarations win.** HEAVY, both trees. Apply's sub-heading test runs only where no `en_runs`
+  is declared, reading the formatting in force *(Wouter's answer — the rule the tracked-change path has kept since
+  rev38)*; the tracked-change bypass's "every source run bold" and `post_process`'s italic reader, the
+  untranslated-term arm of `_declared_italic`, read `resolved` where it is present. *TP:* D09's three cells keep
+  their declared italic — A11 CLOSED; D06's one entry keeps its declared bold pattern. *FP:* an undeclared short
+  paragraph bold in force still written bold; the 118 rebuilt entries where the test fires and the declaration
+  agrees, unchanged. *Corpus:* as 16.3, every move named, 0 unexplained; 16.1's arm reports A11 0 on arm (b). **MUST
+  NOT:** the writers, settled at 16.3. *Done when:* both hold — and **THE HAND-BACK:** the pull request 16.1 opened
+  squash-merged on its green full run, and step 16 handed to Wouter before 16.5.
+- **16.5 — the other properties, per span.** HEAVY, both trees; its own plan with Wouter first. Each English span
+  takes underline, highlight, size, colour, small capitals, shading and character style from the source run it came
+  from, not one template per paragraph — so the template's bias toward the deviant run ends (A18) and a mixed
+  paragraph keeps its states (A14, A13, A7, A4, A12's underline and size). **The device is this sub-step's first
+  decision, measured first on the paragraphs above:** a source reference the operator declares on each `en_runs`
+  span, refused when malformed as `validate_en_runs` refuses offsets (C13); or a match of each declared span to the
+  source runs showing the same emphasis; or both. With it: a symbol font never carried onto English (A5, invented,
+  no corpus document holding one); under a fixed line height, never a larger size than the source run's (D6); the
+  first fragment's formatting consequence (F19). *TP:* each register instance at 16.1's counts, and invented
+  documents for A5 and D6. *FP:* the 914 uniform sizes and 392 uniform fonts kept today, unchanged. **MUST NOT:**
+  move bold or italic. *Done when:* 16.1's other-property findings on arm (b) fall to what the device cannot reach in
+  notes written before it, declared.
+- **16.6 — the definitions range, declared.** HEAVY, both trees; its own plan with Wouter first. The operator
+  declares where the definitions section is — option 3's prescription (a), register L2 — and
+  `reorder_definitions.py` reads it; with none declared the detector stays as the fallback, reports EVERY candidate
+  section rather than the first, and fails loudly, its two wordings corrected (L3). **Not measured in this
+  session:** its first act is the corpus's definitions sections and the detector's answer against the true one,
+  both trees. *TP:* L2's shape, invented — a bold-colon cluster before the real block. *FP:* a document with no
+  definitions section, said so, nothing moved. **MUST NOT:** the term-sanity guard, a positive that must not
+  regress (P11). *Done when:* L2 and L3 closed and P11 held.
+- **16.7 — tab positions per run.** HEAVY, both trees; its own plan with Wouter first. Where a tab or a ruby
+  annotation separates text in a source paragraph, the English is written per source run, so the separator has a
+  place to go back to — A3's remainder (D02's two tables, D05's notices clause, D11's mid-phrase tabs), A6's glued
+  bullets (D05) and A21's ruby. **Reconciled first with step 18**, whose row carries the tab-authoring rule: this
+  sub-step's plan says which of the two holds it. *TP:* the four named shapes, from the corpus where the frozen
+  notes allow, invented otherwise. *FP:* `tests/test_toc_shapes.py`'s 18 of 18 shapes unchanged. **MUST NOT:**
+  the table-of-contents placement step 6 built. *Done when:* A3, A6 and A21 closed, or each remainder declared.
+
+**What every sub-step must NOT touch:** the operator's instructions — step 17's, which rewrites rule 3 once, over a
+finished apply; a gate's strength or an exit code, beyond 16.1's report and what 16.5 to 16.7 refuse as malformed;
+the anti-drift safeguards; the July frozen intermediates, read and never written; a re-translation; a new shipped
+file — the tree stays at 198 of 199, the last slot step 22's. **Left open, their home decided at step 17's plan**
+*(Wouter's scope answer)*: A10, `en_runs` never placing formatting on a tracked-change paragraph; O1, a bold span
+taking its punctuation; A20, leading whitespace in `en`, measured unable to shift a span. F7, F13 and F22 are
+instructions, step 17's to delete once 16.3 removes their reason. A17 closes only when step 17 has the operator
+read `resolved` and declare the bold; C20's delivered half is 16.1's, its count against `en_runs` before apply
+left open; C13 is closed.
+
+**Size:** six HEAVY sub-steps and one MEDIUM — about three sessions for 16.1 to 16.4, and three for 16.5 to 16.7.
+**Two pull requests:** `feature/step16-formatting-part-2`, opened by 16.1 and squash-merged at the hand-back; then
+one from main for 16.5 to 16.7, opened by 16.5 *(the session's reading of Wouter's run-mode answer, his to
+overturn)*. **VERIFY:** each sub-step's controls red at the pin first; mutants on every deciding line; the corpus
+arms, the graft on from 16.2; the rendered diff from 16.3; the parity check and the divergence baseline; the three
+confidentiality controls on every committed file and every real output. **TEST:** the suites that drive extraction,
+apply, `post_process`, `validate_apply` or `reorder_definitions`, both trees; the smoke suite; the full run once
+per pull request, on its exact commit, before the push.
 
 ## 4. How each step is tested — THE METHOD
 

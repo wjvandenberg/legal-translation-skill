@@ -32,6 +32,7 @@ directory first. A baseline that the tool measuring it can modify is not a basel
     uv run --with lxml python tools/apply_corpus_diff.py
     uv run --with lxml python tools/apply_corpus_diff.py --variant us
     uv run --with lxml python tools/apply_corpus_diff.py --doc D06
+    uv run --with lxml python tools/apply_corpus_diff.py --graft     # sub-step 16.2: notes given `resolved`
 """
 import argparse
 import io
@@ -57,6 +58,7 @@ from lxml import etree  # noqa: E402
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 from sibling_dirs import corpus_dirs, logs_dir  # noqa: E402  (register I-40)
+from graft_resolved import GraftVoid, carried, describe, graft_notes_bytes  # noqa: E402  (sub-step 16.2)
 LOGS = logs_dir()
 SCRIPT = "apply_translations_textmatch.py"
 
@@ -233,6 +235,10 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--variant", default="uk", choices=("uk", "us"))
 ap.add_argument("--doc", action="append", help="limit to these corpus doc-ids")
 ap.add_argument("--ref", default=REF, help="baseline commit to compare against")
+ap.add_argument("--graft", action="store_true",
+                help="SUB-STEP 16.2: give each workdir's frozen notes today's extraction's `resolved`, in memory, "
+                     "through tools/graft_resolved.py, before either arm reads them -- both arms the same bytes; "
+                     "a workdir the graft refuses is VOID and the run exits non-zero")
 args = ap.parse_args()
 
 print("=" * 100)
@@ -549,6 +555,7 @@ print(f"  corpus folder(s) reachable: {len(CORPUS)} · "
       f"not compared)")
 
 docs_done, rows, unexplained, voided, text_rows, container_rows = [], [], [], [], [], []
+GRAFTS, GRAFT_VOIDS = {}, []   # sub-step 16.2
 wds = [w for w in (sorted(LOGS.rglob("wd")) + sorted(LOGS.rglob("wd-*"))) if w.is_dir()]
 seen = {}
 for wd in wds:
@@ -580,6 +587,17 @@ for wd in wds:
                  "headers_footers.json", "_boldmap.json"):
         if (wd / name).is_file():
             shutil.copyfile(wd / name, work / "in" / name)
+    if args.graft:
+        # SUB-STEP 16.2: both arms are copied from "in", so both read the same grafted bytes. A refusal is VOID and
+        # the workdir is not run on the ungrafted notes.
+        try:
+            data, gstats = graft_notes_bytes(notes_src, src_docx, ROOT / args.variant / "scripts")
+        except GraftVoid as exc:
+            voided.append(f"{label}: the graft refused — {exc}")
+            GRAFT_VOIDS.append(label)
+            continue
+        (work / "in" / "paragraphs.json").write_bytes(data)
+        GRAFTS[label] = gstats
     file_receipt(work / "in" / "paragraphs.json", ROOT / args.variant)
     # One independent copy per arm, so neither arm's state file can reach the other.
     arms = {}
@@ -590,7 +608,16 @@ for wd in wds:
         xml, note = run_arm(scripts_dir, adir / "src.docx", adir / "paragraphs.json",
                             adir / "out.xml", arm)
         arms[arm] = (xml, note)
+        if args.graft:
+            # THE READ-BACK (16.2): the notes this arm's apply read, counted after it ran -- a graft computed and not
+            # handed over fails the run, since today's apply ignores the key and no byte could show it.
+            rb, carry = carried(adir / "paragraphs.json"), gstats["grafted"] + gstats["already"]
+            if rb != carry:
+                GRAFT_VOIDS.append(f"{label}/{arm}")
+                voided.append(f"{label}: the {arm} arm's notes carry the key on {rb} run(s), not {carry}")
 
+    if any(v.startswith(f"{label}/") for v in GRAFT_VOIDS):
+        continue          # not handed over: VOID above, never also counted as compared
     if arms["old"][0] is None or arms["new"][0] is None:
         voided.append(f"{label}: {arms['old'][1]} | {arms['new'][1]}")
         continue
@@ -830,6 +857,12 @@ if voided:
     print(f"  {len(voided)} NOT compared — VOID, not clean:")
     for v in voided:
         print(f"      {v}")
+if args.graft:
+    print(f"\n  SUB-STEP 16.2 — THE GRAFT, per workdir ({len(GRAFT_VOIDS)} refused or not handed over):")
+    for label, gs in GRAFTS.items():
+        print(f"      {label:<10} {describe(gs)}")
+    t = {k: sum(gs[k] for gs in GRAFTS.values()) for k in ("entries", "aligned", "runs", "grafted", "already")}
+    print(f"      GRAFT TOTAL: {len(GRAFTS)} workdir(s) · {describe(t)}")
 if SAME and moved_docs:
     print("  HARNESS DEFECT — the two arms are the same code and yet something moved.")
 if unexplained:
@@ -839,4 +872,6 @@ if unexplained:
         print(f"      {u}")
 print("=" * 100)
 shutil.rmtree(TMP, ignore_errors=True)
-sys.exit(1 if (unexplained or (SAME and moved_docs)) else 0)
+# A GRAFT THE TOOL WAS ASKED FOR AND COULD NOT GIVE FAILS THE RUN (16.2): its workdir was not compared, and a run that
+# exits 0 over fewer workdirs than it was given reads as a smaller clean run.
+sys.exit(1 if (unexplained or (SAME and moved_docs) or GRAFT_VOIDS) else 0)

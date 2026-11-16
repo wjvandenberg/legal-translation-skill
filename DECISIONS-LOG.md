@@ -2904,3 +2904,156 @@ extends extraction and apply at the places section 3.9 of the build plan names, 
 design choice — where what the styles give WITHOUT a run's own formatting comes from — is still open, for step
 16's plan. The unattended chain of 2026-11-12 ended at step 15's close, as he set it; how step 16 runs is not
 decided.
+
+## 2026-11-12 (6) — Wouter: step 16 planned at one input point; his seven answers
+
+**WOUTER'S ANSWERS, 2026-11-12, QUOTED AS GIVEN** — each the option he chose in the question dialog, after the
+session had measured the corpus *(section 3.16 of the build plan owns the counts and the plan built on them)*:
+
+**(1) "Import extraction's (Recommended)"** — to *where apply gets what the styles alone give a run*: apply imports
+the resolver step 15 built in `extract_paragraphs.py`, over a copy inside apply or a new key in the notes; the
+notes, and what the operator reads, unchanged. **(2) "The source as shown (Recommended)"** — to *what apply writes
+where nothing is declared*: the source paragraph's formatting in force wherever its text runs agree, today's rule
+where they do not; a declared span stays absolute. **(3) "Honour declarations (Recommended)"** — to *the
+sub-heading test that discards the operator's `en_runs`*: declared formatting always wins, the test running only
+where nothing is declared. **(4) "Build it first (Recommended)"** — to *how step 16 catches a formatting error,
+step 11's check comparing text only*: a formatting comparison in the delivered check, report-only, as 16.1, and
+section 3.9's claim corrected.
+
+**(5) "Other properties (Recommended), The definitions range, Tab positions per run"** — to *which of option 3's
+further rows step 16 also builds*: all three. The session recommended the first alone; the other two widen the step
+to L2 and L3, and to A3's remainder, A6 and A21 — 16.6 and 16.7, each to be measured first. **(6) "Graft at load
+time (Recommended)"** — to *how the frozen notes gain `resolved`*: in memory, at every corpus run, from today's
+extraction of the matched source, nothing written into the archive. **(7) "Unattended, stop at contract
+(Recommended)"** — to *how step 16 is built*: 16.1 to 16.4 unattended, then a hand-back before 16.5 changes what
+the notes contain; 16.5 to 16.7 each planned with him first.
+
+**ONE READING THE SESSION TOOK, HIS TO OVERTURN:** answer (7) read as two pull requests — the first squash-merged at
+the hand-back, the second opened by 16.5. **AT THE OPENING:** the house's `auto_mode.py` v8, committed there since
+15.3, adopted byte for byte; its `cycle_evidence.py` v4, staged and not committed there, declared by content —
+and the house committed it with `check_checkers.py` v24 during this session, both declared by content, for the
+next opening. **THE AUDIT GATE'S CORRECTION, BEFORE THE COMMIT:** question (3)'s figures — 142 firings, 7
+declarations differing, 5 in italic and 2 in bold — were counted over the notes; where apply reaches the test
+they are 122, 4, 3 and 1, D09's three matching register A11's three cells. The answer does not turn on them;
+section 3.16 carries the corrected figures.
+
+## 2026-11-13 — sub-step 16.1 built, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-13, QUOTED WHOLE,** typed into the session that conducts step 16: *"go - and continue opening new sessions etc yourself and following your own recommendations for the next 5.5 hours, I will not look at this and will just trust you. Also, do max one check / test etc per session, at the end, rather than doing all the tests all the time for each commit etc."* **No
+question was asked; each choice below is THE SESSION'S, its recommended answer, for him to confirm or overturn.**
+
+**(1) KEPT APART BY CONSTRUCTION:** the formatting arm's findings go to their own report key, `formatting`, and
+their own printed block, never into `findings` — over a non-blocking class inside it — so every existing finding,
+the blocking and counted totals, repack's delivered gate and every exit code stay as they were without a ruling
+having to be read; a defect inside the arm is said, NOT RUN with its exception's type, never raised. **(2) THE
+RESOLVER IMPORTED WHEN THE ARM RUNS,** as the side arm imports its reader: missing, the arm says NOT RUN and names
+`extract_paragraphs.py`; cut short, exit 3 under SKILL.md rule 6 — a ninth route in the sibling-import suite.
+**(3) AMBIGUOUS, NEVER GUESSED:** where one text names several paragraphs on either side formatted differently, the
+pair is counted and not judged — 15 of 1,469 paired on arm (b) — over the bracket arm's first-occurrence rule,
+which a formatting comparison cannot borrow. **(4) EACH SIDE ITS OWN STYLES:** a `.docx` delivery resolved over
+its own styles part, an `.xml` one over the original's, said; the findings identical either way, the two trees
+stopping different documents at repack. **(5) A PATH ON EVERY FINDING** — rebuilt, tc, same-text — so the plan's
+rebuilt counts compare like for like. **(6) THE PINS IN THE CORPUS ARM:** `tools/delivered_corpus_arm.py` prints
+the arm on both arms and pins thirteen counts on arm (b), the prompt's eight instances with A17's bold beside its
+character style and A12's two underlines on D09, and A17's two sets of paragraphs being one. **(7) THE MUTANTS
+ON uk ONLY:** the arm's block is byte-identical in the two trees, which the port's own proof and the suite's case
+12 assert. **(8) THE REGISTER NOT TOUCHED:** 16.1 is an instrument; each row closes at the sub-step that repairs
+it. **(9) AT THE OPENING:** the house's `cycle_evidence.py` v4 and `check_checkers.py` v24 adopted byte for byte,
+each fingerprint its committed blob's. **(10) THE REVIEW'S THREE, DECLARED, NOT CHANGED:** a text box's
+tracked change labels its outer paragraph tc, and a whitespace-only difference labels one same-text — a path
+label each, never a class or a count; and the original's archive is opened twice.
+
+**MEASURED, BOTH TREES IDENTICAL:** `temp/s1113_derive.py`, positional on apply's raw output before the arm
+existed, and the arm on arm (b), by text on the delivery, agree on 104 of 104 findings — 100 rebuilt, 4 in
+tracked changes — over 1,453 of 1,469 paired paragraphs compared; arm (a), the July deliveries, 147.
+
+**(11) THE FULL RUN'S ONE RED, REPAIRED HERE:** `tests/test_cycle_gate.py` asserted that a failing command
+leaves no store file — v3's behaviour; v4's pass ledger counts every run, a red one too, so the case now asserts
+no phase RECORD, the thing `check` accepts. VERIFY re-run for that delta alone, the first VERIFY's 46 of 46
+standing for the rest, its code hashes stamped and unchanged; the full run then once more, on the exact tree.
+
+## 2026-11-16 (1) — run s16-hops-1116, hop 1: 16.2 built, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-16, QUOTED WHOLE,** typed into the session that conducts the run: *"continue with 16.2
+in auto hop mode and don't stop until 17h today. You can already go into step 17 even. I won't respond, I won't
+answer questions - you should just continue."* — and, minutes later: *"You can build even 16.5-16.7 and 17."* **No
+question was asked; each choice below is THE HOP'S, its recommended answer, for him to confirm or overturn** —
+`temp/s1116-hops-questions.md` holds the ones that would have been questions.
+
+**16.2, THE GRAFT.** **(1) THE STRICTEST ALIGNMENT:** each run compared as the WHOLE entry with `resolved` set
+aside, not by text, bold and italic alone — measured first, 1,891 of 1,891 entries and 5,999 of 5,999 runs equal
+that way, both trees, so it costs nothing and refuses more. **(2) TWO SENSES UNDER `--ref`:** `--graft` gives both
+builds the same grafted bytes, the rule every corpus arm keeps; `--graft ours` leaves the pin's build July's own
+notes, the sense of 15.1's acceptance (ii), and is the one 16.2's byte identity was run in. **(3) A READ-BACK THE
+PLAN DID NOT NAME:** each arm counts the runs carrying the key in the notes each build actually read — today's
+apply ignores the key, so no delivered byte could show a graft computed and never handed over; six wiring mutants
+prove it fails. **(4) THE post_process ARM MATCHES THE SOURCE FOR EVERY WORKDIR** under `--graft`, so the two that
+kept a pre-post_process snapshot are grafted too, and its two positive controls re-run on the grafted notes, as
+they re-run on the notes arm 1 used. **(5) `apply_corpus_diff.py` EXITS 1 ON A GRAFT IT COULD NOT GIVE** — new, and
+only under the flag: the tool otherwise exits 0 over voided documents. **(6) THE BYTES HANDED OVER:** a workdir
+with nothing to graft gets the July file's own bytes, 7 of 13; the other 6 extraction's json format. **(7) RED:** the
+helper is new, so its red is its absence at the pin, said by the suite's import; the proof that it decides is the
+seventeen helper mutants and the six wiring mutants. **(8) A DRIFT FOUND, NOT CAUSED:** `freeze_intermediates.py
+--verify` reports all 13 July `.validate-state.json` files moved, each last written 2026-09-02, a day after the
+catalogue; every `paragraphs.json` is on it, 13 of 13. Left as it is and checked by content — question 1 of the
+run's questions file; re-recording the catalogue is Wouter's to authorise.
+
+**16.3, PLANNED, NOT BUILT.** **(9) WHERE APPLY READS THE SOURCE IN FORCE:** from the notes, each run's `resolved`
+over its `bold` and `italic` — question 2. **(10) A MISSING extraction BESIDE APPLY:** today's explicit flags, said
+in one line; a cut-short one exits 3 — question 3. **(11) THE DERIVATION, RUN FIRST:** of 1,214 rebuilt paragraphs,
+580 undeclared, exactly 2 may move in force, both D06's — A12's headings, a bold gain — both trees identical.
+**(12) THE CUT:** context read 52% after 16.2, which cost about 36%; a HEAVY sub-step could not be built and closed
+under the 75% bound, so this hop wrote 16.3's plan and stopped between two items, the build left whole for the
+next hop, with `temp/s1116h1_163_derive.py` (its `--compare` mode the acceptance at apply), a draft suite
+`temp/s1116h1_draft_test_minimal_flags.py`, the pin's scripts in `temp/s1116h1_pin/` and the us port
+`temp/s1116h1_port_us.py`.
+
+## 2026-11-16 (2) — the chain of 2026-11-16, worker 1: 16.3 built, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-16, QUOTED WHOLE,** given to the session conducting today's chain: *"I won't respond, I won't answer questions - you should just continue."* — *"You can build even 16.5-16.7 and 17."* — *"merging, pushing etc should be done automatically - I approve and agree to everything already."*
+**No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm or
+overturn** — `temp/s1116-questions.md` holds the ones that would have been questions, with their options.
+
+**16.3, BUILT.** **(1) THE IMPORT AT LOAD:** apply imports extraction's `read_style_cascade` and `styles_give` as
+it loads, a missing file tolerated, rather than inside the run: the same behaviour, and the sibling suite's "load"
+route proves all five damages. **(2) A WHOLE EXTRACTION FAILING ON ANOTHER MODULE IS RAISED,** a defect in that file
+and not an install. **(3) NO STYLES KNOWN, NOTHING NEW:** the source-in-force rule for undeclared paragraphs is off
+then too, so the delivery is today's byte for byte. **(4) AN EMPTIED `w:rPr` IS NOT WRITTEN.** **(5) THE RENDERED
+DIFF, NOT DISCHARGED:** LibreOffice is no longer installed and Word's automation hung on a hidden dialog, its one
+instance ended; nothing was installed unattended. The fixture `style-bold.docx` is built, and `render_diff.py
+--fixture style-bold`, the `--graft` the plan gives `render_diff` and the corpus page comparison wait for
+LibreOffice, the corpus pages Wouter's to look at. **(6) HOP 1'S DRAFT ARM "NOTHING PRINTED IS A WORD OF THE
+DOCUMENT" DROPPED:** it failed on the pin as well; apply prints the operator's own text by design. **(7) THE CORPUS
+ARM'S `--ref` LEARNS 16.3,** as it learned 2b: the XML members by their flags alone and in force but MOVE_16_3;
+post_process's journal by its element counts alone (measured first, nothing else in it moved, 13 of 13), tied to
+apply's own output, which the chain now keeps, because post_process merges runs after its passes and moves the
+final count outside them. **(8) TWO READERS LEFT FOR 16.4:** `quality_check`'s check 15 and `reorder_definitions`'
+term detector read a run's own `w:b`; a term bold only by its style now carries no flag; neither moved on the
+corpus; the code review named both. **(9) 16.4 PLANNED, NOT BUILT — THE CUT:** context read 46% when 16.3's
+build was measured; 16.3 cost about 31%, and 16.4 is HEAVY, so it could not be built and closed under the 80%
+bound this worker was given. Its own plan is written into its entry, the two readers above its first measurement,
+and the session closes between two items.
+
+## 2026-11-16 (3) — the chain of 2026-11-16, worker 2: 16.4 built, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-16, QUOTED WHOLE,** given to the session conducting today's chain: *"I won't respond, I won't answer questions - you should just continue."* — *"You can build even 16.5-16.7 and 17."* — *"merging, pushing etc should be done automatically - I approve and agree to everything already."*
+**No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm or
+overturn** — `temp/s1116-questions.md` holds the ones that would have been questions, with their options.
+
+**16.4, BUILT.** **(1) THE TWO READERS LEFT, THE GAP DECLARED:** `quality_check`'s check 15 and
+`reorder_definitions`' term detector are handed only `final/word/document.xml`, and 0 of 13 frozen workdirs hold a
+styles part beside it, so neither can read bold in force without a new argument in the operator's instructions,
+which are step 17's; the plan's own answer where a reader cannot reach one. Found beside it and recorded for step
+17's plan: check 15 counts a run carrying an explicit bold-off as bold. **(2) WHERE NOTHING IS DECLARED AND THE
+SUB-HEADING TEST FIRES, ITALIC FOLLOWS THE SOURCE:** read in force, the test fires only where every text run is
+bold in force, which 16.3's source-in-force rule already gives, so its one remaining effect was to force italic off;
+Wouter's answer of 2026-11-12 (6) now applies without that exception. 0 corpus paragraphs either way, both trees.
+**(3) TWO OF 16.3'S TEST CHECKS BROUGHT TO 16.4'S RULE:** a short paragraph bold only by its paragraph mark is now
+expected not bold, as the page shows it; the tracked-change arm's styled paragraph gains one run the source switches
+off, so the override still runs and 16.3's writer is still tested; the suite stays 23 checks. **(4) REGISTER A11
+CLOSED:** the plan's true positive, measured on arm (b), both trees. **(5) THE CORPUS ARM'S `--ref` LEARNS 16.4:**
+against a pin that predates it a paragraph may be split into the runs its declaration names, accepted only where it
+is the same once adjacent runs of equal properties are joined, its bold and italic in force compared character by
+character; a pin that carries 16.4 splits nothing. **(6) THE RENDERED DIFF, NOT ATTEMPTED:** LibreOffice is still not
+installed and Word's automation hung for worker 1; the change is measured in force by the resolver on invented
+documents and on the corpus, never on a page.

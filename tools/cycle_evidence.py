@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """cycle_evidence.py - did VERIFY and TEST actually run, against the content being committed?
-CHECKER VERSION 3 (2026-11-12)
+CHECKER VERSION 4 (2026-11-12)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -15,9 +15,10 @@ reading the tree, only by recording something at the moment a command runs.
     uv run python tools/cycle_evidence.py test   -- <the test command>
     uv run python tools/cycle_evidence.py na verify "<why it does not apply, 15+ chars>"
     uv run python tools/cycle_evidence.py check          # what a pre-commit hook calls
-    uv run python tools/cycle_evidence.py full -- <the full test command>   # v2: on a CLEAN tree
+    uv run python tools/cycle_evidence.py full -- <the full test command>   # v4: clean or FULLY STAGED
     uv run python tools/cycle_evidence.py check-push <commit>   # v2: what a pre-push hook calls
     uv run python tools/cycle_evidence.py status
+    uv run python tools/cycle_evidence.py status --passes [--since 2026-11-12T09:30]   # v4
     uv run python tools/cycle_evidence.py --selftest     # prove every check can FAIL
     uv run python tools/cycle_evidence.py --write-config
 
@@ -45,18 +46,39 @@ evidence is the test groups covering what it changed; the whole suite is what a 
 because a push is where work leaves the machine. Measured before this existed: a gate that wanted
 the full suite as each code commit's test made a session run it once per commit, against the
 house rule that it runs once. `full` records a full run, and `check-push` answers for a commit:
-  * A FULL RUN IS RECORDED ONLY ON A CLEAN TREE, AND ONLY IF IT IS STILL CLEAN AFTERWARDS. The
-    record vouches for a commit, so it must be taken on exactly that commit's content: a run
-    over uncommitted edits - or one that edited the tree while it ran - vouches for something
-    no commit holds. Clean means `git status --porcelain` is empty: modified, staged and
-    untracked-but-not-ignored files all count.
-  * IT IS KEYED BY THE TREE, NOT THE COMMIT. A reworded or rebased commit with the same content
-    is the same thing to a test; a commit id would make a message edit cost a whole run.
+  * A FULL RUN IS RECORDED ONLY ON A CLEAN OR FULLY STAGED TREE, AND ONLY IF NOTHING MOVED WHILE
+    IT RAN. The record vouches for a commit, so it must be taken on exactly that commit's
+    content: a run over unstaged edits - or one that edited the tree while it ran - vouches for
+    something no commit holds. FULLY STAGED means nothing unstaged and nothing untracked outside
+    the ignore rules (v4; v2 to v3 refused anything staged too), so the index IS the next commit.
+  * IT IS KEYED BY THE TREE, NOT THE COMMIT - the tree `git write-tree` names, which on a clean
+    tree is HEAD's. A reworded or rebased commit with the same content is the same thing to a
+    test; a commit id would make a message edit cost a whole run, and a staged tree has none.
   * A PUSH PASSES ON ITS OWN TREE'S RECORD, OR ON THE NEAREST ANCESTOR'S WHEN EVERY PATH CHANGED
     SINCE ENDS IN .md - documents cannot break a script except by crashing a checker the
     commit's own evidence already ran. The suffix is FIXED, for the reason PHASES is.
   * THE RECORDS SIT IN THE SAME UNCOMMITTABLE STORE, under a key git refuses as a branch name,
     so they can never be mistaken for a branch's verify and test.
+
+ONE RUN FOR TEST AND FULL, v4. A session that pushes ran TEST before its commit and the whole
+suite after it, on one tree, because TEST binds the worktree before a commit and `full` took
+only a clean tree after one - measured, about ten minutes a pushing session, and the house rule
+asks for the full run ONCE. So a full run on a FULLY STAGED tree records TEST too, bound to the
+worktree hash like any record - the whole suite being a superset of any covering group, run on
+exactly what the commit carries - and its full record under the staged tree, which the commit
+made next carries unchanged, so the push finds it. An edit after it goes STALE for both. Not on
+a clean tree, which has nothing to commit. VERIFY is untouched: a different question, still run.
+
+THE PASS LEDGER, v4. The records above keep the LAST run per phase, and full runs only when they
+passed - so no command could say how many times a session ran its checks. The before-figure that
+asked for this took a transcript to count it: 39 runs, ten of them whole repeats, a third of the
+session's wall. Every run this script wraps - verify, test, full; red or green; recorded or not -
+is appended under a key git refuses as a branch, with its phase, start, seconds, exit code,
+whether it was recorded and the content hash's first 12, LEDGER_CAP per branch. `status --passes`
+prints them and, per phase, runs and WHOLE REPEATS - every run of a phase after its first -
+`--since` counting one session on a branch that outlives it. A declared N/A and a refused full
+run ran nothing, so neither is a pass. It COUNTS and never refuses: a second whole pass is
+sometimes what a real red needs, so a hook refusing it was declined, and the count is the control.
 
   CHECKED HERE    that a command was recorded for verify and for test, or one of them
                    declared N/A with a reason of real length - the weaker reading, reported
@@ -87,7 +109,8 @@ EXIT CODES.  0 = both phases have evidence matching this content.  1 = blocked.
 2 = could not run at all (not a git repository, or the store is unreadable).
 check-push: 0 = the push may go, 1 = refused, 2 = not a commit, so nothing was decided.
 full: 0 = recorded; the command's own exit code if it failed; 2 = nothing recorded though the
-command may have passed - the tree was not clean before, or the run changed it.
+command may have passed - the tree was not clean or fully staged before, or the run changed it.
+status --passes: 0 = printed; 2 = an argument it does not take, or a --since that is no date.
 """
 from __future__ import annotations
 
@@ -95,6 +118,7 @@ import atexit
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -128,6 +152,18 @@ DOC_SUFFIXES = (".md",)
 
 #: v2. How far back a push looks for the nearest full run before it refuses.
 SEARCH_DEPTH = 200
+
+#: v4. The store key for the pass ledger - like FULL_KEY, a name git refuses as a branch, so the
+#: ledger can never collide with a branch's verify and test.
+LEDGER_KEY = "passes:"
+
+#: v4. How many runs the ledger keeps PER BRANCH, oldest dropped first. The session whose count
+#: asked for the ledger ran 39 checks in four and a half hours, so this keeps several sessions
+#: and still leaves the store a small file read on every commit.
+LEDGER_CAP = 200
+
+#: v4. The phases the ledger counts - the two of PHASES and the push record's full run.
+LEDGER_PHASES = PHASES + ("full",)
 
 DEFAULT_CONFIG = {
     "store": "temp/.cycle-evidence.json",
@@ -226,12 +262,30 @@ def save(store: Path, d) -> None:
     store.write_bytes((json.dumps(d, indent=1, sort_keys=True) + "\n").encode("utf-8"))
 
 
+def ledger_entry(phase: str, start: str, seconds: float, rc: int, recorded: bool, content: str):
+    """One run as the ledger keeps it: no command text and no path, so it can never carry a name."""
+    return {"phase": phase, "start": start, "seconds": round(seconds, 1), "exit": rc,
+            "recorded": recorded, "hash": (content or "")[:12]}
+
+
+def ledger_append(d, name: str, entry) -> None:
+    """v4. Append one run to branch `name`'s ledger in the loaded store `d`, keeping the last
+    LEDGER_CAP - THE PASS LEDGER, in the module docstring.
+
+    A RUN THAT FAILED GOES IN TOO, and that is the half the phase records could never show: they
+    keep a phase's LAST passing run, so a gate run five times to get one green left one record."""
+    runs = d.setdefault(LEDGER_KEY, {}).setdefault(name, [])
+    runs.append(entry)
+    del runs[:-LEDGER_CAP]
+
+
 def record(root: Path, store: Path, phase: str, cmd, cwd: Path | None = None) -> int:
     """Run the command, and record it ONLY if it exits 0.
 
     A FAILING COMMAND IS NOT EVIDENCE, and saying so is half of what this file is for. The
     record is written after the run, from the exit code, so there is no path on which a
-    failure leaves something behind that a later `check` would accept.
+    failure leaves something behind that a later `check` would accept. (v4: it leaves a LEDGER
+    line - a pass counted, never a pass vouched for - and `check` does not read the ledger.)
 
     THE COMMAND RUNS WHERE IT WAS TYPED, NOT AT THE REPOSITORY ROOT, and that split was found
     by wiring this into a real project rather than by reasoning about it. The store and the
@@ -257,21 +311,27 @@ def record(root: Path, store: Path, phase: str, cmd, cwd: Path | None = None) ->
     print(f"  [{phase}] in {where}")
     sys.stdout.flush()
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+    start, t0 = time.strftime("%Y-%m-%dT%H:%M:%S"), time.monotonic()
     rc = subprocess.run(cmd, cwd=str(where), env=env, stdin=subprocess.DEVNULL).returncode
+    seconds, content, name = time.monotonic() - t0, worktree_hash(root), branch(root)
+    d = load(store)
     if rc != 0:
+        # v4: the LEDGER keeps the run; the phase record does not, so `check` still sees nothing.
+        ledger_append(d, name, ledger_entry(phase, start, seconds, rc, False, content))
+        save(store, d)
         print(f"  [{phase}] exit {rc} - NOT recorded. A failing command is not evidence.")
         return rc
-    d = load(store)
-    d.setdefault(branch(root), {})[phase] = {
+    d.setdefault(name, {})[phase] = {
         "command": " ".join(cmd),
         # THE DIRECTORY IS PART OF THE RECORD. The same command name means different things
         # in two folders, and `status` is read by whoever has to believe the evidence.
         "cwd": str(where),
         "exit": rc,
-        "content": worktree_hash(root),
+        "content": content,
         "when": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "declared_na": False,
     }
+    ledger_append(d, name, ledger_entry(phase, start, seconds, rc, True, content))
     save(store, d)
     print(f"  [{phase}] exit 0 - recorded against the current content.")
     return RC_OK
@@ -314,56 +374,102 @@ def tree_of(root: Path, rev: str):
     return tree if rc == 0 and tree else None
 
 
-def unclean(root: Path):
-    """None if the worktree is exactly HEAD's tree, else why not - as a count, never a path list."""
-    rc, out = git_text(root, "status", "--porcelain")
-    if rc != 0:
-        return f"git status exited {rc}, so the tree could not be read"
-    lines = [ln for ln in out.splitlines() if ln.strip()]
-    return f"{len(lines)} path(s) differ from HEAD or are untracked" if lines else None
+def not_fully_staged(root: Path):
+    """v4. None if the worktree equals the INDEX and nothing is untracked outside the ignore
+    rules - a clean tree, or one whose every change is staged - else why not, as a count.
+
+    PORCELAIN READ AS BYTES, NEVER THROUGH git_text: that strips the output, and the leading
+    space of the first line IS the answer - ' M' is unstaged, 'M ' staged. Column two names the
+    worktree against the index, so anything there but a space, or an untracked '??', means the
+    index - what a commit would carry - is not what the run would test."""
+    r = git_bytes(root, "status", "--porcelain")
+    if r.returncode != 0:
+        return f"git status exited {r.returncode}, so the tree could not be read"
+    lines = [ln for ln in r.stdout.decode("utf-8", "replace").splitlines() if ln.strip()]
+    loose = [ln for ln in lines if ln.startswith("??") or ln[1:2] != " "]
+    return (f"{len(loose)} path(s) unstaged, partly staged or untracked - a full run tests what a "
+            f"commit would carry, so stage everything or stash it") if loose else None
+
+
+def staged_tree(root: Path):
+    """v4. The tree the next commit would carry - `git write-tree` of the index - or None.
+    On a clean tree it is HEAD's own tree, so one name serves both."""
+    rc, out = git_text(root, "write-tree")
+    return out if rc == 0 and out else None
 
 
 def record_full(root: Path, store: Path, cmd, cwd: Path | None = None) -> int:
-    """Run the FULL suite and record it against HEAD's TREE - only on a clean tree, only on exit
-    0, and only if the tree is still clean and HEAD unmoved afterwards (THE PUSH RECORD, above).
+    """Run the FULL suite and record it against the TREE THE NEXT COMMIT WOULD CARRY - only on a
+    FULLY STAGED tree, only on exit 0, and only if the index, the worktree and HEAD are all
+    unmoved afterwards (THE PUSH RECORD and ONE RUN FOR TEST AND FULL, above).
 
     THE AFTER-CHECK IS NOT BELT-AND-BRACES. A suite that writes a tracked file while it runs - a
     regenerated fixture, a rewritten config - passes against content that is in no commit, and
-    a record taken then would vouch for a tree it never saw.
+    a record taken then would vouch for a tree it never saw. v4 adds the index to it: a run that
+    STAGES something leaves nothing unstaged, and only the tree id shows that it moved.
     """
-    why = unclean(root)
+    why = not_fully_staged(root)
     if why:
         print(f"  [full] REFUSED - {why}. A full run vouches for a commit, so it runs on exactly "
-              f"a commit's content: commit or stash first. Nothing was run or recorded.")
+              f"a commit's content. Nothing was run or recorded.")
         return RC_COULD_NOT_RUN
-    tree = tree_of(root, "HEAD")
-    if not tree:
+    if not tree_of(root, "HEAD"):
         print("  [full] REFUSED - there is no commit yet, so there is no tree to vouch for.")
         return RC_COULD_NOT_RUN
+    tree = staged_tree(root)
+    if not tree:
+        print("  [full] REFUSED - git write-tree named no tree, so there is nothing to vouch for.")
+        return RC_COULD_NOT_RUN
     head = git_text(root, "rev-parse", "HEAD")[1]
+    staged = tree != tree_of(root, "HEAD")
     where = Path(cwd) if cwd else root
     print(f"  [full] {' '.join(cmd)}")
     print(f"  [full] in {where}, on tree {tree[:12]}")
     sys.stdout.flush()
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+    start, t0 = time.strftime("%Y-%m-%dT%H:%M:%S"), time.monotonic()
     rc = subprocess.run(cmd, cwd=str(where), env=env, stdin=subprocess.DEVNULL).returncode
+    seconds, name = time.monotonic() - t0, branch(root)
+    d = load(store)
     if rc != 0:
+        ledger_append(d, name, ledger_entry("full", start, seconds, rc, False, tree))
+        save(store, d)
         print(f"  [full] exit {rc} - NOT recorded. A failing command is not evidence.")
         return rc
-    after = unclean(root)
-    if after or tree_of(root, "HEAD") != tree:
+    after = not_fully_staged(root)
+    moved = ("HEAD moved" if git_text(root, "rev-parse", "HEAD")[1] != head else
+             "the index moved" if staged_tree(root) != tree else None)
+    if after or moved:
+        ledger_append(d, name, ledger_entry("full", start, seconds, rc, False, tree))
+        save(store, d)
         # 2, NOT 1: the suite PASSED, and an exit 1 would read as a failing suite and send
         # someone hunting a red test that does not exist.
         print(f"  [full] exit 0 but NOT recorded - the run changed what it was testing "
-              f"({after or 'HEAD moved'}), so it vouches for no commit.")
+              f"({after or moved}), so it vouches for no commit.")
         return RC_COULD_NOT_RUN
-    d = load(store)
+    now = time.strftime("%Y-%m-%dT%H:%M:%S")
     d.setdefault(FULL_KEY, {})[tree] = {
-        "commit": head, "command": " ".join(cmd), "cwd": str(where), "exit": rc,
-        "when": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        # A STAGED run has no commit yet: it names the one it was staged on, and the TREE is
+        # the key a push is checked by, so the commit made next finds this record unchanged.
+        "commit": None if staged else head, "staged_on": head if staged else None,
+        "command": " ".join(cmd), "cwd": str(where), "exit": rc, "when": now,
     }
+    if staged:
+        # ONE RUN FOR TEST AND FULL. The whole suite is a superset of any covering group, run
+        # on exactly the content the commit carries, so it IS the commit's TEST - bound to the
+        # worktree hash like every other record, so an edit after it goes STALE as any would.
+        # NOT on a clean tree: there is nothing to commit, and a TEST for it would only replace
+        # the record a branch already has.
+        d.setdefault(name, {})["test"] = {
+            "command": " ".join(cmd), "cwd": str(where), "exit": rc,
+            "content": worktree_hash(root), "when": now, "declared_na": False,
+            "from_full": tree,
+        }
+    ledger_append(d, name, ledger_entry("full", start, seconds, rc, True, tree))
     save(store, d)
-    print(f"  [full] exit 0 - recorded for tree {tree[:12]} (commit {head[:12]}).")
+    print(f"  [full] exit 0 - recorded for tree {tree[:12]} "
+          + (f"(staged on {head[:12]}) - and as TEST for this content, so the commit needs no "
+             f"separate TEST run." if staged else f"(commit {head[:12]})."))
     return RC_OK
 
 
@@ -491,6 +597,50 @@ def print_phases(root: Path, records, current: str) -> None:
         print(f"  {p.upper():<7} {state}")
 
 
+#: v4. What `status --passes --since` accepts: an ISO date, to the second at most. Compared as
+#: TEXT against each run's start, which is the same format, so a prefix such as a bare date works.
+SINCE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}(T\d{2}(:\d{2}(:\d{2})?)?)?$")
+
+
+def _plural(n: int, word: str) -> str:
+    return f"{n} {word}{'' if n == 1 else 's'}"
+
+
+def tally(runs, repeats: int) -> str:
+    """One phase's line: runs, whole repeats, red, recorded, seconds."""
+    red = sum(1 for e in runs if e.get("exit") != 0)
+    kept = sum(1 for e in runs if e.get("recorded"))
+    secs = sum(e.get("seconds", 0) for e in runs)
+    return (f"{_plural(len(runs), 'run')}, {_plural(repeats, 'repeat')}, {red} red, "
+            f"{kept} recorded, {secs:.1f} s")
+
+
+def print_passes(root: Path, store: Path, since: str | None) -> None:
+    """v4. `status --passes`: every run the ledger kept for this branch, then each phase's tally.
+
+    A REPEAT IS EVERY WHOLE RUN OF A PHASE AFTER ITS FIRST, red or green, on any content - the
+    measure the before-figure used, and the one HEAVY CHECKS ONCE A SESSION is about. Whether a
+    repeat was NEEDED is a judgement this cannot make; it makes the count impossible to miss.
+    `n of N` is printed against everything kept, so a --since filter never hides runs silently."""
+    name = branch(root)
+    kept = load(store).get(LEDGER_KEY, {}).get(name, [])
+    shown = [e for e in kept if not since or e.get("start", "") >= since]
+    print(f"PASSES - branch {name or '(detached)'} - store {store}")
+    print(f"  {len(shown)} of {len(kept)} runs in the ledger for this branch"
+          f"{f' since {since}' if since else ''} - it keeps the last {LEDGER_CAP}")
+    for e in shown:
+        print(f"  {e.get('start', '?'):<19}  {e.get('phase', '?').upper():<6} "
+              f"{e.get('seconds', 0):>8.1f} s  exit {e.get('exit', '?')!s:<4} "
+              f"{'recorded' if e.get('recorded') else 'NOT recorded':<13} {e.get('hash', '')}")
+    print("  per phase - a REPEAT is every whole run of a phase after its first:")
+    total = 0
+    for p in LEDGER_PHASES:
+        mine = [e for e in shown if e.get("phase") == p]
+        total += max(0, len(mine) - 1)
+        print(f"  {p.upper():<7} {tally(mine, max(0, len(mine) - 1))}")
+    print(f"  {'ALL':<7} {tally(shown, total)}")
+
+
 def print_blocked(store_hint: str) -> None:
     """The blocking message, WITH THE LIMITS OF THE GATE INSIDE IT.
 
@@ -548,10 +698,21 @@ def main(argv):
     cmd, rest = argv[0], argv[1:]
 
     if cmd == "status":
+        if rest and rest[0] == "--passes":
+            since = None
+            if len(rest) == 3 and rest[1] == "--since" and SINCE_RE.match(rest[2]):
+                since = rest[2]
+            elif len(rest) != 1:
+                print("  status --passes takes nothing, or --since YYYY-MM-DD[THH[:MM[:SS]]]")
+                return RC_COULD_NOT_RUN
+            print_passes(root, store, since)
+            return RC_OK
         print(f"root  {root}")
         print(f"store {store}")
         print(json.dumps(load(store).get(branch(root), {}), indent=1))
         print(f"full runs recorded: {len(load(store).get(FULL_KEY, {}))}")
+        print(f"runs in the pass ledger on this branch: "
+              f"{len(load(store).get(LEDGER_KEY, {}).get(branch(root), []))} - status --passes lists them")
         return RC_OK
 
     if cmd == "na":
@@ -738,6 +899,87 @@ def _commit(d: Path, name: str, body: bytes, *extra: str) -> None:
     git_bytes(d, "commit", "-q", *extra, "-m", "next")
 
 
+#: v4. The file the CLI cases run - this one, unless a red-first or mutant harness points it at
+#: a copy, which is the only reason it is a name rather than __file__ inline.
+_SCRIPT = Path(__file__).resolve()
+
+
+def _cli(d: Path, *a):
+    """v4. THIS SCRIPT RUN AS A PERSON OR A HOOK RUNS IT - its own process, in the fixture - so a
+    case reads what `status --passes` PRINTS, the only thing anyone counting passes ever sees."""
+    env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
+    r = subprocess.run([sys.executable, str(_SCRIPT), *a], cwd=str(d), capture_output=True,
+                       stdin=subprocess.DEVNULL, env=env, timeout=120)
+    return r.returncode, r.stdout.decode("utf-8", "replace")
+
+
+_SUMMARY_RE = re.compile(r"^\s*(VERIFY|TEST|FULL|ALL)\s+(\d+ runs?, \d+ repeats?, \d+ red, \d+ recorded)",
+                         re.M)
+_KEPT_RE = re.compile(r"(\d+ of \d+) runs in the ledger")
+
+
+def _passes_arg(arg):
+    """A builder returns the fixture, or (fixture, the extra arguments `status --passes` takes)."""
+    return arg if isinstance(arg, tuple) else (arg, [])
+
+
+def _summary(phase: str):
+    """v4. The per-phase line `status --passes` prints for `phase`: runs, repeats, red, recorded."""
+    def probe(arg):
+        d, extra = _passes_arg(arg)
+        rc, out = _cli(d, "status", "--passes", *extra)
+        for m in _SUMMARY_RE.finditer(out):
+            if m.group(1) == phase.upper():
+                return m.group(2)
+        return f"no {phase.upper()} summary line (exit {rc})"
+    return probe
+
+
+def _kept(arg) -> str:
+    """v4. The `n of N` `status --passes` prints - shown against kept, so a filter is never silent."""
+    d, extra = _passes_arg(arg)
+    rc, out = _cli(d, "status", "--passes", *extra)
+    m = _KEPT_RE.search(out)
+    return m.group(1) if m else f"no 'n of N' line (exit {rc})"
+
+
+def _passes_exit(arg) -> str:
+    d, extra = _passes_arg(arg)
+    return f"exit {_cli(d, 'status', '--passes', *extra)[0]}"
+
+
+def _staged(d: Path, name: str = "tracked.txt", body: bytes = b"content S, staged\n") -> Path:
+    """v4. A change written and STAGED, not committed - the state a pre-commit gate sees."""
+    (d / name).write_bytes(body)
+    git_bytes(d, "add", "--", name)
+    return d
+
+
+def _recorded_one(d: Path, phase: str) -> None:
+    """Evidence for ONE phase against the content now - _recorded's twin, for a case that must
+    leave the other phase to the run under test."""
+    s = _store(d)
+    rec = load(s)
+    rec.setdefault(branch(d), {})[phase] = {
+        "command": f"echo {phase}", "exit": 0, "content": worktree_hash(d),
+        "when": "2026-01-01T00:00:00", "declared_na": False}
+    save(s, rec)
+
+
+def _phase_state(d: Path, phase: str) -> str:
+    """MISSING, STALE or ok - print_phases' three words, off the store, for one phase."""
+    e = load(_store(d)).get(branch(d), {}).get(phase)
+    if not e:
+        return "MISSING"
+    return "ok" if e["content"] == worktree_hash(d) else "STALE"
+
+
+def _ledger_span(d) -> str:
+    """v4. How many runs one branch's ledger kept, and which is the oldest - read off a store dict."""
+    runs = d.get(LEDGER_KEY, {}).get("b", [])
+    return f"{len(runs)} kept, oldest {runs[0].get('start', '?') if runs else '-'}"
+
+
 def cases(tmp: Path):
     seq = iter(range(1, 999))
 
@@ -875,6 +1117,134 @@ def cases(tmp: Path):
         git_bytes(d, "commit", "-q", "--amend", "-m", "reworded only")
         return d
 
+    # ---- v4: the pass ledger. Every run goes through the REAL entry point, _cli, because what
+    #      is under test is what a person reads, and a case reading the store would test the store.
+    pass_cmd = ("--", sys.executable, "-c", "pass")
+    red_cmd = ("--", sys.executable, "-c", "raise SystemExit(1)")
+
+    def ledger_two(_):
+        """THE CASE THE PLAN NAMES: two runs of one phase, one red - 2 runs, 1 repeat."""
+        d = fresh()
+        _cli(d, "verify", *red_cmd)
+        _cli(d, "verify", *pass_cmd)
+        return d
+
+    def ledger_one(_):
+        d = fresh()
+        _cli(d, "verify", *pass_cmd)
+        return d
+
+    def ledger_since(_):
+        """Three runs, the first moved into the past, counted from a time after it - a SESSION
+        on a branch that outlives it, which is every session that commits straight to main."""
+        d = fresh()
+        for _n in range(3):
+            _cli(d, "test", *pass_cmd)
+        s = _store(d)
+        rec = load(s)
+        runs = rec.get(LEDGER_KEY, {}).get(branch(d), [])
+        if runs:
+            runs[0]["start"] = "2000-01-01T00:00:00"
+            save(s, rec)
+        return d, ["--since", "2001-01-01"]
+
+    def ledger_all(_):
+        d = fresh()
+        for _n in range(3):
+            _cli(d, "test", *pass_cmd)
+        return d, []
+
+    def since_malformed(_):
+        return fresh(), ["--since", "yesterday"]
+
+    def since_iso(_):
+        return fresh(), ["--since", "2026-01-01T09:30"]
+
+    def ledger_over_cap(_):
+        d: dict = {}
+        for n in range(1, LEDGER_CAP + 6):
+            ledger_append(d, "b", ledger_entry("test", f"#{n}", 0.1, 0, True, "0" * 64))
+        return d
+
+    def ledger_under_cap(_):
+        d: dict = {}
+        for n in range(1, 4):
+            ledger_append(d, "b", ledger_entry("test", f"#{n}", 0.1, 0, True, "0" * 64))
+        return d
+
+    def ledger_full_refused(_):
+        """A refused full run never starts, so it is no run - only what RAN is a pass."""
+        d = fresh()
+        (d / "tracked.txt").write_bytes(b"edited, not committed\n")
+        _cli(d, "full", *pass_cmd)
+        return d
+
+    def ledger_full_ran(_):
+        d = fresh()
+        _cli(d, "full", *pass_cmd)
+        return d
+
+    # ---- v4: ONE RUN FOR TEST AND FULL - a full run on a FULLY STAGED tree carries the commit's
+    #      TEST and the push's full record. Each "refused" arm is PAIRED with staged_full, which
+    #      records, because a version that refuses every staged tree passes each of them alone.
+    def staged_full(_):
+        d = _staged(fresh())
+        record_full(d, _store(d), ok_cmd)
+        return d
+
+    def staged_full_fails(_):
+        d = _staged(fresh())
+        record_full(d, _store(d), [sys.executable, "-c", "raise SystemExit(3)"])
+        return d
+
+    def staged_verify_only(_):
+        d = _staged(fresh())
+        _recorded_one(d, "verify")
+        return d
+
+    def staged_verify_full(_):
+        d = staged_full(_)
+        _recorded_one(d, "verify")
+        return d
+
+    def staged_full_commit(_):
+        d = staged_full(_)
+        git_bytes(d, "commit", "-q", "-m", "next")
+        return d
+
+    def staged_full_edit_commit(_):
+        """Edited AND staged after the run, then committed - the push carries a tree no run saw."""
+        d = staged_full(_)
+        _staged(d, body=b"edited after the run\n")
+        git_bytes(d, "commit", "-q", "-m", "next")
+        return d
+
+    def staged_full_then_edit(_):
+        d = staged_full(_)
+        (d / "tracked.txt").write_bytes(b"edited after the run\n")
+        return d
+
+    def staged_untracked(_):
+        d = _staged(fresh())
+        (d / "new.txt").write_bytes(b"never added\n")
+        record_full(d, _store(d), ok_cmd)
+        return d
+
+    def staged_then_edited(_):
+        """Staged, then edited again - partly staged, so the index is not what was tested."""
+        d = _staged(fresh())
+        (d / "tracked.txt").write_bytes(b"edited again, not staged\n")
+        record_full(d, _store(d), ok_cmd)
+        return d
+
+    def staged_run_stages(_):
+        """A run that stages more while it runs: nothing unstaged after, but the index moved."""
+        d = _staged(fresh())
+        record_full(d, _store(d), [sys.executable, "-c",
+                                   "import pathlib, subprocess; pathlib.Path('more.txt').write_bytes(b'x\\n'); "
+                                   "subprocess.run(['git', 'add', 'more.txt'])"])
+        return d
+
     return [
         Case("v2: full on a MODIFIED tree", _has_full, full_dirty, full_clean,
              want=FAIL, good_want=PASS),
@@ -909,6 +1279,33 @@ def cases(tmp: Path):
              store_tracked, store_ignored, want=FAIL, good_want=PASS),
         Case("an UNIGNORED store -> FAIL", lambda d: _status(d, SAFE),
              store_unignored, store_ignored, want=FAIL, good_want=PASS),
+        Case("v4: two runs, one red -> 2 runs, 1 repeat", _summary("verify"), ledger_two, ledger_one,
+             want="2 runs, 1 repeat, 1 red, 1 recorded", good_want="1 run, 0 repeats, 0 red, 1 recorded"),
+        Case("v4: --since counts a session, n of N", _kept, ledger_since, ledger_all,
+             want="2 of 3", good_want="3 of 3"),
+        Case("v4: a malformed --since is refused", _passes_exit, since_malformed, since_iso,
+             want="exit 2", good_want="exit 0"),
+        Case("v4: the ledger keeps the last CAP", _ledger_span, ledger_over_cap, ledger_under_cap,
+             want=f"{LEDGER_CAP} kept, oldest #6", good_want="3 kept, oldest #1"),
+        Case("v4: a full run is a pass, a refusal not", _summary("full"),
+             ledger_full_refused, ledger_full_ran,
+             want="0 runs, 0 repeats, 0 red, 0 recorded", good_want="1 run, 0 repeats, 0 red, 1 recorded"),
+        Case("v4: a STAGED tree's full run records TEST", lambda d: _has_record(d, "test"),
+             staged_full_fails, staged_full, want=FAIL, good_want=PASS),
+        Case("v4: ...its commit needs no TEST run", lambda d: check(d, _store(d)).verdict(),
+             staged_verify_only, staged_verify_full, want=FAIL, good_want=PASS),
+        Case("v4: ...its push passes on the same record", _push,
+             staged_full_edit_commit, staged_full_commit, want=FAIL, good_want=PASS),
+        Case("v4: ...an edit after it is STALE", lambda d: _phase_state(d, "test"),
+             staged_full_then_edit, staged_full, want="STALE", good_want="ok"),
+        Case("v4: staged, an UNTRACKED file refuses", _has_full, staged_untracked, staged_full,
+             want=FAIL, good_want=PASS),
+        Case("v4: staged, an UNSTAGED edit refuses", _has_full, staged_then_edited, staged_full,
+             want=FAIL, good_want=PASS),
+        Case("v4: a run that STAGES more is no record", _has_full, staged_run_stages, staged_full,
+             want=FAIL, good_want=PASS),
+        Case("v4: a CLEAN tree's full run is no TEST", lambda d: _has_record(d, "test"),
+             full_clean, staged_full, want=FAIL, good_want=PASS),
     ]
 
 

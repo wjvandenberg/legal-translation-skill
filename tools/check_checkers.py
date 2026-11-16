@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """check_checkers.py - is this project's copy of each standard script current?
-CHECKER VERSION 23 (2026-11-05)
+CHECKER VERSION 24 (2026-11-12)
 
 Every project gets its OWN COPY of the standard scripts in its tools\\ folder. Copies drift:
 the shared one gets fixed and yours does not hear about it, or yours gets edited and the fix
@@ -132,6 +132,12 @@ were their own change, which is the cost this option exists to remove. For every
 
 IT WRITES, and nothing else is run but git, to name commits. It then prints the ordinary
 report, whose exit code it keeps. A MISSING file is not copied: copy-or-declare is a decision.
+
+AND AN ADOPTION IS FOUR EDITS, NOT ONE (v24) - the copy, its selftest in the project's runner,
+every list there naming the house copies, and its config entry point. Both texts a person adopts
+by - this option's closing lines and MISSING's guidance - name all four, numbered: an adoption of
+2026-11-05 did the first, and a full run found the last two after the commit, which cost a whole
+second full run. Only the copy is this option's to make; the other three are the project's.
 
 WHY A LOWER VERSION IS NOT ENOUGH TO OVERWRITE. classify() calls any copy with a lower
 CHECKER VERSION STALE, whatever else in it differs - so an old copy carrying an undeclared
@@ -518,7 +524,10 @@ def report(rows, refused=(), stale=()):
         print("              \"checkers\": {\"declared_absent\": {\"name.py\": \"why\"}}")
         print("            A project holding NONE of them is a project nothing has been")
         print("            propagated to yet - which is a finding on its first day and a")
-        print("            decision only once somebody has written down why.")
+        print("            decision only once somebody has written down why. Copying it in is")
+        print("            an ADOPTION, and that is four edits:")
+        for line in ADOPTION_EDITS[2:6]:
+            print("          " + line)
         print("REFUSED  -> a config entry with a blank reason. Write the reason, or delete")
         print("            the entry: an empty one reads afterwards exactly like a decision")
         print("            somebody took.")
@@ -643,6 +652,21 @@ def roster_report(rows, void_reason, declared: bool):
 
 # ----------------------------------------------------------------------------- adopt
 
+#: v24. WHAT AN ADOPTION TAKES, named in full - printed by --adopt and under MISSING, the two texts
+#: a person adopts by. Until v23 they named the copy and a config key; an adoption of 2026-11-05
+#: took FOUR edits, and the two only a full run sees were left for it to find - a red full run, a
+#: fix, and the whole run again. One numbered line per edit, so each can be ticked off and checked.
+ADOPTION_EDITS = (
+    "AN ADOPTION IS FOUR EDITS, NOT ONE - every one for a script new to this project, and any",
+    "a new version asks for:",
+    "  (1) the copy itself, proved byte for byte",
+    "  (2) its selftest, in this project's own test runner",
+    "  (3) every list here naming the house copies - a census or vocabulary list, say",
+    "  (4) its entry point in the config, where this project declares entry points",
+    "The last two only a full run sees - so a session that leaves them finds them there, after its commit.",
+)
+
+
 def _git(cwd: Path, *args, data: bytes | None = None):
     """(rc, stdout) of one git command in cwd. Bytes both ways, so no codepage touches them,
     and quotePath off, so a path holding a byte above 0x80 comes back as a path."""
@@ -754,6 +778,7 @@ def adopt(project: Path, shared: Path, declared, write=None) -> int:
           f"ran once,\nwhere each was fixed. A config key a new version needs in THIS project is "
           f"the one\nexception - run that script's entry point once against the config, and "
           f"nothing more.\n")
+    print("\n".join(ADOPTION_EDITS) + "\n")
     return rc
 
 
@@ -1171,6 +1196,17 @@ def adopt_selftest(tmp: Path) -> bool:
           rc2 == 0 and "6 adopted" in out2 and "8 tracked, 0 needing a decision" in out2
           and all((d2 / "tools" / n).read_bytes() == (shared / n).read_bytes() for n in clean),
           f"rc={rc2}")
+
+    # v24: AN ADOPTION IS FOUR EDITS, AND BOTH TEXTS A PERSON ADOPTS BY MUST NAME EACH. An
+    # adoption of 2026-11-05 took four - the copy, its selftest, the project's list of house
+    # copies and a config entry point - and the text named the first, so the two only a full run
+    # sees were left for it to find: a red full run, a fix, and the whole run again. One line per
+    # edit, numbered, so a reader can tick them off and a check can find each one.
+    four = (("(1)", "copy"), ("(2)", "selftest"), ("(3)", "house copies"), ("(4)", "entry point"))
+    check("the adoption text names the four edits of 2026-11-05's adoption",
+          all(says(out2, *n) for n in four), f"{sum(says(out2, *n) for n in four)} of 4")
+    check("...and MISSING's guidance names the same four",
+          all(says(out, *n) for n in four), f"{sum(says(out, *n) for n in four)} of 4")
 
     # THE PROOF MUST BE ABLE TO FAIL, or it is a print statement. A writer that corrupts the
     # copy is caught, and the old bytes are put back rather than left half-adopted.

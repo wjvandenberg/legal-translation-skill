@@ -1434,6 +1434,48 @@ def _italic_declared(path):
     _write_notes(path, notes)
 
 
+@fixture("style-bold.docx",
+         "SUB-STEP 16.3 — bold and italic written only where needed: a heading bold by its paragraph "
+         "STYLE and nothing declared (register A12's shape), a plain paragraph, a paragraph wholly "
+         "italic by its run, and the control — a bold paragraph style switched off run by run. Ships "
+         "its own style-bold.notes.json, carrying `resolved` as extraction writes it")
+def _style_bold(path):
+    """The page sub-step 16.3 is judged on. Before it, apply wrote an explicit off-flag on every run it rebuilt,
+    so the heading lost the bold its style gives and the italic paragraph came back plain; after it, a flag is
+    written only where it changes the value in force. The control's off-flags do work and must stay.
+
+    The notes are written as extraction writes them: `bold` and `italic` read from the run's own properties, and
+    `resolved` only where the value IN FORCE differs - the heading's bold, given by its style."""
+    off = '<w:r><w:rPr><w:b w:val="0"/></w:rPr><w:t xml:space="preserve">%s</w:t></w:r>'
+    heading, plain, slanted, control = ("Eerste artikel", "Gewone tekst van het verloop.",
+                                        "Schuine opmerking hier.", "Romp zonder vet.")
+    body = (
+        p(r(heading), ppr='<w:pPr><w:pStyle w:val="BoldClause"/></w:pPr>') +
+        p(r(plain)) +
+        p(f'<w:r><w:rPr><w:i/></w:rPr><w:t xml:space="preserve">{slanted}</w:t></w:r>') +
+        p(off % control, ppr='<w:pPr><w:pStyle w:val="BoldClause"/></w:pPr>')
+    )
+    docx(path, body)
+
+    def one(text, italic=False, resolved=None):
+        run = {"start": 0, "end": len(text), "text": text, "bold": False, "italic": italic}
+        if resolved:
+            run["resolved"] = resolved
+        return [run]
+
+    notes = [
+        {"idx": 0, "text": heading, "en": "First article", "style": "BoldClause",
+         "runs": one(heading, resolved={"bold": True}), "en_runs": None},
+        {"idx": 1, "text": plain, "en": "Ordinary wording of the course.", "style": "Normal",
+         "runs": one(plain), "en_runs": None},
+        {"idx": 2, "text": slanted, "en": "Slanted remark at this point.", "style": "Normal",
+         "runs": one(slanted, italic=True), "en_runs": None},
+        {"idx": 3, "text": control, "en": "Body without weight.", "style": "BoldClause",
+         "runs": one(control), "en_runs": None},
+    ]
+    _write_notes(path, notes)
+
+
 @fixture("lexicon-choice.docx",
          "STEP 10's SUB-STEP 3b — five strings a LEXICON in the skill presents as correct and a "
          "mandatory rewrite used to overwrite (Annex twice, a sub-lexicon heading, the "

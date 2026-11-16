@@ -1948,7 +1948,11 @@ def _declared_italic(entry, run_text):
                 continue
             if _notes_norm(seg.get('text')) == folded:
                 covered = True
-                if seg.get('italic') is True:
+                # SUB-STEP 16.4: the source run's italic IN FORCE - its `resolved` value where extraction wrote
+                # one, so a term italic by its style alone counts as italic, else its own `italic`.
+                res = seg.get('resolved')
+                italic = res['italic'] if isinstance(res, dict) and 'italic' in res else seg.get('italic')
+                if italic is True:
                     return True
 
     return False if covered else None

@@ -2156,6 +2156,259 @@ def check_sides(delivered, original, notes_dir):
     return summary, findings, lines
 
 
+# ==========================================================================
+# THE FORMATTING ARM -- step 16, sub-step 16.1 (PLAN-2-step-b.md section 3.16).
+# ==========================================================================
+# REPORT ONLY, AND KEPT APART BY CONSTRUCTION. The comparison above reads TEXT:
+# bold, italic and every other run property are invisible to it, so a wrong
+# formatting computation could ship with every gate quiet. This arm compares
+# the formatting of each paired paragraph with its SOURCE paragraph's. It never
+# blocks: its findings go to their own printed block and their own report key,
+# `formatting`, and never into the findings above, so the blocking and counted
+# totals and every exit code are what they would be without it -- and a defect
+# inside the arm is SAID, never raised. It runs only with --original.
+#
+# PAIRED AS THE TEXT ARM PAIRS, NEVER A SECOND WAY: the delivered partner is the
+# one the text comparison claimed for the entry, the source the one the bracket
+# arm finds, by extraction's text. Where one text names several paragraphs on
+# either side and their formatting differs, the pair is AMBIGUOUS -- counted,
+# never judged.
+#
+# WHAT IS COMPARED: the text runs a paragraph OWNS -- its nearest w:p, a w:t
+# holding more than whitespace; so the accept reading, the document as Word
+# shows it with every change accepted.
+#   bold, italic -- IN FORCE, through extract_paragraphs.py's own resolver (step
+#     15), over each side's styles part; a delivery given as document.xml has
+#     none, so the original's, and the report says so. Not resolved, as
+#     extraction declares: table styles, and document defaults overriding the
+#     toggles. A UNIFORM source paragraph is compared exactly: uniform-lost (all
+#     on in the source, not all on delivered), uniform-gained (all off, not all
+#     off). A MIXED one by its count of on-spans, register C20's method:
+#     mixed-lost (delivered all off), mixed-spread (all on), mixed-spans (both
+#     mixed, a different count of spans).
+#   the eleven properties en_runs cannot express -- w:u, w:highlight, w:sz,
+#     w:color, w:rStyle, w:vertAlign, w:smallCaps, w:caps, w:strike, w:shd,
+#     w:rFonts -- by their DIRECT value on the run, no style
+#     resolved: uniform-changed (the source's runs agree, the delivery does not
+#     keep that value everywhere), mixed-lost (they disagree, the delivery is
+#     uniform without one), mixed-spread (uniform with one); uniform-kept and
+#     mixed-other, both sides mixed, are counts only.
+# Each finding carries its PATH: rebuilt (the text changed, no tracked change on
+# either side), tc (a tracked change on either side) or same-text.
+# It prints indices, property names, classes and counts -- never a value, a
+# style id or a word of document text.
+
+_FMT_FORCE = ('bold', 'italic')
+_FMT_VALUE = ('u', 'highlight', 'sz', 'color', 'rStyle', 'vertAlign')
+_FMT_ONOFF = ('smallCaps', 'caps', 'strike')
+_FMT_PROPS = _FMT_VALUE + _FMT_ONOFF + ('shd', 'rFonts')
+_FMT_TC = ('ins', 'del', 'moveFrom', 'moveTo')
+_FMT_FINDING = ('uniform-lost', 'uniform-gained', 'uniform-changed', 'mixed-lost', 'mixed-spread',
+                'mixed-spans')
+
+
+def _fmt_resolver():
+    """extract_paragraphs.py's style-cascade resolver -- (read_style_cascade,
+    resolve_run, get_prop_tristate) -- or None. Imported here, when this arm
+    runs, and not at the top of the file, as the side arm imports its reader:
+    a MISSING sibling leaves the arm NOT RUN and named; a CUT-SHORT one is a
+    broken install, SKILL.md rule 6."""
+    try:
+        from extract_paragraphs import read_style_cascade, resolve_run, get_prop_tristate
+    except (ImportError, SyntaxError) as exc:
+        if _sibling_cut_short('extract_paragraphs.py', exc):  # present but cut short: SKILL.md rule 6
+            _sibling_integrity_exit('extract_paragraphs.py', exc)
+        return None
+    return read_style_cascade, resolve_run, get_prop_tristate
+
+
+def _fmt_val(el, name):
+    return el.get(f'{{{W}}}{name}') if el is not None else None
+
+
+def _fmt_direct(rpr, prop, onoff):
+    """A property's DIRECT value on a run, as the step 16 probes read it: a toggle
+    by its ST_OnOff tri-state, shading by its fill, fonts by their ascii face,
+    any other by its w:val -- None where the run does not name it."""
+    if rpr is None:
+        return None
+    if prop in _FMT_ONOFF:
+        return onoff(rpr, prop)
+    el = rpr.find(f'{{{W}}}{prop}')
+    if prop == 'shd':
+        return _fmt_val(el, 'fill')
+    if prop == 'rFonts':
+        return _fmt_val(el, 'ascii')
+    return _fmt_val(el, 'val')
+
+
+def _fmt_profile(p, cascade, resolve, onoff):
+    """(text, has_tc, [(in_force or None, (direct value per property))]) for the
+    text runs paragraph p OWNS, in document order."""
+    p_tag, r_tag, t_tag = f'{{{W}}}p', f'{{{W}}}r', f'{{{W}}}t'
+    ppr = p.find(f'{{{W}}}pPr')
+    p_style = _fmt_val(ppr.find(f'{{{W}}}pStyle') if ppr is not None else None, 'val')
+    runs, text = [], []
+    for r in p.iter(r_tag):
+        if next(r.iterancestors(p_tag), None) is not p:
+            continue
+        ts = [t.text or '' for t in r.findall(t_tag)]
+        if not ''.join(ts).strip():
+            continue
+        text.extend(ts)
+        rpr = r.find(f'{{{W}}}rPr')
+        force = None
+        if cascade is not None:
+            rs = rpr.find(f'{{{W}}}rStyle') if rpr is not None else None
+            force = resolve(cascade, p_style, _fmt_val(rs, 'val'), rpr)
+        runs.append((force, tuple(_fmt_direct(rpr, prop, onoff) for prop in _FMT_PROPS)))
+    has_tc = any(p.find(f'.//{{{W}}}{t}') is not None for t in _FMT_TC)
+    return ''.join(text), has_tc, runs
+
+
+def _fmt_spans(vals):
+    """The count of maximal runs of True: register C20's span count."""
+    return sum(1 for k, v in enumerate(vals) if v and (k == 0 or not vals[k - 1]))
+
+
+def _fmt_force_class(sv, dv):
+    """bold or italic in force, source values against delivered: a class, or
+    None where nothing differs that this arm judges."""
+    s, d = set(sv), set(dv)
+    if s == {True}:
+        return None if d == {True} else 'uniform-lost'
+    if s == {False}:
+        return None if d == {False} else 'uniform-gained'
+    if d == {False}:
+        return 'mixed-lost'
+    if d == {True}:
+        return 'mixed-spread'
+    return 'mixed-spans' if _fmt_spans(sv) != _fmt_spans(dv) else None
+
+
+def _fmt_prop_class(sv, dv):
+    """A direct property, source values against delivered: a class, or None
+    where neither side names it."""
+    if all(v is None for v in sv) and all(v is None for v in dv):
+        return None
+    if len(set(sv)) == 1:
+        return 'uniform-kept' if set(dv) == {sv[0]} else 'uniform-changed'
+    if len(set(dv)) == 1:
+        return 'mixed-lost' if dv[0] is None else 'mixed-spread'
+    return 'mixed-other'
+
+
+def _fmt_cascade(path, read_cascade):
+    """The styles cascade of a .docx at `path`, or None where it cannot be read."""
+    if path.lower().endswith('.xml'):
+        return None
+    with zipfile.ZipFile(path) as zf:
+        return read_cascade(zf)
+
+
+def check_formatting(paired, got, root, oroot, delivered, original):
+    """The formatting arm: (summary, findings, printed lines). REPORT ONLY -- see
+    the block comment above. `paired` and `got` are the text arm's own."""
+    from collections import Counter
+    head = '  formatting (step 16, sub-step 16.1) - REPORT ONLY, never blocking, never in the totals above'
+    if oroot is None:
+        return ({'ran': False, 'why': 'no original given'}, [],
+                [head, '    NOT RUN - no original given'])
+    names = _fmt_resolver()
+    if names is None:
+        why = 'extract_paragraphs.py is missing beside this script (a partial install)'
+        return {'ran': False, 'why': why}, [], [head, f'    NOT RUN - {why}']
+    read_cascade, resolve, onoff = names
+    try:
+        ocas = _fmt_cascade(original, read_cascade)
+        if delivered.lower().endswith('.xml'):
+            dcas, styles = ocas, "the original's (a delivery given as document.xml carries none)"
+        else:
+            dcas, styles = _fmt_cascade(delivered, read_cascade), 'each side its own'
+        if ocas is None or dcas is None:
+            styles = 'NOT READABLE - bold and italic not compared'
+        force = ocas is not None and dcas is not None
+        opars, dpars = list(oroot.iter(f'{{{W}}}p')), list(root.iter(f'{{{W}}}p'))
+        src_at, deliv_at = {}, {}
+        for i, text in _completeness_para_texts(oroot):
+            src_at.setdefault(text, []).append(i)
+        for i, m, a, r in got:
+            deliv_at.setdefault((m, a, r), []).append(i)
+        memo = {}
+
+        def profile(side, i):
+            if (side, i) not in memo:
+                pars, cas = (opars, ocas) if side == 'o' else (dpars, dcas)
+                memo[(side, i)] = _fmt_profile(pars[i], cas, resolve, onoff)
+            return memo[(side, i)]
+
+        def one(side, at):
+            """The one profile `at` names, or None where its paragraphs differ."""
+            profs = [profile(side, i) for i in at]
+            return profs[0] if all(pr[1:] == profs[0][1:] for pr in profs[1:]) else None
+
+        tally, seen, findings = {}, Counter(), []
+        for idx, _decl, source, key, _cmp in paired:
+            at_o, at_d = src_at.get((source or '').strip()), deliv_at.get(tuple(key))
+            if not at_o or not at_d:
+                seen['source not found' if not at_o else 'delivered not found'] += 1
+                continue
+            sp, dp = one('o', at_o), one('d', at_d)
+            if sp is None or dp is None:
+                seen['ambiguous'] += 1
+                continue
+            if not sp[2] or not dp[2]:
+                seen['no text run'] += 1
+                continue
+            seen['compared'] += 1
+            path = 'tc' if (sp[1] or dp[1]) else 'same-text' if sp[0] == dp[0] else 'rebuilt'
+            base = {'idx': idx, 'path': path, 'source_runs': len(sp[2]), 'delivered_runs': len(dp[2])}
+            if force:
+                for name in _FMT_FORCE:
+                    sv, dv = [f[0][name] for f in sp[2]], [f[0][name] for f in dp[2]]
+                    cls = _fmt_force_class(sv, dv)
+                    if cls:
+                        tally.setdefault(name, Counter())[cls] += 1
+                        findings.append(dict(base, property=name, **{'class': cls},
+                                             source_spans=_fmt_spans(sv), delivered_spans=_fmt_spans(dv)))
+            for k, prop in enumerate(_FMT_PROPS):
+                cls = _fmt_prop_class([f[1][k] for f in sp[2]], [f[1][k] for f in dp[2]])
+                if cls:
+                    tally.setdefault(prop, Counter())[cls] += 1
+                    if cls in _FMT_FINDING:
+                        findings.append(dict(base, property=prop, **{'class': cls}))
+    except Exception as exc:                       # report only: said, never raised
+        why = f'the arm failed inside ({type(exc).__name__}) - nothing it would have found is known'
+        return {'ran': False, 'why': why}, [], [head, f'    NOT RUN - {why}']
+    by_path = Counter(f['path'] for f in findings)
+    summary = {'ran': True, 'styles': styles, 'paired': len(paired),
+               'compared': seen['compared'], 'source_not_found': seen['source not found'],
+               'delivered_not_found': seen['delivered not found'], 'ambiguous': seen['ambiguous'],
+               'no_text_run': seen['no text run'], 'findings_by_path': dict(by_path),
+               'tallies': {p: dict(c) for p, c in tally.items()}}
+    lines = [head,
+             f"    paired paragraphs {len(paired)}: compared {seen['compared']}, source not found "
+             f"{seen['source not found']}, ambiguous {seen['ambiguous']} (one text, several paragraphs "
+             f"formatted differently - never judged), no text run {seen['no text run']}",
+             f'    bold and italic IN FORCE through extract_paragraphs.py\'s resolver - styles: {styles}; '
+             'the other eleven properties by their DIRECT value on the run, no style resolved',
+             f'    findings {len(findings)}: '
+             + ('  '.join(f'{p} {by_path[p]}' for p in ('rebuilt', 'tc', 'same-text') if by_path[p])
+                or 'none')]
+    for prop in _FMT_FORCE + _FMT_PROPS:
+        c = tally.get(prop)
+        if c:
+            lines.append(f'    {prop:<10} ' + '  '.join(f'{k} {c[k]}' for k in sorted(c))
+                         + ('  (uniform-kept and mixed-other are counts only)'
+                            if prop not in _FMT_FORCE and ('uniform-kept' in c or 'mixed-other' in c) else ''))
+    for f in findings:
+        lines.append(f"  FORMAT   idx={f['idx']:<6} {f['property']:<10} {f['class']:<15} {f['path']:<9} "
+                     f"runs {f['source_runs']} -> {f['delivered_runs']}"
+                     + (f"  spans {f['source_spans']} -> {f['delivered_spans']}" if 'source_spans' in f else ''))
+    summary['findings'] = findings
+    return summary, findings, lines
+
+
 def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                     strict=False, report_json=None):
     """Compare the DELIVERED document against what was declared, and its
@@ -2415,6 +2668,8 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
     side_summary, side_findings, side_lines = check_sides(
         delivered, original, os.path.dirname(os.path.abspath(paragraphs_json)))
     findings.extend(side_findings)
+    # THE FORMATTING ARM (sub-step 16.1) -- report only, and kept out of `findings`.
+    fmt_summary, _fmt_found, fmt_lines = check_formatting(paired, got, root, oroot, delivered, original)
     examined = sum(counts[c] for c in counts if not c.startswith('anchor'))
     blockers = [f for f in findings if f['blocking']]
     counted = len(findings) - len(blockers)
@@ -2456,6 +2711,8 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
               f"declared {f['declared_len']}  delivered {f['delivered_len']}"
               + (f"  [{f['ruling']}]" if f['ruling'] else '')
               + (f"  {f['note']}" if f.get('note') else ''))
+    for line in fmt_lines:
+        print(line)
     if report_json:
         with open(report_json, 'wb') as fh:
             fh.write((json.dumps({'examined': examined, 'undeclared': undeclared,
@@ -2467,7 +2724,8 @@ def check_delivered(paragraphs_json, delivered, original=None, journal=None,
                                                                      'unbalanced', 'a15', 'other')},
                                                    source_relative=oroot is not None),
                                   'blocking': len(blockers), 'counted': counted,
-                                  'sides': side_summary, 'findings': findings}, indent=1) + '\n').encode('utf-8'))
+                                  'sides': side_summary, 'findings': findings,
+                                  'formatting': fmt_summary}, indent=1) + '\n').encode('utf-8'))
     if examined == 0 or not got:
         print('  VOID - nothing was examined, which is never the same as clean')
         return 3
@@ -2523,7 +2781,9 @@ def main():
                          'brackets against its paragraphs, and, when the '
                          'delivery is a .docx, read every side part it has '
                          'against the delivery and the declarations beside '
-                         'the notes (C6).')
+                         'the notes (C6). Also compares each paired '
+                         "paragraph's formatting with its source's - REPORT "
+                         'ONLY, never blocking (sub-step 16.1).')
     ap.add_argument('--journal', metavar='JOURNAL_JSON', default=None,
                     help='With --delivered: the change journal to apply. '
                          'Default: post_process_journal.json beside the notes.')
