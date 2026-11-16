@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.11 as #188 to #195, 2026-11-03 to 2026-11-12, G12 closed: STEP 14 CLOSED · STEP 15 CLOSED #196 · 16 IN PROGRESS: 16.1–16.2 BUILT · 17–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5, G7 in every language, as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.11 as #188 to #195, 2026-11-03 to 2026-11-12, G12 closed: STEP 14 CLOSED · STEP 15 CLOSED #196 · 16 IN PROGRESS: 16.1–16.3 BUILT · 17–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,17 +578,17 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-16, HOP 1 OF RUN s16-hops-1116: 16.2 BUILT; 16.3 PLANNED, ITS BUILD THE NEXT HOP'S
+### HANDOFF — 2026-11-16, WORKER 1 OF THE CHAIN: 16.3 BUILT; 16.4 PLANNED, ITS BUILD THE NEXT WORKER'S
 
-**PURPOSE: MET for 16.2** — the July notes given today's `resolved` in memory, VOID on any misalignment: 1,891
-of 1,891 entries, 186 runs, per tree; deliveries unchanged against the pin. 16.3 not built: context, not clock.
+**PURPOSE: MET for 16.3 but its rendered diff** — on the corpus, both trees, 1,259 paragraphs moved in bytes by
+their flags alone, nothing in force but D06's two derived headings, 0 unexplained; quality_check unmoved.
 
-**PRODUCED:** `tools/graft_resolved.py`, `--graft` on three corpus arms, `tests/test_graft_resolved.py`, 47ce1a7;
-16.3's own plan in 3.16 and its derivation, run: 2 paragraphs, A12's, nothing else. No push; PR #198 open.
+**PRODUCED:** apply's two writers, extraction's `styles_give`, `tests/test_minimal_flags.py`, the corpus arm's
+16.3 sense, fixture `style-bold.docx`: 921ec66; 16.4's own plan in 3.16. Pushed at this close; PR #198 open.
 
-**SINGLE NEXT ACTION: 16.3, BUILT to its plan** — drafts in `temp/`: `s1116h1_163_derive.py`, its suite.
+**SINGLE NEXT ACTION: 16.4, BUILT to its plan in 3.16** — then #198 merged, 16.5 planned and built from main.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** the 13 July state files left the catalogue in September, not today.
+**WHAT A NEW SESSION WOULD GET WRONG:** LibreOffice is gone from this machine, so no page can be rendered.
 
-**Open, none blocking:** A10, O1, A20 placed at step 17's plan; the digit rule's blind spot; F18; F30's detection
-half; F12; F31; C20's count against `en_runs` before apply. **Context: 55%.**
+**Open, none blocking:** the two readers of a run's own `w:b`, 16.4's first measurement; A10, O1, A20 at step
+17's plan; the digit rule's blind spot; F18; F30's detection half; F12; F31; C20's count. **Context: 53%.**
