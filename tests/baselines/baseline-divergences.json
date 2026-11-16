@@ -11,9 +11,9 @@
    "sha256_now": "5b85404ec1883d6aa1a2932e2d76e4dd3581757f8702aec22f1eb8b1d198b68e"
   },
   "uk/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step15-formatting-part-1",
-   "commit_subject": "Step 15.3 - G9's first half: the segment check asks apply's own boundary-whitespace restoration through tc_segments; step 15 closed",
-   "sha256_now": "5e58647e085ff3d3b7168d331528526c31ef49e0643549a5edf4f3717da1a7fa"
+   "changed_by": "feature/step16-formatting-part-2",
+   "commit_subject": "Step 16.3 - bold and italic written only where needed: apply's two writers drop the redundant off-flags, D06's two headings keep the bold their style gives, nothing else moves in force",
+   "sha256_now": "6997b876638c6844944640a68060b9d201cebdd49a722a072b6ad5ccf120b361"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -21,9 +21,9 @@
    "sha256_now": "c83cb1d04e5b6a3fd9952ee7331ad588f6f606b3478f719a4a3412ccd773ef3a"
   },
   "uk/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/step15-formatting-part-1",
-   "commit_subject": "Step 15.1 - extraction resolves each run's bold and italic through the style cascade, and writes one sparse key where they differ (option 3)",
-   "sha256_now": "c261ffb97a1af759577d195e9e3210526df3ad7f41aa1de49968ecf7906e2799"
+   "changed_by": "feature/step16-formatting-part-2",
+   "commit_subject": "Step 16.3 - bold and italic written only where needed: apply's two writers drop the redundant off-flags, D06's two headings keep the bold their style gives, nothing else moves in force",
+   "sha256_now": "d60ccad6c8f71b235e3f0da90240508f4c33ea7759b1e49d249d2d255bd3a15f"
   },
   "uk/scripts/post_process.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",
@@ -111,9 +111,9 @@
    "sha256_now": "7943280287e4707fd9a357fced5106e4c9462248df16f358f95b5b5e13a6dfa4"
   },
   "us/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step15-formatting-part-1",
-   "commit_subject": "Step 15.3 - G9's first half: the segment check asks apply's own boundary-whitespace restoration through tc_segments; step 15 closed",
-   "sha256_now": "8bc371d94f612c02b0e8e108097c0bb2c6e8b758602d7fa6a35d6cff8e353a3a"
+   "changed_by": "feature/step16-formatting-part-2",
+   "commit_subject": "Step 16.3 - bold and italic written only where needed: apply's two writers drop the redundant off-flags, D06's two headings keep the bold their style gives, nothing else moves in force",
+   "sha256_now": "aeb8890700182f672667e403af3a236e740a0ce9c9157dfe0e4961d7c3633fef"
   },
   "us/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -121,9 +121,9 @@
    "sha256_now": "c83cb1d04e5b6a3fd9952ee7331ad588f6f606b3478f719a4a3412ccd773ef3a"
   },
   "us/scripts/extract_paragraphs.py": {
-   "changed_by": "feature/step15-formatting-part-1",
-   "commit_subject": "Step 15.1 - extraction resolves each run's bold and italic through the style cascade, and writes one sparse key where they differ (option 3)",
-   "sha256_now": "f526ddd4b4f32d4ab94897dbe49563324212b57082fa0be8c64da90daff7bde6"
+   "changed_by": "feature/step16-formatting-part-2",
+   "commit_subject": "Step 16.3 - bold and italic written only where needed: apply's two writers drop the redundant off-flags, D06's two headings keep the bold their style gives, nothing else moves in force",
+   "sha256_now": "9595942d779f4a191b746741bcf9cb51680cdaad9c7e45e292f42905b6835f58"
   },
   "us/scripts/post_process.py": {
    "changed_by": "feature/step14-9-4-claims-about-the-skill",

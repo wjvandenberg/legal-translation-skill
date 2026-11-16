@@ -9,7 +9,9 @@ validate_apply -> extract_paragraphs (the formatting arm's style resolver, lazil
 validate_en_runs -> reorder_definitions, has no fallback at all; nor, since sub-step 14.11, have the sixth and
 seventh, quality_check -> lexicon_compliance (its legislation tail) and quality_check -> post_process (its reader of
 the operator's declared italic); nor, since sub-step 15.3, has the eighth, validate_segment_shapes ->
-apply_translations_textmatch (the boundary-whitespace restoration it asks, register G9). None of them could tell a
+apply_translations_textmatch (the boundary-whitespace restoration it asks, register G9). Since sub-step 16.3 the
+ninth, apply_translations_textmatch -> extract_paragraphs (the style cascade its writers ask), tolerates a MISSING
+sibling by design: apply writes the explicit flags it always wrote, and says so. None of them could tell a
 sibling that is
 ABSENT from one that is PRESENT BUT CUT SHORT, which is the broken install SKILL.md rule 6 answers by
 re-installing: a cut mid-statement gave a raw traceback, or - where the handler was broad - a control that
@@ -70,12 +72,15 @@ ROUTES = [
     ("quality_check.py", "post_process.py", "load", False),
     # sub-step 15.3: the segment check asks apply's own boundary-whitespace restoration (register G9); no fallback
     ("validate_segment_shapes.py", "apply_translations_textmatch.py", "load", False),
+    # sub-step 16.3: apply's writers ask extraction what the styles give a run; a MISSING extraction leaves apply
+    # writing the explicit flags it always wrote, said in one line - a partial install, tolerated by design
+    ("apply_translations_textmatch.py", "extract_paragraphs.py", "load", True),
 ]
 # the names each importer asks of its sibling: a clean cut before the sibling's own check must remove every one
 NAMES = {"post_process.py": ["will_fix_spacing_fire", "load_declared_notes", "_notes_norm", "_declared_italic"],
          "translate_headers_footers.py": ["_field_aware_text_and_fields", "_para_text"],
          "extract_paragraphs.py": ["_GRAPHIC_ATTR_SURFACES", "graphic_metadata_surfaces", "read_style_cascade",
-                                   "resolve_run", "get_prop_tristate"],
+                                   "resolve_run", "get_prop_tristate", "styles_give"],
          "lexicon_compliance.py": ["_guess_language", "ART_LEGISLATION_FOLLOWS"],
          "reorder_definitions.py": ["find_definitions_section_in_texts"],
          "apply_translations_textmatch.py": ["distribute_text_across_elements", "effective_segment_texts",

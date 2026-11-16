@@ -62,6 +62,32 @@ try:
 except (ImportError, SyntaxError) as _exc:  # deleted, or cut short: a broken install, SKILL.md rule 6
     _sibling_integrity_exit('source_language_markers.py', _exc)
 
+
+def _sibling_cut_short(name, exc):
+    """True when importing the sibling `name` failed because it is PRESENT BUT CUT SHORT: a SyntaxError (cut
+    mid-statement - the whole file is compiled before any of it runs), or an ImportError that is not a
+    ModuleNotFoundError and names the sibling itself (cut cleanly before the names asked of it). A sibling that
+    is simply MISSING - a ModuleNotFoundError naming it - is not, so a fallback designed for a partial install
+    still runs; and an ImportError about some OTHER module, raised inside a whole sibling, is that sibling's
+    defect, not an install's."""
+    if isinstance(exc, SyntaxError):
+        return True
+    return (isinstance(exc, ImportError) and not isinstance(exc, ModuleNotFoundError)
+            and exc.name == os.path.splitext(name)[0])
+
+
+# SUB-STEP 16.3: extraction's style cascade, so the writers below write a run's bold and italic only where the
+# styles do not already give them. A MISSING sibling (a partial install) leaves both None and apply writes the
+# explicit flags it always wrote, said in one line; a CUT-SHORT one is a broken install, SKILL.md rule 6.
+try:
+    from extract_paragraphs import read_style_cascade, styles_give  # noqa: E402
+except (ImportError, SyntaxError) as _exc:
+    if _sibling_cut_short('extract_paragraphs.py', _exc):
+        _sibling_integrity_exit('extract_paragraphs.py', _exc)
+    if not (isinstance(_exc, ModuleNotFoundError) and _exc.name == 'extract_paragraphs'):
+        raise
+    read_style_cascade = styles_give = None
+
 def _check_self_integrity():
     """Rev27: detect install-time truncation by reading the script's own
     source and checking for the sentinel at the bottom. Marketplace
@@ -390,7 +416,8 @@ def apply_trackchanges_inplace(orig_p, en_text, it_text,
                                en_deleted=None, it_deleted=None,
                                en_segments=None,
                                en_runs_spec=None,
-                               original_runs=None):
+                               original_runs=None,
+                               cascade=None):
     """Apply English translation to a tracked-change paragraph in place.
     Segment-aware (en_segments) or legacy proportional fallback. Returns
     True on success, False if the paragraph has no text content.
@@ -677,6 +704,19 @@ def apply_trackchanges_inplace(orig_p, en_text, it_text,
         val_attr = f'{W}val'
         for r_elem in orig_p.iter(f'{W}r'):
             rpr = r_elem.find(f'{W}rPr')
+            # SUB-STEP 16.3: the off-flag only where the run's own styles give bold - its NEAREST paragraph's
+            # style and its character style. Elsewhere it would change nothing in force, so it is not written,
+            # and a direct bold is dropped, which turns the run off exactly as the flag did. No styles known:
+            # the flag on every run, as before. Italic is not touched here.
+            near = r_elem
+            while near is not None and near is not orig_p and near.tag != f'{W}p':
+                near = parent_map.get(near)
+            given = styles_given(cascade, near if near is not None else orig_p, rpr)
+            if given is not None and not given['bold']:
+                if rpr is not None:
+                    for b_elem in list(rpr.findall(f'{W}b')):
+                        rpr.remove(b_elem)
+                continue
             if rpr is None:
                 rpr = ET.Element(f'{W}rPr')
                 r_elem.insert(0, rpr)
@@ -739,8 +779,50 @@ def auto_detect_formatting(en_text, original_runs):
 
     return segments
 
-def make_run_et(text, template_rpr, bold=False, italic=False):
-    """Create a new w:r element with the given text and formatting."""
+def styles_given(cascade, p_elem, rpr):
+    """What the styles alone give a run in paragraph `p_elem` whose run properties are `rpr` - the paragraph's
+    style and the run's character style, through extraction's cascade - as {'bold': ..., 'italic': ...}; None
+    where no styles are known (sub-step 16.3)."""
+    if cascade is None or styles_give is None:
+        return None
+    ppr = p_elem.find(f'{W}pPr') if p_elem is not None else None
+    ps = ppr.find(f'{W}pStyle') if ppr is not None else None
+    rs = rpr.find(f'{W}rStyle') if rpr is not None else None
+    return styles_give(cascade, ps.get(f'{W}val') if ps is not None else None,
+                       rs.get(f'{W}val') if rs is not None else None)
+
+
+def source_in_force(segments, original_runs):
+    """SUB-STEP 16.3, WHERE NOTHING IS DECLARED (Wouter's answer, 2026-11-12 (6)): per property, the source
+    paragraph's formatting IN FORCE wherever its text runs agree - each run's `resolved` over its `bold` and
+    `italic` - set on every segment; where they do not agree, the segments as given. A run whose text is blank
+    has no vote. Returns new segments; the caller's are not touched."""
+    voters = [r for r in (original_runs or []) if isinstance(r, dict) and (r.get('text') or '').strip()]
+    if not voters:
+        return segments
+    out = [dict(s) for s in segments]
+    for name in ('bold', 'italic'):
+        seen = set()
+        for run in voters:
+            res = run.get('resolved')
+            seen.add(bool(res[name] if isinstance(res, dict) and name in res else run.get(name, False)))
+        if len(seen) == 1:
+            value = seen.pop()
+            for s in out:
+                s[name] = value
+    return out
+
+
+def make_run_et(text, template_rpr, bold=False, italic=False, given=None):
+    """Create a new w:r element with the given text and formatting.
+
+    `given` (sub-step 16.3) is what the STYLES alone give the new run - its paragraph's style and the template's
+    character style - as {'bold': ..., 'italic': ...}, from `styles_given`. With it, the template's own b, bCs, i
+    and iCs are dropped and a pair is written only where the wanted value differs from what the styles give:
+    `<w:b/><w:bCs/>` to turn bold on, `<w:b w:val="0"/><w:bCs w:val="0"/>` to turn it off, the same for italic.
+    Where the styles already give the wanted value no flag is written, so the run is formatted IN FORCE exactly
+    as before and carries no redundant off-flag. Without it (no styles known) the explicit flags below, as before.
+    """
     r = ET.Element(f'{W}r')
 
     if template_rpr is not None:
@@ -777,6 +859,32 @@ def make_run_et(text, template_rpr, bold=False, italic=False):
         rpr_elem.append(new_child)
 
     val_attr = f'{W}val'
+
+    if given is not None:
+        # SUB-STEP 16.3 - WRITTEN ONLY WHERE NEEDED. The explicit off-flags below were written because omitting
+        # one let a style's bold or italic show through; knowing what the styles give, the flag is written exactly
+        # where it changes the value in force, and nowhere else.
+        for tag in ('b', 'bCs', 'i', 'iCs'):
+            for el in list(rpr.findall(f'{W}{tag}')):
+                rpr.remove(el)
+        for tag, want, name in (('b', bold, 'bold'), ('i', italic, 'italic')):
+            if bool(want) == bool(given[name]):
+                continue
+            for flag in (tag, tag + 'Cs'):
+                el = ET.Element(f'{W}{flag}')
+                if not want:
+                    el.set(val_attr, '0')
+                insert_rpr_child(rpr, el)
+        if template_rpr is not None:
+            if len(rpr) or rpr.attrib:
+                r.insert(0, rpr)
+        elif not len(rpr) and not rpr.attrib:
+            r.remove(rpr)
+        t = ET.SubElement(r, f'{W}t')
+        t.text = text
+        if text and (text[0] == ' ' or text[-1] == ' '):
+            t.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+        return r
 
     # Explicit bold override:
     #   bold=True  → emit <w:b/>             (turns bold ON, overriding any style that turns it off)
@@ -1842,6 +1950,14 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
     # Read original document.xml
     with zipfile.ZipFile(orig_docx_path) as zf:
         orig_bytes = zf.read('word/document.xml')
+        # SUB-STEP 16.3: the source's styles, read once, so bold and italic are written only where needed.
+        cascade = read_style_cascade(zf) if read_style_cascade is not None else None
+    if read_style_cascade is None:
+        print("  Styles: extract_paragraphs.py is missing beside this script (a partial install) - bold and "
+              "italic written as an explicit flag on every run, as before sub-step 16.3")
+    elif cascade is None:
+        print("  Styles: the source's styles part cannot be read - bold and italic written as an explicit flag "
+              "on every run, as before sub-step 16.3")
 
     # Dynamically register whatever xmlns prefixes the source document actually
     # uses. This MUST happen before ET.fromstring, or ET will assign synthetic
@@ -2010,11 +2126,15 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                                           en_deleted=en_deleted,
                                           en_segments=en_segs,
                                           en_runs_spec=en_runs_spec,
-                                          original_runs=original_runs):
+                                          original_runs=original_runs,
+                                          cascade=cascade):
                 changes += 1
             continue
 
         default_rpr = get_default_rpr_et(orig_p)
+        # SUB-STEP 16.3: what the styles alone give every new run here - this paragraph's style and the template's
+        # character style - or None, where no styles are known and the explicit flags are written as before.
+        given = styles_given(cascade, orig_p, default_rpr)
 
         # Determine formatting
         if en_runs_spec:
@@ -2024,6 +2144,10 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                 segments = en_runs_spec
         else:
             segments = auto_detect_formatting(en_text, original_runs)
+            # SUB-STEP 16.3: nothing declared, so the source's formatting in force where its text runs agree; the
+            # sub-heading test, where it fires, as it was (sub-step 16.4's). No styles known: as before.
+            if given is not None and not is_subheader_paragraph(en_text, original_runs):
+                segments = source_in_force(segments, original_runs)
 
         # A3, THE TABLE-OF-CONTENTS HALF — A PLACEMENT RULE, NOT A PRESERVATION ONE.
         #
@@ -2106,10 +2230,10 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                         new_runs.append(br_run)
                     elif part:
                         new_runs.append(make_run_et(
-                            part, default_rpr, bold=bold, italic=italic))
+                            part, default_rpr, bold=bold, italic=italic, given=given))
             else:
                 new_runs.append(make_run_et(
-                    seg_text, default_rpr, bold=bold, italic=italic))
+                    seg_text, default_rpr, bold=bold, italic=italic, given=given))
 
         def _first_text_container(container):
             """The container holding the paragraph's FIRST text-bearing run, in

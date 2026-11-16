@@ -1,0 +1,69 @@
+[
+  {
+    "idx": 0,
+    "text": "Eerste artikel",
+    "en": "First article",
+    "style": "BoldClause",
+    "runs": [
+      {
+        "start": 0,
+        "end": 14,
+        "text": "Eerste artikel",
+        "bold": false,
+        "italic": false,
+        "resolved": {
+          "bold": true
+        }
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 1,
+    "text": "Gewone tekst van het verloop.",
+    "en": "Ordinary wording of the course.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 29,
+        "text": "Gewone tekst van het verloop.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 2,
+    "text": "Schuine opmerking hier.",
+    "en": "Slanted remark at this point.",
+    "style": "Normal",
+    "runs": [
+      {
+        "start": 0,
+        "end": 23,
+        "text": "Schuine opmerking hier.",
+        "bold": false,
+        "italic": true
+      }
+    ],
+    "en_runs": null
+  },
+  {
+    "idx": 3,
+    "text": "Romp zonder vet.",
+    "en": "Body without weight.",
+    "style": "BoldClause",
+    "runs": [
+      {
+        "start": 0,
+        "end": 16,
+        "text": "Romp zonder vet.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en_runs": null
+  }
+]

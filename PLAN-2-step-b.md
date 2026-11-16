@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-16, HOP 1 OF RUN s16-hops-1116 — SESSION PURPOSE — what · how · purpose:** sub-step 16.2, then 16.3 onward in order as the clock and the context allow · one committed tools/ helper grafting today's extraction's `resolved` into a frozen workdir's notes in memory, VOID on any misalignment, the corpus arms gaining it as an option; each later sub-step its own plan in section 3.16 first · **so that 16.3's change to apply is measured on notes that carry what it reads, with nothing written into the archive** *(written immediately after the tag `rollback-2026-11-16-hop1-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-16, WORKER 1 OF THE CHAIN OF 2026-11-16 — SESSION PURPOSE — what · how · purpose:** sub-step 16.3, then 16.4 to 16.7 and step 17 in order as the clock and the context allow · 16.3 to its plan in section 3.16: apply's two writers drop a run's direct bold and italic and write one only where the wanted value differs from what the styles give, read from 16.2's graft, its controls red on the pin first; each later sub-step its own plan in its 3.16 entry first, each choice on the recommended option and recorded · **so that the delivered document carries the source's formatting in force without the redundant off-flags, and nothing else moves in force** *(written immediately after the tag `rollback-2026-11-16a-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -3293,6 +3293,42 @@ the off-flag totals identical on 44 of 44 rows:
   against the pin, `--graft`, every run whose bytes moved compared IN FORCE by the resolver over both deliveries —
   unchanged, or in a derived paragraph, 0 unexplained; the off-flag probe's counts of 2026-11-12 for the flags
   removed; the bold-document control, the runs whose flag does work, kept.
+  **BUILT 2026-11-16, unattended** *(`DECISIONS-LOG.md` 2026-11-16 (2))*: **arm (b) against the pin, the graft
+  on, both trees identical: 1,259 paragraphs and 2,343 runs moved in bytes, each by its flags alone and the same in
+  force by the resolver over both deliveries, but D06's two derived headings, a bold gain on 2 runs; 0
+  unexplained**, every exit code equal, 13 of 13 per tree. `delivered_corpus_arm.py --ref` gains 16.3's sense, as
+  it gained sub-step 2b's: the three XML members by their flags alone and in force but MOVE_16_3, and
+  post_process's journal by its element counts alone, tied to apply's own output since post_process merges runs
+  after its passes; 214 and 202 checks green, A12 on D06 pinned at 0. `quality_check`'s rows, total and exit code
+  unmoved, 13 of 13 per tree. `tests/test_minimal_flags.py` 23 of 23, both trees, red at the pin; 24 of 24 mutants
+  killed; the sibling suite's ninth route; a new fixture, `style-bold.docx`, whose own notes equal today's
+  extraction's run for run. Beyond the plan: run properties left empty are not written. **NOT DONE, DECLARED:**
+  the rendered diff. LibreOffice is no longer on this machine and Word's automation hung on a hidden dialog, so
+  `render_diff.py --fixture style-bold`, the `--graft` the plan gives it and the corpus page comparison wait for it.
+  **Found, for 16.4:** two readers of a run's own `w:b` downstream of apply, `quality_check`'s check 15 and
+  `reorder_definitions`' term detector, cannot see bold a style gives, which 16.3 no longer writes as a flag;
+  neither moved on any corpus document.
+  **16.4's OWN PLAN — 2026-11-16, written before any code** *(worker 1 of the chain of 2026-11-16, at its safe cut
+  after 16.3; its choices `DECISIONS-LOG.md` 2026-11-16 (2)'s, Wouter's to overturn)*. **Changes, both trees:**
+  `apply_translations_textmatch.py`: the sub-heading test runs only where an entry declares no `en_runs`, its call
+  in the declared branch removed, so a declared span is absolute there too; where it runs it reads each source run
+  in force, `resolved` over `bold`; the tracked-change bypass's "every source run bold" reads the same.
+  `post_process.py`: `_declared_italic`'s untranslated-term arm reads a source run's italic in force, `resolved`
+  over `italic`. **The two readers 16.3's review found** — `quality_check`'s check 15 and `reorder_definitions`'
+  `get_bold_term`, each reading a run's own `w:b`, blind to bold a style gives, which 16.3 no longer writes as a
+  flag — are 16.4's first measurement: whether each can reach the styles part of what it reads; where it can, it
+  reads bold in force through extraction's resolver, as apply does; where it cannot, it is left and the gap
+  declared. *TP:* D09's three cells keep their declared italic (A11 0 on arm (b)); D06's one entry its declared
+  bold pattern; invented: a span declared false over a short paragraph its runs show bold, a short undeclared
+  heading bold by its style alone, a tracked-change paragraph bold by its style throughout. *FP:* the rebuilt
+  entries where the test fires and the declaration agrees, unchanged; an undeclared short paragraph bold in force,
+  still bold. **Derived first,** positional on 16.3's output, the graft on: the declared entries where the
+  sub-heading test fires and the declaration disagrees (4 when measured 2026-11-12 (6): D09's three italic, D06's
+  one bold), and any undeclared short paragraph whose test answer moves when read in force. **Checked against:**
+  that list, run by run, through `delivered_corpus_arm.py --ref` with 16.3's commit as the pin, a 16.4 sense added
+  as 16.3's was; `quality_check` on both builds. **MUST NOT:** the writers, settled at 16.3. **Then the
+  hand-back:** PR #198 squash-merged on its green full run; Wouter's words of 2026-11-16 are the go for 16.5, its
+  own plan written into its entry first, on a new branch from main.
 - **16.3 — bold and italic written only where needed, the off-flags removed in the same sub-step.** HEAVY, both
   trees — the core of section 3.9's step 16, and the one sub-step never to be split, since removing the flags
   without the computation renders a document bold. Apply imports extraction's resolver *(Wouter's answer)*, through

@@ -3007,3 +3007,29 @@ under the 75% bound, so this hop wrote 16.3's plan and stopped between two items
 next hop, with `temp/s1116h1_163_derive.py` (its `--compare` mode the acceptance at apply), a draft suite
 `temp/s1116h1_draft_test_minimal_flags.py`, the pin's scripts in `temp/s1116h1_pin/` and the us port
 `temp/s1116h1_port_us.py`.
+
+## 2026-11-16 (2) — the chain of 2026-11-16, worker 1: 16.3 built, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-16, QUOTED WHOLE,** given to the session conducting today's chain: *"I won't respond, I won't answer questions - you should just continue."* — *"You can build even 16.5-16.7 and 17."* — *"merging, pushing etc should be done automatically - I approve and agree to everything already."*
+**No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm or
+overturn** — `temp/s1116-questions.md` holds the ones that would have been questions, with their options.
+
+**16.3, BUILT.** **(1) THE IMPORT AT LOAD:** apply imports extraction's `read_style_cascade` and `styles_give` as
+it loads, a missing file tolerated, rather than inside the run: the same behaviour, and the sibling suite's "load"
+route proves all five damages. **(2) A WHOLE EXTRACTION FAILING ON ANOTHER MODULE IS RAISED,** a defect in that file
+and not an install. **(3) NO STYLES KNOWN, NOTHING NEW:** the source-in-force rule for undeclared paragraphs is off
+then too, so the delivery is today's byte for byte. **(4) AN EMPTIED `w:rPr` IS NOT WRITTEN.** **(5) THE RENDERED
+DIFF, NOT DISCHARGED:** LibreOffice is no longer installed and Word's automation hung on a hidden dialog, its one
+instance ended; nothing was installed unattended. The fixture `style-bold.docx` is built, and `render_diff.py
+--fixture style-bold`, the `--graft` the plan gives `render_diff` and the corpus page comparison wait for
+LibreOffice, the corpus pages Wouter's to look at. **(6) HOP 1'S DRAFT ARM "NOTHING PRINTED IS A WORD OF THE
+DOCUMENT" DROPPED:** it failed on the pin as well; apply prints the operator's own text by design. **(7) THE CORPUS
+ARM'S `--ref` LEARNS 16.3,** as it learned 2b: the XML members by their flags alone and in force but MOVE_16_3;
+post_process's journal by its element counts alone (measured first, nothing else in it moved, 13 of 13), tied to
+apply's own output, which the chain now keeps, because post_process merges runs after its passes and moves the
+final count outside them. **(8) TWO READERS LEFT FOR 16.4:** `quality_check`'s check 15 and `reorder_definitions`'
+term detector read a run's own `w:b`; a term bold only by its style now carries no flag; neither moved on the
+corpus; the code review named both. **(9) 16.4 PLANNED, NOT BUILT — THE CUT:** context read 46% when 16.3's
+build was measured; 16.3 cost about 31%, and 16.4 is HEAVY, so it could not be built and closed under the 80%
+bound this worker was given. Its own plan is written into its entry, the two readers above its first measurement,
+and the session closes between two items.
