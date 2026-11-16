@@ -71,6 +71,7 @@ W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 from sibling_dirs import corpus_dirs, logs_dir  # noqa: E402  (register I-40)
 sys.path.insert(0, str(ROOT / "tests"))
 from read_receipt import file_receipt  # noqa: E402  (apply refuses to start without skill Step 3's receipt, C26)
+from graft_resolved import GraftVoid, carried, describe, graft_notes_bytes  # noqa: E402  (sub-step 16.2)
 LOGS = logs_dir()
 
 # PINNED TO A COMMIT, NEVER TO A BRANCH NAME OR HEAD. A before-and-after check in this
@@ -134,6 +135,11 @@ ap.add_argument("--from-apply", action="store_true",
                      "delivered output. Without it 11 of the 13 inputs have already been "
                      "through every pass and this tool cannot see a pass that stopped "
                      "rewriting.")
+ap.add_argument("--graft", action="store_true",
+                help="SUB-STEP 16.2: give each workdir's frozen notes today's extraction's `resolved`, in memory, "
+                     "through tools/graft_resolved.py -- the notes staged beside BOTH arms and the ones "
+                     "--from-apply's rebuild reads; the source is matched for every workdir, and a workdir the "
+                     "graft refuses is VOID and NOT EXAMINED")
 args = ap.parse_args()
 SCRIPTS = ROOT / args.variant / "scripts"
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1",
@@ -301,7 +307,7 @@ def run_post_process(scripts_dir, xml_path, timeout=900):
 GATE_MARKER = "SKILL GATE FIRED"
 
 
-def stage_input(ordinal, src_xml, label, notes_src=None):
+def stage_input(ordinal, src_xml, label, notes_src=None, notes_bytes=None):
     """A fresh <workdir>/final/word/document.xml holding a COPY of the frozen input,
     and -- since sub-step 3a -- a copy of that workdir's paragraphs.json beside it.
 
@@ -328,12 +334,17 @@ def stage_input(ordinal, src_xml, label, notes_src=None):
     production, and the caller reports that it fired. The journal is written BEFORE the
     gate by design (post_process.py says so in terms), so a fired gate costs this arm its
     exit code and none of its evidence.
+
+    `notes_bytes` (--graft, sub-step 16.2): the grafted notes, written in place of the copy -- the same bytes
+    for both arms, as the copy was.
     """
     d = TMP / f"{label}{ordinal:02d}" / "final" / "word"
     d.mkdir(parents=True, exist_ok=True)
     dest = d / "document.xml"
     shutil.copy2(src_xml, dest)
-    if notes_src is not None and Path(notes_src).is_file():
+    if notes_bytes is not None:
+        (TMP / f"{label}{ordinal:02d}" / "paragraphs.json").write_bytes(notes_bytes)
+    elif notes_src is not None and Path(notes_src).is_file():
         shutil.copy2(notes_src, TMP / f"{label}{ordinal:02d}" / "paragraphs.json")
     return TMP / f"{label}{ordinal:02d}", dest
 
@@ -397,8 +408,10 @@ def _source_paragraphs(cand):
     return _SRC_TEXTS[k]
 
 
-def rebuild_from_apply(ordinal, wd, corpus):
-    """(path to a rebuilt pre-post_process document.xml, matched fraction) or (None, why)."""
+def match_source(wd, corpus):
+    """(the matched source .docx, matched fraction) or (None, why) -- by which candidate's paragraph text the
+    notes' `text` field reproduces, never by name. Moved out of rebuild_from_apply at sub-step 16.2, which
+    matches the source for every workdir under --graft, unchanged."""
     try:
         notes = json.loads((wd / "paragraphs.json").read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
@@ -418,6 +431,15 @@ def rebuild_from_apply(ordinal, wd, corpus):
             break
     if best is None or frac < 0.5:
         return None, f"no source matched (best {frac:.0%})"
+    return best, frac
+
+
+def rebuild_from_apply(ordinal, wd, corpus, notes_bytes=None):
+    """(path to a rebuilt pre-post_process document.xml, matched fraction) or (None, why).
+    `notes_bytes` (--graft): the grafted notes apply reads in place of the copy."""
+    best, frac = match_source(wd, corpus)
+    if best is None:
+        return None, frac
     a = TMP / f"apply{ordinal:02d}"
     a.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(best, a / "src.docx")
@@ -425,6 +447,8 @@ def rebuild_from_apply(ordinal, wd, corpus):
                  "headers_footers.json", "_boldmap.json"):
         if (wd / name).is_file():
             shutil.copyfile(wd / name, a / name)
+    if notes_bytes is not None:
+        (a / "paragraphs.json").write_bytes(notes_bytes)
     file_receipt(a / "paragraphs.json", ROOT / args.variant)
     r = subprocess.run(["uv", "run", "--with", "lxml", "python", str(SCRIPTS / APPLY),
                         str(a / "src.docx"), str(a / "paragraphs.json"), str(a / "out.xml")],
@@ -439,11 +463,13 @@ print("=" * 96)
 print(f"STEP 9 CORPUS ARM — is the change journal complete on the real documents?  "
       f"[{args.variant}]{'  --from-apply' if args.from_apply else ''}")
 print("=" * 96)
-CORPUS = corpus_dirs() if args.from_apply else []
-if args.from_apply:
+CORPUS = corpus_dirs() if (args.from_apply or args.graft) else []
+if args.from_apply or args.graft:
     # SAY WHAT WAS SEARCHED WITHOUT SAYING WHERE: a reachable-corpus count of 0 is the
     # difference between "eleven documents were rebuilt" and "eleven were never opened".
-    print(f"  --from-apply: corpus folder(s) reachable: {len(CORPUS)}")
+    print(f"  {'--from-apply' if args.from_apply else '--graft'}: corpus folder(s) reachable: {len(CORPUS)}"
+          + ("  · --graft: the notes given today's `resolved` in memory (sub-step 16.2)"
+             if args.graft and args.from_apply else ""))
 
 if not LOGS.is_dir():
     print("\n  VOID — the logs root is not present, so the real arm is unavailable in this")
@@ -538,15 +564,31 @@ NO_NOTES_ON = []       # rows where the conditional pass never received a declar
 fmt_declared = []      # rows where the format contract says it does not claim the case
 worst = None           # (moved_count, workdir_path, ordinal) — the positive control's host
 worst_fmt = None       # the same, for the FORMATTING control — a different document may win
+GRAFTS, GRAFTED_NOTES = {}, {}   # sub-step 16.2, --graft: per ordinal, the graft's counts and the bytes staged
 for i, wd in enumerate(workdirs):
     delivered = wd / "final" / "word" / "document.xml"
+    grafted = None
+    if args.graft:
+        # SUB-STEP 16.2: the notes BOTH arms and the rebuild read, grafted once per workdir. A refusal is VOID and the
+        # row NOT EXAMINED, so the denominator below still adds up -- never run on the ungrafted notes.
+        gsrc, gwhy = match_source(wd, CORPUS)
+        try:
+            if gsrc is None:
+                raise GraftVoid(f"no source to graft from: {gwhy}")
+            grafted, GRAFTS[i] = graft_notes_bytes(wd / "paragraphs.json", gsrc, SCRIPTS)
+            GRAFTED_NOTES[i] = grafted
+        except GraftVoid as exc:
+            unreadable.append(i)
+            void(f"wd{i} graft", str(exc))
+            print(f"  {i:>4}  {'—':>9}  the graft refused — NOT EXAMINED")
+            continue
     pre = [c for c in (wd / n for n in PRE_SNAPSHOT_NAMES) if c.is_file()]
     if not pre:
         pre = [c for c in wd.rglob("*.xml") if c.name in PRE_SNAPSHOT_NAMES]
     if pre:
         src, kind = pre[0], "pre-snap"
     elif args.from_apply:
-        rebuilt, why = rebuild_from_apply(i, wd, CORPUS)
+        rebuilt, why = rebuild_from_apply(i, wd, CORPUS, notes_bytes=grafted)
         if rebuilt is None:
             # REPORTED, NEVER SILENTLY FALLEN BACK TO THE DELIVERED DOCUMENT: a mixed input
             # population is the defect this flag exists to remove.
@@ -555,6 +597,10 @@ for i, wd in enumerate(workdirs):
                   f"NOT EXAMINED")
             continue
         src, kind = rebuilt, "apply"
+        if args.graft:
+            back, carry = carried(TMP / f"apply{i:02d}" / "paragraphs.json"), GRAFTS[i]["grafted"] + GRAFTS[i]["already"]
+            ok(f"wd{i} graft: the notes the rebuild's apply read carry the key on {carry} run(s)", back == carry,
+               f"read back {back}")
     elif delivered.is_file():
         src, kind = delivered, "delivered"
     else:
@@ -572,8 +618,14 @@ for i, wd in enumerate(workdirs):
         continue
 
     INPUTS[i] = src
-    work, xml = stage_input(i, src, "new", notes_src=wd / "paragraphs.json")
+    work, xml = stage_input(i, src, "new", notes_src=wd / "paragraphs.json", notes_bytes=grafted)
     r = run_post_process(SCRIPTS, xml)
+    if args.graft:
+        # THE READ-BACK (16.2): the notes post_process read, counted after it ran. No byte today can show a graft
+        # computed and not handed over, since nothing yet reads the key.
+        carry, back = GRAFTS[i]["grafted"] + GRAFTS[i]["already"], carried(work / "paragraphs.json")
+        ok(f"wd{i} graft: the notes the new arm read carry the key on {carry} run(s)", back == carry,
+           f"read back {back}")
     if r.returncode != 0 and not gate_fired(r):
         unreadable.append(i)
         print(f"  {i:>4}  {kind:>9}  post_process exited {r.returncode} — NOT EXAMINED")
@@ -610,8 +662,12 @@ for i, wd in enumerate(workdirs):
     if BASELINE_DIR is not None:
         # THE SAME NOTES, FROM THE SAME SOURCE, FOR BOTH ARMS. Anything else makes the
         # two runs incomparable — and this tool has already shipped that defect once.
-        owork, oxml = stage_input(i, src, "old", notes_src=wd / "paragraphs.json")
+        owork, oxml = stage_input(i, src, "old", notes_src=wd / "paragraphs.json", notes_bytes=grafted)
         ro = run_post_process(BASELINE_DIR, oxml)
+        if args.graft:
+            oback = carried(owork / "paragraphs.json")
+            ok(f"wd{i} graft: the notes the old arm read carry the key on {carry} run(s)", oback == carry,
+               f"read back {oback}")
         if gate_fired(ro):
             GATE_FIRED_OLD.append(i)
         if ro.returncode != 0 and not gate_fired(ro):
@@ -683,6 +739,11 @@ for i, wd in enumerate(workdirs):
 
 print(f"\n  examined {examined} of {len(workdirs)} frozen workdirs; "
       f"{len(unreadable)} not examined")
+if args.graft:
+    t = {k: sum(gs[k] for gs in GRAFTS.values()) for k in ("entries", "aligned", "runs", "grafted", "already")}
+    for i, gs in GRAFTS.items():
+        print(f"  wd{i:<3} {describe(gs)}")
+    print(f"  GRAFT TOTAL (sub-step 16.2): {len(GRAFTS)} workdir(s) · {describe(t)}")
 ok("every enumerated workdir was examined or REPORTED as not examined",
    examined + len(unreadable) == len(workdirs),
    f"{examined} + {len(unreadable)} != {len(workdirs)}")
@@ -823,7 +884,8 @@ else:
     # arm 1 measured. Found by the formatting control voiding while arm 1's own row for
     # the same document reported nine run shapes moved — two instruments disagreeing.
     work, xml = stage_input(900, src, "ctl",
-                            notes_src=workdirs[ordinal] / "paragraphs.json")
+                            notes_src=workdirs[ordinal] / "paragraphs.json",
+                            notes_bytes=GRAFTED_NOTES.get(ordinal))
     r = run_post_process(SCRIPTS, xml)
     jpath = work / JOURNAL_NAME
     if (r.returncode != 0 and not gate_fired(r)) or not jpath.is_file():
@@ -871,7 +933,8 @@ else:
     # control run without notes produces NO record to remove and the control voids —
     # while arm 1's row for the very same document reports nine.
     fwork, fxml = stage_input(901, fsrc, "fctl",
-                              notes_src=workdirs[fordinal] / "paragraphs.json")
+                              notes_src=workdirs[fordinal] / "paragraphs.json",
+                              notes_bytes=GRAFTED_NOTES.get(fordinal))
     rf = run_post_process(SCRIPTS, fxml)
     fjpath = fwork / JOURNAL_NAME
     if (rf.returncode != 0 and not gate_fired(rf)) or not fjpath.is_file():

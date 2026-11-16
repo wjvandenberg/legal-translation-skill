@@ -38,6 +38,8 @@
       {"name": "gate_tree_scan", "command": "uv run --with lxml python tests/test_gate_tree_scan.py", "count": "RESULT: [0-9]+ of ([0-9]+)"},
       {"name": "glossary_route", "command": "uv run --with lxml python tests/test_glossary_route.py", "count": "CHECKED:? +([0-9]+)"},
       {"name": "glossary_route [us]", "command": "uv run --with lxml python tests/test_glossary_route.py --variant us", "count": "CHECKED:? +([0-9]+)"},
+      {"name": "graft_resolved", "command": "uv run --with lxml python tests/test_graft_resolved.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
+      {"name": "graft_resolved [us]", "command": "uv run --with lxml python tests/test_graft_resolved.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "graphic_metadata", "command": "uv run --with lxml python tests/test_graphic_metadata.py", "count": "CHECKED:? +([0-9]+)"},
       {"name": "graphic_metadata [us]", "command": "uv run --with lxml python tests/test_graphic_metadata.py --variant us", "count": "CHECKED:? +([0-9]+)"},
       {"name": "instruction_rules", "command": "uv run --with lxml python tests/test_instruction_rules.py", "count": "RESULT: [0-9]+ of ([0-9]+)"},

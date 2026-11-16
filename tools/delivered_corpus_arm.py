@@ -134,6 +134,7 @@ folder: every input is copied into a temporary directory first.
         --declare-language                                                                  # sub-step 12.1
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref c4639fa --declare-glossary-kept   # 13.2
     uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref 8ad07c3 --declare-glossary-kept   # 13.5
+    uv run --with lxml python tools/delivered_corpus_arm.py --arm b --ref c9b7d90 --graft ours              # 16.2
 """
 import argparse
 import io
@@ -155,6 +156,7 @@ os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 from lxml import etree  # noqa: E402
 
 from keep_declarations import write_keep_declarations  # noqa: E402  (review finding 6: the one keep builder)
+from graft_resolved import GraftVoid, carried, describe, graft_notes_bytes  # noqa: E402  (sub-step 16.2)
 
 ROOT = Path(__file__).resolve().parent.parent
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
@@ -189,9 +191,16 @@ ap.add_argument("--declare-language", action="store_true",
                      "variant-conversion mode), run skill Step 4d and skill Step 9 as well, and read what every "
                      "language-dependent check says from its own lines. With --ref the pin's build is read the same "
                      "way and must FAIL the acceptance it predates -- the acceptance's own red")
+ap.add_argument("--graft", nargs="?", const="both", choices=("both", "ours"), default=None,
+                help="SUB-STEP 16.2, arm (b): give each workdir's frozen notes today's extraction's `resolved`, in "
+                     "memory, through tools/graft_resolved.py, before the chain reads them -- VOID for that workdir "
+                     "wherever the notes and today's extraction disagree. Under --ref both builds get the same "
+                     "grafted bytes; `--graft ours` leaves the pin's build July's own notes (15.1's acceptance (ii))")
 args = ap.parse_args()
 if args.declare_language and args.sides:
     ap.error("--declare-language reads the body arm's chain; it is not wired into --sides.")
+if args.graft and (args.sides or args.arm == "a"):
+    ap.error("--graft gives apply the notes it reads; it drives arm (b) only and is not wired into arm (a) or --sides.")
 if args.skip_step8 and args.declare_glossary_kept:
     # I-36: skipping skill Step 8 is declaring nothing, so a flag that writes a declaration contradicts the scenario.
     ap.error("--skip-step8 simulates an operator who declares nothing; --declare-glossary-kept writes a "
@@ -849,13 +858,14 @@ def gives_original_glossary(d):
                 and z.read("word/glossary/document.xml") == gl.read_bytes())
 
 
-def chain(scripts_dir, d, src, wd, today=None, language=None):
+def chain(scripts_dir, d, src, wd, today=None, language=None, notes=None):
     """apply -> post_process -> reorder -> repack in d, inputs copied from wd. Keeps a copy of the
     reordered XML (the check's input, as in sub-step 11.1) before repack runs. Returns (rcs, pp).
     `today` is side_parts' (--sides only). `language` (--declare-language, sub-step 12.1) is written beside the
     notes as skill Step 1c writes it, and skill Step 4d and skill Step 9 run too; their output and apply's and repack's are kept
     in LANG_OUT, in memory only, for the language readings -- never printed, since they can quote the text.
-    Neither step writes anything, so the outputs compared under --ref are the same set as without it."""
+    Neither step writes anything, so the outputs compared under --ref are the same set as without it.
+    `notes` (--graft, sub-step 16.2): the grafted notes' bytes, written over the copy in d - never into wd."""
     (d / "final" / "word").mkdir(parents=True, exist_ok=True)
     shutil.copyfile(src, d / "src.docx")
     # I-36: an operator who skips skill Step 8 declares nothing, and since the wiring REPACK reads the declarations beside
@@ -864,6 +874,8 @@ def chain(scripts_dir, d, src, wd, today=None, language=None):
     for name in INPUTS:
         if name not in undeclared and (wd / name).is_file():
             shutil.copyfile(wd / name, d / name)
+    if notes is not None:
+        (d / "paragraphs.json").write_bytes(notes)
     xml, py = d / "final" / "word" / "document.xml", ["uv", "run", "--with", "lxml", "python"]
     said = {}
     if language is not None:
@@ -1826,7 +1838,10 @@ def acceptance(did, rd):
     return out
 
 
-reports_a, reports_b, LANG_KEY = {}, {}, {}
+reports_a, reports_b, LANG_KEY, GRAFTS, GRAFT_READ = {}, {}, {}, {}, {}
+if args.graft:
+    print(f"  --graft {args.graft}: arm (b)'s notes given today's extraction's `resolved` in memory (sub-step 16.2)"
+          + ("; the pin's build gets July's own notes" if args.graft == "ours" and args.ref else ""))
 for n, wd in enumerate(workdirs, 1):
     ids = DOC_ID.findall(str(wd.relative_to(LOGS)))
     did = ids[-1] if ids else f"D??{n}"
@@ -1863,15 +1878,29 @@ for n, wd in enumerate(workdirs, 1):
         declared = TRUE_LANGUAGE.get(did) if args.declare_language else None
         if args.declare_language and declared is None:
             void(f"(b) {key} language", "no true language is recorded for this doc-id")
+        grafted = None
+        if args.graft:
+            # SUB-STEP 16.2: the notes apply reads, given today's `resolved` -- or this workdir is VOID, never run
+            # on the ungrafted notes, which would answer a different question under the same label.
+            try:
+                grafted, GRAFTS[key] = graft_notes_bytes(wd / "paragraphs.json", src, SCRIPTS)
+            except GraftVoid as exc:
+                void(f"(b) {key} graft", str(exc))
+                continue
         LANG_KEY[key] = (b.name, f"r{n:02d}" if REFTREE is not None else None, did)
-        rcs, pp = chain(SCRIPTS, b, src, wd, language=declared)
+        rcs, pp = chain(SCRIPTS, b, src, wd, language=declared, notes=grafted)
+        if args.graft:
+            GRAFT_READ[key] = {"ours": carried(b / "paragraphs.json")}
         if pp is None:
             void(f"(b) {key}", f"apply produced no output (rc={rcs['apply']})")
             continue
         gate = pp.returncode != 0 and "SKILL GATE FIRED" in (pp.stdout or "") + (pp.stderr or "")
         if REFTREE is not None:
             rb = TMP / f"r{n:02d}"
-            rrcs, _ = chain(REFTREE, rb, src, wd, language=declared)
+            rrcs, _ = chain(REFTREE, rb, src, wd, language=declared,
+                            notes=grafted if args.graft == "both" else None)
+            if args.graft:
+                GRAFT_READ[key]["pin"] = carried(rb / "paragraphs.json")
             dn, dr = outputs(b), outputs(rb)
             same_rc = rrcs == rcs
             # SUB-STEP 2: a pin without the delivered gate delivers what ours refuses. Then, and only then,
@@ -2206,6 +2235,23 @@ if args.declare_language and args.arm in ("b", "both"):
     print(f"  read {sum(1 for b, _r, _d in LANG_KEY.values() if b in LANG_OUT)} of {len(LANG_KEY)} rebuilt "
           f"workdirs' language readings")
 
+if args.graft:
+    # SUB-STEP 16.2: what the graft gave each workdir, counts only, and the totals a reader compares with the
+    # derivation (1,891 entries and 186 runs per tree over the 13, measured 2026-11-16).
+    print(f"\n  SUB-STEP 16.2 — THE GRAFT ({args.graft}), per workdir:")
+    for key, gs in GRAFTS.items():
+        print(f"  {key:6} {describe(gs)}")
+        # THE READ-BACK: the notes each build's chain actually read, counted after it ran. Today's apply ignores the
+        # key, so the delivered bytes could never show a graft computed and not handed over; this can.
+        rd, carry = GRAFT_READ.get(key, {}), gs["grafted"] + gs["already"]
+        ok(f"{key} graft: the notes our build read carry the key on {carry} run(s)", rd.get("ours") == carry,
+           f"read back {rd.get('ours')}")
+        if "pin" in rd:
+            want = carry if args.graft == "both" else gs["already"]
+            ok(f"{key} graft: the notes the pin's build read carry it on {want} ({args.graft})", rd["pin"] == want,
+               f"read back {rd['pin']}")
+    t = {k: sum(gs[k] for gs in GRAFTS.values()) for k in ("entries", "aligned", "runs", "grafted", "already")}
+    print(f"  GRAFT TOTAL: {len(GRAFTS)} workdir(s) · {describe(t)}")
 shutil.rmtree(TMP, ignore_errors=True)
 print("\n" + "=" * 96)
 print(f"  {CHECKED} check(s), {len(FAIL)} failure(s), {len(VOIDED)} void")

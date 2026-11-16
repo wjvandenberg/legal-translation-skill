@@ -2971,3 +2971,29 @@ tracked changes — over 1,453 of 1,469 paired paragraphs compared; arm (a), the
 leaves no store file — v3's behaviour; v4's pass ledger counts every run, a red one too, so the case now asserts
 no phase RECORD, the thing `check` accepts. VERIFY re-run for that delta alone, the first VERIFY's 46 of 46
 standing for the rest, its code hashes stamped and unchanged; the full run then once more, on the exact tree.
+
+## 2026-11-16 (1) — run s16-hops-1116, hop 1: 16.2 built, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-16, QUOTED WHOLE,** typed into the session that conducts the run: *"continue with 16.2
+in auto hop mode and don't stop until 17h today. You can already go into step 17 even. I won't respond, I won't
+answer questions - you should just continue."* — and, minutes later: *"You can build even 16.5-16.7 and 17."* **No
+question was asked; each choice below is THE HOP'S, its recommended answer, for him to confirm or overturn** —
+`temp/s1116-hops-questions.md` holds the ones that would have been questions.
+
+**16.2, THE GRAFT.** **(1) THE STRICTEST ALIGNMENT:** each run compared as the WHOLE entry with `resolved` set
+aside, not by text, bold and italic alone — measured first, 1,891 of 1,891 entries and 5,999 of 5,999 runs equal
+that way, both trees, so it costs nothing and refuses more. **(2) TWO SENSES UNDER `--ref`:** `--graft` gives both
+builds the same grafted bytes, the rule every corpus arm keeps; `--graft ours` leaves the pin's build July's own
+notes, the sense of 15.1's acceptance (ii), and is the one 16.2's byte identity was run in. **(3) A READ-BACK THE
+PLAN DID NOT NAME:** each arm counts the runs carrying the key in the notes each build actually read — today's
+apply ignores the key, so no delivered byte could show a graft computed and never handed over; six wiring mutants
+prove it fails. **(4) THE post_process ARM MATCHES THE SOURCE FOR EVERY WORKDIR** under `--graft`, so the two that
+kept a pre-post_process snapshot are grafted too, and its two positive controls re-run on the grafted notes, as
+they re-run on the notes arm 1 used. **(5) `apply_corpus_diff.py` EXITS 1 ON A GRAFT IT COULD NOT GIVE** — new, and
+only under the flag: the tool otherwise exits 0 over voided documents. **(6) THE BYTES HANDED OVER:** a workdir
+with nothing to graft gets the July file's own bytes, 7 of 13; the other 6 extraction's json format. **(7) RED:** the
+helper is new, so its red is its absence at the pin, said by the suite's import; the proof that it decides is the
+seventeen helper mutants and the six wiring mutants. **(8) A DRIFT FOUND, NOT CAUSED:** `freeze_intermediates.py
+--verify` reports all 13 July `.validate-state.json` files moved, each last written 2026-09-02, a day after the
+catalogue; every `paragraphs.json` is on it, 13 of 13. Left as it is and checked by content — question 1 of the
+run's questions file; re-recording the catalogue is Wouter's to authorise.
