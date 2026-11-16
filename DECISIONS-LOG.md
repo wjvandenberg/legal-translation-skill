@@ -3057,3 +3057,21 @@ is the same once adjacent runs of equal properties are joined, its bold and ital
 character; a pin that carries 16.4 splits nothing. **(6) THE RENDERED DIFF, NOT ATTEMPTED:** LibreOffice is still not
 installed and Word's automation hung for worker 1; the change is measured in force by the resolver on invented
 documents and on the corpus, never on a page.
+
+## 2026-11-16 (4) — the chain of 2026-11-16, worker 2: the hand-back, then 16.5 planned and built, unattended
+
+**THE HAND-BACK:** PR #198 squash-merged on its green full run (OVERALL PASS, on 983b81c), as 58ab29b, under
+Wouter's words of 2026-11-16 quoted whole in (3) above; 16.5 then begun on `feature/step16-formatting-part-3`
+from main. **No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm
+or overturn** — `temp/s1116-questions.md` holds them with their options.
+
+**16.5, PLANNED AND BUILT.** **(1) THE DEVICE IS (b), MATCHING BY EMPHASIS, NOT (a), AN OPERATOR'S SOURCE
+REFERENCE:** measured first, (b) reaches 38 of 65 findings on the corpus and (a) 0, since no frozen notes carry a
+reference and no operator writes one until step 17's instructions say so; (a) is recorded for step 17's plan.
+**(2) THE 35 UNIFORM FINDINGS HAD ONE CAUSE, NOT A DEVICE QUESTION:** the paragraph's text sits inside a container
+and the template reader looked at direct runs only — fixed where the paragraph's own runs carry no properties,
+so no other paragraph's template changes. **(3) MATCHING ONLY ON DECLARED SPANS:** where nothing is declared,
+apply's segments come from a definitions pattern, not from the source, so a match would be a guess; every
+reached mixed finding is declared. **(4) A5 GUARDED ON THE TEMPLATE AND ON EACH SPAN.** **(5) D6 AND F19 DECLARED,
+NOT REACHED.** **(6) THE RENDERED DIFF NOT ATTEMPTED** — LibreOffice is not installed. **(7) TWO REVIEW FINDINGS
+FIXED,** each given a check and a mutant.

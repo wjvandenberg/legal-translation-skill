@@ -237,14 +237,137 @@ def _strip_keeping_separators(s):
     return s[i:j]
 
 def get_default_rpr_et(p_elem):
-    """Get run properties from the first text-bearing run."""
+    """Get run properties from the first text-bearing run that has them.
+
+    SUB-STEP 16.5: where none of the paragraph's OWN runs carries any - its text sits inside a hyperlink, a content
+    control or a smart tag - the runs inside the listed containers are read too, in document order (`_run_hosts`),
+    so the properties every source run shares reach the English instead of being dropped (measured: 35 corpus
+    paragraphs, D06's character styles among them). The rule is otherwise the one it always was."""
     for r in p_elem.findall(f'{W}r'):
         t = r.find(f'{W}t')
         if t is not None and t.text and t.text.strip():
             rpr = r.find(f'{W}rPr')
             if rpr is not None:
                 return copy.deepcopy(rpr)
+    for r in _owned_text_runs(p_elem):
+        rpr = r.find(f'{W}rPr')
+        if rpr is not None:
+            return copy.deepcopy(rpr)
     return None
+
+
+def _owned_text_runs(container):
+    """SUB-STEP 16.5: the text-bearing runs `container` owns, in document order - its own w:r children and those
+    inside the listed containers, never a nested paragraph's."""
+    out = []
+    for child in container:
+        if child.tag == f'{W}r':
+            t = child.find(f'{W}t')
+            if t is not None and t.text and t.text.strip():
+                out.append(child)
+        else:
+            for host in _run_hosts(child):
+                out.extend(_owned_text_runs(host))
+    return out
+
+
+# SUB-STEP 16.5: the properties `en_runs` cannot express, each a UNIT of the run-property children that travel
+# together, and the symbol fonts never carried onto English text (register A5).
+_PER_SPAN_UNITS = (('u',), ('highlight',), ('sz', 'szCs'), ('color',), ('rStyle',), ('vertAlign',),
+                   ('smallCaps',), ('caps',), ('strike',), ('shd',), ('rFonts',))
+_SYMBOL_FONTS = ('symbol', 'wingdings', 'wingdings 2', 'wingdings 3', 'webdings', 'marlett')
+_RPR_SCHEMA = (
+    'rStyle', 'rFonts', 'b', 'bCs', 'i', 'iCs', 'caps', 'smallCaps', 'strike', 'dstrike', 'outline', 'shadow',
+    'emboss', 'imprint', 'noProof', 'snapToGrid', 'vanish', 'webHidden', 'color', 'spacing', 'w', 'kern',
+    'position', 'sz', 'szCs', 'highlight', 'u', 'effect', 'bdr', 'shd', 'fitText', 'vertAlign', 'rtl', 'cs', 'em',
+    'lang', 'eastAsianLayout', 'specVanish', 'oMath',
+)
+
+
+def _toggle(rpr, tag):
+    """A run's own ST_OnOff value for `tag`: True, False, or None where it names none."""
+    el = rpr.find(f'{W}{tag}') if rpr is not None else None
+    if el is None:
+        return None
+    return (el.get(f'{W}val') or 'true').strip().lower() not in ('0', 'false', 'off')
+
+
+def without_symbol_font(rpr):
+    """SUB-STEP 16.5, A5: the run properties with a `w:rFonts` naming a symbol font removed - English text in such a
+    font renders as pictographs. Returns the same element, changed in place."""
+    if rpr is None:
+        return rpr
+    for el in list(rpr.findall(f'{W}rFonts')):
+        faces = {(v or '').strip().lower() for k, v in el.attrib.items()
+                 if k in (f'{W}ascii', f'{W}hAnsi', f'{W}cs', f'{W}eastAsia')}
+        if faces & set(_SYMBOL_FONTS):
+            rpr.remove(el)
+    return rpr
+
+
+def emphasis_units(p_elem, cascade):
+    """SUB-STEP 16.5: per unit of `_PER_SPAN_UNITS` whose direct value is a FUNCTION OF EMPHASIS over the source
+    paragraph's own text runs - every run of one bold-and-italic state in force carrying the same - and differs
+    between the states present: {unit: {(bold, italic): (the source element or None, ...)}}. {} where no styles are
+    known or no unit qualifies."""
+    if cascade is None:
+        return {}
+    by_state = {}
+    for r in _owned_text_runs(p_elem):
+        rpr = r.find(f'{W}rPr')
+        given = styles_given(cascade, p_elem, rpr)
+        if given is None:
+            return {}
+        b, i = _toggle(rpr, 'b'), _toggle(rpr, 'i')
+        state = (given['bold'] if b is None else b, given['italic'] if i is None else i)
+        by_state.setdefault(state, []).append(rpr)
+    if len(by_state) < 2:
+        return {}
+    out = {}
+    for unit in _PER_SPAN_UNITS:
+        per, seen = {}, {}
+        for state, rprs in by_state.items():
+            elems = [tuple(rpr.find(f'{W}{tag}') if rpr is not None else None for tag in unit) for rpr in rprs]
+            vals = {tuple(None if el is None else ET.tostring(el) for el in row) for row in elems}
+            if len(vals) != 1:
+                break
+            per[state], seen[state] = elems[0], vals.pop()
+        else:
+            if len(set(seen.values())) > 1:
+                out[unit] = per
+    return out
+
+
+def span_template(template_rpr, units, state):
+    """SUB-STEP 16.5: a copy of the template with each unit of `units` set to what the source runs of `state` carry
+    - removed where they carry none - in schema order; a unit whose map lacks `state` (a blank span's) keeps the
+    template's value. The template itself where nothing applies."""
+    rpr = copy.deepcopy(template_rpr) if template_rpr is not None else ET.Element(f'{W}rPr')
+    for unit, per in units.items():
+        if state not in per:
+            continue        # a blank span's state the source never shows: the template's value, as before
+        for tag in unit:
+            for el in list(rpr.findall(f'{W}{tag}')):
+                rpr.remove(el)
+        for src_el in per[state]:
+            if src_el is None:
+                continue
+            el = copy.deepcopy(src_el)
+            name = el.tag.split('}')[1]
+            order = _RPR_SCHEMA.index(name) if name in _RPR_SCHEMA else len(_RPR_SCHEMA)
+            at = len(rpr)
+            for k, existing in enumerate(rpr):
+                ex = existing.tag.split('}')[1] if '}' in existing.tag else existing.tag
+                if (_RPR_SCHEMA.index(ex) if ex in _RPR_SCHEMA else len(_RPR_SCHEMA)) > order:
+                    at = k
+                    break
+            rpr.insert(at, el)
+    return rpr if (len(rpr) or rpr.attrib or template_rpr is not None) else None
+
+
+def _unit_key(elems):
+    """SUB-STEP 16.5: a unit's value, comparable - each element's bytes, or None where the run names none."""
+    return tuple(None if el is None else ET.tostring(el) for el in elems)
 
 def run_in_force(run, name):
     """SUB-STEP 16.4: a source run's `name` ('bold' or 'italic') IN FORCE - its `resolved` value where extraction
@@ -2143,7 +2266,8 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                 changes += 1
             continue
 
-        default_rpr = get_default_rpr_et(orig_p)
+        # SUB-STEP 16.5, A5: a symbol font in the template is never carried onto English text.
+        default_rpr = without_symbol_font(get_default_rpr_et(orig_p))
         # SUB-STEP 16.3: what the styles alone give every new run here - this paragraph's style and the template's
         # character style - or None, where no styles are known and the explicit flags are written as before.
         given = styles_given(cascade, orig_p, default_rpr)
@@ -2217,6 +2341,18 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
         # with extraction (A16, A19, N1 — branch 7), or any gate's blindness.
         # =====================================================================
 
+        # SUB-STEP 16.5 - PER DECLARED SPAN, THE PROPERTIES THAT FOLLOW EMPHASIS IN THE SOURCE. Where the operator
+        # declared spans, a property the source's text runs carry as a function of their bold and italic in force
+        # (each state's runs agreeing, the states differing) is taken per span from the runs of the span's state -
+        # only where every span's state occurs in the source and the spans do not all land on one value. Nothing
+        # declared, or a property mixed within one state: the template, as before (the residue is register A18's).
+        units = emphasis_units(orig_p, cascade) if (en_runs_spec and given is not None) else {}
+        if units:
+            seg_states = {(bool(sg.get('bold', False)), bool(sg.get('italic', False))) for sg in segments
+                          if en_text[sg.get('start', 0):sg.get('end', len(en_text))].strip()}
+            units = {u: per for u, per in units.items() if seg_states and seg_states <= set(per)
+                     and len({_unit_key(per[st]) for st in seg_states}) > 1}
+
         # Build the English runs FIRST. Clause 3 cannot decide which source tabs
         # are redundant until it knows whether the operator authored any.
         new_runs = []
@@ -2229,6 +2365,13 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                 continue
             bold = seg.get('bold', False)
             italic = seg.get('italic', False)
+            seg_rpr, seg_given = default_rpr, given
+            if units:
+                # SUB-STEP 16.5: this span's own template, and what the styles give it - its character style may
+                # be the span's state's, so bold and italic are written against that
+                seg_rpr = span_template(default_rpr, units, (bool(bold), bool(italic)))
+                seg_rpr = without_symbol_font(seg_rpr)
+                seg_given = styles_given(cascade, orig_p, seg_rpr)
             # \t in en → <w:tab/>; \n → <w:br/>.
             if '\t' in seg_text or '\n' in seg_text:
                 parts = re.split(r'([\t\n])', seg_text)
@@ -2244,10 +2387,10 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
                         new_runs.append(br_run)
                     elif part:
                         new_runs.append(make_run_et(
-                            part, default_rpr, bold=bold, italic=italic, given=given))
+                            part, seg_rpr, bold=bold, italic=italic, given=seg_given))
             else:
                 new_runs.append(make_run_et(
-                    seg_text, default_rpr, bold=bold, italic=italic, given=given))
+                    seg_text, seg_rpr, bold=bold, italic=italic, given=seg_given))
 
         def _first_text_container(container):
             """The container holding the paragraph's FIRST text-bearing run, in

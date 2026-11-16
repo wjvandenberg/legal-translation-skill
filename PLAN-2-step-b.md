@@ -3348,6 +3348,51 @@ the off-flag totals identical on 44 of 44 rows:
   red 11 of 18 at the pin on its true-positive arms alone; 6 of 6 mutants killed;
   16.3's suite's arms 5b and 7 brought to 16.4's rule.
   **NOT DONE, DECLARED:** the rendered diff — LibreOffice is still not installed.
+  **16.5's OWN PLAN — 2026-11-16, written before any code** *(worker 2 of the chain of 2026-11-16, after the
+  hand-back; Wouter's words of that day the go, its choices `DECISIONS-LOG.md` 2026-11-16 (4)'s, his to
+  overturn)*. **THE DEVICE, MEASURED FIRST** (`temp/s1116b_165_measure.py`, today's apply over the 13 workdirs,
+  grafted, positional, both trees identical, its control firing): of 1,214 rebuilt paragraphs, the eleven
+  properties are kept uniform on 1,344 property-paragraphs and are findings on 65 — 35 uniform-changed, 20
+  mixed-lost, 10 mixed-spread. **All 35 uniform-changed have one cause:** the paragraph's text runs sit inside a
+  container (a hyperlink, a content control, a smart tag) and `get_default_rpr_et` reads direct-child runs only,
+  so it finds no template and the run properties every source run shares are dropped — D06's 33 character
+  styles, its caps and small caps among them. **Matching each English span to the source runs of the same
+  emphasis reaches 3 of the 30 mixed findings;** in the other 27 the property changes within one emphasis
+  state, which only a source reference the operator declares could carry — and no frozen notes hold one. So:
+  **(b), not (a)** *(the worker's choice)*: no new key in the notes, since an operator writes one only once step
+  17's instructions say so, and it would reach 0 corpus paragraphs; (a) is recorded for step 17's plan.
+  **Changes, both trees, `apply_translations_textmatch.py` only:** (1) where none of the paragraph's own runs
+  carries run properties, the template is read from the runs inside its listed containers, through the
+  container inventory's `_run_hosts`, the rule otherwise as it was; (2) per DECLARED span, a property whose
+  value is a function of emphasis in force over the source's own text runs, and differs between the states
+  present, is taken from the source runs of the span's state, what the styles give recomputed for it — only
+  where every span's state occurs in the source and the spans do not all land on one value; every other
+  property from the template, as today; (3) A5: a symbol font (Symbol, Wingdings, Webdings, Marlett) is never
+  carried onto English — `w:rFonts` dropped from the template where it names one, invented, no corpus document
+  holding one. *TP:* the 35, and the 3, at the derived counts; invented — a hyperlinked paragraph whose runs
+  share a character style, a bold term underlined beside plain text, A17's shape, a symbol-font template.
+  *FP:* uniform-kept unchanged on 1,344, the 914 sizes and 392 fonts within it; a property mixed within one
+  emphasis state, and a declared state the source never shows, as today. **Declared, not reached:** the 27
+  mixed findings no device reaches in notes written before (a); D6, a size under a fixed line height, reached
+  only where the size follows emphasis; F19, the first fragment's formatting, a path this sub-step does not
+  rebuild. **Derived first,** positional on 16.4's output, independently of the change
+  (`temp/s1116b_165_derive.py`, both trees identical): 35 of D06's paragraphs — 33 character styles, 1 caps,
+  1 small caps kept; 2 small-caps and 1 size spreads ended (A18). **Checked against:** that list, run by run,
+  at apply and through `delivered_corpus_arm.py --ref` with 16.4's merge as the pin, a 16.5 sense added; 16.1's
+  formatting arm, A18's D06 small caps pinned at 0; `quality_check` on both builds. **MUST NOT:** move bold or
+  italic.
+  **BUILT 2026-11-16, unattended** *(`DECISIONS-LOG.md` 2026-11-16 (4))*: **on the corpus, against 16.4's merge
+  58ab29b, the graft on, both trees identical:** at apply exactly the 35 derived D06 paragraphs moved, each now
+  as the source shows it — 33 character styles, 1 caps and 1 small caps kept where the text sits in a
+  container; 2 small-caps and 1 size spreads ended per declared span (A18) — bold and italic in force unmoved,
+  0 unexplained, every exit code equal; arm (b) 184 and 172 checks green, the run properties moving on exactly
+  those 35 in every member the chain wrote, A18's D06 small caps pinned at 0; `quality_check` unmoved, 13 of 13
+  per tree. A new suite, `tests/test_per_span_properties.py`, 17 of 17 both trees, red 8 of 17 at the pin on its
+  true-positive arms alone; 9 of 9 mutants killed. The code review found two, both fixed and each given a check:
+  a blank declared span in a state the source never shows crashed the span template, and a span's own source
+  font could bring a symbol font back. **Declared, not reached:** the 27 mixed findings (A4, A7, A13, A14, A17's
+  D03 pair, A18's D02 highlight, D09's) — each changes within one emphasis state; **(a), the operator's source
+  reference, is step 17's to decide.** **NOT DONE, DECLARED:** the rendered diff — LibreOffice is not installed.
 - **16.3 — bold and italic written only where needed, the off-flags removed in the same sub-step.** HEAVY, both
   trees — the core of section 3.9's step 16, and the one sub-step never to be split, since removing the flags
   without the computation renders a document bold. Apply imports extraction's resolver *(Wouter's answer)*, through
