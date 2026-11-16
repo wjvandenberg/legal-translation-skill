@@ -12,8 +12,8 @@
   },
   "uk/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/step16-formatting-part-2",
-   "commit_subject": "Step 16.3 - bold and italic written only where needed: apply's two writers drop the redundant off-flags, D06's two headings keep the bold their style gives, nothing else moves in force",
-   "sha256_now": "6997b876638c6844944640a68060b9d201cebdd49a722a072b6ad5ccf120b361"
+   "commit_subject": "Step 16.4 - declarations win: a declared span is absolute, the sub-heading test and the tracked-change bypass read the source in force, D09's three cells keep their declared italic",
+   "sha256_now": "65b5175131c647a92bd72493f125152490d35d0362e6e34644d0b173f8286baa"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -26,9 +26,9 @@
    "sha256_now": "d60ccad6c8f71b235e3f0da90240508f4c33ea7759b1e49d249d2d255bd3a15f"
   },
   "uk/scripts/post_process.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "93a63296c2fa453cbcfc44384cc834e1bce4dbaed206d826a7240c8a01dbfa82"
+   "changed_by": "feature/step16-formatting-part-2",
+   "commit_subject": "Step 16.4 - declarations win: a declared span is absolute, the sub-heading test and the tracked-change bypass read the source in force, D09's three cells keep their declared italic",
+   "sha256_now": "638606208254fdf48d3e0c5dd0cfb031a862dfc3f5ea9510c68bcbc0b9a1d0b3"
   },
   "uk/scripts/quality_check.py": {
    "changed_by": "feature/step14-10-g12-text-free-route",
@@ -112,8 +112,8 @@
   },
   "us/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/step16-formatting-part-2",
-   "commit_subject": "Step 16.3 - bold and italic written only where needed: apply's two writers drop the redundant off-flags, D06's two headings keep the bold their style gives, nothing else moves in force",
-   "sha256_now": "aeb8890700182f672667e403af3a236e740a0ce9c9157dfe0e4961d7c3633fef"
+   "commit_subject": "Step 16.4 - declarations win: a declared span is absolute, the sub-heading test and the tracked-change bypass read the source in force, D09's three cells keep their declared italic",
+   "sha256_now": "0489198a9387ee189b2a6d1965a21e77d87e2aa65ac89f4650509fbf69be5073"
   },
   "us/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -126,9 +126,9 @@
    "sha256_now": "9595942d779f4a191b746741bcf9cb51680cdaad9c7e45e292f42905b6835f58"
   },
   "us/scripts/post_process.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "f1c78f52e146c1158d07dd77a448b6eb28976bdf29bbd3520801197c169557de"
+   "changed_by": "feature/step16-formatting-part-2",
+   "commit_subject": "Step 16.4 - declarations win: a declared span is absolute, the sub-heading test and the tracked-change bypass read the source in force, D09's three cells keep their declared italic",
+   "sha256_now": "ce76aabf5861b285d9502b87c9b4563b6627b6b389621b01836e0c37cc4e2a62"
   },
   "us/scripts/quality_check.py": {
    "changed_by": "feature/step14-10-g12-text-free-route",

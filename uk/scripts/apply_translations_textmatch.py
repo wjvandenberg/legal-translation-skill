@@ -246,8 +246,20 @@ def get_default_rpr_et(p_elem):
                 return copy.deepcopy(rpr)
     return None
 
+def run_in_force(run, name):
+    """SUB-STEP 16.4: a source run's `name` ('bold' or 'italic') IN FORCE - its `resolved` value where extraction
+    wrote one (the styles changing what the run's own formatting says), else its own key, as written. So a reader
+    asks what the source SHOWS: a run bold by its style alone reads bold, and one whose `bold` came from its
+    paragraph mark only - a mark's formatting formats the mark - reads as the page shows it."""
+    res = run.get('resolved')
+    if isinstance(res, dict) and name in res:
+        return res[name]
+    return run.get(name)
+
+
 def is_subheader_paragraph(en_text, original_runs):
-    """Detect if a paragraph is a sub-header that should preserve bold."""
+    """Detect if a paragraph is a sub-header that should preserve bold. Sub-step 16.4: each source run is read IN
+    FORCE (`run_in_force`), and apply asks this only where an entry declares no `en_runs`."""
     if not original_runs:
         return False
     word_count = len(en_text.split())
@@ -259,7 +271,7 @@ def is_subheader_paragraph(en_text, original_runs):
         text = run.get("text", "").strip()
         if not text:
             continue
-        if run.get("bold"):
+        if run_in_force(run, "bold"):
             has_bold = True
         else:
             has_non_bold_text = True
@@ -434,7 +446,8 @@ def apply_trackchanges_inplace(orig_p, en_text, it_text,
        this paragraph — respect that authorial intent and skip the
        blanket bold-off.
     2. If every source run in `original_runs` (the JSON `runs` array)
-       has `bold: True`, the source paragraph is *uniformly* bold — a
+       is bold IN FORCE (sub-step 16.4: its `resolved` over its `bold`),
+       the source paragraph is *uniformly* bold — a
        strong signal that bold is the genuine paragraph formatting (not
        a TC-styling leak), so skip the blanket bold-off.
 
@@ -484,12 +497,12 @@ def apply_trackchanges_inplace(orig_p, en_text, it_text,
     if not skip_bold_override and original_runs:
         # Every source run is bold → genuine paragraph-bold. Filter out
         # zero-text runs (e.g. structural runs) before checking — only
-        # text-bearing runs vote.
+        # text-bearing runs vote. Sub-step 16.4: each run's bold IN FORCE.
         try:
             text_runs = [r for r in original_runs
                          if isinstance(r, dict) and r.get('text')]
             if text_runs and all(
-                    r.get('bold') is True for r in text_runs):
+                    run_in_force(r, 'bold') is True for r in text_runs):
                 skip_bold_override = True
         except (TypeError, AttributeError):
             pass
@@ -804,8 +817,7 @@ def source_in_force(segments, original_runs):
     for name in ('bold', 'italic'):
         seen = set()
         for run in voters:
-            res = run.get('resolved')
-            seen.add(bool(res[name] if isinstance(res, dict) and name in res else run.get(name, False)))
+            seen.add(bool(run_in_force(run, name)))
         if len(seen) == 1:
             value = seen.pop()
             for s in out:
@@ -2138,15 +2150,17 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
 
         # Determine formatting
         if en_runs_spec:
-            if is_subheader_paragraph(en_text, original_runs):
-                segments = [{"start": 0, "end": len(en_text), "bold": True, "italic": False}]
-            else:
-                segments = en_runs_spec
+            # SUB-STEP 16.4: A DECLARED SPAN IS ABSOLUTE. The sub-heading test used to replace the operator's
+            # `en_runs` here with one bold, upright span wherever it fired, and on the corpus that discarded three
+            # cells declared italic (register A11) - so it is asked only where nothing is declared, below.
+            segments = en_runs_spec
         else:
             segments = auto_detect_formatting(en_text, original_runs)
-            # SUB-STEP 16.3: nothing declared, so the source's formatting in force where its text runs agree; the
-            # sub-heading test, where it fires, as it was (sub-step 16.4's). No styles known: as before.
-            if given is not None and not is_subheader_paragraph(en_text, original_runs):
+            # SUB-STEP 16.3: nothing declared, so the source's formatting in force where its text runs agree. Sub-step
+            # 16.4: where the sub-heading test fires too - it reads in force now, so it fires only where every text
+            # run is bold in force, which this keeps, and italic follows the source as everywhere else instead of
+            # being forced off. No styles known: as before.
+            if given is not None:
                 segments = source_in_force(segments, original_runs)
 
         # A3, THE TABLE-OF-CONTENTS HALF — A PLACEMENT RULE, NOT A PRESERVATION ONE.

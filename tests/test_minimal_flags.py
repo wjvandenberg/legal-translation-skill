@@ -16,12 +16,13 @@ by extraction's resolver over the document's own styles. What each arm asserts:
      NOT bold, the off-flag kept because it does work; a span declared false over a bold style - not bold
   5  FP, the redundant flags: a plain paragraph in a plain style - delivered with no b, bCs, i or iCs at all, and
      no empty run properties
-  5b the sub-heading test where it fires, untouched (sub-step 16.4's): a short paragraph bold by its paragraph mark
-     alone - the test fires on the notes' `bold` and the paragraph is delivered bold, as before
+  5b the sub-heading test, read IN FORCE since sub-step 16.4: a short paragraph bold by its paragraph mark alone -
+     a mark's bold formats the mark, so the test no longer fires and the paragraph is delivered NOT bold
   6  a mixed source, nothing declared: today's rule - the defined term bold, written as the pair b and bCs with no
      value, the rest not bold and carrying no flag
   7  the tracked-change path: in a plain style no off-flag is written, and a direct bold is dropped; in a style that
-     gives bold, `w:b w:val="0"`; italic not touched; in force not bold either way
+     gives bold, `w:b w:val="0"` - on a paragraph one run of which the source switches off, since one bold in force
+     throughout skips the override from sub-step 16.4; italic not touched; in force not bold either way
   8  WITH NO STYLES KNOWN - the styles part named and absent - apply writes today's explicit flags on every run
   9  A PARTIAL INSTALL - extract_paragraphs.py missing beside apply - today's explicit flags, said in one line
 
@@ -234,9 +235,9 @@ print("\n5  the redundant flags")
 ok("a plain paragraph in a plain style: no b, bCs, i or iCs on any run", all(not flags(x) for x in runs_of(P[6])),
    str([flags(x) for x in runs_of(P[6])]))
 ok("... and no empty run properties left behind", all(x.find(q("rPr")) is None for x in runs_of(P[6])))
-print("\n5b  the sub-heading test, where it fires, untouched (sub-step 16.4's)")
-ok("bold by the paragraph mark alone, short: the test fires and the paragraph is delivered bold, as before",
-   all_force(9, "bold") == {True}, str(all_force(9, "bold")))
+print("\n5b  the sub-heading test, read in force since sub-step 16.4")
+ok("bold by the paragraph mark alone, short: the test does not fire and the paragraph is delivered NOT bold",
+   all_force(9, "bold") == {False}, str(all_force(9, "bold")))
 print("\n6  a mixed source, nothing declared: today's rule")
 m = [(run_text(x), force(cas, P[7], x)["bold"]) for x in runs_of(P[7])]
 ok("the defined term bold, the rest not", [b for _t, b in m] == [False, True, False] or
@@ -251,7 +252,7 @@ ok("... the rest carrying no flag at all, nor an emptied template's run properti
 print("\n7  the tracked-change path")
 troot, _s, tsrc = run_doc("tc", [
     p(r(f"Eerst {NEEDLE} "), ins(r("ingevoegd"))),
-    p(r(f"Kop {NEEDLE} "), ins(r("erbij")), style="BodyBoldZq"),
+    p(r(f"Kop {NEEDLE} "), ins(r("erbij")), r(" los", '<w:b w:val="0"/>'), style="BodyBoldZq"),
     p(r(f"Vet {NEEDLE} ", "<w:b/>"), r("schuin ", "<w:i/>"), ins(r("nieuw"))),
 ], {0: "First inserted", 1: "Head added", 2: "Bold slanted new"})
 tcas = cascade_of(tsrc)

@@ -129,6 +129,12 @@ pass changing as many elements on both sides, ours fewer throughout by exactly w
 first, temp/s1116a_journal_probe.py: nothing else in it moved). A pin that carries 16.3 moves neither. A12 on D06 is
 pinned at 0 from 16.3 on.
 
+STEP 16, SUB-STEP 16.4 (2026-11-16) WIDENS THAT SENSE AGAINST A PIN THAT PREDATES IT: a declared span is absolute, so
+where the pin's sub-heading test replaced a declaration with one bold upright span, ours writes the declared runs - a
+paragraph may be SPLIT, accepted where it is the same once adjacent runs of equal properties are joined, its bold and
+italic in force compared character by character (MOVE_16_4: D09's three cells, an italic gain). A11 on D09 is pinned
+at 0 from 16.4 on. A pin that carries 16.4 moves no flag and splits no run.
+
 WHAT IT NEVER PRINTS: a filename, a path below the logs root, or any document text. Doc-ids,
 paragraph indices, classes and lengths only (CLAUDE.md 5.6). Nothing is written into the logs
 folder: every input is copied into a temporary directory first.
@@ -368,8 +374,9 @@ NAMED_2A = [
 # (row, property, class) -> findings on the REBUILT path, the probes' population. D03's and D03B's two party-block
 # paragraphs are one set read twice (A17): the character style lost and the bold with it, so the two sets of idx
 # must be the same. Arm (a), the July deliveries, is measured and reported, never pinned.
-# SUB-STEP 16.3 moved A12's D06 headings from 2 to 0: apply now writes the bold their style gives.
-FMT_PINS = [("A12", "D06", "bold", "uniform-lost", 0), ("A11", "D09", "italic", "uniform-lost", 3),
+# SUB-STEP 16.3 moved A12's D06 headings from 2 to 0: apply now writes the bold their style gives. SUB-STEP 16.4 moved
+# A11's D09 cells from 3 to 0: a declared span is absolute, so the sub-heading test no longer discards their italic.
+FMT_PINS = [("A12", "D06", "bold", "uniform-lost", 0), ("A11", "D09", "italic", "uniform-lost", 0),
             ("A13", "D04", "u", "mixed-lost", 7), ("A14", "D10", "highlight", "mixed-lost", 1),
             ("A7", "D02", "highlight", "mixed-lost", 1), ("A18", "D02", "highlight", "mixed-spread", 1),
             ("A18", "D06", "smallCaps", "mixed-spread", 2), ("A17", "D03", "rStyle", "mixed-lost", 2),
@@ -617,6 +624,14 @@ LANG_PART_RE = re.compile(r"^docx:word/(?:(glossary)/)?(?:(?:header|footer)\d*|(
 MARK_16_3 = b"def styles_give("
 FLAGS_16_3 = ("b", "bCs", "i", "iCs")
 MOVE_16_3 = {"D06": {("bold", "gain"): 2}}
+# STEP 16, SUB-STEP 16.4 (2026-11-16): a declared span is absolute and the sub-heading test reads the source in force. A
+# pin that predates it - its apply has no `run_in_force` - replaced a declaration with one bold upright span wherever
+# the test fired, so under --ref a paragraph may also be SPLIT into the runs its declaration names: the same text and
+# the same paragraph once the flags are set aside and adjacent runs of equal properties joined, its bold and italic in
+# force compared character by character. In force only where temp/s1116b_164_derive.py derived first, both trees:
+# D09's three cells, an italic gain (register A11).
+MARK_16_4 = b"def run_in_force("
+MOVE_16_4 = {"D09": {("italic", "gain"): 3}}
 
 
 def lang_part(k):
@@ -748,10 +763,43 @@ def _unflagged(par):
     return etree.tostring(par)
 
 
-def flags_moved(new_b, ref_b, cascade, resolver):
+def _joined(par):
+    """SUB-STEP 16.4: `_unflagged`'s paragraph with adjacent plain text runs - run properties and one w:t - of equal
+    properties joined, and w:t's xml:space set aside, so a run split by a declaration alone compares equal."""
+    par = etree.fromstring(_unflagged(par))
+    space = "{http://www.w3.org/XML/1998/namespace}space"
+    for t in par.iter(q("t")):
+        t.attrib.pop(space, None)
+
+    def plain(el):
+        kids = [k for k in el if k.tag != q("rPr")]
+        return el.tag == q("r") and len(kids) == 1 and kids[0].tag == q("t")
+
+    def props(el):
+        rpr = el.find(q("rPr"))
+        return etree.tostring(rpr) if rpr is not None else b""
+
+    for parent in list(par.iter()):
+        kids, i = list(parent), 0
+        while i < len(kids) - 1:
+            a, b = kids[i], kids[i + 1]
+            if plain(a) and plain(b) and props(a) == props(b):
+                ta, tb = a.find(q("t")), b.find(q("t"))
+                ta.text = (ta.text or "") + (tb.text or "")
+                parent.remove(b)
+                kids.pop(i + 1)
+            else:
+                i += 1
+    return etree.tostring(par)
+
+
+def flags_moved(new_b, ref_b, cascade, resolver, splits=False):
     """SUB-STEP 16.3's sense, for one XML member: None unless ours is the pin's with FLAGS_16_3 alone moved - the
     same paragraphs, each with the same text and runs once those flags are set aside; else a Counter of
-    (property, gain|loss) -> paragraphs whose bold or italic IN FORCE moved, and -> runs under ("runs", ...)."""
+    (property, gain|loss) -> paragraphs whose bold or italic IN FORCE moved, and -> runs under ("runs", ...).
+    `splits` (sub-step 16.4's sense, only against a pin that predates it): a paragraph whose runs differ is accepted
+    where it is the same once adjacent runs of equal properties are joined (`_joined`), counted under ("runs",
+    "split"), and its bold and italic in force compared character by character, blank characters set aside."""
     try:
         nr, rr = etree.fromstring(new_b), etree.fromstring(ref_b)
     except etree.XMLSyntaxError:
@@ -774,7 +822,23 @@ def flags_moved(new_b, ref_b, cascade, resolver):
         if etree.tostring(a) == etree.tostring(b):
             continue
         if _unflagged(a) != _unflagged(b):
-            return None
+            if not splits or _joined(a) != _joined(b):
+                return None
+            moved[("runs", "split")] += 1
+            ca = [(ch, in_force(x)) for x in a.iter(q("r")) if x.find(q("t")) is not None
+                  for ch in "".join(t.text or "" for t in x.findall(q("t")))]
+            cb = [(ch, in_force(y)) for y in b.iter(q("r")) if y.find(q("t")) is not None
+                  for ch in "".join(t.text or "" for t in y.findall(q("t")))]
+            if [c for c, _f in ca] != [c for c, _f in cb]:
+                return None
+            ways = set()
+            for (ch, fx), (_c, fy) in zip(ca, cb):
+                for name in ("bold", "italic"):
+                    if ch.strip() and fx[name] != fy[name]:
+                        ways.add((name, "gain" if fx[name] else "loss"))
+            for way in ways:
+                moved[way] += 1
+            continue
         ra = [x for x in a.iter(q("r")) if any((t.text or "").strip() for t in x.findall(q("t")))]
         rb = [x for x in b.iter(q("r")) if any((t.text or "").strip() for t in x.findall(q("t")))]
         ways = set()
@@ -914,6 +978,12 @@ if REFTREE is not None:
     pin_xp = REFTREE / "extract_paragraphs.py"
     PRE_16_3 = pin_xp.is_file() and MARK_16_3 not in pin_xp.read_bytes()
     print(f"  --ref {args.ref}: {'predates' if PRE_16_3 else 'carries'} 16.3's minimal flags (by its own extraction)")
+# SUB-STEP 16.4's SENSE OF --ref: does the pin's apply read a source run in force?
+PRE_16_4 = None
+if REFTREE is not None:
+    pin_ap = REFTREE / "apply_translations_textmatch.py"
+    PRE_16_4 = pin_ap.is_file() and MARK_16_4 not in pin_ap.read_bytes()
+    print(f"  --ref {args.ref}: {'predates' if PRE_16_4 else 'carries'} 16.4's declarations-win (by its own apply)")
 OURS_WIRED = GATE_WIRING in (SCRIPTS / "repack_docx.py").read_bytes()
 GLOSSARY_DECLARED, WIRED_REFUSED = {}, set()
 
@@ -2045,7 +2115,7 @@ for n, wd in enumerate(workdirs, 1):
                 with zipfile.ZipFile(src) as zsrc:
                     cascade = XPM["mod"].read_style_cascade(zsrc)    # this workdir's source, read afresh
                 for k in [k for k in other if k in XML_MEMBERS and dn.get(k) is not None and dr.get(k) is not None]:
-                    fm = flags_moved(dn[k], dr[k], cascade, XPM["mod"].resolve_run)
+                    fm = flags_moved(dn[k], dr[k], cascade, XPM["mod"].resolve_run, splits=bool(PRE_16_4))
                     if fm is not None:
                         other.remove(k)
                         FMOVED.setdefault(key, {})[k] = fm
@@ -2055,7 +2125,7 @@ for n, wd in enumerate(workdirs, 1):
                 if (jk in other and dn.get(jk) is not None and dr.get(jk) is not None
                         and (b / ak).is_file() and (rb / ak).is_file()):
                     na, ra = (b / ak).read_bytes(), (rb / ak).read_bytes()
-                    if flags_moved(na, ra, cascade, XPM["mod"].resolve_run) is not None:
+                    if flags_moved(na, ra, cascade, XPM["mod"].resolve_run, splits=bool(PRE_16_4)) is not None:
                         offset = (sum(1 for _ in etree.fromstring(ra).iter())
                                   - sum(1 for _ in etree.fromstring(na).iter()))
                         if journal_counts_only(dn[jk], dr[jk], offset):
@@ -2253,20 +2323,27 @@ if args.arm in ("b", "both"):
             # SUB-STEP 16.3: against a pin that predates it, every XML member that moved by its flags moved NOTHING in
             # force but the derived paragraphs, the same in each member; against a pin that carries it, no flag moved
             fm = FMOVED.get(key, {})
-            if PRE_16_3:
-                want = Counter(MOVE_16_3.get(did_of(key), {}))
+            if PRE_16_3 or PRE_16_4:
+                # SUB-STEP 16.4: against a pin that predates it, its derived paragraphs too, and its run splits
+                want = Counter(MOVE_16_3.get(did_of(key), {})) if PRE_16_3 else Counter()
+                if PRE_16_4:
+                    want.update(MOVE_16_4.get(did_of(key), {}))
                 for k, got in sorted(fm.items()):
                     paras = Counter({w: n for w, n in got.items() if w[0] != "runs"})
                     runs = {w[1:]: n for w, n in got.items() if w[0] == "runs"}
-                    ok(f"{key}: {k} moved by bold and italic flags alone, and in force exactly the derived paragraphs "
-                       f"({dict(want) or 'none'})", paras == want, f"in force {dict(paras)}, runs {runs}")
+                    ok(f"{key}: {k} moved by bold and italic flags alone"
+                       + (" and the runs a declaration splits" if PRE_16_4 else "")
+                       + f", and in force exactly the derived paragraphs ({dict(want) or 'none'})", paras == want,
+                       f"in force {dict(paras)}, runs {runs}")
                 if fm:
                     FMOVED_KEYS.append(key)
                 if key in JMOVED:
-                    print(f"        post_process's journal moved by its element counts alone, {JMOVED[key]} fewer "
-                          f"throughout — the flags")
+                    print(f"        post_process's journal moved by its element counts alone, ours "
+                          f"{abs(JMOVED[key])} {'fewer' if JMOVED[key] >= 0 else 'more'} throughout — the flags"
+                          + (" and the runs a declaration splits" if PRE_16_4 else ""))
             else:
-                ok(f"{key}: no bold or italic flag moved — the pin carries 16.3's", not fm and key not in JMOVED,
+                ok(f"{key}: no bold or italic flag moved — the pin carries 16.3's and 16.4's",
+                   not fm and key not in JMOVED,
                    f"moved in {sorted(fm)}" + (", and the journal's counts" if key in JMOVED else ""))
             # SUB-STEPS 13.2 AND 13.5, each on its own parts: the language values move IFF the pin predates that
             # sub-step AND delivered a value not the variant's
@@ -2316,6 +2393,18 @@ if args.arm in ("b", "both"):
             for key in BYTES:
                 if MOVE_16_3.get(did_of(key)):
                     ok(f"{key}: 16.3's derived paragraphs moved in force in every XML member the chain wrote "
+                       f"({len(XML_WRITTEN.get(key, ()))})", bool(XML_WRITTEN.get(key))
+                       and set(FMOVED.get(key, {})) == XML_WRITTEN[key], f"moved in {sorted(FMOVED.get(key, {}))}")
+        # SUB-STEP 16.4's PREMISE, the same way: its derived paragraphs moved in force in every member the chain wrote
+        if PRE_16_4:
+            print(f"  16.4 — a declaration's runs or flags moved on {len(FMOVED_KEYS)} of {len(BYTES)} compared "
+                  f"workdir(s) ({args.variant}; the pin predates it)")
+            named16 = [key for key in BYTES if MOVE_16_4.get(did_of(key))]
+            ok("16.4: a workdir its derivation named was compared — the pin predates it, so its sense was exercised",
+               bool(named16), f"none of {sorted(MOVE_16_4)} in this run")
+            for key in BYTES:
+                if MOVE_16_4.get(did_of(key)):
+                    ok(f"{key}: 16.4's derived paragraphs moved in force in every XML member the chain wrote "
                        f"({len(XML_WRITTEN.get(key, ()))})", bool(XML_WRITTEN.get(key))
                        and set(FMOVED.get(key, {})) == XML_WRITTEN[key], f"moved in {sorted(FMOVED.get(key, {}))}")
         # EACH SUB-STEP'S PREMISE, asserted rather than assumed: against a pin that predates it the language MUST have

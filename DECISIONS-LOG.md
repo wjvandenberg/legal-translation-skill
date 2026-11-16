@@ -3033,3 +3033,27 @@ corpus; the code review named both. **(9) 16.4 PLANNED, NOT BUILT — THE CUT:**
 build was measured; 16.3 cost about 31%, and 16.4 is HEAVY, so it could not be built and closed under the 80%
 bound this worker was given. Its own plan is written into its entry, the two readers above its first measurement,
 and the session closes between two items.
+
+## 2026-11-16 (3) — the chain of 2026-11-16, worker 2: 16.4 built, unattended; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-16, QUOTED WHOLE,** given to the session conducting today's chain: *"I won't respond, I won't answer questions - you should just continue."* — *"You can build even 16.5-16.7 and 17."* — *"merging, pushing etc should be done automatically - I approve and agree to everything already."*
+**No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm or
+overturn** — `temp/s1116-questions.md` holds the ones that would have been questions, with their options.
+
+**16.4, BUILT.** **(1) THE TWO READERS LEFT, THE GAP DECLARED:** `quality_check`'s check 15 and
+`reorder_definitions`' term detector are handed only `final/word/document.xml`, and 0 of 13 frozen workdirs hold a
+styles part beside it, so neither can read bold in force without a new argument in the operator's instructions,
+which are step 17's; the plan's own answer where a reader cannot reach one. Found beside it and recorded for step
+17's plan: check 15 counts a run carrying an explicit bold-off as bold. **(2) WHERE NOTHING IS DECLARED AND THE
+SUB-HEADING TEST FIRES, ITALIC FOLLOWS THE SOURCE:** read in force, the test fires only where every text run is
+bold in force, which 16.3's source-in-force rule already gives, so its one remaining effect was to force italic off;
+Wouter's answer of 2026-11-12 (6) now applies without that exception. 0 corpus paragraphs either way, both trees.
+**(3) TWO OF 16.3'S TEST CHECKS BROUGHT TO 16.4'S RULE:** a short paragraph bold only by its paragraph mark is now
+expected not bold, as the page shows it; the tracked-change arm's styled paragraph gains one run the source switches
+off, so the override still runs and 16.3's writer is still tested; the suite stays 23 checks. **(4) REGISTER A11
+CLOSED:** the plan's true positive, measured on arm (b), both trees. **(5) THE CORPUS ARM'S `--ref` LEARNS 16.4:**
+against a pin that predates it a paragraph may be split into the runs its declaration names, accepted only where it
+is the same once adjacent runs of equal properties are joined, its bold and italic in force compared character by
+character; a pin that carries 16.4 splits nothing. **(6) THE RENDERED DIFF, NOT ATTEMPTED:** LibreOffice is still not
+installed and Word's automation hung for worker 1; the change is measured in force by the resolver on invented
+documents and on the corpus, never on a page.
