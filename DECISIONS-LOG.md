@@ -2997,3 +2997,13 @@ seventeen helper mutants and the six wiring mutants. **(8) A DRIFT FOUND, NOT CA
 --verify` reports all 13 July `.validate-state.json` files moved, each last written 2026-09-02, a day after the
 catalogue; every `paragraphs.json` is on it, 13 of 13. Left as it is and checked by content — question 1 of the
 run's questions file; re-recording the catalogue is Wouter's to authorise.
+
+**16.3, PLANNED, NOT BUILT.** **(9) WHERE APPLY READS THE SOURCE IN FORCE:** from the notes, each run's `resolved`
+over its `bold` and `italic` — question 2. **(10) A MISSING extraction BESIDE APPLY:** today's explicit flags, said
+in one line; a cut-short one exits 3 — question 3. **(11) THE DERIVATION, RUN FIRST:** of 1,214 rebuilt paragraphs,
+580 undeclared, exactly 2 may move in force, both D06's — A12's headings, a bold gain — both trees identical.
+**(12) THE CUT:** context read 52% after 16.2, which cost about 36%; a HEAVY sub-step could not be built and closed
+under the 75% bound, so this hop wrote 16.3's plan and stopped between two items, the build left whole for the
+next hop, with `temp/s1116h1_163_derive.py` (its `--compare` mode the acceptance at apply), a draft suite
+`temp/s1116h1_draft_test_minimal_flags.py`, the pin's scripts in `temp/s1116h1_pin/` and the us port
+`temp/s1116h1_port_us.py`.

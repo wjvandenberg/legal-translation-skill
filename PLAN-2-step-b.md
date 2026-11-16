@@ -3265,6 +3265,34 @@ the off-flag totals identical on 44 of 44 rows:
   show a graft never handed over: six wiring mutants each caught by it. `tests/test_graft_resolved.py` 33 of 33,
   both trees; 17 of 17 helper mutants killed. Found, not caused: all 13 July `.validate-state.json` files off the
   catalogue since 2026-09-02, every `paragraphs.json` on it — left, recorded, checked by content.
+  **16.3's OWN PLAN — 2026-11-16, written before any code** *(hop 1 of the unattended run s16-hops-1116; its
+  choices are `DECISIONS-LOG.md` 2026-11-16's, Wouter's to overturn)*. **Changes, both trees:**
+  `extract_paragraphs.py` gains `styles_give` — what the styles alone give a run, `resolve_run` with no direct
+  formatting, its output byte-identical, `tests/test_style_cascade.py`'s round trip proving it — and the inventory
+  comment's reason corrected: decision 6 forbids a shared library, not one script importing another.
+  `apply_translations_textmatch.py` reads the source's styles once, importing `read_style_cascade` and
+  `styles_give` when it runs: a MISSING sibling, today's explicit flags, said in one line; a cut-short one, exit 3
+  under SKILL.md rule 6 — the ninth route in `tests/test_sibling_import_integrity.py`. `make_run_et` takes what the
+  styles give the NEW run — the paragraph's style, the template run's character style — drops the template's
+  direct `b`, `bCs`, `i` and `iCs`, and writes a pair only where the wanted value differs, `bCs` with `b` and `iCs`
+  with `i` as today; with no styles known, today's explicit flags, byte for byte. The tracked-change bold-leak fix
+  the same for bold alone, as it was: `w:b w:val="0"` only where the run's styles give bold, a direct bold dropped
+  elsewhere. **The wanted value where nothing is declared:** per property, the entry's text runs in force — each
+  run's `resolved` over its `bold` and `italic`, so the graft is what the corpus measures with — all agreeing, that
+  value on every span; otherwise today's segments; a declared span absolute; the sub-heading test where it fires,
+  untouched (16.4's). A new suite, `tests/test_minimal_flags.py`, invented documents, both trees; a synthetic
+  fixture rendered both ways by `tools/render_diff.py`, which gains `--graft` for the corpus's page comparison,
+  mechanical and never looked at. The corpus arm's pin for A12 on D06 moves from 2 to 0. **Must not:** the
+  sub-heading test or the readers; another property; italic in the tracked-change path; an exit code or a gate;
+  extraction's output. **Derived first:** `temp/s1116h1_163_derive.py`, positional on today's apply output, the
+  notes grafted — the rebuilt, undeclared paragraphs whose source runs agree on a value today's output does not
+  give every run, per document and property — **run 2026-11-16, both trees identical, its control firing: 2
+  paragraphs, both D06's, A12's two headings, a bold gain on 2 runs; of 580 undeclared, 578 already agree in bold
+  and 579 in italic, 1 mixed.** So nothing else may move in force. **Checked against:** that list, paragraph by
+  paragraph: arm (b)
+  against the pin, `--graft`, every run whose bytes moved compared IN FORCE by the resolver over both deliveries —
+  unchanged, or in a derived paragraph, 0 unexplained; the off-flag probe's counts of 2026-11-12 for the flags
+  removed; the bold-document control, the runs whose flag does work, kept.
 - **16.3 — bold and italic written only where needed, the off-flags removed in the same sub-step.** HEAVY, both
   trees — the core of section 3.9's step 16, and the one sub-step never to be split, since removing the flags
   without the computation renders a document bold. Apply imports extraction's resolver *(Wouter's answer)*, through
