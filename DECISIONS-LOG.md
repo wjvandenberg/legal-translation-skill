@@ -3158,3 +3158,24 @@ EXPECTED MOVEMENT IS 0:** measured on apply's output over all 13; 17.2's true po
 **(5) 17.2 NOT BEGUN:** the brief's clock — no new code sub-step that cannot be committed, verified and tested by
 17:00 — and 17.2 is MEDIUM in both trees, with mutants and the full run. **(6) SECTION 3.1's CELL KEPT AT ITS
 LENGTH** by dropping a phrase the build plan holds twice.
+
+## 2026-11-18 — the chain of 2026-11-18, worker 7: 17.2 built and committed locally, not pushed; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 3'S HEADING'S,** quoted whole there; this worker ran at high effort. **No question was
+asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm or overturn** —
+`temp/s1118-questions.md` holds them with their options. 17.2's plan and result are in section 3.17.
+
+**17.2, BUILT.** **(1) `--styles` TAKES A `.docx` OR A `styles.xml`:** the two scripts read an unpacked
+`document.xml`, so the operator holds both forms; accepting either leaves 17.5 one sentence, not a conversion step.
+**(2) THE LINE SAYING WHICH STYLES WERE USED IS PRINTED ONLY WITH `--styles`:** the plan asks both *byte for byte as
+today* and *says which it used*; a line printed always would move every run's output, so without the option nothing
+new is printed. **(3) A MISSING `extract_paragraphs.py` IS TOLERATED,** as apply's has been since 16.3: without
+`--styles` both scripts then behave as before, and with it each says so; a cut-short one is a broken install, exit
+3. **(4) `--styles` NAMING NO FILE IS A USAGE ERROR, EXIT 2;** a file holding no readable styles part is said and
+read as without — an exit code only where something is passed, which the plan's MUST NOT allows. **(5) A RUN'S OWN
+`w:b` DECIDES FIRST** in both readers, the styles only where it names none; `get_bold_term` keeps its own `w:bCs`
+reading, the styles adding bold and never removing it — the least change to what either reader finds today.
+**(6) NO RENDERED DIFF AT 17.2:** no delivered byte moves without `--styles`, proved on all 13 workdirs per tree,
+and no skill doc passes it before 17.5; 17.6's rendered diff covers it. **(7) COMMITTED LOCALLY, NOT PUSHED, NO
+FULL RUN:** the chain ends at 18:00 and a full run takes 35 to 60 minutes; the next session runs it on the branch's
+last commit, then pushes.
