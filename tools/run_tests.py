@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """run_tests.py - one command that runs everything this project tests with.
-CHECKER VERSION 6 (2026-10-14)
+CHECKER VERSION 7 (2026-11-18)
+
+v7 - AN UNKNOWN ARGUMENT IS REFUSED (exit 2, nothing run), AND --help PRINTS THE USAGE. Until
+v7 any flag it did not know fell through to the default, the whole suite: `--help` ran it.
 
 VERIFY asks "did this change do what it claimed?". TEST asks "did anything else break?".
 This is the second one, and it exists so that question has a single answer rather than a
@@ -433,8 +436,26 @@ def check_coverage(rep, scripts, declared, cfg):
                   if exempt else f"{len(covered & set(names))} exercised, none exempt"])
 
 
+#: EVERY ARGUMENT main() READS (v7). Anything else is refused before anything runs.
+KNOWN_ARGS = ("--write-config", "--selftest", "--quiet", "--list")
+
+
 def main(argv):
     root = Path.cwd()
+    # v7: AN ARGUMENT THIS SCRIPT DOES NOT KNOW IS REFUSED, NEVER IGNORED. Until v7 every flag
+    # was found with `in argv`, so an unknown one fell through to the default - the WHOLE
+    # suite, minutes long. Measured 2026-11-18: `run_tests.py --help`, the universal way to
+    # look before running, ran everything instead. --help now prints the usage lines.
+    args = argv[1:]
+    if any(a in ("-h", "--help") for a in args):
+        print("\n".join(ln for ln in (__doc__ or "").splitlines() if "run_tests.py" in ln
+                        and ln.startswith("    uv run")))
+        return RC_OK
+    unknown = [a for a in args if a not in KNOWN_ARGS]
+    if unknown:
+        print(f"VOID: unknown argument(s) {unknown} - nothing was run. This script takes "
+              f"{', '.join(KNOWN_ARGS)}, or --help for the usage.")
+        return RC_COULD_NOT_RUN
     if "--write-config" in argv:
         write_section(root, "tests", DEFAULT_CONFIG, CONFIG_COMMENT)
         return RC_OK
@@ -955,6 +976,18 @@ def selftest() -> int:
         ok &= good
         print(f"  {'OK  ' if good else 'MISS'} {'a JUDGE exits 0 and says so':<34} "
               f"-> exit={rc}, announced={said}")
+
+        # v7: AN ARGUMENT IT DOES NOT KNOW IS REFUSED BEFORE ANYTHING RUNS, and --help prints
+        # the usage - measured 2026-11-18, `run_tests.py --help` ran the whole suite. The
+        # fixture's one suite FAILS, so a run that started would exit 1, never 2 or 0.
+        for label, flag, want_rc, want_said in (
+                ("an unknown argument runs nothing", "--bogus", RC_COULD_NOT_RUN, "--bogus"),
+                ("--help prints usage, runs nothing", "--help", RC_OK, "--list")):
+            rc, printed = run_main(_script(tmp / f"arg{want_rc}", "t_one.py", FAILING), flag)
+            ran = "t_one" in printed
+            good = rc == want_rc and want_said in printed and not ran
+            ok &= good
+            print(f"  {'OK  ' if good else 'MISS'} {label:<34} -> exit={rc}, suite ran={ran}")
 
         ok &= selftest_config(tmp, "tests", "suites",
                               lambda d: load_section(d, "tests", DEFAULT_CONFIG), width=34)

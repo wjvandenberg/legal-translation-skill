@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""verify_md.py - the document checker.  CHECKER VERSION 31 (2026-10-14)
+"""verify_md.py - the document checker.  CHECKER VERSION 32 (2026-11-18)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
+
+v32 A NAMED FILE THAT DOES NOT EXIST IS VOID, EXIT 2, NAMED - never dropped. Until v32 a run
+naming one real file and one gone checked the real one and passed, the twin of the empty glob
+this script already refused. A project whose config or judged gate names a moved document turns
+VOID at adoption: that is the fix working - re-point the name.
 
 v31 ADDS line_measure, WHAT A SIZE CAP COUNTS. 'physical' (the default for one release) counts
 lines, so a Markdown table row is one line however long; 'wrapped' weighs each line at its
@@ -2195,6 +2200,31 @@ def selftest_charter_handoff(tmp: Path, cfg) -> bool:
     return ok
 
 
+def selftest_missing_named(tmp: Path) -> bool:
+    """A NAMED FILE THAT DOES NOT EXIST IS VOID, NEVER DROPPED (v32), proved both ways.
+
+    Run as a real invocation, in a folder of its own with no config, because the defect lived
+    in _main's target list and no per-document case reaches it. The arms differ ONLY in whether
+    the second named file exists, so the pair cannot pass while comparing two different runs.
+    """
+    import subprocess                                            # noqa: PLC0415
+    d = tmp / "named"
+    d.mkdir(exist_ok=True)
+    (d / "here.md").write_text("# Here\n\nA short document.\n", encoding="utf-8")
+    ok = True
+    for label, second, want_void in (("a missing named file is VOID", "gone.md", True),
+                                     ("all named files present runs", "here.md", False)):
+        r = subprocess.run([sys.executable, str(Path(__file__).resolve()), "here.md", second],
+                           cwd=d, capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", timeout=120)
+        named = "gone.md" in r.stdout
+        good = (r.returncode == 2 and named) if want_void else (r.returncode != 2 and not named)
+        ok &= good
+        print(f"  {'OK  ' if good else 'MISS'} {label:<28} -> exit {r.returncode}, "
+              f"{'names' if named else 'does not name'} the file")
+    return ok
+
+
 def _selftest_body(root: Path, cfg, tmp: Path) -> int:
     """The suite itself. Split out ONLY so the env isolation can wrap it whole."""
     try:
@@ -2240,6 +2270,7 @@ def _selftest_body(root: Path, cfg, tmp: Path) -> int:
         report_pairing(paired, unpaired + 2)
 
         ok &= selftest_charter_handoff(tmp, cfg)
+        ok &= selftest_missing_named(tmp)
         ok &= selftest_shape()
         ok &= selftest_forbidden(tmp)
         ok &= selftest_added_lines(tmp)
@@ -2304,7 +2335,17 @@ def _main(argv, held):
         del args[at:at + 2]
     named = [a for a in args if not a.startswith("-")]
     targets, empty_globs = expand_targets(root, named or cfg["files"])
+    # A NAMED FILE THAT DOES NOT EXIST IS REPORTED, NEVER SWALLOWED (v32) - the literal-path
+    # twin of the empty glob below. Until v32 this line dropped it in silence, so a run naming
+    # one real file and one gone checked the real one and passed: measured 2026-11-18, a judged
+    # gate named three documents moved away two months before and never said so.
+    missing = [p for p in targets if not p.exists()]
     targets = [p for p in targets if p.exists()]
+    for p in missing:
+        print(f"VOID: {p} is named to be checked and does not exist. Either the name is wrong or "
+              f"the document has moved - both mean this run checked less than it was asked to.")
+    if missing:
+        return 2
 
     if not targets:
         print("VOID: no documents to check. Name files, or list them under 'md.files' "

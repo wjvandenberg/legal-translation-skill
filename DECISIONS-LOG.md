@@ -3102,3 +3102,23 @@ MORE, AND THE SORT AS BEFORE:** refusing would stop D06's correct sort and move 
 move. **(4) EACH DECLARED SECTION IS SORTED ON ITS OWN,** closing L2's one-section assumption for declared notes.
 **(5) L2 AND L3 STAY OPEN UNTIL STEP 17:** the code half is built; no frozen notes declare, and no operator will
 until the instructions say so.
+
+## 2026-11-18 — the chain of 2026-11-18, worker 4: 16.7 measured, planned and built as a proof; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 3'S HEADING'S,** quoted whole there; on his instruction of 2026-11-18 this worker ran at
+high effort. **No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm
+or overturn** — `temp/s1118-questions.md` holds them with their options.
+
+**16.7, PLANNED AND BUILT.** **(1) NO NEW NOTES DEVICE — THE AUTHORED TAB IS THE DEVICE:** measured first, 23 of
+23 entries whose operator wrote the tab into `en` are placed today, the source's own tabs dropped; the alternatives
+— an English field per source run, or apply placing a tab where no boundary is provable — would change the notes
+format before step 17 rewrites the instructions once, or make the guess step 6 refused. **(2) RECONCILED WITH STEP
+18 BY LEAVING ITS ROW AS IT IS:** apply's half is 16.7's, proved; the authoring rule and the detection stay step
+18's, step 17's rewrite free to carry the rule's sentence. **(3) THE TAB'S RUN PROPERTIES NOT CARRIED IN STEP 16:**
+0 of the 23 authored entries' source tabs carry underline or shading, so carrying them would move delivered bytes
+with no visible defect to mend; placed at step 18's plan with its measurement. **(4) A21 DECLARED, NOT BUILT:** no
+corpus document holds a ruby and its boundary needs a declaration no notes carry. **(5) THE SUITE PINS THE TWO
+REMAINDERS** so the later step changes them on purpose. **(6) STEP 16 CLOSES ON THIS** under its own *Done when*,
+each remainder declared, and its pull request merges on the closing full run.
+**THREE HOUSE CHECKERS ADOPTED AT THE OPENING,** byte for byte, each released the same day: `verify_md.py` v32,
+`run_tests.py` v7, `install_hooks.py` v16.
