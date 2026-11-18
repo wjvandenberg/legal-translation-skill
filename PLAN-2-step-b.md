@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-18, WORKER 4 OF THE CHAIN OF 2026-11-18 — SESSION PURPOSE — what · how · purpose:** 16.7, tab positions per run, measured and planned in its entry, then built only if it fits the clock, closing step 16 and merging its pull request · counts only from the corpus, synthetic fixtures for every page, every choice on the recommended option and recorded · **so that step 16 can close and step 17 start, nothing half-applied** *(written immediately after the tag `rollback-2026-11-18b-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-18, WORKER 5 OF THE CHAIN OF 2026-11-18 — SESSION PURPOSE — what · how · purpose:** step 17's plan, written as section 3.17, no code · from section 3.16's hand-ons, the register rows and the skill's rule 3, measured read-only where cheap, every choice on the recommended option and recorded · **so that the next session can build step 17 without exploring again** *(written immediately after the tag `rollback-2026-11-18c-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -3558,6 +3558,114 @@ arms, the graft on from 16.2; the rendered diff from 16.3; the parity check and 
 confidentiality controls on every committed file and every real output. **TEST:** the suites that drive extraction,
 apply, `post_process`, `validate_apply` or `reorder_definitions`, both trees; the smoke suite; the full run once
 per pull request, on its exact commit, before the push.
+
+### 3.17 Formatting, part 3 — step 17 · *option 3, its third part* · **PLANNED 2026-11-18, unattended — the session's answers, Wouter's to overturn**
+
+> **FOR THE BUILD — THE PLAN, 2026-11-18** *(worker 5 of the chain of 2026-11-18; Wouter's words of 2026-11-16 and
+> 2026-11-18 the go; every choice below `DECISIONS-LOG.md` 2026-11-18, worker 5's, his to overturn)*. Section 3.9
+> owns WHAT step 17 is — the longest rule in the skill collapses, and the instructions that existed only because
+> the formatting was unknowable are deleted rather than reworded. This owns HOW and the order. **Needs first:**
+> step 16, closed with #198 and #199 (1e92de9). **Unblocks:** step 18, whose tab detection then meets operators
+> already told to author the tab; and phase 3, whose Cowork runs are the first to exercise the rewritten
+> instructions. **Done when:** 17.1 to 17.6 each meet their own *Done when* below.
+
+**Step 17 is no longer doc only, and this plan says so rather than hiding it.** Section 2's row says *doc only*;
+section 3.16 placed four pieces of code here — the two `w:b` readers' reach to a styles part, A10, and 16.5's
+(a), each with its home *"decided at step 17's plan"* — and check 15's off-flag bug was found beside them. **The
+session's answer: they are built here, BEFORE the rewrite, so the operator's instructions are rewritten once,
+over finished code** — 3.16's own reason for leaving them to step 17. Section 2's row is left as it is; this
+paragraph is the correction, as 3.9's was for step 16.
+
+**Measured 2026-11-18, read-only, counts only:**
+
+| what | measured |
+|---|---|
+| rule 3 of skill Step 4, `04-translate.md` lines 44–164 | 8,076 bytes in `uk/`, 8,074 in `us/` — the two differ from line 79 on, so the rewrite is made per tree, never copied across |
+| the tracked-change bold-off section, *Bold fix for TC paragraphs* and the rev38 bypass | 1,604 bytes in `uk/` (lines 332–355); the `us/` lines differ — find it by its heading |
+| `resolved`, the formatting in force 15.1 writes | named **0 times** in either tree's `SKILL.md` or `skill-docs/` as a field — the operator is never told it exists |
+| where `reorder_definitions.py` and `quality_check.py` are invoked | skill Step 7 (`06-postprocess-and-reorder.md`) and skill Step 9 (`08-aux-and-quality.md`); neither passes a styles part |
+| check 15 | `quality_check.py` line 846, both trees — counts a run carrying `<w:b w:val="0"/>` as bold (3.16, 16.4's entry) |
+
+**The sub-steps,** in this order — code first, the rewrite once, over it. **THE PIN IS `1e92de9`**, main at step
+16's close:
+
+- **17.1 — the inventory, measured first.** LIGHT, read-only, no shipped byte. Every sentence in both trees'
+  `SKILL.md` and `skill-docs/` that describes formatting — the off-flags, `p_rpr_b` and `p_rpr_i`, the sub-heading
+  test, the definition auto-detector, the tracked-change bold-off and its bypasses, *Formatting rules for en_runs*
+  (lines 225–232) — set against today's code and labelled TRUE, FALSE or OBSOLETE, with the code line that decides
+  it; F7, F13 and F22 located in it. **And four corpus counts** over the 13 frozen workdirs, both trees, doc-ids
+  and counts only, a planted control firing: A10's tracked-change paragraphs whose `en_runs` declare more than one
+  state; O1's declared bold spans that end on punctuation; the paragraphs check 15 flags today and would flag
+  reading `w:val`; A20's leading-whitespace `en` entries with a declared span. *Done when:* the table and the counts
+  filed in this entry, each sentence of rule 3 with a label. **Checked against:** the code, never the docstrings.
+- **17.2 — the two `w:b` readers reach a styles part; check 15 reads `w:val`.** MEDIUM, both trees,
+  `quality_check.py` and `reorder_definitions.py` only. An optional `--styles <path>` on each, resolving bold
+  through extraction's resolver imported (16.1's route, declared in `tests/test_sibling_import_integrity.py`);
+  absent, each behaves byte for byte as today and says which it used. Check 15 treats `0`, `false` and `off` as
+  not bold (the OOXML rule). *TP:* an invented heading bold only by its style, found by each reader given
+  `--styles`; a run with `w:val="0"` no longer counted by check 15. *FP:* every frozen workdir without `--styles`,
+  13 of 13 per tree unmoved. **Derived first:** 17.1's check-15 count, which is the expected movement — each
+  moved verdict named by doc-id, 0 unexplained. **MUST NOT:** an exit code where nothing is passed; the
+  term-sanity guard (P11). The skill docs pass `--styles` at 17.5, not here.
+- **17.3 — A10: `en_runs` placing formatting on a tracked-change paragraph.** HEAVY, both trees; **its own plan
+  first, in this entry, from 17.1's count.** Today a declared span on a paragraph carrying `en_segments` is read
+  for one boolean only (register A10), so a mixed tracked-change paragraph is delivered plain — 16.4's rendered
+  page shows it. **The session's answer to its home: here, not deferred** — the instruction 17.5 writes would
+  otherwise tell the operator to declare spans that a tracked-change paragraph then ignores. *TP:* invented
+  tracked-change paragraphs, a bold term inside the kept text, inside an insertion, across a seam. *FP:*
+  `tests/test_toc_shapes.py` and every tracked-change suite unchanged; the corpus arm (b) against the pin, each
+  moved paragraph one 17.1 counted. **MUST NOT:** the segment and seam rules of skill Step 4's tracked-change
+  appendix; the ZWSP scrub. *Done when:* A10 closed, or its remainder declared and pinned.
+- **17.4 — 16.5's (a): a source reference the operator declares.** HEAVY, both trees; **its own plan first, and
+  a gate in it:** the 27 mixed findings 16.5 declared (A4, A7, A13, A14, A17's D03 pair, A18's D02 highlight,
+  D09's) each change a property *within one emphasis state*, which only the operator can place. The design to plan
+  against: an optional key on an `en_runs` span naming the source run whose properties it carries, refused
+  malformed in `validate_en_runs.py` and read by apply's span template. **The gate:** if its plan finds the device
+  cannot be added without a new shipped file or a change to the notes' required shape, it stops, and the
+  27 stay declared, placed at phase 3's repairs. *TP:* invented paragraphs for each of the property kinds.
+  *FP:* notes declaring nothing — every delivery byte for byte as at the pin, which no frozen notes can disturb,
+  none declaring the key. *Done when:* the key built and proved, or the gate's stop recorded.
+- **17.5 — the rewrite.** MEDIUM, both trees, **instructions only**, each tree edited on its own. Rule 3
+  collapses to what the operator still decides: read `resolved` and declare a span's bold and italic where the
+  English needs it (A17); a declared span is absolute, and nothing else needs declaring, the styles now giving
+  the rest. **Deleted, not reworded:** the paragraph-mark priority list (F7), the bespoke-`pStyle`-implies-heading
+  rule (F13), the self-contradicting *Qualifier* (F22), the description of the off-flags and the rev38 bold-off
+  bypass — each sentence 17.1 labelled FALSE or OBSOLETE. **Added, one sentence each where it fits:** declare the
+  definitions `role` and pass `--notes` at skill Steps 4 and 7 (L2, L3, 16.6); author the tab where the source
+  separates text with one (A3's remainder, A6 — step 18 keeps the rule's detection and the tab's run
+  properties); end a bold span at the term, not its punctuation (O1); `--styles` at skill Steps 7 and 9 (17.2);
+  17.3's and 17.4's devices as built. **Size, the house's rule for what the model reads:** rule 3 measured before
+  and after, kept only if the after is lower, the original recoverable from the pin. *Done when:* every FALSE and
+  OBSOLETE sentence gone; every new instruction naming a field or option that exists, checked by grep against
+  the code; `README.md` and both `SKILL.md` files changed in the same commit wherever a feature claim moves
+  (§2.4 item 6, fix the claim).
+  **MUST NOT:** the anti-drift safeguards, the 35-paragraph batch cap, any gate's wording of what it enforces,
+  the step numbers; a corpus-derived example — every example invented (§5.6).
+- **17.6 — the close.** LIGHT. The register rows filed (below); the rendered diff on a synthetic fixture for
+  17.2 to 17.4's code; section 2's row noted as corrected here; the full run once, on the pull request's exact
+  commit. *Done when:* step 17 closed in §3.1, each sub-step met or its remainder declared.
+
+**The register rows, as section 9.3 maps them:**
+
+| sub-step | rows it closes or measures | how |
+|---|---|---|
+| 17.1 | A10, O1, A20, check 15 | measured — A20 closes here if 17.1 re-derives 3.16's *measured unable to shift a span*, a pin added to an existing suite, else 17.3 takes it |
+| 17.2 | the two readers' reach (3.16, 16.4); check 15 | code |
+| 17.3 | A10 | code |
+| 17.4 | A4, A7, A13, A14, A17 (D03 pair), A18 (D02 highlight) — the 27 mixed | code, or declared at the gate |
+| 17.5 | F7, F13, F22, A17, L2, L3, A3's remainder, A6, O1 | instructions |
+| left open | C20's count against `en_runs` before apply; tab run properties and A21 (step 18); Wouter's corpus pages; F18, F30, F12 | declared, unchanged |
+
+**What every sub-step must NOT touch:** a new shipped file — the tree stays at 198 of 199, the last slot step
+22's; the July frozen intermediates, read and never written; a re-translation; a gate's strength, beyond what
+17.2 to 17.4 refuse as malformed; the anti-drift safeguards; the tab-authoring rule's detection, step 18's.
+
+**Size:** two HEAVY sub-steps, two MEDIUM, two LIGHT — about three sessions. **One pull request,**
+`feature/step17-formatting-part3`, opened by this plan's commit. **VERIFY:** each code sub-step's controls red at
+the pin first; mutants on every deciding line; the corpus arm (b) with `--ref` on the sub-step before; the parity
+check and the divergence baseline; the three confidentiality controls. **TEST:** the suites that drive
+`quality_check`, `reorder_definitions`, apply, `validate_en_runs` and the tracked-change path, both trees; the
+smoke suite; the full run once per pull request, before the push.
 
 ## 4. How each step is tested — THE METHOD
 

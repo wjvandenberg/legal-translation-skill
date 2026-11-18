@@ -3122,3 +3122,23 @@ REMAINDERS** so the later step changes them on purpose. **(6) STEP 16 CLOSES ON 
 each remainder declared, and its pull request merges on the closing full run.
 **THREE HOUSE CHECKERS ADOPTED AT THE OPENING,** byte for byte, each released the same day: `verify_md.py` v32,
 `run_tests.py` v7, `install_hooks.py` v16.
+
+## 2026-11-18 — the chain of 2026-11-18, worker 5: step 17's plan written, no code; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 3'S HEADING'S,** quoted whole there; on his instruction of 2026-11-18 this worker ran at
+high effort. **No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm
+or overturn** — `temp/s1118-questions.md` holds them with their options. Section 3.17 of `PLAN-2-step-b.md` is the plan.
+
+**STEP 17, PLANNED.** **(1) THE CODE SECTION 3.16 PLACED HERE IS BUILT HERE, BEFORE THE REWRITE:** the two `w:b`
+readers' reach to a styles part, check 15's off-flag bug, A10 and 16.5's (a) — so the operator's instructions are
+rewritten once, over finished code, 3.16's own reason; deferring them would leave the rewrite describing devices
+that do not yet exist, or force a second rewrite. Section 2's *doc only* is corrected in 3.17, the row left as it is.
+**(2) THE READERS GET AN OPTIONAL `--styles`, ABSENT MEANING TODAY'S BYTES:** the least change to a delivered byte
+or an exit code; the skill docs pass it at 17.5. **(3) A10 IS BUILT AT STEP 17, NOT DEFERRED:** 17.5 tells the
+operator to declare spans, and a tracked-change paragraph that ignores them would make that instruction false.
+**(4) 16.5's (a) IS PLANNED WITH A GATE:** built if its own plan finds it needs no new shipped file and no change to
+the notes' required shape; otherwise the 27 mixed findings stay declared, placed at phase 3's repairs. **(5) THE
+TAB-AUTHORING SENTENCE GOES INTO 17.5's REWRITE:** one edit of skill Step 4 instead of two; step 18 keeps the
+detection and the tab's run properties, its row unchanged. **(6) O1 AS AN INSTRUCTION, A20 BY MEASUREMENT:** O1's
+span end is the operator's declaration, so a sentence; A20 closes at 17.1 if 3.16's measurement re-derives, else
+17.3 takes it. **(7) ONE PULL REQUEST FOR THE STEP,** opened by the plan's commit.
