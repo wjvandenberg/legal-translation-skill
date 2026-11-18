@@ -3184,3 +3184,25 @@ last commit, then pushes.
 today")*: so the one full run was made after all, on the filing commit c3b6d45, started 17:19 with the machine kept
 awake — OVERALL PASS, 118 suites, ended 18:09. Choice (7) holds for the two commits; the push followed the run's pass, never bypassing the
 pre-push hook, and PR #200 is NOT merged — it stays open until 17.6. 17.3 not begun, as the conductor said.
+
+## 2026-11-18 — the chain of 2026-11-18, worker 8: 17.3's own plan written, no code; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 3'S HEADING'S,** quoted whole there. **No question was asked; each choice below is THE
+WORKER'S, its recommended answer, for him to confirm or overturn** — `temp/s1118-questions.md` holds them with their
+options. 17.3's plan is in section 3.17, after 17.2's result.
+
+**(1) PLACEMENT ONLY WHERE THE RAW `en` EQUALS THE ACCEPTED SEGMENTS JOINED, CHARACTER FOR CHARACTER.** The other
+options were a tolerant match that forgives whitespace at a seam, or a new refusal in `validate_en_runs.py`. A
+tolerant match guesses where an offset falls, which is A10's own damage arriving by another route; a refusal
+strengthens a gate, which step 17's plan forbids. 17.3.1 measures how many of the 21 align before any code, and
+re-plans if fewer than half do. **(2) AN UNALIGNED PARAGRAPH IS A PRINTED LINE, NEVER AN EXIT CODE,** and is
+delivered as today — the change that moves least where it cannot be proved right. **(3) THE BOLD-OFF PASS DOES NOT
+RUN ON A PARAGRAPH WHOSE SPANS WERE PLACED:** a declared span is absolute since 16.4; running the pass after would
+undo the placement. Where nothing is placed, the pass and both rev38 bypasses decide as at the pin.
+**(4) A20 IS FIXED, NOT ONLY PINNED — each offset re-based by the leading characters the strip removed,** on both
+paths. The options were a pin alone, which would assert a known wrong result for an `en` beginning with a space, or
+the register's other option, a strip on the extraction side, which changes the notes' contract. The re-base moves 0
+on the corpus (17.1) and closes the row. **(5) THE PIN FOR 17.3's CONTROLS IS `e5db826`,** the branch at this plan,
+carrying 17.2's code — not step 17's pin `1e92de9` — so each control is red against the code 17.3 starts from.
+**(6) THE RENDERED DIFF IS 17.3's OWN,** on an invented fixture, rather than left to 17.6: 17.3 is the first
+sub-step of step 17 to move a delivered byte.

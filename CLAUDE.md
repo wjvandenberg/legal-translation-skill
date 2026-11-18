@@ -578,16 +578,16 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-18, WORKER 7 OF THE CHAIN: 17.2 BUILT, FULL RUN PASSED, PUSHED
+### HANDOFF — 2026-11-18, WORKER 8 OF THE CHAIN: 17.3's PLAN WRITTEN, NO CODE
 
-**PURPOSE: MET** — 17.2 committed whole: `--styles` on the two bold readers, check 15 reading `w:val`, both trees,
-red at the pin, every mutant killed, the corpus unmoved 13 of 13 per tree.
+**PURPOSE: MET** — 17.3's own plan written into its 3.17 entry, documents only: declared spans placed on aligned
+tracked-change paragraphs (A10), A20 fixed by a re-base and pinned, sub-steps 17.3.1 to 17.3.4.
 
-**PRODUCED:** three commits on `feature/step17-formatting-part3`, PUSHED after the full run passed on c3b6d45
-(118 suites, OVERALL PASS); PR #200 open, not merged. **Context: 31%.**
+**PRODUCED:** one documents-only commit on `feature/step17-formatting-part3`, pushed on c3b6d45's full run; PR #200
+open, not merged. **Context: 18%.**
 
-**SINGLE NEXT ACTION:** 17.3's own plan in its 3.17 entry — A10, from 17.1's 21 entries; it also takes A20's pin.
+**SINGLE NEXT ACTION:** build 17.3 to its plan — 17.3.1 first, the alignment count over the 21, its gate before code.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** no skill doc passes `--styles` before 17.5.
+**WHAT A NEW SESSION WOULD GET WRONG:** 17.3's controls pin to `e5db826`, not `1e92de9`; `--styles` unused till 17.5.
 
-**Open, none blocking:** 17.3 to 17.6; step 18's tab rule, detection, tab properties, A21; corpus pages; F18; F30; F12.
+**Open, none blocking:** 17.4 to 17.6; step 18's tab rule, detection, tab properties, A21; corpus pages; F18; F30; F12.

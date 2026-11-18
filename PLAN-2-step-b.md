@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-18, WORKER 7 OF THE CHAIN OF 2026-11-18 — SESSION PURPOSE — what · how · purpose:** 17.2 built whole and committed locally, unpushed · `--styles` on the two bold readers through extraction's resolver, check 15 reading `w:val`, both trees, proved red at the pin on invented fixtures · **so that the next session needs only the full run and a push before 17.3** *(written immediately after the tag `rollback-2026-11-18e-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-18, WORKER 8 OF THE CHAIN OF 2026-11-18 — SESSION PURPOSE — what · how · purpose:** 17.3's own plan written into its 3.17 entry, documents only · explored from A10, A20, 17.1's result and the apply code in both trees, nothing under uk/, us/, tools/ or tests/ touched · **so that the next session can build 17.3 to a written plan** *(written immediately after the tag `rollback-2026-11-18f-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -3708,6 +3708,82 @@ unexplained (`temp/s1118e_fp_corpus.py`). The sibling suite's two new routes, to
 delivered byte moves without `--styles`. **Declared, from the review:** the *read* line also prints for a `.docx`
 with no styles part; an explicit `w:bCs` off with no `w:b` reads bold in a bold style under `--styles` (right for
 Latin text, untested); no end-to-end reorder run with `--styles` — each for 17.6 to take or leave.
+
+**17.3's OWN PLAN — 2026-11-18, written before any code** *(worker 8 of the chain of 2026-11-18; its choices
+`DECISIONS-LOG.md` 2026-11-18, worker 8's, Wouter's to overturn)*. **Explored first, read-only:** register rows A10
+and A20, 17.1's result above, section 4's row for a script change, the tracked-change appendix of skill Step 4, and
+apply's tracked-change path, whose lines are the same in `uk/` and `us/` — `apply_trackchanges_inplace` at 550, its
+one boolean read of the spans at 610–619, the segment loop at 708–802, the off-flag pass at 839–873, its call at
+2260, and the regular path's cut of `en_text` by a span at 2363. **Changes, both trees, one shipped script,
+`apply_translations_textmatch.py`;** every validator and gate as at the pin.
+
+**What it builds:**
+1. **Placement.** On a tracked-change paragraph whose `en_segments` types match and which declares `en_runs`, apply
+   places the declared bold and italic on the English it has just written. A span's offsets index the raw `en`, the
+   full accepted text (rule 4 of the appendix's segment rules); the accepted segments are the `regular` and `ins`
+   ones, in order — `del` and `ins_then_del` carry rejected text and are never formatted. **The alignment rule,
+   which decides:** placement only where the raw `en` equals the accepted segments' `en` joined in order, character
+   for character; anywhere else apply places nothing, as today, and prints one line naming the entry's idx — never
+   a guess at where an offset falls.
+2. **How a span lands.** After the segment loop distributes the text and before the ZWSP pass, the accepted
+   segments' `w:t` elements are walked with a cursor into `en`; where a span's edge falls inside one, its run is
+   split in two inside the same wrapper, each half keeping the run's `rPr`, and each run takes its span's bold and
+   italic through 16.3's writer — a flag written only where the styles in force differ (`styles_given`).
+3. **The off-flag pass yields to a placed paragraph.** A declared span is absolute (16.4), so where (1) placed
+   spans the bold-off pass does not run on that paragraph; where nothing was placed, the pass and both rev38
+   bypasses decide exactly as at the pin.
+4. **A20's fix and pin.** The spans index the raw `en` while 2363 cuts `en_text`, the stripped one; each offset is
+   re-based by the count of leading characters `_strip_keeping_separators` removed — the register's second option,
+   no change on the extraction side — on both paths. 17.1 measured 0 entries able to shift, so the corpus moves 0.
+
+**The sub-steps, in order:**
+- **17.3.1 — measure, read-only.** Over the 13 frozen workdirs, both trees, doc-ids and counts only, a planted
+  control firing: of 17.1's 45 tracked-change entries declaring spans, how many pass the alignment rule; of the 21
+  mixed, how many; each failure by its kind (whitespace at a seam, a differing word, a missing segment). *Done
+  when:* the counts filed here. **Its gate:** fewer than half of the 21 aligned, and the alignment rule is
+  re-planned here before any code — never loosened in the code to fit.
+- **17.3.2 — placement, (1) to (3).** Code, both trees.
+- **17.3.3 — A20, (4).** Code, both trees, both paths.
+- **17.3.4 — the proof.** The corpus arm, the rendered diff, the register rows.
+
+**Checked against, and at what level:** the delivered `document.xml`, per paragraph and per run — each run's text,
+its bold and italic in force through the cascade, never its flags alone, and its parent `w:ins` or `w:del` with
+author and date, so a split run is proved to stay inside its wrapper; and the accept-all and reject-all readings,
+unchanged by construction, since no character of text moves.
+
+**MUST NOT:** move a character of text — placement splits runs and sets two properties; touch a `del` or
+`ins_then_del` segment's runs; change a segment or seam rule of the appendix, `effective_segment_texts`,
+`nearest_supplies_ws`, the ZWSP pass or its scrub; the legacy proportional path; strengthen a gate —
+`validate_en_runs.py` and `validate_segment_shapes.py` unchanged, an unaligned paragraph a printed line, never an
+exit code; a new shipped file; the skill docs, which are 17.5's.
+
+**Controls red at the pin `e5db826`** (17.2's code) — `tests/test_tc_declared_spans.py`, both trees, every
+paragraph invented and built by `tests/make_fixtures.py`: a bold term inside the kept text; inside an insertion; a
+span across the seam between a kept and an inserted segment; an italic span beside a bold one; a span after a
+deletion, its offset not counting the deleted text; and for A20, an `en` beginning with a space, a tab and a line
+break, each with a span, on both paths. **Negative inputs:** a misaligned `en`, which must place nothing and print
+its line; a span past the end of `en`, F16's refusal unchanged. **Mutants, one per deciding line, each killed by a
+named control:** the alignment comparison forced true and forced false; the accepted-segment filter admitting
+`del`; the split one character early and one late; bold and italic swapped; the off-flag pass not skipped after
+placement; a ZWSP counted by the cursor; the A20 re-base zero and doubled.
+
+**The corpus arm (b):** `tools/apply_corpus_diff.py --ref e5db826`, 13 of 13 per tree. **Expected movement, derived
+first from 17.3.1:** tracked-change paragraphs among the 45 only, bold or italic in force changing only on the
+aligned ones of the 21 (D02, D04, D06, D07), each moved paragraph counted by doc-id; every other paragraph byte for
+byte as at the pin; 0 unexplained; A20 moving 0.
+
+**The rendered diff of BOTH documents** — `tools/render_diff.py`, LibreOffice headless, on a SYNTHETIC fixture
+only: `tests/fixtures/tc-declared-spans.docx`, invented by `make_fixtures.py` — three tracked-change paragraphs of
+invented text, a bold defined term in kept text, one in an insertion, one across a seam — source and delivered,
+page by page, the bold on the term and nowhere else. No corpus page is rendered (§5.6).
+
+**VERIFY:** the new suite green, and red at the pin; every mutant killed; the corpus arm against its expected
+movement; the parity check, and the divergence baseline re-recorded for the one script; the three confidentiality
+controls on every committed file. **TEST:** `test_segment_restoration`, `test_delivered_formatting`,
+`test_delivered_check`, `test_toc_shapes`, `test_notes_gates`, `test_check_scoping`, `test_strip_noop_guard` and the
+smoke suite, both trees; the full run once, before the push. **Done when:** A10 closed — every aligned
+tracked-change paragraph's declared spans placed — with the unaligned count declared and pinned as its remainder;
+A20 closed by its fix and pin. **Size:** HEAVY, about one session.
 
 **The register rows, as section 9.3 maps them:**
 
