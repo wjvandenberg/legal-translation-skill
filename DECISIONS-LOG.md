@@ -3142,3 +3142,19 @@ TAB-AUTHORING SENTENCE GOES INTO 17.5's REWRITE:** one edit of skill Step 4 inst
 detection and the tab's run properties, its row unchanged. **(6) O1 AS AN INSTRUCTION, A20 BY MEASUREMENT:** O1's
 span end is the operator's declaration, so a sentence; A20 closes at 17.1 if 3.16's measurement re-derives, else
 17.3 takes it. **(7) ONE PULL REQUEST FOR THE STEP,** opened by the plan's commit.
+## 2026-11-18 — the chain of 2026-11-18, worker 6: 17.1 measured, no code; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 3'S HEADING'S,** quoted whole there; on his instruction of 2026-11-18 this worker ran at
+high effort. **No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm
+or overturn** — `temp/s1118-questions.md` holds them with their options. 17.1's result is in section 3.17.
+
+**17.1, MEASURED.** **(1) RULE 3 LABELLED BY PASSAGE, NOT BY LINE:** thirteen rows, rows 1 to 7 covering rule 3
+line by line, each with the code line that decides it; one sentence per row would restate the rule, which 17.5
+deletes anyway. **(2) A20 STAYS OPEN, ITS PIN 17.3's:** the four corpus entries that begin with whitespace and
+declare a span all keep it, so 3.16's measurement re-derives, but the pin is a test, and 17.1 is read-only — 17.3
+touches the same code. **(3) O1 COUNTED IN TWO PARTS:** a span ending on a quotation mark may be a convention, so
+the 18 such are kept apart from the 37 on other punctuation, for 17.5's sentence to rule on. **(4) CHECK 15's
+EXPECTED MOVEMENT IS 0:** measured on apply's output over all 13; 17.2's true positive is therefore invented.
+**(5) 17.2 NOT BEGUN:** the brief's clock — no new code sub-step that cannot be committed, verified and tested by
+17:00 — and 17.2 is MEDIUM in both trees, with mutants and the full run. **(6) SECTION 3.1's CELL KEPT AT ITS
+LENGTH** by dropping a phrase the build plan holds twice.
