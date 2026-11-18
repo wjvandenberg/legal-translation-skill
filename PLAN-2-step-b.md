@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-16, WORKER 2 OF THE CHAIN OF 2026-11-16 — SESSION PURPOSE — what · how · purpose:** sub-step 16.4, the hand-back, then 16.5 to 16.7 and step 17 in order as the clock and the context allow · 16.4 to its plan in section 3.16: the sub-heading test only where nothing is declared, reading in force; the tracked-change bypass and post_process's untranslated-term italic reading `resolved`; the two downstream readers of a run's own bold measured first; its controls red on 16.3's commit first; each later sub-step its own plan in its entry first, each choice on the recommended option and recorded · **so that a declared span is absolute and every reader sees the formatting in force, nothing else moving** *(written immediately after the tag `rollback-2026-11-16b-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-18, WORKER 4 OF THE CHAIN OF 2026-11-18 — SESSION PURPOSE — what · how · purpose:** 16.7, tab positions per run, measured and planned in its entry, then built only if it fits the clock, closing step 16 and merging its pull request · counts only from the corpus, synthetic fixtures for every page, every choice on the recommended option and recorded · **so that step 16 can close and step 17 start, nothing half-applied** *(written immediately after the tag `rollback-2026-11-18b-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -3348,6 +3348,121 @@ the off-flag totals identical on 44 of 44 rows:
   red 11 of 18 at the pin on its true-positive arms alone; 6 of 6 mutants killed;
   16.3's suite's arms 5b and 7 brought to 16.4's rule.
   **NOT DONE, DECLARED:** the rendered diff — LibreOffice is still not installed.
+  **16.5's OWN PLAN — 2026-11-16, written before any code** *(worker 2 of the chain of 2026-11-16, after the
+  hand-back; Wouter's words of that day the go, its choices `DECISIONS-LOG.md` 2026-11-16 (4)'s, his to
+  overturn)*. **THE DEVICE, MEASURED FIRST** (`temp/s1116b_165_measure.py`, today's apply over the 13 workdirs,
+  grafted, positional, both trees identical, its control firing): of 1,214 rebuilt paragraphs, the eleven
+  properties are kept uniform on 1,344 property-paragraphs and are findings on 65 — 35 uniform-changed, 20
+  mixed-lost, 10 mixed-spread. **All 35 uniform-changed have one cause:** the paragraph's text runs sit inside a
+  container (a hyperlink, a content control, a smart tag) and `get_default_rpr_et` reads direct-child runs only,
+  so it finds no template and the run properties every source run shares are dropped — D06's 33 character
+  styles, its caps and small caps among them. **Matching each English span to the source runs of the same
+  emphasis reaches 3 of the 30 mixed findings;** in the other 27 the property changes within one emphasis
+  state, which only a source reference the operator declares could carry — and no frozen notes hold one. So:
+  **(b), not (a)** *(the worker's choice)*: no new key in the notes, since an operator writes one only once step
+  17's instructions say so, and it would reach 0 corpus paragraphs; (a) is recorded for step 17's plan.
+  **Changes, both trees, `apply_translations_textmatch.py` only:** (1) where none of the paragraph's own runs
+  carries run properties, the template is read from the runs inside its listed containers, through the
+  container inventory's `_run_hosts`, the rule otherwise as it was; (2) per DECLARED span, a property whose
+  value is a function of emphasis in force over the source's own text runs, and differs between the states
+  present, is taken from the source runs of the span's state, what the styles give recomputed for it — only
+  where every span's state occurs in the source and the spans do not all land on one value; every other
+  property from the template, as today; (3) A5: a symbol font (Symbol, Wingdings, Webdings, Marlett) is never
+  carried onto English — `w:rFonts` dropped from the template where it names one, invented, no corpus document
+  holding one. *TP:* the 35, and the 3, at the derived counts; invented — a hyperlinked paragraph whose runs
+  share a character style, a bold term underlined beside plain text, A17's shape, a symbol-font template.
+  *FP:* uniform-kept unchanged on 1,344, the 914 sizes and 392 fonts within it; a property mixed within one
+  emphasis state, and a declared state the source never shows, as today. **Declared, not reached:** the 27
+  mixed findings no device reaches in notes written before (a); D6, a size under a fixed line height, reached
+  only where the size follows emphasis; F19, the first fragment's formatting, a path this sub-step does not
+  rebuild. **Derived first,** positional on 16.4's output, independently of the change
+  (`temp/s1116b_165_derive.py`, both trees identical): 35 of D06's paragraphs — 33 character styles, 1 caps,
+  1 small caps kept; 2 small-caps and 1 size spreads ended (A18). **Checked against:** that list, run by run,
+  at apply and through `delivered_corpus_arm.py --ref` with 16.4's merge as the pin, a 16.5 sense added; 16.1's
+  formatting arm, A18's D06 small caps pinned at 0; `quality_check` on both builds. **MUST NOT:** move bold or
+  italic.
+  **BUILT 2026-11-16, unattended** *(`DECISIONS-LOG.md` 2026-11-16 (4))*: **on the corpus, against 16.4's merge
+  58ab29b, the graft on, both trees identical:** at apply exactly the 35 derived D06 paragraphs moved, each now
+  as the source shows it — 33 character styles, 1 caps and 1 small caps kept where the text sits in a
+  container; 2 small-caps and 1 size spreads ended per declared span (A18) — bold and italic in force unmoved,
+  0 unexplained, every exit code equal; arm (b) 184 and 172 checks green, the run properties moving on exactly
+  those 35 in every member the chain wrote, A18's D06 small caps pinned at 0; `quality_check` unmoved, 13 of 13
+  per tree. A new suite, `tests/test_per_span_properties.py`, 17 of 17 both trees, red 8 of 17 at the pin on its
+  true-positive arms alone; 9 of 9 mutants killed. The code review found two, both fixed and each given a check:
+  a blank declared span in a state the source never shows crashed the span template, and a span's own source
+  font could bring a symbol font back. **Declared, not reached:** the 27 mixed findings (A4, A7, A13, A14, A17's
+  D03 pair, A18's D02 highlight, D09's) — each changes within one emphasis state; **(a), the operator's source
+  reference, is step 17's to decide.** **NOT DONE, DECLARED:** the rendered diff — LibreOffice is not installed.
+  **THE RENDERED DIFFS OF 16.3 TO 16.5, DISCHARGED 2026-11-18** *(worker 3 of the chain of 2026-11-18;
+  `DECISIONS-LOG.md` 2026-11-18; LibreOffice re-installed for the user, run headless, synthetic fixtures only)*: each
+  fixture rendered by `tools/render_diff.py` against the commit before its sub-step and against its own, so a page
+  that moved belongs to that sub-step — `style-bold` unchanged from 16.3's commit 921ec66 to today, `declared-spans`
+  from 16.4's merge 58ab29b. **16.3** (`LT_BASELINE_REF=c9b7d90 --fixture style-bold`): before it the heading bold
+  by its style came back upright and the italic paragraph plain; after it both as the source shows them, the bold
+  style switched off run by run still plain. **16.4** (a new fixture, `declared-spans.docx`, its suite's shapes,
+  against 921ec66): A11's cell declared italic, a declared bold pattern, a span declared false, bold by the
+  paragraph mark alone, bold and italic undeclared, and a tracked-change paragraph bold by its style — each now as
+  declared or as the source shows it, where 16.3's code wrote the sub-heading test's bold or an off-flag; the
+  agreeing declaration and the bold control unchanged; the mixed tracked-change paragraph plain on both arms, A10's
+  open gap, step 17's. **16.5** (`span-properties.docx`, its suite's shapes, against 58ab29b): the hyperlinked text
+  keeps its character style and small capitals, the underline and the small capitals stay on the bold span instead
+  of spreading over the paragraph, and a symbol-font template no longer prints Greek letters (A5); the two controls
+  unchanged, the highlight mixed within one emphasis state spread on both arms — one of the 27 mixed findings 16.5
+  declared, step 17's (a). Every page count equal, source to new and old to new. **Found by the first render and
+  fixed in the fixtures, not the code:** no fixture linked its styles part from the main part, so LibreOffice drew
+  the source's style-bold heading upright and the page could not show 16.3's bold; the three page fixtures now link
+  it, every other fixture byte for byte as it was. Still open: the corpus page comparison, Wouter's to look at, and
+  the `--graft` 16.3's plan gave `render_diff.py`.
+  **16.6's OWN PLAN — 2026-11-18, written before any code** *(worker 3 of the chain of 2026-11-18; Wouter's words
+  of 2026-11-16 and 2026-11-18 the go; its choices `DECISIONS-LOG.md` 2026-11-18's, his to overturn)*. **MEASURED
+  FIRST** (`temp/s1118a_166_measure.py`: today's apply and `post_process` over the 13 workdirs, grafted, both trees
+  identical, its control — L2's shape, invented — firing): **only D05 and D06 hold a definitions section**, 26 and
+  59 definition-shaped paragraphs counted from the notes' English independently of the detector, and the detector's
+  range is exactly each, as are the gate's and the heading fallback's; no document holds two; D06 shows a second
+  primary cluster of 2, far later, which the cluster guard passes over. **On L2's shape the detector sorts from the
+  false cluster to the document's end, 162 paragraphs, and the term-sanity guard lets it through** — the agenda
+  pointers read as plausible terms. So the corpus moves nothing, and the change is proved on invented documents.
+  **Changes, both trees:** (1) **THE DECLARATION** — `"role": "definition"` on every paragraph of a definitions
+  section in the notes, the plan's role marker, since the notes are a list of entries the operator writes entry by
+  entry; a run of declared entries, blank paragraphs between them included, is one section;
+  `reorder_definitions.py --notes <paragraphs.json>` reads it, sorts EACH declared section on its own, the
+  detector consulted only for its report; malformed — a role other than `definition`, a declared idx outside the
+  document, notes whose count is not the document's paragraph count — refused, exit 2, nothing written; the
+  term-sanity guard runs over a declared section as over a detected one. `validate_en_runs.py`, the second consumer,
+  checks `en_runs` on the declared entries where any is declared, the detector otherwise, through one reader in
+  `reorder_definitions.py` (the sibling route's names list gains it). (2) **THE FALLBACK**, nothing declared: the
+  detector stays and still sorts the range it finds, and every run — dry or real — reports EVERY candidate section,
+  each primary cluster and each heading-anchored section, and which one it sorts, loudly where there is more than
+  one; exit codes as today. (3) **L3's two wordings:** the no-detection line keeps `no definitions section found`,
+  which skill Step 7's instructions quote, and replaces *expected for many document types* with what to do if the
+  document has one; the term-sanity refusal names the cause the register measured — paragraphs that are not
+  definitions taken as the section, listed — and the remedy, declaring it, never *leave definitions in source order
+  and accept the warnings*; exit 1 kept. (4) The docstring's claim of a `definitions_intro` role and English intro
+  triggers, neither implemented, corrected; `tests/test_instruction_rules.py`'s F38 needle on it moves to the
+  corrected sentence. *TP:* L2's shape declared — the real block sorted, the false cluster and the narrative between
+  untouched; undeclared — every candidate named; two declared sections, each sorted on its own; the gate on a
+  declared section missing `en_runs`, exit 2. *FP:* a document with no definitions section, said so, nothing moved,
+  exit 0; a declared section holding a body-text term still refused by the term-sanity guard (P11); notes declaring
+  nothing, the reorder byte for byte as before. **Derived first:** the measurement above. **Checked against:** it,
+  per document; `delivered_corpus_arm.py --arm b --ref` on 16.5's commit, the graft on, no delivered byte or exit
+  code moved, 13 of 13 per tree (no frozen notes declare a role and the chain passes no `--notes`); the corpus's two
+  sections declared from the measurement's own count and sorted through `--notes --dry-run`, the same definitions
+  as the detector's. **MUST NOT:** the term-sanity guard (P11); the operator's instructions — skill Steps 4 and 7
+  gain the role and `--notes` at step 17; an exit code or a delivered byte where nothing is declared.
+  **BUILT 2026-11-18, unattended** *(`DECISIONS-LOG.md` 2026-11-18)*: `reorder_definitions.py --notes` sorts every
+  section the notes declare, each on its own, every refusal checked before anything moves, written once; the
+  detector's own answer is unchanged, its heading fallback now a silent generator its first-match function reads,
+  so the report can name every candidate; a malformed declaration is refused, exit 2, in reorder and, before apply,
+  in `validate_en_runs.py`, which checks `en_runs` on the declared entries where any is declared through
+  `declared_sections`, the one reader; L3's two wordings corrected, exit codes kept; the docstring corrected and the
+  F38 needle moved. **On the corpus, both trees:** the two true sections declared from the measurement's own count
+  name the detector's 26 and 59 definitions through `--notes --dry-run`, exit 0 each; arm (b) against 16.5's commit
+  c4b8f3f, the graft on, no delivered byte or exit code moved. A new suite, `tests/test_definitions_declared.py`, 33
+  of 33 both trees, red 24 of 33 at the pin; 16 of 16 mutants killed. The code review found three, fixed: the gate
+  now refuses a declared idx past the notes as reorder does, its message names each declared section, and a test
+  variable named like a pin was renamed. **Not closed here:** L2 and L3 close at step 17, when skill Steps 4 and 7
+  tell the operator to declare and pass `--notes` — no frozen notes declare, so until then the fallback decides on
+  every real document; P11 held (arm 5, mutant D11).
 - **16.3 — bold and italic written only where needed, the off-flags removed in the same sub-step.** HEAVY, both
   trees — the core of section 3.9's step 16, and the one sub-step never to be split, since removing the flags
   without the computation renders a document bold. Apply imports extraction's resolver *(Wouter's answer)*, through
@@ -3403,6 +3518,27 @@ the off-flag totals identical on 44 of 44 rows:
   sub-step's plan says which of the two holds it. *TP:* the four named shapes, from the corpus where the frozen
   notes allow, invented otherwise. *FP:* `tests/test_toc_shapes.py`'s 18 of 18 shapes unchanged. **MUST NOT:**
   the table-of-contents placement step 6 built. *Done when:* A3, A6 and A21 closed, or each remainder declared.
+  **PLANNED AND BUILT 2026-11-18, unattended** *(`DECISIONS-LOG.md` 2026-11-18, worker 4)*. **Measured first,**
+  counts only, both trees identical: across the 13 frozen workdirs 97 notes entries sit on a source paragraph
+  with a tab between two pieces of text; 25 are placed by step 6's table-of-contents rule, 23 by a tab the
+  operator AUTHORED in `en` — every one placed, apply writing it as a tab run and clause 3 dropping the source's
+  own tabs from the runs it rebuilds, the authored count winning on the 3 where it differs —, 10 are skipped as
+  `en` equal to the source, and 39 carry no authored tab and are delivered glued (D06 15, D02 11, D11 5, D04 3,
+  D05 3, D09 2); 0 ruby. **So the device this entry asks for exists:** wherever the English says where the
+  separator goes, apply puts it there; what is missing is the operator being told to say it. **Reconciled with
+  step 18 by leaving its row as it is:** apply's half is this sub-step's, proved rather than rebuilt; the
+  tab-authoring rule, an instruction, and the detection of a between-text tab with none authored stay step 18's,
+  step 17's one rewrite free to carry the rule's sentence. **Built:** `tests/test_authored_tabs.py`, 25 of 25 both
+  trees — A3's party grid, cost line, notices marker under a hanging indent and mid-phrase tabs and A6's glued
+  bullet, invented, each placed and never doubled, and clause 3's own leading and trailing shapes; red first not
+  applicable, no shipped byte changing and the device older than step 16; 4 of 4 mutants killed per tree on its
+  deciding lines. **Declared remainders, pinned in the suite:** A3's remainder and A6 close when skill Step 4
+  tells the operator to author the tab — the 39 glued entries are notes written without it; a source tab's run
+  properties are not carried onto an authored one — 12 underlined and 17 shaded tab runs in the corpus's
+  between-text paragraphs, 0 under an authored entry — placed at step 18's plan; A21's ruby needs a declared
+  boundary between reading and base, no corpus document holds one, its pin in `tests/test_container_inventory.py`
+  standing, placed at step 18's plan. `tests/test_toc_shapes.py` unchanged. **STEP 16 IS CLOSED BY THIS**, each
+  sub-step's *Done when* met or its remainder declared.
 
 **What every sub-step must NOT touch:** the operator's instructions — step 17's, which rewrites rule 3 once, over a
 finished apply; a gate's strength or an exit code, beyond 16.1's report and what 16.5 to 16.7 refuse as malformed;

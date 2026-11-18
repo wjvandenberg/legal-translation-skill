@@ -324,7 +324,11 @@ print("=" * 98)
 if not SOFFICE:
     print("  VOID — LibreOffice not found. Set LT_SOFFICE. Nothing rendered, nothing proved.")
     sys.exit(1)
-print(f"  soffice: {SOFFICE}")
+# NO PATH UNDER THE USER FOLDER IS PRINTED (2026-11-18): LibreOffice re-installed for the user lives there, so its
+# path carries the machine's username - the leakage scan caught it in every report on the first run, and the
+# publication check refuses the home-relative form too. Such a location is said in words.
+_HOME = str(Path.home())
+print(f"  soffice: {'found under the user folder (a per-user install)' if SOFFICE.lower().startswith(_HOME.lower()) else SOFFICE}")
 print(f"  dpi: {DPI}")
 
 FAIL, CHECKED = [], 0

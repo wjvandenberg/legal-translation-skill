@@ -3057,3 +3057,68 @@ is the same once adjacent runs of equal properties are joined, its bold and ital
 character; a pin that carries 16.4 splits nothing. **(6) THE RENDERED DIFF, NOT ATTEMPTED:** LibreOffice is still not
 installed and Word's automation hung for worker 1; the change is measured in force by the resolver on invented
 documents and on the corpus, never on a page.
+
+## 2026-11-16 (4) — the chain of 2026-11-16, worker 2: the hand-back, then 16.5 planned and built, unattended
+
+**THE HAND-BACK:** PR #198 squash-merged on its green full run (OVERALL PASS, on 983b81c), as 58ab29b, under
+Wouter's words of 2026-11-16 quoted whole in (3) above; 16.5 then begun on `feature/step16-formatting-part-3`
+from main. **No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm
+or overturn** — `temp/s1116-questions.md` holds them with their options.
+
+**16.5, PLANNED AND BUILT.** **(1) THE DEVICE IS (b), MATCHING BY EMPHASIS, NOT (a), AN OPERATOR'S SOURCE
+REFERENCE:** measured first, (b) reaches 38 of 65 findings on the corpus and (a) 0, since no frozen notes carry a
+reference and no operator writes one until step 17's instructions say so; (a) is recorded for step 17's plan.
+**(2) THE 35 UNIFORM FINDINGS HAD ONE CAUSE, NOT A DEVICE QUESTION:** the paragraph's text sits inside a container
+and the template reader looked at direct runs only — fixed where the paragraph's own runs carry no properties,
+so no other paragraph's template changes. **(3) MATCHING ONLY ON DECLARED SPANS:** where nothing is declared,
+apply's segments come from a definitions pattern, not from the source, so a match would be a guess; every
+reached mixed finding is declared. **(4) A5 GUARDED ON THE TEMPLATE AND ON EACH SPAN.** **(5) D6 AND F19 DECLARED,
+NOT REACHED.** **(6) THE RENDERED DIFF NOT ATTEMPTED** — LibreOffice is not installed. **(7) TWO REVIEW FINDINGS
+FIXED,** each given a check and a mutant.
+
+## 2026-11-18 — the chain of 2026-11-18, worker 3: the rendered diffs of 16.3 to 16.5, then 16.6; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-18, QUOTED WHOLE,** given to the session conducting today's chain: *"Continue where you were, without asking questions, following your recommendations and opening new sessions (auto hop mode) until 15h today. You can already start step 17 etc."* — beside his of 2026-11-16, quoted whole in 2026-11-16 (2).
+**No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm or
+overturn** — `temp/s1118-questions.md` holds them with their options.
+
+**THE RENDERED DIFFS OF 16.3 TO 16.5, DISCHARGED.** **(1) TWO NEW SYNTHETIC FIXTURES, NOT A CHANGE TO THE
+INSTRUMENT:** 16.4 and 16.5 named no fixture and their suites build their documents in memory, which
+`render_diff.py` cannot drive; `declared-spans.docx` and `span-properties.docx` mirror each suite's shapes and ship
+notes equal to today's extraction entry for entry, both trees, the tracked-change entries declared per segment so
+the delivered check can derive their readings. **(2) THE STYLES PART LINKED IN THE THREE PAGE FIXTURES ONLY:** the
+first render drew the source's style-bold heading upright, since no fixture links `word/styles.xml` from the main
+part; linking it in every fixture would move bytes no page here needs. **(3) EACH PAGE ISOLATED BY A SECOND PIN:**
+each fixture also rendered against its own sub-step's commit, unchanged there, so every moved page is that
+sub-step's. The results are section 3.16's.
+**THE REPORT'S OWN FINDING, FIXED IN THE TOOL:** `render_diff.py` printed the per-user LibreOffice's path, which
+carries the machine's username; it now says such a location in words, the reports rendered again, never edited.
+
+**16.6, PLANNED AND BUILT.** **(1) THE DECLARATION IS A ROLE ON EACH PARAGRAPH,** `"role": "definition"`, not a
+range: the notes are a list of entries written entry by entry, and a range cannot hold two sections. **(2) REORDER
+RECEIVES IT THROUGH `--notes`,** never by guessing where paragraphs.json sits; skill Step 7's command gains it at
+step 17. **(3) "FAIL LOUDLY" WHERE NOTHING IS DECLARED MEANS EVERY CANDIDATE NAMED, LOUDLY WHERE THERE ARE TWO OR
+MORE, AND THE SORT AS BEFORE:** refusing would stop D06's correct sort and move an exit code the plan says must not
+move. **(4) EACH DECLARED SECTION IS SORTED ON ITS OWN,** closing L2's one-section assumption for declared notes.
+**(5) L2 AND L3 STAY OPEN UNTIL STEP 17:** the code half is built; no frozen notes declare, and no operator will
+until the instructions say so.
+
+## 2026-11-18 — the chain of 2026-11-18, worker 4: 16.7 measured, planned and built as a proof; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 3'S HEADING'S,** quoted whole there; on his instruction of 2026-11-18 this worker ran at
+high effort. **No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm
+or overturn** — `temp/s1118-questions.md` holds them with their options.
+
+**16.7, PLANNED AND BUILT.** **(1) NO NEW NOTES DEVICE — THE AUTHORED TAB IS THE DEVICE:** measured first, 23 of
+23 entries whose operator wrote the tab into `en` are placed today, the source's own tabs dropped; the alternatives
+— an English field per source run, or apply placing a tab where no boundary is provable — would change the notes
+format before step 17 rewrites the instructions once, or make the guess step 6 refused. **(2) RECONCILED WITH STEP
+18 BY LEAVING ITS ROW AS IT IS:** apply's half is 16.7's, proved; the authoring rule and the detection stay step
+18's, step 17's rewrite free to carry the rule's sentence. **(3) THE TAB'S RUN PROPERTIES NOT CARRIED IN STEP 16:**
+0 of the 23 authored entries' source tabs carry underline or shading, so carrying them would move delivered bytes
+with no visible defect to mend; placed at step 18's plan with its measurement. **(4) A21 DECLARED, NOT BUILT:** no
+corpus document holds a ruby and its boundary needs a declaration no notes carry. **(5) THE SUITE PINS THE TWO
+REMAINDERS** so the later step changes them on purpose. **(6) STEP 16 CLOSES ON THIS** under its own *Done when*,
+each remainder declared, and its pull request merges on the closing full run.
+**THREE HOUSE CHECKERS ADOPTED AT THE OPENING,** byte for byte, each released the same day: `verify_md.py` v32,
+`run_tests.py` v7, `install_hooks.py` v16.

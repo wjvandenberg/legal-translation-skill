@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 15 (2026-11-12)
+"""install_hooks.py - install the hooks, and check they actually bite.  CHECKER VERSION 16 (2026-11-18)
 
 If a project's copy says a lower version than this one, it is stale - see the "Checkers"
 line for each version in ...\\Coding\\templates\\TEMPLATE-CHANGELOG.md and re-copy.
@@ -94,6 +94,9 @@ landed, and the arms asserting "not on the remote" PASSED FOR THE WRONG REASON. 
 terminal setting it and green in a shell that did not, and the selftest red here with only that setting added. Now the
 remote is named with --git-dir and read under the strict setting in every environment, so code that reads a bare
 repository by standing in it fails everywhere; a read neither found nor absent raises. The defect is older than v14.
+v16 (2026-11-18) - --help PRINTS THE USAGE, AND AN ARGUMENT IT DOES NOT KNOW IS REFUSED, exit 2 - both before anything
+is written. Until v16 every flag was found with `in argv`, so anything else fell through to the default, which installs:
+`install_hooks.py --help`, run to look, installed a project's hooks. Case 17 proves both arms in scratch repositories.
 
 WHERE THE SOURCES COME FROM. A directory named 'hooks' beside this file. In a project that
 is tools/hooks/; in the shared folder it is standard-scripts/hooks/. Discovered rather
@@ -703,8 +706,39 @@ def parse_selection(argv) -> tuple:
     return only, guard_dir, None
 
 
+#: EVERY FLAG main() READS (v16), and the two that take a value. Anything else is refused.
+KNOWN_FLAGS = ("--selftest", "--check", "--only", "--guard-dir")
+VALUE_FLAGS = ("--only", "--guard-dir")
+
+
+def unknown_args(argv) -> list:
+    """The arguments main() would not read - a flag's value is skipped, never judged."""
+    out, skip = [], False
+    for a in argv:
+        if skip:
+            skip = False
+        elif a in VALUE_FLAGS:
+            skip = True
+        elif a not in KNOWN_FLAGS:
+            out.append(a)
+    return out
+
+
 def main(argv) -> int:
     global GUARD, PURPOSE, BOARD
+    # v16: --help PRINTS THE USAGE AND AN UNKNOWN ARGUMENT IS REFUSED - BOTH BEFORE ANYTHING IS
+    # WRITTEN. Until v16 every flag was found with `in argv`, so anything else fell through to
+    # the default, which INSTALLS: measured 2026-11-18, `install_hooks.py --help` installed a
+    # project's hooks. The universal way to look before running must never be the way to write.
+    if any(a in ("-h", "--help") for a in argv):
+        print("\n".join(ln for ln in (__doc__ or "").splitlines()
+                        if ln.startswith("    uv run python tools/install_hooks.py")))
+        return 0
+    unknown = unknown_args(argv)
+    if unknown:
+        print(f"  VOID: unknown argument(s) {unknown} - nothing was installed. This script takes "
+              f"{', '.join(KNOWN_FLAGS)}, or --help for the usage.")
+        return 2
     if "--selftest" in argv:
         return selftest()
 
@@ -1253,6 +1287,20 @@ def selftest() -> int:
         ok &= good
         print(f"    {'OK  ' if good else 'MISS'} --only board wires the board guard alone, Read/Edit/Write"
               f" unhooked -> exit {code16}, matchers {matchers}")
+
+    # 17. v16: AN ARGUMENT IT DOES NOT KNOW INSTALLS NOTHING, and --help installs nothing either.
+    #     RED against v15, which ignored both and ran the default install - measured 2026-11-18,
+    #     `install_hooks.py --help` installed a project's hooks. Each arm in a fresh scratch repo.
+    for label, args17, want in (("an unknown argument installs nothing", ["--bogus"], 2),
+                                ("--help installs nothing", ["--help"], 0)):
+        repo17 = _repo("args-" + args17[0].strip("-"))
+        code17, cfg17 = _run(repo17, args17)
+        wired = bool(cfg17.get("hooks"))
+        hook17 = (repo17 / ".git" / "hooks" / "pre-push").exists()
+        good = code17 == want and not wired and not hook17
+        ok &= good
+        print(f"    {'OK  ' if good else 'MISS'} {label} -> exit {code17} (want {want}),"
+              f" Claude hooks wired: {wired}, pre-push installed: {hook17}")
 
     shutil.rmtree(tmp, ignore_errors=True)
     print("\nSELFTEST: " + ("PASS" if ok else "FAIL"))

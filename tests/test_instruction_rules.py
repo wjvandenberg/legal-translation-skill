@@ -313,7 +313,8 @@ REQUIRED = [
     ("F38", "scripts/post_process.py", "document order. The earlier version only walked ``<w:t>``"),
     ("F38", "scripts/post_process.py", "preposition, not a label). The length cap doesn't"),
     ("F38", "scripts/post_process.py", "# The skill replaced the LEGISLATION_KW hardcoded list"),
-    ("F38", "scripts/reorder_definitions.py", "paragraphs.json, OR a paragraph whose English text matches"),
+    # sub-step 16.6 corrected the sentence this needle held (a role and intro triggers never read) - the needle moved
+    ("F38", "scripts/reorder_definitions.py", 'operator marked "role": "definition" in paragraphs.json belongs to'),
     ("F38", "scripts/reorder_definitions.py", "defined terms (Doc 1 post-mortem; cascade root cause)."),
     ("F38", "scripts/source_language_markers.py", "references that once walked through every gate, because"),
 

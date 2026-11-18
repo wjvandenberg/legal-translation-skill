@@ -12,11 +12,18 @@ Detection heuristics (tried in order):
      followed by the defined term.
 
 Section boundaries:
-  - Start: paragraph flagged with role 'definitions_intro' in
-    paragraphs.json, OR a paragraph whose English text matches
-    one of the case-insensitive intro triggers (legacy fallback).
-  - End: next major heading (all-caps paragraph, or a paragraph whose
+  - DECLARED (sub-step 16.6): with --notes, every paragraph the
+    operator marked "role": "definition" in paragraphs.json belongs to
+    a definitions section; a run of declared paragraphs, blank ones
+    between them included, is one section, and each is sorted on its
+    own. The detector is then consulted for its report alone.
+  - DETECTED, where nothing is declared: the structural detector below.
+    Every candidate section it sees is reported, loudly where there is
+    more than one, and the one its cluster guard settles on is sorted.
+    End: next major heading (all-caps paragraph, or a paragraph whose
     style is Heading 1 / Heading 2).
+  (Until 2026-11-18 this said a 'definitions_intro' role and English
+  intro triggers marked the start; neither was ever read.)
 
 Run with --dry-run --expected-defs N first to confirm the script sees
 the right number of definitions before mutating the XML. If the
@@ -446,22 +453,7 @@ def _find_definition_bounds_by_heading(all_p):
     don't conflate the definitions section with whatever follows it.
     Bold is not consulted — that's the whole point of the fallback.
     """
-    for i, p in enumerate(all_p):
-        text = get_full_text(p).strip()
-        if not text or len(text) > 80:
-            # Definition headings are short labels.
-            continue
-        if not _FALLBACK_HEADING_RE.match(text):
-            continue
-        # Heading found at index i. Look ahead at the next 8 paragraphs.
-        window_end = min(i + 1 + 8, len(all_p))
-        predicate_hits = []
-        for j in range(i + 1, window_end):
-            jtext = get_full_text(all_p[j]).strip()
-            if jtext and _FALLBACK_PREDICATE_RE.match(jtext):
-                predicate_hits.append(j)
-        if len(predicate_hits) < 3:
-            continue  # Not a definitions section per the predicate anchor.
+    for def_start, def_end in _heading_sections(all_p):
         # Loud canary: when this fallback fires, the primary bold-anchor
         # detector found nothing — which usually means the operator did
         # not supply ``en_runs`` on definition paragraphs and apply has
@@ -488,6 +480,30 @@ def _find_definition_bounds_by_heading(all_p):
             + "=" * 60 + "\n",
             file=sys.stderr,
         )
+        return def_start, def_end
+    return None, None
+
+
+def _heading_sections(all_p):
+    """Every section the heading fallback would accept, in document order, each
+    (def_start, def_end) — silent; :func:`_find_definition_bounds_by_heading`
+    takes the first and says so (sub-step 16.6: the report names them all)."""
+    for i, p in enumerate(all_p):
+        text = get_full_text(p).strip()
+        if not text or len(text) > 80:
+            # Definition headings are short labels.
+            continue
+        if not _FALLBACK_HEADING_RE.match(text):
+            continue
+        # Heading found at index i. Look ahead at the next 8 paragraphs.
+        window_end = min(i + 1 + 8, len(all_p))
+        predicate_hits = []
+        for j in range(i + 1, window_end):
+            jtext = get_full_text(all_p[j]).strip()
+            if jtext and _FALLBACK_PREDICATE_RE.match(jtext):
+                predicate_hits.append(j)
+        if len(predicate_hits) < 3:
+            continue  # Not a definitions section per the predicate anchor.
         # def_start is the first predicate paragraph; def_end walks
         # forward past predicate-shape and continuation paragraphs to
         # the next non-definition heading or end of document.
@@ -519,8 +535,7 @@ def _find_definition_bounds_by_heading(all_p):
             if k - last_def > K:
                 break
         def_end = last_def + 1
-        return def_start, def_end
-    return None, None
+        yield def_start, def_end
 
 def find_definitions_section_in_texts(texts):
     """Text-only definitions-section detector for use by callers that
@@ -724,6 +739,108 @@ def find_definition_bounds(all_p):
 
     return def_start, def_end
 
+
+# SUB-STEP 16.6 (register L2, L3): the operator DECLARES the definitions section, and where nothing is declared
+# the detector says every candidate it sees instead of silently taking the first. Detection is only needed
+# because the pipeline throws away what the operator knew when writing the notes (PLAN-2-step-b.md, option 3).
+DECLARE_HOW = ('mark each of its paragraphs "role": "definition" in paragraphs.json and re-run with '
+               '--notes <paragraphs.json>')
+
+
+def candidate_sections(all_p):
+    """Every section the detector could take, in document order, as (first, last, what): each cluster of two or
+    more definition-shaped paragraphs no more than 20 apart (the detector's own K), and each heading-anchored
+    section that overlaps none of them. For the report only - find_definition_bounds still decides."""
+    starts = [i for i, p in enumerate(all_p) if looks_like_definition_start(p)]
+    clusters, cur = [], []
+    for i in starts:
+        if cur and i - cur[-1] > 20:
+            clusters.append(cur)
+            cur = []
+        cur.append(i)
+    if cur:
+        clusters.append(cur)
+    out = [(c[0], c[-1], f"{len(c)} definition-shaped paragraphs") for c in clusters if len(c) >= 2]
+    for s, e in _heading_sections(all_p):
+        if not any(s <= last and first <= e - 1 for first, last, _w in out):
+            out.append((s, e - 1, "a definitions heading and its predicate paragraphs"))
+    return sorted(out)
+
+
+def declared_sections(notes):
+    """(sections, problems): the definitions sections the operator DECLARED in paragraphs.json. Every entry carrying
+    "role": "definition" belongs to one; a run of declared entries - entries with neither text nor en between them
+    included - is one section, as (start, end) paragraph positions, end exclusive. A role other than "definition",
+    or a declared entry whose idx is not a whole number from 0, is a problem. Nothing declared is ([], []).
+    Shared with validate_en_runs.py, the other reader of the definitions section."""
+    problems, marked, blank = [], set(), set()
+    for pos, e in enumerate(notes if isinstance(notes, list) else []):
+        if not isinstance(e, dict):
+            continue
+        idx = e.get('idx', pos)
+        if isinstance(idx, int) and not ((e.get('text') or '').strip() or (e.get('en') or '').strip()):
+            blank.add(idx)
+        if 'role' not in e:
+            continue
+        if e['role'] != 'definition':
+            problems.append(f"idx {idx}: role {e['role']!r} - the one role read here is 'definition'")
+        elif not isinstance(idx, int) or isinstance(idx, bool) or idx < 0:
+            problems.append(f"idx {idx!r}: a declared entry needs a whole-number idx from 0")
+        else:
+            marked.add(idx)
+    sections = []
+    for i in sorted(marked):
+        if sections and all(j in blank for j in range(sections[-1][1], i)):
+            sections[-1][1] = i + 1
+        else:
+            sections.append([i, i + 1])
+    return [tuple(s) for s in sections], problems
+
+
+def _declared_or_exit(notes_path, n_paras):
+    """The declared sections in --notes, or exit 2 with nothing written where the declaration is malformed."""
+    try:
+        with open(notes_path, 'r', encoding='utf-8') as f:
+            notes = json.load(f)
+    except (OSError, ValueError) as exc:
+        notes, problems = None, [f"--notes could not be read as JSON: {type(exc).__name__}"]
+    else:
+        problems = [] if isinstance(notes, list) else ["--notes is not a list of entries"]
+    sections, more = declared_sections(notes)
+    problems += more
+    if sections and isinstance(notes, list) and len(notes) != n_paras:
+        problems.append(f"the notes hold {len(notes)} entries and the document {n_paras} paragraphs, so a "
+                        f"declared idx cannot name a paragraph")
+    problems += [f"declared idx {e - 1} is past the document's {n_paras} paragraphs"
+                 for _s, e in sections if e > n_paras]
+    if problems:
+        print("\n" + "=" * 60 + "\n"
+              "[reorder_definitions] SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR.\n"
+              "The definitions section declared in paragraphs.json is malformed;\n"
+              "nothing was reordered and nothing written.\n"
+              + "".join(f"  {p}\n" for p in problems)
+              + "FIX: correct the declaration in paragraphs.json and re-run.\n" + "=" * 60,
+              file=sys.stderr)
+        sys.exit(2)
+    return sections
+
+
+def _report_candidates(cands, def_start, def_end):
+    """Say every candidate section; loudly, on both streams, where there is more than one (register L3)."""
+    if not cands:
+        return
+    print(f"The detector sees {len(cands)} candidate definitions section(s):")
+    for first, last, what in cands:
+        print(f"  P[{first}] to P[{last}] - {what}")
+    if len(cands) > 1:
+        chosen = (f"P[{def_start}] to P[{def_end - 1}]" if def_start is not None else "none of them")
+        msg = ("\n" + "=" * 60 + "\n"
+               f"[reorder_definitions] WARNING — {len(cands)} candidate definitions sections; sorting the first\n"
+               f"the detector's cluster guard settles on: {chosen}. If that is not\n"
+               f"the definitions section, declare the real one: {DECLARE_HOW}.\n" + "=" * 60)
+        print(msg)
+        print(msg, file=sys.stderr)
+
 # Rev11 A2: sanity-check extracted terms before sorting. Catches the
 # bug class where bold detection misfires and pieces of body text
 # (quote marks, "means", colons) get extracted as defined terms. The
@@ -753,9 +870,10 @@ def looks_like_real_term(term):
         return False
     return True
 
-def group_definitions(all_p, def_start, def_end):
+def group_definitions(all_p, def_start, def_end, declared=False):
     """Group paragraphs into definitions using both bold-term and
-    quote-mark heuristics."""
+    quote-mark heuristics. ``declared``: the section is the operator's,
+    which changes what the refusal below names as its likely cause."""
     definitions = []
     current_group = []
     current_term = None
@@ -825,113 +943,35 @@ def group_definitions(all_p, def_start, def_end):
     suspicious = [(t, p) for (t, p) in definitions
                   if not looks_like_real_term(t)]
     if suspicious:
-        msg = [
-            "reorder_definitions: extracted term(s) do not look like real",
-            "defined terms — bold-run detection probably misfired",
-            "(common cause: w:b/@w:val=\"0\" emitted by LibreOffice).",
+        # REGISTER L3, sub-step 16.6: the refusal stays, exit 1 (P11, a positive
+        # that must not regress); its diagnosis once blamed the converter and its
+        # remedy sanctioned skipping the mandatory sort - both wrong.
+        cause = ([
+            "defined terms - the declared section holds paragraphs that are",
+            "not definitions, or a definition whose term is written as body text.",
+        ] if declared else [
+            "defined terms - the paragraphs the detector took as the definitions",
+            "section are probably not definitions (a cluster of bold-then-colon",
+            "or quoted lines elsewhere in the document read as one).",
+        ])
+        msg = ["reorder_definitions: extracted term(s) do not look like real"] + cause + [
             "Refusing to reorder; document unchanged.",
             "Suspicious terms:",
         ]
         for t, paras in suspicious:
             msg.append(f"  '{t}' (~{len(paras)} paras)")
-        msg.append(
-            "Re-run with --dry-run to inspect, or leave definitions in"
-        )
-        msg.append("source order and accept the warnings.")
+        msg.append("Re-run with --dry-run to see every candidate section, then")
+        msg.append(f"declare the real one: {DECLARE_HOW}.")
+        msg.append("The sort is mandatory: do not ship the definitions in source order.")
         raise SystemExit('\n'.join(msg))
 
     return definitions
 
-def reorder(xml_path, output_path=None, dry_run=False, expected_defs=None):
-    """Main entry point: reorder definitions in the document XML.
-
-    Behaviour:
-      - ``dry_run=True`` prints the detection results without modifying
-        the XML.
-      - ``expected_defs`` aborts if the count of extracted definitions
-        does not match the expected number.
-      - Definitions-intro detection is purely structural (no language-
-        specific phrase list).
-      - Before writing back, every paragraph index outside the
-        definitions window must be unchanged or the script aborts.
-    """
-    if output_path is None:
-        output_path = xml_path
-
-    # Capture original header BEFORE parsing (preserves double-quote XML
-    # declaration and all namespace declarations exactly as Word wrote them).
-    with open(xml_path, 'r', encoding='utf-8') as f:
-        raw_xml = f.read()
-    orig_header = extract_header(raw_xml)
-
-    tree = etree.parse(xml_path)
-    root = tree.getroot()
-    all_p = list(root.iter(f'{{{W}}}p'))
-
-    def_start, def_end = find_definition_bounds(all_p)
-
-    if def_start is None or def_end is None:
-        # No definitions section is expected for many document types
-        # (POAs, guarantees, short deeds). Emit to stderr so stdout stays
-        # quiet for the common "nothing to do" case; exit code stays 0
-        # (caller treats False as "skipped", not as a failure).
-        print(
-            "reorder_definitions: no definitions section found "
-            "(skipping — expected for many document types).",
-            file=sys.stderr,
-        )
-        return False
-
-    print(f"Definitions: P[{def_start}] to P[{def_end - 1}] "
-          f"({def_end - def_start} paragraphs)")
-
-    # Snapshot every paragraph's full text BEFORE grouping so we can
-    # later assert that paragraphs outside [def_start, def_end) are
-    # untouched (A3 invariant check). Text-based comparison rather than
-    # `is` because lxml proxy identity is not stable across separate
-    # iter() calls.
-    paras_before = list(all_p)
-    paras_text_before = [get_full_text(p) for p in paras_before]
-
-    definitions = group_definitions(all_p, def_start, def_end)
-
-    if not definitions:
-        print("No individual definitions detected. Check the document "
-              "structure.")
-        return False
-
-    # Compute paragraph-index map for each definition (A6 dry-run output)
-    # — i.e. which index in all_p each definition's paragraphs occupy.
-    para_id_to_idx = {id(p): i for i, p in enumerate(paras_before)}
-    def_para_indices = []
-    for term, paras in definitions:
-        idxs = [para_id_to_idx.get(id(p), -1) for p in paras]
-        def_para_indices.append((term, idxs))
-
-    print(f"Found {len(definitions)} definitions:")
-    for (term, paras), (_, idxs) in zip(definitions, def_para_indices):
-        idx_str = ','.join(str(x) for x in idxs)
-        print(f"  '{term}' ({len(paras)} paras) [{idx_str}]")
-
-    # Rev11 A6: --expected-defs cross-check
-    if expected_defs is not None and len(definitions) != expected_defs:
-        raise SystemExit(
-            f"reorder_definitions: extracted {len(definitions)} definitions, "
-            f"--expected-defs={expected_defs}. "
-            f"Re-run with --dry-run to inspect, or correct the expected count."
-        )
-
-    # Sort alphabetically (case-insensitive)
-    definitions.sort(key=lambda x: x[0].lower())
-
-    print(f"\nSorted order:")
-    for term, _ in definitions:
-        print(f"  {term}")
-
-    # Rev11 A6: in dry-run mode, stop here without mutating the XML.
-    if dry_run:
-        print("\n--dry-run: no changes written.")
-        return True
+def _move_window(root, definitions, def_start, def_end):
+    """Move one section's definitions into their sorted order in the XML, then assert that no paragraph
+    outside [def_start, def_end) moved (Rev11 A3). Lifted out of reorder() unchanged by sub-step 16.6, so
+    each declared section is moved in turn. False where the table structure is not the one expected."""
+    paras_text_before = [get_full_text(p) for p in root.iter(f'{{{W}}}p')]
 
     # Reorder in the XML.
     # Detect whether definitions live in table rows (each <w:p> inside its
@@ -1086,6 +1126,117 @@ def reorder(xml_path, output_path=None, dry_run=False, expected_defs=None):
                     f"unchanged.\n  before: '{paras_text_before[i][:80]}'\n"
                     f"   after: '{paras_text_after[i][:80]}'"
                 )
+    return True
+
+
+def reorder(xml_path, output_path=None, dry_run=False, expected_defs=None,
+            notes_path=None):
+    """Main entry point: reorder definitions in the document XML.
+
+    Behaviour:
+      - ``dry_run=True`` prints the detection results without modifying
+        the XML.
+      - ``expected_defs`` aborts if the count of extracted definitions
+        does not match the expected number.
+      - Definitions-intro detection is purely structural (no language-
+        specific phrase list).
+      - Before writing back, every paragraph index outside the
+        definitions window must be unchanged or the script aborts.
+    """
+    if output_path is None:
+        output_path = xml_path
+
+    # Capture original header BEFORE parsing (preserves double-quote XML
+    # declaration and all namespace declarations exactly as Word wrote them).
+    with open(xml_path, 'r', encoding='utf-8') as f:
+        raw_xml = f.read()
+    orig_header = extract_header(raw_xml)
+
+    tree = etree.parse(xml_path)
+    root = tree.getroot()
+    all_p = list(root.iter(f'{{{W}}}p'))
+
+    windows = _declared_or_exit(notes_path, len(all_p)) if notes_path else []
+    declared_any = bool(windows)
+    cands = candidate_sections(all_p)
+    if windows:
+        print(f"Declared in the notes: {len(windows)} definitions section(s) - "
+              + ", ".join(f"P[{s}] to P[{e - 1}]" for s, e in windows)
+              + f". The detector sees {len(cands)} candidate(s), for the record.")
+    else:
+        def_start, def_end = find_definition_bounds(all_p)
+        _report_candidates(cands, def_start, def_end)
+        if def_start is None or def_end is None:
+            # REGISTER L3 (sub-step 16.6): exit 0 as before - many documents have
+            # no definitions section - but never the reassurance that a miss is
+            # expected; the instructions quote the phrase this line opens with.
+            print(
+                "reorder_definitions: no definitions section found - nothing reordered. "
+                "If this document has one, the detector missed it: " + DECLARE_HOW + ".",
+                file=sys.stderr,
+            )
+            return False
+        windows = [(def_start, def_end)]
+
+    # Snapshot every paragraph's full text BEFORE grouping, for the
+    # paragraph-index map below. Every section is grouped and checked - the
+    # term-sanity refusal included - before ANY paragraph moves, so a refusal
+    # in a later section still leaves the document unchanged.
+    paras_before = list(all_p)
+    para_id_to_idx = {id(p): i for i, p in enumerate(paras_before)}
+    planned = []
+    for def_start, def_end in windows:
+        print(f"Definitions: P[{def_start}] to P[{def_end - 1}] "
+              f"({def_end - def_start} paragraphs)")
+        definitions = group_definitions(all_p, def_start, def_end, declared=declared_any)
+        if not definitions:
+            if declared_any:
+                raise SystemExit(
+                    f"reorder_definitions: the declared section P[{def_start}] to P[{def_end - 1}] holds no "
+                    f"paragraph that starts a definition (a bold term then a colon, or a quoted term). "
+                    f"Refusing to reorder; document unchanged. Correct the declaration and re-run.")
+            print("No individual definitions detected. Check the document "
+                  "structure.")
+            return False
+
+        # Compute paragraph-index map for each definition (A6 dry-run output)
+        # — i.e. which index in all_p each definition's paragraphs occupy.
+        def_para_indices = []
+        for term, paras in definitions:
+            idxs = [para_id_to_idx.get(id(p), -1) for p in paras]
+            def_para_indices.append((term, idxs))
+
+        print(f"Found {len(definitions)} definitions:")
+        for (term, paras), (_, idxs) in zip(definitions, def_para_indices):
+            idx_str = ','.join(str(x) for x in idxs)
+            print(f"  '{term}' ({len(paras)} paras) [{idx_str}]")
+        planned.append((def_start, def_end, definitions))
+
+    # Rev11 A6: --expected-defs cross-check, over every section together
+    total = sum(len(d) for _s, _e, d in planned)
+    if expected_defs is not None and total != expected_defs:
+        raise SystemExit(
+            f"reorder_definitions: extracted {total} definitions, "
+            f"--expected-defs={expected_defs}. "
+            f"Re-run with --dry-run to inspect, or correct the expected count."
+        )
+
+    for _s, _e, definitions in planned:
+        # Sort alphabetically (case-insensitive)
+        definitions.sort(key=lambda x: x[0].lower())
+
+        print(f"\nSorted order:")
+        for term, _ in definitions:
+            print(f"  {term}")
+
+    # Rev11 A6: in dry-run mode, stop here without mutating the XML.
+    if dry_run:
+        print("\n--dry-run: no changes written.")
+        return True
+
+    for def_start, def_end, definitions in planned:
+        if not _move_window(root, definitions, def_start, def_end):
+            return False
 
     # Save — with header grafting to preserve the original XML declaration
     # and namespace declarations. lxml's tree.write() produces its own
@@ -1140,6 +1291,10 @@ if __name__ == '__main__':
     ap.add_argument('--expected-defs', type=int, default=None,
                     help='Abort if the extracted definition count does not '
                          'match this value (A6).')
+    ap.add_argument('--notes', default=None,
+                    help='paragraphs.json: every paragraph marked "role": '
+                         '"definition" is a declared definitions section, '
+                         'sorted in place of what the detector guesses (16.6).')
     args = ap.parse_args()
 
     xml_path = args.doc or args.xml_path
@@ -1152,6 +1307,7 @@ if __name__ == '__main__':
         output_path,
         dry_run=args.dry_run,
         expected_defs=args.expected_defs,
+        notes_path=args.notes,
     )
 
 # === SKILL FILE COMPLETE ===
