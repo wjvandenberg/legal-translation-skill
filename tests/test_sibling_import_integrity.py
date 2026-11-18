@@ -11,7 +11,9 @@ seventh, quality_check -> lexicon_compliance (its legislation tail) and quality_
 the operator's declared italic); nor, since sub-step 15.3, has the eighth, validate_segment_shapes ->
 apply_translations_textmatch (the boundary-whitespace restoration it asks, register G9). Since sub-step 16.3 the
 ninth, apply_translations_textmatch -> extract_paragraphs (the style cascade its writers ask), tolerates a MISSING
-sibling by design: apply writes the explicit flags it always wrote, and says so. None of them could tell a
+sibling by design: apply writes the explicit flags it always wrote, and says so; since sub-step 17.2 so do the
+tenth and eleventh, quality_check -> extract_paragraphs and reorder_definitions -> extract_paragraphs (the style
+resolver --styles asks), each then reading a run's own properties as before. None of them could tell a
 sibling that is
 ABSENT from one that is PRESENT BUT CUT SHORT, which is the broken install SKILL.md rule 6 answers by
 re-installing: a cut mid-statement gave a raw traceback, or - where the handler was broad - a control that
@@ -75,6 +77,10 @@ ROUTES = [
     # sub-step 16.3: apply's writers ask extraction what the styles give a run; a MISSING extraction leaves apply
     # writing the explicit flags it always wrote, said in one line - a partial install, tolerated by design
     ("apply_translations_textmatch.py", "extract_paragraphs.py", "load", True),
+    # sub-step 17.2: the two w:b readers ask extraction's resolver with --styles; a MISSING extraction leaves each
+    # reading a run's own properties, said in one line where --styles is given - a partial install, tolerated
+    ("quality_check.py", "extract_paragraphs.py", "load", True),
+    ("reorder_definitions.py", "extract_paragraphs.py", "load", True),
 ]
 # the names each importer asks of its sibling: a clean cut before the sibling's own check must remove every one
 NAMES = {"post_process.py": ["will_fix_spacing_fire", "load_declared_notes", "_notes_norm", "_declared_italic"],

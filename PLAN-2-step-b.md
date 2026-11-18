@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-18, WORKER 6 OF THE CHAIN OF 2026-11-18 — SESSION PURPOSE — what · how · purpose:** step 17 built from 17.1 as far as the clock allows, each sub-step whole · 17.1 first: the formatting sentences of both trees set against the code, and four corpus counts, read-only, doc-ids and counts only · **so that 17.2 to 17.5 build and rewrite against measured facts, not the docs' own account** *(written immediately after the tag `rollback-2026-11-18d-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-18, WORKER 7 OF THE CHAIN OF 2026-11-18 — SESSION PURPOSE — what · how · purpose:** 17.2 built whole and committed locally, unpushed · `--styles` on the two bold readers through extraction's resolver, check 15 reading `w:val`, both trees, proved red at the pin on invented fixtures · **so that the next session needs only the full run and a push before 17.3** *(written immediately after the tag `rollback-2026-11-18e-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -3677,6 +3677,37 @@ firing on every count first (`temp/s1118d_171_counts.py`):
 | O1 | 55 of 464 declared bold spans end on punctuation — 18 on a quotation mark, 37 on other punctuation | the 37 in nine documents: D05 9, D06 7, D02 6, D09 5, D11 5, D07 2, D03 1, D03B 1, D10 1 | 17.5's sentence: end the span at the term — the 37 are the register's shape; the 18 a convention the sentence must rule on |
 | check 15 | 0 definition paragraphs flagged on apply's output today, 0 reading `w:val`, over 97 paragraphs naming *means* | all 13 | 17.2's expected movement is 0 on the corpus: its true positive is invented, its false-positive arm all 13 unmoved |
 | A20 | 4 entries begin with whitespace and declare a span, and all 4 keep it — a tab or a line break, which apply's strip leaves — so 0 spans shift | D06 4 | 3.16's *measured unable to shift a span* re-derived; the pin is code, so it goes to 17.3, which touches the same path, and A20 stays open until then |
+
+**17.2's OWN PLAN — 2026-11-18, written before any code** *(worker 7 of the chain of 2026-11-18; its choices
+`DECISIONS-LOG.md` 2026-11-18, worker 7's, Wouter's to overturn)*. **Changes, both trees, two shipped scripts:**
+`quality_check.py` and `reorder_definitions.py` each import `read_style_cascade` and `styles_give` from
+`extract_paragraphs.py` at load, a MISSING sibling tolerated as apply's is (16.3) and a cut-short one a broken
+install; each gains `--styles <path>`, a `.docx` or a `styles.xml` on its own. **Check 15** reads a run's own `w:b`
+as bold only where its `w:val` is not `0`, `false` or `off` (the deciding line, 863 in `uk/`, 902 in `us/`), and
+where the run names no `w:b` and `--styles` was read, what the paragraph's and the run's styles give it.
+**`get_bold_term`** keeps its own reading of `w:b` and `w:bCs` and, where the run names no `w:b` and `--styles` was
+read, adds what the styles give. **Without `--styles` neither prints a new line or moves an exit code**; with it,
+each prints one line saying whether the styles were read, and a path that does not exist is a usage error, exit 2.
+**Routes:** two more in `tests/test_sibling_import_integrity.py`, both tolerated. **Expected movement (17.1):** 0
+on the corpus. *TP, invented* (`tests/test_styles_readers.py`, both trees, red at the pin): a definition whose term
+is bold by a character style and one by its paragraph style, flagged without `--styles` and not with it; a term
+run carrying `w:val="0"` flagged; a `Term: meaning` paragraph bold by its style alone found by `get_bold_term` and
+reordered with `--styles`, not without; the `.docx` and the `styles.xml` forms; the missing path refused. *FP:*
+the 13 frozen workdirs per tree without `--styles`, rows, total and exit code as at the pin; `reorder_definitions`'
+output byte for byte as at the pin without `--styles`, which no skill doc passes before 17.5 — so no delivered byte
+moves here and no rendered diff, 17.6's covering it. **MUST NOT:** the term-sanity guard (P11); the skill
+docs, which pass `--styles` at 17.5.
+
+**17.2's RESULT — BUILT 2026-11-18, worker 7, committed locally, not pushed.** As planned, both trees.
+`tests/test_styles_readers.py` 58 of 58 per tree, **red at the pin** (31c0954: 22 failures of 48 per tree);
+**32 of 32 mutants killed**, 16 per tree, on every deciding line (`temp/s1118e_pin_and_mutants.py`). **The corpus,
+without `--styles`:** 13 of 13 workdirs per tree read, `quality_check`'s output and exit code, `reorder_definitions`'
+dry run and its written output byte for byte as at the pin, a planted control seen on 13 of 13; **with `--styles`**
+(the source `.docx`), the styles read on 13 of 13 and check 15's count moved on 0 — 17.1's expected movement, 0
+unexplained (`temp/s1118e_fp_corpus.py`). The sibling suite's two new routes, tolerated. **No rendered diff:** no
+delivered byte moves without `--styles`. **Declared, from the review:** the *read* line also prints for a `.docx`
+with no styles part; an explicit `w:bCs` off with no `w:b` reads bold in a bold style under `--styles` (right for
+Latin text, untested); no end-to-end reorder run with `--styles` — each for 17.6 to take or leave.
 
 **The register rows, as section 9.3 maps them:**
 

@@ -61,6 +61,56 @@ _check_self_integrity()
 
 
 
+# SUB-STEP 17.2: extraction's style resolver, asked only with --styles. NO .pyc INSIDE A SHIPPED TREE: the guard
+# precedes the import (tests/test_no_bytecode_in_tree.py). A MISSING sibling (a partial install) leaves both
+# None and --styles says so; a CUT-SHORT one is a broken install, SKILL.md rule 6.
+sys.dont_write_bytecode = True
+_SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+if _SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPTS_DIR)
+
+
+def _sibling_integrity_exit(name, exc):
+    """A sibling module this script imports is missing or cut short: a broken install, which SKILL.md rule 6
+    answers by re-installing. So the banner and the exit 3 this script prints for its OWN truncation - never a
+    raw traceback and exit 1, and never a gate's costume. Only ImportError (deleted, or cut before the names it
+    is asked for) and SyntaxError (cut mid-statement) arrive here: a broader class would dress a real defect as
+    a broken install - and an ImportError about some OTHER module, raised inside the sibling, is that sibling's
+    defect, so it is raised as it is."""
+    if isinstance(exc, ImportError) and exc.name not in (None, os.path.splitext(name)[0]):
+        raise exc
+    bar = "=" * 60
+    for line in ("", bar, "[skill] FILE INTEGRITY CHECK FAILED — script truncated.",
+                 f"  File: {os.path.join(os.path.dirname(os.path.abspath(__file__)), name)}",
+                 f"  Needed by: {os.path.basename(__file__)} ({type(exc).__name__}: {exc})",
+                 "  Re-install the skill from the .skill / .zip archive.", bar, ""):
+        print(line, file=sys.stderr)
+    sys.exit(3)
+
+
+def _sibling_cut_short(name, exc):
+    """True when importing the sibling `name` failed because it is PRESENT BUT CUT SHORT: a SyntaxError (cut
+    mid-statement - the whole file is compiled before any of it runs), or an ImportError that is not a
+    ModuleNotFoundError and names the sibling itself (cut cleanly before the names asked of it). A sibling that
+    is simply MISSING - a ModuleNotFoundError naming it - is not, so a fallback designed for a partial install
+    still runs; and an ImportError about some OTHER module, raised inside a whole sibling, is that sibling's
+    defect, not an install's."""
+    if isinstance(exc, SyntaxError):
+        return True
+    return (isinstance(exc, ImportError) and not isinstance(exc, ModuleNotFoundError)
+            and exc.name == os.path.splitext(name)[0])
+
+
+try:
+    from extract_paragraphs import read_style_cascade, styles_give  # noqa: E402
+except (ImportError, SyntaxError) as _exc:
+    if _sibling_cut_short('extract_paragraphs.py', _exc):
+        _sibling_integrity_exit('extract_paragraphs.py', _exc)
+    if not (isinstance(_exc, ModuleNotFoundError) and _exc.name == 'extract_paragraphs'):
+        raise
+    read_style_cascade = styles_give = None
+
+
 W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 
 # ECMA-376 ST_OnOff lexical space: true | false | 1 | 0 | on | off
@@ -214,6 +264,62 @@ def _is_non_definition_bold_prefix(term):
             return True
     return False
 
+# SUB-STEP 17.2: --styles. Bold a STYLE gives - a paragraph style, a character style, the document's defaults - is
+# invisible in a run's own properties, and since sub-step 16.3 apply no longer writes it there as a flag. With
+# --styles this reader asks extraction's resolver what the styles give a run that names no w:b of its own; without
+# it, nothing here runs and nothing new is printed.
+class _StylesPart:
+    """A styles.xml given on its own, read as extraction's resolver reads a package's styles part."""
+    def __init__(self, raw):
+        self._raw = raw
+
+    def read(self, name):
+        if name == 'word/styles.xml':
+            return self._raw
+        raise KeyError(name)
+
+
+def load_styles_cascade(path):
+    """(cascade, the line to print) for --styles, a .docx or a styles.xml on its own. The cascade is None where
+    extract_paragraphs.py is missing or no styles part can be read, and bold is then read as without --styles."""
+    import zipfile
+    if read_style_cascade is None:
+        return None, ("Styles: extract_paragraphs.py is missing beside this script (a partial install) - bold read "
+                      "from each run's own properties, as without --styles")
+    try:
+        if zipfile.is_zipfile(path):
+            with zipfile.ZipFile(path) as zf:
+                cascade = read_style_cascade(zf)
+        else:
+            with open(path, 'rb') as f:
+                cascade = read_style_cascade(_StylesPart(f.read()))
+    except (OSError, zipfile.BadZipFile):
+        cascade = None
+    if cascade is None:
+        return None, ("Styles: no styles part could be read from --styles - bold read from each run's own "
+                      "properties, as without --styles")
+    return cascade, ("Styles: read from --styles - a run naming no w:b of its own is bold where its paragraph and "
+                     "character styles make it so")
+
+
+def styles_bold(cascade, p, rpr):
+    """True where the styles give bold to a run of paragraph `p` whose run properties are `rpr` (sub-step 17.2)."""
+    ppr = p.find(f'{{{W}}}pPr')
+    ps = ppr.find(f'{{{W}}}pStyle') if ppr is not None else None
+    rs = rpr.find(f'{{{W}}}rStyle') if rpr is not None else None
+    return bool(styles_give(cascade, ps.get(f'{{{W}}}val') if ps is not None else None,
+                            rs.get(f'{{{W}}}val') if rs is not None else None)['bold'])
+
+
+_STYLES_CASCADE = None
+
+
+def use_styles(path):
+    """--styles (sub-step 17.2): the styles part read once; get_bold_term then asks it. The line to print."""
+    global _STYLES_CASCADE
+    _STYLES_CASCADE, line = load_styles_cascade(path)
+    return line
+
 def get_bold_term(p):
     """If paragraph starts with a bold run followed by ':', return the
     bold text (the defined term). Otherwise return None."""
@@ -247,6 +353,10 @@ def get_bold_term(p):
                 is_bold = is_on(b, default=False)
             else:
                 is_bold = is_on(bi, default=False)
+        if (not is_bold and _STYLES_CASCADE is not None
+                and (rpr is None or rpr.find(f'{{{W}}}b') is None)):
+            # sub-step 17.2: a run naming no w:b of its own is bold where its styles make it so
+            is_bold = styles_bold(_STYLES_CASCADE, p, rpr)
         t = r.find(f'{{{W}}}t')
         text = (t.text or '') if t is not None else ''
 
@@ -1295,12 +1405,20 @@ if __name__ == '__main__':
                     help='paragraphs.json: every paragraph marked "role": '
                          '"definition" is a declared definitions section, '
                          'sorted in place of what the detector guesses (16.6).')
+    ap.add_argument('--styles', default=None,
+                    help='The document\'s styles part - the .docx, or its word/styles.xml - '
+                         'so a term bold by its paragraph or character style is found '
+                         '(17.2). Without it, each run\'s own properties only.')
     args = ap.parse_args()
 
     xml_path = args.doc or args.xml_path
     if not xml_path:
         ap.error("provide a document.xml path (positional or --doc)")
     output_path = (args.output or args.positional_output or xml_path)
+    if args.styles is not None:
+        if not os.path.isfile(args.styles):
+            ap.error('--styles: no such file')
+        print(f"  {use_styles(args.styles)}")
 
     reorder(
         xml_path,

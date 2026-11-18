@@ -94,6 +94,31 @@ except (ImportError, SyntaxError) as _exc:  # deleted, or cut short: a broken in
     _sibling_integrity_exit('post_process.py', _exc)
 
 
+def _sibling_cut_short(name, exc):
+    """True when importing the sibling `name` failed because it is PRESENT BUT CUT SHORT: a SyntaxError (cut
+    mid-statement - the whole file is compiled before any of it runs), or an ImportError that is not a
+    ModuleNotFoundError and names the sibling itself (cut cleanly before the names asked of it). A sibling that
+    is simply MISSING - a ModuleNotFoundError naming it - is not, so a fallback designed for a partial install
+    still runs; and an ImportError about some OTHER module, raised inside a whole sibling, is that sibling's
+    defect, not an install's."""
+    if isinstance(exc, SyntaxError):
+        return True
+    return (isinstance(exc, ImportError) and not isinstance(exc, ModuleNotFoundError)
+            and exc.name == os.path.splitext(name)[0])
+
+
+# SUB-STEP 17.2: extraction's style resolver, asked only with --styles. A MISSING sibling (a partial install)
+# leaves both None and --styles says so; a CUT-SHORT one is a broken install, SKILL.md rule 6.
+try:
+    from extract_paragraphs import read_style_cascade, styles_give  # noqa: E402
+except (ImportError, SyntaxError) as _exc:
+    if _sibling_cut_short('extract_paragraphs.py', _exc):
+        _sibling_integrity_exit('extract_paragraphs.py', _exc)
+    if not (isinstance(_exc, ModuleNotFoundError) and _exc.name == 'extract_paragraphs'):
+        raise
+    read_style_cascade = styles_give = None
+
+
 def _check_self_integrity():
     """Detect install-time truncation. Whole-file scan tolerates null-padding."""
     try:
@@ -881,12 +906,73 @@ def check_truncation(root, verbose, source_data=None):
 
     return issues
 
-def check_formatting(root, verbose, notes=None):
+# SUB-STEP 17.2: --styles. Bold a STYLE gives - a paragraph style, a character style, the document's defaults - is
+# invisible in a run's own properties, and since sub-step 16.3 apply no longer writes it there as a flag. With
+# --styles this reader asks extraction's resolver what the styles give a run that names no w:b of its own; without
+# it, nothing here runs and nothing new is printed.
+class _StylesPart:
+    """A styles.xml given on its own, read as extraction's resolver reads a package's styles part."""
+    def __init__(self, raw):
+        self._raw = raw
+
+    def read(self, name):
+        if name == 'word/styles.xml':
+            return self._raw
+        raise KeyError(name)
+
+
+def load_styles_cascade(path):
+    """(cascade, the line to print) for --styles, a .docx or a styles.xml on its own. The cascade is None where
+    extract_paragraphs.py is missing or no styles part can be read, and bold is then read as without --styles."""
+    import zipfile
+    if read_style_cascade is None:
+        return None, ("Styles: extract_paragraphs.py is missing beside this script (a partial install) - bold read "
+                      "from each run's own properties, as without --styles")
+    try:
+        if zipfile.is_zipfile(path):
+            with zipfile.ZipFile(path) as zf:
+                cascade = read_style_cascade(zf)
+        else:
+            with open(path, 'rb') as f:
+                cascade = read_style_cascade(_StylesPart(f.read()))
+    except (OSError, zipfile.BadZipFile):
+        cascade = None
+    if cascade is None:
+        return None, ("Styles: no styles part could be read from --styles - bold read from each run's own "
+                      "properties, as without --styles")
+    return cascade, ("Styles: read from --styles - a run naming no w:b of its own is bold where its paragraph and "
+                     "character styles make it so")
+
+
+def styles_bold(cascade, p, rpr):
+    """True where the styles give bold to a run of paragraph `p` whose run properties are `rpr` (sub-step 17.2)."""
+    ppr = p.find(f'{{{W}}}pPr')
+    ps = ppr.find(f'{{{W}}}pStyle') if ppr is not None else None
+    rs = rpr.find(f'{{{W}}}rStyle') if rpr is not None else None
+    return bool(styles_give(cascade, ps.get(f'{{{W}}}val') if ps is not None else None,
+                            rs.get(f'{{{W}}}val') if rs is not None else None)['bold'])
+
+
+def _qc_run_bold(p, rpr, cascade):
+    """Check 15's bold on one run (sub-step 17.2). The run's own w:b decides where it names one - NOT bold where its
+    w:val is 0, false or off, which until 17.2 this check counted as bold; where it names none, the styles decide
+    when --styles was read, and otherwise the run is not bold, as before."""
+    b = rpr.find(f'{{{W}}}b') if rpr is not None else None
+    if b is not None:
+        v = b.get(f'{{{W}}}val')
+        return v is None or v.strip().lower() not in ('false', '0', 'off')
+    return cascade is not None and styles_give is not None and styles_bold(cascade, p, rpr)
+
+
+def check_formatting(root, verbose, notes=None, cascade=None):
     """Check 15: Formatting issues (bold on definitions, spurious italic).
 
     `notes` is post_process's `load_declared_notes` mapping, or None: with it, a long italic run the
     operator's notes DECLARE italic, or carry from an italic source run, is no finding - B1's question,
-    asked as post_process's italic pass asks it (register G12; sub-step 14.11). Without notes, as before."""
+    asked as post_process's italic pass asks it (register G12; sub-step 14.11). Without notes, as before.
+
+    `cascade` is the --styles part read through extraction's resolver, or None (sub-step 17.2); the definition rule's bold is
+    `_qc_run_bold`'s."""
     issues = []
 
     for p in root.iter(f'{{{W}}}p'):
@@ -899,7 +985,7 @@ def check_formatting(root, verbose, notes=None):
             for r in p.iter(f'{{{W}}}r'):
                 rpr = r.find(f'{{{W}}}rPr')
                 t = r.find(f'{{{W}}}t')
-                if rpr is not None and rpr.find(f'{{{W}}}b') is not None:
+                if _qc_run_bold(p, rpr, cascade):
                     if t is not None and t.text and len(t.text.strip()) > 2:
                         has_bold = True
                         break
@@ -1218,7 +1304,7 @@ def check_aux_files(aux_dir, source_language, verbose=False, bare_months=None):
 # ======================================================================
 
 def check(xml_path, verbose=False, source_json=None, variant='us',
-          source_language=None, aux_dir=None, original_xml=None):
+          source_language=None, aux_dir=None, original_xml=None, styles=None):
     bare_months = []
     tree = etree.parse(xml_path)
     root = tree.getroot()
@@ -1230,6 +1316,12 @@ def check(xml_path, verbose=False, source_json=None, variant='us',
     # The operator's notes as post_process's italic pass reads them: None without --with-source or when
     # they cannot be read, and then the spurious-italic rule behaves exactly as before.
     declared_notes = load_declared_notes(source_json) if source_json else None
+    # --styles (sub-step 17.2): read once, said in one line; without it nothing is printed and check 15
+    # reads each run's own properties, as before.
+    cascade = None
+    if styles:
+        cascade, styles_line = load_styles_cascade(styles)
+        print(f"  {styles_line}")
 
     # The UNTRANSLATED body, for the checks that must not report an anomaly the
     # document arrived with. Optional: without it those checks behave exactly as
@@ -1269,7 +1361,7 @@ def check(xml_path, verbose=False, source_json=None, variant='us',
         ('word_order', check_word_order),
         ('internal_article_refs', check_article_refs),
         ('that_precedes_follows', check_that_precedes),
-        ('formatting', lambda r, v: check_formatting(r, v, declared_notes)),
+        ('formatting', lambda r, v: check_formatting(r, v, declared_notes, cascade)),
         ('numbering', lambda r, v: check_numbering(r, v, source_root)),
         ('definition_order', check_definition_order),
     ]
@@ -1399,14 +1491,21 @@ if __name__ == '__main__':
                          'footnotes.xml, endnotes.xml). Pass either the parent of '
                          'word/ or word/ itself. Auxiliary files are scanned for '
                          'source-language remnants. Strongly recommended.')
+    ap.add_argument('--styles', dest='styles', default=None,
+                    help='Sub-step 17.2: the document\'s styles part - the .docx, or its '
+                         'word/styles.xml - so check 15 sees bold a paragraph or character '
+                         'style gives. Without it, each run\'s own properties only.')
     args = ap.parse_args()
+    if args.styles is not None and not os.path.isfile(args.styles):
+        ap.error('--styles: no such file')
 
     source_language = args.source_language.lower() if args.source_language else None
 
     results = check(args.xml_path, verbose=args.verbose,
                     source_json=args.source_json,
                     variant=args.variant, source_language=source_language,
-                    aux_dir=args.aux_dir, original_xml=args.original_xml)
+                    aux_dir=args.aux_dir, original_xml=args.original_xml,
+                    styles=args.styles)
 
     # STEP 9's VERDICT HAS TO BE ABLE TO LEAVE THIS SCRIPT, and until now it
     # could not. There was no sys.exit for the issues case, so this script
