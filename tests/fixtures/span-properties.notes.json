@@ -1,0 +1,202 @@
+[
+  {
+    "idx": 0,
+    "text": "Zie de bijlage",
+    "runs": [
+      {
+        "start": 0,
+        "end": 7,
+        "text": "Zie de ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 7,
+        "end": 14,
+        "text": "bijlage",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "See the schedule",
+    "en_runs": null
+  },
+  {
+    "idx": 1,
+    "text": "Begrip betekent dit",
+    "runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "text": "Begrip",
+        "bold": true,
+        "italic": false,
+        "underline": true
+      },
+      {
+        "start": 6,
+        "end": 19,
+        "text": " betekent dit",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "Term means this",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 4,
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 4,
+        "end": 15,
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 2,
+    "text": "Tekst in symbool",
+    "runs": [
+      {
+        "start": 0,
+        "end": 16,
+        "text": "Tekst in symbool",
+        "bold": false,
+        "italic": false,
+        "font": "Symbol",
+        "sz": "20"
+      }
+    ],
+    "en": "Text in symbol",
+    "en_runs": null
+  },
+  {
+    "idx": 3,
+    "text": "Gewoon verder",
+    "runs": [
+      {
+        "start": 0,
+        "end": 7,
+        "text": "Gewoon ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 7,
+        "end": 13,
+        "text": "verder",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "Plain further",
+    "en_runs": null
+  },
+  {
+    "idx": 4,
+    "text": "Eenvormige tekst",
+    "runs": [
+      {
+        "start": 0,
+        "end": 16,
+        "text": "Eenvormige tekst",
+        "bold": false,
+        "italic": false,
+        "font": "Arial",
+        "sz": "22"
+      }
+    ],
+    "en": "Uniform wording",
+    "en_runs": null
+  },
+  {
+    "idx": 5,
+    "text": "De Looptijd geldt",
+    "runs": [
+      {
+        "start": 0,
+        "end": 3,
+        "text": "De ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 3,
+        "end": 11,
+        "text": "Looptijd",
+        "bold": false,
+        "italic": false,
+        "resolved": {
+          "bold": true
+        }
+      },
+      {
+        "start": 11,
+        "end": 17,
+        "text": " geldt",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "The Term applies",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 4,
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 4,
+        "end": 8,
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 8,
+        "end": 16,
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 6,
+    "text": "Naam van de partij",
+    "runs": [
+      {
+        "start": 0,
+        "end": 4,
+        "text": "Naam",
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 4,
+        "end": 18,
+        "text": " van de partij",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "Name of the party",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 4,
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 4,
+        "end": 17,
+        "bold": false,
+        "italic": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,287 @@
+[
+  {
+    "idx": 0,
+    "text": "Cel waarde",
+    "runs": [
+      {
+        "start": 0,
+        "end": 10,
+        "text": "Cel waarde",
+        "bold": true,
+        "italic": false
+      }
+    ],
+    "en": "Cell value",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 10,
+        "bold": false,
+        "italic": true
+      }
+    ]
+  },
+  {
+    "idx": 1,
+    "text": "Artikel kop",
+    "runs": [
+      {
+        "start": 0,
+        "end": 7,
+        "text": "Artikel",
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 7,
+        "end": 11,
+        "text": " kop",
+        "bold": true,
+        "italic": false
+      }
+    ],
+    "en": "Article heading",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 7,
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 7,
+        "end": 15,
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 2,
+    "text": "Vet woord",
+    "runs": [
+      {
+        "start": 0,
+        "end": 9,
+        "text": "Vet woord",
+        "bold": true,
+        "italic": false
+      }
+    ],
+    "en": "Plain words",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 11,
+        "bold": false,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 3,
+    "text": "Kop woorden",
+    "runs": [
+      {
+        "start": 0,
+        "end": 11,
+        "text": "Kop woorden",
+        "bold": true,
+        "italic": false
+      }
+    ],
+    "en": "Heading words",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 13,
+        "bold": true,
+        "italic": false
+      }
+    ]
+  },
+  {
+    "idx": 4,
+    "text": "Merkteken",
+    "runs": [
+      {
+        "start": 0,
+        "end": 9,
+        "text": "Merkteken",
+        "bold": true,
+        "italic": false,
+        "resolved": {
+          "bold": false
+        }
+      }
+    ],
+    "en": "Mark only",
+    "en_runs": null,
+    "p_bold": true,
+    "p_rpr_b": "true"
+  },
+  {
+    "idx": 5,
+    "text": "Stijlkop",
+    "runs": [
+      {
+        "start": 0,
+        "end": 8,
+        "text": "Stijlkop",
+        "bold": false,
+        "italic": false,
+        "resolved": {
+          "bold": true
+        }
+      }
+    ],
+    "en": "Style only",
+    "en_runs": null,
+    "style": "BoldClause"
+  },
+  {
+    "idx": 6,
+    "text": "Schuin vet",
+    "runs": [
+      {
+        "start": 0,
+        "end": 10,
+        "text": "Schuin vet",
+        "bold": true,
+        "italic": true
+      }
+    ],
+    "en": "Bold slanted",
+    "en_runs": null
+  },
+  {
+    "idx": 7,
+    "text": "Vaste kop",
+    "runs": [
+      {
+        "start": 0,
+        "end": 9,
+        "text": "Vaste kop",
+        "bold": true,
+        "italic": false
+      }
+    ],
+    "en": "Firm heading",
+    "en_runs": null
+  },
+  {
+    "idx": 8,
+    "text": "Kop erbij",
+    "runs": [
+      {
+        "start": 0,
+        "end": 4,
+        "text": "Kop ",
+        "bold": false,
+        "italic": false,
+        "resolved": {
+          "bold": true
+        }
+      },
+      {
+        "start": 4,
+        "end": 9,
+        "text": "erbij",
+        "bold": false,
+        "italic": false,
+        "resolved": {
+          "bold": true
+        }
+      }
+    ],
+    "en": "Head added",
+    "en_runs": null,
+    "has_track_changes": true,
+    "style": "BoldClause",
+    "tc_segments": [
+      {
+        "type": "regular",
+        "text": "Kop "
+      },
+      {
+        "type": "ins",
+        "text": "erbij"
+      }
+    ],
+    "en_segments": [
+      {
+        "type": "regular",
+        "en": "Head "
+      },
+      {
+        "type": "ins",
+        "en": "added"
+      }
+    ]
+  },
+  {
+    "idx": 9,
+    "text": "Romp erbij los",
+    "runs": [
+      {
+        "start": 0,
+        "end": 5,
+        "text": "Romp ",
+        "bold": false,
+        "italic": false,
+        "resolved": {
+          "bold": true
+        }
+      },
+      {
+        "start": 5,
+        "end": 10,
+        "text": "erbij",
+        "bold": false,
+        "italic": false,
+        "resolved": {
+          "bold": true
+        }
+      },
+      {
+        "start": 10,
+        "end": 14,
+        "text": " los",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "Body added loose",
+    "en_runs": null,
+    "has_track_changes": true,
+    "style": "BoldClause",
+    "tc_segments": [
+      {
+        "type": "regular",
+        "text": "Romp "
+      },
+      {
+        "type": "ins",
+        "text": "erbij"
+      },
+      {
+        "type": "regular",
+        "text": " los"
+      }
+    ],
+    "en_segments": [
+      {
+        "type": "regular",
+        "en": "Body "
+      },
+      {
+        "type": "ins",
+        "en": "added "
+      },
+      {
+        "type": "regular",
+        "en": "loose"
+      }
+    ]
+  }
+]

@@ -210,8 +210,11 @@ def _member(name):
     return zi
 
 
-def docx(path, body, extra_parts=None, extra_ct=""):
-    """Write a minimal but genuinely valid .docx, byte-identically on every run."""
+def docx(path, body, extra_parts=None, extra_ct="", styles=None):
+    """Write a minimal but genuinely valid .docx, byte-identically on every run.
+
+    `styles` replaces the shared styles part for one fixture (sub-step 16.5's page needs character styles the
+    shared part does not hold); left out, every fixture's bytes are what they were."""
     doc = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
            f'<w:document {W} {R} {WP}><w:body>{body}'
            f'<w:sectPr><w:pgSz w:w="11906" w:h="16838"/></w:sectPr>'
@@ -220,7 +223,7 @@ def docx(path, body, extra_parts=None, extra_ct=""):
     parts = [("[Content_Types].xml", CONTENT_TYPES.format(extra=extra_ct)),
              ("_rels/.rels", RELS),
              ("word/document.xml", doc),
-             ("word/styles.xml", STYLES)]
+             ("word/styles.xml", STYLES if styles is None else styles)]
     parts += sorted((extra_parts or {}).items())   # sorted: dict order must not decide bytes
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
         for name, data in parts:
@@ -1455,7 +1458,7 @@ def _style_bold(path):
         p(f'<w:r><w:rPr><w:i/></w:rPr><w:t xml:space="preserve">{slanted}</w:t></w:r>') +
         p(off % control, ppr='<w:pPr><w:pStyle w:val="BoldClause"/></w:pPr>')
     )
-    docx(path, body)
+    docx(path, body, extra_parts={"word/_rels/document.xml.rels": STYLE_LINK_RELS})
 
     def one(text, italic=False, resolved=None):
         run = {"start": 0, "end": len(text), "text": text, "bold": False, "italic": italic}
@@ -1474,6 +1477,181 @@ def _style_bold(path):
          "runs": one(control), "en_runs": None},
     ]
     _write_notes(path, notes)
+
+
+# A STYLES PART NOTHING POINTS AT IS NOT READ BY A RENDERER. Every fixture here writes word/styles.xml, and
+# extraction and apply read it by name, but a consumer finds it through the main part's relationship - and until
+# 2026-11-18 no fixture declared one. Measured that day on style-bold.docx's first rendered diff: LibreOffice drew
+# the SOURCE's style-bold heading upright, so the page could not show the very bold sub-step 16.3 is about. The
+# fixtures whose page is about what a style gives link it; the others are left byte for byte as they were.
+STYLE_LINK_RELS = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>"""
+
+
+def _xrun(start, text, bold=False, italic=False, resolved=None):
+    """One run entry as extraction writes it: offsets, text, its own bold and italic, `resolved` only where the
+    value in force differs."""
+    run = {"start": start, "end": start + len(text), "text": text, "bold": bold, "italic": italic}
+    if resolved:
+        run["resolved"] = resolved
+    return run
+
+
+def _span(start, end, bold=False, italic=False):
+    return {"start": start, "end": end, "bold": bold, "italic": italic}
+
+
+DECL_SPANS = {
+    "a11": "Cel waarde", "pattern": ("Artikel", " kop"), "false": "Vet woord", "agree": "Kop woorden",
+    "mark": "Merkteken", "style": "Stijlkop", "both": "Schuin vet", "control": "Vaste kop",
+    "tc": ("Kop ", "erbij"), "tcmix": ("Romp ", "erbij", " los"),
+}
+
+
+@fixture("declared-spans.docx",
+         "SUB-STEP 16.4 — the readers, declarations win: a short bold paragraph declared italic and not bold "
+         "(register A11's shape), a declared bold pattern, a span declared false, a declaration that agrees; bold "
+         "by the paragraph mark alone, by its style alone, bold and italic undeclared, the bold control; a "
+         "tracked-change paragraph bold by its style throughout and one mixed in force. Ships its own "
+         "declared-spans.notes.json")
+def _declared_spans(path):
+    """The page sub-step 16.4 is judged on, its shapes those of tests/test_declarations_win.py. Before it, the
+    sub-heading test overrode a short bold paragraph's declaration and forced italic off where it fired, and the
+    tracked-change bypass read a run's own bold; after it, a declaration is absolute and both read the value in
+    force. The agreeing declaration, the bold control and the mixed tracked-change paragraph must not move."""
+    s = DECL_SPANS
+    b, bi, off = "<w:rPr><w:b/></w:rPr>", "<w:rPr><w:b/><w:i/></w:rPr>", '<w:rPr><w:b w:val="0"/></w:rPr>'
+    head = '<w:pPr><w:pStyle w:val="BoldClause"/></w:pPr>'
+    ins = ('<w:ins w:id="%d" w:author="A" w:date="2020-01-01T00:00:00Z">'
+           '<w:r><w:t xml:space="preserve">%s</w:t></w:r></w:ins>')
+    body = (
+        p(r(s["a11"], b)) +
+        p(r(s["pattern"][0], b), r(s["pattern"][1], b)) +
+        p(r(s["false"], b)) +
+        p(r(s["agree"], b)) +
+        p(r(s["mark"]), ppr="<w:pPr><w:rPr><w:b/></w:rPr></w:pPr>") +
+        p(r(s["style"]), ppr=head) +
+        p(r(s["both"], bi)) +
+        p(r(s["control"], b)) +
+        p(r(s["tc"][0]), ins % (1, s["tc"][1]), ppr=head) +
+        p(r(s["tcmix"][0]), ins % (2, s["tcmix"][1]), r(s["tcmix"][2], off), ppr=head)
+    )
+    docx(path, body, extra_parts={"word/_rels/document.xml.rels": STYLE_LINK_RELS})
+    _write_notes(path, _declared_spans_notes())
+
+
+def _declared_spans_notes():
+    """As extraction wrote them on 2026-11-18, entry for entry, both trees - re-prove by running each tree's
+    extract_paragraphs.py over the fixture and comparing, `en`, `en_runs` and `en_segments` set aside - with an
+    operator's English and the declarations 16.4 is about. Nothing here re-checks it on every build."""
+    s, on = DECL_SPANS, {"bold": True}
+    plain = lambda idx, text, en, runs, **kw: dict({"idx": idx, "text": text, "runs": runs, "en": en,
+                                                    "en_runs": None}, **kw)
+    notes = [
+        plain(0, s["a11"], "Cell value", [_xrun(0, s["a11"], bold=True)]),
+        plain(1, "".join(s["pattern"]), "Article heading",
+              [_xrun(0, s["pattern"][0], bold=True), _xrun(7, s["pattern"][1], bold=True)]),
+        plain(2, s["false"], "Plain words", [_xrun(0, s["false"], bold=True)]),
+        plain(3, s["agree"], "Heading words", [_xrun(0, s["agree"], bold=True)]),
+        plain(4, s["mark"], "Mark only", [_xrun(0, s["mark"], bold=True, resolved={"bold": False})],
+              p_bold=True, p_rpr_b="true"),
+        plain(5, s["style"], "Style only", [_xrun(0, s["style"], resolved=on)], style="BoldClause"),
+        plain(6, s["both"], "Bold slanted", [_xrun(0, s["both"], bold=True, italic=True)]),
+        plain(7, s["control"], "Firm heading", [_xrun(0, s["control"], bold=True)]),
+        plain(8, "".join(s["tc"]), "Head added",
+              [_xrun(0, s["tc"][0], resolved=on), _xrun(4, s["tc"][1], resolved=on)],
+              has_track_changes=True, style="BoldClause",
+              tc_segments=[{"type": "regular", "text": s["tc"][0]}, {"type": "ins", "text": s["tc"][1]}]),
+        plain(9, "".join(s["tcmix"]), "Body added loose",
+              [_xrun(0, s["tcmix"][0], resolved=on), _xrun(5, s["tcmix"][1], resolved=on), _xrun(10, s["tcmix"][2])],
+              has_track_changes=True, style="BoldClause",
+              tc_segments=[{"type": "regular", "text": s["tcmix"][0]}, {"type": "ins", "text": s["tcmix"][1]},
+                           {"type": "regular", "text": s["tcmix"][2]}]),
+    ]
+    notes[0]["en_runs"] = [_span(0, 10, italic=True)]                      # A11: declared italic, not bold
+    notes[1]["en_runs"] = [_span(0, 7, bold=True), _span(7, 15)]           # a declared bold pattern
+    notes[2]["en_runs"] = [_span(0, 11)]                                   # declared false
+    notes[3]["en_runs"] = [_span(0, 13, bold=True)]                        # declared, agreeing
+    # a tracked-change paragraph is declared per segment, or the delivered check cannot derive its readings
+    notes[8]["en_segments"] = [{"type": "regular", "en": "Head "}, {"type": "ins", "en": "added"}]
+    notes[9]["en_segments"] = [{"type": "regular", "en": "Body "}, {"type": "ins", "en": "added "},
+                               {"type": "regular", "en": "loose"}]
+    return notes
+
+
+SPAN_STYLES = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles {W}>
+<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>
+<w:style w:type="character" w:styleId="LinkLike"><w:name w:val="Link Like"/>
+  <w:rPr><w:color w:val="0563C1"/><w:u w:val="single"/></w:rPr></w:style>
+<w:style w:type="character" w:styleId="TermBold"><w:name w:val="Term Bold"/>
+  <w:rPr><w:b/></w:rPr></w:style>
+</w:styles>"""
+SPAN_DOC_RELS = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+<Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://example.invalid/" TargetMode="External"/>
+</Relationships>"""
+SPAN_TEXT = {
+    "link": ("Zie de ", "bijlage"), "under": ("Begrip", " betekent dit"), "symbol": "Tekst in symbool",
+    "within": ("Gewoon ", "verder"), "uniform": "Eenvormige tekst", "a17": ("De ", "Looptijd", " geldt"),
+    "caps": ("Naam", " van de partij"),
+}
+
+
+@fixture("span-properties.docx",
+         "SUB-STEP 16.5 — the other properties, per span: text inside a hyperlink sharing a character style and "
+         "small capitals, a bold underlined term beside plain text, a symbol-font template (A5), a property mixed "
+         "within one emphasis state and a uniform paragraph (the two controls), a bold character style on a term "
+         "(A17's shape), and bold small capitals beside plain text (A18's spread). Ships its own "
+         "span-properties.notes.json")
+def _span_properties(path):
+    """The page sub-step 16.5 is judged on, its shapes those of tests/test_per_span_properties.py. Before it, a
+    paragraph whose text sits in a container found no template and lost its character style, and one template
+    per paragraph spread the deviant run's underline, small capitals or symbol font over all the English; after
+    it, the template is read from the container's runs and a property that follows emphasis is taken per
+    declared span. The two controls must not move."""
+    t = SPAN_TEXT
+    link = '<w:rPr><w:rStyle w:val="LinkLike"/><w:smallCaps/></w:rPr>'
+    body = (
+        p('<w:hyperlink r:id="rId9">' + r(t["link"][0], link) + r(t["link"][1], link) + "</w:hyperlink>") +
+        p(r(t["under"][0], '<w:rPr><w:b/><w:u w:val="single"/></w:rPr>'), r(t["under"][1])) +
+        p(r(t["symbol"], '<w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol"/><w:sz w:val="20"/></w:rPr>')) +
+        p(r(t["within"][0], '<w:rPr><w:highlight w:val="yellow"/></w:rPr>'), r(t["within"][1])) +
+        p(r(t["uniform"], '<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="22"/></w:rPr>')) +
+        p(r(t["a17"][0]), r(t["a17"][1], '<w:rPr><w:rStyle w:val="TermBold"/></w:rPr>'), r(t["a17"][2])) +
+        p(r(t["caps"][0], "<w:rPr><w:b/><w:smallCaps/></w:rPr>"), r(t["caps"][1]))
+    )
+    docx(path, body, extra_parts={"word/_rels/document.xml.rels": SPAN_DOC_RELS}, styles=SPAN_STYLES)
+    _write_notes(path, _span_properties_notes())
+
+
+def _span_properties_notes():
+    """As extraction wrote them on 2026-11-18, entry for entry, both trees (re-proved as for declared-spans),
+    with an operator's English and the declarations 16.5 matches by emphasis."""
+    t = SPAN_TEXT
+    e = lambda idx, text, en, runs, en_runs=None: {"idx": idx, "text": text, "runs": runs, "en": en,
+                                                    "en_runs": en_runs}
+    under = _xrun(0, t["under"][0], bold=True)
+    under["underline"] = True
+    sym, uni = _xrun(0, t["symbol"]), _xrun(0, t["uniform"])
+    sym.update(font="Symbol", sz="20")
+    uni.update(font="Arial", sz="22")
+    return [
+        e(0, "".join(t["link"]), "See the schedule", [_xrun(0, t["link"][0]), _xrun(7, t["link"][1])]),
+        e(1, "".join(t["under"]), "Term means this", [under, _xrun(6, t["under"][1])],
+          [_span(0, 4, bold=True), _span(4, 15)]),
+        e(2, t["symbol"], "Text in symbol", [sym]),
+        e(3, "".join(t["within"]), "Plain further", [_xrun(0, t["within"][0]), _xrun(7, t["within"][1])]),
+        e(4, t["uniform"], "Uniform wording", [uni]),
+        e(5, "".join(t["a17"]), "The Term applies",
+          [_xrun(0, t["a17"][0]), _xrun(3, t["a17"][1], resolved={"bold": True}), _xrun(11, t["a17"][2])],
+          [_span(0, 4), _span(4, 8, bold=True), _span(8, 16)]),
+        e(6, "".join(t["caps"]), "Name of the party", [_xrun(0, t["caps"][0], bold=True), _xrun(4, t["caps"][1])],
+          [_span(0, 4, bold=True), _span(4, 17)]),
+    ]
 
 
 @fixture("lexicon-choice.docx",

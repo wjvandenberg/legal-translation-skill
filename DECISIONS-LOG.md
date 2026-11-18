@@ -3075,3 +3075,19 @@ apply's segments come from a definitions pattern, not from the source, so a matc
 reached mixed finding is declared. **(4) A5 GUARDED ON THE TEMPLATE AND ON EACH SPAN.** **(5) D6 AND F19 DECLARED,
 NOT REACHED.** **(6) THE RENDERED DIFF NOT ATTEMPTED** — LibreOffice is not installed. **(7) TWO REVIEW FINDINGS
 FIXED,** each given a check and a mutant.
+
+## 2026-11-18 — the chain of 2026-11-18, worker 3: the rendered diffs of 16.3 to 16.5, then 16.6; the choices the session's own
+
+**WOUTER'S WORDS OF 2026-11-18, QUOTED WHOLE,** given to the session conducting today's chain: *"Continue where you were, without asking questions, following your recommendations and opening new sessions (auto hop mode) until 15h today. You can already start step 17 etc."* — beside his of 2026-11-16, quoted whole in 2026-11-16 (2).
+**No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm or
+overturn** — `temp/s1118-questions.md` holds them with their options.
+
+**THE RENDERED DIFFS OF 16.3 TO 16.5, DISCHARGED.** **(1) TWO NEW SYNTHETIC FIXTURES, NOT A CHANGE TO THE
+INSTRUMENT:** 16.4 and 16.5 named no fixture and their suites build their documents in memory, which
+`render_diff.py` cannot drive; `declared-spans.docx` and `span-properties.docx` mirror each suite's shapes and ship
+notes equal to today's extraction entry for entry, both trees, the tracked-change entries declared per segment so
+the delivered check can derive their readings. **(2) THE STYLES PART LINKED IN THE THREE PAGE FIXTURES ONLY:** the
+first render drew the source's style-bold heading upright, since no fixture links `word/styles.xml` from the main
+part; linking it in every fixture would move bytes no page here needs. **(3) EACH PAGE ISOLATED BY A SECOND PIN:**
+each fixture also rendered against its own sub-step's commit, unchanged there, so every moved page is that
+sub-step's. The results are section 3.16's.
