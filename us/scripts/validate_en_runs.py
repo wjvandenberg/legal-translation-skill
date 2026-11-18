@@ -137,7 +137,7 @@ def main():
     if scripts_dir not in sys.path:
         sys.path.insert(0, scripts_dir)
     try:
-        from reorder_definitions import find_definitions_section_in_texts
+        from reorder_definitions import find_definitions_section_in_texts, declared_sections
     except (ImportError, SyntaxError) as exc:  # deleted, or cut short: a broken install, SKILL.md rule 6
         _sibling_integrity_exit('reorder_definitions.py', exc)
 
@@ -185,18 +185,47 @@ def main():
         src = (p.get('text') or '').strip()
         texts.append(en if en else src)
 
-    start, end = find_definitions_section_in_texts(texts)
-    if start is None:
-        return 0
+    # SUB-STEP 16.6: a section the operator DECLARED ("role": "definition", read by
+    # reorder_definitions.declared_sections, the one reader) is checked in place of the
+    # detector's answer; a malformed declaration is refused here, before apply.
+    sections, problems = declared_sections(paras)
+    problems += [f"declared idx {e - 1} is past the notes' {len(paras)} entries"
+                 for _s, e in sections if e > len(paras)]
+    if problems:
+        print(
+            "\n" + "=" * 60 + "\n"
+            f"[validate_en_runs] SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR.\n"
+            f"[validate_en_runs] BLOCK — a malformed definitions declaration.\n"
+            + "".join(f"  {why}\n" for why in problems)
+            + f"FIX: correct the declaration in paragraphs.json, then re-run apply.\n"
+            + "=" * 60 + "\n",
+            file=sys.stderr,
+        )
+        return 2
+    if sections:
+        by_idx = {p.get('idx', i): p for i, p in enumerate(paras) if isinstance(p, dict)}
+        span = [i for s, e in sections for i in range(s, e)]
+        start, end, size = sections[0][0], sections[-1][1], len(span)
+        found = (f"declared in paragraphs.json (\"role\": \"definition\")\n"
+                 f"at paragraphs " + ", ".join(f"{s}-{e - 1}" for s, e in sections) + ".")
+        missing = [i for i in span if i in by_idx and (by_idx[i].get('en') or '').strip()
+                   and not by_idx[i].get('en_runs')]
+    else:
+        start, end = find_definitions_section_in_texts(texts)
+        if start is None:
+            return 0
+        size = end - start
+        found = (f"detected at paragraphs {start}-{end - 1}\n"
+                 f"by the heading + predicate-cluster pattern.")
 
-    missing = []
-    for i in range(start, end):
-        if i >= len(paras):
-            break
-        p = paras[i]
-        en_runs = p.get('en_runs')
-        if not en_runs:
-            missing.append(p.get('idx', i))
+        missing = []
+        for i in range(start, end):
+            if i >= len(paras):
+                break
+            p = paras[i]
+            en_runs = p.get('en_runs')
+            if not en_runs:
+                missing.append(p.get('idx', i))
 
     if not missing:
         return 0
@@ -227,9 +256,8 @@ def main():
         + "=" * 60 + "\n"
         f"[validate_en_runs] BLOCK — definitions section detected without en_runs.\n"
         f"\n"
-        f"A definitions section was detected at paragraphs {start}-{end - 1}\n"
-        f"by the heading + predicate-cluster pattern. {len(missing)} of the\n"
-        f"{end - start} paragraphs in the section lack `en_runs`.\n"
+        f"A definitions section was {found} {len(missing)} of the\n"
+        f"{size} paragraphs in the section lack `en_runs`.\n"
         f"\n"
         f"Without en_runs on each definition paragraph, apply emits\n"
         f'<w:b w:val="0"/> to prevent style-bold from leaking into body\n'

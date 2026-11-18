@@ -3413,6 +3413,56 @@ the off-flag totals identical on 44 of 44 rows:
   the source's style-bold heading upright and the page could not show 16.3's bold; the three page fixtures now link
   it, every other fixture byte for byte as it was. Still open: the corpus page comparison, Wouter's to look at, and
   the `--graft` 16.3's plan gave `render_diff.py`.
+  **16.6's OWN PLAN — 2026-11-18, written before any code** *(worker 3 of the chain of 2026-11-18; Wouter's words
+  of 2026-11-16 and 2026-11-18 the go; its choices `DECISIONS-LOG.md` 2026-11-18's, his to overturn)*. **MEASURED
+  FIRST** (`temp/s1118a_166_measure.py`: today's apply and `post_process` over the 13 workdirs, grafted, both trees
+  identical, its control — L2's shape, invented — firing): **only D05 and D06 hold a definitions section**, 26 and
+  59 definition-shaped paragraphs counted from the notes' English independently of the detector, and the detector's
+  range is exactly each, as are the gate's and the heading fallback's; no document holds two; D06 shows a second
+  primary cluster of 2, far later, which the cluster guard passes over. **On L2's shape the detector sorts from the
+  false cluster to the document's end, 162 paragraphs, and the term-sanity guard lets it through** — the agenda
+  pointers read as plausible terms. So the corpus moves nothing, and the change is proved on invented documents.
+  **Changes, both trees:** (1) **THE DECLARATION** — `"role": "definition"` on every paragraph of a definitions
+  section in the notes, the plan's role marker, since the notes are a list of entries the operator writes entry by
+  entry; a run of declared entries, blank paragraphs between them included, is one section;
+  `reorder_definitions.py --notes <paragraphs.json>` reads it, sorts EACH declared section on its own, the
+  detector consulted only for its report; malformed — a role other than `definition`, a declared idx outside the
+  document, notes whose count is not the document's paragraph count — refused, exit 2, nothing written; the
+  term-sanity guard runs over a declared section as over a detected one. `validate_en_runs.py`, the second consumer,
+  checks `en_runs` on the declared entries where any is declared, the detector otherwise, through one reader in
+  `reorder_definitions.py` (the sibling route's names list gains it). (2) **THE FALLBACK**, nothing declared: the
+  detector stays and still sorts the range it finds, and every run — dry or real — reports EVERY candidate section,
+  each primary cluster and each heading-anchored section, and which one it sorts, loudly where there is more than
+  one; exit codes as today. (3) **L3's two wordings:** the no-detection line keeps `no definitions section found`,
+  which skill Step 7's instructions quote, and replaces *expected for many document types* with what to do if the
+  document has one; the term-sanity refusal names the cause the register measured — paragraphs that are not
+  definitions taken as the section, listed — and the remedy, declaring it, never *leave definitions in source order
+  and accept the warnings*; exit 1 kept. (4) The docstring's claim of a `definitions_intro` role and English intro
+  triggers, neither implemented, corrected; `tests/test_instruction_rules.py`'s F38 needle on it moves to the
+  corrected sentence. *TP:* L2's shape declared — the real block sorted, the false cluster and the narrative between
+  untouched; undeclared — every candidate named; two declared sections, each sorted on its own; the gate on a
+  declared section missing `en_runs`, exit 2. *FP:* a document with no definitions section, said so, nothing moved,
+  exit 0; a declared section holding a body-text term still refused by the term-sanity guard (P11); notes declaring
+  nothing, the reorder byte for byte as before. **Derived first:** the measurement above. **Checked against:** it,
+  per document; `delivered_corpus_arm.py --arm b --ref` on 16.5's commit, the graft on, no delivered byte or exit
+  code moved, 13 of 13 per tree (no frozen notes declare a role and the chain passes no `--notes`); the corpus's two
+  sections declared from the measurement's own count and sorted through `--notes --dry-run`, the same definitions
+  as the detector's. **MUST NOT:** the term-sanity guard (P11); the operator's instructions — skill Steps 4 and 7
+  gain the role and `--notes` at step 17; an exit code or a delivered byte where nothing is declared.
+  **BUILT 2026-11-18, unattended** *(`DECISIONS-LOG.md` 2026-11-18)*: `reorder_definitions.py --notes` sorts every
+  section the notes declare, each on its own, every refusal checked before anything moves, written once; the
+  detector's own answer is unchanged, its heading fallback now a silent generator its first-match function reads,
+  so the report can name every candidate; a malformed declaration is refused, exit 2, in reorder and, before apply,
+  in `validate_en_runs.py`, which checks `en_runs` on the declared entries where any is declared through
+  `declared_sections`, the one reader; L3's two wordings corrected, exit codes kept; the docstring corrected and the
+  F38 needle moved. **On the corpus, both trees:** the two true sections declared from the measurement's own count
+  name the detector's 26 and 59 definitions through `--notes --dry-run`, exit 0 each; arm (b) against 16.5's commit
+  c4b8f3f, the graft on, no delivered byte or exit code moved. A new suite, `tests/test_definitions_declared.py`, 33
+  of 33 both trees, red 24 of 33 at the pin; 16 of 16 mutants killed. The code review found three, fixed: the gate
+  now refuses a declared idx past the notes as reorder does, its message names each declared section, and a test
+  variable named like a pin was renamed. **Not closed here:** L2 and L3 close at step 17, when skill Steps 4 and 7
+  tell the operator to declare and pass `--notes` — no frozen notes declare, so until then the fallback decides on
+  every real document; P11 held (arm 5, mutant D11).
 - **16.3 — bold and italic written only where needed, the off-flags removed in the same sub-step.** HEAVY, both
   trees — the core of section 3.9's step 16, and the one sub-step never to be split, since removing the flags
   without the computation renders a document bold. Apply imports extraction's resolver *(Wouter's answer)*, through

@@ -3091,3 +3091,14 @@ first render drew the source's style-bold heading upright, since no fixture link
 part; linking it in every fixture would move bytes no page here needs. **(3) EACH PAGE ISOLATED BY A SECOND PIN:**
 each fixture also rendered against its own sub-step's commit, unchanged there, so every moved page is that
 sub-step's. The results are section 3.16's.
+**THE REPORT'S OWN FINDING, FIXED IN THE TOOL:** `render_diff.py` printed the per-user LibreOffice's path, which
+carries the machine's username; it now says such a location in words, the reports rendered again, never edited.
+
+**16.6, PLANNED AND BUILT.** **(1) THE DECLARATION IS A ROLE ON EACH PARAGRAPH,** `"role": "definition"`, not a
+range: the notes are a list of entries written entry by entry, and a range cannot hold two sections. **(2) REORDER
+RECEIVES IT THROUGH `--notes`,** never by guessing where paragraphs.json sits; skill Step 7's command gains it at
+step 17. **(3) "FAIL LOUDLY" WHERE NOTHING IS DECLARED MEANS EVERY CANDIDATE NAMED, LOUDLY WHERE THERE ARE TWO OR
+MORE, AND THE SORT AS BEFORE:** refusing would stop D06's correct sort and move an exit code the plan says must not
+move. **(4) EACH DECLARED SECTION IS SORTED ON ITS OWN,** closing L2's one-section assumption for declared notes.
+**(5) L2 AND L3 STAY OPEN UNTIL STEP 17:** the code half is built; no frozen notes declare, and no operator will
+until the instructions say so.

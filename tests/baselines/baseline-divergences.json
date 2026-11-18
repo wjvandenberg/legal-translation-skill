@@ -206,14 +206,14 @@
    "sha256_now": "f3a9193ddc47a48c637e6c3ec40c16beea2fecbf0ca7ac7adbce9080268ce43e"
   },
   "uk/scripts/validate_en_runs.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "0d1cdd405547526cc265a01103d8658908f3d7bd694ca43fdbf88ab120ab0156"
+   "changed_by": "feature/step16-formatting-part-3",
+   "commit_subject": "Step 16.6 - the definitions range, declared: reorder sorts every section the notes mark, the detector names every candidate, and L3's two wordings are corrected",
+   "sha256_now": "b9fb8336a9631bd42ac80d46e32c5bac04dd3f9563d4c661c04f57062e628d48"
   },
   "us/scripts/validate_en_runs.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "0d1cdd405547526cc265a01103d8658908f3d7bd694ca43fdbf88ab120ab0156"
+   "changed_by": "feature/step16-formatting-part-3",
+   "commit_subject": "Step 16.6 - the definitions range, declared: reorder sorts every section the notes mark, the detector names every candidate, and L3's two wordings are corrected",
+   "sha256_now": "b9fb8336a9631bd42ac80d46e32c5bac04dd3f9563d4c661c04f57062e628d48"
   },
   "uk/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -306,14 +306,14 @@
    "sha256_now": "698f6b47929884980ab5771605b90a1a1afefd8f7664888ca306fd7d3c3decc7"
   },
   "uk/scripts/reorder_definitions.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "8cdeb3a4a4a6f5da356c2d90ab4ab2b621232c0dfc1175ff598b7dc26629fd8f"
+   "changed_by": "feature/step16-formatting-part-3",
+   "commit_subject": "Step 16.6 - the definitions range, declared: reorder sorts every section the notes mark, the detector names every candidate, and L3's two wordings are corrected",
+   "sha256_now": "cdc8c69f6dcd7e87aa25af8b19134a51dbf714551c82ac0fd366df3827e37eaf"
   },
   "us/scripts/reorder_definitions.py": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "1d8653f67f5a9ebb30a81eb3e9ae7b26bcf7d0325b0098af1d5913ae60f1593d"
+   "changed_by": "feature/step16-formatting-part-3",
+   "commit_subject": "Step 16.6 - the definitions range, declared: reorder sorts every section the notes mark, the detector names every candidate, and L3's two wordings are corrected",
+   "sha256_now": "ba61926e2f4fa5ba2b57705cb01baffc3345cbf360195c15b0860deffd8655da"
   },
   "uk/references/general-legal.md": {
    "changed_by": "feature/step14-9-3-step-4-rules",

@@ -82,7 +82,7 @@ NAMES = {"post_process.py": ["will_fix_spacing_fire", "load_declared_notes", "_n
          "extract_paragraphs.py": ["_GRAPHIC_ATTR_SURFACES", "graphic_metadata_surfaces", "read_style_cascade",
                                    "resolve_run", "get_prop_tristate", "styles_give"],
          "lexicon_compliance.py": ["_guess_language", "ART_LEGISLATION_FOLLOWS"],
-         "reorder_definitions.py": ["find_definitions_section_in_texts"],
+         "reorder_definitions.py": ["find_definitions_section_in_texts", "declared_sections"],
          "apply_translations_textmatch.py": ["distribute_text_across_elements", "effective_segment_texts",
                                              "nearest_supplies_ws"]}
 FROM_RE = re.compile(r"^[ \t]*from[ \t]+([A-Za-z_]\w*)[ \t]+import[ \t(]", re.M)
