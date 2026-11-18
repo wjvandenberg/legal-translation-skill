@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5 as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.11 as #188 to #195: STEP 14 CLOSED · STEP 15 CLOSED #196 · STEP 16 CLOSED #199 · 17.1 measured, #200 · 17.2 built, unpushed · 18–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5 as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.11 as #188 to #195: STEP 14 CLOSED · STEP 15 CLOSED #196 · STEP 16 CLOSED #199 · 17.1 measured, #200 · 17.2 built · 18–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,14 +578,15 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-18, WORKER 7 OF THE CHAIN: 17.2 BUILT, COMMITTED LOCALLY, NOT PUSHED
+### HANDOFF — 2026-11-18, WORKER 7 OF THE CHAIN: 17.2 BUILT, FULL RUN PASSED, PUSHED
 
 **PURPOSE: MET** — 17.2 committed whole: `--styles` on the two bold readers, check 15 reading `w:val`, both trees,
 red at the pin, every mutant killed, the corpus unmoved 13 of 13 per tree.
 
-**PRODUCED:** two commits on `feature/step17-formatting-part3`, NOT PUSHED; PR #200 open. **Context: 29%.**
+**PRODUCED:** three commits on `feature/step17-formatting-part3`, PUSHED after the full run passed on c3b6d45
+(118 suites, OVERALL PASS); PR #200 open, not merged. **Context: 31%.**
 
-**SINGLE NEXT ACTION:** the full run on the branch's last commit, push, then 17.3's own plan.
+**SINGLE NEXT ACTION:** 17.3's own plan in its 3.17 entry — A10, from 17.1's 21 entries; it also takes A20's pin.
 
 **WHAT A NEW SESSION WOULD GET WRONG:** no skill doc passes `--styles` before 17.5.
 

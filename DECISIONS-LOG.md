@@ -3179,3 +3179,8 @@ reading, the styles adding bold and never removing it — the least change to wh
 and no skill doc passes it before 17.5; 17.6's rendered diff covers it. **(7) COMMITTED LOCALLY, NOT PUSHED, NO
 FULL RUN:** the chain ends at 18:00 and a full run takes 35 to 60 minutes; the next session runs it on the branch's
 last commit, then pushes.
+
+**(8) THE CHAIN'S END MOVED TO 19:00** *(the conductor at about 17:19, relaying Wouter: "continue until 19h actually
+today")*: so the one full run was made after all, on the filing commit c3b6d45, started 17:19 with the machine kept
+awake — OVERALL PASS, 118 suites, ended 18:09. Choice (7) holds for the two commits; the push followed the run's pass, never bypassing the
+pre-push hook, and PR #200 is NOT merged — it stays open until 17.6. 17.3 not begun, as the conductor said.
