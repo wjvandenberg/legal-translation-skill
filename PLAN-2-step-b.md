@@ -3927,6 +3927,70 @@ are 17.6's to file. **Declared, from the review:** an out-of-range key reaching 
 validator is skipped, is named by the *no source run holds the text* line — `DECISIONS-LOG.md` 2026-11-20, worker
 10's, (8).
 
+**17.5's OWN PLAN — 2026-11-20, written before any edit** *(worker 10 of the chain of 2026-11-20; its choices
+`DECISIONS-LOG.md` 2026-11-20, worker 10's, Wouter's to overturn)*. **Explored first, read-only:** 17.1's thirteen
+rows, each against the code as it now stands (17.2 to 17.4 built); rule 3 of skill Step 4 in both trees, the same
+lines 44–164, the two differing in spelling only; *Formatting rules for en_runs*; the tracked-change bold section and
+its rev38 bypasses (`uk/` 332–355, `us/` 360–383); `SKILL.md`'s *Bold leak in tracked-change paragraphs*; skill Step
+7's two `reorder_definitions.py` commands and skill Step 9's `quality_check.py` command; `README.md`, which makes no
+claim this moves; and `tests/test_instruction_rules.py`, whose F38 needles pin two sentences of rule 3.
+
+**What it changes — instructions only, both trees, each tree's text written on its own** (`temp/s1120b_rule3_uk.md`,
+`_us.md`, one patch `temp/s1120b_patch175.py`):
+1. **Rule 3, rewritten once:** declare `en_runs` where the English needs bold or italic the source shows; read each
+   run's `resolved`, the formatting in force, first; a declared span is absolute; with nothing declared apply keeps
+   the source's formatting in force, so a heading bold by its style needs no span (rows 1, 2 and 8). One sentence
+   each: mark a definitions section `"role": "definition"` (16.6); end a bold span at the term, not its punctuation,
+   a quotation mark inside it only where the source's is bold (O1, its 37 and its 18); author the tab (A3's
+   remainder, A6); name a span's `source_run` where a property changes within one emphasis state (17.4).
+2. **Deleted, not reworded:** *Style-provided bold* (row 2), the *Qualifier* and its repeat (rows 3 and 7, F22), the
+   paragraph-mark priority list (row 4, F7), the bespoke-`pStyle`-implies-heading rule (row 6, F13).
+3. ***Formatting rules for en_runs***' closing sentence brought to the code (row 8).
+4. **The tracked-change bold section** (rows 9 and 10) rewritten to what apply does: the heading test stated, the
+   flag written only where a run's styles give bold, the two bypasses kept, the pass never touching a run a declared
+   span set (17.3, per run — worker 9's decision 9), 17.3's alignment rule, `source_run` not read there (17.4);
+   `SKILL.md`'s *Bold leak* (row 11) the same, shorter.
+5. **`--notes` and `--styles`** on skill Step 7's two commands, **`--styles`** on skill Step 9's (rows 13, 17.2);
+   row 12 stands, check 15 now reading `w:val`.
+6. `tests/test_instruction_rules.py`: the two F38 presence needles on the deleted sentence removed, its absence
+   needles kept, so the corruption they guard cannot return.
+
+**Size, measured before:** rule 3 8,076 bytes in `uk/` and 8,074 in `us/`, after about 2,330 each; the tracked-change
+bold section 1,604 bytes each, after 1,011; *Bold leak* 728, after 547. Kept only because each is lower; the
+originals recoverable from the pin `cd452dc`.
+
+**MUST NOT:** the anti-drift safeguards, the 35-paragraph batch cap, any gate's wording of what it enforces, the
+step numbers, a script; a corpus-derived example — every example invented (§5.6).
+
+**Checked against, and at what level:** every field and option a new sentence names, by grep against the code
+(`resolved`, `role`, `source_run`, `--notes`, `--styles`, the 120-character heading test); each sentence 17.1
+labelled FALSE or OBSOLETE, by a phrase of it, absent from both trees; the rendered instruction read whole once in
+each tree. **VERIFY:** those greps (`temp/s1120b_175checks.py`, a planted phrase firing first); `tools/reachability.py`;
+`tests/test_instruction_rules.py`; the parity check and the divergence baseline re-recorded from the index; the three
+confidentiality controls. **TEST:** `test_instruction_rules`, `test_charter_pointers`, `test_definitions_declared`,
+the smoke suite, both trees; the full run once, before the push. **Done when:** every FALSE and OBSOLETE sentence
+gone, every new instruction naming something that exists, each passage shorter in both trees. **Size:** MEDIUM.
+
+**17.5's RESULT — DONE 2026-11-20, worker 10, instructions only.** As planned, both trees, each tree's text written on
+its own (`temp/s1120b_patch175.py`, the review's fixes `temp/s1120b_fix175.py`). Rule 3 of skill Step 4 rewritten
+once: read `resolved` first; a declared span is absolute; with nothing declared and a styles part read, apply keeps
+the source's formatting in force; one sentence each for `"role": "definition"`, the bold span ending at the term (a
+quotation mark inside it only where the source's is bold), the authored tab and `source_run`. Deleted, not reworded:
+*Style-provided bold*, the *Qualifier* and its repeat, the paragraph-mark priority list, the bespoke-`pStyle` heading
+rule. The tracked-change bold section, renamed *Bold in TC paragraphs*, and `SKILL.md`'s *Bold leak* now say what
+apply does, the pass yielding per run (17.3); `--notes` and `--styles` on skill Step 7's two commands and on
+`SKILL.md`'s reorder troubleshooting command, `--styles` on skill Step 9's; *Formatting rules for en_runs*' close
+brought to the code. `tests/test_instruction_rules.py`'s two F38 presence needles on the deleted sentence removed,
+their absence needles kept.
+
+**Proved.** `temp/s1120b_175checks.py`, a planted phrase caught first: **red before the edit** — 26 of 26 old phrases
+present, 16 of 16 new ones missing — and **green after**: a phrase of every sentence 17.1 labelled FALSE or OBSOLETE
+absent from both trees, every field and option the new text names held by the code that reads it (10 literals per
+tree). **Size:** rule 3 8,076 → 2,361 bytes in `uk/`, 8,074 → 2,356 in `us/`; the tracked-change bold section 1,604 →
+1,065 each; *Bold leak* 728 → 600 each. `README.md` makes no claim this moves. **Declared, from the review:** skill
+Step 10's summary list still names `quality_check.py` with `--aux-dir` only, as it already omitted `--with-source` —
+`DECISIONS-LOG.md` 2026-11-20, worker 10's 17.5 heading, (7).
+
 **The register rows, as section 9.3 maps them:**
 
 | sub-step | rows it closes or measures | how |

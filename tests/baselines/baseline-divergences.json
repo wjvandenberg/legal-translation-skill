@@ -6,9 +6,9 @@
  "count": 67,
  "divergences": {
   "uk/SKILL.md": {
-   "changed_by": "feature/step14-9-5-read-receipt",
-   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
-   "sha256_now": "5b85404ec1883d6aa1a2932e2d76e4dd3581757f8702aec22f1eb8b1d198b68e"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.5 - rule 3 of skill Step 4 rewritten once over the finished code, and the passages that restate it, both trees",
+   "sha256_now": "2cfe2eecf7221e9ccfd4265c920e8c8a12d8c899d6ed1256127da6d6c909cb18"
   },
   "uk/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/step17-formatting-part3",
@@ -91,14 +91,14 @@
    "sha256_now": "c0f23d6887670e80f20c900cf20e5e916e14604235a2885ab811b29e606e491f"
   },
   "uk/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "d0b5470a5bfca04530d102f165e328da04a990c0acfdddc279233a7bc5ee72c8"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.5 - rule 3 of skill Step 4 rewritten once over the finished code, and the passages that restate it, both trees",
+   "sha256_now": "05fd59f54e1ef9175f72eb5f330b62f04e56bdbabe5318af2785e68fcba47e8d"
   },
   "uk/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/step14-9-6-small-loose-ends",
-   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
-   "sha256_now": "efc154f82997152e93edd20c6d77200837c0f421a2ddce3f5fe638dbe7356798"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.5 - rule 3 of skill Step 4 rewritten once over the finished code, and the passages that restate it, both trees",
+   "sha256_now": "50ee40f69617f6974b6ee03356ef32c89d3bd13380244873c82c2a86a2c99d78"
   },
   "uk/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/step14-9-5-read-receipt",
@@ -106,9 +106,9 @@
    "sha256_now": "25bd1a3fbed4f6750293301a921b955b2f3522e64901eff636ae90773131f06f"
   },
   "us/SKILL.md": {
-   "changed_by": "feature/step14-9-5-read-receipt",
-   "commit_subject": "Step 14.9.5 - skill Step 3's lexicon read leaves a receipt, and skill Step 5 refuses without one (C26)",
-   "sha256_now": "7943280287e4707fd9a357fced5106e4c9462248df16f358f95b5b5e13a6dfa4"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.5 - rule 3 of skill Step 4 rewritten once over the finished code, and the passages that restate it, both trees",
+   "sha256_now": "a77e4d5b924943486602a975fdc7bc645e07e2ffcd5a590f5077af6dd3d7306e"
   },
   "us/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/step17-formatting-part3",
@@ -191,14 +191,14 @@
    "sha256_now": "c0f23d6887670e80f20c900cf20e5e916e14604235a2885ab811b29e606e491f"
   },
   "us/skill-docs/06-postprocess-and-reorder.md": {
-   "changed_by": "feature/step14-9-4-claims-about-the-skill",
-   "commit_subject": "Step 14.9.4 - the claims about the skill say what its scripts do: five checks, ElementTree's guards, apply's exit codes, the broken sentences made whole (F23, F37, F36, F38)",
-   "sha256_now": "24542f85b30be5f9e5ea1f52da008a9b32acce08d08d1249ec5e019c2c3e91e8"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.5 - rule 3 of skill Step 4 rewritten once over the finished code, and the passages that restate it, both trees",
+   "sha256_now": "e4e09181a89d02aad247f5289541ed12cf4fcc70cc34630a8c98c808e622e330"
   },
   "us/skill-docs/08-aux-and-quality.md": {
-   "changed_by": "feature/step14-9-6-small-loose-ends",
-   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
-   "sha256_now": "7292c1139603916ddbe8be0a9eafbe0ddf882891ce9634750838925ea336fe34"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.5 - rule 3 of skill Step 4 rewritten once over the finished code, and the passages that restate it, both trees",
+   "sha256_now": "ad68a203306a2ac04fd36205e666dd2977eac7751721af0028bf9620505a0fc6"
   },
   "us/skill-docs/10-repack-and-validate.md": {
    "changed_by": "feature/step14-9-5-read-receipt",
@@ -231,9 +231,9 @@
    "sha256_now": "ba28811b417fda2bc84a40f9de46b47605b99da05c12399852b5f19bad532851"
   },
   "uk/skill-docs/04-translate.md": {
-   "changed_by": "feature/step14-9-6-small-loose-ends",
-   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
-   "sha256_now": "a64800b642af26783502a1e8e483cfd12e40a80c2ef358f80d5c2c3ed3accd62"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.5 - rule 3 of skill Step 4 rewritten once over the finished code, and the passages that restate it, both trees",
+   "sha256_now": "11afe65e25d40da8fee4fe0a74875d256137a495b112d9c08a87d17155e447ec"
   },
   "us/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -251,9 +251,9 @@
    "sha256_now": "d9be5b530d53d59604f8f590f648486cb7bdc33a94f2e1795841bb83404a45d0"
   },
   "us/skill-docs/04-translate.md": {
-   "changed_by": "feature/step14-9-6-small-loose-ends",
-   "commit_subject": "Step 14.9.6 - the small loose ends: apply's kept names, capitals cut off, and four claims put right (F35)",
-   "sha256_now": "8ccc47c33c8140f334254899155b44189403a2087624836299b02812b7081df1"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.5 - rule 3 of skill Step 4 rewritten once over the finished code, and the passages that restate it, both trees",
+   "sha256_now": "091fe7dffcfd5e71d0b2349f4d2c900a811ed0f79fe03ea4bd2b0db4c2aeb48a"
   },
   "uk/scripts/translate_comments.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",

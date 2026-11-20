@@ -565,6 +565,7 @@ input hits a different OOXML quirk, the term-sanity guard still catches the symp
    ```bash
    python <skill-path>/scripts/reorder_definitions.py \
        --doc <workdir>/final/word/document.xml \
+       --notes <workdir>/paragraphs.json --styles <original>.docx \
        --dry-run --expected-defs <N>
    ```
 2. If a single bold-detection variation is the culprit, extend `is_on()` /
@@ -670,15 +671,12 @@ active `w:t` elements and `en_deleted` across `w:delText` elements separately. S
 "Tracked-change paragraphs — MANDATORY DUAL TRANSLATION" in Step 4.
 
 ### Bold leak in tracked-change paragraphs
-Runs inside `<w:ins>` wrappers carry the formatting from the original tracked insertion,
-which often includes bold (inherited from the paragraph style via `basedOn` chains like
-Cmsor2 → Cmsor1). The old apply approach preserved the original rPr on every run, causing
-bold to leak into translated body text. The user sees random words bolded in the party
-section, defined-term paragraphs, or any paragraph with tracked changes.
-
-**Fix**: The apply script now applies `<w:b w:val="0"/>` (explicit bold-off) to all runs in
-non-heading TC paragraphs. This matches what `make_run_et()` does for non-TC paragraphs and
-prevents style-inherited bold from leaking into translated body text.
+Runs inside `<w:ins>` wrappers can pick up bold from the paragraph style's `basedOn` chain,
+which once spread bold over translated body text. **Fix**: on a non-heading TC paragraph the
+apply script removes each run's own bold and writes `<w:b w:val="0"/>` only where the run's
+styles would make it bold (on every run where the document has no styles part) - as `make_run_et()` writes a flag only where the styles would give
+otherwise - unless a declared span says bold or every source run is bold in force; a run a
+declared span set keeps its declaration.
 
 ### Translator alters source-faithful translation to satisfy a QC linter
 The `quality_check.py` truncation patterns are heuristics. When a heuristic flags a paragraph that is in fact a faithful translation of the source — most commonly a list connective like `; and` / `, and` (translation of the Italian `; e`) — the correct response is **not** to trim the connective to silence the linter. Doing so silently strips semantic content that the source author drafted on purpose, and the result is a translation that no longer matches the source.

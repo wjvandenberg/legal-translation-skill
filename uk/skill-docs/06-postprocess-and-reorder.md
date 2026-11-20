@@ -184,12 +184,18 @@ document. This is a 30-second pre-flight that catches the bug class that previou
 # 1. Dry-run with expected count
 python <skill-path>/scripts/reorder_definitions.py \
     --doc <workdir>/final/word/document.xml \
+    --notes <workdir>/paragraphs.json --styles <original>.docx \
     --dry-run --expected-defs <N>
 
 # 2. If the count + extracted terms look right, run for real
 python <skill-path>/scripts/reorder_definitions.py \
-    --doc <workdir>/final/word/document.xml
+    --doc <workdir>/final/word/document.xml \
+    --notes <workdir>/paragraphs.json --styles <original>.docx
 ```
+
+`--notes` sorts every section you marked `"role": "definition"` at skill Step 4, in place
+of the detector's guess; `--styles` lets the script see a term that is bold only by its
+paragraph or character style.
 
 `<N>` is the number of defined terms you actually count in the source document. Pass it
 on every run — if the script extracts more or fewer than `<N>`, it aborts loudly rather

@@ -294,8 +294,8 @@ REQUIRED = [
     ("F36", "skill-docs/05-apply.md", "- [ ] No validator's exit code 2 was suppressed or worked around"),
     # F38: each sentence an automated edit broke, made whole without its version token, one needle a site.
     ("F38", "SKILL.md", "The script's own invariant check would"),
-    ("F38", "skill-docs/04-translate.md", "style provides bold.** The auto-detector inside"),
-    ("F38", "skill-docs/04-translate.md", "**Style-provided bold.** Definitions sections and clause/article"),
+    # (the two needles that stood here held rule 3's opening and *Style-provided bold*; 17.5 deleted that sentence and
+    #  rewrote the opening, so only their absence needles below remain - the corruption cannot come back)
     ("F38", "skill-docs/04-translate.md", "**Backstop: `fix_spacing` covers ins↔del seams.**"),
     ("F38", "skill-docs/04-translate.md", "the hybrid is now the default in Rule 1 above (was a caveat).**"),
     ("F38", "skill-docs/06-postprocess-and-reorder.md", "**Run a dry-run first** so you see what the script will do"),

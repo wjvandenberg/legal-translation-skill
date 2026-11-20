@@ -3281,3 +3281,28 @@ carries*, not *the run it follows*); the exit-code docstring; and a test arm tha
 slicing markup. Declared: an out-of-range key reaching apply prints the *no source run holds the text* line, a
 misdescription reachable only where the validator is skipped, which apply never does. All 13 mutants were run again on
 the final code and suite.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 10: 17.5, rule 3 rewritten; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options.
+17.5's plan and result are in section 3.17, after 17.4's result.
+
+**(1) 17.5 BEGUN:** 17.4 was committed whole before 14:15 and the context was under 70%, the brief's three conditions.
+**(2) O1's 18 SPANS ENDING ON A QUOTATION MARK: THE MARK GOES INSIDE THE SPAN ONLY WHERE THE SOURCE'S IS BOLD.** The
+options were always outside (a rule against the source where its quotation marks are bold) or always inside (the
+register's shape where they are not); following the source is what every other sentence of the rewrite says. **(3) ROW
+10, THE rev38 BYPASSES, KEPT AND STATED, NOT DELETED:** 17.1 labelled it TRUE, narrower than the code; step 17's plan
+deletes only what 17.1 labelled FALSE or OBSOLETE. Rewritten with rows 9 and 11 so the section says what apply does,
+the pass now yielding per run (worker 9's decision 9). **(4) THE OLD SECTION NAME *Bold fix for TC paragraphs* BECOMES
+*Bold in TC paragraphs*:** the old name described a mechanism 16.3 changed; nothing cites it by name (grep of tests,
+tools and both trees). **(5) THE TWO F38 PRESENCE NEEDLES ON *Style-provided bold* ARE REMOVED FROM
+`tests/test_instruction_rules.py`, THEIR ABSENCE NEEDLES KEPT:** the sentence is deleted, so a presence check of it
+can only fail; the absence needles are what keeps the corruption F38 records from coming back. **(6) THE SAME NEW TEXT
+FOR THE TRACKED-CHANGE SECTION AND *Bold leak* IN BOTH TREES:** written for each tree on its own, and identical
+because neither holds a word whose spelling differs; rule 3 differs in *labelled*, *colour* and *full stop*. **(7) THE
+CODE REVIEW (high, inline) RAISED FOUR; THREE FIXED, ONE DECLARED.** Fixed: the bold-off flag is written on every run
+where the document has no styles part, which the new text now says; the in-force default holds only where a styles
+part was read, now said in rule 3 and in *Formatting rules for en_runs*; `SKILL.md`'s reorder troubleshooting command
+given `--notes` and `--styles`, like skill Step 7's. Declared: skill Step 10's summary list names `quality_check.py`
+with `--aux-dir` only, as it already omitted `--with-source`; skill Step 9's command is the one the operator runs.
