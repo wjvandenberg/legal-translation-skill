@@ -3306,3 +3306,26 @@ where the document has no styles part, which the new text now says; the in-force
 part was read, now said in rule 3 and in *Formatting rules for en_runs*; `SKILL.md`'s reorder troubleshooting command
 given `--notes` and `--styles`, like skill Step 7's. Declared: skill Step 10's summary list names `quality_check.py`
 with `--aux-dir` only, as it already omitted `--with-source`; skill Step 9's command is the one the operator runs.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 11: 17.6, step 17 closed; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options.
+17.6's result is in section 3.17, after 17.5's result.
+
+**(1) 17.4'S SIX ROWS FILED, NONE CLOSED:** the key moves no frozen delivery until an operator declares it — 0 of 1,398
+frozen spans name a source run — so each row says the device is built and closes when a phase-3 run declares it and
+the page shows it. Closing them on invented paragraphs would read as a corpus result. **(2) A3, A6 AND O1 CLOSED ON
+THE INSTRUCTION:** A3's and A6's rows named skill Step 4 telling the operator to author the tab as their closing
+condition, and O1's defect is where the operator ends a span, which the new sentence rules on; each row says the
+frozen notes keep the corpus as it was until phase 3. **(3) A17 LEFT OPEN:** the instruction and the device exist,
+but no page yet shows the two terms bold. **(4) THE RENDER'S FINDING FILED IN L2, NOT AS A NEW ROW:** a block's end
+walking past a plain bold section heading is L2's recorded `def_end` mechanism, reproduced without `--styles`; a new
+row would restate it and move typed counts in four files. L2 stays open for phase 3. **(5) 17.2'S RENDERED DIFF BY A
+SCRATCH SCRIPT, NOT `render_diff.py`:** its reorder call passes neither `--notes` nor `--styles`, so it cannot show
+17.2's effect; changing the instrument inside a close would need its own tests and red-first proof. Declared in 3.17
+that it no longer mirrors skill Step 7. **(6) 17.2'S REVIEW POINTS: (3) TAKEN, (1) AND (2) LEFT:** the end-to-end
+reorder with `--styles` is the rendered diff itself; the *read* line on a `.docx` with no styles part changes no
+verdict, and the `w:bCs` reading is right for Latin text — each a code change that would need its own cycle and full
+run for no delivered byte. **(7) SECTION 2'S ROW CORRECTED IN ITS CELL,** *doc only* kept beside the correction, as
+3.17's 17.6 entry asks, and step 17 marked CLOSED there and in 3.17's heading.
