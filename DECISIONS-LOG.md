@@ -3363,3 +3363,22 @@ that tool anyway — worker 11's declared gap closed where the tool is next touc
 optional run needed the plan committed before 14:15 CET with room to spare, and a measurement squeezed into the tail
 of a session is the kind that gets a control skipped. The app's keep-awake request was refused by its classifier; the
 work did not need it.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 13: 18.1 measured, Gate A answered; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options,
+Q30 to Q35; 18.1's result is filed in its entry in section 3.18 of `PLAN-2-step-b.md`. **(1) D1's TAB STOP READ FROM
+THE PARAGRAPH'S OWN PROPERTIES:** the entry says *in their properties*, and a stop inherited from a style is a
+question the page answers, so 18.2's render decides it; the eleven are an upper bound on bucket 1. **(2) D5's PAGE
+BREAK READ IN, BEFORE AND AFTER THE EMPTY RUN** — a page-type break in any of them or in the paragraph before, a
+`pageBreakBefore` or a section break in the paragraph's properties — so a run that merely follows a break is not
+counted as standing in for one. **(3) D4's PADDING SET IS U+3000 AND U+FF3F,** the two full-width characters a
+source uses to pad a line; a wider set would count full-width letters that carry text, not width. **(4) D2's
+SEGMENTS PAIRED BY PARAGRAPH POSITION,** apply keeping every paragraph — measured, 0 of 13 workdirs whose count moved
+— and a segment by its place between breaks; no threshold drawn from the lengths, 18.3 derives it. **(5) (c)'s
+SETTING PLACED INSIDE `w:compat`,** where the schema puts it; the first run, outside it, changed nothing and is kept
+in the result as the negative control. **(6) GATE A ANSWERED ON ITS LETTER — A QUESTION FOR WOUTER AT 18.2's CLOSE,**
+since the standard library read page and position on every synthetic shape; 18.4's findings stay non-blocking until
+he answers, and 18.2 reads positions from the bookmark destinations. 18.2 was not begun and PR #201 not merged, as
+the brief said; the app's keep-awake request was granted this time.

@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-20, WORKER 12 OF THE CHAIN OF 2026-11-20 — SESSION PURPOSE — what · how · purpose:** step 18's own plan, a new section 3.18: layout, option 11, with the tab-authoring rule's detection and the tab's run properties, register A21 · explore read-only first, the brief, the register rows and the code in both trees, the corpus for counts and doc-ids only; byte-exact splices on the CRLF documents; verify_md and the three confidentiality controls; a PR, not merged · **so that step 18 can be built sub-step by sub-step from a written plan** *(written immediately after the tag `rollback-2026-11-20d-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-20, WORKER 13 OF THE CHAIN OF 2026-11-20 — SESSION PURPOSE — what · how · purpose:** sub-step 18.1 as section 3.18 defines it: the layout-device inventory over the 13 frozen workdirs, the bookmark probe and the word-gap probe on synthetic fixtures · read-only, counts by mechanism and doc-id only, a planted control on every count, apply's output on a copy, LibreOffice headless on synthetic fixtures alone; the result filed in 18.1's entry, documents only · **so that Gate A is answered on a measurement and 18.2 to 18.6 build on counted numbers** *(written immediately after the tag `rollback-2026-11-20e-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -4093,7 +4093,7 @@ at; whether a render arm ships goes to Wouter with 18.2's numbers.
   without Word's `doNotExpandShiftReturn` setting — D2's untested lead, measured and not used, a settings part being
   11b's kind of lever. *Done when:* the table filed in this entry, every count with its doc-ids; (b) and (c) each
   answered yes or no with its measurement. **Checked against:** apply's output on a copy, never a delivered client
-  file; no rendered page of a real document looked at (§5.6).
+  file; no rendered page of a real document looked at (§5.6). **MEASURED 2026-11-20 — its result follows this list.**
   **GATE A — the render's home, decided on (b).** If a destination's page and position read back with the standard
   library on every synthetic shape, a shipped render arm becomes a question for Wouter at 18.2's close, with its
   cost; **if not, or if unclear, the render stays in `tools/` and 18.4's findings are non-blocking** — the default,
@@ -4154,6 +4154,49 @@ at; whether a render arm ships goes to Wouter with 18.2's numbers.
   after, every added sentence naming a finding the code prints. *Done when:* step 18 closed in §3.1, each sub-step
   met or its remainder declared. **MUST NOT:** the anti-drift safeguards, the 35-paragraph batch cap, the step
   numbers; a corpus-derived example — every example invented (§5.6).
+
+**18.1's RESULT — MEASURED 2026-11-20, worker 13, read-only, no shipped byte** *(`temp/s1120e_inventory.py`,
+`temp/s1120e_probe.py`; the choices `DECISIONS-LOG.md` 2026-11-20, worker 13's)*. **(a)** Over the 13 frozen
+workdirs, apply run from each tree on a copy; a planted synthetic document carrying every shape once fired all twelve
+counts before a corpus count was read; 13 of 13 workdirs matched a source, 0 void, 0 whose paragraph count moved
+through apply; **both trees identical, count for count.** Counts by mechanism and doc-id only:
+
+| row | mechanism | count | doc-ids |
+|---|---|---|---|
+| D1 | a paragraph whose first text follows a tab, no tab stop in its own properties (bucket 1) | 11 | D11 5, D03 2, D03B 2, D10 1, D05 1 |
+| D1, the positive control | the same shape with a stop of its own | 8 | D01 4 and its repeat 4 |
+| D5 | two or more empty body paragraphs before a non-empty one, no page break in, before or after them | 29 | D02 8, D09 4, D04 3, D07 3, D11 3, D06 2, D08 2, D10 1, D05 1, D01 1 and 1 — 11 of 13 workdirs |
+| D4 | a full-width padding character (U+3000, U+FF3F), source against apply's output | 15 against 0 | D11 |
+| D2 | a justified paragraph (alignment read through the style chain) holding a manual break | 8 paragraphs, 13 segments ended by a break | D10 7 and 11, D11 1 and 2 |
+| D2, the lengths | English against source, per segment ended by a break, the 12 not blank | min 0.58, quartiles 0.89 · 1.05 · 1.15, max 1.19 | 0 below 0.5 |
+| D3 | a table with a `cantSplit` row | 2 tables, 22 rows | D03 1 and 11, D03B 1 and 11 |
+| D6 | a paragraph whose line rule (read through the style chain) is exact | 898 | D06 601, D05 240, D09 57 |
+| D6, the hazard | of them, the largest direct run size larger in apply's output than in the source | 0 | — |
+| A3 | a between-text source tab with no tab authored in `en` — 16.7's 39 | 39 | D06 15, D02 11, D11 5, D04 3, D05 3, D09 2 |
+| A3 | underlined and shaded tab runs in between-text paragraphs — 16.7's 12 and 17 | 12 and 17 | D09 12, D11 17 |
+| A21 | a ruby element in the source | 0 | — |
+
+**What the counts say to the later sub-steps, no more:** the D1 shape also fires on D05, which 3.18's *Done when*
+does not name; D5's shape fires on 11 of 13 workdirs, D01 among them, so it is a candidate count for 18.2's table to
+sort; D6's hazard has no corpus instance, so 18.3's `exact-clip` rests on invented fixtures; no English segment is
+under half its source. **Read and not read:** D1's stop is the paragraph's own `pPr/tabs`, a stop inherited from a
+style left to 18.2's render; D6 compares direct run sizes only; alignment and line rule follow `basedOn` and the
+default paragraph style, never document defaults.
+
+**(b) YES.** Three synthetic device shapes — a leading-tab paragraph, a paragraph after a run of empty ones, a cell
+in a `cantSplit` row — each bookmarked. A plain `--convert-to pdf` carries 0 destinations; with the
+`writer_pdf_Export` option `ExportBookmarksToPDFDestination` all 3 come back as named destinations, and a reader on
+`re` and `zlib` alone read each one's page and position, equal on 3 of 3 to the reference reader's (PyMuPDF, the
+control) and on the page where the text sits — over a PDF of 18 objects in compressed object streams, the plain
+export's 58 read too. **(c) YES, LibreOffice honours `doNotExpandShiftReturn`:** the gap between the break-ended
+segment's words is 186.31 pt without it and 2.51 pt with it, the segment spanning 451.29 against 83.69 pt; placed
+outside `w:compat`, as a first attempt did, it changes nothing — a negative control. Measured, not used (Q27).
+
+**GATE A — ANSWERED 2026-11-20 on (b): page and position read back with the standard library on every synthetic
+shape, so a shipped render arm becomes a question for Wouter at 18.2's close, with its cost** — LibreOffice at run
+time in Cowork, reached today only at skill Step 1b for a legacy `.doc` and not measured there, and the export
+option. **Until he answers, 18.4's findings stay non-blocking, the default; and 18.2 reads positions from the
+bookmark destinations**, as its entry provides when (b) says yes.
 
 **Which register rows each sub-step works:**
 
