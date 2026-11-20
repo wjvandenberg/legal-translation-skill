@@ -12,6 +12,11 @@ last ending at len(en). Apply writes only what a span covers, so a gap drops
 text and an overlap doubles it, with apply exiting 0 (register C13). No flag
 waives it: --allow-bold-loss excuses missing emphasis, never wrong offsets.
 
+And it BLOCKS a span whose optional `source_run` (sub-step 17.4: the position,
+counted from 0, of the source run in the entry's `runs` whose properties the
+span carries) is not a whole number or names no run of that entry. A span
+without the key is not read for it, and no flag waives it either.
+
 Usage:
     python validate_en_runs.py <paragraphs.json> [--allow-bold-loss]
 
@@ -19,8 +24,8 @@ Exit codes:
     0 — PASS (every en_runs tiles its en; no definitions section, or all
         paragraphs in it have en_runs)
     1 — WARN (--allow-bold-loss passed; missing en_runs ignored)
-    2 — BLOCK (en_runs that do not tile en, whatever the flag; or missing
-        en_runs without override)
+    2 — BLOCK (en_runs that do not tile en, or a malformed source_run,
+        whatever the flag; or missing en_runs without override)
 """
 import argparse
 import json
@@ -103,6 +108,37 @@ def tiling_violations(paras):
     return out
 
 
+def source_run_violations(paras):
+    """SUB-STEP 17.4: [(idx, reason)] for every paragraph carrying a span whose
+    optional `source_run` is malformed - not a whole number, below 0, or naming
+    no run of the entry's own `runs`. The key names the source run whose
+    properties the span carries on apply's regular path; a span without it, or
+    with it null, is not read here. One reason per paragraph, the first that
+    applies; positions only, never the paragraph's text.
+    """
+    out = []
+    for i, p in enumerate(paras):
+        if not isinstance(p, dict) or not isinstance(p.get('en_runs'), list):
+            continue
+        idx = p.get('idx', i)
+        listed = p.get('runs')
+        n = len(listed) if isinstance(listed, list) else 0
+        for k, s in enumerate(p['en_runs']):
+            if not isinstance(s, dict) or s.get('source_run') is None:
+                continue
+            v = s['source_run']
+            # A bool is an int to Python and is never a position.
+            if type(v) is not int:
+                out.append((idx, f'span {k} names source_run as {type(v).__name__}, '
+                                 f'not a whole number'))
+                break
+            if v < 0 or v >= n:
+                out.append((idx, f'span {k} names source_run {v}, but the entry lists '
+                                 f'{n} source run(s), counted from 0'))
+                break
+    return out
+
+
 def _sibling_integrity_exit(name, exc):
     """A sibling module this script imports is missing or cut short: a broken install, which SKILL.md rule 6
     answers by re-installing. So the banner and the exit 3 this script prints for its OWN truncation - never a
@@ -173,6 +209,28 @@ def main():
             f"\n"
             f"--allow-bold-loss does NOT waive this: it excuses missing emphasis,\n"
             f"never offsets that point at the wrong characters.\n"
+            + "=" * 60 + "\n",
+            file=sys.stderr,
+        )
+        return 2
+
+    # SUB-STEP 17.4: a malformed `source_run`, on every paragraph, never waived by the flag.
+    bad = source_run_violations(paras)
+    if bad:
+        print(
+            "\n" + "=" * 60 + "\n"
+            f"[validate_en_runs] SKILL GATE FIRED — INTENTIONAL BLOCK, NOT A SCRIPT ERROR.\n"
+            f"[validate_en_runs] BLOCK — a malformed source_run on an en_runs span.\n"
+            f"\n"
+            f"A span may name the source run whose properties it carries, as\n"
+            f"\"source_run\": the position of that run in the entry's `runs`,\n"
+            f"counted from 0. These do not name one:\n"
+            f"\n"
+            + "".join(f"  idx {idx}: {why}\n" for idx, why in bad)
+            + f"\n"
+            f"FIX: give each such span the position of the run whose properties\n"
+            f"it carries, or leave the key out, then re-run apply.\n"
+            f"--allow-bold-loss does NOT waive this.\n"
             + "=" * 60 + "\n",
             file=sys.stderr,
         )

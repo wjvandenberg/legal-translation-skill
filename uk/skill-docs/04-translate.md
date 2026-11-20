@@ -41,126 +41,35 @@ Translate **every non-empty paragraph** by filling in the `"en"` field in the JS
    Never merge or split paragraphs. Each paragraph inherits its formatting (style, numbering
    level, indentation) from the original. Splitting or merging breaks this alignment.
 
-3. **Provide `en_runs` for any paragraph whose source `runs` array shows bold on text,
-   AND for every paragraph in a definitions section or in a heading paragraph whose
-   style provides bold.** The auto-detector inside
-   `apply_translations_textmatch.py` only handles the classic `"X" means …` definition
-   shape with explicit quotes. It will MISS bold on defined-term parentheticals in
-   recitals (`(the "Agreement")`, `(hereinafter the "Substation")`), party-block defined
-   terms, schedule listings, and any other body paragraph that *contains* a bold quoted
-   span without being a textbook definition line. For all of those, populate `en_runs`
-   explicitly — locate each bold quoted phrase in your `en` string and emit
-   `{"start": …, "end": …, "bold": true}` for it.
+3. **Provide `en_runs` wherever the English needs bold or italic that the source shows.**
+   Each entry of the source `runs` array carries its own `bold` and `italic`, and `resolved`
+   where its styles change them: `resolved` is the formatting in force, what the page shows,
+   so read it first. A declared span is absolute: apply writes exactly its `bold` and
+   `italic`. With nothing declared, apply keeps the source's formatting in force wherever
+   its runs agree and a styles part was read, so a heading bold or italic by its style needs
+   no span. The auto-detector inside `apply_translations_textmatch.py` handles only the
+   classic `"X" means …` shape; a
+   bold quoted phrase anywhere else — a defined-term parenthetical in a recital
+   (`(the "Agreement")`), a party-block term, a schedule listing — needs its own span: locate
+   the phrase in your `en` and emit `{"start": …, "end": …, "bold": true}`.
 
-   **Style-provided bold.** Definitions sections and clause/article headings
-   often get their bold from the *paragraph style* (e.g. `FWBL1`, `ITScheduleL1`,
-   bespoke template styles whose `<w:rPr>` in `styles.xml` carries `<w:b/>`), with
-   the run-level `<w:rPr>` left empty. `extract_paragraphs.py` reads run-level
-   formatting only, so `runs[i].bold` is **`false`** even though the rendered source
-   is bold. If you supply only `en` for those paragraphs and leave `en_runs` null,
-   `apply_translations_textmatch.py`'s default-off override (which exists to prevent
-   style-bold leak from `basedOn` parents into body paragraphs) will *strip* the
-   style's bold and the heading or definition will render plain. Identify these
-   paragraphs by structural cues other than run-level bold:
-
-   **Qualifier — run-level overrides that *defeat* the style.** Some authors apply
-   direct run-level `<w:b w:val="0"/>` and/or `<w:i w:val="0"/>` overrides on every
-   run of a heading paragraph specifically to suppress the style-inherited bold or
-   italic for that one paragraph (typical pattern: a Heading3 style provides
-   bold-italic, but the author wants this *particular* heading rendered plain, so
-   they override at the run level). In that case, the rendered source is **plain**,
-   not bold/italic, and emitting `en_runs:bold=true` would *over-bold* the
-   translation — the inverse of the under-bold defect above.
-   
-   Decision rule, applied per paragraph:
-   
-   - If the paragraph is in a definitions section / has a heading style AND **at
-     least one** run shows `runs[i].bold = true`: emit `en_runs` with `bold: true`
-     (under-bold defence — the original rule).
-   - If the paragraph is in a definitions section / has a heading style AND **every
-     run** shows `runs[i].bold = false` (i.e. every run carries an explicit
-     run-level override): emit `en_runs` with `bold: false`. The author has chosen
-     to defeat the style's bold; respect that choice.
-   - The same rule applies symmetrically for italic: emit `italic: true` only if
-     at least one run shows `runs[i].italic = true`; emit `italic: false` if every
-     run shows `runs[i].italic = false`.
-   - Bold and italic are independent — a paragraph can be plain-bold (italic
-     overridden off, bold inherited from style) or italic-only (bold overridden
-     off, italic kept). Decide each property separately by the same per-property
-     "any run true → true; all runs false → false" rule.
-   
-   Why this works: when every run has the explicit `false` override, the run-level
-   property is what Word renders. When *no* run has any override (all `runs[i].bold`
-   are `false` because the run-level `<w:rPr>` is silent), the style's inherited
-   bold wins. Both cases produce `runs[i].bold = false` in `extract_paragraphs.py`'s
-   output (the extract reads run-level only and cannot distinguish "silent" from
-   "explicitly false"), so structural cues are still required to spot a definitions
-   section in the silent case — but the *all-runs-bold-false* check uniquely
-   identifies the explicit-override case and rules out a false bold emission.
-
-   **Paragraph-mark override (`p_rpr_b` / `p_rpr_i`) — the strongest signal.**
-   Some authors apply the bold/italic override at the *paragraph mark* (`<w:pPr>
-   <w:rPr><w:b w:val="0"/><w:i w:val="0"/></w:rPr></w:pPr>`) rather than per-run.
-   This pattern is common in Norwegian / Scandinavian drafts where Heading3 is
-   rendered bold-italic by default but selected paragraphs are intentionally
-   plain. Extract reads run-level only, so all such paragraphs look identical
-   in the `runs` array. As of rev38, `extract_paragraphs.py` also captures the
-   paragraph-mark setting as a tri-state field on the JSON entry:
-   
-   - `p_rpr_b == "false"` (or `p_rpr_i == "false"`) — author explicitly turned
-     OFF style-inherited bold (or italic) for THIS paragraph. Emit
-     `en_runs:[{...,"bold": false, ...}]` (or `italic: false`) regardless of
-     whether the paragraph would otherwise have been treated as a heading.
-   - `p_rpr_b == "true"` — author explicitly turned ON paragraph-mark bold.
-     Emit `bold: true`. (Same for italic.)
-   - field absent — no paragraph-mark setting; the pStyle cascade decides.
-     Apply the heading rule and the all-runs-bold-false qualifier above.
-   
-   Decision priority for headings (apply in order, stop at first match):
-   1. `p_rpr_b == "false"` ⇒ emit `bold: false` (paragraph mark wins)
-   2. `p_rpr_b == "true"` ⇒ emit `bold: true` (paragraph mark wins)
-   3. Any run shows `runs[i].bold == true` ⇒ emit `bold: true`
-   4. Every text-bearing run shows `runs[i].bold == false` AND no `p_rpr_b`
-      AND the paragraph is in a heading style ⇒ emit `bold: true` (style
-      cascade wins; the silent-rPr case)
-   5. Otherwise ⇒ emit `bold: false`
-   
-   The same five rules apply symmetrically and independently for italic
-   using `p_rpr_i` and `runs[i].italic`. Bold and italic are decided
-   separately — a paragraph can be plain-bold or italic-only or both/neither.
-
-   - **Definitions sections** are typically labelled — a section heading paragraph
-     reading `Definitions`, `Defined Terms`, `Definitions and Interpretation`,
-     `Interpretation`, or prefixed by `Article 1`, `Clause 1`, `Section 1`, or a
-     numbered annex labelled `Definitions`. Body paragraphs in such a section follow
-     the predicate pattern `Term : means / shall mean / has the meaning given to it
-     in / indicates / signifies`, with or without quotes around the term.
-   - **Clause/article headings** are identifiable by their paragraph style (any
-     `pStyle` value not in the standard `Normal` / `BodyText` / `Default` set —
-     particularly bespoke template styles like `FWBL1`, `ITScheduleL1`, `Heading1`,
-     `FWHeader`) or by their structural shape (short, all-caps or capitalised, no
-     terminal period).
-
-   When you encounter either pattern, populate `en_runs` for every paragraph in the
-   section even if the source `runs` array shows no bold. For a definition with a
-   bold-italic defined term, emit
-   `[{"start": 0, "end": <term_end>, "bold": true, "italic": true},
-   {"start": <term_end>, "end": <text_len>, "bold": false, "italic": false}]`.
-   For a heading paragraph rendered bold by its style, emit
-   `[{"start": 0, "end": <text_len>, "bold": true}]`.
-
-   `en_runs` may be null only when the source `runs` array shows no bold AND the
-   paragraph is not in a definitions section AND its `pStyle` is a body-text style.
-   When in doubt, apply the qualifier above — check whether **every** run has
-   `runs[i].bold = false` (and same for italic). If yes, emit
-   `en_runs:[{...,"bold": false, "italic": false}]` to *defeat* a style-inherited
-   bold/italic that the author explicitly suppressed. If at least one run shows
-   bold or italic true, emit those properties true. The "supply en_runs by
-   default" advice is correct in spirit (under-specification strips bold from
-   genuinely-bold headings), but you must populate `en_runs` with the **right**
-   bold/italic values per the qualifier — over-bolding a paragraph the author
-   intentionally rendered plain is just as visible a defect as under-bolding a
-   genuinely-bold heading.
+   - **Definitions sections.** Mark every paragraph of the section `"role": "definition"`
+     and give each its spans: `[{"start": 0, "end": <term_end>, "bold": true, "italic":
+     true}, {"start": <term_end>, "end": <text_len>, "bold": false, "italic": false}]`, the
+     term's bold and italic as its source run shows them. Find the section by its heading
+     (`Definitions`, `Defined Terms`, `Interpretation`, or `Article 1` / `Clause 1` so
+     labelled) and by the predicate pattern `Term : means / shall mean / has the meaning
+     given to it in`. `validate_en_runs.py` blocks a section with a paragraph lacking spans,
+     and skill Step 7 sorts the section you marked.
+   - **End a bold span at the term**, never on the comma, colon or full stop after it; a
+     quotation mark around the term goes inside the span only where the source's is bold.
+   - **Author the tab.** Where the source separates text with a tab — a clause number and
+     its heading, a bullet and its text, a label and its value — write `\t` in `en` there.
+   - **A property that changes within one emphasis state.** Where the source's runs agree on
+     bold and italic but differ in underline, highlight, size, colour, character style,
+     shading or small capitals, name on each span the run whose properties it carries:
+     `"source_run": <that run's position in runs, counted from 0>`. Its bold and italic stay
+     as you declare them.
 
 4. **Use the domain-appropriate English legal lexicon** from the reference files.
 
@@ -228,8 +137,9 @@ Getting these wrong (especially confusing Stage 2 with Stage 1) is a material er
 - **Section headings**: inherit formatting from the paragraph style (usually bold via pPr)
 - **Everything else**: `bold: false, italic: false`
 
-If you don't provide `en_runs`, the apply script auto-detects defined terms and applies bold.
-This works for simple definitions but may miss complex cases.
+If you don't provide `en_runs`, the apply script keeps the source's formatting in force wherever
+its runs agree and a styles part was read, and bolds a defined term in the classic `"X" means …` shape; it may miss
+anything else.
 
 #### Working in batches — MANDATORY SIZE LIMIT (MAX 35 PARAGRAPHS)
 
@@ -329,29 +239,20 @@ In Word, this renders as: "The Developer ~~shall not be entitled to unilaterally
 entitled to assign this Development Agreement" — a coherent tracked change showing the
 author's edit from a prohibition to a permission.
 
-**Bold fix for TC paragraphs:** The apply script automatically applies `w:b val="0"` (bold
-off) to all runs in non-heading TC paragraphs. This prevents a common defect where bold
-formatting from `w:ins` runs (which inherit bold from tracked-insertion styling) leaks into
-the translated body text. You do not need to do anything special for this — the fix is
-automatic in the apply script.
+**Bold in TC paragraphs:** On a TC paragraph that is not a heading (its `pStyle` names no
+heading or title, or its text runs to 120 characters or more), apply takes bold off every run:
+a run's own bold is removed, and an explicit bold-off is written only where the run's styles
+would make it bold (on every run, where the document has no styles part). This stops a
+style's bold from spreading over the translated body text.
+You do not need to do anything for this.
 
-**TC bold-off bypass (rev38) — when the override would over-strip.** The bold-off
-override above keys on `pStyle` containing `heading`/`title`/`cmsor`/`titre`. Documents
-drafted in plain Word default styles — common in Japanese contracts and some Scandinavian
-templates where headings get bold purely from run-level `<w:b/>` rather than from a
-Heading-N pStyle — present every heading as a non-heading to that detector. As of rev38,
-two additional bypasses prevent the override from stripping intentional bold:
-
-1. **Operator authored bold** — if you emit `en_runs` with at least one entry whose
-   `bold: true`, the override is skipped for that paragraph. Authorial intent wins.
-2. **Source paragraph is uniformly bold** — if every text-bearing source `runs[i]`
-   carries `bold: true`, the source is genuinely bold throughout (a strong signal it
-   IS a heading) and the override is skipped automatically.
-
-For an unstyled-but-genuinely-bold heading carrying TC, you can rely on bypass 2
-(do nothing — the override skips itself) or be explicit and emit
-`en_runs: [{"start": 0, "end": <text_len>, "bold": true}]` to trigger bypass 1.
-Either path preserves the heading's bold across the apply step.
+**When that pass stands aside.** It does not run on a paragraph where you declare at least one
+span `"bold": true`, or where every text-bearing source run is bold in force; and it never
+touches a run that one of your declared spans set. On a TC paragraph your spans index the
+whole `en`, and apply places their bold and italic only where `en` equals the `regular` and
+`ins` segments' `en` joined in order; anywhere else it prints one line naming the
+paragraph's idx and leaves the formatting as the source shows it. `source_run` is not read
+on a TC paragraph, whose runs keep their own properties.
 
 #### Segment-aware TC translation — MANDATORY for TC paragraphs
 

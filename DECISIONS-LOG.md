@@ -3122,3 +3122,210 @@ REMAINDERS** so the later step changes them on purpose. **(6) STEP 16 CLOSES ON 
 each remainder declared, and its pull request merges on the closing full run.
 **THREE HOUSE CHECKERS ADOPTED AT THE OPENING,** byte for byte, each released the same day: `verify_md.py` v32,
 `run_tests.py` v7, `install_hooks.py` v16.
+
+## 2026-11-18 — the chain of 2026-11-18, worker 5: step 17's plan written, no code; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 3'S HEADING'S,** quoted whole there; on his instruction of 2026-11-18 this worker ran at
+high effort. **No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm
+or overturn** — `temp/s1118-questions.md` holds them with their options. Section 3.17 of `PLAN-2-step-b.md` is the plan.
+
+**STEP 17, PLANNED.** **(1) THE CODE SECTION 3.16 PLACED HERE IS BUILT HERE, BEFORE THE REWRITE:** the two `w:b`
+readers' reach to a styles part, check 15's off-flag bug, A10 and 16.5's (a) — so the operator's instructions are
+rewritten once, over finished code, 3.16's own reason; deferring them would leave the rewrite describing devices
+that do not yet exist, or force a second rewrite. Section 2's *doc only* is corrected in 3.17, the row left as it is.
+**(2) THE READERS GET AN OPTIONAL `--styles`, ABSENT MEANING TODAY'S BYTES:** the least change to a delivered byte
+or an exit code; the skill docs pass it at 17.5. **(3) A10 IS BUILT AT STEP 17, NOT DEFERRED:** 17.5 tells the
+operator to declare spans, and a tracked-change paragraph that ignores them would make that instruction false.
+**(4) 16.5's (a) IS PLANNED WITH A GATE:** built if its own plan finds it needs no new shipped file and no change to
+the notes' required shape; otherwise the 27 mixed findings stay declared, placed at phase 3's repairs. **(5) THE
+TAB-AUTHORING SENTENCE GOES INTO 17.5's REWRITE:** one edit of skill Step 4 instead of two; step 18 keeps the
+detection and the tab's run properties, its row unchanged. **(6) O1 AS AN INSTRUCTION, A20 BY MEASUREMENT:** O1's
+span end is the operator's declaration, so a sentence; A20 closes at 17.1 if 3.16's measurement re-derives, else
+17.3 takes it. **(7) ONE PULL REQUEST FOR THE STEP,** opened by the plan's commit.
+## 2026-11-18 — the chain of 2026-11-18, worker 6: 17.1 measured, no code; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 3'S HEADING'S,** quoted whole there; on his instruction of 2026-11-18 this worker ran at
+high effort. **No question was asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm
+or overturn** — `temp/s1118-questions.md` holds them with their options. 17.1's result is in section 3.17.
+
+**17.1, MEASURED.** **(1) RULE 3 LABELLED BY PASSAGE, NOT BY LINE:** thirteen rows, rows 1 to 7 covering rule 3
+line by line, each with the code line that decides it; one sentence per row would restate the rule, which 17.5
+deletes anyway. **(2) A20 STAYS OPEN, ITS PIN 17.3's:** the four corpus entries that begin with whitespace and
+declare a span all keep it, so 3.16's measurement re-derives, but the pin is a test, and 17.1 is read-only — 17.3
+touches the same code. **(3) O1 COUNTED IN TWO PARTS:** a span ending on a quotation mark may be a convention, so
+the 18 such are kept apart from the 37 on other punctuation, for 17.5's sentence to rule on. **(4) CHECK 15's
+EXPECTED MOVEMENT IS 0:** measured on apply's output over all 13; 17.2's true positive is therefore invented.
+**(5) 17.2 NOT BEGUN:** the brief's clock — no new code sub-step that cannot be committed, verified and tested by
+17:00 — and 17.2 is MEDIUM in both trees, with mutants and the full run. **(6) SECTION 3.1's CELL KEPT AT ITS
+LENGTH** by dropping a phrase the build plan holds twice.
+
+## 2026-11-18 — the chain of 2026-11-18, worker 7: 17.2 built and committed locally, not pushed; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 3'S HEADING'S,** quoted whole there; this worker ran at high effort. **No question was
+asked; each choice below is THE WORKER'S, its recommended answer, for him to confirm or overturn** —
+`temp/s1118-questions.md` holds them with their options. 17.2's plan and result are in section 3.17.
+
+**17.2, BUILT.** **(1) `--styles` TAKES A `.docx` OR A `styles.xml`:** the two scripts read an unpacked
+`document.xml`, so the operator holds both forms; accepting either leaves 17.5 one sentence, not a conversion step.
+**(2) THE LINE SAYING WHICH STYLES WERE USED IS PRINTED ONLY WITH `--styles`:** the plan asks both *byte for byte as
+today* and *says which it used*; a line printed always would move every run's output, so without the option nothing
+new is printed. **(3) A MISSING `extract_paragraphs.py` IS TOLERATED,** as apply's has been since 16.3: without
+`--styles` both scripts then behave as before, and with it each says so; a cut-short one is a broken install, exit
+3. **(4) `--styles` NAMING NO FILE IS A USAGE ERROR, EXIT 2;** a file holding no readable styles part is said and
+read as without — an exit code only where something is passed, which the plan's MUST NOT allows. **(5) A RUN'S OWN
+`w:b` DECIDES FIRST** in both readers, the styles only where it names none; `get_bold_term` keeps its own `w:bCs`
+reading, the styles adding bold and never removing it — the least change to what either reader finds today.
+**(6) NO RENDERED DIFF AT 17.2:** no delivered byte moves without `--styles`, proved on all 13 workdirs per tree,
+and no skill doc passes it before 17.5; 17.6's rendered diff covers it. **(7) COMMITTED LOCALLY, NOT PUSHED, NO
+FULL RUN:** the chain ends at 18:00 and a full run takes 35 to 60 minutes; the next session runs it on the branch's
+last commit, then pushes.
+
+**(8) THE CHAIN'S END MOVED TO 19:00** *(the conductor at about 17:19, relaying Wouter: "continue until 19h actually
+today")*: so the one full run was made after all, on the filing commit c3b6d45, started 17:19 with the machine kept
+awake — OVERALL PASS, 118 suites, ended 18:09. Choice (7) holds for the two commits; the push followed the run's pass, never bypassing the
+pre-push hook, and PR #200 is NOT merged — it stays open until 17.6. 17.3 not begun, as the conductor said.
+
+## 2026-11-18 — the chain of 2026-11-18, worker 8: 17.3's own plan written, no code; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 3'S HEADING'S,** quoted whole there. **No question was asked; each choice below is THE
+WORKER'S, its recommended answer, for him to confirm or overturn** — `temp/s1118-questions.md` holds them with their
+options. 17.3's plan is in section 3.17, after 17.2's result.
+
+**(1) PLACEMENT ONLY WHERE THE RAW `en` EQUALS THE ACCEPTED SEGMENTS JOINED, CHARACTER FOR CHARACTER.** The other
+options were a tolerant match that forgives whitespace at a seam, or a new refusal in `validate_en_runs.py`. A
+tolerant match guesses where an offset falls, which is A10's own damage arriving by another route; a refusal
+strengthens a gate, which step 17's plan forbids. 17.3.1 measures how many of the 21 align before any code, and
+re-plans if fewer than half do. **(2) AN UNALIGNED PARAGRAPH IS A PRINTED LINE, NEVER AN EXIT CODE,** and is
+delivered as today — the change that moves least where it cannot be proved right. **(3) THE BOLD-OFF PASS DOES NOT
+RUN ON A PARAGRAPH WHOSE SPANS WERE PLACED:** a declared span is absolute since 16.4; running the pass after would
+undo the placement. Where nothing is placed, the pass and both rev38 bypasses decide as at the pin.
+**(4) A20 IS FIXED, NOT ONLY PINNED — each offset re-based by the leading characters the strip removed,** on both
+paths. The options were a pin alone, which would assert a known wrong result for an `en` beginning with a space, or
+the register's other option, a strip on the extraction side, which changes the notes' contract. The re-base moves 0
+on the corpus (17.1) and closes the row. **(5) THE PIN FOR 17.3's CONTROLS IS `e5db826`,** the branch at this plan,
+carrying 17.2's code — not step 17's pin `1e92de9` — so each control is red against the code 17.3 starts from.
+**(6) THE RENDERED DIFF IS 17.3's OWN,** on an invented fixture, rather than left to 17.6: 17.3 is the first
+sub-step of step 17 to move a delivered byte.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 9: 17.3 built; the choices the session's own
+
+**WOUTER'S WORDS, 2026-11-20:** *"Continue with everything until 16h today, without me being involved, and you
+opening sessions yourself via auto hop mode"* — with his words of 2026-11-16, quoted whole under worker 3's heading
+of 2026-11-18, the go. **No question was asked; each choice below is THE WORKER'S, its recommended answer, for him
+to confirm or overturn** — `temp/s1120-questions.md` holds them with their options. 17.3's result is in section 3.17,
+after its own plan.
+
+**(1) 17.3.1's GATE DID NOT FIRE: 21 of the 21 mixed tracked-change entries align, 37 of all 45,** so no re-plan.
+**(2) D11's 8 UNALIGNED ENTRIES STAY UNPLACED — THE ALIGNMENT RULE KEPT CHARACTER FOR CHARACTER.** Their accepted
+segments carry 48 zero-width spaces their raw `en` does not, and are equal once those are removed; all 8 are
+single-state. The other option, skipping U+200B in the comparison, would place 8 entries outside A10's 21 and loosen
+the rule the plan says is never loosened in the code to fit. They are A10's declared remainder, a printed line each,
+pinned by the suite's misaligned arm. **(3) THE TRACKED-CHANGE PATH INDEXES THE RAW `en`,** passed to it beside the
+stripped one — the string the offsets index and the alignment rule compares, so A20 needs no re-base there (a re-base
+by zero); passing the stripped text would leave every `en` beginning with a space unaligned. **(4) A CHARACTER APPLY
+ITSELF ADDED** — a restored edge space, a wrapper-boundary zero-width space — **TAKES THE STATE OF THE MAPPED
+CHARACTER BESIDE IT** in the same `w:t`, the one before, else the one after; refusing placement wherever one occurs
+would leave aligned paragraphs unplaced for whitespace apply wrote. **(5) ALIGNED SINGLE-STATE ENTRIES ARE PLACED
+TOO** — rule (1) of the plan names no mixed condition and a declared span is absolute (16.4); the corpus arm counts
+each by doc-id. **(6) THE PASS'S YIELD IS PROVED BY A SPAN WHOSE BOLD IS 1,** read bold as the regular path reads it
+but not `true` to rev38's first bypass, which already skips the pass wherever a span says `true` — the only input on
+which the yield is observable. **(7) THE LEGACY PATH NAMES AN UNPLACED DECLARATION** in one printed line, the plan's
+*anywhere else*; silent at the pin. **(8) ONE COMMIT FOR 17.3.2 TO 17.3.4:** the code is one patch to one script per
+tree and the proof covers both halves together — one cycle record, one commit. **(9) THE CODE REVIEW (high,
+inline) RAISED SEVEN; THREE FIXED, FOUR DECLARED.** Fixed: **the bold-off pass yields to each run placement set,
+not to the whole paragraph** — the plan's (3) read narrowly, because the whole-paragraph skip would also have spared
+the deletion's runs the pass the pin gives them, against the plan's *MUST NOT touch a `del` segment's runs* (a
+character no span covers cannot reach apply: `validate_en_runs.py` refuses spans that do not tile `en`); an arm for a
+run split around a tab; A20's count derived from the strip itself rather than a second copy of its loop. Declared:
+a run carrying a tracked formatting change (`w:rPrChange`) has its current bold or italic changed without its
+recorded old properties, unmeasured on the corpus; a third copy of the run-property schema order beside
+`span_template`'s and `make_run_et`'s, merged only by touching functions outside 17.3; new elements written through
+the script's own standard-library writer, its namespaces registered, as everywhere in it; a neighbour lookup
+quadratic in one `w:t`'s length, which is short. **(10) THIRTEEN MUTANTS; THE CURSOR'S END CHECK REMOVED IS DECLARED
+EQUIVALENT** — a guard no aligned input can reach, since the segment loop writes every character of each accepted
+segment's `en`; the mutant counting a zero-width space as a character of `en` survived the first suite and is killed
+by an arm added for it (a span edge between two equal letters just after a wrapper seam).
+
+## 2026-11-20 — the chain of 2026-11-20, worker 10: 17.4 planned and built; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options.
+17.4's plan and result are in section 3.17, after 17.3's result.
+
+**(1) 17.4's GATE DID NOT FIRE.** The device needs no new shipped file — it is a key read by two scripts that exist —
+and no change to the notes' required shape: the key is optional, and all five other readers of `en_runs` ignore a span
+key they do not know, read in each. The 27 mixed findings are all on the regular path, which the key reaches. So the
+key is built rather than the 27 being left declared for phase 3, the gate's other outcome. **(2) THE KEY IS
+`source_run`, THE POSITION COUNTED FROM 0 OF A RUN IN THE ENTRY'S `runs`.** The other options were a character offset
+into the source `text`, which asks the operator for arithmetic the `runs` list already does, or the property values
+written into the span itself, which would be a vocabulary of eleven properties in the notes — a far larger change to
+what the operator writes and what the validator must police. The position is what the operator sees, one entry per
+run, each with its text beside it. **(3) THE KEY CARRIES 16.5's ELEVEN PROPERTIES AND NOTHING ELSE** — not the run's
+whole formatting. Bold and italic are absolute where declared (16.4), and a run's other children — a tracked
+formatting change, the source language — must not travel onto English; the eleven are exactly what `en_runs` cannot
+express, built through 16.5's own `span_template`. **(4) A KEY WHOSE RUN DOES NOT HOLD THE TEXT EXTRACTION LISTED, AND
+A KEY ON A TRACKED-CHANGE PARAGRAPH, ARE A PRINTED LINE, NEVER AN EXIT CODE,** the span built as at the pin — never a
+guess at which run was meant; the step's plan forbids strengthening a gate beyond refusing the malformed key. A
+tracked-change paragraph's runs are the source's own, split in place (17.3), so they already carry their properties.
+**(5) A `null` KEY READS AS NO KEY,** in the validator and in apply: the notes write `null` for an unset field
+(`en_runs` itself), so refusing it would block a notes file that says nothing. **(6) THE REGISTER IS NOT EDITED AT
+17.4;** 17.6 files the rows, as its own entry says — and the device moves no corpus delivery until an operator
+declares the key, which 17.5's sentence first asks for, so no row's corpus state changes here. **(7) THE PLAN IS
+COMMITTED WITH THE CODE, ONE COMMIT, ONE CYCLE RECORD:** it was written into its entry before any code edit, as the
+brief asks; a separate documents commit would have been a second cycle record for no reader. **(8) THE CODE REVIEW
+(high, inline) RAISED FIVE; FOUR FIXED, ONE DECLARED.** Fixed: **the patch had deleted the line defining
+`validate_en_runs.py`'s sibling-integrity exit** — its anchor was replaced, not inserted before — so a missing or
+cut-short sibling would have crashed with a raw traceback instead of the broken-install banner and exit 3; the line is
+back, both trees, and `test_sibling_import_integrity` passes; the refusal's wording (*the run whose properties it
+carries*, not *the run it follows*); the exit-code docstring; and a test arm that rebuilt its expected value by
+slicing markup. Declared: an out-of-range key reaching apply prints the *no source run holds the text* line, a
+misdescription reachable only where the validator is skipped, which apply never does. All 13 mutants were run again on
+the final code and suite.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 10: 17.5, rule 3 rewritten; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options.
+17.5's plan and result are in section 3.17, after 17.4's result.
+
+**(1) 17.5 BEGUN:** 17.4 was committed whole before 14:15 and the context was under 70%, the brief's three conditions.
+**(2) O1's 18 SPANS ENDING ON A QUOTATION MARK: THE MARK GOES INSIDE THE SPAN ONLY WHERE THE SOURCE'S IS BOLD.** The
+options were always outside (a rule against the source where its quotation marks are bold) or always inside (the
+register's shape where they are not); following the source is what every other sentence of the rewrite says. **(3) ROW
+10, THE rev38 BYPASSES, KEPT AND STATED, NOT DELETED:** 17.1 labelled it TRUE, narrower than the code; step 17's plan
+deletes only what 17.1 labelled FALSE or OBSOLETE. Rewritten with rows 9 and 11 so the section says what apply does,
+the pass now yielding per run (worker 9's decision 9). **(4) THE OLD SECTION NAME *Bold fix for TC paragraphs* BECOMES
+*Bold in TC paragraphs*:** the old name described a mechanism 16.3 changed; nothing cites it by name (grep of tests,
+tools and both trees). **(5) THE TWO F38 PRESENCE NEEDLES ON *Style-provided bold* ARE REMOVED FROM
+`tests/test_instruction_rules.py`, THEIR ABSENCE NEEDLES KEPT:** the sentence is deleted, so a presence check of it
+can only fail; the absence needles are what keeps the corruption F38 records from coming back. **(6) THE SAME NEW TEXT
+FOR THE TRACKED-CHANGE SECTION AND *Bold leak* IN BOTH TREES:** written for each tree on its own, and identical
+because neither holds a word whose spelling differs; rule 3 differs in *labelled*, *colour* and *full stop*. **(7) THE
+CODE REVIEW (high, inline) RAISED FOUR; THREE FIXED, ONE DECLARED.** Fixed: the bold-off flag is written on every run
+where the document has no styles part, which the new text now says; the in-force default holds only where a styles
+part was read, now said in rule 3 and in *Formatting rules for en_runs*; `SKILL.md`'s reorder troubleshooting command
+given `--notes` and `--styles`, like skill Step 7's. Declared: skill Step 10's summary list names `quality_check.py`
+with `--aux-dir` only, as it already omitted `--with-source`; skill Step 9's command is the one the operator runs.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 11: 17.6, step 17 closed; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options.
+17.6's result is in section 3.17, after 17.5's result.
+
+**(1) 17.4'S SIX ROWS FILED, NONE CLOSED:** the key moves no frozen delivery until an operator declares it — 0 of 1,398
+frozen spans name a source run — so each row says the device is built and closes when a phase-3 run declares it and
+the page shows it. Closing them on invented paragraphs would read as a corpus result. **(2) A3, A6 AND O1 CLOSED ON
+THE INSTRUCTION:** A3's and A6's rows named skill Step 4 telling the operator to author the tab as their closing
+condition, and O1's defect is where the operator ends a span, which the new sentence rules on; each row says the
+frozen notes keep the corpus as it was until phase 3. **(3) A17 LEFT OPEN:** the instruction and the device exist,
+but no page yet shows the two terms bold. **(4) THE RENDER'S FINDING FILED IN L2, NOT AS A NEW ROW:** a block's end
+walking past a plain bold section heading is L2's recorded `def_end` mechanism, reproduced without `--styles`; a new
+row would restate it and move typed counts in four files. L2 stays open for phase 3. **(5) 17.2'S RENDERED DIFF BY A
+SCRATCH SCRIPT, NOT `render_diff.py`:** its reorder call passes neither `--notes` nor `--styles`, so it cannot show
+17.2's effect; changing the instrument inside a close would need its own tests and red-first proof. Declared in 3.17
+that it no longer mirrors skill Step 7. **(6) 17.2'S REVIEW POINTS: (3) TAKEN, (1) AND (2) LEFT:** the end-to-end
+reorder with `--styles` is the rendered diff itself; the *read* line on a `.docx` with no styles part changes no
+verdict, and the `w:bCs` reading is right for Latin text — each a code change that would need its own cycle and full
+run for no delivered byte. **(7) SECTION 2'S ROW CORRECTED IN ITS CELL,** *doc only* kept beside the correction, as
+3.17's 17.6 entry asks, and step 17 marked CLOSED there and in 3.17's heading.

@@ -369,6 +369,30 @@ def _unit_key(elems):
     """SUB-STEP 16.5: a unit's value, comparable - each element's bytes, or None where the run names none."""
     return tuple(None if el is None else ET.tostring(el) for el in elems)
 
+
+# SUB-STEP 17.4 - 16.5's (a): A SOURCE RUN THE OPERATOR NAMES. 16.5 carries a property per span only where it follows
+# emphasis in the source; where it changes WITHIN one emphasis state (two plain runs, one underlined) only the operator
+# knows which English words it belongs to - 27 corpus findings of that shape. So a declared span may name, as
+# `source_run`, the position counted from 0 of a source run in the entry's `runs`, and carries that run's eleven
+# `_PER_SPAN_UNITS`; bold and italic stay as the span declares them. Read on the regular path only.
+def _source_runs_listed(p_elem):
+    """SUB-STEP 17.4: the source paragraph's runs as extraction lists them in `runs` - every w:r in document order
+    whose w:t text is not empty - each as (run, its text)."""
+    out = []
+    for r in p_elem.iter(f'{W}r'):
+        text = ''.join(c.text for c in r if c.tag == f'{W}t' and c.text)
+        if text:
+            out.append((r, text))
+    return out
+
+
+def source_run_template(template_rpr, src_rpr):
+    """SUB-STEP 17.4: a copy of the template with each unit of `_PER_SPAN_UNITS` set to what the named source run
+    carries - removed where it carries none - in schema order, through 16.5's `span_template`."""
+    units = {unit: {None: tuple(src_rpr.find(f'{W}{tag}') if src_rpr is not None else None for tag in unit)}
+             for unit in _PER_SPAN_UNITS}
+    return span_template(template_rpr, units, None)
+
 def run_in_force(run, name):
     """SUB-STEP 16.4: a source run's `name` ('bold' or 'italic') IN FORCE - its `resolved` value where extraction
     wrote one (the styles changing what the run's own formatting says), else its own key, as written. So a reader
@@ -547,12 +571,228 @@ def nearest_supplies_ws(effective, i, back):
                 else effective[j].startswith((' ', '\t'))
     return False
 
+# SUB-STEP 17.3 - REGISTER A10: A DECLARED SPAN PLACED ON A TRACKED-CHANGE PARAGRAPH. Until now the spans on a
+# paragraph carrying `en_segments` were read for one boolean only (the rev38 bypass below), so a tracked-change
+# paragraph whose operator declared a bold term beside plain text was delivered with the source's formatting, never
+# the declared one. A span's offsets index the raw `en`, the full ACCEPTED text (rule 4 of the tracked-change
+# segment rules); the accepted segments are the `regular` and `ins` ones, in order - `del` and `ins_then_del` carry
+# rejected text and are never formatted.
+_ACCEPTED_SEGMENTS = ('regular', 'ins')
+
+
+def _declared_states(en_raw, spans):
+    """SUB-STEP 17.3: per character of the raw `en`, the (bold, italic) its declared span gives it, or None where no
+    span covers it. A span naming neither key is not bold and not italic, as the regular path reads it."""
+    states = [None] * len(en_raw)
+    for s in spans or []:
+        if not isinstance(s, dict):
+            continue
+        a, b = s.get('start', 0), s.get('end', len(en_raw))
+        if not isinstance(a, int) or not isinstance(b, int):
+            continue
+        st = (bool(s.get('bold', False)), bool(s.get('italic', False)))
+        for k in range(max(a, 0), min(b, len(en_raw))):
+            states[k] = st
+    return states
+
+
+def _insert_rpr_ordered(rpr, el):
+    """SUB-STEP 17.3: insert `el` into `rpr` at its place in the schema order (`_RPR_SCHEMA`)."""
+    name = el.tag.split('}')[1]
+    order = _RPR_SCHEMA.index(name) if name in _RPR_SCHEMA else len(_RPR_SCHEMA)
+    for k, existing in enumerate(rpr):
+        ex = existing.tag.split('}')[1] if '}' in existing.tag else existing.tag
+        if (_RPR_SCHEMA.index(ex) if ex in _RPR_SCHEMA else len(_RPR_SCHEMA)) > order:
+            rpr.insert(k, el)
+            return
+    rpr.append(el)
+
+
+def _set_run_emphasis(r_elem, bold, italic, given):
+    """SUB-STEP 17.3: an EXISTING run's bold and italic set as 16.3's writer sets a new run's (`make_run_et`): its own
+    b, bCs, i and iCs dropped, and a pair written only where the wanted value differs from what the styles give
+    (`given`); no styles known (`given` None), the explicit pair always, as before. Every other property kept."""
+    rpr = r_elem.find(f'{W}rPr')
+    created = rpr is None
+    if created:
+        rpr = ET.Element(f'{W}rPr')
+        r_elem.insert(0, rpr)
+    for tag in ('b', 'bCs', 'i', 'iCs'):
+        for el in list(rpr.findall(f'{W}{tag}')):
+            rpr.remove(el)
+    for tag, want, name in (('b', bold, 'bold'), ('i', italic, 'italic')):
+        if given is not None and bool(want) == bool(given[name]):
+            continue
+        for flag in (tag, tag + 'Cs'):
+            el = ET.Element(f'{W}{flag}')
+            if not want:
+                el.set(f'{W}val', '0')
+            _insert_rpr_ordered(rpr, el)
+    if created and not len(rpr) and not rpr.attrib:
+        r_elem.remove(rpr)
+
+
+def _place_declared_spans(orig_p, merged_xml, en_segments, en_raw, en_runs_spec, cascade, parent_map, idx):
+    """SUB-STEP 17.3 - place the declared bold and italic on the English the segment loop has just written. Returns
+    the runs it set - empty where nothing was placed.
+
+    THE ALIGNMENT RULE DECIDES: placement only where the raw `en` equals the accepted segments' `en` joined in
+    order, character for character. Anywhere else nothing is placed, as before, and one line names the entry's idx
+    - never a guess at where an offset falls (register A10's own damage arriving by another route).
+
+    THE CURSOR. The accepted segments' w:t elements are walked in order against the raw `en`: a character equal to
+    the next one of `en` is that character; any other is one apply added - a whitespace character the source-edge
+    restoration put back, or the zero-width space the wrapper-boundary pass inserted - and takes the state of the
+    mapped character beside it in the same w:t, the one before it, else the one after. The cursor must reach the end of `en`, or
+    nothing is placed.
+
+    THE SPLIT. Where a run's text changes state, the run becomes one run per state, each a copy of the run's own
+    properties, side by side in the same parent - so a run inside a w:ins stays inside that w:ins, its author and
+    date untouched, and no character of text moves. Each run then takes its state through `_set_run_emphasis`,
+    against what its own styles give. A run whose text keeps one state is set in place, never rebuilt."""
+    accepted = [(es, xs) for es, xs in zip(en_segments, merged_xml) if xs['type'] in _ACCEPTED_SEGMENTS]
+    parts = []
+    for es, _xs in accepted:
+        v = es.get('en') if isinstance(es, dict) else None
+        if v is None:
+            parts = None
+            break
+        parts.append(v if isinstance(v, str) else str(v))
+    if parts is None or ''.join(parts) != en_raw:
+        print(f"    NOTE: en_runs not placed on tracked-change paragraph idx {idx}: its en is not its accepted "
+              f"segments joined, so no offset can be placed (register A10)")
+        return []
+    want = _declared_states(en_raw, en_runs_spec)
+    if all(st is None for st in want):
+        return []
+
+    per_t, cursor = [], 0
+    for _es, xs in accepted:
+        for t in xs['elements']:
+            mapped = []
+            for ch in (t.text or ''):
+                if cursor < len(en_raw) and ch == en_raw[cursor]:
+                    mapped.append(cursor)
+                    cursor += 1
+                else:
+                    mapped.append(-1)
+            per_t.append((t, mapped))
+    if cursor != len(en_raw):
+        print(f"    NOTE: en_runs not placed on tracked-change paragraph idx {idx}: its delivered text does not "
+              f"carry its en in order (register A10)")
+        return []
+
+    states = {}
+    for t, mapped in per_t:
+        st = [want[m] if m >= 0 else None for m in mapped]
+        for k, m in enumerate(mapped):
+            if m >= 0:
+                continue
+            before = [mapped[j] for j in range(k - 1, -1, -1) if mapped[j] >= 0]
+            after = [mapped[j] for j in range(k + 1, len(mapped)) if mapped[j] >= 0]
+            st[k] = want[before[0]] if before else (want[after[0]] if after else None)
+        states[t] = st
+
+    runs = []
+    for t, _m in per_t:
+        r_elem = parent_map.get(t)
+        if r_elem is not None and r_elem.tag == f'{W}r' and not any(r_elem is x for x in runs):
+            runs.append(r_elem)
+
+    placed = []
+    for r_elem in runs:
+        parent = parent_map.get(r_elem)
+        if parent is None:
+            continue
+        near = parent
+        while near is not None and near is not orig_p and near.tag != f'{W}p':
+            near = parent_map.get(near)
+        near = near if near is not None else orig_p
+        rpr = r_elem.find(f'{W}rPr')
+        unset = object()
+        pieces, cur_state, cur = [], unset, []
+        for child in list(r_elem):
+            if child is rpr:
+                continue
+            if child in states and (child.text or ''):
+                text, st = child.text, states[child]
+                k = 0
+                while k < len(text):
+                    j = k
+                    while j < len(text) and st[j] == st[k]:
+                        j += 1
+                    if cur_state is not unset and st[k] != cur_state:
+                        pieces.append((cur_state, cur))
+                        cur = []
+                    cur_state = st[k]
+                    cur.append((child, text[k:j]))
+                    k = j
+            else:
+                cur.append((child, None))
+        pieces.append((cur_state, cur))
+        if len(pieces) == 1:
+            built = [r_elem]
+        else:
+            built = []
+            for _st, kids in pieces:
+                nr = ET.Element(r_elem.tag, dict(r_elem.attrib))
+                if rpr is not None:
+                    nr.append(copy.deepcopy(rpr))
+                for child, chunk in kids:
+                    if chunk is None:
+                        nr.append(child)
+                        continue
+                    nt = ET.Element(child.tag, dict(child.attrib))
+                    nt.text = chunk
+                    if chunk[0] == ' ' or chunk[-1] == ' ':
+                        nt.set('{http://www.w3.org/XML/1998/namespace}space', 'preserve')
+                    nr.append(nt)
+                built.append(nr)
+            built[-1].tail = r_elem.tail
+            at = list(parent).index(r_elem)
+            parent.remove(r_elem)
+            for n, nr in enumerate(built):
+                parent.insert(at + n, nr)
+                parent_map[nr] = parent
+        for nr, (st, _k) in zip(built, pieces):
+            if st is unset or st is None:
+                continue
+            _set_run_emphasis(nr, st[0], st[1], styles_given(cascade, near, nr.find(f'{W}rPr')))
+            placed.append(nr)
+    return placed
+
+
+def _lead_stripped(s):
+    """SUB-STEP 17.3, REGISTER A20: how many leading characters `_strip_keeping_separators` removes from `s` - the
+    count a span's offsets, which index the raw `en`, are re-based by on the regular path, which cuts the stripped
+    text. A leading tab or line break is kept by the strip, so it counts 0."""
+    kept = _strip_keeping_separators(s)
+    return s.find(kept) if kept else 0
+
+
+def _rebase_spans(spans, lead):
+    """SUB-STEP 17.3, REGISTER A20: the declared spans with every integer offset moved back by `lead`, never below
+    0; a span is otherwise as declared. The spans themselves where `lead` is 0."""
+    if not lead or not spans:
+        return spans
+    out = []
+    for s in spans:
+        if isinstance(s, dict):
+            s = dict(s)
+            for key in ('start', 'end'):
+                if isinstance(s.get(key), int):
+                    s[key] = max(0, s[key] - lead)
+        out.append(s)
+    return out
+
 def apply_trackchanges_inplace(orig_p, en_text, it_text,
                                en_deleted=None, it_deleted=None,
                                en_segments=None,
                                en_runs_spec=None,
                                original_runs=None,
-                               cascade=None):
+                               cascade=None,
+                               en_raw=None,
+                               idx=None):
     """Apply English translation to a tracked-change paragraph in place.
     Segment-aware (en_segments) or legacy proportional fallback. Returns
     True on success, False if the paragraph has no text content.
@@ -608,6 +848,7 @@ def apply_trackchanges_inplace(orig_p, en_text, it_text,
     # genuinely bold (operator-authored or uniformly source-bold), skip the
     # bold-off. See docstring above + rev38 post-mortem / Defect 4.
     skip_bold_override = False
+    placed = []
     if en_runs_spec:
         # Operator authored at least one run with bold=True → respect intent.
         try:
@@ -802,6 +1043,12 @@ def apply_trackchanges_inplace(orig_p, en_text, it_text,
                 applied = True
             if not applied:
                 return False
+            # SUB-STEP 17.3, A10: the declared spans placed on the English just written - before the bold-off
+            # pass, which then yields to every run they set (a declared span is absolute, 16.4).
+            if en_runs_spec:
+                placed = _place_declared_spans(orig_p, merged_xml, en_segments,
+                                               en_raw if en_raw is not None else en_text,
+                                               en_runs_spec, cascade, parent_map, idx)
         else:
             print(f"    WARNING: segment type mismatch: en={en_types} vs xml={xml_types}")
             print(f"    Falling back to legacy proportional distribution.")
@@ -810,6 +1057,9 @@ def apply_trackchanges_inplace(orig_p, en_text, it_text,
 
     # ---- Legacy proportional mode (fallback) ----
     if not en_segments:
+        if en_runs_spec:
+            print(f"    NOTE: en_runs not placed on tracked-change paragraph idx {idx}: no en_segments of "
+                  f"its types to place them on (register A10)")
         active_ts = []
         for t in orig_p.iter(f'{W}t'):
             if not is_inside_del(t):
@@ -838,7 +1088,10 @@ def apply_trackchanges_inplace(orig_p, en_text, it_text,
     ]
     if not is_heading and not skip_bold_override:
         val_attr = f'{W}val'
+        placed_ids = {id(x) for x in placed}
         for r_elem in orig_p.iter(f'{W}r'):
+            if id(r_elem) in placed_ids:
+                continue        # SUB-STEP 17.3: a run a declared span set; characters no span covers stay here
             rpr = r_elem.find(f'{W}rPr')
             # SUB-STEP 16.3: the off-flag only where the run's own styles give bold - its NEAREST paragraph's
             # style and its character style. Elsewhere it would change nothing in force, so it is not written,
@@ -2257,12 +2510,18 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
         # paragraph's text — a silent data-loss bug.
         if has_track_changes(orig_p):
             en_segs = entry.get('en_segments')
+            # SUB-STEP 17.4: `source_run` is read on the regular path only - the runs here are the source's own.
+            if any(isinstance(sg, dict) and sg.get('source_run') is not None for sg in (en_runs_spec or [])):
+                print(f"    NOTE: source_run not read on tracked-change paragraph idx {entry.get('idx')}: its runs "
+                      "keep their own properties")
             if apply_trackchanges_inplace(orig_p, en_text, it_text,
                                           en_deleted=en_deleted,
                                           en_segments=en_segs,
                                           en_runs_spec=en_runs_spec,
                                           original_runs=original_runs,
-                                          cascade=cascade):
+                                          cascade=cascade,
+                                          en_raw=entry.get('en') or '',
+                                          idx=entry.get('idx')):
                 changes += 1
             continue
 
@@ -2277,7 +2536,9 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
             # SUB-STEP 16.4: A DECLARED SPAN IS ABSOLUTE. The sub-heading test used to replace the operator's
             # `en_runs` here with one bold, upright span wherever it fired, and on the corpus that discarded three
             # cells declared italic (register A11) - so it is asked only where nothing is declared, below.
-            segments = en_runs_spec
+            # SUB-STEP 17.3, REGISTER A20: the offsets index the raw `en` and `en_text` is that text stripped, so each is
+            # moved back by the leading characters the strip removed.
+            segments = _rebase_spans(en_runs_spec, _lead_stripped(_raw_en))
         else:
             segments = auto_detect_formatting(en_text, original_runs)
             # SUB-STEP 16.3: nothing declared, so the source's formatting in force where its text runs agree. Sub-step
@@ -2353,6 +2614,25 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
             units = {u: per for u, per in units.items() if seg_states and seg_states <= set(per)
                      and len({_unit_key(per[st]) for st in seg_states}) > 1}
 
+        # SUB-STEP 17.4: the source runs the declared spans name by `source_run`, each proved by its text to be the run
+        # extraction listed at that position; a span whose run is not proved is built as before, and said.
+        keyed = {}
+        if en_runs_spec:
+            listed = None
+            for sg in en_runs_spec:
+                key = sg.get('source_run') if isinstance(sg, dict) else None
+                if not isinstance(key, int) or isinstance(key, bool) or key in keyed:
+                    continue
+                if listed is None:
+                    listed = _source_runs_listed(orig_p)
+                proved = (0 <= key < len(listed) and key < len(original_runs)
+                          and isinstance(original_runs[key], dict) and listed[key][1] == original_runs[key].get('text'))
+                keyed[key] = (listed[key][0].find(f'{W}rPr'),) if proved else None
+            unproved = sorted(k for k, v in keyed.items() if v is None)
+            if unproved:
+                print(f"    NOTE: source_run {unproved} not read on paragraph idx {entry.get('idx')}: no source run "
+                      "there holds the text extraction listed - those spans built as before")
+
         # Build the English runs FIRST. Clause 3 cannot decide which source tabs
         # are redundant until it knows whether the operator authored any.
         new_runs = []
@@ -2366,7 +2646,12 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
             bold = seg.get('bold', False)
             italic = seg.get('italic', False)
             seg_rpr, seg_given = default_rpr, given
-            if units:
+            key = seg.get('source_run')
+            if isinstance(key, int) and not isinstance(key, bool) and keyed.get(key) is not None:
+                # SUB-STEP 17.4: the span names its source run - that run's properties, its bold and italic as declared
+                seg_rpr = without_symbol_font(source_run_template(default_rpr, keyed[key][0]))
+                seg_given = styles_given(cascade, orig_p, seg_rpr)
+            elif units:
                 # SUB-STEP 16.5: this span's own template, and what the styles give it - its character style may
                 # be the span's state's, so bold and italic are written against that
                 seg_rpr = span_template(default_rpr, units, (bool(bold), bool(italic)))

@@ -376,7 +376,7 @@ control that is currently empty (glossary). Grading: Step 8 outputs are penalize
 ```bash
 python <skill-path>/scripts/quality_check.py <workdir>/final/word/document.xml \
   --verbose --with-source <workdir>/paragraphs.json --variant us \
-  --aux-dir <workdir>/final
+  --aux-dir <workdir>/final --styles <original>.docx
 ```
 
 **`--aux-dir` is mandatory here, though the script runs without it.** It points at the directory
