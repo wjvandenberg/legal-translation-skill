@@ -1,0 +1,301 @@
+[
+  {
+    "idx": 0,
+    "text": "Gewoon onderstreept",
+    "runs": [
+      {
+        "start": 0,
+        "end": 7,
+        "text": "Gewoon ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 7,
+        "end": 19,
+        "text": "onderstreept",
+        "bold": false,
+        "italic": false,
+        "underline": true
+      }
+    ],
+    "en": "Plain underlined",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "bold": false,
+        "italic": false,
+        "source_run": 0
+      },
+      {
+        "start": 6,
+        "end": 16,
+        "bold": false,
+        "italic": false,
+        "source_run": 1
+      }
+    ]
+  },
+  {
+    "idx": 1,
+    "text": "Gewoon gemarkeerd",
+    "runs": [
+      {
+        "start": 0,
+        "end": 7,
+        "text": "Gewoon ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 7,
+        "end": 17,
+        "text": "gemarkeerd",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "Plain marked",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "bold": false,
+        "italic": false,
+        "source_run": 0
+      },
+      {
+        "start": 6,
+        "end": 12,
+        "bold": false,
+        "italic": false,
+        "source_run": 1
+      }
+    ]
+  },
+  {
+    "idx": 2,
+    "text": "Klein groot",
+    "runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "text": "Klein ",
+        "bold": false,
+        "italic": false,
+        "sz": "18"
+      },
+      {
+        "start": 6,
+        "end": 11,
+        "text": "groot",
+        "bold": false,
+        "italic": false,
+        "sz": "32"
+      }
+    ],
+    "en": "Small large",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "bold": false,
+        "italic": false,
+        "source_run": 0
+      },
+      {
+        "start": 6,
+        "end": 11,
+        "bold": false,
+        "italic": false,
+        "source_run": 1
+      }
+    ]
+  },
+  {
+    "idx": 3,
+    "text": "Zwart rood",
+    "runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "text": "Zwart ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 6,
+        "end": 10,
+        "text": "rood",
+        "bold": false,
+        "italic": false,
+        "color": "C00000"
+      }
+    ],
+    "en": "Black red",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "bold": false,
+        "italic": false,
+        "source_run": 0
+      },
+      {
+        "start": 6,
+        "end": 9,
+        "bold": false,
+        "italic": false,
+        "source_run": 1
+      }
+    ]
+  },
+  {
+    "idx": 4,
+    "text": "Gewoon stijl",
+    "runs": [
+      {
+        "start": 0,
+        "end": 7,
+        "text": "Gewoon ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 7,
+        "end": 12,
+        "text": "stijl",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "Plain style",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "bold": false,
+        "italic": false,
+        "source_run": 0
+      },
+      {
+        "start": 6,
+        "end": 11,
+        "bold": false,
+        "italic": false,
+        "source_run": 1
+      }
+    ]
+  },
+  {
+    "idx": 5,
+    "text": "Gewoon schaduw",
+    "runs": [
+      {
+        "start": 0,
+        "end": 7,
+        "text": "Gewoon ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 7,
+        "end": 14,
+        "text": "schaduw",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "Plain shaded",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "bold": false,
+        "italic": false,
+        "source_run": 0
+      },
+      {
+        "start": 6,
+        "end": 12,
+        "bold": false,
+        "italic": false,
+        "source_run": 1
+      }
+    ]
+  },
+  {
+    "idx": 6,
+    "text": "Gewoon klein",
+    "runs": [
+      {
+        "start": 0,
+        "end": 7,
+        "text": "Gewoon ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 7,
+        "end": 12,
+        "text": "klein",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "Plain small",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "bold": false,
+        "italic": false,
+        "source_run": 0
+      },
+      {
+        "start": 6,
+        "end": 11,
+        "bold": false,
+        "italic": false,
+        "source_run": 1
+      }
+    ]
+  },
+  {
+    "idx": 7,
+    "text": "Gewoon onderstreept",
+    "runs": [
+      {
+        "start": 0,
+        "end": 7,
+        "text": "Gewoon ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 7,
+        "end": 19,
+        "text": "onderstreept",
+        "bold": false,
+        "italic": false,
+        "underline": true
+      }
+    ],
+    "en": "Plain underlined",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 6,
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 6,
+        "end": 16,
+        "bold": false,
+        "italic": false
+      }
+    ]
+  }
+]

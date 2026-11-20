@@ -369,6 +369,30 @@ def _unit_key(elems):
     """SUB-STEP 16.5: a unit's value, comparable - each element's bytes, or None where the run names none."""
     return tuple(None if el is None else ET.tostring(el) for el in elems)
 
+
+# SUB-STEP 17.4 - 16.5's (a): A SOURCE RUN THE OPERATOR NAMES. 16.5 carries a property per span only where it follows
+# emphasis in the source; where it changes WITHIN one emphasis state (two plain runs, one underlined) only the operator
+# knows which English words it belongs to - 27 corpus findings of that shape. So a declared span may name, as
+# `source_run`, the position counted from 0 of a source run in the entry's `runs`, and carries that run's eleven
+# `_PER_SPAN_UNITS`; bold and italic stay as the span declares them. Read on the regular path only.
+def _source_runs_listed(p_elem):
+    """SUB-STEP 17.4: the source paragraph's runs as extraction lists them in `runs` - every w:r in document order
+    whose w:t text is not empty - each as (run, its text)."""
+    out = []
+    for r in p_elem.iter(f'{W}r'):
+        text = ''.join(c.text for c in r if c.tag == f'{W}t' and c.text)
+        if text:
+            out.append((r, text))
+    return out
+
+
+def source_run_template(template_rpr, src_rpr):
+    """SUB-STEP 17.4: a copy of the template with each unit of `_PER_SPAN_UNITS` set to what the named source run
+    carries - removed where it carries none - in schema order, through 16.5's `span_template`."""
+    units = {unit: {None: tuple(src_rpr.find(f'{W}{tag}') if src_rpr is not None else None for tag in unit)}
+             for unit in _PER_SPAN_UNITS}
+    return span_template(template_rpr, units, None)
+
 def run_in_force(run, name):
     """SUB-STEP 16.4: a source run's `name` ('bold' or 'italic') IN FORCE - its `resolved` value where extraction
     wrote one (the styles changing what the run's own formatting says), else its own key, as written. So a reader
@@ -2486,6 +2510,10 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
         # paragraph's text — a silent data-loss bug.
         if has_track_changes(orig_p):
             en_segs = entry.get('en_segments')
+            # SUB-STEP 17.4: `source_run` is read on the regular path only - the runs here are the source's own.
+            if any(isinstance(sg, dict) and sg.get('source_run') is not None for sg in (en_runs_spec or [])):
+                print(f"    NOTE: source_run not read on tracked-change paragraph idx {entry.get('idx')}: its runs "
+                      "keep their own properties")
             if apply_trackchanges_inplace(orig_p, en_text, it_text,
                                           en_deleted=en_deleted,
                                           en_segments=en_segs,
@@ -2586,6 +2614,25 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
             units = {u: per for u, per in units.items() if seg_states and seg_states <= set(per)
                      and len({_unit_key(per[st]) for st in seg_states}) > 1}
 
+        # SUB-STEP 17.4: the source runs the declared spans name by `source_run`, each proved by its text to be the run
+        # extraction listed at that position; a span whose run is not proved is built as before, and said.
+        keyed = {}
+        if en_runs_spec:
+            listed = None
+            for sg in en_runs_spec:
+                key = sg.get('source_run') if isinstance(sg, dict) else None
+                if not isinstance(key, int) or isinstance(key, bool) or key in keyed:
+                    continue
+                if listed is None:
+                    listed = _source_runs_listed(orig_p)
+                proved = (0 <= key < len(listed) and key < len(original_runs)
+                          and isinstance(original_runs[key], dict) and listed[key][1] == original_runs[key].get('text'))
+                keyed[key] = (listed[key][0].find(f'{W}rPr'),) if proved else None
+            unproved = sorted(k for k, v in keyed.items() if v is None)
+            if unproved:
+                print(f"    NOTE: source_run {unproved} not read on paragraph idx {entry.get('idx')}: no source run "
+                      "there holds the text extraction listed - those spans built as before")
+
         # Build the English runs FIRST. Clause 3 cannot decide which source tabs
         # are redundant until it knows whether the operator authored any.
         new_runs = []
@@ -2599,7 +2646,12 @@ def textmatch_apply(orig_docx_path, paragraphs_json_path, output_xml_path,
             bold = seg.get('bold', False)
             italic = seg.get('italic', False)
             seg_rpr, seg_given = default_rpr, given
-            if units:
+            key = seg.get('source_run')
+            if isinstance(key, int) and not isinstance(key, bool) and keyed.get(key) is not None:
+                # SUB-STEP 17.4: the span names its source run - that run's properties, its bold and italic as declared
+                seg_rpr = without_symbol_font(source_run_template(default_rpr, keyed[key][0]))
+                seg_given = styles_given(cascade, orig_p, seg_rpr)
+            elif units:
                 # SUB-STEP 16.5: this span's own template, and what the styles give it - its character style may
                 # be the span's state's, so bold and italic are written against that
                 seg_rpr = span_template(default_rpr, units, (bool(bold), bool(italic)))

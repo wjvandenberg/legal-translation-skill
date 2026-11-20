@@ -12,8 +12,8 @@
   },
   "uk/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/step17-formatting-part3",
-   "commit_subject": "Step 17.3 - declared spans placed on aligned tracked-change paragraphs (A10), and A20 re-based on the regular path",
-   "sha256_now": "693e4c5763d95dcb11dfdab86b92adb232f759049129b26e69c189156b7fcfac"
+   "commit_subject": "Step 17.4 - a source run the operator names on an en_runs span, its properties carried onto that span (16.5's (a))",
+   "sha256_now": "b4b64b7627a2fe7e70fc8138dbfc4d1fedba7081727871bf8221dbd9e566112f"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -112,8 +112,8 @@
   },
   "us/scripts/apply_translations_textmatch.py": {
    "changed_by": "feature/step17-formatting-part3",
-   "commit_subject": "Step 17.3 - declared spans placed on aligned tracked-change paragraphs (A10), and A20 re-based on the regular path",
-   "sha256_now": "02c5f2d5f072a0afd7c1a853526dc02faf62006b9ffbb6903bccf040d0c61306"
+   "commit_subject": "Step 17.4 - a source run the operator names on an en_runs span, its properties carried onto that span (16.5's (a))",
+   "sha256_now": "6c922c17c51c576f02de36519e09e242daec6abfbf7727509f26c800fdc7dd22"
   },
   "us/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -206,14 +206,14 @@
    "sha256_now": "f3a9193ddc47a48c637e6c3ec40c16beea2fecbf0ca7ac7adbce9080268ce43e"
   },
   "uk/scripts/validate_en_runs.py": {
-   "changed_by": "feature/step16-formatting-part-3",
-   "commit_subject": "Step 16.6 - the definitions range, declared: reorder sorts every section the notes mark, the detector names every candidate, and L3's two wordings are corrected",
-   "sha256_now": "b9fb8336a9631bd42ac80d46e32c5bac04dd3f9563d4c661c04f57062e628d48"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.4 - a source run the operator names on an en_runs span, its properties carried onto that span (16.5's (a))",
+   "sha256_now": "3b7e063afd347f89d9f50c808b5054832caaf2875b6f69f7ae0f0348bcc4b4dc"
   },
   "us/scripts/validate_en_runs.py": {
-   "changed_by": "feature/step16-formatting-part-3",
-   "commit_subject": "Step 16.6 - the definitions range, declared: reorder sorts every section the notes mark, the detector names every candidate, and L3's two wordings are corrected",
-   "sha256_now": "b9fb8336a9631bd42ac80d46e32c5bac04dd3f9563d4c661c04f57062e628d48"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.4 - a source run the operator names on an en_runs span, its properties carried onto that span (16.5's (a))",
+   "sha256_now": "3b7e063afd347f89d9f50c808b5054832caaf2875b6f69f7ae0f0348bcc4b4dc"
   },
   "uk/scripts/coalesce_fragmented_tcs.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",

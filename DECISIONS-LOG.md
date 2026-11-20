@@ -3245,3 +3245,39 @@ quadratic in one `w:t`'s length, which is short. **(10) THIRTEEN MUTANTS; THE CU
 EQUIVALENT** — a guard no aligned input can reach, since the segment loop writes every character of each accepted
 segment's `en`; the mutant counting a zero-width space as a character of `en` survived the first suite and is killed
 by an arm added for it (a span edge between two equal letters just after a wrapper seam).
+
+## 2026-11-20 — the chain of 2026-11-20, worker 10: 17.4 planned and built; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options.
+17.4's plan and result are in section 3.17, after 17.3's result.
+
+**(1) 17.4's GATE DID NOT FIRE.** The device needs no new shipped file — it is a key read by two scripts that exist —
+and no change to the notes' required shape: the key is optional, and all five other readers of `en_runs` ignore a span
+key they do not know, read in each. The 27 mixed findings are all on the regular path, which the key reaches. So the
+key is built rather than the 27 being left declared for phase 3, the gate's other outcome. **(2) THE KEY IS
+`source_run`, THE POSITION COUNTED FROM 0 OF A RUN IN THE ENTRY'S `runs`.** The other options were a character offset
+into the source `text`, which asks the operator for arithmetic the `runs` list already does, or the property values
+written into the span itself, which would be a vocabulary of eleven properties in the notes — a far larger change to
+what the operator writes and what the validator must police. The position is what the operator sees, one entry per
+run, each with its text beside it. **(3) THE KEY CARRIES 16.5's ELEVEN PROPERTIES AND NOTHING ELSE** — not the run's
+whole formatting. Bold and italic are absolute where declared (16.4), and a run's other children — a tracked
+formatting change, the source language — must not travel onto English; the eleven are exactly what `en_runs` cannot
+express, built through 16.5's own `span_template`. **(4) A KEY WHOSE RUN DOES NOT HOLD THE TEXT EXTRACTION LISTED, AND
+A KEY ON A TRACKED-CHANGE PARAGRAPH, ARE A PRINTED LINE, NEVER AN EXIT CODE,** the span built as at the pin — never a
+guess at which run was meant; the step's plan forbids strengthening a gate beyond refusing the malformed key. A
+tracked-change paragraph's runs are the source's own, split in place (17.3), so they already carry their properties.
+**(5) A `null` KEY READS AS NO KEY,** in the validator and in apply: the notes write `null` for an unset field
+(`en_runs` itself), so refusing it would block a notes file that says nothing. **(6) THE REGISTER IS NOT EDITED AT
+17.4;** 17.6 files the rows, as its own entry says — and the device moves no corpus delivery until an operator
+declares the key, which 17.5's sentence first asks for, so no row's corpus state changes here. **(7) THE PLAN IS
+COMMITTED WITH THE CODE, ONE COMMIT, ONE CYCLE RECORD:** it was written into its entry before any code edit, as the
+brief asks; a separate documents commit would have been a second cycle record for no reader. **(8) THE CODE REVIEW
+(high, inline) RAISED FIVE; FOUR FIXED, ONE DECLARED.** Fixed: **the patch had deleted the line defining
+`validate_en_runs.py`'s sibling-integrity exit** — its anchor was replaced, not inserted before — so a missing or
+cut-short sibling would have crashed with a raw traceback instead of the broken-install banner and exit 3; the line is
+back, both trees, and `test_sibling_import_integrity` passes; the refusal's wording (*the run whose properties it
+carries*, not *the run it follows*); the exit-code docstring; and a test arm that rebuilt its expected value by
+slicing markup. Declared: an out-of-range key reaching apply prints the *no source run holds the text* line, a
+misdescription reachable only where the validator is skipped, which apply never does. All 13 mutants were run again on
+the final code and suite.

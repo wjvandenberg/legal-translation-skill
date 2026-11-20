@@ -2299,6 +2299,57 @@ def _tc_declared_spans_notes():
     return out
 
 
+KEY_SPANS = [  # (source runs as (text, rPr), the English, where it splits) - one per property kind of 16.5's 27
+    ((("Gewoon ", ""), ("onderstreept", '<w:rPr><w:u w:val="single"/></w:rPr>')), "Plain underlined", 6),
+    ((("Gewoon ", ""), ("gemarkeerd", '<w:rPr><w:highlight w:val="yellow"/></w:rPr>')), "Plain marked", 6),
+    ((("Klein ", '<w:rPr><w:sz w:val="18"/></w:rPr>'), ("groot", '<w:rPr><w:sz w:val="32"/></w:rPr>')),
+     "Small large", 6),
+    ((("Zwart ", ""), ("rood", '<w:rPr><w:color w:val="C00000"/></w:rPr>')), "Black red", 6),
+    ((("Gewoon ", ""), ("stijl", '<w:rPr><w:rStyle w:val="LinkLike"/></w:rPr>')), "Plain style", 6),
+    ((("Gewoon ", ""), ("schaduw", '<w:rPr><w:shd w:val="clear" w:color="auto" w:fill="D9D9D9"/></w:rPr>')),
+     "Plain shaded", 6),
+    ((("Gewoon ", ""), ("klein", "<w:rPr><w:smallCaps/></w:rPr>")), "Plain small", 6),
+]
+
+
+@fixture("source-run-key.docx",
+         "SUB-STEP 17.4 — 16.5's (a), a source run the operator names: seven paragraphs, each two plain runs of which "
+         "one carries underline, highlight, size, colour, a character style, shading or small capitals, declared as "
+         "two plain spans each naming its run; and the underlined one again declared without the key, the control. "
+         "Ships its own source-run-key.notes.json")
+def _source_run_key(path):
+    """The page sub-step 17.4 is judged on. Before it the first source run carrying properties was every span's
+    template, so the property spread over the whole English or, where only the first run carried it, covered words
+    the source never gave it; after it each span carries the properties of the run it names, on its own words only.
+    The control, declared without the key, must not move."""
+    body = "".join(p(*(r(t, rpr) for t, rpr in runs)) for runs, _en, _cut in KEY_SPANS + KEY_SPANS[:1])
+    docx(path, body, extra_parts={"word/_rels/document.xml.rels": SPAN_DOC_RELS}, styles=SPAN_STYLES)
+    _write_notes(path, _source_run_key_notes())
+
+
+def _source_run_key_notes():
+    """As extraction writes them, both trees - tests/test_source_run_key.py re-proves it on every run, `en` and
+    `en_runs` set aside - with an operator's English and each span naming its source run, the last paragraph not."""
+    out = []
+    for idx, (runs, en, cut) in enumerate(KEY_SPANS + KEY_SPANS[:1]):
+        listed, pos = [], 0
+        for t, rpr in runs:
+            run = _xrun(pos, t)
+            if "<w:u " in rpr:
+                run["underline"] = True
+            if "<w:sz " in rpr:
+                run["sz"] = rpr.split('w:val="')[1].split('"')[0]
+            if "<w:color " in rpr:
+                run["color"] = rpr.split('w:val="')[1].split('"')[0]
+            listed.append(run)
+            pos += len(t)
+        spans = [_span(0, cut), _span(cut, len(en))]
+        if idx < len(KEY_SPANS):
+            spans[0]["source_run"], spans[1]["source_run"] = 0, 1
+        out.append({"idx": idx, "text": "".join(t for t, _r in runs), "runs": listed, "en": en, "en_runs": spans})
+    return out
+
+
 def main():
     if "--list" in sys.argv:
         for name, (why, _) in FIXTURES.items():

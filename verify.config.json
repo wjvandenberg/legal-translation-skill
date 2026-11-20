@@ -64,6 +64,8 @@
       {"name": "styles_readers [us]", "command": "uv run --with lxml python tests/test_styles_readers.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "tc_declared_spans", "command": "uv run --with lxml python tests/test_tc_declared_spans.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "tc_declared_spans [us]", "command": "uv run --with lxml python tests/test_tc_declared_spans.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
+      {"name": "source_run_key", "command": "uv run --with lxml python tests/test_source_run_key.py", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
+      {"name": "source_run_key [us]", "command": "uv run --with lxml python tests/test_source_run_key.py --variant us", "count": "([0-9]+) check\\(s\\), [0-9]+ failure"},
       {"name": "no_bytecode_in_tree", "command": "uv run --with lxml python tests/test_no_bytecode_in_tree.py", "count": "CHECKED:? +([0-9]+)"},
       {"name": "no_bytecode_in_tree [us]", "command": "uv run --with lxml python tests/test_no_bytecode_in_tree.py --variant us", "count": "CHECKED:? +([0-9]+)"},
       {"name": "no_delivered_byte_moves", "command": "uv run --with lxml python tests/test_no_delivered_byte_moves.py", "count": "([0-9]+) assertions"},

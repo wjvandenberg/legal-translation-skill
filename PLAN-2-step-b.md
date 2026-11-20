@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-20, WORKER 9 OF THE CHAIN OF 2026-11-20 — SESSION PURPOSE — what · how · purpose:** 17.3 built to its plan in 3.17, A10's declared spans placed on aligned tracked-change paragraphs and A20 re-based and pinned · 17.3.1's alignment count and its gate first, then the code in apply_translations_textmatch.py in both trees, controls red at e5db826, mutants, the corpus arm and a rendered diff on a synthetic fixture · **so that A10 and A20 close and 17.5 can rewrite rule 3 over finished code** *(written immediately after the tag `rollback-2026-11-20a-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-20, WORKER 10 OF THE CHAIN OF 2026-11-20 — SESSION PURPOSE — what · how · purpose:** 17.4 planned and built in 3.17, 16.5's (a): a source run the operator names on an en_runs span, its properties carried onto that span · its own plan and gate first, then apply_translations_textmatch.py and validate_en_runs.py in both trees, controls red at cd452dc, mutants, the corpus arm and a rendered diff on a synthetic fixture; 17.5 if it fits · **so that the 27 mixed findings have a device and 17.5 can rewrite rule 3 over finished code** *(written immediately after the tag `rollback-2026-11-20b-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -3819,6 +3819,113 @@ misaligned arm; **A20 CLOSED** by its fix and its six arms. **Declared, from the
 formatting change keeps its recorded old properties while its bold or italic changes, unmeasured; a third copy of the
 run-property schema order; the script's standard-library writer; a quadratic lookup within one `w:t` —
 `DECISIONS-LOG.md` 2026-11-20, worker 9's, (9).
+
+**17.4's OWN PLAN — 2026-11-20, written before any code** *(worker 10 of the chain of 2026-11-20; its choices
+`DECISIONS-LOG.md` 2026-11-20, worker 10's, Wouter's to overturn)*. **Explored first, read-only:** 16.5's plan and
+result in 3.16, its measurement (`temp/s1116b_165_measure.py`, outputs `_uk.txt`, `_us.txt`), 17.3's code, apply's
+regular path (`get_default_rpr_et` 239, `_PER_SPAN_UNITS` 276, `emphasis_units` 308, `span_template` 341, the span
+loop 2582–2626, the same lines in both trees), extraction's `runs` (extract 493–553: every `w:r` of the paragraph, in
+document order, whose `w:t` text is not empty, deleted text never among them), and every other reader of `en_runs` —
+`validate_en_runs.py`, `post_process.py`, `reorder_definitions.py`, `validate_apply.py`,
+`translate_headers_footers.py`.
+
+**THE GATE, MEASURED FIRST — IT DID NOT FIRE.** (1) **No new shipped file:** the device is a key read by two scripts
+that exist, `apply_translations_textmatch.py` and `validate_en_runs.py`; the tree stays at 198. (2) **No change to the
+notes' required shape:** the key is optional, and all five readers above ignore a span key they do not know — read
+in each, never assumed — so every notes file written before it is valid after it, unchanged. (3) **The 27 are on the
+path the key reaches:** 16.5 measured them over rebuilt paragraphs only, the regular path; their kinds are
+underline, highlight, size, colour, character style, shading and small capitals, all seven among 16.5's eleven.
+
+**What it builds:**
+1. **The key.** An optional `source_run` on an `en_runs` span: a whole number, the position counted from 0 of a
+   source run in the same entry's `runs` list. It says *this English span carries the properties of that source
+   run* — the eleven 16.5 named (`_PER_SPAN_UNITS`: underline, highlight, size, colour, character style, vertical
+   alignment, small capitals, capitals, strike, shading, fonts) — and nothing else: bold and italic stay as the span
+   declares them, absolute since 16.4.
+2. **The refusal, in `validate_en_runs.py`.** A `source_run` that is not a whole number (a `true` is not one), is
+   below 0, or names no run of the entry's `runs` is malformed and BLOCKS, exit 2, in its own message, never waived
+   by `--allow-bold-loss`. A span without the key is checked exactly as at the pin.
+3. **The reading, on apply's regular path.** For a span naming a source run, apply finds that run in the source
+   paragraph by extraction's own rule (the paragraph's runs in document order, those with `w:t` text), proves its
+   text equals that `runs` entry's `text`, and builds the span's run properties from the template with each of the
+   eleven units set to what that run carries, removed where it carries none; a symbol font is never carried (A5);
+   what the styles give is recomputed for the span, as 16.5 does. Bold and italic are then written through 16.3's
+   writer as for any declared span. **Where the text does not match,** the span is built as at the pin and one line
+   is printed naming the entry's idx — never a guess at which run was meant.
+4. **The tracked-change path does not read it:** its runs are the source's own, split in place (17.3), so they
+   already carry their properties; a declared `source_run` there is one printed line naming the idx, the delivery
+   as at the pin.
+
+**Every span without the key is built exactly as at the pin**, 16.5's per-emphasis units included; a span with it
+replaces only its own template.
+
+**MUST NOT:** move bold or italic; move a character of text; change a span without the key, a notes file without
+it, or any delivery made from one — so no frozen notes can move; strengthen a gate beyond refusing the malformed key;
+touch the tracked-change path's placement, the ZWSP pass or its scrub; a new shipped file; the notes' required
+shape; the skill docs, which name the key at 17.5; the register, whose rows 17.6 files.
+
+**Checked against, and at what level:** the delivered `document.xml`, per paragraph and per run — each run's text,
+each of the eleven properties by its direct value on the run, and bold and italic in force through extraction's
+resolver over the document's own styles; and `validate_en_runs.py`'s exit code and message per malformed input.
+
+**The sub-steps, in order:** **17.4.1 — the gate,** measured above, read-only. **17.4.2 — the refusal,** (2),
+both trees. **17.4.3 — the reading,** (3) and (4), both trees. **17.4.4 — the proof:** the suite, the mutants, the
+corpus arm, the rendered diff. One commit for 17.4.2 to 17.4.4, one cycle record.
+
+**Controls red at the pin `cd452dc`** (17.3's code) — a new suite, `tests/test_source_run_key.py`, both trees, every
+document invented in a temporary folder as 16.5's suite builds them. *TP,* one arm per property kind of the 27:
+two plain runs, one underlined, declared as two plain spans keyed to their runs — the underline on its span only;
+the same for highlight, size, colour, a character style, shading and small capitals; a key naming a run inside a
+hyperlink; a key on a bold span over a plain source run — bold as declared, the run's underline carried. *FP:* the
+same paragraphs declared without the key, delivered byte for byte as at the pin; a key naming a source run whose
+properties equal the template's — no property moves. **Negative inputs:** for the refusal — `true`, `1.5`, `"0"`,
+`-1`, and one past the end of `runs`, each exit 2 naming its idx, and the same notes without the key exit 0; for
+apply — a key whose run's text no longer matches (a source edited after extraction), delivered as at the pin with
+its line printed; a key on a tracked-change paragraph, its line printed and the paragraph as at the pin.
+**Mutants, one per deciding line, each killed by a named control:** the refusal's whole-number test admitting a
+`true`; its upper bound off by one; its lower bound dropped; apply ignoring the key; the run lookup off by one; the
+text proof removed; the units copied from the template instead of the run; bold copied from the source run over the
+declared span; the symbol font carried; the styles not recomputed for the span; the tracked-change line dropped.
+
+**The corpus arm (b):** `tools/apply_corpus_diff.py --ref cd452dc`, 13 of 13 per tree. **Expected movement, derived
+first:** 0 — no frozen notes declares the key (counted over the 13 notes files, a planted key firing), so every
+delivery byte for byte as at the pin, 0 unexplained.
+
+**The rendered diff of BOTH documents** — `tools/render_diff.py`, LibreOffice headless, on a SYNTHETIC fixture
+only: `tests/fixtures/source-run-key.docx` with its notes, invented by `make_fixtures.py` — a paragraph per property
+kind, each declared with the key — source and delivered, page by page, against `cd452dc`: before, the property
+spread over the paragraph or lost; after, on its span only. No corpus page is rendered (§5.6).
+
+**VERIFY:** the new suite green both trees, and red at the pin; every mutant killed; the corpus arm at 0 movement;
+the parity check, and the divergence baseline re-recorded from the index for the two scripts; the three
+confidentiality controls on every committed file. **TEST:** `test_per_span_properties`, `test_tc_declared_spans`,
+`test_declarations_win`, `test_delivered_formatting`, `test_delivered_check`, `test_notes_gates`,
+`test_whitespace_and_offsets`, `test_segment_restoration` and the smoke suite, both trees; the full run once, before
+the push. **Done when:** the key built and proved — each of the seven property kinds carried onto its span on an
+invented paragraph, the malformed key refused, every delivery without it unmoved. **Size:** HEAVY, about one session.
+
+**17.4's RESULT — BUILT 2026-11-20, worker 10.** As planned, both trees, two shipped scripts, one patch
+(`temp/s1120b_patch174.py`, the review's fixes `temp/s1120b_fix_review.py`). **The key:** a declared span may name, as
+`source_run`, the position counted from 0 of a source run in the entry's `runs`; on apply's regular path the span then
+carries that run's eleven properties, through 16.5's `span_template`, its bold and italic as declared and what the
+styles give recomputed for it, a symbol font never carried. **The refusal:** `validate_en_runs.py` blocks a key that
+is not a whole number or names no run of the entry, exit 2, never waived; a `null` key reads as none. **The two
+printed lines:** a key whose run no longer holds the text extraction listed, its span built as at the pin; a key on a
+tracked-change paragraph, whose runs keep their own properties.
+
+**Proved.** `tests/test_source_run_key.py`, 50 checks per tree, every document invented: **red at `cd452dc`, 29 of 50
+per tree**, green on both; **13 of 13 mutants killed per tree**, run again on the final code and suite
+(`temp/s1120b_pin_and_mutants.py`, out `temp/s1120b_mutants_out.txt`). **The corpus:** 13 of 13 frozen notes read,
+1,398 declared spans, **0 naming a source run** (`temp/s1120b_key_count.py`, a planted key counted first) — so the
+expected movement is 0; `tools/apply_corpus_diff.py --ref cd452dc` found 13 of 13 documents byte for byte as at the
+pin, in both trees, 0 unexplained. **The rendered diff, both trees** (`tools/render_diff.py --fixture source-run-key`,
+LibreOffice headless, against `cd452dc`): one page each, the count unchanged; at the pin each property spread over the
+whole English line, the size at its smaller value throughout; now each on its own word as the source shows it, the
+control line unchanged; the two trees' new pages identical. **The 27 mixed findings now have their device;** none
+moves on the corpus until an operator declares the key, which 17.5's sentence first asks for — so their register rows
+are 17.6's to file. **Declared, from the review:** an out-of-range key reaching apply, possible only where the
+validator is skipped, is named by the *no source run holds the text* line — `DECISIONS-LOG.md` 2026-11-20, worker
+10's, (8).
 
 **The register rows, as section 9.3 maps them:**
 
