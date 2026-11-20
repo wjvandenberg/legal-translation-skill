@@ -3206,3 +3206,42 @@ on the corpus (17.1) and closes the row. **(5) THE PIN FOR 17.3's CONTROLS IS `e
 carrying 17.2's code — not step 17's pin `1e92de9` — so each control is red against the code 17.3 starts from.
 **(6) THE RENDERED DIFF IS 17.3's OWN,** on an invented fixture, rather than left to 17.6: 17.3 is the first
 sub-step of step 17 to move a delivered byte.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 9: 17.3 built; the choices the session's own
+
+**WOUTER'S WORDS, 2026-11-20:** *"Continue with everything until 16h today, without me being involved, and you
+opening sessions yourself via auto hop mode"* — with his words of 2026-11-16, quoted whole under worker 3's heading
+of 2026-11-18, the go. **No question was asked; each choice below is THE WORKER'S, its recommended answer, for him
+to confirm or overturn** — `temp/s1120-questions.md` holds them with their options. 17.3's result is in section 3.17,
+after its own plan.
+
+**(1) 17.3.1's GATE DID NOT FIRE: 21 of the 21 mixed tracked-change entries align, 37 of all 45,** so no re-plan.
+**(2) D11's 8 UNALIGNED ENTRIES STAY UNPLACED — THE ALIGNMENT RULE KEPT CHARACTER FOR CHARACTER.** Their accepted
+segments carry 48 zero-width spaces their raw `en` does not, and are equal once those are removed; all 8 are
+single-state. The other option, skipping U+200B in the comparison, would place 8 entries outside A10's 21 and loosen
+the rule the plan says is never loosened in the code to fit. They are A10's declared remainder, a printed line each,
+pinned by the suite's misaligned arm. **(3) THE TRACKED-CHANGE PATH INDEXES THE RAW `en`,** passed to it beside the
+stripped one — the string the offsets index and the alignment rule compares, so A20 needs no re-base there (a re-base
+by zero); passing the stripped text would leave every `en` beginning with a space unaligned. **(4) A CHARACTER APPLY
+ITSELF ADDED** — a restored edge space, a wrapper-boundary zero-width space — **TAKES THE STATE OF THE MAPPED
+CHARACTER BESIDE IT** in the same `w:t`, the one before, else the one after; refusing placement wherever one occurs
+would leave aligned paragraphs unplaced for whitespace apply wrote. **(5) ALIGNED SINGLE-STATE ENTRIES ARE PLACED
+TOO** — rule (1) of the plan names no mixed condition and a declared span is absolute (16.4); the corpus arm counts
+each by doc-id. **(6) THE PASS'S YIELD IS PROVED BY A SPAN WHOSE BOLD IS 1,** read bold as the regular path reads it
+but not `true` to rev38's first bypass, which already skips the pass wherever a span says `true` — the only input on
+which the yield is observable. **(7) THE LEGACY PATH NAMES AN UNPLACED DECLARATION** in one printed line, the plan's
+*anywhere else*; silent at the pin. **(8) ONE COMMIT FOR 17.3.2 TO 17.3.4:** the code is one patch to one script per
+tree and the proof covers both halves together — one cycle record, one commit. **(9) THE CODE REVIEW (high,
+inline) RAISED SEVEN; THREE FIXED, FOUR DECLARED.** Fixed: **the bold-off pass yields to each run placement set,
+not to the whole paragraph** — the plan's (3) read narrowly, because the whole-paragraph skip would also have spared
+the deletion's runs the pass the pin gives them, against the plan's *MUST NOT touch a `del` segment's runs* (a
+character no span covers cannot reach apply: `validate_en_runs.py` refuses spans that do not tile `en`); an arm for a
+run split around a tab; A20's count derived from the strip itself rather than a second copy of its loop. Declared:
+a run carrying a tracked formatting change (`w:rPrChange`) has its current bold or italic changed without its
+recorded old properties, unmeasured on the corpus; a third copy of the run-property schema order beside
+`span_template`'s and `make_run_et`'s, merged only by touching functions outside 17.3; new elements written through
+the script's own standard-library writer, its namespaces registered, as everywhere in it; a neighbour lookup
+quadratic in one `w:t`'s length, which is short. **(10) THIRTEEN MUTANTS; THE CURSOR'S END CHECK REMOVED IS DECLARED
+EQUIVALENT** — a guard no aligned input can reach, since the segment loop writes every character of each accepted
+segment's `en`; the mutant counting a zero-width space as a character of `en` survived the first suite and is killed
+by an arm added for it (a span edge between two equal letters just after a wrapper seam).

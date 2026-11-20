@@ -2236,6 +2236,69 @@ def _truncated(path):
     path.write_bytes(data[:int(len(data) * 0.6)])
 
 
+TC_SPANS = {
+    "kept": ("De Prijs ", "nu ", "geldt."),
+    "ins": ("Betaal ", "de Som", "het Bedrag", " vandaag."),
+    "seam": ("Zie het Groot ", "Totaal hier"),
+}
+TC_SPANS_EN = {
+    "kept": ("The Price ", "now ", "applies."),
+    "ins": ("Pay ", "the Sum", "the Amount", " today."),
+    "seam": ("See the Grand ", "Total here"),
+}
+
+
+@fixture("tc-declared-spans.docx",
+         "SUB-STEP 17.3 — register A10: three tracked-change paragraphs, each declaring a bold defined term - in "
+         "the kept text, inside an insertion after a deletion, and across the seam between kept and inserted text. "
+         "Ships its own tc-declared-spans.notes.json")
+def _tc_declared_spans(path):
+    """The page sub-step 17.3 is judged on. Before it a declared span on a tracked-change paragraph was read for one
+    boolean only, so each term below was delivered as the source showed it; after it, the declared bold lands on the
+    term and nowhere else, each run still inside its w:ins or beside it, the deletion untouched."""
+    s = TC_SPANS
+    ins = ('<w:ins w:id="%d" w:author="A" w:date="2020-01-01T00:00:00Z">'
+           '<w:r><w:t xml:space="preserve">%s</w:t></w:r></w:ins>')
+    dele = ('<w:del w:id="%d" w:author="A" w:date="2020-01-01T00:00:00Z">'
+            '<w:r><w:delText xml:space="preserve">%s</w:delText></w:r></w:del>')
+    body = (
+        p(r(s["kept"][0]), ins % (1, s["kept"][1]), r(s["kept"][2])) +
+        p(r(s["ins"][0]), dele % (2, s["ins"][1]), ins % (3, s["ins"][2]), r(s["ins"][3])) +
+        p(r(s["seam"][0]), ins % (4, s["seam"][1]))
+    )
+    docx(path, body, extra_parts={"word/_rels/document.xml.rels": STYLE_LINK_RELS})
+    _write_notes(path, _tc_declared_spans_notes())
+
+
+def _tc_declared_spans_notes():
+    """As extraction wrote them on 2026-11-20, both trees - tests/test_tc_declared_spans.py re-proves it on every
+    run, `en`, `en_runs` and `en_segments` set aside - with an operator's English and one bold term declared on each
+    paragraph."""
+    s, e = TC_SPANS, TC_SPANS_EN
+    out = []
+    for idx, key, types in ((0, "kept", ("regular", "ins", "regular")),
+                            (1, "ins", ("regular", "del", "ins", "regular")),
+                            (2, "seam", ("regular", "ins"))):
+        kept = [t for t, ty in zip(s[key], types) if ty != "del"]
+        runs, pos = [], 0
+        for t in kept:
+            runs.append(_xrun(pos, t))
+            pos += len(t)
+        en = "".join(t for t, ty in zip(e[key], types) if ty != "del")
+        dropped = "".join(t for t, ty in zip(s[key], types) if ty == "del")
+        out.append({"idx": idx, "text": "".join(kept), "runs": runs, "en": en, "en_runs": None,
+                    **({"deleted_text": dropped} if dropped else {}),
+                    "has_track_changes": True,
+                    "tc_segments": [{"type": ty, "text": t} for t, ty in zip(s[key], types)],
+                    "en_segments": [{"type": ty, "en": t} for t, ty in zip(e[key], types)]})
+    term = {0: "Price", 1: "Amount", 2: "Grand Total"}
+    for n in out:
+        a = n["en"].index(term[n["idx"]])
+        b = a + len(term[n["idx"]])
+        n["en_runs"] = [sp for sp in (_span(0, a), _span(a, b, bold=True), _span(b, len(n["en"]))) if sp["end"] > sp["start"]]
+    return out
+
+
 def main():
     if "--list" in sys.argv:
         for name, (why, _) in FIXTURES.items():

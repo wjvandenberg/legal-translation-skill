@@ -1,0 +1,227 @@
+[
+  {
+    "idx": 0,
+    "text": "De Prijs nu geldt.",
+    "runs": [
+      {
+        "start": 0,
+        "end": 9,
+        "text": "De Prijs ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 9,
+        "end": 12,
+        "text": "nu ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 12,
+        "end": 18,
+        "text": "geldt.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "The Price now applies.",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 4,
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 4,
+        "end": 9,
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 9,
+        "end": 22,
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "has_track_changes": true,
+    "tc_segments": [
+      {
+        "type": "regular",
+        "text": "De Prijs "
+      },
+      {
+        "type": "ins",
+        "text": "nu "
+      },
+      {
+        "type": "regular",
+        "text": "geldt."
+      }
+    ],
+    "en_segments": [
+      {
+        "type": "regular",
+        "en": "The Price "
+      },
+      {
+        "type": "ins",
+        "en": "now "
+      },
+      {
+        "type": "regular",
+        "en": "applies."
+      }
+    ]
+  },
+  {
+    "idx": 1,
+    "text": "Betaal het Bedrag vandaag.",
+    "runs": [
+      {
+        "start": 0,
+        "end": 7,
+        "text": "Betaal ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 7,
+        "end": 17,
+        "text": "het Bedrag",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 17,
+        "end": 26,
+        "text": " vandaag.",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "Pay the Amount today.",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 8,
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 8,
+        "end": 14,
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 14,
+        "end": 21,
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "deleted_text": "de Som",
+    "has_track_changes": true,
+    "tc_segments": [
+      {
+        "type": "regular",
+        "text": "Betaal "
+      },
+      {
+        "type": "del",
+        "text": "de Som"
+      },
+      {
+        "type": "ins",
+        "text": "het Bedrag"
+      },
+      {
+        "type": "regular",
+        "text": " vandaag."
+      }
+    ],
+    "en_segments": [
+      {
+        "type": "regular",
+        "en": "Pay "
+      },
+      {
+        "type": "del",
+        "en": "the Sum"
+      },
+      {
+        "type": "ins",
+        "en": "the Amount"
+      },
+      {
+        "type": "regular",
+        "en": " today."
+      }
+    ]
+  },
+  {
+    "idx": 2,
+    "text": "Zie het Groot Totaal hier",
+    "runs": [
+      {
+        "start": 0,
+        "end": 14,
+        "text": "Zie het Groot ",
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 14,
+        "end": 25,
+        "text": "Totaal hier",
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "en": "See the Grand Total here",
+    "en_runs": [
+      {
+        "start": 0,
+        "end": 8,
+        "bold": false,
+        "italic": false
+      },
+      {
+        "start": 8,
+        "end": 19,
+        "bold": true,
+        "italic": false
+      },
+      {
+        "start": 19,
+        "end": 24,
+        "bold": false,
+        "italic": false
+      }
+    ],
+    "has_track_changes": true,
+    "tc_segments": [
+      {
+        "type": "regular",
+        "text": "Zie het Groot "
+      },
+      {
+        "type": "ins",
+        "text": "Totaal hier"
+      }
+    ],
+    "en_segments": [
+      {
+        "type": "regular",
+        "en": "See the Grand "
+      },
+      {
+        "type": "ins",
+        "en": "Total here"
+      }
+    ]
+  }
+]

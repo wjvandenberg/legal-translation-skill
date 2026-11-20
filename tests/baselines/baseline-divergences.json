@@ -11,9 +11,9 @@
    "sha256_now": "5b85404ec1883d6aa1a2932e2d76e4dd3581757f8702aec22f1eb8b1d198b68e"
   },
   "uk/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step16-formatting-part-3",
-   "commit_subject": "Step 16.5 - the other properties per span: the template read from a container's runs, and per declared span where a property follows emphasis; D06's 35 paragraphs keep their character styles and lose A18's spreads",
-   "sha256_now": "d60ea31add9ed400cc90a26dca849528559306cf5d3322cade1c839cc697e905"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.3 - declared spans placed on aligned tracked-change paragraphs (A10), and A20 re-based on the regular path",
+   "sha256_now": "693e4c5763d95dcb11dfdab86b92adb232f759049129b26e69c189156b7fcfac"
   },
   "uk/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
@@ -111,9 +111,9 @@
    "sha256_now": "7943280287e4707fd9a357fced5106e4c9462248df16f358f95b5b5e13a6dfa4"
   },
   "us/scripts/apply_translations_textmatch.py": {
-   "changed_by": "feature/step16-formatting-part-3",
-   "commit_subject": "Step 16.5 - the other properties per span: the template read from a container's runs, and per declared span where a property follows emphasis; D06's 35 paragraphs keep their character styles and lose A18's spreads",
-   "sha256_now": "ab8ed9441a21d395febbbf94979538cc2cf74774640ee3588548ce704022f3d8"
+   "changed_by": "feature/step17-formatting-part3",
+   "commit_subject": "Step 17.3 - declared spans placed on aligned tracked-change paragraphs (A10), and A20 re-based on the regular path",
+   "sha256_now": "02c5f2d5f072a0afd7c1a853526dc02faf62006b9ffbb6903bccf040d0c61306"
   },
   "us/scripts/clean_conversion_artifacts.py": {
    "changed_by": "feature/step14-9-1-validator-console-crash",
