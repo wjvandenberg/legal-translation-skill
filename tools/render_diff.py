@@ -58,6 +58,7 @@ import sys
 import tempfile
 import time
 import zipfile
+import zlib
 from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
@@ -195,12 +196,13 @@ def pick_source_docx(wd, notes, extra_dirs):
     return best, frac
 
 
-def to_pdf(soffice, docx_path, outdir):
-    """Convert with a PRIVATE user profile, so this cannot collide with a running Office."""
+def to_pdf(soffice, docx_path, outdir, flt="pdf"):
+    """Convert with a PRIVATE user profile, so this cannot collide with a running Office. flt is the
+    --convert-to argument: the layout mode passes LAY_PDF_FILTER, which keeps bookmark destinations (18.2)."""
     prof = (outdir / "loprofile").as_uri()
     r = subprocess.run(
         [soffice, f"-env:UserInstallation={prof}", "--headless", "--norestore",
-         "--convert-to", "pdf", "--outdir", str(outdir), str(docx_path)],
+         "--convert-to", flt, "--outdir", str(outdir), str(docx_path)],
         capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=900)
     pdf = outdir / (docx_path.stem + ".pdf")
     return (pdf if pdf.is_file() else None), r
@@ -227,6 +229,385 @@ def pixel_delta(a, b):
         return None
     diff = sum(1 for x, y in zip(ra, rb) if x != y)
     return diff / len(ra) if ra else 0.0
+
+
+# =========================================================================================
+# STEP 18.2 -- THE LAYOUT MODE (PLAN-2-step-b.md 3.18). Each layout device 18.1's inventory counts, found in the
+# SOURCE's XML, then placed on the page in the source's render and in the delivery's: a bookmark is set on the
+# device's paragraph in a COPY of each document -- never the delivered file -- the copy is exported by LibreOffice
+# headless with ExportBookmarksToPDFDestination (a plain export carries no destination, 18.1 (b)), and each
+# destination's page and position is read back with re and zlib alone. Numbers only; every PDF is deleted.
+#
+# WHAT "MOVED" MEANS, PER MECHANISM -- a translation reflows every page, so a raw position always moves; each test
+# below asks the one question the device exists to answer, and a "moved" is a page a reader must look at, never a
+# defect proved:
+#   D1  (bucket 1) a paragraph whose first text follows tabs, no tab stop of its own: the x where its text starts,
+#       source against delivery, more than LAY_X_TOL points apart. D1-control, the same shape WITH a stop of its
+#       own (D01's blocks), is measured the same way and must stay silent.
+#   D5  (bucket 2) two or more empty paragraphs before a non-empty one, no page break: whether a page boundary
+#       falls between the paragraph before the run and the run's last empty paragraph, and between that and the
+#       device paragraph -- the pair of answers, source against delivery.
+#   D3  (bucket 3) a table with a cantSplit row: whether a page boundary falls between the paragraph before the
+#       first such row and the row's first paragraph, source against delivery.
+#   D2, D4 (bucket 3) decided by the XML (18.3's shapes), so placed on the page and never judged "moved".
+#   D6  (bucket 3) an exact-line-height paragraph whose largest direct run grew -- XML only, counted here.
+# =========================================================================================
+LAY_PREFIX = "lt18d"  # letters and digits only: LibreOffice writes "_" in a destination name as #5F
+LAY_X_TOL = 1.0
+LAY_PDF_FILTER = 'pdf:writer_pdf_Export:{"ExportBookmarksToPDFDestination":{"type":"boolean","value":"true"}}'
+LAY_PAD = (chr(0x3000), chr(0xFF3F))
+LAY_JUST = {"both", "distribute", "thaiDistribute", "lowKashida", "mediumKashida", "highKashida"}
+LAY_BUCKET = {"D1": 1, "D1-control": "control", "D5": 2, "D3": 3, "D2": 3, "D4": 3, "D6": 3}
+
+
+def lay_q(tag):
+    return "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}" + tag
+
+
+def lay_val(el):
+    return el.get(lay_q("val")) if el is not None else None
+
+
+def lay_styles(styles_xml):
+    """(style element by id, the default paragraph style's id) -- for alignment and line rule only."""
+    by, default_p = {}, None
+    if styles_xml:
+        for s in etree.fromstring(styles_xml).iter(lay_q("style")):
+            by[s.get(lay_q("styleId"))] = s
+            if s.get(lay_q("type")) == "paragraph" and s.get(lay_q("default")) in ("1", "true"):
+                default_p = s.get(lay_q("styleId"))
+    return by, default_p
+
+
+def lay_resolved(p, styles, child, attr):
+    """The paragraph's own pPr/child@attr, else its style chain's (basedOn), else the default paragraph style's."""
+    by, default_p = styles
+    ppr = p.find(lay_q("pPr"))
+    if ppr is not None:
+        c = ppr.find(lay_q(child))
+        if c is not None and c.get(lay_q(attr)) is not None:
+            return c.get(lay_q(attr))
+    sid = lay_val(ppr.find(lay_q("pStyle"))) if ppr is not None else None
+    sid, seen = sid or default_p, []
+    while sid and sid in by and sid not in seen:
+        seen.append(sid)
+        sp = by[sid].find(lay_q("pPr"))
+        c = sp.find(lay_q(child)) if sp is not None else None
+        if c is not None and c.get(lay_q(attr)) is not None:
+            return c.get(lay_q(attr))
+        sid = lay_val(by[sid].find(lay_q("basedOn")))
+    return None
+
+
+def lay_atoms(p):
+    """(kind, text) in order: text, tab (a rendered tab, never a stop), br (a manual line break)."""
+    out = []
+    for el in p.iter():
+        if el.tag == lay_q("t") and el.text:
+            out.append(("text", el.text))
+        elif el.tag == lay_q("tab") and el.getparent() is not None and el.getparent().tag == lay_q("r"):
+            out.append(("tab", "\t"))
+        elif el.tag == lay_q("br") and el.get(lay_q("type"), "textWrapping") == "textWrapping":
+            out.append(("br", ""))
+    return out
+
+
+def lay_leading_tab(p):
+    for kind, s in lay_atoms(p):
+        if kind == "tab":
+            return True
+        if kind == "text" and s.strip():
+            return False
+    return False
+
+
+def lay_own_stops(p):
+    ppr = p.find(lay_q("pPr"))
+    tabs = ppr.find(lay_q("tabs")) if ppr is not None else None
+    return tabs is not None and len(tabs.findall(lay_q("tab"))) > 0
+
+
+def lay_text(p):
+    return "".join(t.text or "" for t in p.iter(lay_q("t")))
+
+
+def lay_is_empty(p):
+    if lay_text(p).strip():
+        return False
+    return not any(next(p.iter(lay_q(tag)), None) is not None for tag in ("drawing", "pict", "object"))
+
+
+def lay_has_break(p):
+    if p is None or p.tag != lay_q("p"):
+        return False
+    if any(br.get(lay_q("type")) == "page" for br in p.iter(lay_q("br"))):
+        return True
+    ppr = p.find(lay_q("pPr"))
+    if ppr is None:
+        return False
+    pbb = ppr.find(lay_q("pageBreakBefore"))
+    return (pbb is not None and lay_val(pbb) not in ("0", "false")) or ppr.find(lay_q("sectPr")) is not None
+
+
+def lay_lead_tabs(p):
+    """How many tabs come before a paragraph's first non-blank text -- a number, never the text."""
+    n = 0
+    for kind, s in lay_atoms(p):
+        if kind == "tab":
+            n += 1
+        elif kind == "text" and s.strip():
+            break
+    return n
+
+
+def lay_lead_blanks(p):
+    """How many blank characters (spaces and the like, never a tab) come before a paragraph's first non-blank text --
+    a number, never the text: what else, beside the tab count, moves where the text starts."""
+    n = 0
+    for kind, s in lay_atoms(p):
+        if kind == "text":
+            if s.strip():
+                return n + len(s) - len(s.lstrip())
+            n += len(s)
+    return n
+
+
+def lay_max_sz(p):
+    v = [int(s.get(lay_q("val"))) for s in p.iter(lay_q("sz")) if s.getparent().tag == lay_q("rPr")
+         and s.getparent().getparent().tag == lay_q("r") and (s.get(lay_q("val")) or "").isdigit()]
+    return max(v) if v else None
+
+
+def lay_devices(root, styles):
+    """Every layout device in a document, from its XML alone, as 18.1's inventory reads them. Each is a dict:
+    mech, bucket, and marks -- {role: paragraph index in document order}, roles 'dev' (and 'prev', 'last' where
+    the question is a page boundary); 'n' is the instance count it stands for (D4: padding characters)."""
+    paras = list(root.iter(lay_q("p")))
+    at = {id(p): i for i, p in enumerate(paras)}
+    devs = []
+    for i, p in enumerate(paras):
+        if lay_leading_tab(p):
+            devs.append({"mech": "D1-control" if lay_own_stops(p) else "D1", "marks": {"dev": i}, "n": 1})
+        if lay_resolved(p, styles, "jc", "val") in LAY_JUST and any(k == "br" for k, _ in lay_atoms(p)):
+            devs.append({"mech": "D2", "marks": {"dev": i}, "n": 1})
+        pads = sum(lay_text(p).count(ch) for ch in LAY_PAD)
+        if pads:
+            devs.append({"mech": "D4", "marks": {"dev": i}, "n": pads})
+    body = root.find(lay_q("body"))
+    kids = [k for k in body if k.tag in (lay_q("p"), lay_q("tbl"))] if body is not None else []
+    i = 0
+    while i < len(kids):
+        if kids[i].tag == lay_q("p") and lay_is_empty(kids[i]):
+            j = i
+            while j < len(kids) and kids[j].tag == lay_q("p") and lay_is_empty(kids[j]):
+                j += 1
+            run, nxt = kids[i:j], (kids[j] if j < len(kids) else None)
+            prev = kids[i - 1] if i > 0 else None
+            if (len(run) >= 2 and nxt is not None and nxt.tag == lay_q("p") and not any(map(lay_has_break, run))
+                    and not lay_has_break(prev) and not lay_has_break(nxt)):
+                first = at[id(run[0])]
+                devs.append({"mech": "D5", "n": 1, "marks": {"prev": first - 1 if first else None,
+                                                            "last": at[id(run[-1])], "dev": at[id(nxt)]}})
+            i = j
+        else:
+            i += 1
+    for t in root.iter(lay_q("tbl")):
+        rows = [tr for tr in t.findall(lay_q("tr")) if tr.find(lay_q("trPr")) is not None
+                and tr.find(lay_q("trPr")).find(lay_q("cantSplit")) is not None
+                and lay_val(tr.find(lay_q("trPr")).find(lay_q("cantSplit"))) not in ("0", "false")]
+        first = next(rows[0].iter(lay_q("p")), None) if rows else None
+        if first is not None:
+            k = at[id(first)]
+            devs.append({"mech": "D3", "n": 1, "marks": {"prev": k - 1 if k else None, "dev": k}})
+    for d in devs:
+        d["bucket"] = LAY_BUCKET[d["mech"]]
+    return devs
+
+
+def lay_mark(root, wanted):
+    """Set a bookmark on each wanted paragraph of a COPY's tree: wanted is [(paragraph index, name, after_tabs)].
+    after_tabs puts it before the first run carrying non-blank text, splitting that run where tabs precede its
+    text in the same run, so the destination's x is where the text starts; otherwise it opens the paragraph.
+    Rendering is unchanged by either. Returns the number set."""
+    paras = list(root.iter(lay_q("p")))
+    ids = [int(b.get(lay_q("id"))) for b in root.iter(lay_q("bookmarkStart")) if (b.get(lay_q("id")) or "").isdigit()]
+    nid, done = max(ids + [0]) + 1000, 0
+    for idx, name, after_tabs in wanted:
+        if idx is None or not 0 <= idx < len(paras):
+            continue
+        p = paras[idx]
+        start = etree.Element(lay_q("bookmarkStart"))
+        start.set(lay_q("id"), str(nid))
+        start.set(lay_q("name"), name)
+        end = etree.Element(lay_q("bookmarkEnd"))
+        end.set(lay_q("id"), str(nid))
+        nid += 1
+        run = None
+        if after_tabs:
+            # the paragraph's OWN runs: a text box anchored in it holds paragraphs of its own (review fix)
+            run = next((r for r in p.iter(lay_q("r")) if next(r.iterancestors(lay_q("p")), None) is p
+                        and any((t.text or "").strip() for t in r.iter(lay_q("t")))), None)
+        if run is not None:
+            kids = list(run)
+            first_t = next(k for k in kids if k.tag == lay_q("t") and (k.text or "").strip())
+            lead = [k for k in kids[:kids.index(first_t)] if k.tag == lay_q("tab")]
+            if lead:
+                head = etree.Element(lay_q("r"))
+                rpr = run.find(lay_q("rPr"))
+                if rpr is not None:
+                    head.append(etree.fromstring(etree.tostring(rpr)))
+                for k in kids[:kids.index(first_t)]:
+                    if k.tag != lay_q("rPr"):
+                        head.append(k)
+                run.addprevious(head)
+            run.addprevious(start)
+            run.addnext(end)
+        else:
+            ppr = p.find(lay_q("pPr"))
+            pos = 1 if ppr is not None and len(p) and p[0] is ppr else 0
+            p.insert(pos, start)
+            p.insert(pos + 1, end)
+        done += 1
+    return done
+
+
+def lay_marked_copy(src_docx, out_docx, wanted):
+    """A copy of src_docx whose document.xml carries the bookmarks; every other part copied byte for byte. Written
+    once, to a new path beside nothing that ships -- never a delivered file changed."""
+    with zipfile.ZipFile(src_docx) as z:
+        root = etree.fromstring(z.read("word/document.xml"))
+        n = lay_mark(root, wanted)
+        payload = etree.tostring(root, xml_declaration=True, encoding="UTF-8", standalone=True)
+        with zipfile.ZipFile(out_docx, "w", zipfile.ZIP_DEFLATED) as zout:
+            for item in z.infolist():
+                zout.writestr(item, payload if item.filename == "word/document.xml" else z.read(item.filename))
+    return n
+
+
+def lay_pdf_objects(data):
+    """{object number: bytes}, from plain objects and from FlateDecode object streams -- the standard library only."""
+    objs = {}
+    for m in re.finditer(rb"(\d+)\s+0\s+obj(.*?)endobj", data, re.S):
+        objs[int(m.group(1))] = m.group(2)
+    for body in list(objs.values()):
+        if b"/ObjStm" not in body:
+            continue
+        s = lay_pdf_stream(body)
+        fm = re.search(rb"/First\s+(\d+)", body)
+        if s is None or fm is None:
+            continue
+        first = int(fm.group(1))
+        head = s[:first].split()
+        pairs = [(int(head[i]), int(head[i + 1])) for i in range(0, len(head) - 1, 2)]
+        for k, (on, off) in enumerate(pairs):
+            end = pairs[k + 1][1] if k + 1 < len(pairs) else len(s) - first
+            objs[on] = s[first + off:first + end]
+    return objs
+
+
+def lay_pdf_stream(body):
+    m = re.search(rb"stream\r?\n(.*?)\r?\nendstream", body, re.S)
+    if not m:
+        return None
+    if b"/FlateDecode" in body:
+        try:
+            return zlib.decompress(m.group(1))
+        except zlib.error:
+            return None
+    return m.group(1)
+
+
+def lay_destinations(pdf_path):
+    """{destination name: (page number from 1, x, y)} read with re and zlib alone, and the page count; the names a
+    named-destination array or a /Dests dictionary carries, each resolved through the page tree's order."""
+    objs = lay_pdf_objects(Path(pdf_path).read_bytes())
+    cat = next((b for b in objs.values() if re.search(rb"/Type\s*/Catalog", b)), None)
+    pm = re.search(rb"/Pages\s+(\d+)\s+0\s+R", cat or b"")
+    if pm is None:
+        return {}, 0
+    order, stack = [], [int(pm.group(1))]
+    while stack:
+        n = stack.pop(0)
+        b = objs.get(n, b"")
+        if re.search(rb"/Type\s*/Pages", b):
+            km = re.search(rb"/Kids\s*\[(.*?)\]", b, re.S)
+            stack = [int(k) for k in re.findall(rb"(\d+)\s+0\s+R", km.group(1) if km else b"")] + stack
+        else:
+            order.append(n)
+    xyz = rb"\[\s*(\d+)\s+0\s+R\s*/XYZ\s+([-\d.]+)\s+([-\d.]+)"
+    found = {}
+    for b in objs.values():
+        for nm, pg, x, y in re.findall(rb"\(([^)]*)\)\s*" + xyz, b):
+            found[nm.decode("latin-1")] = (int(pg), float(x), float(y))
+        for nm, pg, x, y in re.findall(rb"/([A-Za-z0-9_#.]+)\s*" + xyz, b):
+            found.setdefault(re.sub(r"#([0-9A-Fa-f]{2})", lambda h: chr(int(h.group(1), 16)), nm.decode("latin-1")),
+                             (int(pg), float(x), float(y)))
+    for b in objs.values():
+        for nm, ref in re.findall(rb"\(([^)]*)\)\s*(\d+)\s+0\s+R", b):
+            m = re.search(xyz, objs.get(int(ref), b""))
+            if m:
+                found.setdefault(nm.decode("latin-1"), (int(m.group(1)), float(m.group(2)), float(m.group(3))))
+    return ({k: (order.index(v[0]) + 1, v[1], v[2]) for k, v in found.items() if v[0] in order}, len(order))
+
+
+def lay_wanted(devs):
+    """The bookmarks one document needs: one per (device, role), named by device number and role."""
+    return [(d["marks"][role], f"{LAY_PREFIX}{k}r{role}", role == "dev" and d["mech"] in ("D1", "D1-control"))
+            for k, d in enumerate(devs) for role in sorted(d["marks"]) if d["marks"][role] is not None]
+
+
+def lay_judge(devs, src_dest, del_dest):
+    """Per device: (pages source -> delivery of its 'dev' paragraph, moved) -- moved True, False, 'n/a' for an
+    XML-decided device, or 'unread' where a destination it needs did not come back on either side."""
+    out = []
+    for k, d in enumerate(devs):
+        def get(dest, role):
+            return dest.get(f"{LAY_PREFIX}{k}r{role}") if d["marks"].get(role) is not None else None
+        sd, dd = get(src_dest, "dev"), get(del_dest, "dev")
+        pages = (sd[0] if sd else None, dd[0] if dd else None)
+        if d["mech"] in ("D2", "D4"):
+            out.append((pages, "n/a" if sd and dd else "unread"))
+            continue
+        if not (sd and dd):
+            out.append((pages, "unread"))
+            continue
+        if d["mech"] in ("D1", "D1-control"):
+            out.append((pages, abs(sd[1] - dd[1]) > LAY_X_TOL))
+            continue
+        roles = ["prev", "last", "dev"] if d["mech"] == "D5" else ["prev", "dev"]
+        roles = [r for r in roles if d["marks"].get(r) is not None]
+        sides = []
+        for dest in (src_dest, del_dest):
+            got = [get(dest, r) for r in roles]
+            sides.append(None if None in got else tuple(b[0] > a[0] for a, b in zip(got, got[1:])))
+        out.append((pages, "unread" if None in sides else sides[0] != sides[1]))
+    return out
+
+
+def lay_reordered(applied_texts, final_texts):
+    """The paragraph positions the definitions reorder moved: where apply's output and the delivery differ in text
+    AND apply's text sits at another position of the delivery. A text post_process changed in place stays paired;
+    a moved paragraph cannot be paired by position, so a device on it is reported 'unpaired', never judged."""
+    if len(applied_texts) != len(final_texts):
+        return None
+    where = {}
+    for j, t in enumerate(final_texts):
+        where.setdefault(t, set()).add(j)
+    return {i for i, (a, f) in enumerate(zip(applied_texts, final_texts)) if a != f and where.get(a, set()) - {i}}
+
+
+def lay_d6_grown(src_root, del_root, styles, skip=frozenset()):
+    """D6's hazard, XML only: exact-line-height paragraphs, paired by position (the reordered ones skipped), whose
+    largest direct run grew."""
+    sps, dps = list(src_root.iter(lay_q("p"))), list(del_root.iter(lay_q("p")))
+    if len(sps) != len(dps):
+        return None
+    n = 0
+    for i, (sp, dp) in enumerate(zip(sps, dps)):
+        if i not in skip and lay_resolved(sp, styles, "spacing", "lineRule") == "exact":
+            a, b = lay_max_sz(sp), lay_max_sz(dp)
+            n += a is not None and b is not None and b > a
+    return n
 
 
 def keep_dir(logs, label, variant):
@@ -300,6 +681,11 @@ ap.add_argument("--post-process", action="store_true",
                      "not evidence about the step. Section 5.2's gate needs this arm. "
                      "STEP 11's SUB-STEP 4a: with --doc, each arm runs apply, post_process, the "
                      "reorder and repack, where without it the --doc arm skips post_process")
+ap.add_argument("--layout", action="store_true",
+                help="STEP 18.2: with --doc, the classification run -- each layout device in the source placed by "
+                     "page and position in the source's render and in the delivery's (apply, post_process, the "
+                     "reorder with skill Step 7's flags, repack), read from bookmark destinations set on COPIES; "
+                     "numbers by doc-id only, every PDF deleted. Every workdir of each named doc-id, repeats too")
 ap.add_argument("--variant", default="uk", choices=("uk", "us"))
 ap.add_argument("--pages", type=int, action="append", default=[],
                 help="force these page numbers to be written even if they did not change "
@@ -545,7 +931,14 @@ def run_post_process_doc(scripts_dir, adir, xml):
                           cwd=str(ROOT), env=env, timeout=900)
     if proc.returncode != 0 and "SKILL GATE FIRED" not in (proc.stdout or "") + (proc.stderr or ""):
         return None, proc
-    ro = subprocess.run(py + [str(scripts_dir / "reorder_definitions.py"), "--doc", str(dest)],
+    # SKILL STEP 7's OWN FLAGS (18.2): since 16.6 and 17.2 the step passes --notes and --styles, so a reorder run
+    # without them sorts by the detector's guess and sees only direct bold -- not the step a delivery goes through
+    # (17.5). Passed where the arm's reorder accepts them; a pinned tree older than both runs without, as it shipped.
+    ro_cmd = py + [str(scripts_dir / "reorder_definitions.py"), "--doc", str(dest)]
+    ro_src = (scripts_dir / "reorder_definitions.py").read_text(encoding="utf-8", errors="replace")
+    if "'--notes'" in ro_src and "'--styles'" in ro_src:
+        ro_cmd += ["--notes", str(wd / "paragraphs.json"), "--styles", str(adir / "source.docx")]
+    ro = subprocess.run(ro_cmd,
                         capture_output=True, text=True, encoding="utf-8", errors="replace",
                         cwd=str(ROOT), env=env, timeout=900)
     if ro.returncode != 0:
@@ -959,6 +1352,161 @@ for stem in args.fixture:
         "(tools/keep_declarations.py), so the delivered check inside repack reads them as kept.",
         "",
     ]) + "\n").encode("utf-8"))
+
+# =========================================================================================
+# STEP 18.2 — THE LAYOUT MODE over the real corpus. MECHANICAL ONLY: numbers by doc-id, no page shown or kept.
+# =========================================================================================
+if args.layout:
+    if not args.doc:
+        print("  REFUSED: --layout needs --doc (the synthetic proof is tests/test_layout_mode.py). Nothing rendered.")
+        sys.exit(2)
+    if not LOGS.exists():
+        print("\n  logs folder not reachable. VOID, not a pass.")
+        sys.exit(1)
+    TMP = Path(tempfile.mkdtemp(prefix="l18-render-"))
+    atexit.register(shutil.rmtree, TMP, ignore_errors=True)
+    SCRIPTS = ROOT / args.variant / "scripts"
+    CORPUS = corpus_dirs()
+    print(f"\n  LAYOUT MODE, variant {args.variant}: each arm runs apply -> post_process -> reorder "
+          "(--notes, --styles) -> repack; bookmarks on copies; destinations read with re and zlib alone")
+    print(f"  corpus folder(s) reachable: {len(CORPUS)}")
+    wds = [w for w in (sorted(LOGS.rglob("wd")) + sorted(LOGS.rglob("wd-*"))) if w.is_dir()]
+    seen, table, docs_done, considered, bodies = {}, [], 0, [], []
+    for wd in wds:
+        doc = wd.name[3:] if wd.name.startswith("wd-") else wd.parent.name
+        seen[doc] = seen.get(doc, 0) + 1
+        label = doc if seen[doc] == 1 else f"{doc}#{seen[doc]}"
+        if doc not in args.doc or not (wd / "paragraphs.json").is_file():
+            continue
+        considered.append(doc)
+        notes = json.loads((wd / "paragraphs.json").read_text(encoding="utf-8"))
+        src, frac = pick_source_docx(wd, notes, CORPUS)
+        if src is None or frac < 0.5:
+            ok(f"{label}: source matched", False, f"best {frac:.0%}")
+            continue
+        adir = TMP / label.replace("#", "n")
+        adir.mkdir(parents=True)
+        shutil.copyfile(src, adir / "source.docx")
+        for n in ("paragraphs.json", ".validate-state.json", "_boldmap.json"):
+            if (wd / n).is_file():
+                shutil.copyfile(wd / n, adir / n)
+        xml, _ = run_apply(SCRIPTS, adir / "source.docx", adir / "paragraphs.json", adir / "document.xml")
+        if xml is None:
+            ok(f"{label}: apply produced document.xml", False)
+            continue
+        xml, pp = run_post_process_doc(SCRIPTS, adir, xml)
+        if xml is None:
+            ok(f"{label}: post_process and the reorder ran", False, step_failure(pp))
+            continue
+        deliv, rp = repack(SCRIPTS, adir / "source.docx", xml, adir / "delivery.docx", adir / "paragraphs.json")
+        if deliv is None:
+            # A REFUSED REPACK IS THE FROZEN NOTES MEETING TODAY'S GATES, NOT THIS INSTRUMENT'S FAILURE (18.2): July's
+            # notes predate checks steps 4 to 17 added. The layout question is about the BODY as applied, post-processed
+            # and reordered, so it is classified on that body, byte-substituted into a copy of the source as the fixture
+            # path does for a blocked arm -- never a deliverable, deleted with the rest -- and the gate is named.
+            why = refusal(rp)
+            deliv = _repack_bypass(adir / "source.docx", xml, adir / "delivery-body.docx")
+            if deliv is None:
+                ok(f"{label}: repack refused and the body could not be built", False, why)
+                continue
+            bodies.append(label)
+            print(f"  {label}: repack {why}; classified on the body as applied")
+        with zipfile.ZipFile(adir / "source.docx") as z:
+            sroot = etree.fromstring(z.read("word/document.xml"))
+            sty = lay_styles(z.read("word/styles.xml") if "word/styles.xml" in z.namelist() else None)
+        with zipfile.ZipFile(deliv) as z:
+            droot = etree.fromstring(z.read("word/document.xml"))
+        devs = lay_devices(sroot, sty)
+        npar_s, npar_d = len(list(sroot.iter(lay_q("p")))), len(list(droot.iter(lay_q("p"))))
+        # THE REORDER PERMUTES PARAGRAPHS AND KEEPS THEIR COUNT (review fix): apply keeps every paragraph in place,
+        # so apply's output against the delivery names the positions the reorder moved.
+        moved_by_reorder = lay_reordered(para_texts((adir / "document.xml").read_bytes()), para_texts(
+            etree.tostring(droot)))
+        grown = lay_d6_grown(sroot, droot, sty, moved_by_reorder or frozenset())
+        print(f"\n  {label}: {len(devs)} device(s) in the source; paragraphs {npar_s} -> {npar_d}; "
+              f"D6 exact-height paragraphs whose run grew: {grown if grown is not None else 'unpaired'}")
+        if grown:
+            table.append((label, "D6", 3, grown, (None, None), "n/a", ""))
+        if not devs:
+            docs_done += 1
+            continue
+        if npar_s != npar_d:
+            ok(f"{label}: source and delivery pair paragraph for paragraph", False, f"{npar_s} -> {npar_d}")
+            for d in devs:
+                table.append((label, d["mech"], d["bucket"], d["n"], (None, None), "unpaired", ""))
+            continue
+        if moved_by_reorder:
+            print(f"       the reorder moved {len(moved_by_reorder)} paragraph(s): a device on one is 'unpaired'")
+            keep = []
+            for d in devs:
+                if any(v in moved_by_reorder for v in d["marks"].values() if v is not None):
+                    table.append((label, d["mech"], d["bucket"], d["n"], (None, None), "unpaired", ""))
+                else:
+                    keep.append(d)
+            devs = keep
+        wanted = lay_wanted(devs)
+        dests = {}
+        for side, docx_in in (("source", adir / "source.docx"), ("delivery", deliv)):
+            mdir = adir / f"marked-{side}"
+            mdir.mkdir()
+            mk = mdir / f"{side}.docx"
+            set_n = lay_marked_copy(docx_in, mk, wanted)
+            pdf, r = to_pdf(SOFFICE, mk, mdir, LAY_PDF_FILTER)
+            if pdf is None:
+                ok(f"{label} {side}: rendered to PDF", False, f"exit {r.returncode}")
+                break
+            got, pages = lay_destinations(pdf)
+            got = {k: v for k, v in got.items() if k.startswith(LAY_PREFIX)}
+            print(f"       {side}: {pages} page(s); {set_n} of {len(wanted)} bookmarks set, {len(got)} came back")
+            dests[side] = got
+            pdf.unlink()
+        if len(dests) != 2:
+            continue
+        docs_done += 1
+        sps, dps = list(sroot.iter(lay_q("p"))), list(droot.iter(lay_q("p")))
+        for k, (d, (pages, moved)) in enumerate(zip(devs, lay_judge(devs, dests["source"], dests["delivery"]))):
+            detail = ""
+            if d["mech"] in ("D1", "D1-control"):
+                i, sx, dx = d["marks"]["dev"], dests["source"].get(f"{LAY_PREFIX}{k}rdev"),                     dests["delivery"].get(f"{LAY_PREFIX}{k}rdev")
+                detail = (f"x {sx[1]:.1f} -> {dx[1]:.1f}, " if sx and dx else "") +                     f"leading tabs {lay_lead_tabs(sps[i])} -> {lay_lead_tabs(dps[i])}, " +                     f"blanks {lay_lead_blanks(sps[i])} -> {lay_lead_blanks(dps[i])}"
+            table.append((label, d["mech"], d["bucket"], d["n"], pages, moved, detail))
+    shutil.rmtree(TMP, ignore_errors=True)
+    print("\n  THE CLASSIFICATION — one line per flagged instance group: doc-id, mechanism, bucket, instances, "
+          "page source -> delivery, moved")
+    for label, mech, bucket, n, pages, moved, detail in table:
+        mv = "MOVED" if moved is True else "same" if moved is False else moved
+        print(f"    {label:<7} {mech:<11} bucket {str(bucket):<8} n {n:<3} p {pages[0]} -> {pages[1]}   {mv}" + (f"   {detail}" if detail else ""))
+    flagged = [t for t in table if t[1] != "D1-control"]
+    inst = sum(t[3] for t in flagged)
+    b12 = sum(t[3] for t in flagged if t[2] in (1, 2))
+    by = {}
+    for t in table:
+        k = (t[1], t[2])
+        c = by.setdefault(k, [0, 0, 0, 0, set()])
+        c[0] += t[3]
+        c[1] += t[3] if t[5] is True else 0
+        c[2] += t[3] if t[5] is False else 0
+        c[3] += t[3] if t[5] in ("unread", "unpaired") else 0
+        c[4].add(t[0].split("#")[0])
+    print("\n  BY MECHANISM — instances, moved, same, unread or unpaired, doc-ids")
+    for (mech, bucket), (n, mv, same, unread, ids) in sorted(by.items(), key=lambda kv: str(kv[0])):
+        print(f"    {mech:<11} bucket {str(bucket):<8} {n:>4}  moved {mv:>3}  same {same:>3}  unread {unread:>3}  "
+              f"{', '.join(sorted(ids))}")
+    print(f"\n  FLAGGED INSTANCES (the control excluded): {inst}; in buckets 1 and 2: {b12}"
+          + (f" ({b12 / inst:.0%})" if inst else ""))
+    ctl_moved = sum(t[3] for t in table if t[1] == "D1-control" and t[5] is True)
+    print(f"  THE POSITIVE CONTROL (D1 with a stop of its own): "
+          f"{sum(t[3] for t in table if t[1] == 'D1-control')} instance(s), moved {ctl_moved}")
+    # EVERY WORKDIR OF EVERY DOC-ID ASKED, never "at least one" (review fix): a skipped workdir is a hole in the table.
+    print(f"  classified on the body as applied, repack having refused: {len(bodies)} of {docs_done}"
+          + (f" ({', '.join(bodies)})" if bodies else ""))
+    ok(f"layout: {docs_done} of {len(considered)} workdir(s) classified", considered and docs_done == len(considered))
+    ok("layout: every doc-id asked has a workdir", not set(args.doc) - set(considered),
+       ", ".join(sorted(set(args.doc) - set(considered))))
+    print(f"\n{'=' * 98}\n" + (f"FAIL — {len(FAIL)} of {CHECKED} assertions" if FAIL else
+                                f"PASS — {CHECKED} assertions. No page of a real document was displayed or kept."))
+    print("=" * 98)
+    sys.exit(1 if FAIL else 0)
 
 # =========================================================================================
 # REAL CORPUS — MECHANICAL ONLY. Renders are made outside the repository and DELETED.

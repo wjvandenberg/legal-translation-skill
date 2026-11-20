@@ -3382,3 +3382,26 @@ in the result as the negative control. **(6) GATE A ANSWERED ON ITS LETTER — A
 since the standard library read page and position on every synthetic shape; 18.4's findings stay non-blocking until
 he answers, and 18.2 reads positions from the bookmark destinations. 18.2 was not begun and PR #201 not merged, as
 the brief said; the app's keep-awake request was granted this time.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 14: 18.2 built and run; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options,
+from Q36; 18.2's plan and result are filed in its entry in section 3.18 of `PLAN-2-step-b.md`. **(1) THE LAYOUT MODE
+LIVES IN `render_diff.py`, ITS PROOF IN A NEW SUITE:** the entry names the tool, and a new module in `tools/` would
+fall under the house runner's selftest glob and need an entry point of its own; the suite loads the functions from
+the file's syntax tree, as `test_render_keep.py` does. **(2) "MOVED" IS ASKED PER MECHANISM,** never as a raw
+position: a translation reflows every page, so D1 is the x where the text starts, D5 and D3 whether a page boundary
+falls where the source's did, D2 and D4 placed but never judged; a "moved" is a page to look at, not a defect proved.
+**(3) THE DELIVERY IS BUILT AS SKILL STEPS 6 TO 10 BUILD IT** — apply, post_process, the reorder with its two flags,
+repack — so `--layout` needs no `--post-process`. **(4) THE REORDER'S FLAGS ARE PASSED WHERE THAT ARM'S REORDER
+ACCEPTS THEM:** the baseline pin `b47603d` predates both, and an argument it does not know would refuse the old arm.
+**(5) A DEVICE ON A PARAGRAPH THE REORDER MOVED IS "UNPAIRED", NEVER JUDGED** — the code review's finding: the
+reorder keeps the count and permutes the order, so pairing by position there would judge another paragraph.
+**(6) THE OWN PLAN WAS WRITTEN AFTER THE FIRST CODE EDIT, NOT BEFORE IT** — a slip of this session, declared rather
+than hidden: the plan follows 3.18's entry word for word and widens nothing, and the suite is proved red at the
+pin and against a mutant.
+**(7) WHERE REPACK REFUSES, THE BODY AS APPLIED IS CLASSIFIED,** byte-substituted into a copy of the source as
+the fixture path builds a blocked arm, the refusing gate named: July's notes predate checks steps 4 to 17 added,
+so the first run refused 5 of 13 workdirs in one tree and 6 in the other, and a table missing them would not be
+3.18's table; layout is a property of the body, and the copy is rendered to numbers and deleted, never delivered.
