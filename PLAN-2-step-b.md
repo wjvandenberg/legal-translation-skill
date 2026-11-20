@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-20, WORKER 11 OF THE CHAIN OF 2026-11-20 — SESSION PURPOSE — what · how · purpose:** 17.6, the close of step 17: its register rows filed, the rendered diff of 17.2 to 17.4's code on a synthetic fixture, section 2's row noted as corrected, 17.2's three declared review points taken or left · byte-exact splices on the CRLF documents, audit_register before and after with its FAIL rows diffed, render_diff headless, one full run on the pushed commit, then PR #200 squash-merged on green · **so that step 17 is closed in section 3.1 and step 18 starts from main** *(written immediately after the tag `rollback-2026-11-20c-start`)* |
+| **status** | **IN PROGRESS. Steps 3 to 11 are CLOSED**, and step 14's `quality_check` sub-step is merged — **how, step by step, is `evidence/EVIDENCE-phase2-history.md`**, where this cell's text to 2026-10-16 moved word for word on 2026-10-19 *(Wouter, 2026-10-14 (3))*; each step's own record follows its brief in §3. **STEP 12, DECLARE THE LANGUAGE, IS CLOSED but for H1's half, which is step 13's** — sub-step 12.1 the declaration at skill Step 1c (#133); 12.2 numbering, month names and the diligence audit reading it (#136, #137); 12.3 the ratio check able to fire, NOT APPLICABLE on a source declared English (#139, its review fixes #140); §3.2 owns it. **STEP 13, DECLARED MODES, IS EXPLORED, its four choices Wouter's** *(`DECISIONS-LOG.md`, 2026-10-16 (2))*; its plan is written in §3.4 and approved by Wouter, 2026-10-19; sub-step 13.1 is measured, nothing built, the gear's design Wouter's — the table a dated addition to section 3.4 of `evidence/EVIDENCE-a3-structure.md` — 13.2 is built, register R1 closed, its residue register R2, built last as 13.5; 13.3 is built, register L5 closed; every suite is in the full runner (#160) and 13.4 is built, H1 and H3 closed (#161); 13.5 is built, register R2 closed, and step 13 is done but for the runtime problem, open until phase 3's timing. Step 14's remainder is explored and its plan APPROVED in §3.14 by Wouter, 2026-10-26, his answers folded in; 14.2 merged as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30; 14.5, G7 in every language, inserted after 14.4 by Wouter on 2026-10-30 and the old 14.5 to 14.9 renumbered 14.6 to 14.10, as #183, 2026-11-02; 14.6 is next; steps 15 to 22 are planned and decided, not begun. · **THIS SESSION, 2026-11-20, WORKER 12 OF THE CHAIN OF 2026-11-20 — SESSION PURPOSE — what · how · purpose:** step 18's own plan, a new section 3.18: layout, option 11, with the tab-authoring rule's detection and the tab's run properties, register A21 · explore read-only first, the brief, the register rows and the code in both trees, the corpus for counts and doc-ids only; byte-exact splices on the CRLF documents; verify_md and the three confidentiality controls; a PR, not merged · **so that step 18 can be built sub-step by sub-step from a written plan** *(written immediately after the tag `rollback-2026-11-20d-start`)* |
 | **purpose** | so that goals (ii) and (iv) are BUILT — the formatting-defect classes closed and install-truncation made detectable — each fix pointing at a specific observed failure, never at theory |
 | **serves** | section 3 of `CLAUDE.md` — its **phase 2**, Building. *(This project has used the house's words since 2026-10-13 — phase, step, sub-step — and text dated before that keeps the old ones, read through the mapping in that charter's section 1.3. So do this document's records, whatever their date: each option's verdict and build record after its brief, §9.3's rows, and Parts Two and Four — rename (b2), 2026-10-19.)* |
 | **produces** | steps **3–22** — the fixes for goals (ii) and (iv), each merge-sized, each with its own acceptance condition |
@@ -4035,6 +4035,150 @@ the pin first; mutants on every deciding line; the corpus arm (b) with `--ref` o
 check and the divergence baseline; the three confidentiality controls. **TEST:** the suites that drive
 `quality_check`, `reorder_definitions`, apply, `validate_en_runs` and the tracked-change path, both trees; the
 smoke suite; the full run once per pull request, before the push.
+
+### 3.18 Layout — step 18 · *option 11, 11a only* · **PLANNED 2026-11-20, unattended — the session's answers, Wouter's to overturn**
+
+> **FOR THE BUILD — THE PLAN, 2026-11-20** *(worker 12 of the chain of 2026-11-20; Wouter's words of 2026-11-20 the
+> go; every choice below `DECISIONS-LOG.md` 2026-11-20, worker 12's, his to overturn)*. Section 3.10 owns WHAT step
+> 18 is — 11a, see it and say so, every flagged instance classified into one of its three buckets — option 11 in
+> section 6 owns why, and section 2's row adds the tab-authoring rule and the justified-short-tail check. This owns
+> HOW and the order. **Needs first:** step 4's disclosure channel (rule 5b, and repack's `accepted_consequences.json`);
+> step 11's delivered-document check, `validate_apply.py --delivered --original`, the road a delivered finding takes
+> to that channel; step 17, closed with #200 (e36b753), whose rewrite already tells the operator to author the tab.
+> **Unblocks:** the deferred 11b decision — 3.10's revisit trigger is this step's classification run, so 18.2's table
+> goes to Wouter as decision 4's evidence; step 21's claims; phase 3, whose Cowork runs meet the new findings first.
+> **Done when:** 18.1 to 18.7 each meet their own *Done when* below, and together 3.10's: the check fires on the
+> four documents the register records — D11, D10, D03 with D03B, D04 — stays silent on D01, the positive control,
+> and classifies every instance it flags.
+
+**What step 18 is not.** It repairs nothing: no paragraph property, tab stop, page break, table property or settings
+part is written, and the golden rule stays unopened (3.10). Wouter's signature-block complaint stays on the page,
+disclosed. L2's definitions-block walk, 17.6's rendered finding, is not layout: it stays L2's, open for phase 3.
+
+**Read 2026-11-20, read-only — no corpus count taken yet; 18.1 takes them:**
+
+| what | read |
+|---|---|
+| the rows section 9.3 maps here | D1 to D5; and two placed here by steps 16 and 17 — A3's remainder (the tab rule's detection, and a source tab's run properties carried onto an authored tab: 12 underlined and 17 shaded tab runs in between-text paragraphs, 0 under an authored entry, 16.7) and A21 (ruby, 0 corpus instances) |
+| D6, the exact line height | 3.10's (d) places its fix in option 3, and steps 15 to 17 closed without touching it — so its detection is taken here, the session's answer |
+| the channel | a finding of `validate_apply.py --delivered` blocks unless marked otherwise; repack refuses the archive until each blocking finding passes or is named in `accepted_consequences.json`, then prints the ACCEPTED CONSEQUENCE block for the delivery notes; a non-blocking finding is counted and never blocks, as step 11's count-it ruling set |
+| a renderer inside the skill | LibreOffice is reached at skill Step 1b only, through the docx skill's `soffice.py`, for a legacy `.doc`; no shipped script reads a PDF, and `lxml` is the only third-party import |
+| the tree | 198 of 199 files, the last slot step 22's (§6.3) — so **every shipped change lands in an existing script** |
+| `tools/render_diff.py` | compares an OLD against a NEW deliverable, and source against target by page count only; `--post-process` calls the reorder with neither `--notes` nor `--styles`, so it no longer mirrors skill Step 7 (17.5) |
+
+**Two splits shape the plan.** (1) **What needs a render and what does not.** D2's short tail, D4's width-bearing
+padding and D6's clipping hazard are decided by the XML of the two documents, so they can run on every delivery;
+D1's tab-positioned block, D5's hand-made page break and D3's table that moves are decided only where the page is
+drawn. (2) **Where the render lives.** A rendered comparison inside the shipped skill needs a renderer at run time
+and a PDF read with the standard library and `lxml` alone; neither is proved. **The session's answer, gated at
+18.1:** the render is a development instrument in `tools/` — it produces the classification, which is the
+deliverable — and the shipped check names each render-dependent device on the delivery as a page a reader must look
+at; whether a render arm ships goes to Wouter with 18.2's numbers.
+
+**The sub-steps,** in this order — measure, classify, then the shipped checks, the instruction last. **THE PIN IS
+`e36b753`**, main at step 17's close:
+
+- **18.1 — the inventory and the render probe, measured first.** LIGHT, read-only, no shipped byte. **(a)** Over the
+  13 frozen workdirs, both trees, counts by mechanism and doc-id only, a planted control firing on every count
+  first: paragraphs positioned by leading tab runs with no tab stop in their properties (D1, bucket 1), and the same
+  shape with stops (the positive control's); runs of two or more empty paragraphs before a non-empty one, with no
+  page break in or before it (D5, bucket 2); full-width padding characters, source against apply's output on a copy
+  (D4); justified paragraphs with a segment ended by a manual break, each segment's length in the source and in the
+  English (D2); `cantSplit` tables (D3); paragraphs whose line height is exact and whose delivered run is larger than
+  its source run (D6); between-text source tabs with no tab authored in `en`, re-deriving 16.7's 39, and the
+  underlined and shaded tab runs, re-deriving its 12 and 17; ruby, re-deriving 0. **(b)** On SYNTHETIC fixtures
+  only: whether a bookmark set on a device paragraph of a copy — never the delivered file — survives LibreOffice's
+  headless PDF export as a destination carrying its page and position, and whether that reads back with the
+  standard library alone. **(c)** On a synthetic justified paragraph: the word gap LibreOffice draws with and
+  without Word's `doNotExpandShiftReturn` setting — D2's untested lead, measured and not used, a settings part being
+  11b's kind of lever. *Done when:* the table filed in this entry, every count with its doc-ids; (b) and (c) each
+  answered yes or no with its measurement. **Checked against:** apply's output on a copy, never a delivered client
+  file; no rendered page of a real document looked at (§5.6).
+  **GATE A — the render's home, decided on (b).** If a destination's page and position read back with the standard
+  library on every synthetic shape, a shipped render arm becomes a question for Wouter at 18.2's close, with its
+  cost; **if not, or if unclear, the render stays in `tools/` and 18.4's findings are non-blocking** — the default,
+  taken without asking.
+- **18.2 — the classification run, the deliverable.** MEDIUM, `tools/` only, no shipped byte. `render_diff.py` gains
+  a layout mode: for each device 18.1's inventory finds, its page and position in the source's render and in the
+  delivery's, read mechanically — from the bookmark destinations if 18.1 (b) says yes, otherwise from the page on
+  which the device's paragraph starts — every image deleted, as `--doc` does today; and `--post-process` passes
+  `--notes` and `--styles`, so it mirrors skill Step 7 again. Run over the corpus and the 13 workdirs, both
+  variants, the positive control included. *Done when:* a table of every flagged instance — its mechanism, its
+  bucket, whether its rendered position moved — by doc-id, firing on D11, D10, D03 with D03B and D04, silent on
+  D01's tab-stop blocks; the share in buckets 1 and 2 stated in instances, not mechanisms (3.10). **3.10's revisit
+  trigger is then met:** the table goes to Wouter as decision 4's evidence, 11b his; nothing in this step waits on
+  it. *VERIFY:* a synthetic fixture per bucket, the moved device found and the unmoved one not; the positive
+  control's shape silent. *TEST:* `render_diff`'s own suite; the smoke suite. **MUST NOT:** show, keep or commit a
+  page of a real document; render without `--headless`.
+- **18.3 — the three checks that need no render.** MEDIUM, both trees, `validate_apply.py --delivered --original`
+  and repack's repair text only. A new finding class, `layout`, with three shapes, each bucket 3 and each
+  blocking, so the operator repairs it or names it under rule 5b: `short-tail` (D2 — a segment ended by a manual
+  break in a justified paragraph whose last line the English leaves short where the source's was not, the
+  threshold derived from 18.1's lengths, never chosen); `width-char` (D4 — a full-width padding character in the
+  source whose width the delivery lost, whatever its count); `exact-clip` (D6 — a run larger than its source in a
+  paragraph whose line height is exact). **GATE B — on 18.1's counts and 18.2's table:** a shape that fires on a
+  corpus document the register does not name, where 18.2 shows nothing moved on the page, ships non-blocking,
+  counted, its reason in this entry. *TP, invented:* each shape, and its inherited twin silent — a source tail
+  already short, a source padding already ASCII. *FP:* the 13 workdirs per tree, every verdict as at the pin but
+  the instances 18.1 counted, each named by doc-id. **MUST NOT:** an existing class's verdict or exit code; any
+  repair.
+- **18.4 — the devices only a render can judge, named on the delivery.** MEDIUM, both trees, the same two scripts.
+  Shapes `tab-position` (bucket 1, leading tab runs with no tab stop), `empty-run` (bucket 2, two or more empty
+  paragraphs standing in for a page break) and `cantsplit-table` (bucket 3), each finding naming the paragraph to
+  look at and why. **Under Gate A's default they are non-blocking:** printed and counted, and skill Step 11 carries
+  each into the delivery notes' third item — never a block the operator cannot discharge without a renderer.
+  *TP, invented:* each shape; D01's shape, tab stops present, silent. *FP:* the 13 workdirs, each new line one 18.1
+  counted. **MUST NOT:** block on a device whose effect the check cannot see.
+- **18.5 — the tab-authoring rule's detection, and the tab's run properties.** MEDIUM, both trees. **(a)** The
+  per-batch check names every entry whose source separates two pieces of text with a tab while its `en` authors
+  none — leaving out what step 6 places and an `en` equal to its source — as a warning by idx, never an exit code;
+  its home, `validate_translations.py` or `validate_en_runs.py`, settled in the sub-step's own plan. **(b)** Apply
+  carries a source between-text tab's run properties onto the authored tab in the same order where the two counts
+  agree, so an underlined tab — a line to sign on — keeps its line; where they differ, as today. *TP, invented:* an
+  authored tab under an underlined source tab keeps the underline; a missing tab named. *FP:*
+  `tests/test_authored_tabs.py` and `tests/test_toc_shapes.py` unchanged; the corpus byte-quiet, 0 authored entries
+  sitting on a property-bearing tab (16.7). **MUST NOT:** the table-of-contents placement step 6 built; clause 3's
+  drop of the source's own tabs from the runs it rebuilds.
+- **18.6 — A21: the ruby named, not rebuilt.** LIGHT, both trees. Extraction prints each paragraph holding a ruby
+  annotation, telling the operator its reading and its base arrive glued in `text`; the delivered check counts ruby
+  in the source against the delivery and names a loss as `layout`/`ruby`, bucket 3, blocking, so it reaches the
+  reader. **The repair stays declared:** a boundary between reading and base that no notes can carry.
+  `tests/test_container_inventory.py`'s pin is changed deliberately, its verdict — the annotation removed —
+  unchanged. *TP:* the sweep's invented ruby. *FP:* 0 corpus instances, re-derived at 18.1.
+- **18.7 — the instruction and the close.** LIGHT. Skill Steps 10 and 11, both trees, each tree edited on its own:
+  what a `layout` finding means, which shapes rule 5b may accept and which are carried as third-item lines; skill
+  Step 4's tab sentence names 18.5's warning; `README.md` and both `SKILL.md` files in the same commit wherever a
+  feature claim moves (§2.4 item 6) — layout changes are detected and disclosed, not repaired. The register rows
+  filed; the rendered diff on a synthetic fixture for 18.3 to 18.6's code; the full run once, on the pull
+  request's exact commit. **Size, the house's rule for what the model reads:** each passage measured before and
+  after, every added sentence naming a finding the code prints. *Done when:* step 18 closed in §3.1, each sub-step
+  met or its remainder declared. **MUST NOT:** the anti-drift safeguards, the 35-paragraph batch cap, the step
+  numbers; a corpus-derived example — every example invented (§5.6).
+
+**Which register rows each sub-step works:**
+
+| sub-step | rows | kind |
+|---|---|---|
+| 18.1 | D1 to D6, A3's remainder, A21 | measured |
+| 18.2 | D1, D3, D5, and D2 and D4 on the page | instrument — the classification |
+| 18.3 | D2, D4, D6 | code |
+| 18.4 | D1, D3, D5 | code |
+| 18.5 | A3's remainder | code |
+| 18.6 | A21 | code, the repair declared |
+| 18.7 | every row above | instructions, the close |
+| left open | 11b, decision 4, Wouter's on 18.2's table; L2; 17.4's six rows (phase 3); Wouter's corpus pages; F18, F30, F12 | declared, unchanged |
+
+**What every sub-step must NOT touch:** a repair of any layout device — paragraph properties, tab stops, page breaks,
+table properties and the settings part stay as the source has them (the golden rule, unopened); a new shipped file
+— the tree stays at 198 of 199; the July frozen intermediates, read and never written; a re-translation; an
+existing finding's verdict or exit code; the anti-drift safeguards; a rendered page of a real document looked at.
+
+**Size:** no HEAVY sub-step — four MEDIUM, three LIGHT, about three sessions, 18.2's corpus render the longest
+single run. **One pull request,** `feature/step18-layout`, opened by this plan's commit. **VERIFY:** each code
+sub-step's controls red at the pin first; mutants on every deciding line; the corpus arm against the sub-step
+before; the parity check and the divergence baseline; the three confidentiality controls. **TEST:** the suites
+driving `validate_apply`, repack, apply, extraction and the per-batch check, both trees; `render_diff`'s for 18.2;
+the smoke suite; the full run once per pull request, before the push.
 
 ## 4. How each step is tested — THE METHOD
 

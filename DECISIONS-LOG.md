@@ -3329,3 +3329,37 @@ reorder with `--styles` is the rendered diff itself; the *read* line on a `.docx
 verdict, and the `w:bCs` reading is right for Latin text — each a code change that would need its own cycle and full
 run for no delivered byte. **(7) SECTION 2'S ROW CORRECTED IN ITS CELL,** *doc only* kept beside the correction, as
 3.17's 17.6 entry asks, and step 17 marked CLOSED there and in 3.17's heading.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 12: step 18's plan written; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options,
+Q19 to Q29. The plan is section 3.18 of the build plan; no code, no corpus count, no shipped byte.
+
+**(1) THE RENDER IS A DEVELOPMENT INSTRUMENT, GATED:** a rendered comparison inside the shipped skill needs a renderer
+at run time and a PDF read with the standard library and `lxml` alone, and neither is proved — so 18.2 builds it in
+`tools/`, where it produces the classification 3.10 calls the deliverable, and 18.1's probe decides whether a shipped
+render arm is even put to Wouter (Gate A). Shipping it unproved would make every delivery depend on a renderer the
+skill reaches today only for a legacy `.doc`. **(2) THE RENDER-DEPENDENT DEVICES ARE NON-BLOCKING BY DEFAULT:** a
+tab-positioned block, an empty-paragraph run and a `cantSplit` table cannot be judged from the XML, and a block the
+operator cannot discharge without a renderer would push rule 5b's channel into routine use; each is named on the
+delivery and carried into the notes' third item instead. **(3) THE THREE NO-RENDER SHAPES BLOCK, WITH A FALLBACK:**
+D2's short tail, D4's lost width and D6's clipping hazard are decided by the XML of both documents, so each blocks and
+reaches the reader through rule 5b; Gate B turns a shape to counted where the corpus shows it firing with nothing
+moved on the page — step 11's count-it ruling, applied. **(4) D6 TAKEN INTO STEP 18:** 3.10 places its fix in option
+3, and steps 15 to 17 closed without touching it; detection is the cheap half, it sits in the same check, and left
+where it is it would be nobody's. **(5) THE ORDER — MEASURE, CLASSIFY, THEN THE SHIPPED CHECKS:** the short-tail
+threshold and Gate B both need 18.1's lengths and 18.2's table, so building the checks first would mean choosing a
+number the plan says must be derived. **(6) THE TAB DETECTION WARNS, NEVER BLOCKS:** 16.7 counted 39 glued entries,
+and a mid-phrase tab can have no natural place once the words reorder, so a block would force a tab where the English
+has none; its home between the two per-batch checks is left to 18.5's own plan. **(7) A TAB'S RUN PROPERTIES CARRIED
+BY ORDER, WHERE THE COUNTS AGREE:** an underlined tab is a line to sign on, and the order is the only correspondence
+the notes give; where the counts differ apply stays as today, never guessing. **(8) A21 DETECTED AND DISCLOSED, ITS
+REPAIR DECLARED:** the boundary between reading and base is a declaration no notes carry and no corpus document holds
+a ruby, so building the device would be theory; naming the loss is 11a's own answer. **(9) `doNotExpandShiftReturn`
+MEASURED, NOT USED:** writing the settings part is a lever of 11b's kind, and it would change the source's own
+justified lines too. **(10) `render_diff.py --post-process` MADE TO MIRROR SKILL STEP 7 INSIDE 18.2,** which changes
+that tool anyway — worker 11's declared gap closed where the tool is next touched. **(11) 18.1 NOT RUN TODAY:** the
+optional run needed the plan committed before 14:15 CET with room to spare, and a measurement squeezed into the tail
+of a session is the kind that gets a control skipped. The app's keep-awake request was refused by its classifier; the
+work did not need it.

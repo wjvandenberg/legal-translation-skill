@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5 as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.11 as #188 to #195: STEP 14 CLOSED · STEP 15 CLOSED #196 · STEP 16 CLOSED #199 · STEP 17 CLOSED #200 · 18–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5 as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.11 as #188 to #195: STEP 14 CLOSED · STEP 15 CLOSED #196 · STEP 16 CLOSED #199 · STEP 17 CLOSED #200 · STEP 18 PLANNED 2026-11-20, section 3.18 of the build plan, its PR open · 19–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,18 +578,20 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-20, WORKER 11 OF THE CHAIN: STEP 17 CLOSED
+### HANDOFF — 2026-11-20, WORKER 12 OF THE CHAIN: STEP 18 PLANNED
 
-**PURPOSE: MET** — 17.6 closed step 17: fourteen register rows filed, 17.2's rendered diff made, section 2's row
-corrected, the full run passed, and PR #200 squash-merged on green after this commit.
+**PURPOSE: MET** — step 18's plan is section 3.18 of the build plan: 18.1 to 18.7, each triaged with its *Done
+when*, VERIFY, TEST and MUST NOT, and two gates; documents only, no shipped byte, 18.1 not run.
 
-**PRODUCED:** 3525293 (17.6, documents only) and this documents commit; the full run, 122 suites, OVERALL
-PASS on 3525293 (2,004 s). **Context: 26%.**
+**PRODUCED:** this documents commit — section 3.18, eleven choices in `DECISIONS-LOG.md` (2026-11-20, worker 12),
+Q19 to Q29 in `temp/s1120-questions.md`; `feature/step18-layout`, its PR open, not merged. **Context: 23%.**
 
-**SINGLE NEXT ACTION:** step 18, layout and the tab rule's detection — its own plan first, as a section 3.18.
+**SINGLE NEXT ACTION:** 18.1 — the layout-device inventory over the 13 frozen workdirs and the render probe on
+synthetic fixtures, read-only; then Gate A.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** 17.4's six rows are filed OPEN — no frozen notes name a `source_run`, so
-only phase 3 closes them; `render_diff.py --post-process` passes neither `--notes` nor `--styles`.
+**WHAT A NEW SESSION WOULD GET WRONG:** the render is a `tools/` instrument until Gate A says otherwise, so the
+render-dependent findings ship non-blocking; D6 is in step 18 though 9.3 maps only D1 to D5; the short-tail
+threshold is derived at 18.1, never chosen.
 
-**Open, none blocking:** L2's detector walking past a plain bold heading; 17.2's points (1) and (2); step 18's
-tab properties and A21; corpus pages; F18; F30; F12.
+**Open, none blocking:** 11b, decision 4, Wouter's on 18.2's table; L2's walk past a plain bold heading; 17.4's
+six rows (phase 3); corpus pages; F18; F30; F12.
