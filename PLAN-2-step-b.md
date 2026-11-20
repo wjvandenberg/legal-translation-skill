@@ -4213,6 +4213,42 @@ moved is *unpaired*, never judged. **Must not:** a shipped byte; the `--doc` and
 of a real document shown or kept; a render without `--headless`. **Done when:** 3.18's *Done when* for 18.2, and the
 suite red at the pin (`e36b753`) and against an x-tolerance mutant, green on this tree.
 
+**18.2's RESULT — BUILT AND RUN 2026-11-20, worker 14, `tools/` only, no shipped byte** *(the code commit
+`render_diff.py --layout` and `tests/test_layout_mode.py`; the choices `DECISIONS-LOG.md` 2026-11-20, worker 14's)*.
+Run over the 13 frozen workdirs, repeats included, from each tree: **13 of 13 classified in both, the two tables
+identical line for line**, every count equal to 18.1's. July's notes no longer pass today's repack on 5 workdirs in
+one tree and 6 in the other — the remnant, `validate_apply` and delivered gates, each named — so those are classified
+on the body as applied (Q41). Every bookmark set came back as a destination on every workdir; 0 devices sat on a
+paragraph the reorder moved; every PDF deleted, no page shown or kept. By doc-id, every flagged instance:
+
+| doc-id | mechanism | bucket | instances | moved |
+|---|---|---|---|---|
+| D01 and its repeat | D1 with a stop of its own (the positive control) | control | 4 and 4 | 1 and 1 — x 185.4 to 162.9 pt, leading tabs 1 to 1, blanks 0 to 0 |
+| D01 and its repeat | D5 | 2 | 1 and 1 | 0 |
+| D02 | D5 | 2 | 8 | 2 — pages 4 and 9 |
+| D03 and D03B | D1 | 1 | 2 and 2 | 0 |
+| D03 and D03B | D3 | 3 | 1 and 1 | 1 and 1 — the row from page 5 to 6 |
+| D04 | D5 | 2 | 3 | 1 — page 4 to 3 |
+| D05 | D1; D5 | 1; 2 | 1; 1 | 0; 0 |
+| D06 | D5 | 2 | 2 | 0 |
+| D07 | D5 | 2 | 3 | 0 |
+| D08 | D5 | 2 | 2 | 1 — page 4 to 5 |
+| D09 | D5 | 2 | 4 | 0 |
+| D10 | D1; D2; D5 | 1; 3; 2 | 1; 7; 1 | 0; placed, not judged; 0 |
+| D11 | D1; D2; D4; D5 | 1; 3; 3; 2 | 5; 1; 15 in 3 paragraphs; 3 | 0; placed, not judged; placed, not judged; 0 |
+
+**INSTANCES, NOT MECHANISMS (3.10):** 65 flagged, the control excluded — bucket 1 11, bucket 2 29, bucket 3 25 (D2 8,
+D3 2, D4 15) — so **buckets 1 and 2 hold 40 of 65, 62%**. **Moved:** bucket 1 0 of 11 — every leading tab kept and
+every x equal; bucket 2 4 of 29; bucket 3's D3 2 of 2; D2 and D4 are decided by the XML, 18.3's. D6's hazard: 0 on
+13 of 13. **3.18's *Done when*:** fires on D11, D10, D03 with D03B and D04; the bucket-1 shape is silent on D01, whose
+8 blocks are found as the control. **What the control shows:** 2 of the 8 moved 22.5 pt with their tab count and
+blanks unchanged, so the cause is outside what this instrument reads — a numbering label or the tab run's own
+properties the candidates, 18.4's plan to read; a tab stop of its own is not proof a block holds its place.
+**VERIFY:** the suite, synthetic only, a fixture per bucket — the moved device found, the unmoved one not, the control
+silent — red at `e36b753` and against two mutants (an x tolerance of 1000 pt, a page judge that always answers same).
+**Gate A's question is Wouter's, Q43,** with these numbers: a shipped render arm would see 6 moved instances in 65,
+at LibreOffice at run time in Cowork, not measured there; here a tree took about 13 minutes for 13 workdirs.
+
 **Which register rows each sub-step works:**
 
 | sub-step | rows | kind |

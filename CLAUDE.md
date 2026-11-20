@@ -175,7 +175,7 @@ holds each with its measurement, two further classes being workstreams in `PLAN-
 | phase | what | status | blocked on |
 |---|---|---|---|
 | **1** | **Foundation: the repository** | **DONE, 2026-08-07** — PUBLIC, branch protection live with `enforce_admins` | — |
-| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5 as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.11 as #188 to #195: STEP 14 CLOSED · STEP 15 CLOSED #196 · STEP 16 CLOSED #199 · STEP 17 CLOSED #200 · STEP 18: 18.1 MEASURED 2026-11-20, section 3.18, its PR open · 19–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
+| **2** | **Building** (goals ii and iv) — steps 3 to 22 of `PLAN-2-step-b.md`, whose section 2 owns the order | **IN PROGRESS: 3–12 CLOSED · 13 DONE but for the runtime problem, open until phase 3's timing — five sub-steps, section 3.4 of the build plan · renames (c) to (d2c) done: (c) to (d2b) and all but three test files of (d2c) merged, #167, #169, #170 and #177, the last three in #178 · 14.1 merged, 14.2 as #179, 2026-10-29, 14.3 as #180 and 14.4 as #181, 2026-10-30, and 14.5 as #183, 14.6, `quality_check`'s G3 and G13, as #184, 14.7, `validate_reject_all`'s G4, as #185, and 14.8, `verify_diligence`'s C10, as #186, 2026-11-02; the remainder APPROVED in section 3.14 of the build plan, 2026-10-26; 14.9 measured as #187; 14.9.1 to 14.11 as #188 to #195: STEP 14 CLOSED · STEP 15 CLOSED #196 · STEP 16 CLOSED #199 · STEP 17 CLOSED #200 · STEP 18: 18.1 and 18.2 DONE 2026-11-20, 3.18, its PR open · 19–22 not begun** — history: `evidence/EVIDENCE-phase2-history.md` | nothing technical |
 | **3** | **The full Cowork test, and its repairs** — every test document through Cowork, all recorded, each failure repaired here | **NOT STARTED**; its plan written when it starts | phase 2 |
 | **4** | **Polish, then publish** — the skill's steps renumbered, smaller repairs, **Step D**, *then* repackaging and publication | **NOT STARTED** | phase 3 |
 | **5** | **The private run-logging tier and its monthly analysis** — **a config overlay, never a third variant, never published** | **NOT STARTED**; its log FORMAT designed at step 22 | phase 4 — **built only after both skills publish** |
@@ -578,20 +578,19 @@ Wouter's explicit OK.)*
 > **The handoff and nothing else** — done is §2.3, left is §3, method is §5. **REPLACED every session,
 > never appended to; fold anything durable into §1–§6 first** *(§5.8; the cap is in `verify.config.json`)*.
 
-### HANDOFF — 2026-11-20, WORKER 13 OF THE CHAIN: 18.1 MEASURED, GATE A ANSWERED
+### HANDOFF — 2026-11-20, WORKER 14 OF THE CHAIN: 18.2 BUILT AND RUN, THE TABLE FILED
 
-**PURPOSE: MET** — 18.1's result is filed in its entry in section 3.18 of the build plan: (a) both trees, 13 of 13,
-a planted control firing; (b) yes; (c) yes; Gate A answered. Documents only, no shipped byte.
+**PURPOSE: MET** — `render_diff.py --layout` classifies 13 of 13 workdirs, both trees identical; the table is in
+18.2's entry in section 3.18 of the build plan, with Gate A's question as Q43 in `temp/s1120-questions.md`.
 
-**PRODUCED:** this documents commit on `feature/step18-layout`, PR #201 open, not merged; six choices in
-`DECISIONS-LOG.md` (2026-11-20, worker 13), Q30 to Q35 in `temp/s1120-questions.md`. **Context: 20%.**
+**PRODUCED:** b3b7afc, the code, and this documents commit on `feature/step18-layout`, PR #201 open, not merged; seven
+choices in `DECISIONS-LOG.md` (2026-11-20, worker 14), Q36 to Q43. **Context: 33%.**
 
-**SINGLE NEXT ACTION:** 18.2 — the classification run in `tools/`, positions read from the bookmark destinations,
-its table to Wouter with Gate A's question: whether a render arm ships, at what cost.
+**SINGLE NEXT ACTION:** 18.3 — the three checks that need no render, Gate B sorted on 18.2's table.
 
-**WHAT A NEW SESSION WOULD GET WRONG:** a plain `--convert-to pdf` carries no destination — the export option is
-needed; D5's shape fires on 11 of 13 workdirs, D01 too, so it is a candidate count, not a finding; D6's hazard has 0
-corpus instances; D1's eleven read the paragraph's own stops only.
+**WHAT A NEW SESSION WOULD GET WRONG:** July's notes no longer pass today's repack on 5 or 6 of 13 workdirs, so
+`--layout` classifies those on the body as applied, the gate named; "moved" is asked per mechanism, never as a raw
+position; 2 of the 8 control blocks moved, which is not bucket 1 firing; the full run includes the layout suite.
 
-**Open, none blocking:** 11b, decision 4 and the render arm, Wouter's on 18.2's table; L2; 17.4's six rows
+**Open, none blocking:** 11b, decision 4 and the render arm, Wouter's on 18.2's table (Q43); L2; 17.4's six rows
 (phase 3); corpus pages; F18; F30; F12.
