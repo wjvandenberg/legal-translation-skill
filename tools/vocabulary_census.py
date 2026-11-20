@@ -247,6 +247,7 @@ CODE_SWEPT = {
     "tests/test_notes_gates.py": [
         ("phrase", "SLICE 4b's WRITTEN PLAN", "a quotation of the build plan's dated heading, which keeps its words"),
     ],
+    "tests/test_layout_mode.py": [],
     "tests/test_parity_check.py": [],
     "tests/test_pass_conditions.py": [],
     "tests/test_pre_push_hook.py": [],

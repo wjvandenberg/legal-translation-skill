@@ -3329,3 +3329,79 @@ reorder with `--styles` is the rendered diff itself; the *read* line on a `.docx
 verdict, and the `w:bCs` reading is right for Latin text — each a code change that would need its own cycle and full
 run for no delivered byte. **(7) SECTION 2'S ROW CORRECTED IN ITS CELL,** *doc only* kept beside the correction, as
 3.17's 17.6 entry asks, and step 17 marked CLOSED there and in 3.17's heading.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 12: step 18's plan written; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options,
+Q19 to Q29. The plan is section 3.18 of the build plan; no code, no corpus count, no shipped byte.
+
+**(1) THE RENDER IS A DEVELOPMENT INSTRUMENT, GATED:** a rendered comparison inside the shipped skill needs a renderer
+at run time and a PDF read with the standard library and `lxml` alone, and neither is proved — so 18.2 builds it in
+`tools/`, where it produces the classification 3.10 calls the deliverable, and 18.1's probe decides whether a shipped
+render arm is even put to Wouter (Gate A). Shipping it unproved would make every delivery depend on a renderer the
+skill reaches today only for a legacy `.doc`. **(2) THE RENDER-DEPENDENT DEVICES ARE NON-BLOCKING BY DEFAULT:** a
+tab-positioned block, an empty-paragraph run and a `cantSplit` table cannot be judged from the XML, and a block the
+operator cannot discharge without a renderer would push rule 5b's channel into routine use; each is named on the
+delivery and carried into the notes' third item instead. **(3) THE THREE NO-RENDER SHAPES BLOCK, WITH A FALLBACK:**
+D2's short tail, D4's lost width and D6's clipping hazard are decided by the XML of both documents, so each blocks and
+reaches the reader through rule 5b; Gate B turns a shape to counted where the corpus shows it firing with nothing
+moved on the page — step 11's count-it ruling, applied. **(4) D6 TAKEN INTO STEP 18:** 3.10 places its fix in option
+3, and steps 15 to 17 closed without touching it; detection is the cheap half, it sits in the same check, and left
+where it is it would be nobody's. **(5) THE ORDER — MEASURE, CLASSIFY, THEN THE SHIPPED CHECKS:** the short-tail
+threshold and Gate B both need 18.1's lengths and 18.2's table, so building the checks first would mean choosing a
+number the plan says must be derived. **(6) THE TAB DETECTION WARNS, NEVER BLOCKS:** 16.7 counted 39 glued entries,
+and a mid-phrase tab can have no natural place once the words reorder, so a block would force a tab where the English
+has none; its home between the two per-batch checks is left to 18.5's own plan. **(7) A TAB'S RUN PROPERTIES CARRIED
+BY ORDER, WHERE THE COUNTS AGREE:** an underlined tab is a line to sign on, and the order is the only correspondence
+the notes give; where the counts differ apply stays as today, never guessing. **(8) A21 DETECTED AND DISCLOSED, ITS
+REPAIR DECLARED:** the boundary between reading and base is a declaration no notes carry and no corpus document holds
+a ruby, so building the device would be theory; naming the loss is 11a's own answer. **(9) `doNotExpandShiftReturn`
+MEASURED, NOT USED:** writing the settings part is a lever of 11b's kind, and it would change the source's own
+justified lines too. **(10) `render_diff.py --post-process` MADE TO MIRROR SKILL STEP 7 INSIDE 18.2,** which changes
+that tool anyway — worker 11's declared gap closed where the tool is next touched. **(11) 18.1 NOT RUN TODAY:** the
+optional run needed the plan committed before 14:15 CET with room to spare, and a measurement squeezed into the tail
+of a session is the kind that gets a control skipped. The app's keep-awake request was refused by its classifier; the
+work did not need it.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 13: 18.1 measured, Gate A answered; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options,
+Q30 to Q35; 18.1's result is filed in its entry in section 3.18 of `PLAN-2-step-b.md`. **(1) D1's TAB STOP READ FROM
+THE PARAGRAPH'S OWN PROPERTIES:** the entry says *in their properties*, and a stop inherited from a style is a
+question the page answers, so 18.2's render decides it; the eleven are an upper bound on bucket 1. **(2) D5's PAGE
+BREAK READ IN, BEFORE AND AFTER THE EMPTY RUN** — a page-type break in any of them or in the paragraph before, a
+`pageBreakBefore` or a section break in the paragraph's properties — so a run that merely follows a break is not
+counted as standing in for one. **(3) D4's PADDING SET IS U+3000 AND U+FF3F,** the two full-width characters a
+source uses to pad a line; a wider set would count full-width letters that carry text, not width. **(4) D2's
+SEGMENTS PAIRED BY PARAGRAPH POSITION,** apply keeping every paragraph — measured, 0 of 13 workdirs whose count moved
+— and a segment by its place between breaks; no threshold drawn from the lengths, 18.3 derives it. **(5) (c)'s
+SETTING PLACED INSIDE `w:compat`,** where the schema puts it; the first run, outside it, changed nothing and is kept
+in the result as the negative control. **(6) GATE A ANSWERED ON ITS LETTER — A QUESTION FOR WOUTER AT 18.2's CLOSE,**
+since the standard library read page and position on every synthetic shape; 18.4's findings stay non-blocking until
+he answers, and 18.2 reads positions from the bookmark destinations. 18.2 was not begun and PR #201 not merged, as
+the brief said; the app's keep-awake request was granted this time.
+
+## 2026-11-20 — the chain of 2026-11-20, worker 14: 18.2 built and run; the choices the session's own
+
+**WOUTER'S WORDS ARE WORKER 9'S HEADING'S,** quoted there. **No question was asked; each choice below is THE WORKER'S,
+its recommended answer, for him to confirm or overturn** — `temp/s1120-questions.md` holds them with their options,
+from Q36; 18.2's plan and result are filed in its entry in section 3.18 of `PLAN-2-step-b.md`. **(1) THE LAYOUT MODE
+LIVES IN `render_diff.py`, ITS PROOF IN A NEW SUITE:** the entry names the tool, and a new module in `tools/` would
+fall under the house runner's selftest glob and need an entry point of its own; the suite loads the functions from
+the file's syntax tree, as `test_render_keep.py` does. **(2) "MOVED" IS ASKED PER MECHANISM,** never as a raw
+position: a translation reflows every page, so D1 is the x where the text starts, D5 and D3 whether a page boundary
+falls where the source's did, D2 and D4 placed but never judged; a "moved" is a page to look at, not a defect proved.
+**(3) THE DELIVERY IS BUILT AS SKILL STEPS 6 TO 10 BUILD IT** — apply, post_process, the reorder with its two flags,
+repack — so `--layout` needs no `--post-process`. **(4) THE REORDER'S FLAGS ARE PASSED WHERE THAT ARM'S REORDER
+ACCEPTS THEM:** the baseline pin `b47603d` predates both, and an argument it does not know would refuse the old arm.
+**(5) A DEVICE ON A PARAGRAPH THE REORDER MOVED IS "UNPAIRED", NEVER JUDGED** — the code review's finding: the
+reorder keeps the count and permutes the order, so pairing by position there would judge another paragraph.
+**(6) THE OWN PLAN WAS WRITTEN AFTER THE FIRST CODE EDIT, NOT BEFORE IT** — a slip of this session, declared rather
+than hidden: the plan follows 3.18's entry word for word and widens nothing, and the suite is proved red at the
+pin and against a mutant.
+**(7) WHERE REPACK REFUSES, THE BODY AS APPLIED IS CLASSIFIED,** byte-substituted into a copy of the source as
+the fixture path builds a blocked arm, the refusing gate named: July's notes predate checks steps 4 to 17 added,
+so the first run refused 5 of 13 workdirs in one tree and 6 in the other, and a table missing them would not be
+3.18's table; layout is a property of the body, and the copy is rendered to numbers and deleted, never delivered.
